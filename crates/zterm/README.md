@@ -276,3 +276,13 @@ measurements.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Sixel parsing
+
+`Terminal::feed` decodes bounded Sixel images from DCS streams and exposes them
+through `graphics_draws`, alongside Kitty images. DECSDM 80, private/shared
+palette mode 1070 and cursor-right mode 8452 are queryable with DECRQM. Sixel
+input commits only at ST; cancellation drops the partial decoder without moving
+the cursor or publishing pixels. The [graphics protocol scope](../../docs/protocols.md#sixel)
+distinguishes tested decoding/cursor behavior from framebuffer and native-GUI
+compatibility limits.

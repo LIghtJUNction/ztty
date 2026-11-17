@@ -4,14 +4,17 @@
 
 extern crate alloc;
 
+use alloc::boxed::Box;
 use alloc::format;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
 mod decode;
 mod protocol;
+mod sixel;
 mod stream;
 
+pub use sixel::Palette as SixelPalette;
 pub use stream::CommandStream;
 
 use protocol::Command;
@@ -94,6 +97,13 @@ pub struct Outcome {
     pub cursor_move: Option<(usize, usize)>,
 }
 
+/// Successfully stored sixel geometry and the resulting color registers.
+pub struct SixelOutcome {
+    pub width: u32,
+    pub height: u32,
+    pub palette: SixelPalette,
+}
+
 struct StoredImage {
     id: u32,
     number: u32,
@@ -112,6 +122,7 @@ struct Placement {
     x_offset: u32,
     y_offset: u32,
     z: i32,
+    pixel_scale_y: u32,
 }
 
 impl Placement {
@@ -119,7 +130,7 @@ impl Placement {
         let cw = cell_width.max(1);
         let ch = cell_height.max(1);
         let sw = u64::from(self.source.width);
-        let sh = u64::from(self.source.height);
+        let sh = u64::from(self.source.height) * u64::from(self.pixel_scale_y);
         let target_w = u64::from(self.columns) * u64::from(cw);
         let target_h = u64::from(self.rows) * u64::from(ch);
         let (width, height) = match (self.columns, self.rows) {
@@ -169,6 +180,7 @@ pub struct Graphics {
     images: Vec<StoredImage>,
     placements: Vec<Placement>,
     pending: Option<Transfer>,
+    sixel: Option<Box<sixel::Decoder>>,
     used: usize,
     revision: u64,
     next_id: u32,
@@ -190,6 +202,7 @@ impl Graphics {
             images: Vec::new(),
             placements: Vec::new(),
             pending: None,
+            sixel: None,
             used: 0,
             revision: 0,
             next_id: 1,
@@ -207,6 +220,10 @@ impl Graphics {
     }
     pub fn pending_bytes(&self) -> usize {
         self.pending.as_ref().map_or(0, |t| t.bytes.len())
+            + self
+                .sixel
+                .as_ref()
+                .map_or(0, |decoder| decoder.allocated_bytes())
     }
     pub fn image_count(&self) -> usize {
         self.images.len()
@@ -271,11 +288,104 @@ impl Graphics {
         self.pending = None;
     }
 
+    /// Begin a sixel body after a validated DCS `q` header. Color registers and
+    /// decoding storage are allocated only while a sixel stream is active.
+    pub fn begin_sixel(
+        &mut self,
+        aspect: u16,
+        transparent: bool,
+        background: [u8; 3],
+        palette: Option<&SixelPalette>,
+    ) {
+        self.abort_transfer();
+        self.sixel = Some(Box::new(sixel::Decoder::new(
+            self.limits,
+            aspect,
+            transparent,
+            background,
+            palette,
+        )));
+    }
+
+    /// Feed one body byte. A malformed or excessive stream drops its partial
+    /// allocation immediately; later bytes remain ignored until the next DCS.
+    pub fn sixel_put(&mut self, byte: u8) {
+        if self
+            .sixel
+            .as_mut()
+            .is_some_and(|decoder| decoder.push(byte).is_err())
+        {
+            self.sixel = None;
+        }
+    }
+
+    pub fn abort_sixel(&mut self) {
+        self.sixel = None;
+    }
+
+    /// Commit only after an actual ST. No reply is sent by the sixel protocol.
+    /// The terminal, rather than the scene, implements scrolling/cursor policy.
+    pub fn finish_sixel(&mut self, context: Context) -> Option<SixelOutcome> {
+        let decoded = self.sixel.take()?.finish().ok()?;
+        if decoded.width == 0 || decoded.height == 0 {
+            return Some(SixelOutcome {
+                width: 0,
+                height: 0,
+                palette: decoded.palette,
+            });
+        }
+        if self.placements.len() >= self.limits.max_placements {
+            return None;
+        }
+        let id = self.allocate_id();
+        self.reserve_image(id, decoded.pixels.capacity()).ok()?;
+        self.set_viewport(context.cell_width, context.cell_height, context.rows);
+        self.changed();
+        self.used += decoded.pixels.capacity();
+        let result = SixelOutcome {
+            width: decoded.width,
+            height: decoded.height * decoded.scale_y,
+            palette: decoded.palette,
+        };
+        self.images.push(StoredImage {
+            id,
+            number: 0,
+            anonymous: true,
+            image: Image {
+                width: decoded.width,
+                height: decoded.height,
+                pixels: Arc::new(decoded.pixels),
+                generation: self.revision,
+            },
+        });
+        self.placements.push(Placement {
+            image_id: id,
+            id: 0,
+            col: context.col.min(context.cols.saturating_sub(1)).min(65534) as i32,
+            row: context.row.min(context.rows.saturating_sub(1)).min(65534) as i32,
+            source: Rect {
+                x: 0,
+                y: 0,
+                width: result.width,
+                height: result.height / decoded.scale_y,
+            },
+            columns: 0,
+            rows: 0,
+            x_offset: 0,
+            y_offset: 0,
+            z: -1,
+            pixel_scale_y: decoded.scale_y,
+        });
+        self.placements.sort_by_key(|p| (p.z, p.image_id));
+        Some(result)
+    }
+
     /// Clear all stored images, placements and partial transfers.
     pub fn clear(&mut self) {
         self.images.clear();
         self.placements.clear();
         self.pending = None;
+        self.sixel = None;
         self.used = 0;
         self.changed();
     }
@@ -662,6 +772,7 @@ impl Graphics {
             x_offset: c.x_offset,
             y_offset: c.y_offset,
             z: c.z,
+            pixel_scale_y: 1,
         })
     }
 
@@ -822,5 +933,7 @@ fn append_reply(replies: &mut Vec<u8>, text: &str) {
 
 #[cfg(test)]
 extern crate std;
+#[cfg(test)]
+mod sixel_tests;
 #[cfg(test)]
 mod tests;

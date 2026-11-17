@@ -4,7 +4,7 @@
 
 extern crate alloc;
 
-/// Platform-independent Kitty graphics decoding, storage and placement.
+/// Platform-independent Kitty and Sixel graphics decoding, storage and placement.
 pub use zgraphics as graphics;
 /// Platform-independent terminal input encoders.
 pub use zinput as input;
@@ -32,3 +32,6 @@ mod shell_tests;
 
 #[cfg(test)]
 mod theme_tests;
+
+#[cfg(test)]
+mod sixel_tests;
