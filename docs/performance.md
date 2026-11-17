@@ -5,38 +5,38 @@ Report date: **2026-11-18, Asia/Taipei**. Production Rust source:
 
 The current implementation has a working Linux GUI, bounded screen/history
 storage, and a production Rust dependency graph that does not link Rust `std`.
-The recorded core benchmark processes a 1 KiB ASCII burst in a median 3.019 µs.
-This measures parsing and screen updates only. It is not evidence of physical
-key-to-screen latency or an overall win over Kitty or Ghostty.
+The development-machine core benchmark processes a 1 KiB ASCII burst in a median
+3.138 µs. This measures parsing and screen updates only; it is separate from the
+PTY measurements below and from physical key-to-screen latency.
 
 ## What each measurement means
 
 | Layer | Measurement | Included | Excluded |
 | --- | --- | --- | --- |
 | Terminal core | Bytes per second; amortized feed time | Parsing, screen edits, dirty-row marking | PTY, window system, fonts, rendering, scanout |
-| PTY response | Query round trip | Child write, PTY, terminal processing, reply, child read | Physical keyboard and display scanout |
+| PTY response | Sustained query round trip | Child write, PTY, logical state, reply, child read | Physical keyboard; no rendering or presentation completion fence |
 | Terminal process | RSS and PSS | Process mappings and attributable shared pages | Child process and separate X server allocations |
-| X graphics | XRes pixmap bytes and X server memory delta | Retained server-side buffers and observed server growth | Complete GPU/driver accounting |
+| X graphics | XRes pixmap bytes and X server memory delta | Server-side resources and observed server growth | Complete GPU/driver accounting |
 | Visible response | Physical input to changed pixels | Input device, scheduler, application, compositor, scanout | Not measured in this report |
 
 `no_std` controls the Rust runtime boundary. It does not itself prove low memory
-or low latency. The frontend still uses the system C ABI, X11, Xft, font data,
-and a retained pixmap; those costs must be included in whole-application claims.
+or low latency. The frontend uses the system C ABI, X11, Xft, font data, and a
+retained pixmap; whole-application accounting must include those separate costs.
 
 ## Recorded core benchmark
 
-[Raw measurement and environment](measurements/core-2026-11-18.json).
+[Development-machine raw result](measurements/core-native-2026-11-18.json).
 
 | Setting | Value |
 | --- | --- |
-| Machine | Local execution environment, separate from the development PC |
-| CPU | Intel Xeon Platinum 8573C; 9 logical CPUs exposed |
-| Kernel / architecture | Linux 6.18.57 / x86_64 |
-| Compiler | Rust 1.100.0, commit `0ef1bc386`, 2026-11-09 |
+| CPU | Intel Core i9-12900HX, 24 logical CPUs |
+| Kernel / architecture | Linux 7.3.4-arch1-1 / x86_64 |
+| Compiler | Rust 1.100.0, commit `0ef1bc386` |
 | Build | Release, fat LTO, one codegen unit |
 | Screen | 120 columns × 32 rows |
 | History case | 2,048 requested rows, filled before timing |
-| Run timestamp | 2026-11-17 16:31:28 UTC / 2026-11-18 00:31:28 Asia/Taipei |
+| Source ref | `3e2f03297c638f14d9799dcb78a915f634287813` |
+| Run timestamp | 2026-11-18 01:47:40 Asia/Taipei |
 
 ### Memory and throughput
 
@@ -44,38 +44,34 @@ and a retained pixmap; those costs must be included in whole-application claims.
 | --- | ---: |
 | Cell size | 28 bytes |
 | Initial terminal-core live heap | 107,676 bytes / 105.15 KiB |
-| ASCII, no retained history | 202.116 MiB/s |
-| ASCII, full retained history | 126.492 MiB/s |
-| SGR color/control workload | 128.566 MiB/s |
-| Mixed Unicode workload | 76.143 MiB/s |
+| ASCII, no retained history | 232.927 MiB/s |
+| ASCII, full retained history | 177.049 MiB/s |
+| SGR color/control workload | 125.111 MiB/s |
+| Mixed Unicode workload | 97.722 MiB/s |
 | Allocations during the measured steady-state throughput loops | 0 |
 
-The initial heap is counted from allocation layout sizes when constructing a
-fresh `Terminal`. It excludes allocator metadata, code, stack storage, fonts,
-window resources, and the rest of the process. The requested history capacity
-does not allocate all history rows immediately. The 8 MiB history limit applies
-to cell storage; it is not a limit on total process memory.
+The initial heap counts allocation layout sizes for a fresh `Terminal`. It
+excludes allocator metadata, code, stack, fonts, window resources, and the rest
+of the process. History rows are allocated on demand. The 8 MiB history bound
+covers cell storage, not total process memory.
 
 ### Amortized update time
 
 | Workload | p50 | p95 | p99 | Measured allocations |
 | --- | ---: | ---: | ---: | ---: |
-| Cursor-home + single ASCII overwrite | 34 ns | 36 ns | 69 ns | 0 |
-| 1,024 ASCII bytes | 3.019 µs | 7.177 µs | 14.441 µs | 0 |
+| Cursor-home + single ASCII overwrite | 37 ns | 41 ns | 43 ns | 0 |
+| 1,024 ASCII bytes | 3.138 µs | 4.119 µs | 4.495 µs | 0 |
 
 The harness records 10,000 samples. Each sample times 16 feed calls and divides
-the elapsed time by 16; these percentiles describe **batch-amortized feed cost**,
-not the distribution of isolated user key events. Throughput is the median of
-seven runs of 4,096 feeds after warmup. `black_box` retains the workload and
-screen result; allocation counters cover the timed loops.
+the elapsed time by 16. These percentiles describe batch-amortized feed cost,
+not isolated key events. Throughput is the median of seven runs of 4,096 feeds
+after warmup. `black_box` retains the workload and result; allocation counters
+cover the timed loops.
 
-This is one recorded run on shared infrastructure, without isolated CPU cores
-or fixed clock control. The p99 tail is retained rather than presented as the
-median. The development PC uses an i9-12900HX and a different kernel; its earlier
-pre-optimization measurements are not used to calculate an optimization gain
-against these Xeon results.
-
-Reproduce the core measurement:
+This is a recorded run on a shared development machine, without isolated cores
+or fixed-clock control. A [separate Xeon environment result](measurements/core-2026-11-18.json)
+is retained for reproducibility, but is not combined with these samples or used
+to calculate optimization gains across machines.
 
 ```sh
 mkdir -p artifacts
@@ -85,35 +81,122 @@ cargo run --locked --release -p zterm --example benchmark \
 
 ## Whole-terminal measurements
 
-The scripts for PTY round trips and ztty/Kitty runtime comparison are included.
-A final completed runtime result was not retrieved before the development
-connection became unavailable. This report therefore gives **no measured
-whole-process RSS/PSS value, no PTY latency number, and no comparative speedup**.
-Ghostty was not installed in the inspected development environment and was not
-measured.
+[Four-configuration raw results](measurements/runtime-profiled-2026-11-18.json)
+and [query-only diagnostic results](measurements/runtime-query-only-2026-11-18.json).
+The 12 update/query runs and six query-only runs all passed. Each used a fresh
+Xvfb server; no owned terminal or child processes remained after cleanup.
+
+The machine is the i9-12900HX described above. Both applications request the
+same 120×32 character grid, `monospace` at 11 points, a 2,000-row history limit,
+and the same static UTF-8/color page. `LIBGL_ALWAYS_SOFTWARE=1` is set. Memory is
+sampled on the main screen before the query workload, with history mostly empty.
+These results do not describe full-history or alternate-screen memory.
+
+Each configuration is measured three times. Runs are interleaved, rotating the
+starting configuration each repetition. Each run records starting load; the
+one-minute load ranged from 9.73 to 14.82 during the update/query comparison.
+The CPU governor was `powersave`; cores were not isolated and frequency was not
+fixed. All per-run observations are retained in the JSON.
+
+| Configuration | Explicit timing overrides |
+| --- | --- |
+| ztty 0.1.0 | None |
+| Kitty 0.50.0, default | Installed defaults with `-c NONE` |
+| Kitty 0.50.0, input-zero | `input_delay=0` |
+| Kitty 0.50.0, low-latency | `input_delay=0`, `repaint_delay=2`, `sync_to_monitor=no` |
+
+The explicit low-latency settings follow the relevant X11 timing options in
+[Kitty's performance guide](https://sw.kovidgoyal.net/kitty/performance/).
+The tested settings apply only to each launched process; the user's configuration
+files are not modified.
+
+### Process memory
+
+Values below are medians of three measurements, in MiB (1,048,576 bytes).
+RSS and PSS are two descriptions of process memory; do not add them together.
+PSS apportions shared mappings and can vary with other running processes.
+
+| Configuration | RSS | PSS |
+| --- | ---: | ---: |
+| ztty | 18.195 | 8.653 |
+| Kitty, default | 155.168 | 124.787 |
+| Kitty, input-zero | 155.340 | 125.315 |
+| Kitty, low-latency | 155.504 | 114.102 |
+
+This is a software-X11 comparison of different frontends and feature sets. It
+is not a measurement of Kitty with its normal hardware GPU path. The same
+requested font and grid also do not establish identical pixel workloads:
+
+| Application | Actual window pixels | Font files observed in the process |
+| --- | --- | --- |
+| ztty | 1104×728 | ObelMono variable, NotoSansCJK Regular |
+| Kitty | 1081×609 | ObelMono variable, ObelMono Italic variable, NotoSansCJK Regular, SymbolsNerdFontMono Regular |
+
+ztty's server-side XRes pixmap allocation was **3,214,848 bytes / 3.066 MiB** in
+every run. It is outside the terminal process RSS/PSS. Kitty reported zero XRes
+pixmap bytes; this counter does not cover all GL resources and therefore does
+not imply zero graphics memory. X server memory deltas and pixel-surface
+estimates are separate fields in the raw report. They overlap with other
+accounts and are not added into a claimed total.
+
+Idle sampling found zero CPU ticks over each approximately 500 ms interval,
+with a 100 Hz `/proc` accounting clock. This is a resolution-limited observation,
+not a guarantee of exactly zero CPU consumption. ztty used one thread. Its
+release entry executable is 155,944 bytes; that excludes system libraries and
+font resources and is not compared with another application's launcher size.
+
+### Sustained character update plus query
+
+Each request sends cursor-home, writes the same `q` cell, and requests cursor
+position. The child waits for the expected reply before issuing the next request.
+Each run discards 100 warmups and records 1,000 samples. The table shows the
+**median of the three per-run percentiles**, in microseconds; it is not a pooled
+3,000-sample percentile or an isolated keyboard event distribution.
+
+| Configuration | p50, µs | p95, µs | p99, µs |
+| --- | ---: | ---: | ---: |
+| ztty | 16.705 | 29.913 | 79.184 |
+| Kitty, default | 6600.024 | 11425.976 | 13978.167 |
+| Kitty, input-zero | 6968.149 | 11716.759 | 13868.448 |
+| Kitty, low-latency | 6489.879 | 9927.157 | 12173.915 |
+
+### Query-only diagnostic
+
+This separate workload establishes the cursor position before timing, then sends
+only DSR queries. It uses the same warmup/sample counts and three repetitions.
+
+| Configuration | p50, µs | p95, µs | p99, µs |
+| --- | ---: | ---: | ---: |
+| ztty | 16.934 | 32.905 | 89.426 |
+| Kitty, input-zero | 47.320 | 98.040 | 168.922 |
+
+The large change for Kitty when per-request writes are removed shows that this
+measurement is sensitive to the rendering workload and main-loop scheduling.
+The millisecond results cannot be attributed solely to a default input delay,
+or presented as a parser-speed ratio. This is an inference from the controlled
+workload change, not an instrumented attribution of individual delays.
+
+**DSR reports logical terminal state; it does not wait for rendering submission
+or display presentation.** Earlier rendering can still contend with later
+requests. The Python child, PTY directions, scheduler, and terminal processing
+all contribute. No physical key-to-screen result or overall Kitty/Ghostty
+superiority follows from these numbers. Ghostty was not measured.
+
+Reproduce both workloads:
 
 ```sh
-# Protocol checks plus 100 warmups and 1,000 PTY round trips:
-xvfb-run -a -s '-screen 0 1600x1000x24' \
-  ./target/release/ztty --geometry 120x32 \
-  -e /usr/bin/python3 tests/pty_probe.py artifacts/pty-probe.json
-
-# Three independent Xvfb sessions per available terminal:
-python3 tools/measure_runtime.py
+python3 tools/measure_runtime.py \
+  --output artifacts/runtime-metrics-profiled.json
+python3 tools/measure_runtime.py --query-only \
+  --apps ztty kitty --kitty-profiles input-zero \
+  --output artifacts/runtime-query-only.json
 ```
-
-The runtime runner requests the same 120×32 grid, monospace size, 2,000 history
-lines, fixed UTF-8/color content, and software rendering for each application.
-It records actual window dimensions and font files, RSS/PSS, optional XRes
-pixmap accounting, idle CPU ticks, and the PTY round-trip distribution. These
-Xvfb measurements would characterize that environment; they would not establish
-relative native GPU rendering or physical display latency.
 
 ## Functional validation
 
-The following results were observed on the Linux development machine before
-the connection became unavailable. Production sources were subsequently read
-back from GitHub and verified against their committed blob hashes.
+The following results were observed on the Linux development machine. The
+production Rust files are unchanged by the subsequent publication, documentation,
+and measurement-tool commits.
 
 | Check | Result |
 | --- | --- |
@@ -127,13 +210,12 @@ back from GitHub and verified against their committed blob hashes.
 | GUI acceptance | 11 passed, 0 failed under Xvfb/X11 |
 | Portable-core bare-metal target | Not run successfully; target library unavailable |
 
-Independent consumers subsequently verified the published `zinput` and `zpty`
-packages, both individually and together. Registry versions were pinned to
-0.1.0, with no workspace path overrides; `no_std` library checks and executable
-tests, including real PTY I/O, all passed. Their embedded VCS records match the
-source commit above. See [the consumer report](measurements/registry-consumer-2026-11-18.json).
-`zterm` also passed an independent package dry-run using registry dependencies;
-actual registry publication remains pending.
+All three published libraries, `zinput`, `zpty`, and `zterm`, passed individual
+and combined consumers outside this workspace. Registry versions were pinned
+to 0.1.0 with no local path overrides. `no_std` library checks, terminal state and
+input behavior, and real PTY I/O passed. Package checksums and embedded source
+commits were read back. See [the consumer report](measurements/registry-consumer-all-2026-11-18.json)
+and [publication record](releasing.md).
 
 The GUI acceptance covers legacy input, Kitty keyboard flags and repeat/release,
 resize, ASCII/CJK selection, sanitized bracketed paste, lossless large paste
@@ -141,23 +223,18 @@ under backpressure, SGR mouse, gesture ownership, explicit OSC 8 opening, and
 synchronized output across writes and Expose events. The large-paste fixture
 delivered 139,276 bytes, including 12 delimiter bytes.
 
-The original development-machine GUI JSON remains under `artifacts/` there.
-The actual preview image was retrieved and is preserved below. No replacement
-raw test log is invented from this summary. Detailed implemented and tested
-protocol boundaries are in [protocols.md](protocols.md).
+The original [GUI result](measurements/gui-2026-11-18.json) and
+[12-check PTY protocol result](measurements/pty-protocols-2026-11-18.json) are
+preserved. Detailed implemented and tested boundaries are in
+[protocols.md](protocols.md).
 
 ![Actual ztty output showing UTF-8, ANSI colors, RGB colors, and an OSC 8 link](assets/ztty-preview.png)
 
-## Next measurements required for the project goal
+## Remaining acceptance for the project goal
 
-1. Retrieve or rerun complete PTY/RSS/PSS measurements on the development PC
-   after checking whether the existing owned job has finished.
-2. Test real XWayland and input-method sessions, full-history and alternate-screen
-   memory, interactive editing, and sustained TUI output.
-3. Compare Kitty and Ghostty on the same hardware, fonts, content, window size,
-   rendering conditions, and measurement definitions.
-4. Measure visible input response separately from parser time, including
-   compositor scheduling and display refresh. Report medians and tail latency.
-
-The core result supports further low-latency engineering. Whole-application
-claims require the remaining measurements and compatibility work.
+The current data establish a small, responsive implementation under the stated
+workloads. The next acceptance work is real XWayland and input-method sessions,
+full-history and alternate-screen memory, sustained TUI and Unicode workloads,
+and comparison with Ghostty. Native GPU and physical input-to-visible-pixel
+measurements need their own harness and comparable desktop conditions. These
+are separate from the published-library and software-X11 results above.

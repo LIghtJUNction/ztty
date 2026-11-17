@@ -27,6 +27,22 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PROBE = ROOT / "tests" / "pty_probe.py"
+KITTY_PROFILES = {
+    "default": {},
+    "input-zero": {"input_delay": "0"},
+    "low-latency": {"input_delay": "0", "repaint_delay": "2", "sync_to_monitor": "no"},
+}
+KITTY_BASE_SETTINGS = {
+    "linux_display_server": "x11", "font_family": "monospace", "font_size": "11",
+    "initial_window_width": "120c", "initial_window_height": "32c",
+    "remember_window_size": "no", "scrollback_lines": "2000",
+}
+
+
+def configuration_label(app, profile):
+    return f"kitty:{profile}" if app == "kitty" else app
+
+
 FRAME = (
     "\x1b[2J\x1b[H\x1b[?25l"
     "\x1b[38;2;138;180;248mztty terminal runtime measurement\x1b[0m\r\n\r\n"
@@ -56,7 +72,7 @@ def receive_json(connection):
     return json.loads(data.split(b"\n", 1)[0])
 
 
-def child(socket_path):
+def child(socket_path, query_only=False):
     """The measured application's child is idle until the runner requests work."""
     import termios
     import tty
@@ -86,6 +102,8 @@ def child(socket_path):
                 status = 0
                 try:
                     sys.argv = [str(PROBE), str(result_path), "--benchmark-only"]
+                    if query_only:
+                        sys.argv.append("--query-only")
                     runpy.run_path(str(PROBE), run_name="__main__")
                 except SystemExit as error:
                     status = error.code or 0
@@ -281,9 +299,10 @@ def wait_for(predicate, process, description, timeout=15):
     raise TimeoutError("timed out waiting for " + description)
 
 
-def measure(app, binary, repetition, args):
+def measure(app, binary, repetition, args, profile="default"):
     from Xlib import X, display
-    result = {"app": app, "repetition": repetition, "ok": False}
+    result = {"app": app, "profile": profile, "configuration": configuration_label(app, profile),
+              "repetition": repetition, "ok": False}
     terminal = xvfb = connection = d = None
     child_identity = {}
     with tempfile.TemporaryDirectory(prefix=f"ztty-runtime-{app}-") as temporary:
@@ -318,13 +337,17 @@ def measure(app, binary, repetition, args):
             environment.update(DISPLAY=display_name, LC_ALL="C.UTF-8", XMODIFIERS="@im=none", LIBGL_ALWAYS_SOFTWARE="1")
             socket_path = directory / "control.sock"
             child_command = [sys.executable, str(Path(__file__).resolve()), "--child", str(socket_path)]
+            if args.query_only:
+                child_command.append("--query-only")
             if app == "ztty":
                 command = [str(binary), "--font", "monospace:size=11", "--geometry", "120x32", "--scrollback", "2000", "-e"] + child_command
+                result["explicit_settings"] = {"font": "monospace:size=11", "geometry": "120x32", "scrollback": "2000"}
             else:
-                command = [str(binary), "-c", "NONE", "-o", "linux_display_server=x11",
-                           "-o", "font_family=monospace", "-o", "font_size=11",
-                           "-o", "initial_window_width=120c", "-o", "initial_window_height=32c",
-                           "-o", "remember_window_size=no", "-o", "scrollback_lines=2000"] + child_command
+                result["explicit_settings"] = KITTY_BASE_SETTINGS | KITTY_PROFILES[profile]
+                command = [str(binary), "-c", "NONE"]
+                for name, value in result["explicit_settings"].items():
+                    command.extend(["-o", f"{name}={value}"])
+                command.extend(child_command)
             result["command"] = command
             result["requested"] = {"columns": 120, "rows": 32, "font_family": "monospace", "font_size_points": 11, "scrollback_lines": 2000}
             result["fontconfig_match"] = capture(["fc-match", "-f", "%{family}\n%{style}\n%{file}\n", "monospace:size=11"])
@@ -448,6 +471,12 @@ def main():
     parser.add_argument("--child", help=argparse.SUPPRESS)
     parser.add_argument("--ztty", type=Path, default=ROOT / "target/release/ztty")
     parser.add_argument("--kitty", default=shutil.which("kitty"))
+    parser.add_argument("--apps", nargs="+", choices=["ztty", "kitty"], default=["ztty", "kitty"],
+                        help="applications to measure (default: ztty kitty)")
+    parser.add_argument("--kitty-profiles", nargs="+", choices=list(KITTY_PROFILES), default=list(KITTY_PROFILES),
+                        help="Kitty timing profiles (default: default input-zero low-latency)")
+    parser.add_argument("--query-only", action="store_true",
+                        help="time DSR queries without moving or writing a character in each timed request")
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts/runtime-metrics.json")
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--settle-ms", type=int, default=500)
@@ -455,19 +484,30 @@ def main():
     parser.add_argument("--timeout", type=float, default=60)
     args = parser.parse_args()
     if args.child:
-        return child(args.child)
+        return child(args.child, args.query_only)
     if not 1 <= args.repeats <= 10 or args.idle_ms < 250 or args.settle_ms < 0 or args.timeout <= 0:
         parser.error("require 1..10 repeats, idle >=250ms, settle >=0ms, and timeout >0")
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    report = {"schema": 1, "ok": False, "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    applications = list(dict.fromkeys(args.apps))
+    profiles = list(dict.fromkeys(args.kitty_profiles))
+    configurations = [(app, profile) for app in applications
+                      for profile in (profiles if app == "kitty" else ["default"])]
+    report = {"schema": 2, "ok": False, "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
               "method": {"display": "fresh Xvfb per application per run, 1920x1200x24, requested 96 DPI",
-                         "rendering": "LIBGL_ALWAYS_SOFTWARE=1; software X11/XWayland-equivalent protocol environment, no native compositor",
+                         "rendering": "LIBGL_ALWAYS_SOFTWARE=1; software X11 in Xvfb, no native compositor",
                          "font": "monospace, 11 points", "geometry": "120x32 cells", "history_limit": 2000,
                          "settle_ms": args.settle_ms, "idle_sample_ms": args.idle_ms, "repeats": args.repeats,
-                         "roundtrip": "100 warmups + 1000 DSR queries, child/PTY/terminal/PTY/child; includes Python probe overhead, excludes display scanout",
+                         "run_order": "one run per configuration each repetition; starting configuration rotates by one each repetition",
+                         "kitty_default": "-c NONE with shared font/geometry/X11 settings; timing options use installed Kitty defaults",
+                         "workload": "query-only" if args.query_only else "home-write-query",
+                         "roundtrip": "100 warmups + 1000 requests, child/PTY/terminal/PTY/child; includes Python probe overhead; DSR is not a frame-completion barrier",
                          "scope_limits": ["not physical key-to-screen latency", "not hardware GPU/native desktop performance",
                                           "RSS/PSS, X server delta, XRes bytes, and pixel estimate are separate accounts; do not blindly sum shared mappings",
-                                          "Ghostty is not installed and is not measured"]},
+                                          "Ghostty is not measured by this runner"]},
+              "configurations": {configuration_label(app, profile): {
+                  "app": app, "profile": profile,
+                  "timing_overrides": KITTY_PROFILES[profile] if app == "kitty" else {},
+              } for app, profile in configurations},
               "runs": [], "applications": {}, "errors": []}
     try:
         # Adopt only descendants of this runner if a failed terminal exits before
@@ -477,35 +517,56 @@ def main():
         report["machine"] = machine()
         if not shutil.which("Xvfb"):
             raise RuntimeError("Xvfb is required")
-        for name, path in [("ztty", args.ztty), ("kitty", args.kitty)]:
+        binaries = {}
+        for name in applications:
+            path = args.ztty if name == "ztty" else args.kitty
             if not path or not Path(path).is_file():
                 report["errors"].append(f"{name} executable unavailable: {path}")
                 continue
             binary = Path(path).resolve()
+            binaries[name] = binary
             report["applications"][name] = {"binary": str(binary), "binary_bytes": binary.stat().st_size,
                                               "binary_size_scope": "entry executable only; excludes application resources and shared runtime libraries",
                                               "version": capture([str(binary), "--version"])}
-            for repetition in range(1, args.repeats + 1):
-                measured = measure(name, binary, repetition, args)
+        for repetition in range(1, args.repeats + 1):
+            offset = (repetition - 1) % len(configurations)
+            order = configurations[offset:] + configurations[:offset]
+            for name, profile in order:
+                if name not in binaries:
+                    continue
+                label = configuration_label(name, profile)
+                load_at_start = list(os.getloadavg())
+                try:
+                    measured = measure(name, binaries[name], repetition, args, profile)
+                except Exception as error:
+                    measured = {"app": name, "profile": profile, "configuration": label,
+                                "repetition": repetition, "ok": False, "error": repr(error)}
+                measured["load_average_at_start"] = load_at_start
+                measured["run_index"] = len(report["runs"]) + 1
                 report["runs"].append(measured)
                 args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-                print(json.dumps({"app": name, "run": repetition, "ok": measured["ok"],
+                print(json.dumps({"app": name, "profile": profile, "configuration": label,
+                                  "run": repetition, "ok": measured["ok"],
                                   "rss_bytes": measured.get("process_memory", {}).get("Rss_bytes"),
                                   "pty_us": measured.get("pty_probe", {}).get("pty_roundtrip_us"),
                                   "error": measured.get("error")}, ensure_ascii=False), flush=True)
     except Exception as error:
         report["errors"].append(repr(error))
     summary = {}
-    for app in report["applications"]:
-        runs = [run for run in report["runs"] if run["app"] == app and run["ok"]]
+    for label, configuration in report["configurations"].items():
+        attempted = [run for run in report["runs"] if run["configuration"] == label]
+        runs = [run for run in attempted if run["ok"]]
+        summary[label] = {**configuration, "requested_runs": args.repeats,
+                          "successful_runs": len(runs), "failed_runs": len(attempted) - len(runs),
+                          "missing_runs": args.repeats - len(attempted)}
         if runs:
-            summary[app] = {"successful_runs": len(runs), "median_process_rss_bytes": statistics.median(run["process_memory"]["Rss_bytes"] for run in runs),
+            summary[label].update({"median_process_rss_bytes": statistics.median(run["process_memory"]["Rss_bytes"] for run in runs),
                             "median_process_pss_bytes": statistics.median(run["process_memory"]["Pss_bytes"] for run in runs),
                             "median_idle_percent_one_core": statistics.median(run["idle_cpu"]["percent_of_one_core"] for run in runs),
                             "median_of_run_pty_p50_us": statistics.median(run["pty_probe"]["pty_roundtrip_us"]["p50"] for run in runs),
-                            "median_of_run_pty_p95_us": statistics.median(run["pty_probe"]["pty_roundtrip_us"]["p95"] for run in runs)}
+                            "median_of_run_pty_p95_us": statistics.median(run["pty_probe"]["pty_roundtrip_us"]["p95"] for run in runs)})
     report["summary"] = summary
-    report["ok"] = not report["errors"] and len(report["runs"]) == 2 * args.repeats and all(run["ok"] for run in report["runs"])
+    report["ok"] = not report["errors"] and len(report["runs"]) == len(configurations) * args.repeats and all(run["ok"] for run in report["runs"])
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Saved {args.output}", flush=True)
     return 0 if report["ok"] else 1

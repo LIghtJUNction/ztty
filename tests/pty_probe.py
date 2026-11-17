@@ -33,8 +33,10 @@ def exchange(command, expected):
 
 def main():
     result_path = sys.argv[1]
+    query_only = "--query-only" in sys.argv[2:]
     previous = termios.tcgetattr(0)
-    result = {"schema": 1, "checks": [], "ok": False}
+    workload = "query-only" if query_only else "home-write-query"
+    result = {"schema": 1, "checks": [], "workload": workload, "ok": False}
     try:
         tty.setraw(0)
         checks = [
@@ -55,11 +57,14 @@ def main():
         for name, command, expected in selected_checks:
             exchange(command, expected)
             result["checks"].append(name)
-        # Query is the synchronization point; timing includes both PTY directions.
+        # DSR confirms logical cursor state, not rendering or presentation completion.
+        if query_only:
+            exchange(b"\x1b[1;2H\x1b[6n", b"\x1b[1;2R")
+        timed_command = b"\x1b[6n" if query_only else b"\x1b[Hq\x1b[6n"
         samples = []
         for index in range(1100):
             start = time.perf_counter_ns()
-            exchange(b"\x1b[Hq\x1b[6n", b"\x1b[1;2R")
+            exchange(timed_command, b"\x1b[1;2R")
             duration = (time.perf_counter_ns() - start) / 1000
             if index >= 100:
                 samples.append(duration)
@@ -69,7 +74,10 @@ def main():
             "p95": round(samples[int(len(samples) * .95)], 3),
             "p99": round(samples[int(len(samples) * .99)], 3),
             "samples": len(samples),
-            "scope": "child write, PTY, parser/grid, response, PTY, child read; excludes scanout",
+            "warmup_samples": 100,
+            "workload": workload,
+            "request_hex": timed_command.hex(),
+            "scope": "child write, PTY, logical terminal state, response, PTY, child read; DSR does not wait for rendered frames or scanout",
         }
         result["environment"] = {name: os.environ.get(name) for name in ["TERM", "COLORTERM", "TERM_PROGRAM"]}
         result["ok"] = True
