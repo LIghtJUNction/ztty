@@ -1,0 +1,28 @@
+{"command": ["cargo", "test", "--test", "config_watch", "--", "--nocapture"], "source_sha256": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1", "test_sha256": "c4e5f5179e79826888ea45eb86d89652b552314a81d6455afec8d9e4096e38dc"}
+   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.18s
+     Running tests/config_watch.rs (target/debug/build/ztty/f9a0558505853ca6/out/config_watch-f9a0558505853ca6)
+
+running 3 tests
+inotify race trace:
+add-watch /tmp/ztty-config-watch-2311332-0-1794957092596145893/settings -> -1
+mkdir /tmp/ztty-config-watch-2311332-0-1794957092596145893/settings before ancestor add-watch
+add-watch /tmp/ztty-config-watch-2311332-0-1794957092596145893 -> 2
+add-watch /tmp/ztty-config-watch-2311332-0-1794957092596145893/settings -> 3
+test renamed_parent_recreated_before_ancestor_watch_still_reloads_later_file ... ok
+inotify race trace:
+add-watch /tmp/ztty-config-watch-2311332-1-1794957092599848745/missing/deep/settings -> -1
+add-watch /tmp/ztty-config-watch-2311332-1-1794957092599848745/missing/deep -> -1
+add-watch /tmp/ztty-config-watch-2311332-1-1794957092599848745/missing -> -1
+mkdir /tmp/ztty-config-watch-2311332-1-1794957092599848745/missing/deep/settings before ancestor add-watch
+add-watch /tmp/ztty-config-watch-2311332-1-1794957092599848745 -> 1
+add-watch /tmp/ztty-config-watch-2311332-1-1794957092599848745/missing -> 2
+add-watch /tmp/ztty-config-watch-2311332-1-1794957092599848745/missing/deep -> 3
+add-watch /tmp/ztty-config-watch-2311332-1-1794957092599848745/missing/deep/settings -> 4
+test missing_deep_directories_created_before_ancestor_watch_do_not_lose_file_updates ... ok
+test retaining_one_path_preserves_shared_descriptor_and_releases_the_last_reference ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+CARGO_EXIT=0

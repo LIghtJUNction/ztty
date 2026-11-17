@@ -1,0 +1,28 @@
+{"old_source_commit": "19fb5966ca4164ebc679abc2d8dacd4c26927b39", "old_watcher_sha256": "4fe12b27a19f859d822b6a661f2ac7c50e932ca868233260201632d519f2657b", "temporary_package": "/tmp/ztty-config-watch-old-kclectju", "command": ["cargo", "test", "--manifest-path", "/tmp/ztty-config-watch-old-kclectju/Cargo.toml", "--test", "config_watch", "--", "--nocapture"]}
+   Compiling ztty-config-watch-regression v0.0.0 (/tmp/ztty-config-watch-old-kclectju)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.07s
+     Running tests/config_watch.rs (/tmp/ztty-config-watch-old-kclectju/target/debug/build/ztty-config-watch-regression/cb0207f673342425/out/config_watch-cb0207f673342425)
+
+running 3 tests
+
+thread 'missing_deep_directories_created_before_ancestor_watch_do_not_lose_file_updates' (2221570) panicked at tests/config_watch.rs:159:5:
+file close-write must reach the config watcher: /tmp/ztty-config-watch-2221569-0-1794956629370920304/missing/deep/settings/ztty.conf
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test missing_deep_directories_created_before_ancestor_watch_do_not_lose_file_updates ... FAILED
+test retaining_one_path_preserves_shared_descriptor_and_releases_the_last_reference ... ok
+
+thread 'renamed_parent_recreated_before_ancestor_watch_still_reloads_later_file' (2221571) panicked at tests/config_watch.rs:159:5:
+file close-write must reach the config watcher: /tmp/ztty-config-watch-2221569-2-1794956629378839377/settings/ztty.conf
+test renamed_parent_recreated_before_ancestor_watch_still_reloads_later_file ... FAILED
+
+failures:
+
+failures:
+    missing_deep_directories_created_before_ancestor_watch_do_not_lose_file_updates
+    renamed_parent_recreated_before_ancestor_watch_still_reloads_later_file
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+error: test failed, to rerun pass `--test config_watch`
+
+CARGO_EXIT=101

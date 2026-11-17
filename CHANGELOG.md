@@ -20,6 +20,7 @@
 
 ### Fixed
 
+- Config reload reconnects without losing a directory created before its ancestor watch is installed; deterministic real inotify regressions prove the old failure and the repaired behavior.
 - Native Linux evidence is archived and read back before staging cleanup, preserving the flat Release checksum contract; incomplete gates cannot produce accepted artifacts.
 - Benchmark reports now pin the isolated Xvfb helper hash and preserve collection-time identity when regenerating charts.
 - Linux input preserves horizontal wheels and extra mouse buttons 8–11; configured bindings support all eleven X11 buttons.
