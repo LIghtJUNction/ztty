@@ -1,9 +1,11 @@
 //! X11/XWayland window and Xft text rendering, accessed through a small C ABI.
 use alloc::ffi::CString;
 use alloc::format;
+use alloc::rc::{Rc, Weak};
 use alloc::string::String;
 use alloc::vec::Vec;
-use core::ffi::{c_char, c_int, c_long, c_uint, c_ulong, c_void};
+use core::cell::RefCell;
+use core::ffi::{CStr, c_char, c_int, c_long, c_uint, c_ulong, c_void};
 use zterm::{
     BOLD, Cell, CursorShape, DIM, EXPLICIT_BG, HIDDEN, INVERSE, STRIKE, Terminal, UNDERLINE,
 };
@@ -180,6 +182,21 @@ pub union Event {
     pub property: PropertyEvent,
     pub pad: [c_long; 24],
 }
+impl Event {
+    /// Destination used after XFilterEvent has consumed input-method traffic.
+    pub fn window(&self) -> Xid {
+        // Configure/DestroyNotify place the subject after the event destination.
+        unsafe {
+            match self.kind {
+                CONFIGURE_NOTIFY | DESTROY_NOTIFY => self.configure.window,
+                SELECTION_REQUEST => self.request.owner,
+                SELECTION_NOTIFY => self.selection.requestor,
+                _ => self.key.window,
+            }
+        }
+    }
+}
+
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct RenderColor {
@@ -314,6 +331,10 @@ unsafe extern "C" {
     fn XDestroyWindow(display: *mut Display, window: Xid) -> c_int;
     fn XSelectInput(display: *mut Display, window: Xid, mask: c_long) -> c_int;
     fn XMapWindow(display: *mut Display, window: Xid) -> c_int;
+    fn XMapRaised(display: *mut Display, window: Xid) -> c_int;
+    fn XSetInputFocus(display: *mut Display, window: Xid, revert_to: c_int, time: c_ulong)
+    -> c_int;
+    fn XFreeColormap(display: *mut Display, colormap: Xid) -> c_int;
     fn XStoreName(display: *mut Display, window: Xid, title: *const c_char) -> c_int;
     fn XSetClassHint(display: *mut Display, window: Xid, hint: *mut ClassHint) -> c_int;
     fn XInternAtom(display: *mut Display, name: *const c_char, only_exists: c_int) -> Atom;
@@ -577,6 +598,135 @@ unsafe fn alpha_visual(display: *mut Display, screen: c_int) -> Option<*mut c_vo
 
 type DrawnCursor = ((usize, usize), CursorShape);
 
+/// Shared X11 connection for a single-threaded host of terminal windows.
+///
+/// Font entries are weak: closing their last window releases the faces and
+/// glyph cache even if headless sessions keep the host process alive.
+pub struct Connection {
+    pub display: *mut Display,
+    pub fd: i32,
+    screen: i32,
+    im: *mut c_void,
+    fonts: RefCell<Vec<Weak<Fonts>>>,
+}
+
+impl Connection {
+    pub fn new() -> Result<Rc<Self>, &'static str> {
+        Self::new_for_display(None)
+    }
+
+    pub fn new_for_display(name: Option<&CStr>) -> Result<Rc<Self>, &'static str> {
+        unsafe {
+            crate::os::setlocale(0, c"".as_ptr());
+            XSetLocaleModifiers(c"".as_ptr());
+            let display = XOpenDisplay(name.map_or(core::ptr::null(), CStr::as_ptr));
+            if display.is_null() {
+                return Err("cannot open DISPLAY; ztty needs X11 or XWayland");
+            }
+            let screen = XDefaultScreen(display);
+            let im = XOpenIM(
+                display,
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+            );
+            let mut supported = 0;
+            XkbSetDetectableAutoRepeat(display, 1, &mut supported);
+            let fd = XConnectionNumber(display);
+            crate::os::fcntl(fd, 2, 1);
+            Ok(Rc::new(Self {
+                display,
+                fd,
+                screen,
+                im,
+                fonts: RefCell::new(Vec::new()),
+            }))
+        }
+    }
+
+    fn fonts(self: &Rc<Self>, name: &str) -> Result<Rc<Fonts>, &'static str> {
+        let mut cache = self.fonts.borrow_mut();
+        cache.retain(|font| font.strong_count() != 0);
+        for font in cache.iter().filter_map(Weak::upgrade) {
+            if font.name == name {
+                return Ok(font);
+            }
+        }
+        let c_name = CString::new(name).map_err(|_| "invalid font name")?;
+        let font = unsafe { XftFontOpenName(self.display, self.screen, c_name.as_ptr()) };
+        if font.is_null() {
+            return Err("cannot load the requested font");
+        }
+        let fonts = Rc::new(Fonts {
+            connection: Rc::clone(self),
+            name: name.into(),
+            font,
+            fallbacks: RefCell::new(Vec::new()),
+        });
+        cache.push(Rc::downgrade(&fonts));
+        Ok(fonts)
+    }
+}
+
+impl Drop for Connection {
+    fn drop(&mut self) {
+        unsafe {
+            if !self.im.is_null() {
+                XCloseIM(self.im);
+            }
+            XCloseDisplay(self.display);
+        }
+    }
+}
+
+struct Fonts {
+    connection: Rc<Connection>,
+    name: String,
+    font: *mut Font,
+    fallbacks: RefCell<Vec<*mut Font>>,
+}
+
+impl Fonts {
+    fn glyph(&self, ch: char) -> *mut Font {
+        let display = self.connection.display;
+        unsafe {
+            if ch.is_ascii() || XftCharExists(display, self.font, ch as u32) != 0 {
+                return self.font;
+            }
+            let mut fallbacks = self.fallbacks.borrow_mut();
+            for &font in fallbacks.iter() {
+                if XftCharExists(display, font, ch as u32) != 0 {
+                    return font;
+                }
+            }
+            if fallbacks.len() < 16
+                && let Ok(name) = CString::new(format!("{}:charset={:x}", self.name, ch as u32))
+            {
+                let font = XftFontOpenName(display, self.connection.screen, name.as_ptr());
+                if !font.is_null() {
+                    if XftCharExists(display, font, ch as u32) != 0 {
+                        fallbacks.push(font);
+                        return font;
+                    }
+                    XftFontClose(display, font);
+                }
+            }
+        }
+        self.font
+    }
+}
+
+impl Drop for Fonts {
+    fn drop(&mut self) {
+        unsafe {
+            for &font in self.fallbacks.get_mut().iter() {
+                XftFontClose(self.connection.display, font);
+            }
+            XftFontClose(self.connection.display, self.font);
+        }
+    }
+}
+
 pub struct Window {
     pub display: *mut Display,
     pub id: Xid,
@@ -586,19 +736,17 @@ pub struct Window {
     pub width: i32,
     pub height: i32,
     pub wm_delete: Atom,
-    screen: i32,
     depth: u32,
     visual: *mut c_void,
     colormap: c_ulong,
+    owns_colormap: bool,
     pixmap: Xid,
     gc: *mut c_void,
     draw: *mut XftDraw,
     font: *mut Font,
-    font_name: String,
-    fallbacks: Vec<*mut Font>,
+    fonts: Rc<Fonts>,
     colors: Vec<ColorEntry>,
     next_color: usize,
-    im: *mut c_void,
     ic: *mut c_void,
     clipboard: Atom,
     utf8: Atom,
@@ -622,18 +770,22 @@ pub struct Window {
 
 impl Window {
     pub fn new(cols: usize, rows: usize, appearance: &Appearance) -> Result<Self, &'static str> {
-        let font_name = &appearance.font;
+        Self::new_shared(cols, rows, appearance, &Connection::new()?)
+    }
+
+    pub fn new_shared(
+        cols: usize,
+        rows: usize,
+        appearance: &Appearance,
+        connection: &Rc<Connection>,
+    ) -> Result<Self, &'static str> {
         let padding = appearance.padding;
         let background = appearance.theme.background;
-        let name = CString::new(font_name.as_str()).map_err(|_| "invalid font name")?;
+        let fonts = connection.fonts(&appearance.font)?;
+        let font = fonts.font;
         unsafe {
-            crate::os::setlocale(0, c"".as_ptr());
-            XSetLocaleModifiers(c"".as_ptr());
-            let display = XOpenDisplay(core::ptr::null());
-            if display.is_null() {
-                return Err("cannot open DISPLAY; ztty needs X11 or XWayland");
-            }
-            let screen = XDefaultScreen(display);
+            let display = connection.display;
+            let screen = connection.screen;
             let root = XRootWindow(display, screen);
             let alpha = if appearance.opacity < 100 {
                 alpha_visual(display, screen)
@@ -649,11 +801,6 @@ impl Window {
                     XDefaultDepth(display, screen) as u32,
                 )
             };
-            let font = XftFontOpenName(display, screen, name.as_ptr());
-            if font.is_null() {
-                XCloseDisplay(display);
-                return Err("cannot load the requested font");
-            }
             let mut ext: GlyphInfo = core::mem::zeroed();
             XftTextExtentsUtf8(display, font, b"M".as_ptr(), 1, &mut ext);
             let cw = i32::from(ext.x_off).max(1);
@@ -705,12 +852,7 @@ impl Window {
             let pixmap = XCreatePixmap(display, id, width as u32, height as u32, depth);
             let gc = XCreateGC(display, id, 0, core::ptr::null_mut());
             let draw = XftDrawCreate(display, pixmap, visual, colormap);
-            let im = XOpenIM(
-                display,
-                core::ptr::null_mut(),
-                core::ptr::null_mut(),
-                core::ptr::null_mut(),
-            );
+            let im = connection.im;
             let ic = if im.is_null() {
                 core::ptr::null_mut()
             } else {
@@ -738,10 +880,7 @@ impl Window {
                     XSelectInput(display, id, events | filter_events);
                 }
             }
-            let mut supported = 0;
-            XkbSetDetectableAutoRepeat(display, 1, &mut supported);
-            let fd = XConnectionNumber(display);
-            crate::os::fcntl(fd, 2, 1);
+            let fd = connection.fd;
             let mut out = Self {
                 display,
                 id,
@@ -751,19 +890,17 @@ impl Window {
                 width,
                 height,
                 wm_delete,
-                screen,
                 depth,
                 visual,
                 colormap,
+                owns_colormap: alpha.is_some(),
                 pixmap,
                 gc,
                 draw,
                 font,
-                font_name: font_name.clone(),
-                fallbacks: Vec::new(),
+                fonts,
                 colors: Vec::with_capacity(256),
                 next_color: 0,
-                im,
                 ic,
                 clipboard: XInternAtom(display, c"CLIPBOARD".as_ptr(), 0),
                 utf8: XInternAtom(display, c"UTF8_STRING".as_ptr(), 0),
@@ -975,31 +1112,18 @@ impl Window {
         color
     }
     fn glyph_font(&mut self, ch: char) -> *mut Font {
-        unsafe {
-            if ch.is_ascii() || XftCharExists(self.display, self.font, ch as u32) != 0 {
-                return self.font;
-            }
-            for &font in &self.fallbacks {
-                if XftCharExists(self.display, font, ch as u32) != 0 {
-                    return font;
-                }
-            }
-            if self.fallbacks.len() < 16
-                && let Ok(name) =
-                    CString::new(format!("{}:charset={:x}", self.font_name, ch as u32))
-            {
-                let font = XftFontOpenName(self.display, self.screen, name.as_ptr());
-                if !font.is_null() {
-                    if XftCharExists(self.display, font, ch as u32) != 0 {
-                        self.fallbacks.push(font);
-                        return font;
-                    }
-                    XftFontClose(self.display, font);
-                }
-            }
-        }
-        self.font
+        self.fonts.glyph(ch)
     }
+
+    /// Bring an already attached session back without opening a second window.
+    pub fn raise(&self) {
+        unsafe {
+            XMapRaised(self.display, self.id);
+            XSetInputFocus(self.display, self.id, 1, 0);
+            XFlush(self.display);
+        }
+    }
+
     fn cell_colors(&self, cell: &Cell, selected: bool) -> (u32, u32, bool) {
         let (mut fg, mut bg) = if cell.flags & INVERSE != 0 {
             (cell.bg, cell.fg)
@@ -1500,14 +1624,7 @@ impl Drop for Window {
             if !self.ic.is_null() {
                 XDestroyIC(self.ic);
             }
-            if !self.im.is_null() {
-                XCloseIM(self.im);
-            }
             XftDrawDestroy(self.draw);
-            for &font in &self.fallbacks {
-                XftFontClose(self.display, font);
-            }
-            XftFontClose(self.display, self.font);
             for color in &mut self.colors {
                 XftColorFree(self.display, self.visual, self.colormap, &mut color.color);
             }
@@ -1516,7 +1633,9 @@ impl Drop for Window {
             if self.id != 0 {
                 XDestroyWindow(self.display, self.id);
             }
-            XCloseDisplay(self.display);
+            if self.owns_colormap {
+                XFreeColormap(self.display, self.colormap);
+            }
         }
     }
 }
