@@ -7,6 +7,11 @@ native GPU rendering, display frame rate, or keyboard-to-photon latency.
 
 ![Ten-window terminal comparison](terminals-10-windows.svg)
 
+The checked-in ten-window baseline was recorded with host load1
+31.02–36.57; its timings describe that busy host. The
+[verification record](verification-2026-11-18.md) separates preserved measurements,
+successful workload checks and outstanding performance acceptance.
+
 ## Reproduce
 
 From the repository root, with the release binary already built:

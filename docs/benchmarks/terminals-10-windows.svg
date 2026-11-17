@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="790" viewBox="0 0 1120 790" role="img" aria-labelledby="title desc">
+<title id="title">Ten terminal windows: memory and real PTY performance</title>
+<desc id="desc">3 fresh-process runs per terminal, all using shared instances. Application PSS and private memory exclude probe workloads and the X server. Latency and throughput use DSR logical completion, not a rendered-frame fence.</desc>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#e8eaed}.muted{fill:#bdc1c6}.h{font-size:20px;font-weight:600}.small{font-size:13px}.value{font-size:16px;font-weight:600}.label{font-size:15px}</style>
+<rect width="1120" height="790" rx="18" fill="#17191d"/>
+<text x="36" y="47" font-size="28" font-weight="600">10 windows. Shared instances. Same workload.</text>
+<text x="36" y="76" class="muted" font-size="15">Linux X11 / isolated Xvfb · software rendering · medians of 3 fresh-process runs</text>
+<rect x="36" y="102" width="504" height="229" rx="12" fill="#202329" stroke="#41464d"/>
+<text x="56" y="134" class="h">Application PSS</text>
+<text x="56" y="157" class="small muted">MiB · lower is better</text>
+<text x="56" y="200" class="label">ztty</text>
+<rect x="129" y="183" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="129" y="183" width="5.846" height="22" rx="4" fill="#1a73e8"/>
+<text x="520" y="200" text-anchor="end" class="value">15.36</text>
+<text x="56" y="249" class="label">Ghostty</text>
+<rect x="129" y="232" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="129" y="232" width="295.000" height="22" rx="4" fill="#00897b"/>
+<text x="520" y="249" text-anchor="end" class="value">775.4</text>
+<text x="56" y="298" class="label">Kitty</text>
+<rect x="129" y="281" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="129" y="281" width="133.605" height="22" rx="4" fill="#8754c8"/>
+<text x="520" y="298" text-anchor="end" class="value">351.2</text>
+<rect x="580" y="102" width="504" height="229" rx="12" fill="#202329" stroke="#41464d"/>
+<text x="600" y="134" class="h">Application private memory</text>
+<text x="600" y="157" class="small muted">MiB · lower is better</text>
+<text x="600" y="200" class="label">ztty</text>
+<rect x="673" y="183" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="673" y="183" width="4.559" height="22" rx="4" fill="#1a73e8"/>
+<text x="1064" y="200" text-anchor="end" class="value">11.70</text>
+<text x="600" y="249" class="label">Ghostty</text>
+<rect x="673" y="232" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="673" y="232" width="295.000" height="22" rx="4" fill="#00897b"/>
+<text x="1064" y="249" text-anchor="end" class="value">756.8</text>
+<text x="600" y="298" class="label">Kitty</text>
+<rect x="673" y="281" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="673" y="281" width="127.545" height="22" rx="4" fill="#8754c8"/>
+<text x="1064" y="298" text-anchor="end" class="value">327.2</text>
+<rect x="36" y="355" width="504" height="229" rx="12" fill="#202329" stroke="#41464d"/>
+<text x="56" y="387" class="h">PTY round-trip latency (p50)</text>
+<text x="56" y="410" class="small muted">µs · lower is better</text>
+<text x="56" y="453" class="label">ztty</text>
+<rect x="129" y="436" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="129" y="436" width="1.624" height="22" rx="4" fill="#1a73e8"/>
+<text x="520" y="453" text-anchor="end" class="value">63.52</text>
+<text x="56" y="502" class="label">Ghostty</text>
+<rect x="129" y="485" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="129" y="485" width="1.943" height="22" rx="4" fill="#00897b"/>
+<text x="520" y="502" text-anchor="end" class="value">75.99</text>
+<text x="56" y="551" class="label">Kitty</text>
+<rect x="129" y="534" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="129" y="534" width="295.000" height="22" rx="4" fill="#8754c8"/>
+<text x="520" y="551" text-anchor="end" class="value">11537.7</text>
+<rect x="580" y="355" width="504" height="229" rx="12" fill="#202329" stroke="#41464d"/>
+<text x="600" y="387" class="h">Output processing throughput</text>
+<text x="600" y="410" class="small muted">MiB/s · higher is better</text>
+<text x="600" y="453" class="label">ztty</text>
+<rect x="673" y="436" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="673" y="436" width="23.794" height="22" rx="4" fill="#1a73e8"/>
+<text x="1064" y="453" text-anchor="end" class="value">5.66</text>
+<text x="600" y="502" class="label">Ghostty</text>
+<rect x="673" y="485" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="673" y="485" width="295.000" height="22" rx="4" fill="#00897b"/>
+<text x="1064" y="502" text-anchor="end" class="value">70.18</text>
+<text x="600" y="551" class="label">Kitty</text>
+<rect x="673" y="534" width="295" height="22" rx="4" fill="#30343b"/>
+<rect x="673" y="534" width="108.836" height="22" rx="4" fill="#8754c8"/>
+<text x="1064" y="551" text-anchor="end" class="value">25.89</text>
+<text x="36" y="625" class="small muted">PSS includes every surviving terminal process, launcher and helper. PTY children and X-server memory are separate.</text>
+<text x="36" y="650" class="small muted">Performance: one focused window at a time, nine idle; write → DSR reply. This is logical completion, not display frame rate.</text>
+<text x="36" y="675" class="small muted">Memory: fixed UTF-8/color frame, fonts warmed, empty history. 120 × 32 cells, monospace 11 pt; no disk-cache flush.</text>
+<text x="36" y="700" class="small muted">ztty 0.2.0 · Ghostty 1.4.0-arch1 · kitty 0.50.0 created by Kovid Goyal · 2026-11-17 UTC</text>
+<text x="36" y="725" class="small muted">Raw samples, exact commands, versions, source hashes and scope: docs/benchmarks/terminals-10-windows.json</text>
+<text x="36" y="750" class="small muted">Recorded host load1: 31.0–36.6; 24 logical CPUs. Timing samples were collected on a busy host.</text>
+</svg>
