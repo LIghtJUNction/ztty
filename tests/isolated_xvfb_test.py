@@ -18,7 +18,11 @@ class IsolationTests(unittest.TestCase):
     def test_existing_server_remains_alive_and_native_endpoint_unchanged(self):
         native = re.search(r":([0-9]+)(?:\.[0-9]+)?$", os.environ.get("DISPLAY", ""))
         before = isolated_xvfb.display_endpoints(int(native[1])) if native else None
-        with isolated_xvfb.start_xvfb(screen="640x480x24", stderr=subprocess.DEVNULL) as server:
+        environment = dict(os.environ, ZTTY_XVFB_TEST="owned-environment")
+        with isolated_xvfb.start_xvfb(screen="640x480x24", stderr=subprocess.DEVNULL,
+                                      env=environment) as server:
+            self.assertIn(b"ZTTY_XVFB_TEST=owned-environment",
+                          Path(f"/proc/{server.process.pid}/environ").read_bytes().split(b"\0"))
             self.assertGreaterEqual(server.number, 100)
             self.assertLessEqual(server.number, 30000)
             self.assertTrue(server.evidence["pid_lock_verified"])
