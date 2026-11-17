@@ -18,8 +18,8 @@ pub const ANSI_PALETTE: [u32; 16] = [
     0xff0000, 0x00ff00, 0xffff00, 0x5c5cff, 0xff00ff, 0x00ffff, 0xffffff,
 ];
 
-/// Initial foreground, background, and ANSI colors (24-bit RGB).
-#[derive(Clone, Copy, Debug)]
+/// Configured foreground, background, and ANSI colors (24-bit RGB).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Theme {
     pub foreground: u32,
     pub background: u32,
@@ -50,6 +50,41 @@ impl Theme {
             .get(index as usize)
             .copied()
             .unwrap_or_else(|| extended_color(index))
+    }
+
+    fn recolor(&self, fg: &mut u32, bg: &mut u32, flags: u16, indices: u8) {
+        if flags & EXPLICIT_FG == 0 {
+            *fg = self.foreground;
+        } else if flags & PALETTE_FG != 0 {
+            *fg = self.palette[usize::from(indices & 15)];
+        }
+        if flags & EXPLICIT_BG == 0 {
+            *bg = self.background;
+        } else if flags & PALETTE_BG != 0 {
+            *bg = self.palette[usize::from(indices >> 4)];
+        }
+    }
+
+    fn recolor_cell(&self, cell: &mut Cell) {
+        self.recolor(&mut cell.fg, &mut cell.bg, cell.flags, cell.palette_indices);
+    }
+
+    fn recolor_style(&self, style: &mut Style) {
+        self.recolor(
+            &mut style.fg,
+            &mut style.bg,
+            style.flags,
+            style.palette_indices,
+        );
+    }
+
+    fn recolor_screen(&self, screen: &mut Screen) {
+        for cell in &mut screen.cells {
+            self.recolor_cell(cell);
+        }
+        self.recolor_cell(&mut screen.blank);
+        self.recolor_style(&mut screen.saved.style);
+        screen.mark_all();
     }
 }
 
@@ -143,6 +178,41 @@ impl Terminal {
             state: State::new(cols, rows, history_limit, theme),
             framing: 0,
             apc: zgraphics::CommandStream::new(),
+        }
+    }
+
+    /// Return the configured default colors and ANSI palette.
+    pub fn theme(&self) -> Theme {
+        self.state.theme
+    }
+
+    /// Apply a theme to retained text without changing terminal content or modes.
+    ///
+    /// Default colors and ANSI palette references follow the new theme on the
+    /// live screen, in scrollback, and in both active and cached alternate-screen
+    /// state. Explicit RGB colors and indexed colors 16..=255 keep their values.
+    /// Current and saved SGR styles are updated by the same source information;
+    /// matching RGB values alone never identify a default or a palette reference.
+    ///
+    /// An actual change marks every screen row dirty. This scans retained cells
+    /// in place and does not allocate. Reapplying the same theme does nothing.
+    pub fn set_theme(&mut self, theme: Theme) {
+        if self.state.theme == theme {
+            return;
+        }
+        self.state.theme = theme;
+        theme.recolor_style(&mut self.state.style);
+        theme.recolor_screen(&mut self.state.screen);
+        if let Some(primary) = self.state.primary.as_mut() {
+            theme.recolor_screen(primary);
+        }
+        if let Some(alternate) = self.state.inactive_alternate.as_mut() {
+            theme.recolor_screen(alternate);
+        }
+        for row in &mut self.state.history {
+            for cell in row {
+                theme.recolor_cell(cell);
+            }
         }
     }
 
@@ -1227,28 +1297,44 @@ impl State {
                 27 => self.style.flags &= !INVERSE,
                 28 => self.style.flags &= !HIDDEN,
                 29 => self.style.flags &= !STRIKE,
-                30..=37 => self.style.fg = self.theme.color(value - 30),
+                30..=37 => {
+                    self.style
+                        .set_color(true, self.theme.color(value - 30), Some(value - 30))
+                }
                 40..=47 => {
-                    self.style.bg = self.theme.color(value - 40);
-                    self.style.flags |= EXPLICIT_BG;
+                    self.style
+                        .set_color(false, self.theme.color(value - 40), Some(value - 40));
                 }
-                90..=97 => self.style.fg = self.theme.color(value - 90 + 8),
+                90..=97 => self.style.set_color(
+                    true,
+                    self.theme.color(value - 90 + 8),
+                    Some(value - 90 + 8),
+                ),
                 100..=107 => {
-                    self.style.bg = self.theme.color(value - 100 + 8);
-                    self.style.flags |= EXPLICIT_BG;
+                    self.style.set_color(
+                        false,
+                        self.theme.color(value - 100 + 8),
+                        Some(value - 100 + 8),
+                    );
                 }
-                39 => self.style.fg = self.theme.foreground,
+                39 => {
+                    self.style.fg = self.theme.foreground;
+                    self.style.flags &= !(EXPLICIT_FG | PALETTE_FG);
+                    self.style.palette_indices &= 0xf0;
+                }
                 49 => {
                     self.style.bg = self.theme.background;
-                    self.style.flags &= !EXPLICIT_BG;
+                    self.style.flags &= !(EXPLICIT_BG | PALETTE_BG);
+                    self.style.palette_indices &= 0x0f;
                 }
                 38 | 48 => {
+                    let mut palette = None;
                     let color = if group.len() > 1 {
                         match group.get(1) {
-                            Some(5) => group
-                                .get(2)
-                                .filter(|v| **v <= 255)
-                                .map(|v| self.theme.color(*v)),
+                            Some(5) => group.get(2).filter(|v| **v <= 255).map(|v| {
+                                palette = Some(*v);
+                                self.theme.color(*v)
+                            }),
                             Some(2) => {
                                 let base = if group.len() >= 6 { 3 } else { 2 };
                                 rgb(
@@ -1262,9 +1348,11 @@ impl State {
                     } else {
                         match raw_param(groups, i + 1) {
                             Some(5) => {
-                                let value = raw_param(groups, i + 2)
-                                    .filter(|v| *v <= 255)
-                                    .map(|v| self.theme.color(v));
+                                let value =
+                                    raw_param(groups, i + 2).filter(|v| *v <= 255).map(|v| {
+                                        palette = Some(v);
+                                        self.theme.color(v)
+                                    });
                                 i += 2;
                                 value
                             }
@@ -1281,12 +1369,7 @@ impl State {
                         }
                     };
                     if let Some(color) = color {
-                        if value == 38 {
-                            self.style.fg = color;
-                        } else {
-                            self.style.bg = color;
-                            self.style.flags |= EXPLICIT_BG;
-                        }
+                        self.style.set_color(value == 38, color, palette);
                     }
                 }
                 _ => {}
