@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "source_sha": "4b3829a0754643e0ff080772db9a1c1886c1fa12",
+  "status": "passed",
+  "pixel_readback": "not_performed",
+  "ime_keyboard": "not_performed",
+  "host": "macOS-15.8.2-arm64-arm-64bit-Mach-O",
+  "checks": {
+    "native_pty_and_pixel_geometry": true,
+    "cursor_reply": true,
+    "kitty_capability_query": true,
+    "chunked_rgba": true,
+    "png": true,
+    "alternate_screen_image_isolation": true,
+    "malformed_image_text_recovery": true,
+    "image_deletion": true
+  },
+  "pty_size": {
+    "cols": 40,
+    "rows": 12,
+    "pixel_width": 320,
+    "pixel_height": 180
+  },
+  "application_exit": 0,
+  "exit_code": 0,
+  "binary_sha256": "4171cc671ddabb6cc00f38fb8fc63fbc2574733ea6a1be27033780a5de0d9448"
+}

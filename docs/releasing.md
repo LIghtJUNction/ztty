@@ -1,97 +1,152 @@
-# Releasing Project Z terminal packages
+# Releasing ztty and its reusable libraries
 
-## Current publication record
+Report date: **2026-11-18, Asia/Taipei**. The current application source is
+[`7535aa2`](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92).
+The libraries below are published on crates.io. The application has verified
+0.2.0 candidate artifacts from the formal Release workflow; this record does
+not claim that a `v0.2.0` GitHub Release or AUR update has been published.
 
-All three reusable packages are published on crates.io as version **0.1.0**.
-Registry readback and isolated consumers were verified on 2026-11-18
-(Asia/Taipei). Each package is published by LIghtJUNction and is not yanked.
+## Published packages
 
-| Package | Version | Embedded source commit |
-| --- | --- | --- |
-| [zinput](https://crates.io/crates/zinput/0.1.0) | 0.1.0 | `9333047c0867756a73d71e29524ddef3d9f21544` |
-| [zpty](https://crates.io/crates/zpty/0.1.0) | 0.1.0 | `9333047c0867756a73d71e29524ddef3d9f21544` |
-| [zterm](https://crates.io/crates/zterm/0.1.0) | 0.1.0 | `3e2f03297c638f14d9799dcb78a915f634287813` |
+| Package | Version | Embedded source commit | Publication time, Asia/Taipei |
+| --- | --- | --- | --- |
+| [zinput](https://crates.io/crates/zinput/0.1.0) | 0.1.0 | `9333047c0867756a73d71e29524ddef3d9f21544` | 2026-11-17 21:50:38 |
+| [zgraphics](https://crates.io/crates/zgraphics/0.1.0) | 0.1.0 | `4b3829a0754643e0ff080772db9a1c1886c1fa12` | 2026-11-18 04:03:59 |
+| [zpty](https://crates.io/crates/zpty/0.2.0) | 0.2.0 | `4b3829a0754643e0ff080772db9a1c1886c1fa12` | 2026-11-18 04:03:23 |
+| [zterm](https://crates.io/crates/zterm/0.2.0) | 0.2.0 | `7535aa29f1a2728a78a446ffea6784dcbc2aae92` | 2026-11-18 04:07:01 |
 
-The second source commit adds documentation and test tools to the same production
-Rust implementation. The crates.io checksums and actual publication timestamps
-are recorded in [registry.json](measurements/registry.json).
+The crates.io API confirms LIghtJUNction as publisher and all four versions as
+not yanked. Cargo downloaded each package from the registry; package checksums
+match the API and the embedded VCS metadata matches the table. All four
+individual consumers and their combined consumer passed. These consumers use
+exact registry versions with no workspace path or Git overrides. Their library
+code is `no_std`; their test executables use `std` to drive terminal state,
+input encoding, graphics placement/deletion, and a real Linux PTY child.
 
-Each package passed an independent consumer, and all three passed a combined
-consumer. The generated manifests use exact crates.io versions, without local
-path or git overrides. Checks include a `no_std` library, terminal screen/query
-behavior, Kitty input encoding, and a real PTY child process. The published
-packages' VCS metadata and checksums were read back from Cargo's downloaded
-artifacts. See [the complete consumer record](measurements/registry-consumer-all-2026-11-18.json).
+Evidence: [registry metadata](measurements/registry-0.2-2026-11-18.json) and
+[independent consumers](measurements/registry-native-graphics-2026-11-18.json).
+The previous 0.1 publication record is retained in
+[registry.json](measurements/registry.json).
 
 ```sh
-python3 tools/verify_registry.py
+cargo add zvte@0.1.3 --no-default-features
+cargo add zinput@0.1.0 --no-default-features
+cargo add zgraphics@0.1.0 --no-default-features
+cargo add zpty@0.2.0 --no-default-features
+cargo add zterm@0.2.0 --no-default-features
 ```
 
-## Release procedure
+## Application artifacts and native verification
 
-The workspace contains three independently reusable libraries and the graphical
-`ztty` application. Package names and versions are checked against crates.io
-before publication. Release contents must pass local tests and packaging
-verification first.
+[Release candidate run 44165748395](https://github.com/LIghtJUNction/ztty/actions/runs/44165748395)
+checked out the same immutable source commit in each job. All five native build
+jobs succeeded. The archives, application manifests, native reports, and build
+reports were downloaded and checked against their recorded hashes. The
+[artifact record](measurements/native-artifacts-2026-11-18.json) contains exact
+file sizes, SHA-256 values, and source identity.
+
+| Platform | Artifact | Verified scope |
+| --- | --- | --- |
+| Linux x86_64 | `ztty-linux-x86_64.tar.gz` | Native release build and CLI startup; separate development-machine Xvfb and Hyprland acceptance |
+| Linux ARM64 | `ztty-linux-aarch64.tar.gz` | Native release build and CLI startup; ARM64 GUI not exercised |
+| macOS Apple Silicon | `ztty-macos-aarch64.zip` and `.tar.gz` | Apple SDK build, real AppKit/Darwin PTY, 8 session/protocol checks, application packaging and signature verification |
+| macOS Intel | `ztty-macos-x86_64.zip` and `.tar.gz` | The same native build, 8 checks, and package verification |
+| Windows x86_64 | `ztty-windows-x86_64.zip` | Native Win32/ConPTY execution and 17 checks, including actual window pixels |
+| Windows ARM64 | `ztty-0.2.0-windows-arm64.zip` | Cross-linked PE and complete bundle verified; native ARM64 execution not performed |
+
+Windows ARM64 has a separate [cross-build record](measurements/windows-arm64-cross-2026-11-18.json).
+It is not one of the five native jobs. The macOS probes explicitly leave pixel
+readback and IME/keyboard acceptance open. Windows x86_64 tests use the unpacked
+runtime bundle with compiler directories removed from PATH.
+
+The macOS archives contain `ztty.app`, a launchable native application. Packages
+are ad-hoc signed and verified; they do not carry a Developer ID signature or
+Apple notarization. The Windows bundle contains `ztty.exe` plus the official
+Microsoft ConPTY runtime. Keep its files together when extracting it. Runtime
+loading first checks the executable's own directory; the PTY library also
+supports the Windows inbox API.
+
+The pinned ConPTY package is `Microsoft.Windows.Console.ConPTY 1.25.261109001`.
+Its NuGet SHA-256 is:
+
+```text
+3d77f535df848e44225c2a8912ac844fecb23f3057732b639f3034b587496f09
+```
+
+The packager verifies the download, PE architecture, complete archive membership,
+and per-file hashes. The [Windows packaging tool](../tools/package_windows.py)
+and [macOS packaging tool](../tools/package_macos.py) describe reproducible inputs.
+
+The report and deliverables are also archived in the
+[ztty Google Drive folder](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa).
+GitHub Actions candidate artifacts have limited retention. The current Linux
+`install.sh` and AUR package follow published application releases, so building
+this source or using these 0.2 candidate archives is required for the new work
+until a matching application release is published.
+
+## Local gates and crate publication
+
+Routine development gates run locally. The current result includes 72 library
+unit tests, four doctests, strict workspace Clippy, a Linux release build,
+production dependency and symbol checks, and a bare-metal check of the portable
+libraries. See [the gate log](measurements/local-gates-2026-11-18.txt),
+[no_std audit](measurements/no-std-graphics-2026-11-18.txt), and
+[protocol acceptance](protocols.md#acceptance-coverage).
 
 ```sh
 sh tools/check.sh
 cargo test --workspace --doc
 cargo run -p zpty --example capture
+cargo check -p zinput -p zgraphics -p zterm --target x86_64-unknown-none
 python3 tests/gui_smoke.py --binary ./target/release/ztty
+python3 tests/graphics_smoke.py --binary ./target/release/ztty
+python3 tests/hyprland_graphics.py --binary ./target/release/ztty
 ```
 
-Publish in dependency order. `zinput` and `zpty` are independent; `zterm` depends
-on `zinput`; the application depends on `zterm` and `zpty`.
+The last command is an opt-in live desktop check and requires a logged-in
+Hyprland session. The Xvfb tests create their own display servers. Native macOS
+and Windows probes are run on their corresponding operating systems.
+
+Publish libraries from a clean committed checkout. Verify package contents and
+builds before upload, in dependency order: `zinput` and `zgraphics` before
+`zterm`; `zpty` is independent. Only publish packages whose versions changed.
+The 0.2 publication used local `cargo package` verification and source-bound
+native gates, then `cargo publish --locked --no-verify` from a clean development
+machine checkout to reuse the already completed build checks. Credentials came
+from Cargo's existing configuration and were not copied into source or reports.
 
 ```sh
-cargo publish --locked -p zinput
+cargo package --locked -p zgraphics
+cargo publish --locked -p zgraphics
+cargo package --locked -p zpty
 cargo publish --locked -p zpty
+cargo package --locked -p zterm
 cargo publish --locked -p zterm
+python3 tools/verify_registry.py
 ```
 
-Run the corresponding `cargo publish --dry-run` command before each actual
-publication. Dependent packages must resolve their dependencies from the public
-registry, so publish and verify `zinput` before packaging `zterm`. Credentials
-come from Cargo's configured credential provider or `CARGO_REGISTRY_TOKEN`;
-they are never included in source, commands, or reports.
+## Formal application release
 
-Record registry readback, package checks, commit IDs, and benchmark scope in the
-release report. Rebuild a small consumer using registry versions to verify that
-the public packages work independently of workspace path dependencies.
+The [Release workflow](../.github/workflows/release.yml) supports two operations.
+`workflow_dispatch` with `build_only=true` generates candidate artifacts from a
+branch and leaves release publishing and AUR untouched. This is the operation
+used for the current native verification. The source SHA is pinned before any
+platform job starts; failed or incomplete probes cannot produce an accepted
+build report.
 
-Routine development checks can run locally. Pull requests and release tags also run CI.
-
-## GitHub and AUR
-
-The application release uses the application package version in `Cargo.toml`. After
-merging a version update, push the matching tag to publish it.
+A matching `vX.Y.Z` tag uses the existing Verify publication gate, all five native
+build jobs, source and checksum validation, an Arch package installation check,
+then GitHub Release publication and AUR updating. Branch publication is rejected,
+and the tag is checked again before publishing. Existing assets must match their
+recorded source and hashes before the AUR update can proceed.
 
 ```sh
+gh workflow run release.yml --ref native-graphics-0.2 -f build_only=true
+# For an approved application release whose Cargo version is X.Y.Z:
 git tag -a vX.Y.Z -m 'ztty X.Y.Z'
 git push origin refs/tags/vX.Y.Z
 ```
 
-The tag workflow runs the same checks as pull request CI, including the Xvfb
-GUI suite. It generates a deterministic source archive and SHA256 checksum,
-builds native Linux x86_64 and AArch64 binaries on separate runners, builds
-and installs the Arch package in a clean container, then publishes the
-GitHub Release and pushes the generated PKGBUILD and .SRCINFO to the AUR.
-Retry a failed run on the same tag. Existing release assets are checked before
-the AUR update, and an older tag cannot downgrade the AUR package.
-
-The release workflow uses the repository secret `AUR_SSH_KEY`. Its public key
-must be registered to an account that can maintain `ztty` on the AUR.
-`packaging/aur/known_hosts` pins the AUR SSH host key.
-
-
-| Platform | Architectures | Status |
-| --- | --- | --- |
-| Linux (glibc, X11/XWayland) | x86_64, aarch64 | Prebuilt archives and `install.sh` |
-| macOS | x86_64, arm64 | Planned native PTY and window backend |
-| Windows | x86_64, arm64 | Planned ConPTY and native window backend |
-
-Linux archives include the executable and license. Each binary archive has
-its own SHA256 file. The installer picks the architecture, verifies the
-download, checks that the binary runs, and installs it in `~/.local/bin`.
-Set `ZTTY_INSTALL_DIR` to install elsewhere and `ZTTY_VERSION` to pin a tag.
+The AUR step retains the existing `AUR_SSH_KEY` secret and pinned host key in
+`packaging/aur/known_hosts`. An older tag cannot downgrade the package. This work
+did not change the user's desktop configuration or other project jobs.

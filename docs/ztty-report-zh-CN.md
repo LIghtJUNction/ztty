@@ -1,128 +1,110 @@
-# ztty 开发与发布记录
+# ztty 0.2：原生平台、Kitty 图片与组件发布
 
 日期：2026-11-18，Asia/Taipei。
 
-**ztty 的 Linux 终端初版、三个可复用库的正式发布，以及本轮公开包和软件 X11 测量均已完成。** `zinput`、`zpty`、`zterm` 现在都能从 crates.io 安装，并已验证在独立项目中单独和组合使用。
+**本轮已经完成 Linux 图片显示路径、macOS/Windows 原生后端，以及可复用组件的 crates.io 发布。** 在实际 Hyprland/XWayland 窗口里，现成的 `kitten icat` 能自动探测内联传输并显示照片和透明 PNG；Xvfb 的颜色、透明度、滚动、缩放、主备屏和删除验收通过。macOS 两种架构与 Windows x86_64 也完成了对应操作系统上的原生构建与运行检查。
 
-项目仓库：[LIghtJUNction/ztty](https://github.com/LIghtJUNction/ztty)。生产 Rust 实现来自 [9333047](https://github.com/LIghtJUNction/ztty/commit/9333047c0867756a73d71e29524ddef3d9f21544)；后续提交补充测试、发布记录和测量工具，没有改变这版生产代码。
+生产源码来自 [7535aa2](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92)。这一提交包含自动探测修复。此前的 [4b3829a](https://github.com/LIghtJUNction/ztty/commit/4b3829a0754643e0ff080772db9a1c1886c1fa12) 引入完整图形与原生平台实现，保留了用户已有的 Fcitx 5 事件路由修复；后续文档和证据提交不改变这份生产代码。
 
-## 组件与发布
+项目：[LIghtJUNction/ztty](https://github.com/LIghtJUNction/ztty)。最终原生制品构建：[Release candidate 44165748395](https://github.com/LIghtJUNction/ztty/actions/runs/44165748395)。报告与安装包归档：[Google Drive / ztty](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa)。
 
-| 组件 | 职责 | 状态 |
+![实际 Hyprland/XWayland 窗口中的照片与透明 PNG](https://raw.githubusercontent.com/LIghtJUNction/ztty/main/docs/assets/kitty-graphics-hyprland.png)
+
+## 三项图片验收
+
+| 用户要求 | 实际结果 | 证据 |
 | --- | --- | --- |
-| `zvte 0.1.3` | 把 ANSI/VT 字节流解析成终端操作 | 复用用户现有的库，关闭默认特性 |
-| [`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0) | 键盘、鼠标、焦点、粘贴事件编码 | 已发布，独立使用验证通过 |
-| [`zpty 0.1.0`](https://crates.io/crates/zpty/0.1.0) | Linux PTY、非阻塞 I/O、子进程生命周期 | 已发布，真实 PTY 验证通过 |
-| [`zterm 0.1.0`](https://crates.io/crates/zterm/0.1.0) | 屏幕、历史、模式、协议回复和变化记录 | 已发布，单包及组合验证通过 |
+| 现成工具直接出图 | `kitten icat` 0.50.0 显示照片和透明 PNG，退出码均为 0；`--detect-support` 返回 `stream`，PNG 使用自动探测 | [真实桌面记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/graphics-hyprland-2026-11-18.json) |
+| 像素和生命周期正确 | 真实 PTY + Xvfb 窗口像素读回，RGB/RGBA/PNG、四档 alpha、裁剪、图层、分片、复用、替换、滚动、缩放、备用屏和删除均通过 | [7 组图像验收](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/graphics-xvfb-2026-11-18.json) |
+| 异常输入可恢复 | 坏图、超限尺寸、坏 Base64 和中断传输后仍可输出文字、输入按键并显示下一张有效图片；80 次中断上传后，热身后的前后 RSS 样本增量为 0 | [异常输入与恢复记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/graphics-xvfb-2026-11-18.json) |
 
-三个新库都有独立 Cargo 包、MIT 许可证、README 和公共 API。`zinput` 与 `zpty` 没有 Cargo 依赖；`zterm` 复用 `zinput`、`zvte` 和关闭默认特性的 `unicode-width`。
+真实桌面使用 Hyprland 0.57.2 的 XWayland 服务。测试只创建、调整和截取自己的窗口，没有修改桌面配置。该会话正常的 X0 路径当时缺失，测试通过临时自有别名连接现有同用户 XWayland socket，并在结束时移除别名；原始记录保留了这一环境条件。
+
+Xvfb 的像素测试不是协议回放：测试数据从真正的子进程 PTY 进入终端，再读取窗口颜色。透明度检查覆盖 alpha 0、64、128、255；图片滚动三行后检查位置变化，切换备用屏后检查主屏图片隐藏与恢复，删除后检查原区域已经重绘。0 字节 RSS 增量是这组恢复测试的采样结果，不是总内存或峰值为零的声明。
+
+## 平台后端与已验证边界
+
+| 平台 | 原生实现 | 本轮实际验证 |
+| --- | --- | --- |
+| Linux x86_64 | Linux PTY、X11/XWayland、Xft 文字、XRender 图片合成 | 12 项已有 GUI 回归、7 组图像测试、真实 Hyprland/XWayland 工具验收 |
+| Linux ARM64 | 同一 Linux 后端 | 原生构建和 CLI 启动；未做 ARM64 图形桌面验收 |
+| macOS Apple Silicon | Darwin `forkpty`、AppKit 窗口、CoreText/CoreGraphics | Apple SDK 原生构建、实际 AppKit/PTY、8 项会话及协议检查、应用包签名与结构检查 |
+| macOS Intel | 同一 macOS 后端 | 原生 Intel 构建及同样的 8 项检查 |
+| Windows x86_64 | ConPTY、Win32 窗口、GDI 文字、自己的 RGBA 合成 | 17 项原生检查，包括实际 ConPTY 查询往返、RGB/RGBA/PNG 窗口像素、透明度、滚动、裁剪、缩放、主备屏、删除和键盘恢复 |
+| Windows ARM64 | 同一 Windows 后端 | PE 实际交叉链接、系统导入和完整运行包验证；未在 ARM64 Windows 执行 |
+
+macOS 可以原生启动应用和 shell，不需要 X11；Windows 不需要 WSL。macOS 的原生像素读回及输入法/键盘验收仍未完成，报告明确保留 `pixel_readback: not_performed` 和 `ime_keyboard: not_performed`。Windows ARM64 的交叉构建也没有代替真实运行结果。
+
+原生证据分别保存在 [macOS ARM64](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/ztty-macos-aarch64.native-7535aa2.json)、[macOS Intel](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/ztty-macos-x86_64.native-7535aa2.json)、[Windows x86_64](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/ztty-windows-x86_64.native-7535aa2.json) 和 [Windows ARM64 交叉构建](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/windows-arm64-cross-2026-11-18.json)。
+
+## 已发布的可复用组件
+
+| 组件 | 发布版本 | 职责 |
+| --- | --- | --- |
+| [zgraphics](https://crates.io/crates/zgraphics/0.1.0) | 0.1.0，新包 | Kitty 图片传输、PNG/RGB/RGBA 解码、存储、放置和删除 |
+| [zpty](https://crates.io/crates/zpty/0.2.0) | 0.2.0 | Linux/macOS PTY、Windows ConPTY、有界 I/O 和子进程生命周期 |
+| [zterm](https://crates.io/crates/zterm/0.2.0) | 0.2.0 | 字符屏幕、历史、图片锚点、模式、协议回复和变化记录 |
+| [zinput](https://crates.io/crates/zinput/0.1.0) | 0.1.0，继续复用 | 键盘、鼠标、焦点及粘贴事件编码 |
+| [zvte](https://crates.io/crates/zvte/0.1.3) | 0.1.3，继续复用 | 用户已有的 ANSI/VT 流式解析器 |
 
 ```sh
 cargo add zvte@0.1.3 --no-default-features
+cargo add zgraphics@0.1.0 --no-default-features
+cargo add zpty@0.2.0 --no-default-features
+cargo add zterm@0.2.0 --no-default-features
 cargo add zinput@0.1.0 --no-default-features
-cargo add zpty@0.1.0 --no-default-features
-cargo add zterm@0.1.0 --no-default-features
 ```
 
-注册表回读确认三个包均由 LIghtJUNction 发布，版本为 0.1.0，未被撤回。`zterm` 于 2026-11-18 01:45:40（Asia/Taipei）发布，Cargo 已确认可从注册表取得。
+四个 ztty 组件均已从 crates.io 重新下载，在工作区以外验证单独使用和组合使用；生成的 manifest 只有精确注册表版本，没有本地路径覆盖。验证覆盖 `no_std` 库编译、终端状态、事件编码、图片放置/删除和真正的 PTY 子进程。注册表校验和与 Cargo 下载包一致，发布者均为 LIghtJUNction，未被撤回。详见 [独立消费者结果](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/registry-native-graphics-2026-11-18.json) 与 [发布回读](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/registry-0.2-2026-11-18.json)。
 
-独立验证项目使用精确 crates.io 版本，没有本地路径依赖。三个单包消费者和一个组合消费者均完成元数据检查、`no_std` 库检查及实际运行，覆盖屏幕状态、协议回复、键盘编码和真实 PTY。`zinput`、`zpty` 的包内源码提交为 `9333047`，`zterm` 为 `3e2f032`；两次提交之间的生产 Rust 源码一致。校验和与源提交均保存在[发布记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/releasing.md)。
+## 图片实现与 no_std 边界
 
-## 实现方式
+终端收到图片命令后，先收齐并验证图片，再保存一份 RGBA 像素；“放置”只记录图片 ID、字符行列、裁剪和层级。滚动时移动这些位置，绘制时将像素合成到窗口。这使协议、图片数据和窗口 API 可以分别复用，后续 Sixel 也可以复用图片存储和绘制路径。
 
-终端接收键盘操作，把它编码后送给程序；接收程序输出的文字和控制指令，更新屏幕，再画出变化。代码按数据所有权拆分：`zpty` 管进程与文件描述符，`zterm` 管屏幕，`zinput` 负责事件编码。
+`zgraphics` 实现 `a=q/t/T/p/d`、直接传输 `t=d`、RGB24/RGBA32/PNG100、zlib 压缩、分片、图片/放置 ID、裁剪、缩放、层级和删除。主屏与备用屏拥有独立场景。Linux 通过 XRender 合成，macOS 通过 CoreGraphics，Windows 直接合成到 DIB；没有嵌入 Kitty 的渲染器。
 
-字符格使用连续数组，每格 28 字节，没有单独的堆指针。整屏滚动改变行索引，避免搬动整块屏幕；历史按需增长，字符存储上限为 8 MiB，达到上限后复用旧行。备用屏幕按需分配。
+真实工具验收发现并修复了两类兼容问题。当前 Kitty 可以发送 128 KiB APC 分片，并省略 Base64 尾部填充，因此接收器改为有界流式解码。自动探测器还忽略较短的 DA1 回复，因此把数值为 6 的 VT102 标识写成等价的 `06`，维持原能力声明。两项都加入了回归测试，最终通过现成工具验证。
 
-前端使用单线程事件循环，空闲时在 `poll` 中等待，绘制只处理变化的行。PTY 写队列保留已写位置，遇到部分写入或背压时等待继续。同步输出保留上一帧，并用 150 ms 超时处理缺少结束标记的情况。
+生产应用和依赖图保持 Rust `no_std`，动态存储使用 `alloc`。11 个生产 crate 的启用特性与源属性审计通过，Linux release 二进制没有 Rust `std::` 符号，`zinput/zgraphics/zterm` 在没有标准库的 `x86_64-unknown-none` 目标上通过检查。PNG 使用第三方 `zune-png/zune-core/zune-inflate` 的无标准库配置；这些不是用户自行编写的库。系统窗口、字体和 C ABI 仍属于运行时成本。证据见 [依赖审计](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/no-std-graphics-2026-11-18.txt)。
 
-生产 Rust 代码和依赖使用 `no_std`；动态存储使用 `alloc`，分配器由应用提供。Linux 窗口和字体通过系统 C ABI 使用 libc/libutil、X11、Xft 及编译器 unwinder。测试和基准程序使用的 `std` 不进入生产程序的 Rust 依赖链。系统字体、共享库、图形缓冲仍然占内存，因此核心模型的大小不能代替整个窗口的内存。
+默认每个场景最多保存 128 张图片、512 个放置，保留像素容量最多 32 MiB；单图最多 16 MiB，待完成传输最多 16 MiB。宽或高最多 8192 像素，同时必须满足字节限制。APC 暂存只需要 512 字节头部和 4096 字节编码数据。主备屏各自有配额，解码临时缓冲和平台显示缓存另行计入，因此这些数字不是整个进程的总内存上限。
 
-## 已实现的功能
+## 性能与测试
 
-- 真实 shell、主备屏、光标、滚动区域、插入/删除/擦除、历史浏览。
-- 流式 UTF-8、中日韩宽字符、每格两个组合字符、16/256 色和真彩色。
-- Kitty 键盘标志 1/2/4/8/16，按下/重复/释放、修饰键和关联文本，主备屏模式栈分离。
-- SGR/传统鼠标、焦点事件、括号粘贴、同步输出。
-- OSC 标题、工作目录元数据、OSC 8 链接、颜色查询、DSR、DA、DECRQM 和有限 XTGETTCAP。
-- X11/Xft 窗口、字体回退、选择、剪贴板/主选择、INCR 接收及 XIM 接口。
+同一台本地机器、绑定 CPU 0、三次交替运行的核心基准，图形版本与此前基线对比如下。该结果只包含解析和屏幕更新，不包含 PTY、渲染与显示器。
 
-Ctrl+Shift+C/V 复制粘贴，Shift+PageUp/PageDown 浏览历史，Ctrl+点击打开链接。应用捕获鼠标时，按住 Shift 使用本地选择、滚轮和中键粘贴。链接只在明确点击后打开，通过 argv 传递。
-
-## 验证结果
-
-| 检查 | 结果 |
-| --- | --- |
-| 库单元测试 | 40 项通过 |
-| README 示例测试 | 3 项通过 |
-| Clippy 严格检查、Linux release 构建 | 通过 |
-| 生产依赖和二进制 `no_std` 审计 | 通过，未发现 Rust `std` 符号 |
-| PTY 真实会话 | 读写、尺寸、控制终端、退出、子进程归属通过 |
-| Xvfb/X11 GUI 验收 | 11 项通过，0 项失败 |
-| PTY 协议检查 | 12 项通过 |
-| 公开包独立消费者 | 三个单包及三包组合全部通过 |
-| 本轮软件 X11 测量 | 12 轮写屏/查询、6 轮纯查询全部通过 |
-
-大粘贴验收完整送达 139,276 字节，含 12 字节括号粘贴分隔符。测量结束后没有残留的测试终端或子进程。
-
-真实 IBus/Fcitx、实际 XWayland 会话和专门构造的 INCR 分块传输仍需验收。裸机目标的附加编译检查未执行成功；Linux `no_std` 的源文件、依赖和已链接二进制检查已通过。原始验收记录保存在[性能与验证报告](https://github.com/LIghtJUNction/ztty/blob/main/docs/performance.md)。
-
-## 开发机核心性能
-
-环境：i9-12900HX、24 个逻辑 CPU、Linux 7.3.4-arch1-1、Rust 1.100.0、release 构建，120×32 字符。
-
-| 指标 | 实测 |
-| --- | ---: |
-| 初始核心堆内存 | 107,676 B，约 105.15 KiB |
-| ASCII 吞吐 | 232.927 MiB/s |
-| 满历史缓冲 ASCII 吞吐 | 177.049 MiB/s |
-| SGR 工作负载 | 125.111 MiB/s |
-| 混合 Unicode 吞吐 | 97.722 MiB/s |
-| 1 KiB 更新 p50 / p95 / p99 | 3.138 / 4.119 / 4.495 µs |
-| 已测稳态处理循环的堆分配 | 0 次 |
-
-延迟样本每次合并计时 16 次 feed 再取均值，共 10,000 个样本；吞吐取 7 轮中位数。这里测量解析和屏幕状态更新，不含 PTY 和绘制。另一台 Xeon 环境的旧记录单独保留，不混合计算或作为优化收益。
-
-## 整窗内存与 PTY 响应
-
-本轮在开发机上使用独立 Xvfb/X11，每组 3 次，轮换测量顺序；设置 `LIBGL_ALWAYS_SOFTWARE=1`。两者请求相同的 120×32 字符网格、monospace 11pt 和固定文本页面，历史未填满。实际窗口为 ztty 1104×728、Kitty 1081×609；字体文件和每轮负载均保留在原始结果中。
-
-下表为每组三次的中位数，单位 MiB：
-
-| 配置 | 进程 RSS | 进程 PSS |
+| 指标 | 基线 | 图形版本 |
 | --- | ---: | ---: |
-| ztty | 18.195 | 8.653 |
-| Kitty 0.50.0，默认时序 | 155.168 | 124.787 |
-| Kitty，仅 `input_delay=0` | 155.340 | 125.315 |
-| Kitty，低延迟时序 | 155.504 | 114.102 |
+| ASCII 吞吐 | 313.713 MiB/s | 312.621 MiB/s |
+| 满历史缓冲 ASCII 吞吐 | 209.947 MiB/s | 220.766 MiB/s |
+| SGR 吞吐 | 172.967 MiB/s | 171.978 MiB/s |
+| 混合 Unicode 吞吐 | 114.261 MiB/s | 108.145 MiB/s |
+| 1 KiB 输入 p50 | 2.168 µs | 2.232 µs |
+| 初始终端核心堆 | 107,676 B | 107,676 B |
+| 已测稳态循环分配 | 0 | 0 |
 
-RSS 包含进程驻留页面，PSS 按比例分摊共享页面，两者不能相加。ztty 另有约 3.066 MiB 的 X server pixmap；它与 X server 增量、像素估算等账户也不能重复累加。Kitty 的 XRes pixmap 计数为零不代表其图形内存为零。软件 GL 的内存分布与正常硬件 GPU 环境不同，不能把本表直接推广到真实桌面。
+图片存储按需分配，所以没有图片时的初始核心堆没有增长。三个核心测量运行的原始值、源文件摘要和计算口径在 [同机对照记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/graphics-core-overhead-2026-11-18.json) 中。
 
-持续写同一字符并查询光标位置时，ztty 往返 p50 为 **16.705 µs**，p95 为 **29.913 µs**，p99 为 **79.184 µs**；Kitty 三种时序配置的 p50 约 6.49–6.97 ms。每轮预热 100 次后测 1,000 次，报告取三轮各分位数的中位数。
+这组样本中，混合 Unicode 吞吐下降约 5.35%，满历史缓冲的 ASCII 吞吐提高约 5.15%。只有三次交替运行，机器负载和频率没有固定；报告保留这些变化与波动，没有把细小差异解释成稳定的性能结论。
 
-去掉每轮写屏，仅查询光标位置后，结果为：
+在 i9-12900HX 开发机上另做三次 120×32 软件 X11 整窗测量，图形版本进程 RSS 中位数约 **18.36 MiB**，PSS 约 **13.59 MiB**。XRes 另外观察到 **6,547,456 B** 服务器 pixmap 资源，不包含在进程 RSS/PSS 内，也不代表完整 GPU 内存。写一个字符并查询状态的 PTY 往返 p50 为 **16.456 µs**，p95 为 **34.915 µs**，p99 为 **101.634 µs**，均为三次运行相应分位数的中位数。
 
-| 配置 | p50 | p95 | p99 |
-| --- | ---: | ---: | ---: |
-| ztty | 16.934 µs | 32.905 µs | 89.426 µs |
-| Kitty，`input_delay=0` | 47.320 µs | 98.040 µs | 168.922 µs |
+该运行时测量早于 DA1 序列化修复，使用已核对哈希的本地构建。它不是原生 macOS/Windows 性能，也不是物理键盘到显示像素的延迟。查询回复确认程序理解了终端状态，显示器何时呈现新帧需要另行测量。本轮没有重新比较 Kitty 或测试 Ghostty，因此不据此宣称已经整体超过它们。[完整性能与边界](https://github.com/LIghtJUNction/ztty/blob/main/docs/performance.md) 保留了旧版本的历史比较。
 
-Kitty 的结果随写屏负载变化很大，说明该测量对绘制与主循环调度敏感；这不能被简化为纯解析器速度的倍数差。查询回复只确认终端已经理解逻辑状态，不代表新像素已经显示。这里没有测物理键盘到显示器的延迟，也没有测 Ghostty。
+最终本地检查通过 **72 项库单元测试、4 项 doctest、严格 Clippy、Linux release 构建、依赖和符号审计、裸机目标检查**。[本地门禁记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/local-gates-2026-11-18.txt) 包含对应提交和编译日志。裸机检查中 `zune-png 0.5.2` 有针对未来 Rust 的兼容性提示；当前固定 Rust 1.100.0 检查成功，正式平台构建通过。
 
-低延迟配置使用 `input_delay=0`、`repaint_delay=2`、`sync_to_monitor=no`，依据 [Kitty 官方性能说明](https://sw.kovidgoyal.net/kitty/performance/)，仅对测试进程生效。完整配置、样本口径、每轮结果和脚本校验和均在[性能报告及原始数据](https://github.com/LIghtJUNction/ztty/blob/main/docs/performance.md)中。
+## 安装包与运行
 
-## 运行与后续范围
+Google Drive 的 ztty 文件夹保存 0.2.0 候选包、SHA256SUMS、报告和图片证据；GitHub Release workflow 也保留对应构建制品。macOS 包为 `.app`，包含 ad-hoc 签名验证，但没有 Developer ID 签名或 Apple 公证。Windows 包携带固定版本的官方 ConPTY，解压后需要把配套文件保留在一起。
 
-开发机项目目录：`/home/lightjunction/Documents/GITHUB/ztty`。
+本轮正式发布的是上述 crates.io 组件。应用安装包是通过原生门禁的候选制品，未发布 `v0.2.0` GitHub Release，也未更新 AUR；现有 Linux 一键安装器仍跟随已发布应用版本。新功能可以使用候选包，或在开发机 `/home/lightjunction/Documents/GITHUB/ztty` 从源码构建。
 
 ```sh
 cargo build --locked --release
 ./target/release/ztty
-./target/release/ztty --font 'monospace:size=12' --geometry 100x28
+# 在 ztty 的 shell 内：
+kitten icat --scale-up photo.jpg
+kitten icat transparent.png
 ```
 
-依赖 Linux、Rust 1.100.0、C 链接器、X11/Xft 开发库和等宽字体。`make install` 可安装到当前用户的 `~/.local`。
-
-当前提供 X11/XWayland 前端。原生 Wayland、专用 GPU 渲染、Sixel/Kitty 图像、OSC 52、复杂文字塑形、完整 emoji ZWJ 和历史重排仍未实现。下一阶段的验收应覆盖真实桌面、输入法、满历史/备用屏内存、持续 TUI 输出，以及与 Ghostty 的同条件比较。
-
-[实际界面截图](https://github.com/LIghtJUNction/ztty/blob/main/docs/assets/ztty-preview.png)。
+第一版按约定保留文件/共享内存传输和动画为后续工作，Sixel 尚未接入。原生 Wayland、专用 GPU 渲染、macOS 像素及输入法验收、Windows ARM64 原生验收、复杂文字塑形和历史重排仍需要各自实现或测量。Linux 的脏行绘制也尚未移植到 macOS/Windows 的所有绘制路径，不能把 Linux 的性能直接推广到其他平台。

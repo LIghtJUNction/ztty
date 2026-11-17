@@ -1,0 +1,255 @@
+{
+  "scope": "same-host paired parser/screen-only benchmark, CPU0, 3 interleaved runs; no PTY or renderer",
+  "baseline_git": "bbb201c24e91a1cbdddf1b503108271bc57407d6",
+  "optimization": "ordinary chunks forwarded intact; bounded streaming APC with unpadded final base64 compatibility",
+  "results": [
+    {
+      "variant": "baseline",
+      "run": 1,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 333.777,
+        "ascii_full_history_mib_s": 238.318,
+        "sgr_mib_s": 188.465,
+        "unicode_mib_s": 115.555,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 32,
+          "p95": 33,
+          "p99": 112,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2170,
+          "p95": 3423,
+          "p99": 6093,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "graphics",
+      "run": 1,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 291.783,
+        "ascii_full_history_mib_s": 211.627,
+        "sgr_mib_s": 171.978,
+        "unicode_mib_s": 108.145,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 35,
+          "p95": 36,
+          "p99": 63,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2230,
+          "p95": 3741,
+          "p99": 7358,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "graphics",
+      "run": 2,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 318.552,
+        "ascii_full_history_mib_s": 220.766,
+        "sgr_mib_s": 172.646,
+        "unicode_mib_s": 98.661,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 36,
+          "p95": 36,
+          "p99": 63,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2232,
+          "p95": 3887,
+          "p99": 7040,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "run": 2,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 295.524,
+        "ascii_full_history_mib_s": 177.627,
+        "sgr_mib_s": 172.967,
+        "unicode_mib_s": 111.736,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 32,
+          "p95": 33,
+          "p99": 59,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2168,
+          "p95": 3290,
+          "p99": 6535,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "run": 3,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 313.713,
+        "ascii_full_history_mib_s": 209.947,
+        "sgr_mib_s": 163.508,
+        "unicode_mib_s": 114.261,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 33,
+          "p95": 33,
+          "p99": 57,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2168,
+          "p95": 4282,
+          "p99": 8037,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "graphics",
+      "run": 3,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 312.621,
+        "ascii_full_history_mib_s": 221.273,
+        "sgr_mib_s": 163.915,
+        "unicode_mib_s": 108.558,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 36,
+          "p95": 36,
+          "p99": 36,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2249,
+          "p95": 4000,
+          "p99": 6240,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "baseline": {
+    "ascii_mib_s": 313.713,
+    "sgr_mib_s": 172.967,
+    "initial_heap": 107676,
+    "burst_p50_ns": 2168,
+    "edit_p50_ns": 32,
+    "allocations": [
+      0,
+      0,
+      0
+    ]
+  },
+  "graphics": {
+    "ascii_mib_s": 312.621,
+    "sgr_mib_s": 171.978,
+    "initial_heap": 107676,
+    "burst_p50_ns": 2232,
+    "edit_p50_ns": 36,
+    "allocations": [
+      0,
+      0,
+      0
+    ]
+  },
+  "metadata": {
+    "recorded_date": "2026-11-18 Asia/Taipei",
+    "environment": "ChatGPT local Linux workspace; not the Arch/Hyprland developer machine used by earlier benchmarks",
+    "kernel": "6.18.57",
+    "architecture": "x86_64",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "affinity": [
+      0
+    ],
+    "repetitions": 3,
+    "order": [
+      "baseline",
+      "graphics",
+      "graphics",
+      "baseline",
+      "baseline",
+      "graphics"
+    ],
+    "command": "cargo build -p zterm --release --example benchmark; taskset -c 0 target/release/examples/benchmark",
+    "workload_source": "crates/zterm/examples/benchmark.rs",
+    "baseline_source": "git archive bbb201c24e91a1cbdddf1b503108271bc57407d6; zterm version 0.1.0",
+    "candidate": "zterm 0.2.0 working tree, optimized framing + zgraphics CommandStream; large APC, unpadded Base64 and repeated action continuation accepted",
+    "limitations": "Process-local parser and screen model only. No PTY, graphical renderer, compositor or display latency. Shared host load and clock scaling remain uncontrolled; small throughput differences may include noise.",
+    "candidate_source_sha256": {
+      "crates/zterm/src/lib.rs": "ceb707dec0625d3544a50647e632b0764dd725d73b9ce34ac28df8fefc4bc185",
+      "crates/zterm/src/screen.rs": "fa6e442485b4e25233f526d6777c320c4194e0455d7843e9c7455dc861a82e85",
+      "crates/zterm/src/tests.rs": "43f432b374c9b82b0a7fcc390594afd98b9f287d1025f24a58a57c55b211eac2",
+      "crates/zterm/src/terminal.rs": "9899391c557d3648375bfdb910830b0331c422491282f8260331e06c2172915d",
+      "crates/zgraphics/src/decode.rs": "ef7c165b1d53c5154c5b739da312089b4f9697022c357bb0c0430a034bab6f8d",
+      "crates/zgraphics/src/lib.rs": "578a7fdea5a3a4aa67e49a12d93bba4841c9358229623db20aec6e665b9eaf94",
+      "crates/zgraphics/src/protocol.rs": "57f83c8496ffa8c8548168984f50895b4ea1c9cc2d07a4bc863043c42f006bf7",
+      "crates/zgraphics/src/stream.rs": "ff36a13f3fef855b2304d3301c76a64563c8ccdd7bf1f2ee5c493057fa78a032",
+      "crates/zgraphics/src/tests.rs": "de32087e8313d0b459fbed937101c83ece7143a2215568bee5ff130c0eef2d97"
+    },
+    "candidate_binary_sha256": "42b5832857ae17eff0ecebbd2fad55104c0918d23917021fc38e28d920ca1382",
+    "baseline_binary_sha256": "257c9ecdaabaeb6a412a86b071fcb0d6186c2645dde219f4e7748fb4f921fe21"
+  }
+}
