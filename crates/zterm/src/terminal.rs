@@ -285,6 +285,9 @@ impl Terminal {
         if self.cols() == cols && self.rows() == rows {
             return;
         }
+        if cols != self.cols() {
+            self.state.shell.invalidate_screen(self.state.line_base);
+        }
         if !self.state.modes.alternate_screen {
             let dropped = self.state.screen.y.saturating_add(1).saturating_sub(rows);
             for row in 0..dropped {
@@ -307,6 +310,7 @@ impl Terminal {
         if let Some(primary) = self.state.primary.as_mut() {
             let dropped = primary.y.saturating_add(1).saturating_sub(rows);
             for row in 0..dropped {
+                self.state.line_base = self.state.line_base.saturating_add(1);
                 push_history(
                     &mut self.state.history,
                     self.state.history_limit,
@@ -398,6 +402,83 @@ impl Terminal {
     pub fn working_directory(&self) -> &str {
         &self.state.cwd
     }
+    /// OSC 133 records, oldest first. No storage is allocated before the first mark.
+    pub fn commands(
+        &self,
+    ) -> impl DoubleEndedIterator<Item = &crate::CommandRecord> + ExactSizeIterator {
+        self.state.shell.records.iter()
+    }
+
+    pub fn shell_phase(&self) -> crate::ShellPhase {
+        self.state.shell.phase
+    }
+
+    /// Scrollback offset that makes a retained command's prompt visible.
+    pub fn command_scroll_offset(&self, id: u64) -> Option<usize> {
+        if self.state.modes.alternate_screen {
+            return None;
+        }
+        let command = self
+            .state
+            .shell
+            .records
+            .iter()
+            .find(|record| record.id == id)?;
+        let oldest = self
+            .state
+            .line_base
+            .saturating_sub(self.state.history.len() as u64);
+        if !command.available || command.prompt.line < oldest {
+            return None;
+        }
+        Some(self.state.line_base.saturating_sub(command.prompt.line) as usize)
+    }
+
+    /// Copy rendered command output, excluding its input and following prompt.
+    ///
+    /// Physical screen lines become newlines and trailing blank cells are omitted.
+    /// This reads existing primary-screen/history cells; it does not save a second
+    /// output transcript. Evicted or destructively edited ranges set `truncated`.
+    /// `max_bytes` is capped at `MAX_COMMAND_TEXT` and never splits UTF-8.
+    pub fn command_output(&self, id: u64, max_bytes: usize) -> Option<crate::CommandText> {
+        let record = self
+            .state
+            .shell
+            .records
+            .iter()
+            .find(|record| record.id == id)?;
+        let start = record.output?;
+        let end = record.end.unwrap_or_else(|| self.state.primary_position());
+        Some(self.state.command_text(
+            start,
+            end,
+            max_bytes,
+            record.available,
+            record.end.is_some(),
+        ))
+    }
+
+    /// Copy the rendered command line when the shell supplied an OSC 133 B mark.
+    pub fn command_input(&self, id: u64, max_bytes: usize) -> Option<crate::CommandText> {
+        let record = self
+            .state
+            .shell
+            .records
+            .iter()
+            .find(|record| record.id == id)?;
+        let start = record.input?;
+        let end = record
+            .output
+            .unwrap_or_else(|| self.state.primary_position());
+        Some(self.state.command_text(
+            start,
+            end,
+            max_bytes,
+            record.available,
+            record.output.is_some(),
+        ))
+    }
+
     pub fn responses(&self) -> &[u8] {
         &self.state.responses
     }
@@ -469,6 +550,8 @@ struct State {
     history: VecDeque<Vec<Cell>>,
     history_limit: usize,
     history_bytes: usize,
+    line_base: u64,
+    shell: crate::shell::ShellIntegration,
     style: Style,
     modes: Modes,
     autowrap: bool,
@@ -504,6 +587,8 @@ impl State {
             history: VecDeque::new(),
             history_limit: history_limit.min(65536),
             history_bytes: 0,
+            line_base: 0,
+            shell: crate::shell::ShellIntegration::default(),
             style: theme.style(),
             modes: Modes::default(),
             autowrap: true,
@@ -527,6 +612,90 @@ impl State {
             cell_width: 8,
             cell_height: 16,
         }
+    }
+
+    fn primary_screen(&self) -> &Screen {
+        self.primary.as_ref().unwrap_or(&self.screen)
+    }
+
+    fn primary_position(&self) -> crate::TextPosition {
+        let screen = self.primary_screen();
+        crate::TextPosition {
+            line: self.line_base.saturating_add(screen.y as u64),
+            column: screen.x + usize::from(screen.wrap),
+        }
+    }
+
+    fn command_text(
+        &self,
+        start: crate::TextPosition,
+        end: crate::TextPosition,
+        max_bytes: usize,
+        available: bool,
+        complete: bool,
+    ) -> crate::CommandText {
+        let mut result = crate::CommandText {
+            text: String::new(),
+            truncated: !available,
+            complete,
+        };
+        if !available || end < start {
+            result.truncated = true;
+            return result;
+        }
+        let limit = max_bytes.min(crate::MAX_COMMAND_TEXT);
+        let screen = self.primary_screen();
+        let oldest = self.line_base.saturating_sub(self.history.len() as u64);
+        let last = self.line_base.saturating_add(screen.rows as u64 - 1);
+        let first = start.line.max(oldest);
+        result.truncated |= start.line < oldest || end.line > last;
+        if first > end.line || first > last {
+            result.truncated |= start != end;
+            return result;
+        }
+        for line in first..=end.line.min(last) {
+            let cells = if line < self.line_base {
+                &self.history[(line - oldest) as usize][..]
+            } else {
+                screen.row((line - self.line_base) as usize)
+            };
+            let from = if line == start.line { start.column } else { 0 };
+            let until = if line == end.line {
+                end.column
+            } else {
+                cells.len()
+            };
+            result.truncated |= from > cells.len() || until > cells.len();
+            let from = from.min(cells.len());
+            let until = until.min(cells.len()).max(from);
+            let selected = &cells[from..until];
+            let length = selected
+                .iter()
+                .rposition(|cell| cell.ch != ' ' || cell.combining != ['\0'; 2])
+                .map_or(0, |index| index + 1);
+            for cell in &selected[..length] {
+                if cell.width == 0 {
+                    continue;
+                }
+                for ch in core::iter::once(cell.ch)
+                    .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
+                {
+                    if result.text.len() + ch.len_utf8() > limit {
+                        result.truncated = true;
+                        return result;
+                    }
+                    result.text.push(ch);
+                }
+            }
+            if line < end.line {
+                if result.text.len() == limit {
+                    result.truncated = true;
+                    return result;
+                }
+                result.text.push('\n');
+            }
+        }
+        result
     }
 
     fn graphics_command(&mut self, body: &[u8]) {
@@ -628,9 +797,10 @@ impl State {
     }
 
     fn record_history_row(&mut self, row: usize) {
-        if self.history_limit == 0 || self.modes.alternate_screen {
+        if self.modes.alternate_screen {
             return;
         }
+        self.line_base = self.line_base.saturating_add(1);
         push_history(
             &mut self.history,
             self.history_limit,
@@ -641,6 +811,11 @@ impl State {
 
     fn scroll_up(&mut self, top: usize, bottom: usize, count: usize, save_history: bool) {
         let count = count.min(bottom - top + 1);
+        if !self.modes.alternate_screen
+            && (top != 0 || bottom + 1 != self.screen.rows || !save_history)
+        {
+            self.shell.invalidate_screen(self.line_base);
+        }
         let blank = self.style.blank();
         for _ in 0..count {
             if top == 0 && bottom + 1 == self.screen.rows {
@@ -671,6 +846,9 @@ impl State {
     }
 
     fn scroll_down(&mut self, top: usize, bottom: usize, count: usize) {
+        if !self.modes.alternate_screen {
+            self.shell.invalidate_screen(self.line_base);
+        }
         let blank = self.style.blank();
         for _ in 0..count.min(bottom - top + 1) {
             if top == 0 && bottom + 1 == self.screen.rows {
@@ -1137,6 +1315,9 @@ impl State {
                 self.screen.clear_range(y, 0, x + 1, blank);
             }
             2 => {
+                if !self.modes.alternate_screen {
+                    self.shell.invalidate_screen(self.line_base);
+                }
                 self.screen.clear(blank);
                 self.graphics_command(b"Ga=d");
             }
@@ -1211,7 +1392,10 @@ impl Perform for State {
                 let mut inactive_graphics = mem::take(&mut self.inactive_graphics);
                 graphics.clear();
                 inactive_graphics.clear();
+                let mut shell = mem::take(&mut self.shell);
+                shell.clear();
                 *self = Self::new(cols, rows, history, self.theme);
+                self.shell = shell;
                 self.graphics = graphics;
                 self.inactive_graphics = inactive_graphics;
                 self.cell_width = width;
@@ -1442,6 +1626,9 @@ impl Perform for State {
         match *command {
             b"0" | b"2" if params.len() > 1 => self.title = join_text_fields(&params[1..], 256),
             b"7" if params.len() > 1 => self.cwd = join_text_fields(&params[1..], 2048),
+            b"133" if !self.modes.alternate_screen => {
+                self.shell.mark(&params[1..], self.primary_position());
+            }
             b"8" => {
                 if params.len() < 3 {
                     return;
