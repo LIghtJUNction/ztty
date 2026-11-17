@@ -69,6 +69,11 @@ metrics and fallback selection can still differ; the raw record preserves the
 observed geometry and font mappings. No desktop window manager or compositor
 runs in the private display. `LIBGL_ALWAYS_SOFTWARE=1` selects software rendering
 for the OpenGL terminals; Ghostty uses its X11 GTK backend.
+All three applications also receive `GTK_A11Y=none` and `NO_AT_BRIDGE=1`: the
+isolated display has no desktop accessibility session. This avoids activating
+unavailable AT-SPI/systemd services and is an explicit benchmark configuration,
+not a measurement of accessibility-enabled desktop operation. Other surviving
+application helpers remain included; unreadable application memory aborts the run.
 
 | Application | Sharing mechanism | History setting |
 | --- | --- | --- |
@@ -182,6 +187,7 @@ separate from this three-terminal, ten-window comparison.
 - [Linux `proc_pid_smaps(5)`](https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html): PSS and private-memory fields.
 - [Kitty invocation](https://sw.kovidgoyal.net/kitty/invocation/): single-instance groups and launcher lifetime.
 - [Ghostty configuration reference](https://ghostty.org/docs/config/reference): single-instance behavior, `command`, `-e`, geometry, history, and disabled default config files.
+- [GTK runtime environment](https://docs.gtk.org/gtk4/running.html): X11, OpenGL, and accessibility backend settings.
 - [Ghostty binary installation](https://ghostty.org/docs/install/binary): distribution package scope.
 - [XRes client pixmap accounting](https://xorg.freedesktop.org/releases/X11R6.9.0/doc/html/XResQueryClientPixmapBytes.3.html): server-side resource scope.
 
