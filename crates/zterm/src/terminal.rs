@@ -121,6 +121,10 @@ impl Modes {
 pub struct Terminal {
     parser: Parser<4096>,
     state: State,
+    // zvte intentionally does not buffer APCs. This framing layer handles only
+    // ESC _ strings and leaves all text, UTF-8, CSI, OSC and DCS work to zvte.
+    framing: u8,
+    apc: zgraphics::CommandStream,
 }
 
 fn dimensions(cols: usize, rows: usize) -> (usize, usize) {
@@ -137,12 +141,143 @@ impl Terminal {
         Self {
             parser: Parser::new_with_size(),
             state: State::new(cols, rows, history_limit, theme),
+            framing: 0,
+            apc: zgraphics::CommandStream::new(),
         }
     }
 
     /// Consume arbitrary PTY chunks, preserving partial UTF-8 and sequences.
     pub fn feed(&mut self, bytes: &[u8]) {
-        self.parser.advance(bytes, &mut self.state);
+        let mut offset = 0;
+        while offset < bytes.len() {
+            match self.framing {
+                0 => {
+                    // Keep ordinary VT chunks intact, including every CSI/SGR
+                    // in them. Only the rare APC introducer requires splitting.
+                    // `contains` uses core's byte-search specialization, so
+                    // the common no-underscore path scans words, not callbacks.
+                    let remaining = &bytes[offset..];
+                    let apc = if remaining.contains(&b'_') {
+                        remaining.windows(2).position(|pair| pair == b"\x1b_")
+                    } else {
+                        None
+                    };
+                    if let Some(start) = apc {
+                        // First deliver ESC: zvte must cancel/dispatch an older
+                        // OSC or DCS before the APC dispatcher takes ownership.
+                        self.parser
+                            .advance(&remaining[..start + 1], &mut self.state);
+                        self.begin_apc();
+                        offset += start + 2;
+                    } else {
+                        self.parser.advance(remaining, &mut self.state);
+                        self.framing = u8::from(remaining.last() == Some(&0x1b));
+                        offset = bytes.len();
+                    }
+                }
+                1 => {
+                    let byte = bytes[offset];
+                    offset += 1;
+                    if byte == b'_' {
+                        self.begin_apc();
+                    } else {
+                        self.parser.advance(&[byte], &mut self.state);
+                        self.framing = u8::from(byte == 0x1b);
+                    }
+                }
+                2 => {
+                    let end = bytes[offset..]
+                        .iter()
+                        .position(|b| matches!(*b, 0x1b | 0x18 | 0x1a))
+                        .map(|i| offset + i)
+                        .unwrap_or(bytes.len());
+                    if end != offset {
+                        let context = self.state.graphics_context();
+                        self.apc.push(
+                            &mut self.state.graphics,
+                            &bytes[offset..end],
+                            context,
+                            &mut self.state.responses,
+                        );
+                        offset = end;
+                    }
+                    if offset == bytes.len() {
+                        continue;
+                    }
+                    let byte = bytes[offset];
+                    offset += 1;
+                    match byte {
+                        0x1b => self.framing = 3,
+                        0x18 | 0x1a => {
+                            self.apc.abort(&mut self.state.graphics);
+                            self.framing = 0;
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+                _ => {
+                    let byte = bytes[offset];
+                    if byte == b'\\' {
+                        offset += 1;
+                        let previous = self.state.graphics.revision();
+                        let context = self.state.graphics_context();
+                        let outcome = self.apc.finish(
+                            &mut self.state.graphics,
+                            context,
+                            &mut self.state.responses,
+                        );
+                        self.state.graphics_result(previous, outcome);
+                        self.framing = 0;
+                    } else {
+                        // A new ESC sequence cancels an unterminated APC. The
+                        // current byte is processed again as an ESC continuation.
+                        self.apc.abort(&mut self.state.graphics);
+                        self.parser.advance(b"\x1b", &mut self.state);
+                        self.framing = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    fn begin_apc(&mut self) {
+        self.parser.reset();
+        self.apc.begin();
+        self.framing = 2;
+    }
+
+    /// Set physical text-cell dimensions for graphics and CSI pixel-size replies.
+    pub fn set_cell_size(&mut self, width: u32, height: u32) {
+        let width = width.clamp(1, 4096);
+        let height = height.clamp(1, 4096);
+        if (self.state.cell_width, self.state.cell_height) != (width, height) {
+            self.state.cell_width = width;
+            self.state.cell_height = height;
+            self.state.graphics.set_viewport(width, height, self.rows());
+            self.state
+                .inactive_graphics
+                .set_viewport(width, height, self.rows());
+            self.state.screen.mark_all();
+        }
+    }
+
+    /// The current screen's bounded image store and placement scene.
+    pub fn graphics(&self) -> &zgraphics::Graphics {
+        &self.state.graphics
+    }
+
+    /// Borrow visible image placements in z-order; this iterator allocates nothing.
+    pub fn graphics_draws(
+        &self,
+        history_offset: usize,
+    ) -> impl Iterator<Item = zgraphics::Draw<'_>> {
+        self.state
+            .graphics
+            .draws(if self.state.modes.alternate_screen {
+                0
+            } else {
+                history_offset.min(self.history_len())
+            })
     }
 
     pub fn resize(&mut self, cols: usize, rows: usize) {
@@ -155,6 +290,18 @@ impl Terminal {
             for row in 0..dropped {
                 self.state.record_history_row(row);
             }
+            self.state.graphics.scroll(
+                0,
+                self.state.screen.rows - 1,
+                -(dropped as i32),
+                self.state.history.len(),
+                true,
+            );
+        } else {
+            let dropped = self.state.screen.y.saturating_add(1).saturating_sub(rows);
+            self.state
+                .graphics
+                .scroll(0, self.state.screen.rows - 1, -(dropped as i32), 0, false);
         }
         self.state.screen.resize(cols, rows);
         if let Some(primary) = self.state.primary.as_mut() {
@@ -167,11 +314,31 @@ impl Terminal {
                     primary.row(row),
                 );
             }
+            self.state.inactive_graphics.scroll(
+                0,
+                primary.rows - 1,
+                -(dropped as i32),
+                self.state.history.len(),
+                true,
+            );
             primary.resize(cols, rows);
         }
         if let Some(alternate) = self.state.inactive_alternate.as_mut() {
+            let dropped = alternate.y.saturating_add(1).saturating_sub(rows);
+            self.state
+                .inactive_graphics
+                .scroll(0, alternate.rows - 1, -(dropped as i32), 0, false);
             alternate.resize(cols, rows);
         }
+        self.state
+            .graphics
+            .set_viewport(self.state.cell_width, self.state.cell_height, rows);
+        self.state.inactive_graphics.set_viewport(
+            self.state.cell_width,
+            self.state.cell_height,
+            rows,
+        );
+        self.state.graphics.trim_history(self.state.history.len());
         let previous_cols = self.state.tabs.len();
         self.state.tabs.resize(cols, false);
         for (x, tab) in self.state.tabs.iter_mut().enumerate().skip(previous_cols) {
@@ -320,6 +487,10 @@ struct State {
     dcs: Vec<u8>,
     dcs_overflow: bool,
     last_char: char,
+    graphics: zgraphics::Graphics,
+    inactive_graphics: zgraphics::Graphics,
+    cell_width: u32,
+    cell_height: u32,
 }
 
 impl State {
@@ -351,6 +522,42 @@ impl State {
             dcs: Vec::new(),
             dcs_overflow: false,
             last_char: ' ',
+            graphics: zgraphics::Graphics::default(),
+            inactive_graphics: zgraphics::Graphics::default(),
+            cell_width: 8,
+            cell_height: 16,
+        }
+    }
+
+    fn graphics_command(&mut self, body: &[u8]) {
+        let previous = self.graphics.revision();
+        let context = self.graphics_context();
+        let outcome = self.graphics.command(body, context, &mut self.responses);
+        self.graphics_result(previous, outcome);
+    }
+
+    fn graphics_context(&self) -> zgraphics::Context {
+        zgraphics::Context {
+            col: self.screen.x,
+            row: self.screen.y,
+            cols: self.screen.cols,
+            rows: self.screen.rows,
+            cell_width: self.cell_width,
+            cell_height: self.cell_height,
+        }
+    }
+
+    fn graphics_result(&mut self, previous: u64, outcome: zgraphics::Outcome) {
+        if let Some((cols, rows)) = outcome.cursor_move {
+            let col = self.screen.x.saturating_add(cols).min(self.screen.cols - 1);
+            for _ in 0..rows.min(self.screen.rows) {
+                self.linefeed();
+            }
+            self.screen.x = col;
+            self.screen.wrap = false;
+        }
+        if self.graphics.revision() != previous {
+            self.screen.mark_all();
         }
     }
 
@@ -453,6 +660,13 @@ impl State {
                 self.screen.row_mut(bottom).fill(blank);
             }
         }
+        self.graphics.scroll(
+            top,
+            bottom,
+            -(count as i32),
+            self.history.len(),
+            save_history && !self.modes.alternate_screen,
+        );
         self.screen.dirty[top..=bottom].fill(true);
     }
 
@@ -473,6 +687,13 @@ impl State {
                 self.screen.row_mut(top).fill(blank);
             }
         }
+        self.graphics.scroll(
+            top,
+            bottom,
+            count.min(bottom - top + 1) as i32,
+            self.history.len(),
+            false,
+        );
         self.screen.dirty[top..=bottom].fill(true);
     }
 
@@ -661,9 +882,16 @@ impl State {
             }
         }
         self.modes.alternate_screen = enabled;
+        self.graphics.abort_transfer();
+        mem::swap(&mut self.graphics, &mut self.inactive_graphics);
+        self.graphics.abort_transfer();
+        self.graphics
+            .set_viewport(self.cell_width, self.cell_height, self.screen.rows);
+        self.graphics.invalidate();
         self.modes.kitty_keyboard = self.screen.keyboard;
         if enabled && clear {
             self.screen.clear(self.style.blank());
+            self.graphics.clear();
         }
         self.screen.mark_all();
     }
@@ -908,10 +1136,18 @@ impl State {
                 }
                 self.screen.clear_range(y, 0, x + 1, blank);
             }
-            2 => self.screen.clear(blank),
+            2 => {
+                self.screen.clear(blank);
+                self.graphics_command(b"Ga=d");
+            }
             3 => {
                 self.history.clear();
                 self.history_bytes = 0;
+                if self.modes.alternate_screen {
+                    self.inactive_graphics.trim_history(0);
+                } else {
+                    self.graphics.trim_history(0);
+                }
                 self.screen.mark_all();
             }
             _ => {}
@@ -970,7 +1206,17 @@ impl Perform for State {
             ([], b'c') => {
                 let (cols, rows, history) =
                     (self.screen.cols, self.screen.rows, self.history_limit);
+                let (width, height) = (self.cell_width, self.cell_height);
+                let mut graphics = mem::take(&mut self.graphics);
+                let mut inactive_graphics = mem::take(&mut self.inactive_graphics);
+                graphics.clear();
+                inactive_graphics.clear();
                 *self = Self::new(cols, rows, history, self.theme);
+                self.graphics = graphics;
+                self.inactive_graphics = inactive_graphics;
+                self.cell_width = width;
+                self.cell_height = height;
+                self.graphics.set_viewport(width, height, rows);
             }
             ([b'('], b'0') => self.g0 = true,
             ([b'('], b'B' | b'A') => self.g0 = false,
@@ -1029,7 +1275,9 @@ impl Perform for State {
         }
         if action == 'c' && param(groups, 0, 0) == 0 {
             match intermediates {
-                b"" => self.reply("\x1b[?6c"),
+                // Kitty's graphics probe requires a DA1 payload longer than
+                // three bytes. A leading zero preserves numeric VT102 ID 6.
+                b"" => self.reply("\x1b[?06c"),
                 b">" => self.reply("\x1b[>0;1;0c"),
                 _ => {}
             }
@@ -1166,6 +1414,15 @@ impl Perform for State {
             't' if raw == 18 => {
                 let (rows, cols) = (self.screen.rows, self.screen.cols);
                 self.reply_args(format_args!("\x1b[8;{rows};{cols}t"));
+            }
+            't' if raw == 14 => {
+                let height = self.screen.rows as u32 * self.cell_height;
+                let width = self.screen.cols as u32 * self.cell_width;
+                self.reply_args(format_args!("\x1b[4;{height};{width}t"));
+            }
+            't' if raw == 16 => {
+                let (height, width) = (self.cell_height, self.cell_width);
+                self.reply_args(format_args!("\x1b[6;{height};{width}t"));
             }
             _ => {}
         }

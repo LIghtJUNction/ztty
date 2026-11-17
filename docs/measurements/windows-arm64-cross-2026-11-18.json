@@ -1,0 +1,136 @@
+{
+  "report_date": "2026-11-18",
+  "scope": "Windows ARM64 release cross-build and package verification",
+  "source_sha": "7535aa29f1a2728a78a446ffea6784dcbc2aae92",
+  "source_repository": "https://github.com/LIghtJUNction/ztty",
+  "source_files_match_commit": true,
+  "source_files_sha256": {
+    "Cargo.lock": "77826a3a1dd20d8d896b291e28fb795aa1e82ce07af8bbcbf8a29bcc8fdb35ac",
+    "Cargo.toml": "6158a5d4fb5e2e1fc444acd21ee4e3b7545f02dcebc6e890176007313f5483b1",
+    "LICENSE": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+    "crates/zgraphics/Cargo.toml": "4bbc49452d1e6ee1666278c412a255038e43977997b6451f520bf0818fcb98e0",
+    "crates/zgraphics/README.md": "fea7e46b39fac1942ccaff60d208c84c60dadddc3f14d673df5b9cf15656055a",
+    "crates/zgraphics/src/decode.rs": "ef7c165b1d53c5154c5b739da312089b4f9697022c357bb0c0430a034bab6f8d",
+    "crates/zgraphics/src/lib.rs": "578a7fdea5a3a4aa67e49a12d93bba4841c9358229623db20aec6e665b9eaf94",
+    "crates/zgraphics/src/protocol.rs": "57f83c8496ffa8c8548168984f50895b4ea1c9cc2d07a4bc863043c42f006bf7",
+    "crates/zgraphics/src/stream.rs": "ff36a13f3fef855b2304d3301c76a64563c8ccdd7bf1f2ee5c493057fa78a032",
+    "crates/zgraphics/src/tests.rs": "de32087e8313d0b459fbed937101c83ece7143a2215568bee5ff130c0eef2d97",
+    "crates/zinput/Cargo.toml": "978381a202ad8de932f2ca4962791ec61fb42df8991a39499e413be506399a26",
+    "crates/zinput/README.md": "7962967c5ee782bf7307df0e4da0152d2f63d88a0438ff71636e88b7894582d4",
+    "crates/zinput/src/lib.rs": "a89b46ad6d7e2bc5e674f9f9c8cc93699b3109cd80a664162ae28ceea1c8066a",
+    "crates/zpty/Cargo.toml": "cdcb5dc7ea477cd04561e2747bc3fdeeb54333079e8cee881cc2a04ecc348553",
+    "crates/zpty/src/lib.rs": "22779be10924e40908394da8a8db28c02cbc32e15a05d915a5fd0e4d2d3d4d8f",
+    "crates/zpty/src/windows.rs": "fe69c05c6c4ebb07f254a8daf4d9dcb529185436a627551ddfea4cbf4625160e",
+    "crates/zterm/Cargo.toml": "9681ecdb6695b6a203df870e45473fb38b17cccb0312149b034dc44ebcdc7d40",
+    "crates/zterm/README.md": "059737288778617f8bab7c64b61ba25b6f1ee240181600e9f303a8def0149eeb",
+    "crates/zterm/src/lib.rs": "ceb707dec0625d3544a50647e632b0764dd725d73b9ce34ac28df8fefc4bc185",
+    "crates/zterm/src/screen.rs": "fa6e442485b4e25233f526d6777c320c4194e0455d7843e9c7455dc861a82e85",
+    "crates/zterm/src/terminal.rs": "ea6717ace74061103d7ecb7829e12da98ff2f8a73266c5693b88d579aa4bbfb5",
+    "crates/zterm/src/tests.rs": "98386430d75b31b3b45d6b80989db2c6995781db55befe9f3b582318c27b187e",
+    "rust-toolchain.toml": "2005a6440b4cf56de43085410f26315d73dece6d34a6d32920669f65f33062c4",
+    "src/appearance.rs": "15d81da910f6b5b29c41e34f506831225f85d64c89e7c25784287cfa025df656",
+    "src/main.rs": "19f8bdfe3a6a2866d4e36899cfdd8725ec7054a4031f07dd6bbe2397097b08b4",
+    "src/os_windows.rs": "93d68d994f7e25fcb9406cb4752b7bc766b3154252e91d8b7fd5360fe8b42e18",
+    "src/platform/windows.rs": "1b5d2b1390d42063472b5ed4188afde1bcefc50ea1dd6f41c8c4eeffd8bdbc66",
+    "tools/package_windows.py": "deb44ff73d4dfd79878097b00f64782aae18af1722d3a863cc96abee1b72db39"
+  },
+  "source_files_digest_sha256": "9900e778b29b2db36c3f3cd64fc7bfb8eba2d13fcbfb4fad69c6606504d65c28",
+  "target": "aarch64-pc-windows-gnullvm",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "llvm_mingw": {
+    "version": "20261104",
+    "host": "ubuntu-22.04-x86_64",
+    "source_url": "https://github.com/mstorsjo/llvm-mingw/releases/download/20261104/llvm-mingw-20261104-ucrt-ubuntu-22.04-x86_64.tar.xz",
+    "archive_sha256": "919380403de87dca3c581c2053230cd298af5e891286628ba0613b7fed370926"
+  },
+  "build": {
+    "command": "CARGO_TARGET_AARCH64_PC_WINDOWS_GNULLVM_LINKER=<llvm-mingw>/bin/aarch64-w64-mingw32-clang cargo build --locked --release --bin ztty --target aarch64-pc-windows-gnullvm",
+    "status": "passed"
+  },
+  "pe_audit": {
+    "machine": "ARM64 (0xaa64)",
+    "subsystem": "Windows GUI",
+    "imports": [
+      "api-ms-win-crt-stdio-l1-1-0.dll",
+      "api-ms-win-crt-runtime-l1-1-0.dll",
+      "api-ms-win-crt-locale-l1-1-0.dll",
+      "api-ms-win-crt-heap-l1-1-0.dll",
+      "api-ms-win-crt-private-l1-1-0.dll",
+      "api-ms-win-crt-string-l1-1-0.dll",
+      "KERNEL32.dll",
+      "SHELL32.dll",
+      "USER32.dll",
+      "GDI32.dll",
+      "dwmapi.dll",
+      "IMM32.dll",
+      "api-ms-win-crt-environment-l1-1-0.dll",
+      "api-ms-win-crt-math-l1-1-0.dll"
+    ],
+    "non_system_static_imports": [],
+    "status": "passed"
+  },
+  "package_validation": {
+    "source_package_sha256": "verified",
+    "pe_architecture": "verified",
+    "zip_integrity": "verified",
+    "file_roundtrip_sha256": "verified"
+  },
+  "native_runtime": "not_run",
+  "limitations": [
+    "This artifact was cross-built on Linux. No Windows ARM64 machine executed it in this session.",
+    "Cross-build and archive checks do not validate Windows ARM64 startup, ConPTY behavior, pixels, fonts, keyboard input, or performance.",
+    "Windows x64 native acceptance results are recorded separately and do not establish ARM64 runtime acceptance."
+  ],
+  "artifacts": {
+    "binary": {
+      "path": "target/aarch64-pc-windows-gnullvm/release/ztty.exe",
+      "bytes": 293888,
+      "sha256": "524d403dc0ac071868ff3da6b0f0d173b2339a4be31a2e87b79fda075202e5f5"
+    },
+    "archive": {
+      "path": "artifacts/ztty-0.2.0-windows-arm64.zip",
+      "bytes": 724473,
+      "sha256": "a4a5b2c2aaa021bb23298e771b36b5a3db30e2b471baae66b8451d7777d87163"
+    },
+    "package_report": {
+      "path": "artifacts/windows-arm64-package.json",
+      "bytes": 1540,
+      "sha256": "cdb70817cb7da5c2d9a37c196f149008ff16da7600984d30a31577d0c9a7fab8"
+    }
+  },
+  "package_manifest": {
+    "ztty_version": "0.2.0",
+    "architecture": "arm64",
+    "minimum_windows_build": 17763,
+    "conpty": {
+      "package": "Microsoft.Windows.Console.ConPTY",
+      "version": "1.25.261109001",
+      "url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.console.conpty/1.25.261109001/microsoft.windows.console.conpty.1.25.261109001.nupkg",
+      "package_sha256": "3d77f535df848e44225c2a8912ac844fecb23f3057732b639f3034b587496f09",
+      "license": "MIT"
+    },
+    "files": {
+      "ztty.exe": {
+        "bytes": 293888,
+        "sha256": "524d403dc0ac071868ff3da6b0f0d173b2339a4be31a2e87b79fda075202e5f5"
+      },
+      "conpty.dll": {
+        "bytes": 116024,
+        "sha256": "3608cef830a1c4fbbf3981594ad3f64ebe2df6db98fe43a48a4ca7d2875d8959"
+      },
+      "OpenConsole.exe": {
+        "bytes": 1151288,
+        "sha256": "c04334f450b5731930b63a28ac4da8a058367242dbcf2fb9b323ea25e5a23252"
+      },
+      "LICENSE-ztty.txt": {
+        "bytes": 1070,
+        "sha256": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4"
+      },
+      "LICENSE-ConPTY.txt": {
+        "bytes": 1074,
+        "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+      }
+    },
+    "validation": "Packaging verifies hashes and PE architecture; native runtime tests are separate."
+  }
+}

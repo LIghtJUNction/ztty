@@ -1,0 +1,9 @@
+{
+  "source_sha": "7535aa29f1a2728a78a446ffea6784dcbc2aae92",
+  "scope": "native CLI startup; Linux GUI acceptance runs locally before this release workflow",
+  "passed": true,
+  "exit_code": 0,
+  "stdout": "ztty 0.2.0\n",
+  "stderr": "",
+  "binary_sha256": "2faae99ba5680df8e0298b614c65272f80b8dd8a623e7d4c785b1baf571550c3"
+}

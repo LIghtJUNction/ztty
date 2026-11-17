@@ -16,6 +16,23 @@ struct InputBuffers {
     encoded: Vec<u8>,
 }
 
+fn pty_size(cols: usize, rows: usize, window: Option<&Window>) -> zpty::Size {
+    let (pixel_width, pixel_height) = window.map_or((0, 0), |window| {
+        (
+            cols.saturating_mul(window.cw as usize)
+                .min(u16::MAX as usize) as u16,
+            rows.saturating_mul(window.ch as usize)
+                .min(u16::MAX as usize) as u16,
+        )
+    });
+    zpty::Size {
+        cols: cols as u16,
+        rows: rows as u16,
+        pixel_width,
+        pixel_height,
+    }
+}
+
 struct Ui {
     window: Window,
     attachment: u64,
@@ -299,13 +316,8 @@ impl Ui {
                 if e.width != self.window.width || e.height != self.window.height {
                     let (cols, rows) = self.window.resize(e.width, e.height);
                     terminal.resize(cols, rows);
-                    pty.resize(zpty::Size {
-                        rows: rows as u16,
-                        cols: cols as u16,
-                        pixel_width: e.width.clamp(0, 65535) as u16,
-                        pixel_height: e.height.clamp(0, 65535) as u16,
-                    })
-                    .map_err(|_| "cannot resize the PTY")?;
+                    pty.resize(pty_size(cols, rows, Some(&self.window)))
+                        .map_err(|_| "cannot resize the PTY")?;
                     self.history = self.history.min(terminal.history_len());
                     self.selection = None;
                     self.force = true;
@@ -393,7 +405,12 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
-        if !synchronized && (self.force || terminal.dirty() || self.window.cursor_changed(cursor)) {
+        if !synchronized
+            && (self.force
+                || terminal.dirty()
+                || self.window.cursor_changed(cursor)
+                || self.window.graphics_changed(terminal))
+        {
             self.window
                 .render(terminal, self.history, self.selection, self.force, cursor);
             self.force = false;
@@ -830,13 +847,16 @@ impl Pool {
                 &program,
                 &argv,
                 &env,
-                zpty::Size::new(cols as u16, rows as u16),
+                pty_size(cols, rows, ui.as_ref().map(|ui| &ui.window)),
                 &close,
             )
         }
         .map_err(|e| format!("cannot create PTY: {e}"))?;
         drop(directory);
-        let terminal = Terminal::with_theme(cols, rows, history, appearance.theme);
+        let mut terminal = Terminal::with_theme(cols, rows, history, appearance.theme);
+        if let Some(ui) = &ui {
+            terminal.set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
+        }
         let session = Session {
             uri,
             name: name.into(),
@@ -953,7 +973,11 @@ impl Pool {
                 let session = &mut self.sessions[index];
                 session
                     .pty
-                    .resize(zpty::Size::new(cols as u16, rows as u16))
+                    .resize(pty_size(
+                        cols,
+                        rows,
+                        session.ui.as_ref().map(|ui| &ui.window),
+                    ))
                     .map_err(|e| format!("resize failed: {e}"))?;
                 session.terminal.resize(cols, rows);
                 if let Some(ui) = &mut session.ui {
@@ -983,6 +1007,17 @@ impl Pool {
                     &connection,
                 )
                 .map_err(String::from)?;
+                session
+                    .pty
+                    .resize(pty_size(
+                        session.terminal.cols(),
+                        session.terminal.rows(),
+                        Some(&window),
+                    ))
+                    .map_err(|e| format!("cannot update attached PTY size: {e}"))?;
+                session
+                    .terminal
+                    .set_cell_size(window.cw as u32, window.ch as u32);
                 session.ui = Some(Ui::new(window, attachment));
                 Ok(Reply::Value(session.info()))
             }

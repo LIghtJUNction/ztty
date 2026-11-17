@@ -65,6 +65,7 @@ enable_audio_bell no
 shell_integration disabled
 confirm_os_window_close 0
 """
+SESSION_BUS_CONFIG = '<busconfig>\n  <type>session</type>\n  <listen>unix:path={address}</listen>\n  <auth>EXTERNAL</auth>\n  <policy context="default">\n    <allow own="*"/>\n    <allow send_destination="*"/>\n    <allow receive_sender="*"/>\n  </policy>\n  <!-- No service directories: this private bus only coordinates instances. -->\n</busconfig>\n'
 GHOSTTY_CONFIG = """font-family = monospace
 font-size = 11
 window-width = 120
@@ -303,7 +304,11 @@ def terminal_command(app, binary, directory, tag):
                 "--font", "monospace:size=11", "--geometry", "120x32",
                 "--scrollback", "2000", "-e", wrapper]
     if app == "kitty":
-        return [str(binary), "--config", str(directory / "kitty.conf"),
+        options = []
+        for line in KITTY_CONFIG.splitlines():
+            key, value = line.split(maxsplit=1)
+            options.extend(["-o", key + "=" + value])
+        return [str(binary), "--config", "NONE", *options,
                 "--single-instance", "--instance-group", tag, wrapper]
     return [
         str(binary), "--config-default-files=false",
@@ -324,8 +329,10 @@ def measure(app, binary, repetition, settle):
         tag = directory.name
         prefix = "terminal-benchmark-" + tag + "-"
         (directory / "ztty.conf").write_text(ZTTY_CONFIG)
-        (directory / "kitty.conf").write_text(KITTY_CONFIG)
         (directory / "ghostty.conf").write_text(GHOSTTY_CONFIG)
+        bus_config = SESSION_BUS_CONFIG.format(address=html.escape(str(directory / "bus")))
+        (directory / "dbus.conf").write_text(bus_config)
+        result["dbus_config"] = bus_config
         control_path = str(directory / "control.sock")
         wrapper = "#!/bin/sh\nexec " + shlex.join([
             sys.executable, str(Path(__file__).resolve()), "--child", control_path,
@@ -334,7 +341,7 @@ def measure(app, binary, repetition, settle):
         (directory / "probe").chmod(0o700)
         environment = os.environ.copy()
         for key in ("WAYLAND_DISPLAY", "KITTY_LISTEN_ON", "KITTY_PID", "KITTY_WINDOW_ID",
-                    "TERM_PROGRAM", "TERM_PROGRAM_VERSION", "GHOSTTY_BIN_DIR",
+                    "TERM_PROGRAM", "TERM_PROGRAM_VERSION", "KITTY_CONFIG_DIRECTORY", "GHOSTTY_BIN_DIR",
                     "GHOSTTY_RESOURCES_DIR", "DBUS_SESSION_BUS_ADDRESS"):
             environment.pop(key, None)
         environment.update({
@@ -378,7 +385,8 @@ def measure(app, binary, repetition, settle):
                 xconnection = display.Display(display_name)
                 server_before = memory(xvfb.pid)
                 bus = subprocess.Popen(
-                    ["dbus-daemon", "--session", "--nofork", "--print-address=1"],
+                    ["dbus-daemon", "--config-file=" + str(directory / "dbus.conf"),
+                     "--nofork", "--print-address=1"],
                     stdout=subprocess.PIPE, stderr=blog, env=environment,
                     start_new_session=True,
                 )
@@ -694,7 +702,7 @@ def svg_document(report):
                 f'<rect x="{x + 93}" y="{yy - 12}" width="{width:.3f}" height="22" rx="4" fill="{colors[app]}"/>',
                 f'<text x="{x + 484}" y="{yy + 5}" text-anchor="end" class="value">{label}</text>',
             ])
-    date = report["timestamp"][:10]
+    date = report["timestamp"][:10] + " UTC"
     versions = []
     for app in APPS:
         first = report["binaries"][app]["version"].get("stdout", "").splitlines()
@@ -820,12 +828,14 @@ def main():
             "cold_warm": "fresh terminal processes and isolated config per run; memory sampled after fixed frame and font warm-up; OS page/font caches are not flushed",
             "graphics_scope": "Xvfb software rendering only; X-server PSS delta and XRes client pixmaps recorded separately; does not quantify native GPU/VRAM or desktop compositor behavior",
             "window_visibility": "all ten windows mapped and tiled without overlap on one private 7680x2160 X display",
+            "desktop_services": "private EXTERNAL-authenticated D-Bus without service activation directories; GTK accessibility disabled; portal/accessibility desktop services are outside this isolated configuration",
             "ordering": "three app orders rotate by one app each repetition; only one app's ten windows run at a time",
             "limitations": "single machine, one grid/font/output pattern; history capacities have different units and histories remain empty; no real keyboard-to-photon claim",
         },
         "sources": [
             "https://ghostty.org/docs/config/reference",
             "https://docs.gtk.org/gtk4/running.html",
+            "https://dbus.freedesktop.org/doc/dbus-daemon.1.html",
             "https://ghostty.org/docs/install/binary",
             "https://sw.kovidgoyal.net/kitty/invocation/",
             "https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html",

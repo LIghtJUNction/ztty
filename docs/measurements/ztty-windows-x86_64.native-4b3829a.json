@@ -1,0 +1,154 @@
+{
+  "passed": true,
+  "source_sha": "4b3829a0754643e0ff080772db9a1c1886c1fa12",
+  "status": "passed",
+  "platform": "win32",
+  "binary": "D:\\a\\_temp\\ztty-windows-native\\ztty.exe",
+  "transport": "real ConPTY",
+  "renderer": "Win32 retained DIB",
+  "checks": [
+    {
+      "name": "absent_default_config_and_cmd_exit",
+      "passed": true
+    },
+    {
+      "name": "unicode_arguments_and_native_child",
+      "passed": true
+    },
+    {
+      "name": "capability_query_roundtrip",
+      "passed": true
+    },
+    {
+      "name": "opaque_red",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "half_alpha_green",
+      "passed": true,
+      "pixel": [
+        8,
+        140,
+        16
+      ]
+    },
+    {
+      "name": "fully_transparent",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "image_scrolls_with_content",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "old_image_position_repainted",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "alternate_hides_primary_image",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "primary_image_restored",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "deletion_repaints_image",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "png_decode_and_alpha",
+      "passed": true,
+      "pixel": [
+        8,
+        140,
+        16
+      ]
+    },
+    {
+      "name": "rgb24_decode",
+      "passed": true,
+      "pixel": [
+        12,
+        34,
+        56
+      ]
+    },
+    {
+      "name": "right_edge_clips_image",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "resize_clips_without_ghosts",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "resize_restores_visible_image",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "keyboard_recovers_after_malformed_graphics",
+      "passed": true
+    }
+  ],
+  "client_pixels": [
+    180,
+    190
+  ],
+  "cell_pixels": [
+    9,
+    19
+  ],
+  "exit_code": 0,
+  "binary_sha256": "f07d901d56736424bbfa0fafdc91d336f3465a0348a651b61716911f1f2f6637"
+}

@@ -1,0 +1,167 @@
+{
+  "source_sha": "7535aa29f1a2728a78a446ffea6784dcbc2aae92",
+  "run_id": 44165748395,
+  "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44165748395",
+  "build_only": true,
+  "platforms": [
+    {
+      "name": "ztty-macos-x86_64",
+      "passed": true,
+      "binary_sha256": "f1e7e0d22fc610db5a895c79b8a38fafd560c4775837fcd0e9db99176e1d0965",
+      "files": {
+        "ztty-macos-x86_64.manifest.json": {
+          "bytes": 2963,
+          "sha256": "1c3ef6cec6de3ff3c89ca595bc60ac4caeaccb81dc1eb4d04c772656f2a1b61c"
+        },
+        "ztty-macos-x86_64.manifest.json.sha256": {
+          "bytes": 98,
+          "sha256": "fde901cb7e52080d03d15c2e185a6e7cc5e2d2f8d0d11b16bafe44db6ad87ead"
+        },
+        "ztty-macos-x86_64.native.json": {
+          "bytes": 740,
+          "sha256": "a44f4bfeac7a5cffcdc0f68d4cdaeb79a708dcf5dcdc8a7be2f3cd3ff0f215d0"
+        },
+        "ztty-macos-x86_64.native.stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "ztty-macos-x86_64.native.stdout.log": {
+          "bytes": 553,
+          "sha256": "5e711b3cc15aad073189041d089b1493b528939c66e102462e453c9677f48eef"
+        },
+        "ztty-macos-x86_64.tar.gz": {
+          "bytes": 163481,
+          "sha256": "67183ffc56bde749a44ff38e13bd26b405fc29bffdcb76c3c9d69dde2bf2fe8b"
+        },
+        "ztty-macos-x86_64.tar.gz.sha256": {
+          "bytes": 91,
+          "sha256": "6313ae73b95851553bdde26fc9795bfa8a64fa3834109144c6f83460ca5dbcf1"
+        },
+        "ztty-macos-x86_64.zip": {
+          "bytes": 164062,
+          "sha256": "6b7609e4f197e5eb1bcaeb0f3a293bfaf2aecd1cc6203445565f68e3f8771dc2"
+        },
+        "ztty-macos-x86_64.zip.sha256": {
+          "bytes": 88,
+          "sha256": "5825f4ae4c96052044bef69a62a4c7a96e25d8bbec9f92d33267d4d1a4e4296b"
+        }
+      }
+    },
+    {
+      "name": "ztty-windows-x86_64",
+      "passed": true,
+      "binary_sha256": "17f6856264914ab9c2869922080ca7602dd32c57b9a7b64a2997590d28df85f9",
+      "files": {
+        "ztty-windows-x86_64.manifest.json": {
+          "bytes": 1255,
+          "sha256": "a775f21e7d343d73338342f4efaa7f896695243239886ab036672e04d2cf4454"
+        },
+        "ztty-windows-x86_64.manifest.json.sha256": {
+          "bytes": 101,
+          "sha256": "bed3dcd82080b156eca897e0f7bca0576636b856eba8771044488471eeea5bc8"
+        },
+        "ztty-windows-x86_64.native.json": {
+          "bytes": 2698,
+          "sha256": "d0bcf643b220c73c679d48c0007b89a5fad6019c578e65647e05600163c34e8b"
+        },
+        "ztty-windows-x86_64.native.stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "ztty-windows-x86_64.native.stdout.log": {
+          "bytes": 2507,
+          "sha256": "7d5413b3f6d5acf14bec4cac741b02936fe11cb71b5a6be3c567df903e5b9889"
+        },
+        "ztty-windows-x86_64.zip": {
+          "bytes": 789083,
+          "sha256": "e66425c0bcc50ff5f9b19b4d763e50e76a5aa1e5f4d38ad9123786b4b31e6391"
+        },
+        "ztty-windows-x86_64.zip.sha256": {
+          "bytes": 91,
+          "sha256": "362649fa8ed64c60bd5bbd899cf6c032fddaacd3760369dc332ab7f8c2ed36d9"
+        }
+      }
+    },
+    {
+      "name": "ztty-macos-aarch64",
+      "passed": true,
+      "binary_sha256": "6569fa92d7a44c53d61c8edb60e7225c6f342b8968be4a08ac707e2e0516f90d",
+      "files": {
+        "ztty-macos-aarch64.manifest.json": {
+          "bytes": 2967,
+          "sha256": "b81c330359d24757b651a3b27735a7c482d74004416ff51711f7491745053261"
+        },
+        "ztty-macos-aarch64.manifest.json.sha256": {
+          "bytes": 99,
+          "sha256": "570e8cb15c981d298370f674f40c9dacef369bef61e787291cc76bfeed8d5300"
+        },
+        "ztty-macos-aarch64.native.json": {
+          "bytes": 738,
+          "sha256": "2391534e5b38dae4135cd310b01c31ade522e34a4b5015328e8e8d5b31a9b11a"
+        },
+        "ztty-macos-aarch64.native.stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "ztty-macos-aarch64.native.stdout.log": {
+          "bytes": 551,
+          "sha256": "f3221594d0e80cf5df292d9d14b083602a3469edeb6a5aeac5e3b2ae4872fd8a"
+        },
+        "ztty-macos-aarch64.tar.gz": {
+          "bytes": 150295,
+          "sha256": "b4975446d9a8d847fa685ee7263ab0bd55579b8aa030880ce5fc14a56b51ff2f"
+        },
+        "ztty-macos-aarch64.tar.gz.sha256": {
+          "bytes": 92,
+          "sha256": "cb2da0211fec75e1800592935d7435775fe9c454a5533839f42e50e2bb592df9"
+        },
+        "ztty-macos-aarch64.zip": {
+          "bytes": 150605,
+          "sha256": "7a5342336d2019deb721173a5f223d7b0f7c6524b158db8fb2dd1a1d0f79d499"
+        },
+        "ztty-macos-aarch64.zip.sha256": {
+          "bytes": 89,
+          "sha256": "6512cb21fd7528af1cd6e5c7bdd49c5c31c0f7b2423aa7a190729fdca63e20dc"
+        }
+      }
+    },
+    {
+      "name": "ztty-linux-x86_64",
+      "passed": true,
+      "binary_sha256": "58bcd99989cea4bf152ab112708068da853ed7f9287a0a4f7224903db2cdca08",
+      "files": {
+        "ztty-linux-x86_64.native.json": {
+          "bytes": 327,
+          "sha256": "0094331c7da53605253b7e127c6e4ed053ab571a8995ebe0b395627d7d230fb9"
+        },
+        "ztty-linux-x86_64.tar.gz": {
+          "bytes": 146649,
+          "sha256": "d3b6a2442260de7b97efbef746bb8844958867a527c37bc431075dad62783b30"
+        },
+        "ztty-linux-x86_64.tar.gz.sha256": {
+          "bytes": 91,
+          "sha256": "24d7d5f0ecb09edd77ae3ca25b45f1fefccd2f56920d290448b54eb6f756fd0e"
+        }
+      }
+    },
+    {
+      "name": "ztty-linux-aarch64",
+      "passed": true,
+      "binary_sha256": "2faae99ba5680df8e0298b614c65272f80b8dd8a623e7d4c785b1baf571550c3",
+      "files": {
+        "ztty-linux-aarch64.native.json": {
+          "bytes": 327,
+          "sha256": "0fa4620d22e97d481c23cccf519a25acbb37324a931f74ab4f7bc37411c4f3dc"
+        },
+        "ztty-linux-aarch64.tar.gz": {
+          "bytes": 140052,
+          "sha256": "b1c5d5ce401a03584a50f10fb7d726aec91627be5e523de1c17c20a171e663ad"
+        },
+        "ztty-linux-aarch64.tar.gz.sha256": {
+          "bytes": 92,
+          "sha256": "c1f87da84a7ad3281f15bb968d42c1ed7758333e2613726de7d5da41955f8b3f"
+        }
+      }
+    }
+  ]
+}

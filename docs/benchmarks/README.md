@@ -74,6 +74,11 @@ isolated display has no desktop accessibility session. This avoids activating
 unavailable AT-SPI/systemd services and is an explicit benchmark configuration,
 not a measurement of accessibility-enabled desktop operation. Other surviving
 application helpers remain included; unreadable application memory aborts the run.
+The private D-Bus uses EXTERNAL authentication and no service activation
+directories. It supports shared-instance coordination without launching desktop
+portals, document-portal FUSE mounts, or systemd services. The exact bus
+configuration is included in each raw run. This scope excludes desktop-service
+overhead for all three applications.
 
 | Application | Sharing mechanism | History setting |
 | --- | --- | --- |
@@ -86,6 +91,10 @@ uses a fixed executable as its `command` setting instead. The same probe
 executable is used as the child command in the other terminals. It replaces its
 small launcher shell with Python, so the workload does not leave a shell waiting
 behind it. No interactive shell startup files run.
+
+Kitty receives `--config NONE` plus the listed settings as `-o` overrides,
+so neither system nor personal configuration files affect this run. Any
+surviving Kitty helper processes are included in application memory.
 
 The histories are empty when memory is sampled. The output workload updates
 the visible screen in place and does not scroll. The different history capacity
@@ -187,6 +196,7 @@ separate from this three-terminal, ten-window comparison.
 - [Linux `proc_pid_smaps(5)`](https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html): PSS and private-memory fields.
 - [Kitty invocation](https://sw.kovidgoyal.net/kitty/invocation/): single-instance groups and launcher lifetime.
 - [Ghostty configuration reference](https://ghostty.org/docs/config/reference): single-instance behavior, `command`, `-e`, geometry, history, and disabled default config files.
+- [D-Bus daemon configuration](https://dbus.freedesktop.org/doc/dbus-daemon.1.html): private Unix bus, authentication, and service activation directories.
 - [GTK runtime environment](https://docs.gtk.org/gtk4/running.html): X11, OpenGL, and accessibility backend settings.
 - [Ghostty binary installation](https://ghostty.org/docs/install/binary): distribution package scope.
 - [XRes client pixmap accounting](https://xorg.freedesktop.org/releases/X11R6.9.0/doc/html/XResQueryClientPixmapBytes.3.html): server-side resource scope.

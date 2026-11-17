@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "ok": true,
+  "desktop": "Hyprland/XWayland",
+  "display": ":220",
+  "checks": [
+    {
+      "name": "photo",
+      "distinct_colors": 47700,
+      "passed": true
+    },
+    {
+      "name": "transparent_png",
+      "distinct_colors": 250,
+      "passed": true
+    }
+  ],
+  "hyprland_version": "0.57.2",
+  "tools": [
+    {
+      "file": "hopper.jpg",
+      "exit_code": 0,
+      "stderr": "",
+      "transport": "explicit stream"
+    },
+    {
+      "file": "transparent.png",
+      "exit_code": 0,
+      "stderr": "",
+      "transport": "automatic detection"
+    }
+  ],
+  "detected_transport": "stream",
+  "pty_size": [
+    143,
+    39
+  ],
+  "window": {
+    "xwayland": true,
+    "client_pixels": [
+      1325,
+      900
+    ],
+    "cell_pixels": [
+      9,
+      22
+    ]
+  },
+  "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-graphics-worktree/artifacts/kitty-graphics-hyprland.png",
+  "stderr": "",
+  "display_connection": {
+    "actual_xwayland_socket": "/tmp/.X11-unix/X0_",
+    "temporary_owned_alias": "/tmp/.X11-unix/X220",
+    "reason": "normal X0 pathname absent; connected to existing same-user XWayland socket without changing server settings"
+  },
+  "source_sha": "7535aa29f1a2728a78a446ffea6784dcbc2aae92",
+  "binary_sha256": "08c64f4cb59ef2fb330b7615bfefd975901c4e75221501a7059b4c007c47a471",
+  "raw_capture_sha256": "b6806546a278ef61d2aaf0915ba4d98a57656c6d329de0baa5d539cec78673b6"
+}

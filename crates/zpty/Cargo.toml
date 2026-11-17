@@ -1,9 +1,9 @@
 [package]
 name = "zpty"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.100"
-description = "A small no_std Linux PTY owner with nonblocking I/O and explicit child lifecycle"
+description = "Native no_std PTY and ConPTY ownership for Linux, macOS and Windows"
 license = "MIT"
 repository = "https://github.com/LIghtJUNction/ztty"
 readme = "README.md"

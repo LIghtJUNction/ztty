@@ -1,0 +1,13 @@
+ztty 0.2.0: no_std, features=[]
+zterm 0.2.0: no_std, features=[]
+zvte 0.1.3: no_std, features=[]
+zinput 0.1.0: no_std, features=[]
+zgraphics 0.1.0: no_std, features=[]
+zune-png 0.5.2: no_std, features=[]
+zune-inflate 0.2.54: no_std, features=['simd-adler32', 'zlib']
+simd-adler32 0.3.10: no_std, features=[]
+zune-core 0.5.3: no_std, features=[]
+unicode-width 0.2.3: no_std, features=[]
+zpty 0.2.0: no_std, features=[]
+release executable: no Rust std symbols
+System C ABI libraries are listed separately by ldd; this check covers Rust std.

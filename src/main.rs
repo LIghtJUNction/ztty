@@ -1,22 +1,48 @@
 #![no_std]
 #![no_main]
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
 extern crate alloc;
 
 mod appearance;
+#[cfg(target_os = "linux")]
 mod broker;
+#[cfg(target_os = "linux")]
 mod json;
+#[cfg(target_os = "linux")]
 mod mcp;
+#[cfg(target_os = "linux")]
 mod os;
+#[cfg(target_os = "windows")]
+#[path = "os_windows.rs"]
+mod os;
+#[cfg(target_os = "macos")]
+#[path = "os_macos.rs"]
+mod os;
+#[cfg(target_os = "linux")]
+#[path = "platform/linux.rs"]
+mod platform;
+#[cfg(target_os = "windows")]
+#[path = "platform/windows.rs"]
+mod platform;
+#[cfg(target_os = "macos")]
+#[path = "platform/macos.rs"]
+mod platform;
+#[cfg(target_os = "linux")]
 mod session;
+#[cfg(target_os = "linux")]
 mod x11;
+#[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+compile_error!("ztty supports Linux, macOS, and Windows");
 
 use alloc::ffi::CString;
 use alloc::string::String;
 use alloc::vec::Vec;
 use appearance::Appearance;
 use core::ffi::{CStr, c_char, c_int};
+#[cfg(target_os = "linux")]
 use input::{Key, ModifierKey, Modifiers};
+#[cfg(target_os = "linux")]
 use zterm::{Terminal, input};
 
 #[global_allocator]
@@ -25,6 +51,7 @@ static ALLOCATOR: os::Allocator = os::Allocator;
 // Stable Rust's precompiled alloc contains unwind cleanup references even for
 // panic=abort consumers. Use the platform unwinder for those ABI references;
 // this application's Rust panic/personality boundaries always terminate.
+#[cfg(target_os = "linux")]
 #[link(name = "gcc_s")]
 unsafe extern "C" {}
 
@@ -45,6 +72,7 @@ fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
     unsafe { os::_exit(101) }
 }
 
+#[cfg(target_os = "linux")]
 const HELP: &str = "ztty — shared no_std terminal sessions for Linux\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty attach [NAME | ztty://ADDRESS]\n\
@@ -64,12 +92,27 @@ attach without a name lists all local and MCP sessions.\n\
 MCP defaults to stdio; HTTP defaults to 127.0.0.1:8732/mcp.\n\
 Runs on X11 and XWayland. Use ztty mcp --help for transport options.\n";
 
+#[cfg(not(target_os = "linux"))]
+const HELP: &str = "ztty — a small no_std Rust terminal\n\n\
+Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\n\
+  --config PATH        Load an appearance file\n\
+  --font NAME          Fontconfig name (default: monospace:size=11)\n\
+  --geometry COLSxROWS Initial character dimensions (default: 120x32)\n\
+  --scrollback LINES   Maximum retained lines (default: 2000; 0 disables)\n\
+  --help               Show this help\n\
+  --version            Show the version\n\n\
+Ctrl+Shift+C copies a selection; Ctrl+Shift+V pastes.\n\
+Shift+PageUp/PageDown and the wheel browse scrollback.\n\
+Shift+drag selects while applications use the mouse; Ctrl+click opens links.\n\
+Native Linux X11/XWayland, macOS AppKit, and Windows Win32 backends.\n";
+
 struct Config {
     appearance: Appearance,
     cols: usize,
     rows: usize,
     history: usize,
     command: Vec<CString>,
+    #[cfg(target_os = "linux")]
     name: Option<String>,
 }
 
@@ -86,6 +129,7 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         rows: 32,
         history: 2000,
         command: Vec::new(),
+        #[cfg(target_os = "linux")]
         name: None,
     };
     let mut i = 1;
@@ -114,6 +158,7 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
                 i += 1;
                 config_path = Some(*args.get(i).ok_or("--config needs a path")?);
             }
+            #[cfg(target_os = "linux")]
             b"--name" => {
                 i += 1;
                 cfg.name = Some(
@@ -163,17 +208,16 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         i += 1;
     }
     if cfg.command.is_empty() {
-        let value = unsafe { os::getenv(c"SHELL".as_ptr()) };
-        let shell = if value.is_null() {
-            c"/bin/sh"
-        } else {
-            unsafe { CStr::from_ptr(value) }
-        };
-        cfg.command.push(if shell.is_empty() {
-            c"/bin/sh".into()
-        } else {
-            shell.into()
-        });
+        #[cfg(unix)]
+        {
+            let shell = os::env(c"SHELL")
+                .filter(|s| !s.is_empty())
+                .unwrap_or(b"/bin/sh");
+            cfg.command
+                .push(CString::new(shell).map_err(|_| "invalid shell path")?);
+        }
+        #[cfg(windows)]
+        cfg.command.push(os::default_shell());
     }
     cfg.appearance = Appearance::load(config_path)?;
     if let Some(font) = font {
@@ -182,10 +226,12 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
     Ok(Some(cfg))
 }
 
+#[cfg(target_os = "linux")]
 struct Queue {
     bytes: Vec<u8>,
     offset: usize,
 }
+#[cfg(target_os = "linux")]
 impl Queue {
     fn new() -> Self {
         Self {
@@ -226,6 +272,7 @@ impl Queue {
     }
 }
 
+#[cfg(target_os = "linux")]
 fn key(symbol: u64) -> Key {
     match symbol {
         0xff1b => Key::Escape,
@@ -293,6 +340,7 @@ fn key(symbol: u64) -> Key {
     }
 }
 
+#[cfg(target_os = "linux")]
 fn modifiers(state: u32) -> Modifiers {
     Modifiers(
         ((state & 1 != 0) as u8)
@@ -304,6 +352,7 @@ fn modifiers(state: u32) -> Modifiers {
     )
 }
 
+#[cfg(target_os = "linux")]
 fn key_modifiers(state: u32, symbol: u64, pressed: bool, held: &[u64; 256]) -> Modifiers {
     let mut result = modifiers(state);
     for (bit, symbols) in [
@@ -331,125 +380,60 @@ fn key_modifiers(state: u32, symbol: u64, pressed: bool, held: &[u64; 256]) -> M
     result
 }
 
+#[cfg(target_os = "linux")]
 fn paste(bytes: Vec<u8>, terminal: &Terminal, queue: &mut Queue) {
     let text = String::from_utf8_lossy(&bytes);
     queue.push(&input::encode_paste(&text, &terminal.modes().input()));
 }
 
-fn run(cfg: Config) -> Result<i32, String> {
-    use json::{Value, object};
-    let mut request = object([
-        ("op", Value::from("create")),
-        ("origin", Value::from("local")),
-        ("headless", Value::Bool(false)),
-        ("cols", Value::from(cfg.cols)),
-        ("rows", Value::from(cfg.rows)),
-        ("history", Value::from(cfg.history)),
-        ("_appearance", cfg.appearance.to_json()),
-        (
-            "_argv",
-            Value::Array(
-                cfg.command
-                    .iter()
-                    .map(|s| Value::from(broker::hex(s.to_bytes())))
-                    .collect(),
-            ),
-        ),
-    ]);
-    if let Some(name) = cfg.name {
-        request.set("name", Value::from(name));
-    }
-    let created = broker::request(&request)?;
-    wait_session(&created)
-}
-
-fn wait_session(session: &json::Value) -> Result<i32, String> {
-    let uri = session
-        .get("uri")
-        .and_then(json::Value::as_str)
-        .ok_or("missing session address")?;
-    let attachment = session
-        .get("attachment")
-        .and_then(json::Value::as_u64)
-        .ok_or("missing attachment token")?;
-    let value = broker::request(&json::object([
-        ("op", json::Value::from("wait")),
-        ("session", json::Value::from(uri)),
-        ("attachment", json::Value::from(attachment)),
-    ]))?;
-    Ok(value
-        .get("exit_code")
-        .and_then(json::Value::as_i64)
-        .unwrap_or(0) as i32)
-}
-
-fn attach(args: &[&CStr]) -> Result<i32, String> {
-    use json::{Value, object};
-    if args.is_empty() || args == [c"--list"] || args == [c"list"] {
-        let value = broker::request(&object([("op", Value::from("list"))]))?;
-        let sessions = value
-            .get("sessions")
-            .and_then(Value::as_array)
-            .ok_or("invalid session list")?;
-        if sessions.is_empty() {
-            os::print(1, b"No ztty sessions.\n");
-            return Ok(0);
+fn launch(args: &[&CStr]) -> Result<i32, String> {
+    config(args).and_then(|cfg| {
+        if let Some(cfg) = cfg {
+            #[cfg(target_os = "linux")]
+            {
+                platform::run(cfg)
+            }
+            #[cfg(not(target_os = "linux"))]
+            {
+                platform::run(cfg).map_err(String::from)
+            }
+        } else {
+            Ok(0)
         }
-        os::print(1, b"SESSION\tSTATE\tSIZE\tWINDOW\n");
-        for session in sessions {
-            let line = alloc::format!(
-                "{}\t{}\t{}x{}\t{}\n",
-                session.get("uri").and_then(Value::as_str).unwrap_or(""),
-                if session.get("running").and_then(Value::as_bool) == Some(true) {
-                    "running"
-                } else {
-                    "exited"
-                },
-                session.get("cols").and_then(Value::as_u64).unwrap_or(0),
-                session.get("rows").and_then(Value::as_u64).unwrap_or(0),
-                if session.get("attached").and_then(Value::as_bool) == Some(true) {
-                    "attached"
-                } else {
-                    "detached"
-                }
-            );
-            os::print(1, line.as_bytes());
-        }
-        return Ok(0);
-    }
-    if args.len() != 1 {
-        return Err("usage: ztty attach [NAME | ztty://ADDRESS]".into());
-    }
-    let name = args[0]
-        .to_str()
-        .map_err(|_| "session selector must be UTF-8")?;
-    let appearance = Appearance::load(None)?;
-    let value = broker::request(&object([
-        ("op", Value::from("attach")),
-        ("session", Value::from(name)),
-        ("_appearance", appearance.to_json()),
-    ]))?;
-    wait_session(&value)
+    })
 }
 
+#[cfg(target_os = "linux")]
 pub(crate) fn serve() -> Result<(), String> {
     session::serve()
 }
 
-/// C runtime entry point; all production Rust remains no_std.
+/// C runtime entry point. Rust's standard library and its runtime are absent.
+///
 /// # Safety
-/// argv contains argc valid NUL-terminated strings from the C runtime.
+/// `argv` must point to `argc` valid, NUL-terminated argument strings, as supplied
+/// by the platform C runtime at process startup.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int {
+    #[cfg(not(windows))]
     let args: Vec<&CStr> = unsafe { core::slice::from_raw_parts(argv, argc.max(0) as usize) }
         .iter()
         .map(|&ptr| unsafe { CStr::from_ptr(ptr) })
         .collect();
+    #[cfg(windows)]
+    let owned_args = os::arguments();
+    #[cfg(windows)]
+    let args: Vec<&CStr> = owned_args.iter().map(|s| s.as_c_str()).collect();
+    #[cfg(windows)]
+    let _ = (argc, argv);
+    #[cfg(target_os = "linux")]
     let result = match args.get(1).map(|s| s.to_bytes()) {
         Some(b"mcp") => mcp::run(&args[2..]),
-        Some(b"attach") => attach(&args[2..]),
-        _ => config(&args).and_then(|cfg| cfg.map_or(Ok(0), run)),
+        Some(b"attach") => platform::attach(&args[2..]),
+        _ => launch(&args),
     };
+    #[cfg(not(target_os = "linux"))]
+    let result = launch(&args);
     match result {
         Ok(status) => status,
         Err(message) => {
