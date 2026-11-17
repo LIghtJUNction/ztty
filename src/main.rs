@@ -39,6 +39,8 @@ mod search;
 #[cfg(target_os = "linux")]
 mod session;
 #[cfg(target_os = "linux")]
+mod workspace_state;
+#[cfg(target_os = "linux")]
 mod x11;
 #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 compile_error!("ztty supports Linux, macOS, and Windows");
@@ -90,6 +92,8 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty control NAME acquire|release [--takeover]\n\
        ztty commands NAME | command-output NAME COMMAND_ID\n\
        ztty shell-integration bash|zsh|fish|nu\n\
+       ztty save-layout NAME > workspace.json\n\
+       ztty restore-layout workspace.json\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
   --name NAME          Name this local session\n\
   --tab NAME           Open a new tab in NAME's window\n\
@@ -516,7 +520,7 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
         Some(b"attach") => platform::attach(&args[2..]),
         Some(
             b"list" | b"info" | b"detach" | b"rename" | b"action" | b"move" | b"control"
-            | b"commands" | b"command-output",
+            | b"commands" | b"command-output" | b"save-layout" | b"restore-layout",
         ) => platform::command(&args[1..]),
         _ => launch(&args),
     };

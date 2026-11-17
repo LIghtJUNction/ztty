@@ -458,6 +458,8 @@ unsafe extern "C" {
     fn XResizeWindow(display: *mut Display, window: Xid, width: c_uint, height: c_uint) -> c_int;
     fn XSetInputFocus(display: *mut Display, window: Xid, revert_to: c_int, time: c_ulong)
     -> c_int;
+    fn XGetInputFocus(display: *mut Display, window: *mut Xid, revert_to: *mut c_int) -> c_int;
+    fn XNextRequest(display: *mut Display) -> c_ulong;
     fn XFreeColormap(display: *mut Display, colormap: Xid) -> c_int;
     fn XStoreName(display: *mut Display, window: Xid, title: *const c_char) -> c_int;
     fn XSetClassHint(display: *mut Display, window: Xid, hint: *mut ClassHint) -> c_int;
@@ -722,6 +724,17 @@ unsafe fn alpha_visual(display: *mut Display, screen: c_int) -> Option<*mut c_vo
 
 type DrawnCursor = ((usize, usize), CursorShape);
 
+/// Focus events can remain queued after reparenting or an explicit focus
+/// change. Consult the current server owner before acting on such an event.
+pub fn input_focus(display: *mut Display) -> Xid {
+    let mut window = 0;
+    let mut revert = 0;
+    unsafe {
+        XGetInputFocus(display, &mut window, &mut revert);
+    }
+    window
+}
+
 /// A workspace adds one native parent, without a duplicate terminal backing
 /// pixmap, font set or terminal model. Children retain their PTYs when moved.
 pub struct Container {
@@ -730,6 +743,7 @@ pub struct Container {
     pub width: i32,
     pub height: i32,
     pub wm_delete: Atom,
+    pub configure_serial: c_ulong,
 }
 
 impl Container {
@@ -782,12 +796,28 @@ impl Container {
                 width: window.width,
                 height: window.height,
                 wm_delete,
+                configure_serial: 0,
             }
         }
     }
 
     pub fn display(&self) -> *mut Display {
         self.connection.display
+    }
+
+    pub fn resize(&mut self, width: i32, height: i32) {
+        self.width = width.max(1);
+        self.height = height.max(1);
+        unsafe {
+            self.configure_serial = XNextRequest(self.display());
+            XResizeWindow(
+                self.display(),
+                self.id,
+                self.width as u32,
+                self.height as u32,
+            );
+            XFlush(self.display());
+        }
     }
 
     pub fn title(&self, text: &str) {
@@ -984,6 +1014,7 @@ pub struct Window {
     pub width: i32,
     pub height: i32,
     pub wm_delete: Atom,
+    pub configure_serial: core::cell::Cell<c_ulong>,
     depth: u32,
     visual: *mut c_void,
     colormap: c_ulong,
@@ -1169,6 +1200,7 @@ impl Window {
                 width,
                 height,
                 wm_delete,
+                configure_serial: core::cell::Cell::new(0),
                 depth,
                 visual,
                 colormap,
@@ -1365,6 +1397,7 @@ impl Window {
             .saturating_add((self.padding * 2) as usize)
             .clamp(1, u16::MAX as usize);
         unsafe {
+            self.configure_serial.set(XNextRequest(self.display));
             XResizeWindow(self.display, self.id, width as c_uint, height as c_uint);
             XFlush(self.display);
         }
@@ -1402,6 +1435,7 @@ impl Window {
         unsafe {
             let root = XRootWindow(self.display, self.fonts.connection.screen);
             XUnmapWindow(self.display, self.id);
+            self.configure_serial.set(XNextRequest(self.display));
             XReparentWindow(self.display, self.id, parent.unwrap_or(root), 0, 0);
             if !self.suspended {
                 XMapWindow(self.display, self.id);
@@ -1412,6 +1446,7 @@ impl Window {
 
     pub fn place(&mut self, rect: crate::layout::Rect) -> (usize, usize) {
         unsafe {
+            self.configure_serial.set(XNextRequest(self.display));
             XMoveResizeWindow(
                 self.display,
                 self.id,

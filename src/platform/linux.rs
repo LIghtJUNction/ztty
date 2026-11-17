@@ -127,7 +127,15 @@ pub fn command(args: &[&CStr]) -> Result<i32, String> {
     };
     let op = text(0)?;
     let mut request = object([("op", Value::from(op))]);
-    if op == "list" {
+    if op == "restore-layout" {
+        if args.len() != 2 {
+            return Err("usage: ztty restore-layout FILE".into());
+        }
+        let bytes = os::read_config(args[1])
+            .map_err(|e| alloc::format!("cannot read layout (OS error {e})"))?;
+        let layout = json::parse(&bytes).map_err(String::from)?;
+        request.set("layout", layout);
+    } else if op == "list" {
         if args.len() > 2 {
             return Err("usage: ztty list [FILTER]".into());
         }
@@ -138,7 +146,7 @@ pub fn command(args: &[&CStr]) -> Result<i32, String> {
         let selector = text(1)?;
         request.set("session", Value::from(selector));
         match op {
-            "info" | "detach" | "commands" if args.len() == 2 => {}
+            "info" | "detach" | "commands" | "save-layout" if args.len() == 2 => {}
             "command-output" if args.len() == 3 => {
                 request.set("op", Value::from("command-read"));
                 let id = text(2)?

@@ -2,15 +2,23 @@
 """Exercise real X11 panes, PTYs, detach and input arbitration in an owned display."""
 import argparse
 import ctypes
+import fcntl
+import hashlib
 import json
 import os
 from pathlib import Path
-import select
+import shutil
 import signal
 import socket
+import struct
 import subprocess
+import sys
 import tempfile
+import termios
 import time
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+from isolated_xvfb import start_xvfb
 
 CHILD = r'''import os,sys,tty
 tty.setraw(0)
@@ -34,9 +42,12 @@ def main():
     parser.add_argument("--screenshot", type=Path, default=Path("artifacts/workspaces.png"))
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
-    report = {"ok": False, "checks": [], "platform": "Linux X11 / private Xvfb", "binary": str(binary)}
+    report = {"ok": False, "checks": [], "platform": "Linux X11 / private Xvfb", "binary": str(binary),
+              "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
+              "test_script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     owned = []
     broker_pid = None
+    broker_start_ticks = None
     xvfb = connection = None
     ctypes.CDLL(None).prctl(36, 1, 0, 0, 0)
 
@@ -52,25 +63,52 @@ def main():
             time.sleep(0.02)
         raise TimeoutError(label)
 
+    def start_ticks(pid):
+        return int(Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19])
+
+    def pty_size(pid):
+        # Read only the PTY belonging to a child created by this test.
+        fd = os.open(f"/proc/{pid}/fd/0", os.O_RDONLY | os.O_NOCTTY | os.O_CLOEXEC)
+        try:
+            rows, cols, _, _ = struct.unpack("HHHH", fcntl.ioctl(fd, termios.TIOCGWINSZ, b"\0" * 8))
+            return cols, rows
+        finally:
+            os.close(fd)
+
     with tempfile.TemporaryDirectory(prefix="ztty-workspaces-") as temporary:
         root = Path(temporary)
         log = (root / "stderr.log").open("wb")
         try:
-            read_fd, write_fd = os.pipe()
-            xvfb = subprocess.Popen(["Xvfb", "-displayfd", str(write_fd), "-screen", "0", "1600x1000x24", "-nolisten", "tcp"],
-                                    pass_fds=(write_fd,), stdout=subprocess.DEVNULL, stderr=log, start_new_session=True)
-            os.close(write_fd)
-            try:
-                if not select.select([read_fd], [], [], 10)[0]:
-                    raise TimeoutError("Xvfb startup")
-                number = os.read(read_fd, 64).strip().decode()
-            finally:
-                os.close(read_fd)
-            assert number.isdecimal(), number
-            connection = display.Display(":" + number)
-            env = dict(os.environ, DISPLAY=":" + number, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
+            xvfb = start_xvfb(screen="1600x1000x24", stderr=log)
+            connection = display.Display(xvfb.display)
+            report["display"] = xvfb.display
+            report["xserver_pid"] = xvfb.process.pid
+            report["xserver_ownership"] = xvfb.evidence
+            env = dict(os.environ, DISPLAY=xvfb.display, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
                        XDG_RUNTIME_DIR=temporary, ZTTY_SOCKET="@ztty-workspaces-" + root.name)
             env.pop("WAYLAND_DISPLAY", None)
+            # Never alter the parent environment. Only our first launcher and
+            # its broker subtree load this shim; its marker targets one PID.
+            env.pop("LD_PRELOAD", None)
+            fault_source = Path(__file__).with_name("ioctl_resize_fault.c")
+            fault_library = root / "ioctl_resize_fault.so"
+            fault_marker = root / "resize-failure.pid"
+            fault_log = root / "resize-failure.log"
+            compiler = shutil.which("cc")
+            if compiler is None:
+                raise RuntimeError("cc is required for the real ioctl failure regression")
+            compile_command = [compiler, "-shared", "-fPIC", "-O2", "-Wall", "-Wextra", "-Werror",
+                               "-o", str(fault_library), str(fault_source)]
+            compiled = subprocess.run(compile_command, capture_output=True, text=True, timeout=30, check=True)
+            report["fault_injection"] = {
+                "source": str(fault_source),
+                "source_sha256": hashlib.sha256(fault_source.read_bytes()).hexdigest(),
+                "library_sha256": hashlib.sha256(fault_library.read_bytes()).hexdigest(),
+                "compile_command": compile_command,
+                "compiler_stdout": compiled.stdout,
+                "compiler_stderr": compiled.stderr,
+                "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
+            }
             config = root / "config"
             config.write_text("background = #000000\nbackground-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 20\n")
 
@@ -95,9 +133,14 @@ def main():
                 return rpc({"op": "info", "session": name})
 
             def start(name, extra=()):
+                launch_env = env
+                if broker_pid is None:
+                    launch_env = dict(env, LD_PRELOAD=str(fault_library),
+                                      ZTTY_TEST_RESIZE_FAILURE_MARKER=str(fault_marker),
+                                      ZTTY_TEST_RESIZE_FAILURE_LOG=str(fault_log))
                 process = subprocess.Popen([str(binary), "--name", name, "--config", str(config), "--geometry", "100x26", *extra,
                                             "-e", "/usr/bin/python3", "-c", CHILD, str(root / (name + ".input")), name, temporary],
-                                           env=env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True)
+                                           env=launch_env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True)
                 owned.append(process)
                 wait(lambda: process.poll() is None and any(s["name"] == name for s in rpc({"op": "list"})["sessions"]), name + " startup")
                 wait(lambda: name in rpc({"op":"read", "session":name})["screen"], name + " screen")
@@ -125,6 +168,10 @@ def main():
 
             alpha = start("alpha")
             broker_pid = alpha["broker_pid"]
+            broker_start_ticks = start_ticks(broker_pid)
+            assert Path(f"/proc/{broker_pid}/exe").resolve() == binary
+            report["broker_pid"] = broker_pid
+            report["broker_start_ticks"] = broker_start_ticks
             assert alpha["id"] > 0 and abs(alpha["created_at"] / 1000 - time.time()) < 30
             beta = start("beta", ["--split-right", "alpha"])
             wait(lambda: info("alpha")["workspace"] == info("beta")["workspace"] != None, "split grouping")
@@ -161,11 +208,25 @@ def main():
             report["checks"].append("tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell")
 
             # Capture the actual split surface, not a mock or screenshot of text.
-            connection.sync()
-            time.sleep(0.1)
-            geometry = parent.get_geometry()
-            pixels = parent.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
-            screenshot = Image.frombytes("RGB", (geometry.width, geometry.height), pixels.data, "raw", "BGRX")
+            # A fixed delay can capture a blank surface under CPU pressure.
+            # Wait for rendered glyph pixels in both panes, independently of
+            # the terminal model's text response.
+            def capture_split():
+                connection.sync()
+                geometry = parent.get_geometry()
+                pixels = parent.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
+                image = Image.frombytes("RGB", (geometry.width, geometry.height), pixels.data, "raw", "BGRX")
+                counts = {}
+                for name in ("alpha", "beta"):
+                    pane = connection.create_resource_object("window", info(name)["window_id"]).get_geometry()
+                    region = image.crop((pane.x + 12, pane.y + 12,
+                                         pane.x + pane.width - 12, pane.y + pane.height - 12))
+                    counts[name] = sum(region.convert("L").histogram()[128:])
+                if all(count >= 100 for count in counts.values()):
+                    report["screenshot_glyph_pixels"] = counts
+                    return image
+                return None
+            screenshot = wait(capture_split, "rendered glyph pixels in both native split panes")
             args.screenshot.parent.mkdir(parents=True, exist_ok=True)
             screenshot.save(args.screenshot)
             report["screenshot"] = str(args.screenshot)
@@ -177,6 +238,101 @@ def main():
             assert info("beta")["pid"] == old_pid
             assert info("alpha")["workspace"] == info("beta")["workspace"]
             report["checks"].append("moving panes between native windows and layouts preserves the PTY process")
+
+            # Save a real multi-tab split tree, move its windows independently,
+            # then restore geometry without restarting or recreating any PTY.
+            snapshot_path=root / "workspace.json"
+            saved=subprocess.run([str(binary),"save-layout","alpha"],env=env,capture_output=True,check=True,timeout=10)
+            snapshot=json.loads(saved.stdout)
+            snapshot_path.write_bytes(saved.stdout)
+            before_pids={name:info(name)["pid"] for name in ("alpha","beta","gamma")}
+            assert len(snapshot["tabs"])==2 and len(snapshot["nodes"])==4,snapshot
+            action("beta","move-window")
+            action("gamma","move-window")
+            restored=subprocess.run([str(binary),"restore-layout",str(snapshot_path)],env=env,capture_output=True,check=True,timeout=10)
+            assert json.loads(restored.stdout)["attached"]
+            after=json.loads(subprocess.check_output([str(binary),"save-layout","alpha"],env=env,timeout=10))
+            assert after==snapshot,(snapshot,after)
+            assert {name:info(name)["pid"] for name in before_pids}==before_pids
+            assert info("alpha")["workspace"]==info("beta")["workspace"]==info("gamma")["workspace"]
+            invalid=json.loads(saved.stdout)
+            next(node for node in invalid["nodes"] if "pane" in node)["pane"]="ztty://local/missing-exited-session"
+            unchanged=info("alpha")["workspace"]
+            rpc({"op":"restore-layout","layout":invalid},success=False)
+            rpc({"op":"restore-layout","layout":snapshot,"_actor":"agent-a"},success=False)
+            assert info("alpha")["workspace"]==unchanged
+            assert rpc({"op":"save-layout","session":"alpha"})==snapshot
+            report["checks"].append("versioned CLI layout snapshots restore tabs/splits/geometry with unchanged PTY PIDs; unknown sessions and nonlocal restores fail before mutation")
+
+            # Leave one pane behind in the old container. Its expansion is the
+            # first fallible arrange after the selected panes were reparented.
+            # Earlier code dropped the new parent at this error and destroyed
+            # every selected view. The marker also checks all-view completion
+            # and that retrying the same geometry repairs the actual PTY size.
+            start("delta", ["--split-right", "alpha"])
+            names = ("alpha", "beta", "gamma", "delta")
+            before = {name: info(name) for name in names}
+            identities = {name: start_ticks(view["pid"]) for name, view in before.items()}
+            old_parent = before["delta"]["workspace"]
+            sizes_before = {name: pty_size(view["pid"]) for name, view in before.items()}
+            for name in names:
+                assert sizes_before[name] == (before[name]["cols"], before[name]["rows"]), (name, before[name])
+            fault_marker.write_text(f"{broker_pid}\n")
+            failed = rpc({"op": "restore-layout", "layout": snapshot}, success=False)
+            assert "cannot resize split PTY" in failed.get("error", ""), failed
+            wait(lambda: fault_log.exists() and len(fault_log.read_text().splitlines()) >= 2,
+                 "old and restored workspace resize errors")
+            attempts = [json.loads(line) for line in fault_log.read_text().splitlines()]
+            assert all(item["pid"] == broker_pid and item["errno"] == 5 for item in attempts), attempts
+            assert len({item["fd"] for item in attempts}) >= 2, attempts
+            report["fault_injection"].update({"attempts": attempts, "error_response": failed,
+                                              "child_pids": {name: view["pid"] for name, view in before.items()},
+                                              "pty_sizes_before": sizes_before})
+            failed_views = {name: info(name) for name in names}
+            restored_parent = failed_views["alpha"]["workspace"]
+            assert restored_parent is not None and restored_parent != old_parent
+            report["fault_injection"].update({"old_container": old_parent,
+                                              "restored_container_after_error": restored_parent,
+                                              "child_start_ticks": identities,
+                                              "child_window_ids": {name: view["window_id"] for name, view in before.items()}})
+            for name in names:
+                view = failed_views[name]
+                assert view["pid"] == before[name]["pid"] and start_ticks(view["pid"]) == identities[name]
+                assert view["window_id"] == before[name]["window_id"] and view["attached"] and view["running"], view
+                window = connection.create_resource_object("window", view["window_id"])
+                attributes = window.get_attributes()
+                expected_parent = old_parent if name == "delta" else restored_parent
+                assert window.query_tree().parent.id == expected_parent, (name, view)
+                assert view["visible"] == (name != "gamma"), (name, view)
+                assert (attributes.map_state == X.IsViewable) == view["visible"], (name, attributes)
+                assert pty_size(view["pid"]) == sizes_before[name], (name, "failed resize changed the PTY")
+                assert (view["cols"], view["rows"]) == sizes_before[name], (name, "model advanced despite failed ioctl")
+                token = f"fault-survived-{name}"
+                rpc({"op": "write", "session": name, "data": token})
+                wait(lambda name=name, token=token: token.encode() in input_bytes(name), name + " PTY after resize error")
+                wait(lambda name=name, token=token: token in rpc({"op": "read", "session": name})["screen"],
+                     name + " output after resize error")
+            connection.sync()
+            fault_marker.unlink()
+            recovered = rpc({"op": "restore-layout", "layout": snapshot})
+            assert recovered["attached"]
+            recovered_views = {name: info(name) for name in names}
+            for name, view in recovered_views.items():
+                assert view["pid"] == before[name]["pid"] and start_ticks(view["pid"]) == identities[name]
+                assert view["window_id"] == before[name]["window_id"]
+                expected = (view["cols"], view["rows"])
+                wait(lambda pid=view["pid"], expected=expected: pty_size(pid) == expected, name + " actual PTY resize recovery")
+                window = connection.create_resource_object("window", view["window_id"])
+                window.get_attributes()
+                expected_parent = old_parent if name == "delta" else recovered_views["alpha"]["workspace"]
+                assert window.query_tree().parent.id == expected_parent, (name, view)
+            assert pty_size(recovered_views["delta"]["pid"]) != sizes_before["delta"], "left-behind pane did not expand"
+            assert rpc({"op": "save-layout", "session": "alpha"}) == snapshot
+            report["fault_injection"].update({"attempts": attempts, "error_response": failed,
+                                              "child_pids": {name: view["pid"] for name, view in before.items()},
+                                              "pty_sizes_before": sizes_before,
+                                              "pty_sizes_recovered": {name: pty_size(view["pid"]) for name, view in recovered_views.items()}})
+            report["checks"].append("injected ioctl EIO keeps both containers, every view, PTY identity and old dimensions alive; retrying the same snapshot repairs actual PTY sizes")
 
             old_uri = info("beta")["uri"]
             rpc({"op": "rename", "session": "beta", "name": "renamed"})
@@ -215,6 +371,45 @@ def main():
             assert b"forbidden" not in input_bytes("beta")
             report["checks"].append("per-request input ownership rejects old operators and permits multiple observers")
 
+            # A canonical URI is reusable after close. A saved layout must not
+            # silently adopt a different PTY later created with that same name.
+            previous = start("incarnation")
+            previous_started = start_ticks(previous["pid"])
+            previous_waiter = owned[-1]
+            stale_snapshot = rpc({"op": "save-layout", "session": "incarnation"})
+            rpc({"op": "close", "session": "incarnation"})
+            wait(lambda: not any(s["name"] == "incarnation" for s in rpc({"op": "list"})["sessions"]),
+                 "old incarnation removed")
+            previous_waiter.wait(timeout=5)
+            wait(lambda: not Path(f"/proc/{previous['pid']}").exists()
+                 or start_ticks(previous["pid"]) != previous_started, "old incarnation PTY reaped")
+            replacement = start("incarnation")
+            assert replacement["uri"] == previous["uri"], (previous, replacement)
+            assert replacement["pid"] != previous["pid"] and replacement["id"] != previous["id"]
+            fresh_snapshot = rpc({"op": "save-layout", "session": "incarnation"})
+            current_window = connection.create_resource_object("window", replacement["window_id"])
+            geometry = current_window.get_geometry()
+            parent_id = current_window.query_tree().parent.id
+            stale_error = rpc({"op": "restore-layout", "layout": stale_snapshot}, success=False)
+            unchanged = info("incarnation")
+            for field in ("id", "pid", "uri", "created_at", "window_id", "workspace", "cols", "rows", "input_owner"):
+                assert unchanged[field] == replacement[field], (field, replacement, unchanged)
+            assert rpc({"op": "save-layout", "session": "incarnation"}) == fresh_snapshot
+            now_geometry = current_window.get_geometry()
+            assert (now_geometry.width, now_geometry.height) == (geometry.width, geometry.height)
+            assert current_window.query_tree().parent.id == parent_id
+            assert current_window.get_attributes().map_state == X.IsViewable
+            rpc({"op": "write", "session": "incarnation", "data": "replacement-still-live"})
+            wait(lambda: "replacement-still-live" in rpc({"op": "read", "session": "incarnation"})["screen"],
+                 "replacement PTY survives stale snapshot")
+            report["incarnation_reuse"] = {"uri": replacement["uri"],
+                                           "previous_id": previous["id"], "replacement_id": replacement["id"],
+                                           "previous_pid": previous["pid"], "replacement_pid": replacement["pid"],
+                                           "previous_created_at": previous["created_at"],
+                                           "replacement_created_at": replacement["created_at"],
+                                           "rejected_restore": stale_error}
+            report["checks"].append("a stale layout cannot adopt a new PTY that reuses the closed session's origin/name; rejection preserves the replacement view and process")
+
             # Any local user can explicitly reclaim their own desktop session;
             # transport observers never get this action through MCP dispatch.
             for session in rpc({"op": "list"})["sessions"]:
@@ -224,6 +419,7 @@ def main():
             for process in owned:
                 process.wait(timeout=5)
             report["checks"].append("all launch/attach waiters complete and sessions release their views and PTYs")
+            assert hashlib.sha256(binary.read_bytes()).hexdigest() == report["binary_sha256"], "binary changed during verification"
             report["ok"] = True
         except Exception as error:
             import traceback
@@ -237,8 +433,9 @@ def main():
             # eligible. No name-based kill and no shared user display cleanup.
             if broker_pid:
                 try:
-                    os.kill(broker_pid, signal.SIGTERM)
-                except ProcessLookupError:
+                    if start_ticks(broker_pid) == broker_start_ticks and Path(f"/proc/{broker_pid}/exe").resolve() == binary:
+                        os.kill(broker_pid, signal.SIGTERM)
+                except (FileNotFoundError, ProcessLookupError):
                     pass
             for process in owned:
                 if process.poll() is None:
@@ -249,8 +446,7 @@ def main():
                     os.killpg(process.pid, signal.SIGKILL)
                     process.wait(timeout=3)
             if xvfb:
-                xvfb.terminate()
-                xvfb.wait(timeout=3)
+                xvfb.close()
             log.close()
             report["stderr"] = (root / "stderr.log").read_text(errors="replace")[-8000:]
             args.output.parent.mkdir(parents=True, exist_ok=True)

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Versioned Linux workspace snapshots restore live tabs, split ratios, focus and geometry without replacing PTYs; bounded schema/identity checks reject invalid layouts before UI mutation.
+
 - Linux workspace tabs and horizontal/vertical split panes in the shared broker, with pane focus, swap, resizing, maximize/restore and moves between native windows.
 - Stable session IDs, creation timestamps, filtered listing and rename that preserves existing session URIs.
 - Explicit local detach, observe attach and input ownership with deliberate takeover.
@@ -16,6 +18,9 @@
 - Reproducible independent/shared 1/5/10/20 benchmark tooling, workload checks, retained raw measurements and SVG generation.
 
 ### Fixed
+
+- Workspace restore retains live parent/child windows and retries PTY dimensions after resize errors; stale queued focus/geometry events no longer overwrite the restored layout.
+- Saved layouts reject a replacement session that reuses a closed session's canonical URI.
 
 - Closing an observing view preserves another operator's live PTY; observing an existing workspace does not steal focus.
 - Ownership handoff cancels pending input and asynchronous clipboard transfers.
