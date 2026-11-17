@@ -26,6 +26,7 @@ import sys
 import tempfile
 import termios
 import time
+import traceback
 import tty
 
 from measure_runtime import (
@@ -341,7 +342,7 @@ def measure(app, binary, repetition, settle):
             "XMODIFIERS": "@im=none", "GDK_BACKEND": "x11",
             "LIBGL_ALWAYS_SOFTWARE": "1", "GSK_RENDERER": "gl",
             "GDK_SCALE": "1", "GDK_DPI_SCALE": "1",
-            "GSETTINGS_BACKEND": "memory",
+            "GSETTINGS_BACKEND": "memory", "GTK_A11Y": "none", "NO_AT_BRIDGE": "1",
             "ZTTY_SOCKET": "@ztty-compare-" + tag,
             "XDG_RUNTIME_DIR": temporary,
             "XDG_CONFIG_HOME": str(directory / "config"),
@@ -401,6 +402,7 @@ def measure(app, binary, repetition, settle):
                     key: environment[key] for key in (
                         "LC_ALL", "XMODIFIERS", "GDK_BACKEND", "LIBGL_ALWAYS_SOFTWARE",
                         "GSK_RENDERER", "GDK_SCALE", "GDK_DPI_SCALE", "GSETTINGS_BACKEND",
+                        "GTK_A11Y", "NO_AT_BRIDGE",
                     )
                 }
                 started = time.monotonic()
@@ -528,6 +530,7 @@ def measure(app, binary, repetition, settle):
                     send_json(channel, {"op": "quit"})
             except Exception as error:
                 result["error"] = repr(error)
+                result["traceback"] = traceback.format_exc()
             finally:
                 for channel in connections:
                     with contextlib.suppress(OSError):
@@ -822,6 +825,7 @@ def main():
         },
         "sources": [
             "https://ghostty.org/docs/config/reference",
+            "https://docs.gtk.org/gtk4/running.html",
             "https://ghostty.org/docs/install/binary",
             "https://sw.kovidgoyal.net/kitty/invocation/",
             "https://man7.org/linux/man-pages/man5/proc_pid_smaps.5.html",
