@@ -132,6 +132,7 @@ jobs:
       - name: Run native Linux PTY and X11 GUI acceptance
         id: native
         run: |
+          cargo +"$RUST_TOOLCHAIN" test --locked --test working_directory -- --test-threads=1 > "dist/$ARTIFACT_STEM.working-directory.log" 2>&1
           python tests/linux_native_test.py -v > "dist/$ARTIFACT_STEM.gate-tests.log" 2>&1
           python tests/linux_native.py --binary target/release/ztty \
             --source-root "$GITHUB_WORKSPACE" --source-sha "$SOURCE_SHA" \

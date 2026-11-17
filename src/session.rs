@@ -6,7 +6,9 @@ use crate::{
     json::{self, Value},
     key, key_modifiers,
     layout::{Axis, Layout},
-    modifiers, os, paste, search, workspace_state,
+    modifiers, os, paste, search,
+    working_directory::WorkingDirectory,
+    workspace_state,
     x11::{self, Connection, Selection, Window},
 };
 use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
@@ -999,24 +1001,6 @@ fn local_directory(uri: &str) -> Option<String> {
         bytes.push(byte);
     }
     String::from_utf8(bytes).ok()
-}
-
-struct WorkingDirectory(broker::Fd);
-impl WorkingDirectory {
-    fn enter(path: &CStr) -> Result<Self, String> {
-        let saved = broker::Fd(unsafe { os::open(c".".as_ptr(), 0o2000000 | 0o200000) });
-        if saved.0 < 0 || unsafe { os::chdir(path.as_ptr()) } < 0 {
-            return Err("cannot enter session working directory".into());
-        }
-        Ok(Self(saved))
-    }
-}
-impl Drop for WorkingDirectory {
-    fn drop(&mut self) {
-        unsafe {
-            os::fchdir(self.0.0);
-        }
-    }
 }
 
 impl Pool {
