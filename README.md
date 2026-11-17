@@ -184,6 +184,8 @@ cargo test --workspace --doc
 cargo run -p zpty --example capture
 cargo run --release -p zterm --example benchmark
 python3 tests/gui_smoke.py --binary ./target/release/ztty
+# Optional: real Fcitx 5 XIM with the Pinyin addon and a private D-Bus session.
+python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 python3 tools/verify_registry.py
 
 # Optional portability gate for the platform-independent libraries:

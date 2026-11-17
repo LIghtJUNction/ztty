@@ -39,10 +39,10 @@ SGR mouse input; Shift gesture ownership; explicit OSC 8 opening; configured ARG
 output across writes and Expose events. The large-paste assertion includes the
 12 bytes of bracketed-paste delimiters, for 139,276 delivered bytes.
 
-Unit tests additionally cover screen state and query semantics. The current GUI
-suite does not exercise a real IBus/Fcitx XIM session, a deliberately chunked INCR
-clipboard transfer, or an actual Wayland/XWayland desktop session. These remain
-separate integration acceptance tasks.
+Unit tests also cover screen state and query semantics. The optional
+`--fcitx` test runs Fcitx 5 with Pinyin on Xvfb and a private D-Bus session,
+checking ordinary key forwarding and Chinese text committed to the PTY.
+IBus and deliberately fragmented INCR transfers remain separate integration tests.
 
 ## References
 

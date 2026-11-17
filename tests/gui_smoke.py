@@ -24,8 +24,8 @@ RESET = "\x1bc\x1b[?25l"
 
 
 class Gui:
-    def __init__(self, binary, font, directory):
-        self.terminal = self.xvfb = self.control = self.d = None
+    def __init__(self, binary, font, directory, fcitx=False):
+        self.terminal = self.fcitx = self.xvfb = self.control = self.d = None
         self.xlog = self.tlog = None
         from PIL import Image
         from Xlib import X, XK, Xatom, display, protocol
@@ -94,6 +94,8 @@ class Gui:
             "cursor-shape = bar\ncursor-blink-interval = 150\n",
             encoding="utf-8",
         )
+        if fcitx:
+            self.start_fcitx(environment)
         self.terminal = subprocess.Popen(
             [str(binary), "--config", str(config), "--font", font, "--geometry", "120x32", "-e", sys.executable,
              str(ROOT / "tests/gui_child.py"), "--socket", str(socket_path),
@@ -127,6 +129,38 @@ class Gui:
         if self.cw < 1 or self.ch < 1:
             raise AssertionError("invalid terminal cell dimensions")
         self.emit(RESET)
+
+    def start_fcitx(self, environment):
+        config = self.directory / "fcitx-config"
+        profile = config / "fcitx5" / "profile"
+        profile.parent.mkdir(parents=True)
+        profile.write_text(
+            "[Groups/0]\nName=Default\nDefault Layout=us\nDefaultIM=pinyin\n"
+            "[Groups/0/Items/0]\nName=keyboard-us\n"
+            "[Groups/0/Items/1]\nName=pinyin\n[GroupOrder]\n0=Default\n",
+            encoding="utf-8",
+        )
+        environment.update(XMODIFIERS="@im=fcitx", XDG_CONFIG_HOME=str(config))
+        self.fcitx_environment = {
+            key: value for key, value in environment.items()
+            if key not in ("WAYLAND_DISPLAY", "WAYLAND_SOCKET")
+        }
+        self.fcitx_environment.update(
+            XDG_CACHE_HOME=str(config / "cache"),
+            XDG_DATA_HOME=str(config / "data"),
+        )
+        with (self.directory / "fcitx.stderr").open("wb") as log:
+            self.fcitx = subprocess.Popen(
+                ["fcitx5", "--disable=wayland,waylandim,notifications,classicui"],
+                env=self.fcitx_environment, stdout=log, stderr=log,
+            )
+        selection = self.d.intern_atom("@server=fcitx")
+        self.wait(lambda: self.d.get_selection_owner(selection), "Fcitx XIM server", 10)
+
+    def fcitx_remote(self, *args):
+        return subprocess.check_output(
+            ["fcitx5-remote", *args], env=self.fcitx_environment, text=True, timeout=5
+        ).strip()
 
     def pump(self):
         if self.d is None:
@@ -383,6 +417,9 @@ class Gui:
                     with contextlib.suppress(ProcessLookupError):
                         os.killpg(self.terminal.pid, signal.SIGKILL)
                     self.terminal.wait(timeout=2)
+        if self.fcitx is not None and self.fcitx.poll() is None:
+            self.fcitx.terminate()
+            self.fcitx.wait(timeout=3)
         if self.d is not None:
             with contextlib.suppress(Exception):
                 self.d.close()
@@ -623,6 +660,28 @@ def appearance_and_cursor(gui):
     return {"argb_depth": 32, "background_alpha": 191, "cursor_phases_verified": True}
 
 
+def fcitx_input(gui):
+    gui.fcitx_remote("-c")
+    gui.tap("a")
+    gui.expect_input(b"a")
+    gui.clear_input()
+    gui.key("Control_L", True)
+    gui.tap("space")
+    gui.key("Control_L", False)
+    gui.wait(lambda: gui.fcitx_remote() == "2" and gui.fcitx_remote("-n") == "pinyin",
+             "Pinyin activation")
+    for char in "nihao":
+        gui.tap(char)
+    gui.tap("space")
+    committed = "你好".encode()
+    gui.expect_input(committed)
+    gui.clear_input()
+    gui.fcitx_remote("-c")
+    gui.tap("Return")
+    gui.expect_input(b"\r")
+    return {"committed_text": committed.decode()}
+
+
 def preview(gui, output):
     gui.reset()
     gui.window.configure(width=112 * gui.cw + 24, height=28 * gui.ch + 24)
@@ -655,17 +714,27 @@ def preview(gui, output):
     return {"path": str(output), "width": image.width, "height": image.height}
 
 
-def main():
+def main(fcitx=False):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, default=ROOT / "target/release/ztty")
+    parser.add_argument("--fcitx", action="store_true",
+                        help="test real XIM via Fcitx 5 and Pinyin using an isolated D-Bus session")
     parser.add_argument("--font", default="monospace:size=11")
     parser.add_argument("--artifacts", type=Path, default=ROOT / "artifacts")
     args = parser.parse_args()
+    if args.fcitx:
+        # Launch a dedicated bus regardless of the caller's desktop environment.
+        os.execvp("dbus-run-session", ["dbus-run-session", "--", sys.executable, "-c",
+            "import sys; sys.path.insert(0,sys.argv[1]); import gui_smoke; "
+            "sys.argv = [gui_smoke.__file__, *sys.argv[2:]]; sys.exit(gui_smoke.main(fcitx=True))",
+            str(ROOT / "tests"), *[arg for arg in sys.argv[1:] if arg != "--fcitx"]])
     args.artifacts.mkdir(parents=True, exist_ok=True)
     result = {"schema": 1, "ok": False, "binary": str(args.binary.resolve()), "display": "owned Xvfb", "checks": []}
     tests = [legacy_keyboard, kitty_disambiguation, kitty_events_and_text, resize_signal,
              selection_clipboard, clipboard_bracketed_paste, large_paste_backpressure,
              sgr_mouse_drag, shift_selection_release, osc8_open, synchronized_output, appearance_and_cursor]
+    if fcitx:
+        tests = [fcitx_input]
     gui = None
     with tempfile.TemporaryDirectory(prefix="ztty-gui-") as directory:
         try:
@@ -673,7 +742,7 @@ def main():
                 raise FileNotFoundError(args.binary)
             # Assign before construction so even a failed setup is cleaned up.
             gui = Gui.__new__(Gui)
-            gui.__init__(args.binary.resolve(), args.font, directory)
+            gui.__init__(args.binary.resolve(), args.font, directory, fcitx)
             for test in tests:
                 try:
                     detail = test(gui)
@@ -682,10 +751,11 @@ def main():
                     result["checks"].append({"name": test.__name__, "ok": False, "error": f"{type(error).__name__}: {error}"})
                     if gui.terminal.poll() is not None:
                         break
-            try:
-                result["preview"] = preview(gui, args.artifacts / "ztty-preview.png")
-            except Exception as error:
-                result["checks"].append({"name": "preview", "ok": False, "error": f"{type(error).__name__}: {error}"})
+            if not fcitx:
+                try:
+                    result["preview"] = preview(gui, args.artifacts / "ztty-preview.png")
+                except Exception as error:
+                    result["checks"].append({"name": "preview", "ok": False, "error": f"{type(error).__name__}: {error}"})
             result["ok"] = len(result["checks"]) == len(tests) and all(check["ok"] for check in result["checks"])
         except Exception as error:
             result["error"] = f"{type(error).__name__}: {error}"
@@ -693,6 +763,9 @@ def main():
             if gui is not None:
                 with contextlib.suppress(Exception):
                     gui.close()
+            fcitx_log = Path(directory) / "fcitx.stderr"
+            if fcitx and not result["ok"] and fcitx_log.exists():
+                result["fcitx_stderr_tail"] = fcitx_log.read_text(errors="replace")[-3000:]
             stderr = Path(directory) / "ztty.stderr"
             if stderr.exists() and stderr.stat().st_size:
                 result["stderr_tail"] = stderr.read_text(errors="replace")[-2000:]
