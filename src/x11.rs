@@ -378,6 +378,7 @@ unsafe extern "C" {
     ) -> *mut c_void;
     fn XCloseIM(im: *mut c_void) -> c_int;
     fn XCreateIC(im: *mut c_void, ...) -> *mut c_void;
+    fn XGetICValues(ic: *mut c_void, ...) -> *mut c_char;
     fn XDestroyIC(ic: *mut c_void);
     fn XSetICFocus(ic: *mut c_void);
     fn XUnsetICFocus(ic: *mut c_void);
@@ -680,11 +681,8 @@ impl Window {
                 // An empty CARDINAL region requests blur across the window.
                 XChangeProperty(display, id, blur, 6, 32, 0, core::ptr::null(), 0);
             }
-            XSelectInput(
-                display,
-                id,
-                1 | 2 | 4 | 8 | 64 | 32768 | 131072 | 2097152 | 4194304,
-            );
+            let events = 1 | 2 | 4 | 8 | 64 | 32768 | 131072 | 2097152 | 4194304;
+            XSelectInput(display, id, events);
             let mut wm_delete = XInternAtom(display, c"WM_DELETE_WINDOW".as_ptr(), 0);
             XSetWMProtocols(display, id, &mut wm_delete, 1);
             let mut hint = ClassHint {
@@ -727,6 +725,19 @@ impl Window {
                     core::ptr::null::<c_char>(),
                 )
             };
+            if !ic.is_null() {
+                let mut filter_events: c_long = 0;
+                if XGetICValues(
+                    ic,
+                    c"filterEvents".as_ptr(),
+                    &mut filter_events as *mut c_long,
+                    core::ptr::null::<c_char>(),
+                )
+                .is_null()
+                {
+                    XSelectInput(display, id, events | filter_events);
+                }
+            }
             let mut supported = 0;
             XkbSetDetectableAutoRepeat(display, 1, &mut supported);
             let fd = XConnectionNumber(display);

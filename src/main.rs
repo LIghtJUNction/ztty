@@ -360,7 +360,9 @@ fn run(cfg: Config) -> Result<i32, &'static str> {
             unsafe {
                 x11::XNextEvent(window.display, &mut event);
             }
-            if unsafe { x11::XFilterEvent(&mut event, window.id) } != 0 {
+            // XIM transport events can target Xlib's private windows.
+            // Let Xlib use the event destination when selecting a filter.
+            if unsafe { x11::XFilterEvent(&mut event, 0) } != 0 {
                 continue;
             }
             match unsafe { event.kind } {
