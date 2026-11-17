@@ -612,10 +612,6 @@ pub struct Connection {
 }
 
 impl Connection {
-    pub fn new() -> Result<Rc<Self>, &'static str> {
-        Self::new_for_display(None)
-    }
-
     pub fn new_for_display(name: Option<&CStr>) -> Result<Rc<Self>, &'static str> {
         unsafe {
             crate::os::setlocale(0, c"".as_ptr());
@@ -770,10 +766,6 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(cols: usize, rows: usize, appearance: &Appearance) -> Result<Self, &'static str> {
-        Self::new_shared(cols, rows, appearance, &Connection::new()?)
-    }
-
     pub fn new_shared(
         cols: usize,
         rows: usize,
