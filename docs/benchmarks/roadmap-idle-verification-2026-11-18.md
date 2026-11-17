@@ -10,6 +10,26 @@ It does not replace the README baseline or establish stable performance rankings
 Filenames use the roadmap delivery date; raw collection timestamps are
 2026-11-17 UTC.
 
+## Display attribution qualification
+
+**The historical display listener ownership was not verified.** The collectors
+used Xvfb with an automatically selected display number, without checking that
+the X11 listener serving the application belonged to that Xvfb PID. The smaps
+run records display :0; the matrix did not retain its display numbers. A later
+isolation investigation found that display-number allocation alone could
+conflict with an existing native Xwayland endpoint.
+
+[Separate verification metadata](roadmap-idle-display-verification-2026-11-18.json)
+records this limitation and hashes the unchanged raw files. Application PIDs,
+process start times, executable identities and owned-process cleanup remain
+recorded and verified. The claimed isolated-server scope is provisional:
+attributing the recorded Xvfb cost or graphical resources to these application
+windows, and comparing complete server-plus-application costs, is not proven.
+The historical SVG's isolation wording must be read with this qualification.
+Guarded reruns using listener-PID verification are required before publishing
+new display-isolated comparisons. No raw measurements have been erased or
+reclassified as measurements from the new guard.
+
 ## Evidence and source identity
 
 - [Raw matrix](roadmap-idle-matrix-smoke-2026-11-18.json)
@@ -45,7 +65,7 @@ come from existing counters. Missing counters remain null.
 Values are MiB, the median of three nearby memory snapshots within one run per
 cell. RSS counts shared pages in each process; PSS apportions shared resident
 pages. Swap remains separate and is not added to PSS as unique physical memory.
-Application totals exclude Xvfb, PTY workload children, and private D-Bus.
+Application totals exclude the recorded Xvfb, PTY workload children, and private D-Bus; the actual rendering-server attribution remains unverified.
 Full dedicated Xvfb PSS is available in each derived row as
 `median_app_plus_xserver_pss_bytes`.
 
@@ -76,8 +96,8 @@ were left running. The idle matrix was limited to 24 cases to avoid adding
 the full 96-case workload pressure under these conditions.
 
 The configuration used 120×32 cells, monospace 11 pt at 96 DPI, opaque windows,
-disabled blur/blinking, a fixed multilingual color frame, and isolated Xvfb
-with software rendering. Binary versions: ztty 0.2.0, Ghostty 1.4.0-arch1,
+disabled blur/blinking, and a fixed multilingual color frame. It requested
+X11/software rendering and launched Xvfb, but did not verify the client listener. Binary versions: ztty 0.2.0, Ghostty 1.4.0-arch1,
 Kitty 0.50.0; exact executable hashes and distribution provenance are in JSON.
 Shared mode uses one ztty broker, Kitty single-instance grouping, or Ghostty
 GTK single-instance grouping. Independent mode verifies distinct GUI owners
@@ -122,7 +142,9 @@ python3 tools/benchmark_terminals.py \
   --matrix --workloads idle --repetitions 1 --purpose smoke --no-readme \
   --json docs/benchmarks/roadmap-idle-matrix-smoke-2026-11-18.json \
   --svg docs/benchmarks/roadmap-idle-matrix-smoke-2026-11-18.svg
-python3 docs/benchmarks/roadmap_idle_smaps.py --help
+python3 docs/benchmarks/roadmap_idle_smaps.py \
+  --binary ./artifacts/roadmap-benchmark-ztty \
+  --output docs/benchmarks/roadmap-idle-smaps-2026-11-18.json
 python3 tests/test_benchmark_terminals.py
 ```
 

@@ -6,6 +6,8 @@
 每个应用开启 10 个终端。[原始测量](docs/benchmarks/terminals-10-windows.json) · [条件与限制](docs/benchmarks/verification-2026-11-18.md) · 从当前源码重新构建并测量：`make benchmark-terminals`。
 
 请同时检查主机负载和 Swap，区分 RSS 与 PSS。当前存档基线处于资源竞争环境，不能作为安静环境下的性能排名；X server 资源另计，DSR 探针不测量真实 GPU 显存或输入到显示延迟。
+此历史基线未核验 X 显示服务的套接字归属。新脚本已使用受保护的独立显示服务；在重新运行前，涉及显示服务的归因数值仍属暂定。
+
 <!-- terminal-benchmark:end -->
 
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。

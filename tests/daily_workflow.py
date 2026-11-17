@@ -12,12 +12,15 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import select
 import signal
 import socket
 import subprocess
+import sys
 import tempfile
 import time
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+from isolated_xvfb import start_xvfb
 
 
 CHILD = r'''import os,sys,tty
@@ -104,21 +107,10 @@ def main():
         root = Path(temporary)
         log = (root / "stderr.log").open("wb")
         try:
-            read_fd, write_fd = os.pipe()
-            xvfb = subprocess.Popen(
-                ["Xvfb", "-displayfd", str(write_fd), "-screen", "0", "1600x1000x24", "-nolisten", "tcp"],
-                pass_fds=(write_fd,), stdout=subprocess.DEVNULL, stderr=log, start_new_session=True,
-            )
-            os.close(write_fd)
-            try:
-                if not select.select([read_fd], [], [], 10)[0]:
-                    raise TimeoutError("Xvfb startup")
-                number = os.read(read_fd, 64).strip().decode()
-            finally:
-                os.close(read_fd)
-            assert number.isdecimal(), number
-            connection = display.Display(":" + number)
-            env = dict(os.environ, DISPLAY=":" + number, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
+            xvfb = start_xvfb(screen="1600x1000x24", stderr=log, timeout=10)
+            connection = display.Display(xvfb.display)
+            report["display_ownership"] = xvfb.evidence
+            env = dict(os.environ, DISPLAY=xvfb.display, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
                        XDG_RUNTIME_DIR=temporary, XDG_CONFIG_HOME=str(root / "config-home"),
                        ZTTY_SOCKET="@ztty-daily-" + root.name)
             env.pop("WAYLAND_DISPLAY", None)
@@ -503,12 +495,7 @@ def main():
                     os.killpg(process.pid, signal.SIGKILL)
                     process.wait(timeout=3)
             if xvfb is not None:
-                xvfb.terminate()
-                try:
-                    xvfb.wait(timeout=3)
-                except subprocess.TimeoutExpired:
-                    xvfb.kill()
-                    xvfb.wait(timeout=3)
+                xvfb.close()
             # Reap only adopted children of this test. Nonblocking and bounded.
             deadline = time.monotonic() + 2
             while time.monotonic() < deadline:
