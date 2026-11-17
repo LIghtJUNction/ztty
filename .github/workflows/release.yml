@@ -332,18 +332,38 @@ jobs:
 
   windows:
     needs: version
-    runs-on: windows-2025
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            arch: x86_64
+            windows_arch: x64
+            host: x86_64-pc-windows-msvc
+            target: x86_64-pc-windows-gnullvm
+            llvm_sha256: '552191b5754c49a5a20723276a6fc56541ea1922c4c50b7b669022333fc1b40f'
+          - runner: windows-11-arm
+            arch: aarch64
+            windows_arch: arm64
+            host: aarch64-pc-windows-msvc
+            target: aarch64-pc-windows-gnullvm
+            llvm_sha256: '7d7f8387a8706639b0b47a629d6e23f8b3ef9acce67e9832b8cd4c5bb2816eab'
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 35
     env:
-      ARCH: x86_64
-      RUNNER_LABEL: windows-2025
-      RUST_TARGET: x86_64-pc-windows-gnullvm
+      ARCH: ${{ matrix.arch }}
+      WINDOWS_ARCH: ${{ matrix.windows_arch }}
+      RUNNER_LABEL: ${{ matrix.runner }}
+      RUST_HOST: ${{ matrix.host }}
+      RUST_TARGET: ${{ matrix.target }}
       VERSION: ${{ needs.version.outputs.version }}
       SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
       BUILD_ONLY: ${{ needs.version.outputs.build_only }}
-      ARTIFACT_STEM: ztty-windows-x86_64
+      ARTIFACT_STEM: ztty-windows-${{ matrix.arch }}
+      # SHA-256 digests from the official 20261104 release assets API.
+      # https://github.com/mstorsjo/llvm-mingw/releases/tag/20261104
       LLVM_MINGW_VERSION: '20261104'
-      LLVM_MINGW_SHA256: '552191b5754c49a5a20723276a6fc56541ea1922c4c50b7b669022333fc1b40f'
+      LLVM_MINGW_SHA256: ${{ matrix.llvm_sha256 }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -352,7 +372,7 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6, pinned commit
         with:
           python-version: '3.13'
-          architecture: x64
+          architecture: ${{ matrix.windows_arch }}
       - name: Record immutable source and initialize reports
         id: source
         shell: python {0}
@@ -372,6 +392,9 @@ jobs:
                       "build_only": os.environ["BUILD_ONLY"] == "true", "passed": False, "status": "initialized"}
           if "LLVM_MINGW_SHA256" in os.environ:
               metadata["llvm_mingw"] = {"version": os.environ["LLVM_MINGW_VERSION"], "sha256": os.environ["LLVM_MINGW_SHA256"]}
+          metadata["rust_host"] = os.environ["RUST_HOST"]
+          metadata["rust_target"] = os.environ["RUST_TARGET"]
+          metadata["windows_architecture"] = os.environ["WINDOWS_ARCH"]
           (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
           (out / f"{stem}.native.json").write_text(json.dumps({"source_sha": source, "passed": False,
               "status": "not_run", "pixel_readback": "not_performed"}, indent=2) + "\n", encoding="utf-8")
@@ -383,25 +406,32 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $nativeArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
+          $shellArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString().ToLowerInvariant()
+          if ($nativeArchitecture -ne $env:WINDOWS_ARCH -or $shellArchitecture -ne $env:WINDOWS_ARCH) {
+            throw "Expected native $env:WINDOWS_ARCH PowerShell; OS=$nativeArchitecture process=$shellArchitecture"
+          }
+          $archiveName = "llvm-mingw-${env:LLVM_MINGW_VERSION}-ucrt-${env:ARCH}"
           $archive = Join-Path $env:RUNNER_TEMP 'llvm-mingw.zip'
-          $url = "https://github.com/mstorsjo/llvm-mingw/releases/download/${env:LLVM_MINGW_VERSION}/llvm-mingw-${env:LLVM_MINGW_VERSION}-ucrt-x86_64.zip"
+          $url = "https://github.com/mstorsjo/llvm-mingw/releases/download/${env:LLVM_MINGW_VERSION}/$archiveName.zip"
           Invoke-WebRequest -Uri $url -OutFile $archive
           $digest = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLowerInvariant()
           if ($digest -ne $env:LLVM_MINGW_SHA256) { throw 'LLVM MinGW archive SHA-256 mismatch' }
           Expand-Archive -Path $archive -DestinationPath $env:RUNNER_TEMP
-          $compilerBin = Join-Path $env:RUNNER_TEMP "llvm-mingw-${env:LLVM_MINGW_VERSION}-ucrt-x86_64/bin"
-          $linker = Join-Path $compilerBin 'x86_64-w64-mingw32-clang.exe'
+          $compilerBin = Join-Path $env:RUNNER_TEMP "$archiveName/bin"
+          $linker = Join-Path $compilerBin "${env:ARCH}-w64-mingw32-clang.exe"
           if (!(Test-Path $linker)) { throw 'Pinned LLVM MinGW linker is missing' }
           $compilerBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           "LLVM_MINGW_BIN=$compilerBin" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          "CARGO_TARGET_X86_64_PC_WINDOWS_GNULLVM_LINKER=$linker" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          rustup toolchain install $env:RUST_TOOLCHAIN --profile minimal --target $env:RUST_TARGET
+          $targetKey = $env:RUST_TARGET.ToUpperInvariant().Replace('-', '_')
+          "CARGO_TARGET_${targetKey}_LINKER=$linker" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          rustup toolchain install "${env:RUST_TOOLCHAIN}-${env:RUST_HOST}" --profile minimal --target $env:RUST_TARGET
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Build the native Win32 executable
         id: build
         shell: pwsh
         run: |
-          cargo "+$env:RUST_TOOLCHAIN" build --locked --release --bin ztty --target $env:RUST_TARGET
+          cargo "+${env:RUST_TOOLCHAIN}-${env:RUST_HOST}" build --locked --release --bin ztty --target $env:RUST_TARGET
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Package the pinned ConPTY runtime and unpack the actual test bundle
         id: package
@@ -412,7 +442,7 @@ jobs:
           stem = os.environ["ARTIFACT_STEM"]
           binary = Path("target") / os.environ["RUST_TARGET"] / "release/ztty.exe"
           archive_path = Path("dist") / f"{stem}.zip"
-          subprocess.run([sys.executable, "tools/package_windows.py", "--binary", str(binary), "--output", str(archive_path), "--arch", "x64"], check=True, timeout=120)
+          subprocess.run([sys.executable, "tools/package_windows.py", "--binary", str(binary), "--output", str(archive_path), "--arch", os.environ["WINDOWS_ARCH"]], check=True, timeout=120)
           runtime = Path(os.environ["RUNNER_TEMP"]) / "ztty-windows-native"
           runtime.mkdir()
           with zipfile.ZipFile(archive_path) as archive:
@@ -440,7 +470,7 @@ jobs:
                   if os.path.normcase(os.path.normpath(path)) != compiler)
               version = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=30, check=True, env=environment)
               assert version.stdout.strip() == "ztty " + os.environ["VERSION"], version.stdout
-              result = subprocess.run([sys.executable, "tests/windows_native.py", "--binary", str(binary), "--output", str(report_path)],
+              result = subprocess.run([sys.executable, "tests/windows_native.py", "--binary", str(binary), "--output", str(report_path), "--arch", os.environ["WINDOWS_ARCH"]],
                                       capture_output=True, text=True, timeout=180, env=environment)
               stdout, stderr = result.stdout, result.stderr
               report.update(json.loads(report_path.read_text(encoding="utf-8")))
@@ -542,7 +572,7 @@ jobs:
           import hashlib, json, os
           from pathlib import Path
           folder = Path(os.environ["RUNNER_TEMP"]) / "ztty-release/bin"
-          expected = {"ztty-linux-x86_64", "ztty-linux-aarch64", "ztty-macos-x86_64", "ztty-macos-aarch64", "ztty-windows-x86_64"}
+          expected = {"ztty-linux-x86_64", "ztty-linux-aarch64", "ztty-macos-x86_64", "ztty-macos-aarch64", "ztty-windows-x86_64", "ztty-windows-aarch64"}
           records = {path.name.removesuffix(".build.json"): path for path in folder.glob("*.build.json")}
           assert set(records) == expected, f"missing or unexpected platform build reports: {set(records)}"
           for stem, path in records.items():
@@ -577,9 +607,10 @@ jobs:
           import hashlib, json, os, sys
           from pathlib import Path
           folder = Path(sys.argv[1])
-          records = list(folder.glob("*.build.json"))
-          assert len(records) == 5, "existing release lacks platform provenance"
-          for path in records:
+          expected = {"ztty-linux-x86_64", "ztty-linux-aarch64", "ztty-macos-x86_64", "ztty-macos-aarch64", "ztty-windows-x86_64", "ztty-windows-aarch64"}
+          records = {path.name.removesuffix(".build.json"): path for path in folder.glob("*.build.json")}
+          assert set(records) == expected, "existing release lacks platform provenance"
+          for path in records.values():
               report = json.loads(path.read_text(encoding="utf-8"))
               assert report["source_sha"] == os.environ["SOURCE_SHA"] and report["version"] == os.environ["VERSION"], path.name
               assert report["passed"], path.name
