@@ -12,7 +12,7 @@ and its verification status are described separately below.
 | SGR | 16/256/RGB colors, semicolon and colon parameters, core attributes; renderer uses its configured font face |
 | UTF-8 | Streaming decode across arbitrary chunks; CJK widths; two inline combining scalars |
 | Kitty keyboard | Flags 1/2/4/8/16, event reports, shifted alternatives, associated text, independent screen stacks; the Linux frontend does not supply a base-layout alternative |
-| Mouse | DEC 1000/1002/1003 tracking; legacy and SGR 1006 encoding |
+| Mouse | DEC 9 (X10)/1000/1002/1003 tracking; legacy and SGR 1006 encoding |
 | Focus | DEC 1004 |
 | Cursor appearance | DECSCUSR block, underline, and bar with steady or blinking variants; DEC private modes 12 and 25 |
 | Bracketed paste | DEC 2004; bounded paste with control-character sanitization |
