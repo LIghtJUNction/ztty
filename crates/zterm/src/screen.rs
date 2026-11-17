@@ -12,6 +12,13 @@ pub const STRIKE: u16 = 32;
 pub const HIDDEN: u16 = 64;
 /// The background was selected by an SGR color sequence.
 pub const EXPLICIT_BG: u16 = 128;
+/// The foreground was selected by an SGR color sequence.
+pub const EXPLICIT_FG: u16 = 256;
+/// The foreground refers to the ANSI palette, indexed by `Cell::palette_indices`.
+pub const PALETTE_FG: u16 = 512;
+/// The background refers to the ANSI palette, indexed by `Cell::palette_indices`.
+pub const PALETTE_BG: u16 = 1024;
+const COLOR_FLAGS: u16 = EXPLICIT_FG | EXPLICIT_BG | PALETTE_FG | PALETTE_BG;
 
 /// A character cell. A wide glyph's trailing cell has `width == 0`.
 /// Two combining scalars are stored inline, without per-cell allocations.
@@ -23,6 +30,10 @@ pub struct Cell {
     pub bg: u32,
     pub flags: u16,
     pub width: u8,
+    /// ANSI color indices: foreground in bits 0..4, background in bits 4..8.
+    /// Each index is meaningful only when its `PALETTE_FG`/`PALETTE_BG` flag is set.
+    /// This occupies an existing padding byte; a cell remains 28 bytes.
+    pub palette_indices: u8,
     pub link_id: u32,
 }
 
@@ -40,6 +51,7 @@ impl Cell {
         bg: DEFAULT_BG,
         flags: 0,
         width: 1,
+        palette_indices: 0,
         link_id: 0,
     };
 }
@@ -49,6 +61,7 @@ pub(crate) struct Style {
     pub fg: u32,
     pub bg: u32,
     pub flags: u16,
+    pub palette_indices: u8,
     pub link_id: u32,
 }
 
@@ -58,6 +71,7 @@ impl Default for Style {
             fg: DEFAULT_FG,
             bg: DEFAULT_BG,
             flags: 0,
+            palette_indices: 0,
             link_id: 0,
         }
     }
@@ -72,6 +86,7 @@ impl Style {
             bg: self.bg,
             flags: self.flags,
             width,
+            palette_indices: self.palette_indices,
             link_id: self.link_id,
         }
     }
@@ -81,8 +96,24 @@ impl Style {
         Cell {
             fg: self.fg,
             bg: self.bg,
-            flags: self.flags & EXPLICIT_BG,
+            flags: self.flags & COLOR_FLAGS,
+            palette_indices: self.palette_indices,
             ..Cell::BLANK
+        }
+    }
+
+    pub fn set_color(&mut self, foreground: bool, color: u32, palette: Option<u16>) {
+        let (target, explicit, indexed, shift) = if foreground {
+            (&mut self.fg, EXPLICIT_FG, PALETTE_FG, 0)
+        } else {
+            (&mut self.bg, EXPLICIT_BG, PALETTE_BG, 4)
+        };
+        *target = color;
+        self.flags = (self.flags | explicit) & !indexed;
+        self.palette_indices &= !(15 << shift);
+        if let Some(index) = palette.filter(|index| *index < 16) {
+            self.flags |= indexed;
+            self.palette_indices |= (index as u8) << shift;
         }
     }
 }

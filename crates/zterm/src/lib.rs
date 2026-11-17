@@ -13,8 +13,8 @@ mod shell;
 mod terminal;
 
 pub use screen::{
-    BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, HIDDEN, INVERSE, ITALIC, STRIKE,
-    UNDERLINE,
+    BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, EXPLICIT_FG, HIDDEN, INVERSE, ITALIC,
+    PALETTE_BG, PALETTE_FG, STRIKE, UNDERLINE,
 };
 pub use shell::{
     CommandRecord, CommandText, MAX_COMMAND_TEXT, MAX_COMMANDS, ShellPhase, TextPosition,
@@ -29,3 +29,6 @@ mod tests;
 
 #[cfg(test)]
 mod shell_tests;
+
+#[cfg(test)]
+mod theme_tests;
