@@ -1,8 +1,12 @@
 # ztty
 
+<!-- terminal-benchmark:start -->
 [![Recorded 10-terminal memory comparison](docs/benchmarks/terminals-10-windows.svg)](docs/benchmarks/verification-2026-11-18.md)
 
-Recorded Linux/Xvfb data, including application helpers: ztty **58.75 MiB RSS / 15.36 MiB PSS**, Ghostty **818.23 / 775.36**, Kitty **397.68 / 351.16**. The host was busy (load1 31.02–36.57); these measurements are a reproducible historical sample, not a quiet-host performance ranking. X server resources are separate, real GPU memory and input-to-display latency were not measured. [Raw data, workload checks and reproduction](docs/benchmarks/verification-2026-11-18.md).
+Ten terminals per app. [Raw measurements](docs/benchmarks/terminals-10-windows.json) · [Conditions and limits](docs/benchmarks/verification-2026-11-18.md) · rerun from current source: `make benchmark-terminals`.
+
+Read the recorded host load and Swap alongside RSS/PSS. The archived baseline was collected under resource contention; it does not establish a quiet-host ranking. X server resources are separate; real GPU memory and input-to-display latency are not measured by the DSR probe.
+<!-- terminal-benchmark:end -->
 
 A lean native terminal, written in Rust without the Rust standard library.
 
