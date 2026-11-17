@@ -1,9 +1,20 @@
 # ztty
 
+<!-- terminal-benchmark:start -->
+![十窗口终端内存与 PTY 性能比较](docs/benchmarks/terminals-10-windows.svg)
+
+每个终端均开启 10 个窗口、使用共享实例，实测 3 轮。[测量方法与复跑命令](docs/benchmarks/README.md) · [原始数据](docs/benchmarks/terminals-10-windows.json)
+
+从当前源码重新构建并实测：`make benchmark-terminals`。
+<!-- terminal-benchmark:end -->
+
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。
 0.2 版本补齐了 macOS、Windows 后端，并加入静态 Kitty 图形协议。
 项目优先验证 Linux，目标是以更低的内存占用和更快的交互响应，
 逐步超过 Kitty 与 Ghostty。
+
+Linux 上的多个窗口自动复用一个会话进程、显示连接和字体缓存。
+每个窗口分别保存自己的 PTY、屏幕和历史记录。共享会话与 MCP 目前仅支持 Linux。
 
 终端的工作可以拆成三件事：把键盘操作编码后送给程序，理解程序返回的
 文字和控制指令，再把变化的内容画出来。图片也遵循这条路径：程序
@@ -72,6 +83,9 @@ cargo add zvte@0.1.3 --no-default-features
 
 ## Linux 安装与运行
 
+本文命令对应当前源码。安装脚本下载最新已发布标签的版本；尚未发布的改动
+请通过源码构建使用。
+
 Arch Linux 可使用 `yay -S ztty`。其他 Linux 发行版可用一键安装脚本，
 自动选择 x86_64 或 ARM64 预编译包并校验 SHA256。
 
@@ -102,6 +116,51 @@ Linux/macOS 默认使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用
 的打包和原生验收入口见 [发布工作流](.github/workflows/release.yml)。
 Windows 包携带固定版本的 Microsoft ConPTY 运行组件，库也支持回退到
 系统自带 API，细节见 [`zpty` 文档](crates/zpty/README.md)。
+
+## 多窗口、会话与 MCP（Linux）
+
+正常启动多个 ztty 即可共享资源，无需额外开启复用模式：
+
+```sh
+ztty --name work -e /bin/bash &
+ztty --name logs -e /bin/sh &
+ztty attach
+ztty attach work
+```
+
+`ztty attach` 不带参数时列出全部本地和 MCP 会话。带名字时打开该会话的
+窗口，已有窗口则将它置前；命令会等待窗口关闭后返回。示例中的 `&`
+让启动命令在后台等待，当前 shell 可以继续使用。
+
+本地会话地址为 `ztty://local/work`。MCP 创建的会话按来源命名：
+
+| 来源 | 地址示例 |
+| --- | --- |
+| stdio | `ztty://mcp/stdio/work` |
+| HTTP | `ztty://mcp/http/127.0.0.1:8732/work` |
+
+同一个短名字可以出现在不同来源下；重名时使用完整地址。名字支持 1–64 个
+ASCII 字母、数字、点、下划线或连字符，省略名字时自动生成 `session-N`。
+
+```sh
+# 默认 stdio，启动时不打开窗口
+ztty mcp
+
+# Streamable HTTP，地址为 http://127.0.0.1:8732/mcp
+ztty mcp --transport http --host 127.0.0.1 --port 8732
+
+ztty attach ztty://mcp/stdio/work
+```
+
+六个 MCP 工具分别创建、列出、读取、输入、调整尺寸和关闭会话。MCP 会话
+在连接退出后继续保留，关闭观察窗口只会脱离显示；程序退出后仍可查看输出
+和退出码，通过 `session_close` 释放会话。普通本地窗口关闭时会结束其会话。
+
+HTTP 支持配置主机和端口，端口 `0` 自动选择空闲端口。监听非回环地址时
+需要通过 `ZTTY_MCP_TOKEN` 或 `--token` 配置令牌。每次输入最多 64 KiB；
+读取按字节游标分页，单页可多返回最多 3 字节以补全 UTF-8 字符。
+
+完整的客户端配置、工具参数和生命周期见 [会话与 MCP](docs/sessions.md)。
 
 ## 在终端里显示图片
 
@@ -161,10 +220,15 @@ GDI 画布；三平台外观一致性仍待原生验收。
 
 ## 性能与当前范围
 
-性能数据分开记录核心解析与屏幕更新、PTY 往返、完整进程内存和图形
-缓冲占用。基准的机器、尺寸、样本量、分位数与复现命令见
-[性能报告](docs/performance.md)。微秒级的核心处理时间需要与显示器
-刷新、桌面合成等时间分开理解。
+同机配对测量中，8 个空闲窗口的 ztty 总 PSS 从 47.021 MiB 降至
+15.366 MiB，减少 67.3%；统计包含共享进程和 8 个等待命令返回的启动进程。
+从 1 个增加到 8 个窗口时，每新增窗口的平均 PSS 从 5.198 MiB 降至
+0.599 MiB。单窗口 PSS 则增加了 0.539 MiB。
+
+每个窗口的 X server pixmap 仍占 3,273,728 字节，单独计算；shell 和它运行
+的程序也另计。完整表格、测量条件及原始数据见
+[多窗口内存报告](docs/performance.md#multiple-window-memory)。
+核心解析、PTY 往返与实际屏幕显示延迟分别记录。
 
 当前通过 X11/XWayland 提供 Linux 窗口。原生 Wayland、专用 GPU
 渲染后端、Sixel、Kitty 文件/共享内存传输与动画、Unicode 图片占位符、
@@ -178,6 +242,9 @@ sh tools/check.sh
 cargo test --workspace --doc
 python3 tests/gui_smoke.py --binary ./target/release/ztty
 python3 tests/graphics_smoke.py --binary ./target/release/ztty
+python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
+python3 tests/mcp_transport.py --binary ./target/release/ztty
+python3 tests/mcp_sessions.py --binary ./target/release/ztty
 # 可选：真实 Fcitx 5、Pinyin 插件和独立 D-Bus 会话。
 python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 ```

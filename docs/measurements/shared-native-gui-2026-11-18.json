@@ -1,0 +1,210 @@
+{
+  "schema": 1,
+  "timestamp": "2026-11-17T20:40:14.013341+00:00",
+  "ok": true,
+  "purpose": "GUI integration gates after merging native Kitty graphics into the shared session runtime.",
+  "binary": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/shared-worktree/target/release/ztty",
+    "sha256": "32e2bba63d939e419cb51b81b6b0ac54fcea8062fbc521cdbf443808321de3c9",
+    "bytes": 442592
+  },
+  "source": {
+    "head": {
+      "exit_code": 0,
+      "stdout": "5382637136922ec33efab2e268ae1b7542b5b7ea",
+      "stderr": ""
+    },
+    "merge_head": {
+      "exit_code": 0,
+      "stdout": "1b2adf2d58f091b23a63f8b957ff0b233b4ff864",
+      "stderr": ""
+    },
+    "integration_files_sha256": {
+      "src/x11.rs": "43042d6732db48d232506030f8d3a5473f13eb8b41785235fad19f696ba25ccb",
+      "src/session.rs": "d74fb1eaac82376422647af50f35b0f174ca7e4e55a0d9d181556bc5a12e516e"
+    },
+    "script_sha256": {
+      "tests/shared_gui_smoke.py": "6ca50bc7b933630df8a148cc1da2e8d03e2cb1093db869fcc02a9f46dcc79b9b",
+      "tests/graphics_smoke.py": "7cd76ee895cdf1bb4ab47cbb1004a45143ef87d771245ce0334c305622e5fee9",
+      "tests/gui_smoke.py": "04669d7c1271c92f611712ec7549c8e9dababcfcb446bc899987e66457818838"
+    }
+  },
+  "isolation": {
+    "shared_lifecycle": "Private Xvfb with unique temporary-directory ZTTY_SOCKET; headless-to-attach case uses a second private namespace.",
+    "native_graphics": "Private Xvfb with ZTTY_SOCKET=@ztty-gui-<test process PID> from Gui harness; no production broker used."
+  },
+  "gates": [
+    {
+      "name": "shared_lifecycle",
+      "command": [
+        "/usr/bin/python3",
+        "tests/shared_gui_smoke.py",
+        "--binary",
+        "target/release/ztty",
+        "--output",
+        "artifacts/shared-native-lifecycle-2026-11-18.json"
+      ],
+      "exit_code": 0,
+      "passed": 9,
+      "failed": 0,
+      "result": {
+        "ok": true,
+        "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/shared-worktree/target/release/ztty",
+        "checks": [
+          {
+            "name": "concurrent_start_and_independent_pty_input",
+            "ok": true,
+            "windows": 3,
+            "gui_owner_pid": 425033,
+            "different_font_sizes": [
+              11,
+              13
+            ]
+          },
+          {
+            "name": "attach_reuses_window",
+            "ok": true
+          },
+          {
+            "name": "close_one_preserves_shared_font_peer",
+            "ok": true
+          },
+          {
+            "name": "reload_font_group_with_other_windows_alive",
+            "ok": true
+          },
+          {
+            "name": "external_destroy_preserves_host_and_survivor",
+            "ok": true
+          },
+          {
+            "name": "close_all_windows",
+            "ok": true
+          },
+          {
+            "name": "same_name_replacement_keeps_old_wait_generation",
+            "ok": true
+          },
+          {
+            "name": "headless_mcp_broker_then_display_attach",
+            "ok": true,
+            "xauth_scope": "isolated Xvfb without authentication"
+          },
+          {
+            "name": "persistent_reattach_renews_wait_generation",
+            "ok": true
+          }
+        ],
+        "remaining_owned_pids": [],
+        "terminal_stderr": "_XSERVTransSocketUNIXCreateListener: ...SocketCreateListener() failed\n_XSERVTransMakeAllCOTSServerListeners: server already running\n"
+      }
+    },
+    {
+      "name": "native_graphics",
+      "command": [
+        "/usr/bin/python3",
+        "tests/graphics_smoke.py",
+        "--binary",
+        "target/release/ztty",
+        "--artifacts",
+        "artifacts/shared-native-graphics-2026-11-18"
+      ],
+      "exit_code": 0,
+      "passed": 7,
+      "failed": 0,
+      "result": {
+        "schema": 1,
+        "ok": true,
+        "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/shared-worktree/target/release/ztty",
+        "display": "owned Xvfb",
+        "checks": [
+          {
+            "name": "capability_and_size",
+            "ok": true,
+            "cell_pixels": [
+              9,
+              24
+            ],
+            "query_did_not_place": true
+          },
+          {
+            "name": "rgb_rgba_png",
+            "ok": true,
+            "formats": [
+              24,
+              32,
+              100
+            ],
+            "alpha": [
+              0,
+              64,
+              128,
+              255
+            ],
+            "png_base64_chunk": 16
+          },
+          {
+            "name": "chunk_place_delete_replace",
+            "ok": true,
+            "raw_bytes": 12800,
+            "chunked": true,
+            "soft_delete_replaced": true,
+            "hard_delete": true
+          },
+          {
+            "name": "crop_clip_and_layers",
+            "ok": true,
+            "source_crop": true,
+            "viewport_clip": true,
+            "negative_z_background": true
+          },
+          {
+            "name": "scrolling_resize_alternate",
+            "ok": true,
+            "scroll_rows": 3,
+            "alternate_isolation": true,
+            "resize_cols": 80,
+            "delete_no_ghost": true
+          },
+          {
+            "name": "malformed_and_bounded",
+            "ok": true,
+            "malformed_cases": 4,
+            "aborted_transfers": 80,
+            "rss_growth_bytes": 0,
+            "keyboard_recovered": true
+          },
+          {
+            "name": "kitten_icat",
+            "ok": true,
+            "detected_transport": "stream",
+            "tools": [
+              {
+                "file": "hopper.jpg",
+                "exit_code": 0,
+                "stderr": "",
+                "transport": "explicit stream"
+              },
+              {
+                "file": "transparent-edge.png",
+                "exit_code": 0,
+                "stderr": "",
+                "transport": "automatic detection"
+              }
+            ],
+            "preview": "kitty-graphics-xvfb.png"
+          }
+        ],
+        "stderr_tail": "",
+        "passed": 7,
+        "failed": 0
+      }
+    }
+  ],
+  "passed": 16,
+  "failed": 0,
+  "notes": [
+    "Only the requested lifecycle and graphics gates were run; previous source-bound reports and old memory measurements were preserved.",
+    "The shared-lifecycle log retains two Xvfb display-selection listener messages; Xvfb allocated a usable private display, all nine checks passed, and no owned processes remained."
+  ]
+}

@@ -1,5 +1,13 @@
 # ztty
 
+<!-- terminal-benchmark:start -->
+![Ten-window terminal memory and PTY performance comparison](docs/benchmarks/terminals-10-windows.svg)
+
+Ten windows per terminal, shared instances, three real runs. [Method and rerun command](docs/benchmarks/README.md) · [Raw measurements](docs/benchmarks/terminals-10-windows.json)
+
+Rerun from current source: `make benchmark-terminals`.
+<!-- terminal-benchmark:end -->
+
 A lean native terminal, written in Rust without the Rust standard library.
 
 ztty runs shells and terminal applications through the operating system's
@@ -8,6 +16,12 @@ static Kitty Graphics Protocol support. Screen state, input encoding, PTY
 ownership, and image processing are reusable libraries. The visual design is
 deliberately quiet: a dark background, readable text, generous padding, and no
 application toolbar.
+
+On Linux, multiple windows automatically share one session process, display connection
+and font cache. Each window keeps its own PTY, screen and history. In the
+recorded pre-graphics eight-window comparison, total ztty PSS fell from 47.021 to 15.366 MiB,
+including the waiting launchers. The single-window case rose by 0.539 MiB.
+See [measurement conditions and graphics-memory accounting](docs/performance.md#multiple-window-memory).
 
 The long-term goal is to exceed Kitty and Ghostty in responsiveness and memory
 efficiency. Current measurements, their scope, and remaining work are documented
@@ -19,6 +33,9 @@ acceptance target; the platform table records what has actually been exercised.
 ![Actual ztty window displaying a photo and transparent PNG in Hyprland/XWayland](docs/assets/kitty-graphics-hyprland.png)
 
 ## Platforms and verification
+
+Shared sessions, attach, and MCP currently use the Linux broker. Native macOS
+and Windows terminals remain available through their platform backends.
 
 | Platform | Native implementation | Current acceptance status |
 | --- | --- | --- |
@@ -33,6 +50,9 @@ and [the release record](docs/releasing.md) for the verified scope and available
 artifacts.
 
 ## Install on Linux
+
+The examples below describe the current source tree. Release downloads follow
+the latest published tag; build from source for unreleased changes.
 
 On Arch Linux, install the AUR package with `yay -S ztty`. Other Linux
 distributions can install a prebuilt x86_64 or AArch64 binary with:
@@ -101,6 +121,41 @@ resize, alternate-screen isolation, deletion, and recovery after invalid input.
 Its final check runs `kitten icat` 0.50 on a photo and a transparent PNG.
 See [the graphics protocol scope](docs/protocols.md#kitty-graphics) for limits
 and deferred features.
+
+## Shared sessions and MCP (Linux)
+
+On Linux, run several terminals normally; resource sharing is automatic:
+
+```sh
+ztty --name work -e /bin/bash &
+ztty --name logs -e /bin/sh &
+ztty attach
+ztty attach work
+```
+
+`ztty attach` lists sessions when no name is given. A name opens or raises its
+window and waits for it to close. Local sessions have addresses such as
+`ztty://local/work`; an ambiguous short name requires the complete address.
+
+```sh
+# MCP over stdio, without opening a window
+ztty mcp
+
+# Streamable HTTP at http://127.0.0.1:8732/mcp
+ztty mcp --transport http --host 127.0.0.1 --port 8732
+
+# View a session created by an MCP client
+ztty attach ztty://mcp/stdio/checks
+ztty attach ztty://mcp/http/127.0.0.1:8732/checks
+```
+
+MCP exposes six tools to create, list, read, write, resize and close PTYs.
+MCP-created sessions keep their output when the transport exits; closing their
+window detaches it. Ordinary local windows keep the usual close-to-exit
+behavior. HTTP listeners outside loopback require a bearer token.
+
+See [sessions and MCP](docs/sessions.md) for naming, lifecycle, HTTP tokens,
+client setup and bounded UTF-8 output cursors.
 
 ## Appearance
 
@@ -254,6 +309,9 @@ cargo test --workspace --doc
 cargo run -p zpty --example capture
 cargo run --release -p zterm --example benchmark
 python3 tests/gui_smoke.py --binary ./target/release/ztty
+python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
+python3 tests/mcp_transport.py --binary ./target/release/ztty
+python3 tests/mcp_sessions.py --binary ./target/release/ztty
 python3 tests/graphics_smoke.py --binary ./target/release/ztty
 # Optional: real Fcitx 5 XIM with the Pinyin addon and a private D-Bus session.
 python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty

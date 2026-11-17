@@ -45,6 +45,70 @@ impl Default for Appearance {
 }
 
 impl Appearance {
+    #[cfg(target_os = "linux")]
+    pub fn to_json(&self) -> crate::json::Value {
+        use crate::json::Value;
+        let mut entries = alloc::vec![
+            ("font", self.font.clone()),
+            ("foreground", format!("#{:06x}", self.theme.foreground)),
+            ("background", format!("#{:06x}", self.theme.background)),
+            ("window-padding", format!("{}", self.padding)),
+            ("background-opacity", format!("{}", self.opacity)),
+            ("background-blur", format!("{}", self.blur)),
+            ("cursor-color", format!("#{:06x}", self.cursor_color)),
+            (
+                "cursor-shape",
+                String::from(match self.cursor_shape {
+                    CursorShape::Block => "block",
+                    CursorShape::Underline => "underline",
+                    CursorShape::Bar => "bar",
+                })
+            ),
+            ("cursor-blink", format!("{}", self.cursor_blink)),
+            (
+                "cursor-blink-interval",
+                format!("{}", self.cursor_blink_interval)
+            ),
+            (
+                "selection-foreground",
+                format!("#{:06x}", self.selection_foreground)
+            ),
+            (
+                "selection-background",
+                format!("#{:06x}", self.selection_background)
+            ),
+        ];
+        for (index, color) in self.theme.palette.iter().enumerate() {
+            entries.push(("palette", format!("{index}=#{color:06x}")));
+        }
+        Value::Array(
+            entries
+                .into_iter()
+                .map(|(key, value)| Value::Array(alloc::vec![Value::from(key), Value::from(value)]))
+                .collect(),
+        )
+    }
+
+    #[cfg(target_os = "linux")]
+    pub fn from_json(value: &crate::json::Value) -> Result<Self, &'static str> {
+        let entries = value.as_array().ok_or("invalid appearance")?;
+        if entries.len() > 64 {
+            return Err("too many appearance options");
+        }
+        let mut appearance = Self::default();
+        for entry in entries {
+            let pair = entry
+                .as_array()
+                .filter(|p| p.len() == 2)
+                .ok_or("invalid appearance entry")?;
+            appearance.set(
+                pair[0].as_str().ok_or("invalid appearance key")?,
+                pair[1].as_str().ok_or("invalid appearance value")?,
+            )?;
+        }
+        Ok(appearance)
+    }
+
     pub fn load(explicit: Option<&CStr>) -> Result<Self, String> {
         let mut appearance = Self::default();
         let default;

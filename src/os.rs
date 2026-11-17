@@ -26,8 +26,8 @@ struct TimeSpec {
 unsafe extern "C" {
     pub fn write(fd: c_int, data: *const c_void, size: usize) -> isize;
     pub fn close(fd: c_int) -> c_int;
-    fn open(path: *const c_char, flags: c_int, ...) -> c_int;
-    fn read(fd: c_int, data: *mut c_void, size: usize) -> isize;
+    pub fn open(path: *const c_char, flags: c_int, ...) -> c_int;
+    pub fn read(fd: c_int, data: *mut c_void, size: usize) -> isize;
     pub fn poll(fds: *mut PollFd, count: usize, timeout: c_int) -> c_int;
     pub fn fcntl(fd: c_int, command: c_int, ...) -> c_int;
     pub fn getenv(name: *const c_char) -> *mut c_char;
@@ -37,6 +37,11 @@ unsafe extern "C" {
     static mut environ: *mut *mut c_char;
     pub fn fork() -> c_int;
     pub fn getpid() -> c_int;
+    pub fn getuid() -> u32;
+    pub fn chdir(path: *const c_char) -> c_int;
+    pub fn fchdir(fd: c_int) -> c_int;
+    pub fn getcwd(buffer: *mut c_char, size: usize) -> *mut c_char;
+    pub fn kill(pid: c_int, signal: c_int) -> c_int;
     pub fn waitpid(pid: c_int, status: *mut c_int, options: c_int) -> c_int;
     pub fn _exit(status: c_int) -> !;
     pub fn __errno_location() -> *mut c_int;
@@ -141,7 +146,7 @@ pub fn read_config(path: &CStr) -> Result<Vec<u8>, i32> {
 
 /// Copy the inherited environment before any fork. Environment entries stay in
 /// their original byte encoding; UTF-8 is not imposed on Unix process metadata.
-fn environment() -> Vec<CString> {
+pub fn environment() -> Vec<CString> {
     let mut output = Vec::new();
     let mut pointer = unsafe { environ };
     if !pointer.is_null() {
@@ -181,8 +186,10 @@ fn resolve(program: &CStr, environment: &[CString]) -> Option<CString> {
 }
 
 /// Prepare every byte of the shell's environment and resolve PATH in the parent.
-pub fn child_setup(program: &CStr) -> Result<(CString, Vec<CString>), &'static str> {
-    let mut env = environment();
+pub fn child_setup_with_env(
+    program: &CStr,
+    mut env: Vec<CString>,
+) -> Result<(CString, Vec<CString>), &'static str> {
     let executable = resolve(program, &env).ok_or("command not found on PATH")?;
     env.retain(|entry| {
         ![
@@ -198,8 +205,11 @@ pub fn child_setup(program: &CStr) -> Result<(CString, Vec<CString>), &'static s
         c"TERM=xterm-256color".into(),
         c"COLORTERM=truecolor".into(),
         c"TERM_PROGRAM=ztty".into(),
-        CString::new(concat!("TERM_PROGRAM_VERSION=", env!("CARGO_PKG_VERSION"))).unwrap(),
     ]);
+    env.push(
+        CString::new(concat!("TERM_PROGRAM_VERSION=", env!("CARGO_PKG_VERSION")))
+            .map_err(|_| "invalid package version")?,
+    );
     Ok((executable, env))
 }
 

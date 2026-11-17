@@ -1,6 +1,6 @@
 PREFIX ?= $(HOME)/.local
 
-.PHONY: build check bench install uninstall
+.PHONY: build check bench benchmark-terminals install uninstall
 
 build:
 	cargo build --locked --release
@@ -10,6 +10,9 @@ check:
 
 bench:
 	cargo run --locked --release -p zterm --example benchmark
+
+benchmark-terminals: build
+	python3 tools/benchmark_terminals.py
 
 install: build
 	install -Dm755 target/release/ztty $(DESTDIR)$(PREFIX)/bin/ztty

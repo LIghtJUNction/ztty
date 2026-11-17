@@ -83,6 +83,7 @@ class Gui:
         )
         opener.chmod(0o755)
         environment = os.environ.copy()
+        environment["ZTTY_SOCKET"] = "@ztty-gui-" + str(os.getpid())
         environment.update(DISPLAY=self.display_name, LC_ALL="C.UTF-8", XMODIFIERS="@im=none")
         environment["PATH"] = str(executable_dir) + os.pathsep + environment.get("PATH", "")
         environment["ZTTY_GUI_OPEN_LOG"] = str(self.directory / "opened.jsonl")

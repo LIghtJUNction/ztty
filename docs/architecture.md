@@ -27,6 +27,55 @@ ordered PTY write queue as keyboard input. Source entry points are
 [`zterm::Terminal`](../crates/zterm/src/terminal.rs) and
 [`zgraphics::CommandStream`](../crates/zgraphics/src/stream.rs).
 
+## Shared process ownership (Linux)
+
+On Linux, ordinary launches and MCP servers connect to one session broker for the current
+user. The broker owns the PTYs and terminal state; each foreground launcher
+waits on its session without creating another display or font stack.
+MCP stdio and HTTP listeners remain separate protocol processes and use the
+same broker. [Session implementation](../src/session.rs),
+[local IPC](../src/broker.rs) and [X11 resources](../src/x11.rs) define these boundaries.
+
+| Owner | Resources |
+| --- | --- |
+| Broker | Session registry, event loop and shared read/encoding scratch buffers |
+| Display connection | X11 connection, atoms and XIM context, shared by its windows |
+| Font selection on a display | Base and fallback Xft fonts and their glyph caches |
+| Terminal session | PTY child, screen, history, input queue and retained output |
+| Visible window | Xft draw target, pixmap, input context, selection and cursor state |
+| Launcher | Caller metadata and foreground completion wait |
+
+The broker opens a display only when a window is needed. Windows with the same
+font selection reuse its font set. Closing the last window releases unused
+font sets. The broker keeps its opened X11 connection until it exits, so headless
+MCP sessions can later be attached without rebuilding Xlib state. The per-window
+pixmap and each session's contents remain independent allocations.
+
+One single-threaded loop polls PTYs, display connections and local IPC peers.
+XIM filters an event before its destination window selects the session.
+Output-heavy sessions have a read budget per iteration so other windows and
+control requests receive service.
+
+The local protocol uses an abstract Unix socket and checks the connecting
+user with `SO_PEERCRED`. `ZTTY_SOCKET=@name` selects an isolated broker
+namespace, which the test tools use. Creator argv, working directory and
+environment are carried with each launch; the first creator's environment
+does not become the default for all later sessions.
+
+## Session control
+
+An ordinary window owns a local session whose lifetime ends when its window
+closes or its child exits. MCP-created sessions retain their output and exit
+status until explicitly closed; a window can attach to and detach from that
+state. The broker exits after its last session and pending work are gone.
+[Sessions and MCP](sessions.md) documents the exact names and lifecycle.
+
+The MCP transports translate six terminal tools into the same broker operations.
+They use bounded `no_std` JSON handling. Stdio uses newline framing; Streamable
+HTTP uses JSON responses with independent transport sessions. Session reads
+return byte cursors and UTF-8-safe text pages, with retained output bounded
+separately from terminal history.
+
 ## Screen state
 
 A screen is a contiguous array of fixed-size cells. A row origin index maps
@@ -110,7 +159,7 @@ continuously polling the terminal model:
 
 | Platform | PTY readiness and input | Rendering path |
 | --- | --- | --- |
-| [Linux](../src/platform/linux.rs) | `poll` over X11 and PTY descriptors; XIM commits | Xft text and Xrender images into a retained X pixmap |
+| [Linux](../src/platform/linux.rs) | `poll` over X11, PTY and broker IPC descriptors; XIM commits | Xft text and Xrender images into a retained X pixmap |
 | [macOS](../src/platform/macos.rs) | AppKit events and a Core Foundation file-descriptor source for the Darwin PTY | CoreText text and CoreGraphics images in an AppKit view |
 | [Windows](../src/platform/windows.rs) | Win32 messages plus ConPTY output/process events in `MsgWaitForMultipleObjectsEx` | GDI text and direct RGBA compositing into a retained DIB |
 
@@ -164,12 +213,15 @@ closure, `execve`, a bounded error write, and `_exit`.
 
 ## Memory accounting
 
-Core heap measurements describe the terminal model. Process RSS additionally
-includes code, shared libraries, font data, allocator bookkeeping, and temporary
-decoding allocations. Decoded image quotas and renderer cache quotas describe
-retained resources, not peak RSS. A large image can temporarily require its
-compressed bytes, decompressed bytes, canonical RGBA, and a native upload at the
-same time.
+Core heap measurements describe one terminal model. The Linux multi-window
+report sums PSS and private memory across the broker and all waiting launchers.
+PSS apportions shared mappings; adding process RSS values would count shared
+pages repeatedly. Code, system libraries, font data and allocator state remain
+part of process memory.
+
+Decoded image quotas and renderer cache quotas describe retained resources,
+not peak RSS. A large image can temporarily require its compressed bytes,
+decompressed bytes, canonical RGBA, and a native upload at the same time.
 
 The retained X pixmap and Xrender image uploads belong to the X server and must
 be counted separately. Apple and Windows graphics resources likewise have native
