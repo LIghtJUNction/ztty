@@ -1,10 +1,41 @@
 # Releasing ztty and its reusable libraries
 
-Report date: **2026-11-18, Asia/Taipei**. The current application source is
+Report date: **2026-11-18, Asia/Taipei**. The earlier verified application candidate used
 [`7535aa2`](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92).
 The libraries below are published on crates.io. The application has verified
 0.2.0 candidate artifacts from the formal Release workflow; this record does
 not claim that a `v0.2.0` GitHub Release or AUR update has been published.
+
+## Roadmap candidate acceptance gates
+
+The newer roadmap branch is not covered by run 44165748395. Its Release
+workflow now requires six native architecture jobs: Linux x86_64/ARM64,
+macOS Intel/Apple Silicon, and Windows x86_64/ARM64. A Windows ARM64 PE built
+on x86_64 is not accepted as native ARM64 evidence. The Windows gate checks
+the operating system, Python process and tested executable architectures.
+
+Both Linux jobs run `tests/linux_native.py` against a clean, pinned checkout
+and the freshly built ELF. The gate runs workspace restore, daily workflow,
+Sixel pixel and extended-input suites on owned Xvfb displays; it records the
+binary, test and helper hashes and checks process cleanup. These are software
+X11 checks, not native Wayland, GPU or physical input-device acceptance.
+The gate's ten failure-path/packaging tests pass locally. The new complete
+native workflow and its resulting binaries still require execution.
+
+Linux evidence is retained in a separate `ztty-linux-ARCH.native.tar.gz`, with
+per-suite JSON reports, screenshots and logs. Packaging reads every archived
+file back before removing the dedicated staging directory. A failed native
+suite or failed evidence archive cannot produce an accepted build manifest.
+The flat archive name preserves the existing Release file/checksum contract.
+
+```sh
+python3 tests/linux_native_test.py -v
+python3 tests/linux_native.py --binary target/release/ztty \
+  --source-root "$PWD" --source-sha "$(git rev-parse HEAD)" \
+  --arch "$(uname -m)" --version 0.2.0 \
+  --output artifacts/linux-native.json \
+  --evidence-dir artifacts/linux-native
+```
 
 ## Published packages
 
@@ -134,7 +165,7 @@ used for the current native verification. The source SHA is pinned before any
 platform job starts; failed or incomplete probes cannot produce an accepted
 build report.
 
-A matching `vX.Y.Z` tag uses the existing Verify publication gate, all five native
+A matching `vX.Y.Z` tag uses the existing Verify publication gate, all six native
 build jobs, source and checksum validation, an Arch package installation check,
 then GitHub Release publication and AUR updating. Branch publication is rejected,
 and the tag is checked again before publishing. Existing assets must match their

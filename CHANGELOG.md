@@ -4,6 +4,7 @@
 
 ### Added
 
+- Linux x86_64/ARM64 release gates now require four real X11/PTY suites with source, executable and display ownership evidence; Windows ARM64 must execute natively.
 - Versioned Linux workspace snapshots restore live tabs, split ratios, focus and geometry without replacing PTYs; bounded schema/identity checks reject invalid layouts before UI mutation.
 
 - Linux workspace tabs and horizontal/vertical split panes in the shared broker, with pane focus, swap, resizing, maximize/restore and moves between native windows.
@@ -19,6 +20,7 @@
 
 ### Fixed
 
+- Native Linux evidence is archived and read back before staging cleanup, preserving the flat Release checksum contract; incomplete gates cannot produce accepted artifacts.
 - Benchmark reports now pin the isolated Xvfb helper hash and preserve collection-time identity when regenerating charts.
 - Linux input preserves horizontal wheels and extra mouse buttons 8–11; configured bindings support all eleven X11 buttons.
 - Mouse releases follow the destination of their original press across Shift changes; focus and ownership transitions clear held input without cancelling a valid focus-loss clipboard transfer.

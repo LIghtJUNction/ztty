@@ -116,30 +116,28 @@ jobs:
           epoch = subprocess.check_output(["git", "show", "-s", "--format=%ct", "HEAD"], text=True).strip()
           with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
               stream.write(f"SOURCE_DATE_EPOCH={epoch}\n")
-      - name: Install native Linux build dependencies
+      - name: Install native Linux build and GUI acceptance dependencies
         id: toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxft-dev libxrender-dev
+          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev libxtst6 \
+            xvfb fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
+          python -m pip install --disable-pip-version-check 'python-xlib==0.33' 'Pillow==13.0.0'
+          fc-cache -f
           test "$(uname -m)" = "$ARCH"
           rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
       - name: Build the native Linux executable
         id: build
         run: cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty
-      - name: Check native Linux executable startup
+      - name: Run native Linux PTY and X11 GUI acceptance
         id: native
-        shell: python {0}
         run: |
-          import hashlib, json, os, subprocess
-          from pathlib import Path
-          binary = Path("target/release/ztty")
-          result = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=30)
-          report = {"source_sha": os.environ["SOURCE_SHA"], "scope": "native CLI startup; Linux GUI acceptance runs locally before this release workflow",
-                    "passed": result.returncode == 0 and result.stdout.strip() == "ztty " + os.environ["VERSION"],
-                    "exit_code": result.returncode, "stdout": result.stdout, "stderr": result.stderr,
-                    "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest()}
-          Path(f"dist/{os.environ['ARTIFACT_STEM']}.native.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-          assert report["passed"], report
+          python tests/linux_native_test.py -v > "dist/$ARTIFACT_STEM.gate-tests.log" 2>&1
+          python tests/linux_native.py --binary target/release/ztty \
+            --source-root "$GITHUB_WORKSPACE" --source-sha "$SOURCE_SHA" \
+            --arch "$ARCH" --version "$VERSION" \
+            --output "dist/$ARTIFACT_STEM.native.json" \
+            --evidence-dir "dist/$ARTIFACT_STEM.native"
       - name: Package the native Linux executable
         id: package
         run: |
@@ -149,6 +147,23 @@ jobs:
           tar --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --numeric-owner \
             -czf "dist/ztty-linux-$ARCH.tar.gz" -C "$package_dir" ztty LICENSE
           (cd dist && sha256sum "ztty-linux-$ARCH.tar.gz" > "ztty-linux-$ARCH.tar.gz.sha256")
+      - name: Archive Linux native acceptance evidence
+        id: evidence
+        if: ${{ always() && steps.source.outcome == 'success' }}
+        env:
+          OUTCOME_NATIVE: ${{ steps.native.outcome }}
+        shell: python {0}
+        run: |
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path("tests").resolve()))
+          from linux_native import archive_evidence
+          stem = os.environ["ARTIFACT_STEM"]
+          evidence = Path("dist") / f"{stem}.native"
+          if evidence.exists():
+              print(json.dumps(archive_evidence(evidence, Path("dist") / f"{stem}.native.tar.gz")))
+          elif os.environ["OUTCOME_NATIVE"] == "success":
+              raise RuntimeError("successful native acceptance produced no evidence directory")
       - name: Finalize source-bound artifact report
         if: ${{ always() && steps.source.outcome == 'success' }}
         env:
@@ -156,6 +171,7 @@ jobs:
           OUTCOME_BUILD: ${{ steps.build.outcome }}
           OUTCOME_NATIVE: ${{ steps.native.outcome }}
           OUTCOME_PACKAGE: ${{ steps.package.outcome }}
+          OUTCOME_EVIDENCE: ${{ steps.evidence.outcome }}
         shell: python {0}
         run: |
           import hashlib, json, os
@@ -164,7 +180,7 @@ jobs:
           stem = os.environ["ARTIFACT_STEM"]
           path = out / f"{stem}.build.json"
           report = json.loads(path.read_text(encoding="utf-8"))
-          report["outcomes"] = {key: os.environ[f"OUTCOME_{key.upper()}"] for key in ("toolchain", "build", "native", "package")}
+          report["outcomes"] = {key: os.environ[f"OUTCOME_{key.upper()}"] for key in ("toolchain", "build", "native", "package", "evidence")}
           report["passed"] = all(value == "success" for value in report["outcomes"].values())
           report["status"] = "accepted" if report["passed"] else "failed"
           report["files"] = {file.name: {"bytes": file.stat().st_size, "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
@@ -176,11 +192,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ${{ env.ARTIFACT_STEM }}
-          path: |
-            dist/*.zip*
-            dist/*.tar.gz*
-            dist/*.json*
-            dist/*.log
+          path: dist/
           if-no-files-found: error
           retention-days: 14
 
