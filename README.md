@@ -75,13 +75,16 @@ can be used without the graphical application.
 ```sh
 cargo add zinput@0.1.0 --no-default-features
 cargo add zpty@0.1.0 --no-default-features
+cargo add zterm@0.1.0 --no-default-features
 # For applications that need only the parser:
 cargo add zvte@0.1.3 --no-default-features
 ```
 
-[`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0) and
-[`zpty 0.1.0`](https://crates.io/crates/zpty/0.1.0) are published.
-`zterm 0.1.0` is available in this workspace; its registry publication is pending.
+[`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0),
+[`zpty 0.1.0`](https://crates.io/crates/zpty/0.1.0), and
+[`zterm 0.1.0`](https://crates.io/crates/zterm/0.1.0) are published.
+All three passed individual and combined consumers using exact registry versions
+outside this workspace, including a real PTY session.
 See [the release record](docs/releasing.md) for the verified publication state.
 
 All production Rust crates use `#![no_std]`. The libraries use `alloc` where
@@ -131,7 +134,7 @@ cargo test --workspace --doc
 cargo run -p zpty --example capture
 cargo run --release -p zterm --example benchmark
 python3 tests/gui_smoke.py --binary ./target/release/ztty
-python3 tools/verify_registry.py --packages zinput zpty
+python3 tools/verify_registry.py
 
 # Optional portability gate for the platform-independent libraries:
 rustup target add x86_64-unknown-none
