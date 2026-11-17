@@ -9,11 +9,15 @@ pub use zgraphics as graphics;
 /// Platform-independent terminal input encoders.
 pub use zinput as input;
 mod screen;
+mod shell;
 mod terminal;
 
 pub use screen::{
     BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, HIDDEN, INVERSE, ITALIC, STRIKE,
     UNDERLINE,
+};
+pub use shell::{
+    CommandRecord, CommandText, MAX_COMMAND_TEXT, MAX_COMMANDS, ShellPhase, TextPosition,
 };
 pub use terminal::{CursorShape, Modes, Terminal, Theme};
 
@@ -22,3 +26,6 @@ extern crate std;
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod shell_tests;
