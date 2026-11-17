@@ -36,6 +36,7 @@ from measure_runtime import (
     process_stat, same_process,
 )
 from measure_multiwindow import cleanup
+from isolated_xvfb import start_xvfb
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT = ROOT / "docs/benchmarks/terminals-10-windows.json"
@@ -440,7 +441,7 @@ def measure(app, binary, repetition, settle, count=WINDOWS, mode="shared", workl
         result["error"] = "comparison deferred: " + "; ".join(result["host_contention"])
         return result
     launchers, connections, identities = [], [], {}
-    xvfb = bus = xconnection = listener = None
+    xvfb = xserver = bus = xconnection = listener = None
     with tempfile.TemporaryDirectory(prefix="ztty-compare-") as temporary:
         directory = Path(temporary)
         tag = directory.name
@@ -483,26 +484,13 @@ def measure(app, binary, repetition, settle, count=WINDOWS, mode="shared", workl
                 (directory / "terminal.log").open("wb") as tlog, \
                 (directory / "dbus.log").open("wb") as blog:
             try:
-                read_fd, write_fd = os.pipe()
-                try:
-                    xvfb = subprocess.Popen(
-                        ["Xvfb", "-displayfd", str(write_fd), "-screen", "0",
-                         f"7680x{max(2160, ((count + 4) // 5) * 1080)}x24",
-                         "-dpi", "96", "-nolisten", "tcp"],
-                        pass_fds=(write_fd,), stdout=subprocess.DEVNULL, stderr=xlog,
-                        env=environment, start_new_session=True,
-                    )
-                finally:
-                    os.close(write_fd)
-                try:
-                    if not select.select([read_fd], [], [], 10)[0]:
-                        raise TimeoutError("Xvfb did not allocate a display")
-                    number = os.read(read_fd, 64).strip().decode("ascii")
-                    if not number.isdecimal():
-                        raise RuntimeError("invalid Xvfb display number")
-                finally:
-                    os.close(read_fd)
-                environment["DISPLAY"] = display_name = ":" + number
+                xserver = start_xvfb(
+                    screen=f"7680x{max(2160, ((count + 4) // 5) * 1080)}x24",
+                    dpi=96, stderr=xlog, env=environment, timeout=10,
+                )
+                xvfb = xserver.process
+                environment["DISPLAY"] = display_name = xserver.display
+                result["display_ownership"] = xserver.evidence
                 xconnection = display.Display(display_name)
                 server_before = memory(xvfb.pid)
                 bus = subprocess.Popen(
@@ -719,14 +707,15 @@ def measure(app, binary, repetition, settle, count=WINDOWS, mode="shared", workl
                         process.wait(timeout=1)
                 if xconnection is not None:
                     xconnection.close()
-                for process in (bus, xvfb):
-                    if process is not None:
-                        process.terminate()
-                        try:
-                            process.wait(timeout=2)
-                        except subprocess.TimeoutExpired:
-                            process.kill()
-                            process.wait(timeout=2)
+                if bus is not None:
+                    bus.terminate()
+                    try:
+                        bus.wait(timeout=2)
+                    except subprocess.TimeoutExpired:
+                        bus.kill()
+                        bus.wait(timeout=2)
+                if xserver is not None:
+                    xserver.close()
                 remaining.extend(pid for pid in owned_processes(tag) if pid not in remaining)
                 result["remaining_owned_pids"] = remaining
                 if remaining:

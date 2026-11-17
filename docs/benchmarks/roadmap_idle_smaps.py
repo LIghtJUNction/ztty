@@ -17,7 +17,6 @@ import json
 import os
 from pathlib import Path
 import re
-import select
 import subprocess
 import sys
 import tempfile
@@ -28,6 +27,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from benchmark_terminals import FRAME, MARKER, ZTTY_CONFIG, host_pressure, owned_processes
 from measure_runtime import memory, process_stat, same_process
 from measure_multiwindow import cleanup
+from isolated_xvfb import start_xvfb
 from Xlib import display
 
 FIELDS = ("Size", "Rss", "Pss", "Shared_Clean", "Shared_Dirty", "Private_Clean", "Private_Dirty", "Swap", "SwapPss")
@@ -105,7 +105,7 @@ def main():
         "limitations": "Busy host; three near-in-time snapshots, not independent performance repetitions. Reading smaps is not an allocation profiler. RSS counts shared mapped pages in each process.",
         "host_before": host_pressure(), "samples": [],
     }
-    launcher = xvfb = connection = None
+    launcher = xvfb = xserver = connection = None
     identities = {}
     with tempfile.TemporaryDirectory(prefix="ztty-idle-smaps-") as temporary:
         directory = Path(temporary)
@@ -119,19 +119,10 @@ def main():
         env.update({MARKER: tag, "ZTTY_SOCKET": "@" + tag, "LC_ALL": "C.UTF-8", "LANG": "C.UTF-8", "XMODIFIERS": "@im=none", "XDG_CONFIG_HOME": str(directory / "config"), "XDG_CACHE_HOME": str(directory / "cache"), "XDG_RUNTIME_DIR": temporary})
         with (directory / "stderr.log").open("wb") as stderr, (directory / "xvfb.log").open("wb") as xlog:
             try:
-                read_fd, write_fd = os.pipe()
-                try:
-                    xvfb = subprocess.Popen(["Xvfb", "-displayfd", str(write_fd), "-screen", "0", "1920x1200x24", "-dpi", "96", "-nolisten", "tcp"], env=env, pass_fds=(write_fd,), stdout=subprocess.DEVNULL, stderr=xlog, start_new_session=True)
-                finally:
-                    os.close(write_fd)
-                try:
-                    if not select.select([read_fd], [], [], 10)[0]:
-                        raise TimeoutError("private X display did not become ready")
-                    number = os.read(read_fd, 64).strip().decode("ascii")
-                    assert number.isdecimal(), number
-                finally:
-                    os.close(read_fd)
-                env["DISPLAY"] = ":" + number
+                xserver = start_xvfb(screen="1920x1200x24", dpi=96, stderr=xlog, env=env, timeout=10)
+                xvfb = xserver.process
+                env["DISPLAY"] = xserver.display
+                report["display_ownership"] = xserver.evidence
                 connection = display.Display(env["DISPLAY"])
                 frame = FRAME + b"\x1b]0;" + title.encode() + b"\x07"
                 child = "import os,sys,base64,time; os.write(1,base64.b64decode(sys.argv[1])); time.sleep(120)"
@@ -174,14 +165,17 @@ def main():
                 report["error"] = repr(error)
             finally:
                 identities.update(owned_processes(tag))
+                if xvfb is not None:
+                    identities.pop(xvfb.pid, None)
                 report["remaining_owned_pids"] = cleanup(identities)
                 if connection:
                     with contextlib.suppress(Exception):
                         connection.close()
-                for process in (launcher, xvfb):
-                    if process:
-                        with contextlib.suppress(Exception):
-                            process.wait(timeout=2)
+                if launcher:
+                    with contextlib.suppress(Exception):
+                        launcher.wait(timeout=2)
+                if xserver is not None:
+                    xserver.close()
                 report["ok"] = report["ok"] and not report["remaining_owned_pids"]
                 report["stderr"] = (directory / "stderr.log").read_text(errors="replace")
                 report["host_after"] = host_pressure()

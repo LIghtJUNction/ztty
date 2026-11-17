@@ -12,7 +12,6 @@ import datetime
 import json
 import os
 from pathlib import Path
-import select
 import shlex
 import signal
 import statistics
@@ -21,6 +20,7 @@ import tempfile
 import time
 
 from measure_runtime import FRAME, descendants, machine, memory, pixmap_bytes, process_stat, same_process
+from isolated_xvfb import start_xvfb
 
 ROOT = Path(__file__).resolve().parents[1]
 SETTINGS = "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\n"
@@ -91,31 +91,16 @@ def measure(binary, count, repetition, expect_shared):
     from Xlib import display
     result = {"windows": count, "repetition": repetition, "ok": False}
     processes, identities = [], {}
-    xvfb = connection = None
+    xvfb = xserver = connection = None
     with tempfile.TemporaryDirectory(prefix="ztty-multiwindow-") as temporary:
         directory = Path(temporary)
         (directory / "appearance.conf").write_text(SETTINGS)
         with (directory / "xvfb.log").open("wb") as xlog, (directory / "terminal.log").open("wb") as tlog:
             try:
-                read_fd, write_fd = os.pipe()
-                try:
-                    xvfb = subprocess.Popen(
-                        ["Xvfb", "-displayfd", str(write_fd), "-screen", "0", "1920x1200x24",
-                         "-dpi", "96", "-nolisten", "tcp"],
-                        pass_fds=(write_fd,), stdout=subprocess.DEVNULL, stderr=xlog,
-                        start_new_session=True,
-                    )
-                finally:
-                    os.close(write_fd)
-                try:
-                    if not select.select([read_fd], [], [], 10)[0]:
-                        raise TimeoutError("Xvfb did not allocate a display")
-                    number = os.read(read_fd, 64).strip().decode("ascii")
-                    if not number.isdecimal():
-                        raise RuntimeError("invalid Xvfb display number")
-                finally:
-                    os.close(read_fd)
-                display_name = ":" + number
+                xserver = start_xvfb(screen="1920x1200x24", dpi=96, stderr=xlog, timeout=10)
+                xvfb = xserver.process
+                display_name = xserver.display
+                result["display_ownership"] = xserver.evidence
                 connection = display.Display(display_name)
                 before_server = memory(xvfb.pid)
                 environment = os.environ.copy()
@@ -200,13 +185,8 @@ def measure(binary, count, repetition, expect_shared):
                         process.wait(timeout=1)
                 if connection is not None:
                     connection.close()
-                if xvfb is not None:
-                    xvfb.terminate()
-                    try:
-                        xvfb.wait(timeout=2)
-                    except subprocess.TimeoutExpired:
-                        xvfb.kill()
-                        xvfb.wait(timeout=2)
+                if xserver is not None:
+                    xserver.close()
                 result["remaining_owned_pids"] = remaining
                 if remaining:
                     result.update(ok=False, cleanup_error="owned processes remained after teardown")

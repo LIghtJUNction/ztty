@@ -6,6 +6,8 @@
 Ten terminals per app. [Raw measurements](docs/benchmarks/terminals-10-windows.json) · [Conditions and limits](docs/benchmarks/verification-2026-11-18.md) · rerun from current source: `make benchmark-terminals`.
 
 Read the recorded host load and Swap alongside RSS/PSS. The archived baseline was collected under resource contention; it does not establish a quiet-host ranking. X server resources are separate; real GPU memory and input-to-display latency are not measured by the DSR probe.
+Display-server ownership was not verified in this historical baseline. Current runs use a guarded private X server; treat the server-attributed figures here as provisional until the guarded rerun.
+
 <!-- terminal-benchmark:end -->
 
 A lean native terminal, written in Rust without the Rust standard library.

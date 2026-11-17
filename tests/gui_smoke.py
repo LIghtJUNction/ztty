@@ -10,7 +10,6 @@ import contextlib
 import json
 import os
 from pathlib import Path
-import select
 import signal
 import socket
 import subprocess
@@ -20,6 +19,8 @@ import time
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+from isolated_xvfb import start_xvfb
 RESET = "\x1bc\x1b[?25l"
 
 
@@ -45,25 +46,8 @@ class Gui:
         self.key_events = []
         self.down = set()
         self.mouse_down = set()
-        read_fd, write_fd = os.pipe()
-        try:
-            self.xvfb = subprocess.Popen(
-                ["Xvfb", "-displayfd", str(write_fd), "-screen", "0", "1600x1000x24", "-nolisten", "tcp"],
-                pass_fds=(write_fd,), stdout=subprocess.DEVNULL, stderr=self.xlog,
-                start_new_session=True,
-            )
-        finally:
-            os.close(write_fd)
-        try:
-            ready, _, _ = select.select([read_fd], [], [], 10)
-            if not ready:
-                raise RuntimeError("Xvfb did not provide a display within 10 seconds")
-            number = os.read(read_fd, 64).strip().decode("ascii")
-            if not number.isdecimal():
-                raise RuntimeError("Xvfb failed to allocate an isolated display")
-        finally:
-            os.close(read_fd)
-        self.display_name = ":" + number
+        self.xvfb = start_xvfb(screen="1600x1000x24", stderr=self.xlog, timeout=10)
+        self.display_name = self.xvfb.display
         self.d = display.Display(self.display_name)
         self.root = self.d.screen().root
         self.helper = self.root.create_window(
@@ -425,12 +409,7 @@ class Gui:
             with contextlib.suppress(Exception):
                 self.d.close()
         if self.xvfb is not None:
-            self.xvfb.terminate()
-            try:
-                self.xvfb.wait(timeout=3)
-            except subprocess.TimeoutExpired:
-                self.xvfb.kill()
-                self.xvfb.wait(timeout=2)
+            self.xvfb.close()
         if self.xlog is not None:
             self.xlog.close()
         if self.tlog is not None:

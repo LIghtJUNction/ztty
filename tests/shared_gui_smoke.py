@@ -6,7 +6,6 @@ import ctypes
 import json
 import os
 from pathlib import Path
-import select
 import signal
 import socket
 import subprocess
@@ -16,6 +15,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from measure_multiwindow import cleanup, owned_processes, terminal_windows
+from isolated_xvfb import start_xvfb
 from measure_runtime import descendants, process_stat
 from mcp_transport import INIT, READY, line, packet, send as mcp_send
 
@@ -50,25 +50,12 @@ def main():
         tag = directory.name
         with (directory / "terminal.log").open("wb") as tlog:
             try:
-                rfd, wfd = os.pipe()
-                try:
-                    xvfb = subprocess.Popen(
-                        ["Xvfb", "-displayfd", str(wfd), "-screen", "0", "1920x1200x24", "-nolisten", "tcp"],
-                        pass_fds=(wfd,), stdout=subprocess.DEVNULL, stderr=tlog, start_new_session=True)
-                finally:
-                    os.close(wfd)
-                try:
-                    if not select.select([rfd], [], [], 10)[0]:
-                        raise TimeoutError("Xvfb did not start")
-                    number = os.read(rfd, 64).strip().decode()
-                finally:
-                    os.close(rfd)
-                if not number.isdecimal():
-                    raise RuntimeError("invalid display number")
-                d = display.Display(":" + number)
+                xvfb = start_xvfb(screen="1920x1200x24", stderr=tlog, timeout=10)
+                d = display.Display(xvfb.display)
+                result["display_ownership"] = xvfb.evidence
                 env = os.environ.copy()
                 env.pop("WAYLAND_DISPLAY", None)
-                env.update(DISPLAY=":" + number, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
+                env.update(DISPLAY=xvfb.display, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
                            ZTTY_MEMORY_TAG=temporary, ZTTY_SOCKET="@ztty-shared-gui-" + tag,
                            XDG_RUNTIME_DIR=temporary)
 
@@ -357,8 +344,7 @@ def main():
                 if d is not None:
                     d.close()
                 if xvfb is not None:
-                    xvfb.terminate()
-                    xvfb.wait(timeout=2)
+                    xvfb.close()
         result["terminal_stderr"] = (directory / "terminal.log").read_text(errors="replace")[-4096:]
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
