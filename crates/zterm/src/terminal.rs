@@ -1318,7 +1318,7 @@ impl State {
                 }
             }
             1049 => self.alternate(enabled, true, true),
-            1000 | 1002 | 1003 => {
+            9 | 1000 | 1002 | 1003 => {
                 if enabled {
                     self.modes.mouse_tracking = mode;
                 } else if self.modes.mouse_tracking == mode {
@@ -1345,7 +1345,7 @@ impl State {
                 80 => Some(self.sixel_display),
                 1070 => Some(self.sixel_private),
                 8452 => Some(self.sixel_right),
-                1000 | 1002 | 1003 => Some(self.modes.mouse_tracking == mode),
+                9 | 1000 | 1002 | 1003 => Some(self.modes.mouse_tracking == mode),
                 1004 => Some(self.modes.focus_events),
                 1006 => Some(self.modes.sgr_mouse),
                 2004 => Some(self.modes.bracketed_paste),
