@@ -60,6 +60,25 @@ Record registry readback, package checks, commit IDs, and benchmark scope in the
 release report. Rebuild a small consumer using registry versions to verify that
 the public packages work independently of workspace path dependencies.
 
-Routine development verification runs locally. Release automation, when added,
-must preserve these publication and artifact checks without introducing routine
-push-triggered test runs.
+Routine development checks can run locally. Pull requests and release tags also run CI.
+
+## GitHub and AUR
+
+The application release uses the workspace version in `Cargo.toml`. After
+merging a version update, push the matching tag to publish it.
+
+```sh
+git tag -a vX.Y.Z -m 'ztty X.Y.Z'
+git push origin refs/tags/vX.Y.Z
+```
+
+The tag workflow runs the same checks as pull request CI, including the Xvfb
+GUI suite. It generates a deterministic source archive and SHA256 checksum,
+builds and installs the Arch package in a clean container, then publishes the
+GitHub Release and pushes the generated PKGBUILD and .SRCINFO to the AUR.
+Retry a failed run on the same tag. Existing release assets are checked before
+the AUR update, and an older tag cannot downgrade the AUR package.
+
+The release workflow uses the repository secret `AUR_SSH_KEY`. Its public key
+must be registered to an account that can maintain `ztty` on the AUR.
+`packaging/aur/known_hosts` pins the AUR SSH host key.
