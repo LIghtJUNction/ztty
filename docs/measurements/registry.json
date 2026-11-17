@@ -1,7 +1,7 @@
 {
-  "schema": 1,
-  "checked_at_utc": "2026-11-17T16:31:32.407965+00:00",
-  "source_commit": "9333047c0867756a73d71e29524ddef3d9f21544",
+  "schema": 2,
+  "checked_at_utc": "2026-11-17T17:50:26.803862+00:00",
+  "source_commit": "3e2f03297c638f14d9799dcb78a915f634287813",
   "packages": [
     {
       "name": "zinput",
@@ -13,7 +13,13 @@
       "published_by": "LIghtJUNction",
       "checksum": "dc155bb3eff182f026daf325f0cf709f0b0e8fdf334ffdf62a9532f3c4bb5c81",
       "crate_size_bytes": 10857,
-      "rust_version": "1.100"
+      "rust_version": "1.100",
+      "vcs": {
+        "git": {
+          "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+        },
+        "path_in_vcs": "crates/zinput"
+      }
     },
     {
       "name": "zpty",
@@ -25,14 +31,31 @@
       "published_by": "LIghtJUNction",
       "checksum": "52dfe1f11c6f172311b06db7da086cb3b714b8ac779a2fc507ed172724080e58",
       "crate_size_bytes": 7427,
-      "rust_version": "1.100"
+      "rust_version": "1.100",
+      "vcs": {
+        "git": {
+          "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+        },
+        "path_in_vcs": "crates/zpty"
+      }
     },
     {
       "name": "zterm",
       "version": "0.1.0",
       "api_url": "https://crates.io/api/v1/crates/zterm/0.1.0",
-      "status": "not_published",
-      "http_status": 404
+      "status": "published",
+      "yanked": false,
+      "published_at_utc": "2026-11-17T17:45:40.645778Z",
+      "published_by": "LIghtJUNction",
+      "checksum": "2bd050c6982f560bd9d670b094ba67133933bf8764f0b6e01bf86c958417a60d",
+      "crate_size_bytes": 21530,
+      "rust_version": "1.100",
+      "vcs": {
+        "git": {
+          "sha1": "3e2f03297c638f14d9799dcb78a915f634287813"
+        },
+        "path_in_vcs": "crates/zterm"
+      }
     }
   ]
 }

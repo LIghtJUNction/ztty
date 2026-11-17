@@ -2,34 +2,28 @@
 
 ## Current publication record
 
-The source implementation is committed as
-[`9333047`](https://github.com/LIghtJUNction/ztty/commit/9333047c0867756a73d71e29524ddef3d9f21544).
-The crates.io API confirmed the following records on 2026-11-17:
+All three reusable packages are published on crates.io as version **0.1.0**.
+Registry readback and isolated consumers were verified on 2026-11-18
+(Asia/Taipei). Each package is published by LIghtJUNction and is not yanked.
 
-| Package | Version | Registry state |
+| Package | Version | Embedded source commit |
 | --- | --- | --- |
-| [zinput](https://crates.io/crates/zinput/0.1.0) | 0.1.0 | Published by LIghtJUNction; not yanked |
-| [zpty](https://crates.io/crates/zpty/0.1.0) | 0.1.0 | Published by LIghtJUNction; not yanked |
-| zterm | 0.1.0 | Source complete; publication not yet confirmed; version API returned 404 |
+| [zinput](https://crates.io/crates/zinput/0.1.0) | 0.1.0 | `9333047c0867756a73d71e29524ddef3d9f21544` |
+| [zpty](https://crates.io/crates/zpty/0.1.0) | 0.1.0 | `9333047c0867756a73d71e29524ddef3d9f21544` |
+| [zterm](https://crates.io/crates/zterm/0.1.0) | 0.1.0 | `3e2f03297c638f14d9799dcb78a915f634287813` |
 
-`zterm` packaging verification was started on the developer machine. The
-development connection became unavailable before a publication result could be
-observed. Check the registry and the existing job before retrying publication.
-The first two packages have completed both package verification and publication.
-An independent local `cargo publish --dry-run --locked -p zterm` subsequently
-passed with registry `zinput`; its [complete log](measurements/zterm-package-dry-run-2026-11-18.log)
-shows that upload was explicitly aborted by dry-run mode. It did not publish
-the package.
+The second source commit adds documentation and test tools to the same production
+Rust implementation. The crates.io checksums and actual publication timestamps
+are recorded in [registry.json](measurements/registry.json).
 
-The published `zinput` and `zpty` packages also passed individual and combined
-consumer builds outside this workspace, including a `no_std` library check and
-real PTY execution. Their registry checksums and embedded VCS commit match the
-release source. See the [registry readback](measurements/registry.json) and
-[independent-consumer record](measurements/registry-consumer-2026-11-18.json).
+Each package passed an independent consumer, and all three passed a combined
+consumer. The generated manifests use exact crates.io versions, without local
+path or git overrides. Checks include a `no_std` library, terminal screen/query
+behavior, Kitty input encoding, and a real PTY child process. The published
+packages' VCS metadata and checksums were read back from Cargo's downloaded
+artifacts. See [the complete consumer record](measurements/registry-consumer-all-2026-11-18.json).
 
 ```sh
-python3 tools/verify_registry.py --packages zinput zpty
-# After zterm is available in the registry:
 python3 tools/verify_registry.py
 ```
 

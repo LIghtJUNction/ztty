@@ -30,13 +30,16 @@ Kitty 增强键盘和同步输出协议。界面采用深色背景、等宽字�
 `zterm` 复用 `zinput`、你开发的 `zvte` 和 `no_std` 的 Unicode 宽度表。
 需要动态内存的地方使用 `alloc`，分配器由宿主提供。
 
-[`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0) 和
-[`zpty 0.1.0`](https://crates.io/crates/zpty/0.1.0) 已发布到 crates.io。
-`zterm 0.1.0` 的源码和测试已在本仓库中，注册表发布尚待完成。
+[`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0)、
+[`zpty 0.1.0`](https://crates.io/crates/zpty/0.1.0) 和
+[`zterm 0.1.0`](https://crates.io/crates/zterm/0.1.0) 已发布到 crates.io。
+三个包均已在工作区之外验证单独及组合使用，依赖全部来自注册表，
+包括真实 PTY 会话在内的检查全部通过。
 
 ```sh
 cargo add zinput@0.1.0 --no-default-features
 cargo add zpty@0.1.0 --no-default-features
+cargo add zterm@0.1.0 --no-default-features
 cargo add zvte@0.1.3 --no-default-features
 ```
 
