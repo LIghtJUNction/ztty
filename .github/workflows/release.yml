@@ -1,0 +1,77 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ztty-release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Verify release version
+        id: version
+        run: |
+          version=$(bash tools/release-source.sh "$RUNNER_TEMP/ztty-release")
+          if [[ "$GITHUB_REF" != "refs/tags/v$version" ]]; then
+            echo "Select the release tag v$version when dispatching this workflow." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: version
+    uses: ./.github/workflows/verify.yml
+
+  publish:
+    needs: [version, verify]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Prepare source and test Arch package
+        run: |
+          out="$RUNNER_TEMP/ztty-release"
+          bash tools/release-source.sh "$out"
+          docker run --rm -v "$out:/work" -e VERSION archlinux:base-devel bash -euxc '
+            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender
+            useradd -m builder
+            install -d -o builder -g builder /home/builder/package
+            cp /work/aur/PKGBUILD "/work/ztty-$VERSION.tar.gz" /home/builder/package/
+            chown builder:builder /home/builder/package/*
+            cd /home/builder/package
+            runuser -u builder -- makepkg --noconfirm
+            runuser -u builder -- makepkg --printsrcinfo > /work/aur/.SRCINFO
+            pacman -U --noconfirm ztty-*.pkg.tar.zst
+            ztty --version | grep -Fx "ztty $VERSION"
+          '
+      - name: Publish or verify GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          out="$RUNNER_TEMP/ztty-release"
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            readback=$(mktemp -d)
+            gh release download "v$VERSION" --dir "$readback" --pattern "ztty-$VERSION.tar.gz" --pattern SHA256SUMS
+            cmp "$out/SHA256SUMS" "$readback/SHA256SUMS"
+            (cd "$readback" && sha256sum --check SHA256SUMS)
+          else
+            gh release create "v$VERSION" --verify-tag --generate-notes \
+              "$out/ztty-$VERSION.tar.gz" "$out/SHA256SUMS"
+          fi
+      - name: Update AUR
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+        run: bash tools/publish-aur.sh "$RUNNER_TEMP/ztty-release/aur"
