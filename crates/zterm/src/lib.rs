@@ -10,9 +10,10 @@ mod screen;
 mod terminal;
 
 pub use screen::{
-    BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, HIDDEN, INVERSE, ITALIC, STRIKE, UNDERLINE,
+    BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, HIDDEN, INVERSE, ITALIC, STRIKE,
+    UNDERLINE,
 };
-pub use terminal::{Modes, Terminal};
+pub use terminal::{CursorShape, Modes, Terminal, Theme};
 
 #[cfg(test)]
 extern crate std;

@@ -13,12 +13,63 @@ const MAX_HISTORY_BYTES: usize = 8 * 1024 * 1024;
 const MAX_LINKS: usize = 1024;
 const MAX_RESPONSES: usize = 65536;
 
+pub const ANSI_PALETTE: [u32; 16] = [
+    0x000000, 0xcd0000, 0x00cd00, 0xcdcd00, 0x0000ee, 0xcd00cd, 0x00cdcd, 0xe5e5e5, 0x7f7f7f,
+    0xff0000, 0x00ff00, 0xffff00, 0x5c5cff, 0xff00ff, 0x00ffff, 0xffffff,
+];
+
+/// Initial foreground, background, and ANSI colors (24-bit RGB).
+#[derive(Clone, Copy, Debug)]
+pub struct Theme {
+    pub foreground: u32,
+    pub background: u32,
+    pub palette: [u32; 16],
+}
+
+impl Default for Theme {
+    fn default() -> Self {
+        Self {
+            foreground: DEFAULT_FG,
+            background: DEFAULT_BG,
+            palette: ANSI_PALETTE,
+        }
+    }
+}
+
+impl Theme {
+    fn style(self) -> Style {
+        Style {
+            fg: self.foreground,
+            bg: self.background,
+            ..Style::default()
+        }
+    }
+
+    fn color(self, index: u16) -> u32 {
+        self.palette
+            .get(index as usize)
+            .copied()
+            .unwrap_or_else(|| extended_color(index))
+    }
+}
+
+/// Shape selected by DECSCUSR.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CursorShape {
+    Block,
+    Underline,
+    Bar,
+}
+
 /// Input and rendering modes negotiated by the child process.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Modes {
     pub app_cursor: bool,
     pub app_keypad: bool,
     pub cursor_visible: bool,
+    /// None follows the frontend preference.
+    pub cursor_blink: Option<bool>,
+    pub cursor_shape: Option<CursorShape>,
     pub bracketed_paste: bool,
     pub focus_events: bool,
     /// Zero, or DECSET 1000 (click), 1002 (drag), or 1003 (all motion).
@@ -35,6 +86,8 @@ impl Default for Modes {
             app_cursor: false,
             app_keypad: false,
             cursor_visible: true,
+            cursor_blink: None,
+            cursor_shape: None,
             bracketed_paste: false,
             focus_events: false,
             mouse_tracking: 0,
@@ -76,10 +129,14 @@ fn dimensions(cols: usize, rows: usize) -> (usize, usize) {
 
 impl Terminal {
     pub fn new(cols: usize, rows: usize, history_limit: usize) -> Self {
+        Self::with_theme(cols, rows, history_limit, Theme::default())
+    }
+
+    pub fn with_theme(cols: usize, rows: usize, history_limit: usize, theme: Theme) -> Self {
         let (cols, rows) = dimensions(cols, rows);
         Self {
             parser: Parser::new_with_size(),
-            state: State::new(cols, rows, history_limit),
+            state: State::new(cols, rows, history_limit, theme),
         }
     }
 
@@ -135,7 +192,7 @@ impl Terminal {
     #[inline]
     pub fn cell(&self, col: usize, row: usize) -> &Cell {
         if col >= self.cols() || row >= self.rows() {
-            return &Cell::BLANK;
+            return &self.state.screen.blank;
         }
         &self.state.screen.cells[self.state.screen.index(col, row)]
     }
@@ -143,7 +200,7 @@ impl Terminal {
     /// View the visible screen, moved `offset` lines into primary-screen history.
     pub fn view_cell(&self, col: usize, row: usize, offset: usize) -> &Cell {
         if col >= self.cols() || row >= self.rows() {
-            return &Cell::BLANK;
+            return &self.state.screen.blank;
         }
         if self.state.modes.alternate_screen {
             return self.cell(col, row);
@@ -156,7 +213,7 @@ impl Terminal {
         let line = &history[absolute];
         match line.get(col) {
             Some(cell) if !(cell.width == 2 && col + 1 >= self.cols()) => cell,
-            _ => &Cell::BLANK,
+            _ => &self.state.screen.blank,
         }
     }
 
@@ -238,6 +295,7 @@ impl fmt::Write for ReplyBuffer {
 }
 
 struct State {
+    theme: Theme,
     screen: Screen,
     primary: Option<Screen>,
     inactive_alternate: Option<Screen>,
@@ -265,16 +323,17 @@ struct State {
 }
 
 impl State {
-    fn new(cols: usize, rows: usize, history_limit: usize) -> Self {
+    fn new(cols: usize, rows: usize, history_limit: usize, theme: Theme) -> Self {
         let tabs = (0..cols).map(|x| x % 8 == 0).collect();
         Self {
-            screen: Screen::new(cols, rows),
+            theme,
+            screen: Screen::new(cols, rows, theme.style()),
             primary: None,
             inactive_alternate: None,
             history: VecDeque::new(),
             history_limit: history_limit.min(65536),
             history_bytes: 0,
-            style: Style::default(),
+            style: theme.style(),
             modes: Modes::default(),
             autowrap: true,
             insert: false,
@@ -586,10 +645,9 @@ impl State {
             if save {
                 self.save_cursor();
             }
-            let mut alternate = self
-                .inactive_alternate
-                .take()
-                .unwrap_or_else(|| Screen::new(self.screen.cols, self.screen.rows));
+            let mut alternate = self.inactive_alternate.take().unwrap_or_else(|| {
+                Screen::new(self.screen.cols, self.screen.rows, self.theme.style())
+            });
             if clear {
                 alternate.x = 0;
                 alternate.y = 0;
@@ -629,6 +687,7 @@ impl State {
                 self.autowrap = enabled;
                 self.screen.wrap = false;
             }
+            12 => self.modes.cursor_blink = Some(enabled),
             25 => {
                 self.modes.cursor_visible = enabled;
                 self.screen.dirty[self.screen.y] = true;
@@ -663,6 +722,7 @@ impl State {
                 1 => Some(self.modes.app_cursor),
                 6 => Some(self.screen.origin),
                 7 => Some(self.autowrap),
+                12 => self.modes.cursor_blink,
                 25 => Some(self.modes.cursor_visible),
                 47 | 1047 | 1049 => Some(self.modes.alternate_screen),
                 1000 | 1002 | 1003 => Some(self.modes.mouse_tracking == mode),
@@ -738,7 +798,7 @@ impl State {
                     let link_id = self.style.link_id;
                     self.style = Style {
                         link_id,
-                        ..Style::default()
+                        ..self.theme.style()
                     };
                 }
                 1 => self.style.flags |= BOLD,
@@ -761,16 +821,28 @@ impl State {
                 27 => self.style.flags &= !INVERSE,
                 28 => self.style.flags &= !HIDDEN,
                 29 => self.style.flags &= !STRIKE,
-                30..=37 => self.style.fg = palette(value - 30),
-                40..=47 => self.style.bg = palette(value - 40),
-                90..=97 => self.style.fg = palette(value - 90 + 8),
-                100..=107 => self.style.bg = palette(value - 100 + 8),
-                39 => self.style.fg = DEFAULT_FG,
-                49 => self.style.bg = DEFAULT_BG,
+                30..=37 => self.style.fg = self.theme.color(value - 30),
+                40..=47 => {
+                    self.style.bg = self.theme.color(value - 40);
+                    self.style.flags |= EXPLICIT_BG;
+                }
+                90..=97 => self.style.fg = self.theme.color(value - 90 + 8),
+                100..=107 => {
+                    self.style.bg = self.theme.color(value - 100 + 8);
+                    self.style.flags |= EXPLICIT_BG;
+                }
+                39 => self.style.fg = self.theme.foreground,
+                49 => {
+                    self.style.bg = self.theme.background;
+                    self.style.flags &= !EXPLICIT_BG;
+                }
                 38 | 48 => {
                     let color = if group.len() > 1 {
                         match group.get(1) {
-                            Some(5) => group.get(2).filter(|v| **v <= 255).map(|v| palette(*v)),
+                            Some(5) => group
+                                .get(2)
+                                .filter(|v| **v <= 255)
+                                .map(|v| self.theme.color(*v)),
                             Some(2) => {
                                 let base = if group.len() >= 6 { 3 } else { 2 };
                                 rgb(
@@ -784,8 +856,9 @@ impl State {
                     } else {
                         match raw_param(groups, i + 1) {
                             Some(5) => {
-                                let value =
-                                    raw_param(groups, i + 2).filter(|v| *v <= 255).map(palette);
+                                let value = raw_param(groups, i + 2)
+                                    .filter(|v| *v <= 255)
+                                    .map(|v| self.theme.color(v));
                                 i += 2;
                                 value
                             }
@@ -806,6 +879,7 @@ impl State {
                             self.style.fg = color;
                         } else {
                             self.style.bg = color;
+                            self.style.flags |= EXPLICIT_BG;
                         }
                     }
                 }
@@ -896,14 +970,14 @@ impl Perform for State {
             ([], b'c') => {
                 let (cols, rows, history) =
                     (self.screen.cols, self.screen.rows, self.history_limit);
-                *self = Self::new(cols, rows, history);
+                *self = Self::new(cols, rows, history, self.theme);
             }
             ([b'('], b'0') => self.g0 = true,
             ([b'('], b'B' | b'A') => self.g0 = false,
             ([b')'], b'0') => self.g1 = true,
             ([b')'], b'B' | b'A') => self.g1 = false,
             ([b'#'], b'8') => {
-                self.screen.cells.fill(Style::default().cell('E', 1));
+                self.screen.cells.fill(self.theme.style().cell('E', 1));
                 self.screen.mark_all();
             }
             _ => {}
@@ -927,6 +1001,18 @@ impl Perform for State {
             && matches!(intermediates[0], b'?' | b'>' | b'<' | b'=')
         {
             self.kitty(intermediates[0], groups);
+            return;
+        }
+        if action == 'q' && intermediates == b" " {
+            let style = param(groups, 0, 0);
+            let shape = match style {
+                0..=2 => CursorShape::Block,
+                3 | 4 => CursorShape::Underline,
+                5 | 6 => CursorShape::Bar,
+                _ => return,
+            };
+            self.modes.cursor_shape = Some(shape);
+            self.modes.cursor_blink = Some(style == 0 || style % 2 == 1);
             return;
         }
         if action == 'p' && (intermediates == b"?$" || intermediates == b"$") {
@@ -1146,7 +1232,7 @@ impl Perform for State {
                         .and_then(|value| value.parse::<u16>().ok())
                         .filter(|index| *index <= 255)
                     {
-                        self.reply_color(4, Some(index), palette(index), bell_terminated);
+                        self.reply_color(4, Some(index), self.theme.color(index), bell_terminated);
                     }
                 }
             }
@@ -1162,9 +1248,9 @@ impl Perform for State {
                             command as u16,
                             None,
                             if command == 10 {
-                                DEFAULT_FG
+                                self.theme.foreground
                             } else {
-                                DEFAULT_BG
+                                self.theme.background
                             },
                             bell_terminated,
                         );
@@ -1307,14 +1393,7 @@ fn clean_text(bytes: &[u8], max: usize) -> String {
     }
     text
 }
-fn palette(index: u16) -> u32 {
-    const BASE: [u32; 16] = [
-        0x000000, 0xcd0000, 0x00cd00, 0xcdcd00, 0x0000ee, 0xcd00cd, 0x00cdcd, 0xe5e5e5, 0x7f7f7f,
-        0xff0000, 0x00ff00, 0xffff00, 0x5c5cff, 0xff00ff, 0x00ffff, 0xffffff,
-    ];
-    if index < 16 {
-        return BASE[index as usize];
-    }
+fn extended_color(index: u16) -> u32 {
     if index >= 232 {
         let level = 8 + (index.min(255) - 232) as u32 * 10;
         return level * 0x010101;

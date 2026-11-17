@@ -26,6 +26,8 @@ struct TimeSpec {
 unsafe extern "C" {
     pub fn write(fd: c_int, data: *const c_void, size: usize) -> isize;
     pub fn close(fd: c_int) -> c_int;
+    fn open(path: *const c_char, flags: c_int, ...) -> c_int;
+    fn read(fd: c_int, data: *mut c_void, size: usize) -> isize;
     pub fn poll(fds: *mut PollFd, count: usize, timeout: c_int) -> c_int;
     pub fn fcntl(fd: c_int, command: c_int, ...) -> c_int;
     pub fn getenv(name: *const c_char) -> *mut c_char;
@@ -107,6 +109,34 @@ pub fn print(fd: i32, bytes: &[u8]) {
             break;
         }
     }
+}
+
+pub fn env(name: &CStr) -> Option<&'static [u8]> {
+    // This process never mutates its environment.
+    let value = unsafe { getenv(name.as_ptr()) };
+    (!value.is_null()).then(|| unsafe { CStr::from_ptr(value).to_bytes() })
+}
+
+pub fn read_config(path: &CStr) -> Result<Vec<u8>, i32> {
+    const O_NONBLOCK: c_int = 0o4000;
+    let fd = unsafe { open(path.as_ptr(), O_NONBLOCK) };
+    if fd < 0 {
+        return Err(errno());
+    }
+    let mut bytes = Vec::new();
+    let mut buffer = [0u8; 4096];
+    let result = loop {
+        let size = unsafe { read(fd, buffer.as_mut_ptr().cast(), buffer.len()) };
+        match size {
+            0 => break Ok(bytes),
+            n if n < 0 && errno() == EINTR => continue,
+            n if n < 0 => break Err(errno()),
+            n if bytes.len() + n as usize > 65536 => break Err(27), // EFBIG
+            n => bytes.extend_from_slice(&buffer[..n as usize]),
+        }
+    };
+    unsafe { close(fd) };
+    result
 }
 
 /// Copy the inherited environment before any fork. Environment entries stay in

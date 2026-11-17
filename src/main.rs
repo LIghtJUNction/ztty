@@ -3,12 +3,14 @@
 
 extern crate alloc;
 
+mod appearance;
 mod os;
 mod x11;
 
 use alloc::ffi::CString;
 use alloc::string::String;
 use alloc::vec::Vec;
+use appearance::Appearance;
 use core::ffi::{CStr, c_char, c_int};
 use input::{Key, KeyEvent, ModifierKey, Modifiers, MouseEvent};
 use x11::{Selection, Window};
@@ -42,6 +44,7 @@ fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
 
 const HELP: &str = "ztty — a small no_std Rust terminal for Linux\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\n\
+  --config PATH        Load an appearance file\n\
   --font NAME          Fontconfig name (default: monospace:size=11)\n\
   --geometry COLSxROWS Initial character dimensions (default: 120x32)\n\
   --scrollback LINES   Maximum retained lines (default: 2000; 0 disables)\n\
@@ -53,7 +56,7 @@ Shift+drag selects while applications use the mouse; Ctrl+click opens links.\n\
 Runs on X11 and XWayland. Fonts and desktop integration use system libraries.\n";
 
 struct Config {
-    font: String,
+    appearance: Appearance,
     cols: usize,
     rows: usize,
     history: usize,
@@ -64,9 +67,11 @@ fn number(bytes: &[u8]) -> Option<usize> {
     core::str::from_utf8(bytes).ok()?.parse().ok()
 }
 
-fn config(args: &[&CStr]) -> Result<Option<Config>, &'static str> {
+fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
+    let mut config_path = None;
+    let mut font = None;
     let mut cfg = Config {
-        font: String::from("monospace:size=11"),
+        appearance: Appearance::default(),
         cols: 120,
         rows: 32,
         history: 2000,
@@ -88,23 +93,24 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, &'static str> {
             }
             b"-e" | b"--" => {
                 if i + 1 == args.len() {
-                    return Err("-e needs a command");
+                    return Err("-e needs a command".into());
                 }
                 cfg.command
                     .extend(args[i + 1..].iter().map(|s| (*s).into()));
                 break;
             }
+            b"--config" => {
+                i += 1;
+                config_path = Some(*args.get(i).ok_or("--config needs a path")?);
+            }
             b"--font" => {
                 i += 1;
-                cfg.font = String::from(
+                font = Some(
                     args.get(i)
                         .ok_or("--font needs a value")?
                         .to_str()
                         .map_err(|_| "font name is not UTF-8")?,
                 );
-                if cfg.font.len() > 1024 || cfg.font.is_empty() {
-                    return Err("font name must contain 1..1024 bytes");
-                }
             }
             b"--geometry" => {
                 i += 1;
@@ -116,7 +122,7 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, &'static str> {
                 cfg.cols = number(&text[..split]).ok_or("invalid column count")?;
                 cfg.rows = number(&text[split + 1..]).ok_or("invalid row count")?;
                 if !(2..=512).contains(&cfg.cols) || !(2..=256).contains(&cfg.rows) {
-                    return Err("geometry must be 2..512 columns by 2..256 rows");
+                    return Err("geometry must be 2..512 columns by 2..256 rows".into());
                 }
             }
             b"--scrollback" => {
@@ -128,10 +134,10 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, &'static str> {
                 )
                 .ok_or("invalid scrollback line count")?;
                 if cfg.history > 100_000 {
-                    return Err("scrollback is limited to 100000 lines");
+                    return Err("scrollback is limited to 100000 lines".into());
                 }
             }
-            _ => return Err("unknown argument; run ztty --help"),
+            _ => return Err("unknown argument; run ztty --help".into()),
         }
         i += 1;
     }
@@ -147,6 +153,10 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, &'static str> {
         } else {
             shell.into()
         });
+    }
+    cfg.appearance = Appearance::load(config_path)?;
+    if let Some(font) = font {
+        cfg.appearance.set_font(font)?;
     }
     Ok(Some(cfg))
 }
@@ -306,7 +316,7 @@ fn paste(bytes: Vec<u8>, terminal: &Terminal, queue: &mut Queue) {
 }
 
 fn run(cfg: Config) -> Result<i32, &'static str> {
-    let mut window = Window::new(cfg.cols, cfg.rows, &cfg.font)?;
+    let mut window = Window::new(cfg.cols, cfg.rows, &cfg.appearance)?;
     let (program, environment) = os::child_setup(&cfg.command[0])?;
     let arguments: Vec<&CStr> = cfg.command.iter().map(|s| s.as_c_str()).collect();
     let environment: Vec<&CStr> = environment.iter().map(|s| s.as_c_str()).collect();
@@ -323,7 +333,7 @@ fn run(cfg: Config) -> Result<i32, &'static str> {
     }
     .map_err(|_| "cannot create a PTY")?;
     let mut openers = os::Openers::new();
-    let mut terminal = Terminal::new(cfg.cols, cfg.rows, cfg.history);
+    let mut terminal = Terminal::with_theme(cfg.cols, cfg.rows, cfg.history, cfg.appearance.theme);
     let mut queue = Queue::new();
     let mut selection: Option<Selection> = None;
     let mut history = 0usize;
@@ -335,6 +345,10 @@ fn run(cfg: Config) -> Result<i32, &'static str> {
     let mut local_buttons = [false; 8];
     let mut swallowed_buttons = [false; 8];
     let mut sync_since: Option<u64> = None;
+    let mut blink_deadline = None;
+    let mut cursor_visible = true;
+    let mut last_cursor = None;
+    let mut reset_blink = false;
     let mut read_buffer = [0u8; 65536];
     let mut text_buffer = alloc::vec![0u8; 4096];
     let mut encoded = Vec::with_capacity(128);
@@ -354,6 +368,7 @@ fn run(cfg: Config) -> Result<i32, &'static str> {
                     let mut e = unsafe { event.key };
                     let code = (e.keycode as usize).min(255);
                     let press = e.kind == x11::KEY_PRESS;
+                    reset_blink |= press;
                     let symbol = if !press && held[code] != 0 {
                         held[code]
                     } else {
@@ -595,6 +610,7 @@ fn run(cfg: Config) -> Result<i32, &'static str> {
                 x11::FOCUS_IN | x11::FOCUS_OUT => {
                     let focused = unsafe { event.kind } == x11::FOCUS_IN;
                     window.focus(focused);
+                    reset_blink = true;
                     force = true;
                     if !focused {
                         held.fill(0);
@@ -655,8 +671,32 @@ fn run(cfg: Config) -> Result<i32, &'static str> {
             title.push_str(terminal.title());
             window.title(&title);
         }
-        if !terminal.modes().synchronized_output && (force || terminal.dirty()) {
-            window.render(&mut terminal, history, selection, force);
+        let modes = terminal.modes();
+        let cursor = (history == 0 && modes.cursor_visible).then(|| {
+            (
+                terminal.cursor(),
+                modes.cursor_shape.unwrap_or(cfg.appearance.cursor_shape),
+            )
+        });
+        let blinking = window.focused
+            && cursor.is_some()
+            && modes.cursor_blink.unwrap_or(cfg.appearance.cursor_blink);
+        let synchronized = modes.synchronized_output;
+        if !blinking || synchronized {
+            blink_deadline = None;
+            cursor_visible = true;
+        } else if blink_deadline.is_none() || reset_blink || cursor != last_cursor {
+            blink_deadline = Some(now + cfg.appearance.cursor_blink_interval);
+            cursor_visible = true;
+        } else if blink_deadline.is_some_and(|deadline| deadline <= now) {
+            blink_deadline = Some(now + cfg.appearance.cursor_blink_interval);
+            cursor_visible = !cursor_visible;
+        }
+        last_cursor = cursor;
+        reset_blink = false;
+        let cursor = cursor.filter(|_| cursor_visible);
+        if !synchronized && (force || terminal.dirty() || window.cursor_changed(cursor)) {
+            window.render(&mut terminal, history, selection, force, cursor);
             force = false;
         }
         let _ = pty.reap();
@@ -675,8 +715,8 @@ fn run(cfg: Config) -> Result<i32, &'static str> {
         ];
         let timeout = if unsafe { x11::XPending(window.display) } != 0 {
             0
-        } else if let Some(start) = sync_since {
-            150u64.saturating_sub(os::milliseconds().saturating_sub(start)) as i32
+        } else if let Some(deadline) = sync_since.map(|start| start + 150).or(blink_deadline) {
+            deadline.saturating_sub(os::milliseconds()) as i32
         } else {
             -1
         };
@@ -744,7 +784,13 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
         .iter()
         .map(|&ptr| unsafe { CStr::from_ptr(ptr) })
         .collect();
-    let result = config(&args).and_then(|cfg| if let Some(cfg) = cfg { run(cfg) } else { Ok(0) });
+    let result = config(&args).and_then(|cfg| {
+        if let Some(cfg) = cfg {
+            run(cfg).map_err(String::from)
+        } else {
+            Ok(0)
+        }
+    });
     match result {
         Ok(status) => status,
         Err(message) => {

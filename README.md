@@ -4,7 +4,7 @@ A lean terminal for Linux, written in Rust without the Rust standard library.
 
 ztty runs real shells and terminal applications through a Linux PTY. Its screen
 engine and input protocols are independent libraries; the desktop frontend uses
-the system X11 and Xft libraries. The visual design is deliberately quiet: a dark
+the system X11, Xft, and Xrender libraries. The visual design is deliberately quiet: a dark
 background, readable text, generous padding, and no application toolbar.
 
 The long-term goal is to exceed Kitty and Ghostty in responsiveness and memory
@@ -18,17 +18,16 @@ Linux terminal with an explicit compatibility boundary.
 
 ## Build and run
 
-Requirements: Linux, Rust 1.100.0, a C linker, X11/Xft development libraries, and a
+Requirements: Linux, Rust 1.100.0, a C linker, X11/Xft/Xrender development libraries, and a
 monospace font. The X11 frontend can also run through XWayland on Wayland desktops.
-Automated GUI acceptance currently uses Xvfb/X11 on x86_64; a real XWayland
-session and IBus/Fcitx input-method sessions have not yet been accepted.
+Automated GUI acceptance uses Xvfb/X11 on x86_64.
 
 ```sh
 # Arch Linux
-sudo pacman -S --needed base-devel libx11 libxft fontconfig
+sudo pacman -S --needed base-devel libx11 libxft libxrender fontconfig
 
 # Debian / Ubuntu
-sudo apt install build-essential libx11-dev libxft-dev libfontconfig1-dev
+sudo apt install build-essential libx11-dev libxft-dev libxrender-dev libfontconfig1-dev
 
 cargo build --locked --release
 ./target/release/ztty
@@ -40,6 +39,43 @@ cargo build --locked --release
 Set `PREFIX` to choose another location. The default shell comes from `SHELL`,
 with `/bin/sh` as the fallback. Child sessions receive `TERM=xterm-256color`,
 `COLORTERM=truecolor`, and `TERM_PROGRAM=ztty`.
+
+## Appearance
+
+Edit `$XDG_CONFIG_HOME/ztty/ztty.conf` (default `~/.config/ztty/ztty.conf`),
+or choose a file with `ztty --config PATH`. Settings take effect on the next
+launch. Omitted keys use the built-in defaults and `--font` overrides the file.
+Use UTF-8, one `key = value` per line, and whole-line comments starting with `#`.
+
+```ini
+font = monospace:size=11
+window-padding = 16
+background = #161a23
+foreground = #e1e7f0
+background-opacity = 92
+background-blur = true
+cursor-shape = underline
+cursor-color = #b1ccff
+cursor-blink = true
+cursor-blink-interval = 500
+selection-foreground = #f0f4fa
+selection-background = #394969
+# Optional ANSI palette overrides, one line per index from 0 through 15.
+palette = 1=#e06c75
+palette = 4=#61afef
+```
+
+Padding is in pixels (0–128), opacity is a percentage (0–100), and the blink
+interval is the duration of each phase in milliseconds (100–5000). Cursor
+shapes are `block`, `underline`, and `bar`. Applications can change the active
+shape and blink mode through DECSCUSR and DEC private mode 12.
+
+Opacity affects the default background. Explicit ANSI backgrounds, selected
+text, and glyph colors keep their own opacity. Blur requires a compositor.
+`background-blur` controls the KWin-compatible X11 blur request. Compositors
+with their own rules, including Hyprland, apply their configured blur policy
+to transparent windows. Set opacity to 100 for a fully opaque window on any
+desktop.
 
 ## Controls
 
@@ -90,7 +126,7 @@ See [the release record](docs/releasing.md) for the verified publication state.
 All production Rust crates use `#![no_std]`. The libraries use `alloc` where
 variable storage is necessary, with the allocator supplied by their host.
 Normal dependencies have default features disabled. The GUI links system C ABI
-libraries (`libc`, `libutil`, `X11`, `Xft`, and the compiler unwinder); those are
+libraries (`libc`, `libutil`, `X11`, `Xft`, `Xrender`, and the compiler unwinder); those are
 listed separately from the Rust dependency graph. Development tests and
 benchmark runners use `std`.
 
@@ -121,7 +157,8 @@ Kitty graphics, OSC 52 clipboard access, complex text shaping / full emoji ZWJ
 layout, and history reflow are future work. Resizing preserves and crops existing
 rows; shrinking vertically keeps the cursor visible and retains displaced main
 screen rows in history. Italic attributes are retained by the core; the initial
-renderer uses the selected font face. Blink attributes do not schedule timers.
+renderer uses the selected font face. Text blink attributes are not animated.
+Cursor blinking is independent and runs only while the visible cursor is focused.
 
 Capability replies advertise the implemented subset. Image support and complete
 Kitty/Ghostty feature parity are not claimed.

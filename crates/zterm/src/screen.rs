@@ -10,6 +10,8 @@ pub const UNDERLINE: u16 = 8;
 pub const INVERSE: u16 = 16;
 pub const STRIKE: u16 = 32;
 pub const HIDDEN: u16 = 64;
+/// The background was selected by an SGR color sequence.
+pub const EXPLICIT_BG: u16 = 128;
 
 /// A character cell. A wide glyph's trailing cell has `width == 0`.
 /// Two combining scalars are stored inline, without per-cell allocations.
@@ -77,7 +79,9 @@ impl Style {
     pub fn blank(self) -> Cell {
         // Erased cells retain the current background, never a hyperlink.
         Cell {
+            fg: self.fg,
             bg: self.bg,
+            flags: self.flags & EXPLICIT_BG,
             ..Cell::BLANK
         }
     }
@@ -97,6 +101,7 @@ pub(crate) struct Screen {
     pub cols: usize,
     pub rows: usize,
     pub cells: Vec<Cell>,
+    pub blank: Cell,
     pub row0: usize,
     pub x: usize,
     pub y: usize,
@@ -112,11 +117,13 @@ pub(crate) struct Screen {
 }
 
 impl Screen {
-    pub fn new(cols: usize, rows: usize) -> Self {
+    pub fn new(cols: usize, rows: usize, style: Style) -> Self {
+        let blank = style.blank();
         Self {
             cols,
             rows,
-            cells: vec![Cell::BLANK; cols * rows],
+            cells: vec![blank; cols * rows],
+            blank,
             row0: 0,
             x: 0,
             y: 0,
@@ -125,7 +132,10 @@ impl Screen {
             top: 0,
             bottom: rows - 1,
             origin: false,
-            saved: SavedCursor::default(),
+            saved: SavedCursor {
+                style,
+                ..SavedCursor::default()
+            },
             keyboard: 0,
             keyboard_stack: [0; 32],
             keyboard_depth: 0,
@@ -222,7 +232,7 @@ impl Screen {
         // Keep the cursor's row visible when shrinking vertically. The owner
         // records any discarded primary-screen rows in scrollback first.
         let dropped = self.y.saturating_add(1).saturating_sub(rows);
-        let mut cells = vec![Cell::BLANK; cols * rows];
+        let mut cells = vec![self.blank; cols * rows];
         for y in 0..rows.min(self.rows - dropped) {
             let count = cols.min(self.cols);
             cells[y * cols..y * cols + count].copy_from_slice(&self.row(y + dropped)[..count]);
@@ -240,7 +250,7 @@ impl Screen {
         self.bottom = rows - 1;
         self.dirty = vec![true; rows];
         for y in 0..rows {
-            self.repair_row(y, Cell::BLANK);
+            self.repair_row(y, self.blank);
         }
     }
 }
