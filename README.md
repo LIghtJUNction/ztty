@@ -1,23 +1,47 @@
 # ztty
 
-A lean terminal for Linux, written in Rust without the Rust standard library.
+A lean native terminal, written in Rust without the Rust standard library.
 
-ztty runs real shells and terminal applications through a Linux PTY. Its screen
-engine and input protocols are independent libraries; the desktop frontend uses
-the system X11, Xft, and Xrender libraries. The visual design is deliberately quiet: a dark
-background, readable text, generous padding, and no application toolbar.
+ztty runs shells and terminal applications through the operating system's
+pseudo-terminal interface. Version 0.2 adds native macOS and Windows backends and
+static Kitty Graphics Protocol support. Screen state, input encoding, PTY
+ownership, and image processing are reusable libraries. The visual design is
+deliberately quiet: a dark background, readable text, generous padding, and no
+application toolbar.
 
-Multiple windows automatically share one session process, display connection
+On Linux, multiple windows automatically share one session process, display connection
 and font cache. Each window keeps its own PTY, screen and history. In the
-recorded eight-window comparison, total ztty PSS fell from 47.021 to 15.366 MiB,
+recorded pre-graphics eight-window comparison, total ztty PSS fell from 47.021 to 15.366 MiB,
 including the waiting launchers. The single-window case rose by 0.539 MiB.
 See [measurement conditions and graphics-memory accounting](docs/performance.md#multiple-window-memory).
 
+The long-term goal is to exceed Kitty and Ghostty in responsiveness and memory
+efficiency. Current measurements, their scope, and remaining work are documented
+in [the performance report](docs/performance.md). Linux remains the first
+acceptance target; the platform table records what has actually been exercised.
+
 [中文介绍](README.zh-CN.md)
 
-![Actual ztty protocol preview](docs/assets/ztty-preview.png)
+![Actual ztty window displaying a photo and transparent PNG in Hyprland/XWayland](docs/assets/kitty-graphics-hyprland.png)
 
-## Install
+## Platforms and verification
+
+Shared sessions, attach, and MCP currently use the Linux broker. Native macOS
+and Windows terminals remain available through their platform backends.
+
+| Platform | Native implementation | Current acceptance status |
+| --- | --- | --- |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | 12 GUI checks and 7 graphics checks passed under Xvfb; actual `kitten icat` photo, transparent PNG, and automatic transport detection passed in Hyprland/XWayland |
+| macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | 8 native session/protocol checks passed on Intel and Apple Silicon; pixel readback and IME/keyboard acceptance remain open |
+| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | 17 native checks passed on x86_64, including real ConPTY, window-pixel readback, and keyboard recovery |
+
+The macOS and Windows backends use their native APIs. macOS does not require
+X11, and Windows does not require WSL. Cross-target compilation does not establish
+runtime or visual correctness. See [protocol acceptance](docs/protocols.md#acceptance-coverage)
+and [the release record](docs/releasing.md) for the verified scope and available
+artifacts.
+
+## Install on Linux
 
 The examples below describe the current source tree. Release downloads follow
 the latest published tag; build from source for unreleased changes.
@@ -30,14 +54,15 @@ curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/insta
 sh install.sh
 ```
 
-The script verifies the archive and installs to `~/.local/bin`. The binary
-requires glibc, X11, Xft, and Xrender. Native macOS and Windows builds are planned.
+The script installs the latest published release, verifies its archive, and
+installs to `~/.local/bin`. The Linux binary requires glibc, X11, Xft, and Xrender.
+The working tree may contain changes that have not yet reached that release.
 
 ## Build and run
 
-Requirements: Linux, Rust 1.100.0, a C linker, X11/Xft/Xrender development libraries, and a
-monospace font. The X11 frontend can also run through XWayland on Wayland desktops.
-Automated GUI acceptance uses Xvfb/X11 on x86_64.
+The toolchain is Rust 1.100.0. On Linux, also install a C linker, X11/Xft/Xrender
+development libraries, and a monospace font. The X11 frontend can run through
+XWayland on Wayland desktops.
 
 ```sh
 # Arch Linux
@@ -53,13 +78,45 @@ cargo build --locked --release
 ```
 
 `make install` installs the executable and desktop entry under `~/.local`.
-Set `PREFIX` to choose another location. The default shell comes from `SHELL`,
-with `/bin/sh` as the fallback. Child sessions receive `TERM=xterm-256color`,
-`COLORTERM=truecolor`, and `TERM_PROGRAM=ztty`.
+Set `PREFIX` to choose another location. Linux and macOS use `SHELL`, with
+`/bin/sh` as the fallback; Windows uses `COMSPEC`, falling back to `cmd.exe`.
+Use `-e` to select a different command. Child sessions receive
+`TERM=xterm-256color`, `COLORTERM=truecolor`, and `TERM_PROGRAM=ztty`.
 
-## Shared sessions and MCP
+macOS builds link AppKit, CoreText, CoreGraphics, and the Darwin runtime.
+Windows builds use the Win32 APIs and ConPTY. The Windows packaging path includes
+a pinned Microsoft ConPTY redistribution; `zpty` can also use the Windows inbox
+API. The [PTY documentation](crates/zpty/README.md) explains the operating-system
+requirements and lifetime differences. Native packaging and acceptance commands
+are maintained in [the release workflow](.github/workflows/release.yml).
 
-Run several terminals normally; resource sharing is automatic:
+## Inline images
+
+Run an existing Kitty-compatible tool inside ztty to display static images:
+
+```sh
+kitten icat --scale-up photo.jpg
+kitten icat transparent.png
+```
+
+The tool decodes a JPEG before transmission; ztty accepts inline PNG, RGB, or
+RGBA data. Automatic detection selects inline `stream` transmission; it can also
+be selected explicitly with `--transfer-mode=stream`. File and shared-memory transports
+are outside this version's scope. Capability queries, compressed and chunked
+uploads, image IDs, placements, source cropping, scaling, alpha blending, and
+deletion are implemented. Images follow terminal scrolling, and the primary and
+alternate screens keep separate image scenes.
+
+The Linux graphics suite sends data through a real PTY and reads window pixels.
+It checks colors, transparent edges, clipping, image replacement, scrolling,
+resize, alternate-screen isolation, deletion, and recovery after invalid input.
+Its final check runs `kitten icat` 0.50 on a photo and a transparent PNG.
+See [the graphics protocol scope](docs/protocols.md#kitty-graphics) for limits
+and deferred features.
+
+## Shared sessions and MCP (Linux)
+
+On Linux, run several terminals normally; resource sharing is automatic:
 
 ```sh
 ztty --name work -e /bin/bash &
@@ -94,8 +151,11 @@ client setup and bounded UTF-8 output cursors.
 
 ## Appearance
 
-Edit `$XDG_CONFIG_HOME/ztty/ztty.conf` (default `~/.config/ztty/ztty.conf`),
-or choose a file with `ztty --config PATH`. Settings take effect on the next
+Linux uses `$XDG_CONFIG_HOME/ztty/ztty.conf`, defaulting to
+`~/.config/ztty/ztty.conf`. macOS defaults to
+`~/Library/Application Support/ztty/ztty.conf` and accepts the same explicit
+`XDG_CONFIG_HOME` override. Windows uses `%APPDATA%\ztty\ztty.conf`.
+Choose another file with `ztty --config PATH`. Settings take effect on the next
 launch. Omitted keys use the built-in defaults and `--font` overrides the file.
 Use UTF-8, one `key = value` per line, and whole-line comments starting with `#`.
 
@@ -122,14 +182,15 @@ interval is the duration of each phase in milliseconds (100–5000). Cursor
 shapes are `block`, `underline`, and `bar`. Applications can change the active
 shape and blink mode through DECSCUSR and DEC private mode 12.
 
-Opacity affects the default background. Explicit ANSI backgrounds, selected
-text, and glyph colors keep their own opacity. Blur requires a compositor.
-`background-blur` controls the KWin-compatible X11 blur request. Compositors
-with their own rules, including Hyprland, apply their configured blur policy
-to transparent windows. Set opacity to 100 for a fully opaque window on any
-desktop.
+On Linux, opacity affects the default background. Explicit ANSI backgrounds,
+selected text, and glyph colors keep their own opacity. Blur requires a
+compositor. `background-blur` controls the KWin-compatible X11 blur request.
+Compositors with their own rules, including Hyprland, apply their configured blur policy
+to transparent windows. Set opacity to 100 for an opaque Linux window. macOS
+uses a native visual-effect view for blur; Windows currently renders an opaque
+GDI surface. Appearance parity across the three backends has not been validated.
 
-## Controls
+## Linux controls
 
 | Action | Control |
 | --- | --- |
@@ -153,34 +214,45 @@ ESC and non-text controls are removed before bracketed-paste wrapping.
 Each package has its own manifest, license, documentation, and public API. They
 can be used without the graphical application.
 
-| Package | Responsibility | Rust dependencies |
-| --- | --- | --- |
-| [zinput](crates/zinput) | Legacy / Kitty keyboard, mouse, focus, and paste encoding | None |
-| [zpty](crates/zpty) | Linux nonblocking PTY and explicit child lifecycle | None |
-| [zterm](crates/zterm) | Screen, scrollback, VT state, queries, and damage tracking | zinput, zvte, unicode-width |
-| [zvte](https://github.com/LIghtJUNction/zvte) | Allocation-free streaming ANSI/VT parser | None |
+| Package | Source version | Responsibility | Direct Rust dependencies |
+| --- | --- | --- | --- |
+| [zinput](crates/zinput) | 0.1.0 | Legacy / Kitty keyboard, mouse, focus, and paste encoding | None |
+| [zpty](crates/zpty) | 0.2.0 | Linux/macOS PTY, Windows ConPTY, explicit child lifecycle | None |
+| [zterm](crates/zterm) | 0.2.0 | Screen, scrollback, VT state, image anchoring, queries, damage | zinput, zvte, zgraphics, unicode-width |
+| [zgraphics](crates/zgraphics) | 0.1.0 | Bounded Kitty graphics, PNG/RGB/RGBA decoding, image storage and placement | zune-core, zune-png, zune-inflate |
+| [zvte](https://github.com/LIghtJUNction/zvte) | 0.1.3 | Allocation-free streaming ANSI/VT parser | None |
+
+The reusable packages are available from crates.io:
 
 ```sh
 cargo add zinput@0.1.0 --no-default-features
-cargo add zpty@0.1.0 --no-default-features
-cargo add zterm@0.1.0 --no-default-features
+cargo add zgraphics@0.1.0 --no-default-features
+cargo add zpty@0.2.0 --no-default-features
+cargo add zterm@0.2.0 --no-default-features
 # For applications that need only the parser:
 cargo add zvte@0.1.3 --no-default-features
 ```
 
 [`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0),
-[`zpty 0.1.0`](https://crates.io/crates/zpty/0.1.0), and
-[`zterm 0.1.0`](https://crates.io/crates/zterm/0.1.0) are published.
-All three passed individual and combined consumers using exact registry versions
-outside this workspace, including a real PTY session.
+[`zgraphics 0.1.0`](https://crates.io/crates/zgraphics/0.1.0),
+[`zpty 0.2.0`](https://crates.io/crates/zpty/0.2.0), and
+[`zterm 0.2.0`](https://crates.io/crates/zterm/0.2.0) are published.
+All four packages passed individual and combined consumers using exact
+registry versions outside this workspace, including a real PTY session.
 See [the release record](docs/releasing.md) for the verified publication state.
 
-All production Rust crates use `#![no_std]`. The libraries use `alloc` where
-variable storage is necessary, with the allocator supplied by their host.
-Normal dependencies have default features disabled. The GUI links system C ABI
-libraries (`libc`, `libutil`, `X11`, `Xft`, `Xrender`, and the compiler unwinder); those are
-listed separately from the Rust dependency graph. Development tests and
-benchmark runners use `std`.
+Production Rust compiles without `std`. The Project Z crates use `#![no_std]`;
+the PNG, DEFLATE, checksum, and Unicode-width dependencies are selected with
+their `no_std` feature configuration. All direct normal dependencies disable
+default features. The libraries use `alloc` where variable storage is necessary,
+with the allocator supplied by their host. `zgraphics` uses shared immutable
+pixel buffers and requires pointer-width atomics.
+
+Native platform libraries remain part of the runtime: X11/Xft/Xrender and the C
+runtime on Linux, Apple frameworks on macOS, and Win32/ConPTY on Windows. They
+are accounted for separately from the Rust dependency graph. Tests and benchmark
+runners use `std`. [The dependency audit](tools/check_no_std.py) checks the
+enabled production feature graph.
 
 ## Terminal behavior
 
@@ -193,27 +265,33 @@ benchmark runners use `std`.
 - SGR and legacy mouse reports, focus events, bracketed paste, and synchronized
   output with a 150 ms recovery timeout.
 - OSC 0/2 titles, OSC 7 working-directory metadata, OSC 8 hyperlinks, palette
-  queries, DSR, DA, DECRQM, and a bounded subset of XTGETTCAP.
-- XIM input, font fallback, selection, clipboard/primary selection, and INCR
-  clipboard reception.
+  queries, character/cell/pixel size reports, DSR, DA, DECRQM, and a bounded
+  subset of XTGETTCAP.
+- Static Kitty graphics with bounded image storage and transfer buffers.
+- On Linux: XIM input, font fallback, selection, clipboard/primary selection,
+  and INCR clipboard reception.
 
 The screen model stores 28 bytes per cell on the tested x86_64 target. Full-screen
 scrolling rotates row indices; retained history grows lazily, is limited to
-8 MiB of cells, and reuses old rows once full. The event loop sleeps in `poll`
-when idle and redraws damaged rows.
+8 MiB of cells, and reuses old rows once full. The Linux event loop waits in
+`poll` and redraws damaged rows. Image storage is separate and allocated only
+when images are received; its quotas are documented in
+[the architecture](docs/architecture.md#image-lifecycle-and-memory).
 
 ## Current boundaries
 
-This release uses X11/XWayland. Native Wayland, a dedicated GPU renderer, Sixel,
-Kitty graphics, OSC 52 clipboard access, complex text shaping / full emoji ZWJ
-layout, and history reflow are future work. Resizing preserves and crops existing
-rows; shrinking vertically keeps the cursor visible and retains displaced main
-screen rows in history. Italic attributes are retained by the core; the initial
-renderer uses the selected font face. Text blink attributes are not animated.
+The Linux backend uses X11/XWayland. Native Wayland, a dedicated GPU renderer,
+Sixel, Kitty file/shared-memory transport and animation, OSC 52 clipboard access,
+complex text shaping / full emoji ZWJ layout, and history reflow are future work.
+Kitty Unicode placeholders and relative placements are also deferred.
+Resizing preserves and crops existing rows; shrinking vertically keeps the
+cursor visible and retains displaced main-screen rows in history. Italic
+attributes are retained by the core; the Linux renderer uses the selected font
+face. Text blink attributes are not animated.
 Cursor blinking is independent and runs only while the visible cursor is focused.
 
-Capability replies advertise the implemented subset. Image support and complete
-Kitty/Ghostty feature parity are not claimed.
+Capability replies advertise the implemented subset. Static images are supported;
+complete Kitty/Ghostty feature parity and a performance lead remain goals.
 
 ## Verify
 
@@ -226,6 +304,7 @@ python3 tests/gui_smoke.py --binary ./target/release/ztty
 python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
 python3 tests/mcp_transport.py --binary ./target/release/ztty
 python3 tests/mcp_sessions.py --binary ./target/release/ztty
+python3 tests/graphics_smoke.py --binary ./target/release/ztty
 # Optional: real Fcitx 5 XIM with the Pinyin addon and a private D-Bus session.
 python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 python3 tools/verify_registry.py
@@ -235,10 +314,14 @@ rustup target add x86_64-unknown-none
 ZTTY_BARE_METAL=1 sh tools/check.sh
 ```
 
-The GUI test starts its own Xvfb session and uses real X11 input, clipboard,
-resize, PTY, and frame presentation paths. It requires Xvfb, python-xlib, and
-Pillow. It leaves the current desktop session untouched and produces a JSON
-result plus a screenshot under `artifacts/`.
+The Linux GUI and graphics tests start their own Xvfb sessions and use real
+X11 input, clipboard, resize, PTY, and frame presentation paths. They require
+Xvfb, python-xlib, and Pillow; the graphics suite also requires `kitten`.
+They leave the current desktop session untouched and write JSON results and
+screenshots under `artifacts/`. The native macOS and Windows gates are
+[macos_smoke.py](tests/macos_smoke.py) and
+[windows_native.py](tests/windows_native.py). Their recorded results and remaining
+acceptance gaps are listed in [protocol acceptance](docs/protocols.md#acceptance-coverage).
 
 See [architecture](docs/architecture.md), [protocol references](docs/protocols.md),
 and [release instructions](docs/releasing.md).

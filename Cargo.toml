@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/zinput", "crates/zpty", "crates/zterm"]
+members = ["crates/zinput", "crates/zpty", "crates/zterm", "crates/zgraphics"]
 resolver = "3"
 
 [workspace.package]
@@ -18,7 +18,7 @@ rust-version.workspace = true
 license.workspace = true
 authors.workspace = true
 repository.workspace = true
-description = "A lean no_std Rust terminal for Linux, built on Project Z"
+description = "A lean native no_std Rust terminal with Kitty graphics, built on Project Z"
 readme = "README.md"
 categories = ["command-line-utilities", "no-std"]
 keywords = ["terminal", "linux", "no-std", "x11", "pty"]
@@ -30,8 +30,8 @@ test = false
 bench = false
 
 [dependencies]
-zterm = { path = "crates/zterm", version = "0.1.0", default-features = false }
-zpty = { path = "crates/zpty", version = "0.1.0", default-features = false }
+zterm = { path = "crates/zterm", version = "0.2.0", default-features = false }
+zpty = { path = "crates/zpty", version = "0.2.0", default-features = false }
 
 [profile.dev]
 panic = "abort"

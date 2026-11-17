@@ -1,0 +1,99 @@
+{
+  "schema": 2,
+  "verified_at": "2026-11-17T20:13:22.939589+00:00",
+  "source": "crates.io API and downloaded Cargo registry archives",
+  "packages": [
+    {
+      "name": "zinput",
+      "version": "0.1.0",
+      "checksum": "dc155bb3eff182f026daf325f0cf709f0b0e8fdf334ffdf62a9532f3c4bb5c81",
+      "created_at": "2026-11-17T13:50:38.487831Z",
+      "yanked": false,
+      "published_by": {
+        "id": 367539,
+        "login": "LIghtJUNction",
+        "name": "LIghtJUNction",
+        "avatar": "https://avatars.githubusercontent.com/u/106986785?v=4",
+        "url": "https://github.com/LIghtJUNction",
+        "github_username_matches": true,
+        "created_at": "2022-06-06T15:48:15Z"
+      },
+      "vcs": {
+        "git": {
+          "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+        },
+        "path_in_vcs": "crates/zinput"
+      },
+      "consumer_passed": true
+    },
+    {
+      "name": "zgraphics",
+      "version": "0.1.0",
+      "checksum": "7cc7b3779e8e4ef10ffb582c39bd8910ab0a82d25a2b08f43a684572f112ee6e",
+      "created_at": "2026-11-17T20:03:59.978498Z",
+      "yanked": false,
+      "published_by": {
+        "id": 367539,
+        "login": "LIghtJUNction",
+        "name": "LIghtJUNction",
+        "avatar": "https://avatars.githubusercontent.com/u/106986785?v=4",
+        "url": "https://github.com/LIghtJUNction",
+        "github_username_matches": true,
+        "created_at": "2022-06-06T15:48:15Z"
+      },
+      "vcs": {
+        "git": {
+          "sha1": "4b3829a0754643e0ff080772db9a1c1886c1fa12"
+        },
+        "path_in_vcs": "crates/zgraphics"
+      },
+      "consumer_passed": true
+    },
+    {
+      "name": "zpty",
+      "version": "0.2.0",
+      "checksum": "1fb386d8debaaefd52f552d238e20292994bd8c149278d5ed57eb7ecddc399ba",
+      "created_at": "2026-11-17T20:03:23.806315Z",
+      "yanked": false,
+      "published_by": {
+        "id": 367539,
+        "login": "LIghtJUNction",
+        "name": "LIghtJUNction",
+        "avatar": "https://avatars.githubusercontent.com/u/106986785?v=4",
+        "url": "https://github.com/LIghtJUNction",
+        "github_username_matches": true,
+        "created_at": "2022-06-06T15:48:15Z"
+      },
+      "vcs": {
+        "git": {
+          "sha1": "4b3829a0754643e0ff080772db9a1c1886c1fa12"
+        },
+        "path_in_vcs": "crates/zpty"
+      },
+      "consumer_passed": true
+    },
+    {
+      "name": "zterm",
+      "version": "0.2.0",
+      "checksum": "b30360ffc9bd7dccd2c79f0a9e2ddd562430eae3ce28d47dca90de2d02cc7fdf",
+      "created_at": "2026-11-17T20:07:01.409552Z",
+      "yanked": false,
+      "published_by": {
+        "id": 367539,
+        "login": "LIghtJUNction",
+        "name": "LIghtJUNction",
+        "avatar": "https://avatars.githubusercontent.com/u/106986785?v=4",
+        "url": "https://github.com/LIghtJUNction",
+        "github_username_matches": true,
+        "created_at": "2022-06-06T15:48:15Z"
+      },
+      "vcs": {
+        "git": {
+          "sha1": "7535aa29f1a2728a78a446ffea6784dcbc2aae92"
+        },
+        "path_in_vcs": "crates/zterm"
+      },
+      "consumer_passed": true
+    }
+  ]
+}

@@ -24,7 +24,14 @@ def main():
         targets = [t for t in package["targets"] if "lib" in t["kind"] or "bin" in t["kind"]]
         for target in targets:
             source = pathlib.Path(target["src_path"]).read_text()
-            assert re.search(r"#!\[no_std\]", source), target["src_path"]
+            unconditional = re.search(r"#!\[no_std\]", source)
+            conditional = re.search(
+                r'#!\[cfg_attr\(not\(feature\s*=\s*"std"\),\s*no_std\)\]', source
+            )
+            # The feature graph above proves the condition for dependency
+            # crates that offer std as an optional feature. Bare-metal cargo
+            # check additionally verifies the complete portable dependency graph.
+            assert unconditional or conditional, target["src_path"]
         for dep in node["deps"]:
             if any(kind["kind"] is None for kind in dep["dep_kinds"]):
                 pending.append(dep["pkg"])

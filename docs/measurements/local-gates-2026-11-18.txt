@@ -1,0 +1,197 @@
+Source: 7535aa29f1a2728a78a446ffea6784dcbc2aae92
+Linux binary SHA256: 08c64f4cb59ef2fb330b7615bfefd975901c4e75221501a7059b4c007c47a471
+[
+  {
+    "command": [
+      "cargo",
+      "clippy",
+      "--workspace",
+      "--all-targets",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--lib",
+      "--locked"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--doc",
+      "--locked"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "cargo",
+      "check",
+      "-p",
+      "zinput",
+      "-p",
+      "zgraphics",
+      "-p",
+      "zterm",
+      "--target",
+      "x86_64-unknown-none",
+      "--locked"
+    ],
+    "exit_code": 0
+  }
+]
+
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.06s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s
+     Running unittests src/lib.rs (target/debug/build/zgraphics/9c72335f18633719/out/zgraphics-9c72335f18633719)
+
+running 23 tests
+test tests::chunked_rgba_is_atomic_and_uses_final_cursor_position ... ok
+test tests::crop_aspect_ratio_letterboxing_and_metric_resize ... ok
+test tests::compressed_rgb_decodes_and_wrong_dimensions_fail ... ok
+test tests::failed_combined_transmission_does_not_evict_or_replace_valid_images ... ok
+test tests::feature_query_is_honest_and_does_not_cancel_pending_transfer ... ok
+test tests::invalid_chunks_abort_but_leave_existing_images_untouched ... ok
+test tests::deletion_frees_only_selected_unreferenced_images ... ok
+test tests::limits_bound_transfer_store_and_placement_counts ... ok
+test tests::numbers_allocate_unique_ids_and_delete_newest_only ... ok
+test tests::query_decodes_without_storing_or_replacing_an_image ... ok
+test tests::malformed_base64_is_rejected_without_partial_append ... ok
+test tests::partial_scroll_does_not_move_unaffected_placements ... ok
+test tests::invalid_png_crc_truncation_and_bombs_are_rejected ... ok
+test tests::quiet_modes_and_response_queue_are_bounded ... ok
+test tests::png_formats_decode_to_straight_rgba ... ok
+test tests::retained_pixels_outlive_scene_deletion_without_copying ... ok
+test tests::replacement_and_placement_ids_follow_lifecycle ... ok
+test tests::padded_and_unpadded_final_base64_decode_identically ... ok
+test tests::scroll_keeps_images_in_history_and_trims_expired_placements ... ok
+test tests::streamed_m_flags_quiet_errors_and_transfer_limit_are_preserved ... ok
+test tests::malformed_png_headers_with_valid_checksums_remain_recoverable ... ok
+test tests::current_icat_128k_chunks_can_repeat_action_and_quiet_on_continuations ... ok
+test tests::large_single_apc_like_icat_streams_with_bounded_staging_and_unpadded_tail ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/build/zinput/a9b8707fefb6d40e/out/zinput-a9b8707fefb6d40e)
+
+running 10 tests
+test tests::clipboard_cannot_inject_a_bracket_end_or_control_keys ... ok
+test tests::focus_and_reusable_buffer_append ... ok
+test tests::ime_commits_are_never_truncated_or_discarded ... ok
+test tests::kitty_alternate_keys_and_complete_associated_text ... ok
+test tests::kitty_disambiguates_without_breaking_reset_keys ... ok
+test tests::kitty_event_reporting_and_release_exceptions ... ok
+test tests::legacy_text_control_and_application_cursor ... ok
+test tests::modifier_keys_keypad_and_lock_state ... ok
+test tests::sgr_encoding_does_not_itself_enable_tracking ... ok
+test tests::tracking_modes_filter_motion_and_legacy_coordinates_are_bounded ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/build/zpty/cbe701f1c1b83fa2/out/zpty-cbe701f1c1b83fa2)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/build/zterm/3b7b08a43a1b3beb/out/zterm-3b7b08a43a1b3beb)
+
+running 39 tests
+test tests::alternate_screen_restores_primary_cursor_style_and_content ... ok
+test tests::ascii_batch_overwrites_complete_wide_glyphs_and_handles_the_last_column ... ok
+test tests::ascii_delayed_wrap_and_carriage_return ... ok
+test tests::ascii_batch_repairs_both_wide_boundaries_without_touching_other_glyphs ... ok
+test tests::damage_tracking_marks_changed_rows_and_cursor_rows ... ok
+test tests::cell_storage_has_no_heap_pointer_and_is_compact ... ok
+test tests::erase_half_of_wide_character_clears_both_halves ... ok
+test tests::graphics_cursor_policy_and_reset_generation_are_stable ... ok
+test tests::graphics_dispatch_cancels_previous_osc_and_dcs_without_text_leakage ... ok
+test tests::graphics_follow_scroll_resize_alternate_screen_and_deletion ... ok
+test tests::graphics_query_precedes_device_attributes_and_reports_actual_cell_size ... ok
+test tests::history_is_bounded_and_view_orders_oldest_to_newest ... ok
+test tests::hyperlink_survives_closure_sgr_reset_and_scroll ... ok
+test tests::incomplete_graphics_transfers_do_not_consume_following_text ... ok
+test tests::insert_delete_characters_and_lines_are_bounded ... ok
+test tests::icat_probe_finishes_on_da1_without_advertising_additional_capabilities ... ok
+test tests::kitty_keyboard_flags_and_stacks_are_screen_local ... ok
+test tests::mouse_encoding_and_tracking_modes_are_independent ... ok
+test tests::origin_mode_coordinates_and_cursor_report_follow_margins ... ok
+test tests::kitty_graphics_framing_is_independent_of_every_pty_chunk_boundary ... ok
+test tests::osc_color_queries_reply_with_resolved_rgb_and_valid_indices ... ok
+test tests::overflowing_osc_is_rejected_as_a_whole ... ok
+test tests::repeated_alternate_screen_enable_keeps_primary_saved_state ... ok
+test tests::resize_in_alternate_screen_preserves_primary_cursor_and_history ... ok
+test tests::missing_st_unknown_apc_and_oversize_apc_recover_on_cancellation ... ok
+test tests::resize_keeps_the_cursor_row_and_moves_discarded_rows_into_history ... ok
+test tests::resize_preserves_cells_and_removes_split_wide_glyph ... ok
+test tests::scroll_region_preserves_outside_rows_and_does_not_enter_history ... ok
+test tests::semicolons_in_osc_metadata_are_preserved ... ok
+test tests::sgr_supports_indexed_rgb_and_colon_forms ... ok
+test tests::sync_output_and_mode_queries_report_actual_state ... ok
+test tests::tabs_and_dec_line_drawing_work_without_allocated_glyphs ... ok
+test tests::terminal_capability_queries_reject_unknown_names ... ok
+test tests::wide_character_wraps_before_last_column ... ok
+test tests::wide_glyphs_and_combining_marks_occupy_correct_cells ... ok
+test tests::utf8_and_sequences_are_independent_of_chunk_boundaries ... ok
+test tests::malformed_input_cannot_escape_grid_bounds ... ok
+test tests::query_reply_storage_is_bounded ... ok
+test tests::large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.00s
+   Doc-tests zgraphics
+
+running 1 test
+test crates/zgraphics/src/../README.md - (line 14) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.24s; merged doctests compilation took 0.24s
+   Doc-tests zinput
+
+running 2 tests
+test crates/zinput/src/lib.rs - (line 29) ... ok
+test crates/zinput/src/lib.rs - (line 60) ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.16s; merged doctests compilation took 0.16s
+   Doc-tests zpty
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests zterm
+
+running 1 test
+test crates/zterm/src/../README.md - (line 23) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.17s; merged doctests compilation took 0.17s
+    Checking simd-adler32 v0.3.10
+    Checking zune-core v0.5.3
+    Checking zinput v0.1.0 (/workspace/scratch/659d23db7f1e/ztty-native/crates/zinput)
+    Checking unicode-width v0.2.3
+    Checking zvte v0.1.3
+    Checking zune-inflate v0.2.54
+    Checking zune-png v0.5.2
+    Checking zgraphics v0.1.0 (/workspace/scratch/659d23db7f1e/ztty-native/crates/zgraphics)
+    Checking zterm v0.2.0 (/workspace/scratch/659d23db7f1e/ztty-native/crates/zterm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.64s
+    Blocking waiting for file lock on package cache
+warning: the following packages contain code that will be rejected by a future version of Rust: zune-png v0.5.2
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`

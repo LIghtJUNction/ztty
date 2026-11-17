@@ -285,3 +285,14 @@ impl Drop for Openers {
         self.reap();
     }
 }
+
+pub fn default_config_path() -> Option<CString> {
+    let xdg = env(c"XDG_CONFIG_HOME").filter(|p| p.starts_with(b"/"));
+    let base = xdg.or_else(|| env(c"HOME").filter(|p| p.starts_with(b"/")))?;
+    let mut bytes = base.to_vec();
+    if xdg.is_none() {
+        bytes.extend_from_slice(b"/.config");
+    }
+    bytes.extend_from_slice(b"/ztty/ztty.conf");
+    CString::new(bytes).ok()
+}

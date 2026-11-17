@@ -1,10 +1,14 @@
 # Sessions and MCP
 
-ztty keeps terminal sessions in one process for the current user. Ordinary
+On Linux, ztty keeps terminal sessions in one process for the current user. Ordinary
 launches, attached windows and MCP tools use that same process. Each session
 owns its PTY, screen and history; windows on the same display reuse the display
 connection and font caches. See [architecture](architecture.md) for ownership
 and [performance](performance.md#multiple-window-memory) for measured memory.
+
+The shared broker, attach command and MCP transports described here currently
+require Linux. Native macOS and Windows terminal backends are implemented
+separately; see the [platform table](../README.md#platforms-and-verification).
 
 ## Open, list and attach
 
@@ -206,4 +210,5 @@ python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
 The MCP tests cover transport lifecycle, IPv6, concurrent requests, real PTYs,
 UTF-8 cursor boundaries, creator environment isolation, namespaced addressing,
 exit status and persistence. The GUI test covers shared-window behavior on
-a private Xvfb display. The current backend is Linux X11/XWayland.
+a private Xvfb display. These shared-session tests exercise Linux X11/XWayland;
+native macOS and Windows frontends have their own acceptance records.
