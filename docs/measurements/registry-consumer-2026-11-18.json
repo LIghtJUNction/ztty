@@ -1,0 +1,301 @@
+{
+  "schema": 2,
+  "timestamp_utc": "2026-11-17T16:32:53.914410+00:00",
+  "requested_packages": [
+    "zinput",
+    "zpty"
+  ],
+  "version": "0.1.0",
+  "ok": true,
+  "packages": [
+    {
+      "name": "zinput",
+      "version": "0.1.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+        },
+        "path_in_vcs": "crates/zinput"
+      },
+      "cargo_lock_checksum": "dc155bb3eff182f026daf325f0cf709f0b0e8fdf334ffdf62a9532f3c4bb5c81",
+      "library_source_has_no_std": true
+    },
+    {
+      "name": "zpty",
+      "version": "0.1.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+        },
+        "path_in_vcs": "crates/zpty"
+      },
+      "cargo_lock_checksum": "52dfe1f11c6f172311b06db7da086cb3b714b8ac779a2fc507ed172724080e58",
+      "library_source_has_no_std": true
+    }
+  ],
+  "individual_checks": [
+    {
+      "selected": [
+        "zinput"
+      ],
+      "ok": true,
+      "packages": [
+        {
+          "name": "zinput",
+          "version": "0.1.0",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "selected": true,
+          "vcs": {
+            "git": {
+              "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+            },
+            "path_in_vcs": "crates/zinput"
+          },
+          "cargo_lock_checksum": "dc155bb3eff182f026daf325f0cf709f0b0e8fdf334ffdf62a9532f3c4bb5c81",
+          "library_source_has_no_std": true
+        }
+      ],
+      "commands": [
+        {
+          "stage": "metadata",
+          "command": [
+            "cargo",
+            "--config",
+            "net.retry=1",
+            "--config",
+            "http.timeout=20",
+            "metadata",
+            "--format-version",
+            "1",
+            "--manifest-path",
+            "/tmp/ztty-registry-8m0ba9_z/zinput/Cargo.toml"
+          ],
+          "ok": true,
+          "exit_code": 0,
+          "stderr": "    Blocking waiting for file lock on package cache\n    Updating crates.io index\n     Locking 1 package to highest Rust 1.100.0 compatible version\n"
+        },
+        {
+          "stage": "no_std_library_check",
+          "command": [
+            "cargo",
+            "--config",
+            "net.retry=1",
+            "--config",
+            "http.timeout=20",
+            "check",
+            "--lib",
+            "--locked",
+            "--manifest-path",
+            "/tmp/ztty-registry-8m0ba9_z/zinput/Cargo.toml"
+          ],
+          "ok": true,
+          "exit_code": 0,
+          "stderr": "    Checking zinput v0.1.0\n    Checking ztty-registry-check-zinput v0.0.0 (/tmp/ztty-registry-8m0ba9_z/zinput)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.31s\n",
+          "stdout": ""
+        },
+        {
+          "stage": "consumer_run",
+          "command": [
+            "cargo",
+            "--config",
+            "net.retry=1",
+            "--config",
+            "http.timeout=20",
+            "run",
+            "--locked",
+            "--manifest-path",
+            "/tmp/ztty-registry-8m0ba9_z/zinput/Cargo.toml"
+          ],
+          "ok": true,
+          "exit_code": 0,
+          "stderr": "   Compiling zinput v0.1.0\n   Compiling ztty-registry-check-zinput v0.0.0 (/tmp/ztty-registry-8m0ba9_z/zinput)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.47s\n     Running `target/debug/ztty-registry-check-zinput`\n",
+          "stdout": "registry consumer passed\n"
+        }
+      ],
+      "consumer_library_no_std": true,
+      "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies"
+    },
+    {
+      "selected": [
+        "zpty"
+      ],
+      "ok": true,
+      "packages": [
+        {
+          "name": "zpty",
+          "version": "0.1.0",
+          "source": "registry+https://github.com/rust-lang/crates.io-index",
+          "selected": true,
+          "vcs": {
+            "git": {
+              "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+            },
+            "path_in_vcs": "crates/zpty"
+          },
+          "cargo_lock_checksum": "52dfe1f11c6f172311b06db7da086cb3b714b8ac779a2fc507ed172724080e58",
+          "library_source_has_no_std": true
+        }
+      ],
+      "commands": [
+        {
+          "stage": "metadata",
+          "command": [
+            "cargo",
+            "--config",
+            "net.retry=1",
+            "--config",
+            "http.timeout=20",
+            "metadata",
+            "--format-version",
+            "1",
+            "--manifest-path",
+            "/tmp/ztty-registry-8m0ba9_z/zpty/Cargo.toml"
+          ],
+          "ok": true,
+          "exit_code": 0,
+          "stderr": "    Updating crates.io index\n     Locking 1 package to highest Rust 1.100.0 compatible version\n Downloading crates ...\n  Downloaded zpty v0.1.0\n"
+        },
+        {
+          "stage": "no_std_library_check",
+          "command": [
+            "cargo",
+            "--config",
+            "net.retry=1",
+            "--config",
+            "http.timeout=20",
+            "check",
+            "--lib",
+            "--locked",
+            "--manifest-path",
+            "/tmp/ztty-registry-8m0ba9_z/zpty/Cargo.toml"
+          ],
+          "ok": true,
+          "exit_code": 0,
+          "stderr": "    Checking zpty v0.1.0\n    Checking ztty-registry-check-zpty v0.0.0 (/tmp/ztty-registry-8m0ba9_z/zpty)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.19s\n",
+          "stdout": ""
+        },
+        {
+          "stage": "consumer_run",
+          "command": [
+            "cargo",
+            "--config",
+            "net.retry=1",
+            "--config",
+            "http.timeout=20",
+            "run",
+            "--locked",
+            "--manifest-path",
+            "/tmp/ztty-registry-8m0ba9_z/zpty/Cargo.toml"
+          ],
+          "ok": true,
+          "exit_code": 0,
+          "stderr": "   Compiling zpty v0.1.0\n   Compiling ztty-registry-check-zpty v0.0.0 (/tmp/ztty-registry-8m0ba9_z/zpty)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.32s\n     Running `target/debug/ztty-registry-check-zpty`\n",
+          "stdout": "registry consumer passed\n"
+        }
+      ],
+      "consumer_library_no_std": true,
+      "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies"
+    }
+  ],
+  "combined_check": {
+    "selected": [
+      "zinput",
+      "zpty"
+    ],
+    "ok": true,
+    "packages": [
+      {
+        "name": "zinput",
+        "version": "0.1.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "selected": true,
+        "vcs": {
+          "git": {
+            "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+          },
+          "path_in_vcs": "crates/zinput"
+        },
+        "cargo_lock_checksum": "dc155bb3eff182f026daf325f0cf709f0b0e8fdf334ffdf62a9532f3c4bb5c81",
+        "library_source_has_no_std": true
+      },
+      {
+        "name": "zpty",
+        "version": "0.1.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "selected": true,
+        "vcs": {
+          "git": {
+            "sha1": "9333047c0867756a73d71e29524ddef3d9f21544"
+          },
+          "path_in_vcs": "crates/zpty"
+        },
+        "cargo_lock_checksum": "52dfe1f11c6f172311b06db7da086cb3b714b8ac779a2fc507ed172724080e58",
+        "library_source_has_no_std": true
+      }
+    ],
+    "commands": [
+      {
+        "stage": "metadata",
+        "command": [
+          "cargo",
+          "--config",
+          "net.retry=1",
+          "--config",
+          "http.timeout=20",
+          "metadata",
+          "--format-version",
+          "1",
+          "--manifest-path",
+          "/tmp/ztty-registry-8m0ba9_z/combined/Cargo.toml"
+        ],
+        "ok": true,
+        "exit_code": 0,
+        "stderr": "    Updating crates.io index\n     Locking 2 packages to highest Rust 1.100.0 compatible versions\n"
+      },
+      {
+        "stage": "no_std_library_check",
+        "command": [
+          "cargo",
+          "--config",
+          "net.retry=1",
+          "--config",
+          "http.timeout=20",
+          "check",
+          "--lib",
+          "--locked",
+          "--manifest-path",
+          "/tmp/ztty-registry-8m0ba9_z/combined/Cargo.toml"
+        ],
+        "ok": true,
+        "exit_code": 0,
+        "stderr": "    Checking zinput v0.1.0\n    Checking zpty v0.1.0\n    Checking ztty-registry-check-zinput-zpty v0.0.0 (/tmp/ztty-registry-8m0ba9_z/combined)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.24s\n",
+        "stdout": ""
+      },
+      {
+        "stage": "consumer_run",
+        "command": [
+          "cargo",
+          "--config",
+          "net.retry=1",
+          "--config",
+          "http.timeout=20",
+          "run",
+          "--locked",
+          "--manifest-path",
+          "/tmp/ztty-registry-8m0ba9_z/combined/Cargo.toml"
+        ],
+        "ok": true,
+        "exit_code": 0,
+        "stderr": "   Compiling zinput v0.1.0\n   Compiling zpty v0.1.0\n   Compiling ztty-registry-check-zinput-zpty v0.0.0 (/tmp/ztty-registry-8m0ba9_z/combined)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.45s\n     Running `target/debug/ztty-registry-check-zinput-zpty`\n",
+        "stdout": "registry consumer passed\n"
+      }
+    ],
+    "consumer_library_no_std": true,
+    "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies"
+  },
+  "scope": "actual crates.io consumers; library code is no_std, executable harness uses std; zpty runs a real PTY"
+}

@@ -1,0 +1,22 @@
+command: cargo publish --dry-run --locked -p zterm
+exit_code: 0
+
+stdout:
+
+
+stderr:
+    Updating crates.io index
+   Packaging zterm v0.1.0 (/workspace/scratch/659d23db7f1e/ztty/crates/zterm)
+    Updating crates.io index
+    Packaged 10 files, 80.7KiB (20.9KiB compressed)
+   Verifying zterm v0.1.0 (/workspace/scratch/659d23db7f1e/ztty/crates/zterm)
+ Downloading crates ...
+  Downloaded zinput v0.1.0
+    Blocking waiting for file lock on package cache
+   Compiling zvte v0.1.3
+   Compiling unicode-width v0.2.3
+   Compiling zinput v0.1.0
+   Compiling zterm v0.1.0 (/workspace/scratch/659d23db7f1e/ztty/target/package/zterm-0.1.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 25.04s
+   Uploading zterm v0.1.0 (/workspace/scratch/659d23db7f1e/ztty/crates/zterm)
+warning: aborting upload due to dry run
