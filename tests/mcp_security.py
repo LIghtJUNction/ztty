@@ -26,7 +26,7 @@ def observer_stdio(binary, uri):
         send(proc, READY)
         send(proc, LIST)
         names = {t["name"] for t in line(proc)["result"]["tools"]}
-        assert names == {"session_list", "session_read"}
+        assert names == {"session_list", "session_read", "session_commands", "session_command_read"}
         read = raw_tool(proc, "session_read", {"session": uri})
         assert read["result"]["isError"] is False
         for name, args in [
@@ -69,7 +69,7 @@ def observer_http(binary, uri):
         assert server.request(READY, observer_sid, headers=observer_header)[0] == 202
         status, _, body = server.request(LIST, observer_sid, headers=observer_header)
         assert status == 200
-        assert {t["name"] for t in body["result"]["tools"]} == {"session_list", "session_read"}
+        assert {t["name"] for t in body["result"]["tools"]} == {"session_list", "session_read", "session_commands", "session_command_read"}
         assert rpc(server, observer_sid, "session_read", {"session": uri},
                    "Bearer test-observer")[2]["result"]["isError"] is False
         for name, args in [

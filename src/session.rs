@@ -1,11 +1,12 @@
 //! Shared PTYs and desktop windows, driven by one poll loop.
 use crate::{
-    Appearance, Queue,
+    Appearance, Queue, actions,
     broker::{self, Reply},
+    config_watch,
     json::{self, Value},
     key, key_modifiers,
     layout::{Axis, Layout},
-    modifiers, os, paste,
+    modifiers, os, paste, search,
     x11::{self, Connection, Selection, Window},
 };
 use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
@@ -16,6 +17,18 @@ use zterm::{CursorShape, Terminal, input};
 struct InputBuffers {
     text: Vec<u8>,
     encoded: Vec<u8>,
+}
+
+struct Search {
+    query: String,
+    hit: Option<search::Hit>,
+    count: usize,
+    ordinal: usize,
+}
+
+struct Palette {
+    query: String,
+    selected: usize,
 }
 
 fn pty_size(cols: usize, rows: usize, window: Option<&Window>) -> zpty::Size {
@@ -40,6 +53,11 @@ struct Ui {
     workspace: Option<u64>,
     visible: bool,
     read_only: bool,
+    search: Option<Search>,
+    palette: Option<Palette>,
+    pending_action: Option<&'static str>,
+    message: Option<(String, u64)>,
+    command: Option<u64>,
     attachment: u64,
     selection: Option<Selection>,
     history: usize,
@@ -63,6 +81,11 @@ impl Ui {
             workspace: None,
             visible: true,
             read_only: false,
+            search: None,
+            palette: None,
+            pending_action: None,
+            message: None,
+            command: None,
             attachment,
             selection: None,
             history: 0,
@@ -80,6 +103,61 @@ impl Ui {
             reset_blink: false,
         }
     }
+    fn error(&mut self, message: String) {
+        self.message = Some((
+            message
+                .chars()
+                .filter(|c| !c.is_control())
+                .take(512)
+                .collect(),
+            os::milliseconds() + 5000,
+        ));
+        self.force = true;
+    }
+    fn find(&mut self, terminal: &Terminal, forward: bool, restart: bool) {
+        let Some(search) = &mut self.search else {
+            return;
+        };
+        let result = search::find(
+            terminal,
+            &search.query,
+            if restart { None } else { search.hit },
+            forward,
+        );
+        search.hit = result.hit;
+        search.count = result.count;
+        search.ordinal = result.ordinal;
+        if let Some(hit) = result.hit {
+            let (history, row) = search::viewport(terminal, hit);
+            self.history = history;
+            self.selection = Some(Selection {
+                start: (hit.start, row),
+                end: (hit.end, row),
+                dragging: false,
+            });
+        } else {
+            self.selection = None;
+        }
+        self.force = true;
+    }
+
+    fn start_search(&mut self, terminal: &Terminal) {
+        let query = self
+            .selection
+            .map(|selection| selection.text(terminal, self.history))
+            .filter(|text| text.len() <= 1024 && !text.contains('\n'))
+            .unwrap_or_default();
+        self.search = Some(Search {
+            query,
+            hit: None,
+            count: 0,
+            ordinal: 0,
+        });
+        self.find(terminal, false, true);
+    }
+    // Keep model, PTY and scratch buffers independently borrowed; the view
+    // deliberately does not own the session or its input queue.
+    #[allow(clippy::too_many_arguments)]
     fn event(
         &mut self,
         event: &mut x11::Event,
@@ -112,32 +190,89 @@ impl Ui {
                     self.intercepted[code] = false;
                     return Ok(());
                 }
-                if press && mods.0 & 5 == 5 && (symbol == b'c' as u64 || symbol == b'C' as u64) {
-                    if let Some(s) = self.selection {
-                        self.window.copy(s.text(terminal, self.history), false);
+                if self.search.is_some() {
+                    if !press {
+                        return Ok(());
                     }
                     self.intercepted[code] = true;
+                    match symbol {
+                        0xff1b => {
+                            self.search = None;
+                            self.window.search_matches(0, Vec::new());
+                            self.force = true;
+                        }
+                        0xff0d | 0xffc0 => self.find(terminal, mods.0 & 1 == 0, false),
+                        0xff08 => {
+                            self.search.as_mut().unwrap().query.pop();
+                            self.find(terminal, false, true);
+                        }
+                        0x61 | 0x41 | 0x75 | 0x55 if mods.0 & 4 != 0 => {
+                            self.search.as_mut().unwrap().query.clear();
+                            self.find(terminal, false, true);
+                        }
+                        _ => {
+                            let lookup = self.window.lookup(&mut e, text_buffer);
+                            if !lookup.ignored {
+                                let text =
+                                    core::str::from_utf8(&text_buffer[..lookup.len]).unwrap_or("");
+                                let query = &mut self.search.as_mut().unwrap().query;
+                                for ch in text.chars().filter(|ch| !ch.is_control()) {
+                                    if query.len() + ch.len_utf8() <= 1024 {
+                                        query.push(ch);
+                                    }
+                                }
+                                self.find(terminal, false, true);
+                            }
+                        }
+                    }
                     return Ok(());
                 }
-                if press && mods.0 & 5 == 5 && (symbol == b'v' as u64 || symbol == b'V' as u64) {
-                    if allow_input {
-                        self.window.paste(false);
+                if let Some(palette) = &mut self.palette {
+                    if !press {
+                        return Ok(());
                     }
                     self.intercepted[code] = true;
-                    return Ok(());
-                }
-                if press && mods.0 & 1 != 0 && (symbol == 0xff55 || symbol == 0xff56) {
-                    let step = terminal.rows().saturating_sub(1).max(1);
-                    self.history = if symbol == 0xff55 {
-                        self.history
-                            .saturating_add(step)
-                            .min(terminal.history_len())
-                    } else {
-                        self.history.saturating_sub(step)
-                    };
-                    self.selection = None;
+                    match symbol {
+                        0xff1b => self.palette = None,
+                        0xff0d => {
+                            self.pending_action = actions::matching(&palette.query)
+                                .nth(palette.selected)
+                                .map(|a| a.name);
+                            self.palette = None;
+                        }
+                        0xff52 | 0xff54 => {
+                            let count = actions::matching(&palette.query).count();
+                            if count != 0 {
+                                palette.selected = (palette.selected
+                                    + if symbol == 0xff54 { 1 } else { count - 1 })
+                                    % count;
+                            }
+                        }
+                        0xff08 => {
+                            palette.query.pop();
+                            palette.selected = 0;
+                        }
+                        0x61 | 0x41 | 0x75 | 0x55 if mods.0 & 4 != 0 => {
+                            palette.query.clear();
+                            palette.selected = 0;
+                        }
+                        _ => {
+                            let lookup = self.window.lookup(&mut e, text_buffer);
+                            if !lookup.ignored {
+                                for ch in core::str::from_utf8(&text_buffer[..lookup.len])
+                                    .unwrap_or("")
+                                    .chars()
+                                    .filter(|c| !c.is_control())
+                                {
+                                    if palette.query.len() + ch.len_utf8() <= 128 {
+                                        palette.query.push(ch.to_ascii_lowercase());
+                                    }
+                                }
+                                palette.selected = 0;
+                            }
+                        }
+                    }
                     self.force = true;
-                    self.intercepted[code] = true;
                     return Ok(());
                 }
                 let lookup = if press {
@@ -399,6 +534,14 @@ impl Ui {
         appearance: &Appearance,
         observing: bool,
     ) -> Option<u64> {
+        if self
+            .message
+            .as_ref()
+            .is_some_and(|(_, until)| *until <= os::milliseconds())
+        {
+            self.message = None;
+            self.force = true;
+        }
         let now = os::milliseconds();
         if terminal.modes().synchronized_output {
             let start = self.sync_since.get_or_insert(now);
@@ -455,15 +598,56 @@ impl Ui {
                 || self.window.cursor_changed(cursor)
                 || self.window.graphics_changed(terminal))
         {
+            if let Some(search) = &self.search
+                && (self.force || terminal.dirty())
+            {
+                self.window.search_matches(
+                    terminal.cols(),
+                    search::highlights(terminal, &search.query, self.history),
+                );
+            }
             self.window
                 .render(terminal, self.history, self.selection, self.force, cursor);
+            if let Some(search) = &self.search {
+                self.window.overlay(&format!(
+                    "Find: {}   {}/{}   Enter / Shift+Enter · Esc",
+                    search.query, search.ordinal, search.count
+                ));
+            }
+            if let Some(palette) = &self.palette {
+                let mut lines = alloc::vec![format!("Run: {}", palette.query)];
+                let start = palette.selected.saturating_sub(2);
+                for (index, action) in actions::matching(&palette.query)
+                    .enumerate()
+                    .skip(start)
+                    .take(5)
+                {
+                    lines.push(format!(
+                        "{} {}",
+                        if index == palette.selected { ">" } else { " " },
+                        action.label
+                    ));
+                }
+                if lines.len() == 1 {
+                    lines.push("  No matching action".into());
+                }
+                lines.push("↑/↓ select · Enter run · Esc close".into());
+                self.window.overlay_lines(&lines);
+            }
+            if let Some((message, _)) = &self.message {
+                self.window.overlay(&format!("ztty: {message}"));
+            }
             self.force = false;
         }
 
-        match (self.sync_since.map(|s| s + 150), self.blink_deadline) {
+        let deadline = match (self.sync_since.map(|s| s + 150), self.blink_deadline) {
             (Some(a), Some(b)) => Some(a.min(b)),
             (a, b) => a.or(b),
-        }
+        };
+        self.message
+            .as_ref()
+            .map(|(_, until)| deadline.map_or(*until, |d| d.min(*until)))
+            .or(deadline)
     }
 }
 
@@ -485,6 +669,8 @@ struct Session {
     input_owner: Option<String>,
     launch_env: Vec<CString>,
     initial_cwd: CString,
+    config_path: Option<CString>,
+    base_font: String,
 }
 
 impl Session {
@@ -699,6 +885,8 @@ struct Pool {
     finished: Vec<(String, i32)>,
     reaping: Vec<(i32, u64)>,
     shortcuts: [bool; 256],
+    mouse_shortcuts: [bool; 8],
+    watcher: config_watch::Watcher,
 }
 
 fn bounded(
@@ -787,32 +975,6 @@ fn local_directory(uri: &str) -> Option<String> {
     String::from_utf8(bytes).ok()
 }
 
-fn shortcut(symbol: u64, state: u32) -> Option<&'static str> {
-    if state & (1 | 4 | 8 | 64) != 1 | 4 {
-        return None;
-    }
-    match symbol {
-        0x54 | 0x74 => Some("new-tab"),
-        0x45 | 0x65 => Some("split-right"),
-        0x4f | 0x6f => Some("split-down"),
-        0x4e | 0x6e => Some("new-window"),
-        0x55 | 0x75 => Some("move-window"),
-        0x44 | 0x64 => Some("detach"),
-        0x57 | 0x77 => Some("close"),
-        0x47 | 0x67 => Some("take-control"),
-        0xff55 => Some("previous-tab"),
-        0xff56 => Some("next-tab"),
-        0xff51 => Some("previous-pane"),
-        0xff53 => Some("next-pane"),
-        0xff52 => Some("swap-previous"),
-        0xff54 => Some("swap-next"),
-        0xff0d => Some("maximize"),
-        0x2b | 0x3d => Some("grow"),
-        0x2d | 0x5f => Some("shrink"),
-        _ => None,
-    }
-}
-
 struct WorkingDirectory(broker::Fd);
 impl WorkingDirectory {
     fn enter(path: &CStr) -> Result<Self, String> {
@@ -843,6 +1005,8 @@ impl Pool {
             finished: Vec::new(),
             reaping: Vec::new(),
             shortcuts: [false; 256],
+            mouse_shortcuts: [false; 8],
+            watcher: config_watch::Watcher::new(),
         }
     }
 
@@ -988,6 +1152,26 @@ impl Pool {
         } else {
             Appearance::load(None)?
         };
+        let config_path = match request.get("_config").and_then(Value::as_str) {
+            Some(path) => Some(broker::unhex(path)?),
+            None => os::default_config_path(),
+        };
+        let config_path = config_path
+            .map(|path| {
+                if path.to_bytes().starts_with(b"/") {
+                    Ok(path)
+                } else {
+                    let base = request
+                        .get("_cwd")
+                        .and_then(Value::as_str)
+                        .ok_or("relative config requires caller directory")?;
+                    let mut bytes = broker::unhex(base)?.to_bytes().to_vec();
+                    bytes.push(b'/');
+                    bytes.extend_from_slice(path.to_bytes());
+                    CString::new(bytes).map_err(|_| String::from("invalid config path"))
+                }
+            })
+            .transpose()?;
         let headless = request
             .get("headless")
             .and_then(Value::as_bool)
@@ -1041,6 +1225,7 @@ impl Pool {
             uri,
             name: name.into(),
             origin: origin.into(),
+            base_font: appearance.font.clone(),
             appearance,
             pty,
             terminal,
@@ -1053,7 +1238,11 @@ impl Pool {
             input_owner: Some(input_owner),
             launch_env: env,
             initial_cwd: cwd,
+            config_path,
         };
+        if let Some(path) = &session.config_path {
+            self.watcher.watch(path);
+        }
         self.sessions.push(session);
         if let Some(target) = request.get("target").and_then(Value::as_str) {
             let target_request = json::object([("session", Value::from(target))]);
@@ -1077,6 +1266,11 @@ impl Pool {
 
     fn retire(&mut self, index: usize) -> Value {
         let session = self.sessions.remove(index);
+        self.watcher.retain(|path| {
+            self.sessions
+                .iter()
+                .any(|s| s.config_path.as_deref() == Some(path))
+        });
         let mut result = session.info();
         result.set("closed", Value::Bool(true));
         result.set("running", Value::Bool(false));
@@ -1322,6 +1516,9 @@ impl Pool {
         if let Some(cwd) = local_directory(session.terminal.working_directory()) {
             request.set("cwd", Value::from(cwd));
         }
+        if let Some(path) = &session.config_path {
+            request.set("_config", Value::from(broker::hex(path.to_bytes())));
+        }
         if mode != "window" {
             request.set("target", Value::from(session.uri.clone()));
             request.set("layout", Value::from(mode));
@@ -1342,6 +1539,139 @@ impl Pool {
                 if let Some(ui) = &mut self.sessions[index].ui {
                     ui.open = false;
                 }
+            }
+            "search" => {
+                let session = &mut self.sessions[index];
+                if let Some(ui) = &mut session.ui {
+                    ui.palette = None;
+                    ui.start_search(&session.terminal);
+                }
+            }
+            "palette" => {
+                if let Some(ui) = &mut self.sessions[index].ui {
+                    ui.search = None;
+                    ui.window.search_matches(0, Vec::new());
+                    ui.palette = Some(Palette {
+                        query: String::new(),
+                        selected: 0,
+                    });
+                    ui.force = true;
+                }
+            }
+            "none" => {}
+            "copy" => {
+                let session = &mut self.sessions[index];
+                if let Some(ui) = &mut session.ui
+                    && let Some(selection) = ui.selection
+                {
+                    ui.window
+                        .copy(selection.text(&session.terminal, ui.history), false);
+                }
+            }
+            "paste" | "paste-primary" => {
+                let session = &mut self.sessions[index];
+                if session.input_owner.as_deref() != Some("local")
+                    || session.ui.as_ref().is_some_and(|ui| ui.read_only)
+                {
+                    return Err("observing views cannot paste; take input control first".into());
+                }
+                if let Some(ui) = &mut session.ui {
+                    ui.window.paste(action == "paste-primary");
+                }
+            }
+            "scroll-up" | "scroll-down" => {
+                let session = &mut self.sessions[index];
+                if let Some(ui) = &mut session.ui {
+                    let step = session.terminal.rows().saturating_sub(1).max(1);
+                    ui.history = if action == "scroll-up" {
+                        ui.history
+                            .saturating_add(step)
+                            .min(session.terminal.history_len())
+                    } else {
+                        ui.history.saturating_sub(step)
+                    };
+                    ui.selection = None;
+                    ui.force = true;
+                }
+            }
+            "previous-command" | "next-command" => {
+                let session = &mut self.sessions[index];
+                let ui = session.ui.as_mut().ok_or("session has no window")?;
+                let command = if action == "previous-command" {
+                    session.terminal.commands().rev().find(|c| {
+                        ui.command.is_none_or(|id| c.id < id)
+                            && session.terminal.command_scroll_offset(c.id).is_some()
+                    })
+                } else {
+                    session.terminal.commands().find(|c| {
+                        ui.command.is_some_and(|id| c.id > id)
+                            && session.terminal.command_scroll_offset(c.id).is_some()
+                    })
+                };
+                let command = command
+                    .ok_or("no shell command in that direction; enable shell integration")?;
+                let offset = session
+                    .terminal
+                    .command_scroll_offset(command.id)
+                    .ok_or("command has left the retained history")?;
+                ui.command = Some(command.id);
+                ui.history = offset;
+                ui.selection = None;
+                ui.force = true;
+            }
+            "copy-command-output" => {
+                let session = &mut self.sessions[index];
+                let ui = session.ui.as_mut().ok_or("session has no window")?;
+                let id = ui
+                    .command
+                    .or_else(|| {
+                        session
+                            .terminal
+                            .commands()
+                            .rev()
+                            .find(|c| c.output.is_some())
+                            .map(|c| c.id)
+                    })
+                    .ok_or("no command output; enable shell integration")?;
+                let output = session
+                    .terminal
+                    .command_output(id, 65536)
+                    .ok_or("command output is unavailable")?;
+                if output.truncated {
+                    return Err("command output is truncated; use the bounded command-output API to inspect it explicitly".into());
+                }
+                ui.window.copy(output.text, false);
+            }
+            "reload" => return self.reload(index),
+            "font-increase" | "font-decrease" | "font-reset" => {
+                let session = &self.sessions[index];
+                let mut next = session.appearance.clone();
+                next.font = if action == "font-reset" {
+                    session.base_font.clone()
+                } else {
+                    let mut size = 11.0f64;
+                    let mut name = String::new();
+                    for part in next.font.split(':') {
+                        if let Some(value) = part.strip_prefix("size=") {
+                            size = value
+                                .parse::<f64>()
+                                .ok()
+                                .filter(|v| v.is_finite() && *v > 0.0)
+                                .ok_or("invalid font size")?;
+                        } else {
+                            if !name.is_empty() {
+                                name.push(':');
+                            }
+                            name.push_str(part);
+                        }
+                    }
+                    format!(
+                        "{name}:size={}",
+                        (size + if action == "font-increase" { 1.0 } else { -1.0 })
+                            .clamp(4.0, 128.0)
+                    )
+                };
+                return self.apply_appearance(index, next, false);
             }
             "take-control" => {
                 let request = json::object([
@@ -1380,6 +1710,59 @@ impl Pool {
         Ok(self.sessions[index].info())
     }
 
+    fn reload(&mut self, index: usize) -> Result<Value, String> {
+        let appearance = Appearance::load(self.sessions[index].config_path.as_deref())?;
+        self.apply_appearance(index, appearance, true)
+    }
+
+    fn apply_appearance(
+        &mut self,
+        index: usize,
+        appearance: Appearance,
+        reset_font: bool,
+    ) -> Result<Value, String> {
+        let session = &mut self.sessions[index];
+        if let Some(ui) = &mut session.ui {
+            let allow_resize = session.input_owner.as_deref() == Some("local") && !ui.read_only;
+            let (cols, rows) = ui.window.reconfigure(&appearance, |cols, rows, cw, ch| {
+                if allow_resize && !session.eof {
+                    session
+                        .pty
+                        .resize(zpty::Size {
+                            cols: cols as u16,
+                            rows: rows as u16,
+                            pixel_width: (cols * cw as usize).min(u16::MAX as usize) as u16,
+                            pixel_height: (rows * ch as usize).min(u16::MAX as usize) as u16,
+                        })
+                        .map_err(|e| format!("cannot resize reconfigured PTY: {e}"))?;
+                }
+                Ok(())
+            })?;
+            session
+                .terminal
+                .set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
+            if allow_resize {
+                session.terminal.resize(cols, rows);
+            }
+            ui.history = ui.history.min(session.terminal.history_len());
+            ui.selection = None;
+            ui.last_cursor = None;
+            ui.force = true;
+            ui.reset_blink = true;
+            ui.message = None;
+        }
+        session.terminal.set_theme(appearance.theme);
+        if reset_font {
+            session.base_font = appearance.font.clone();
+        }
+        session.appearance = appearance;
+        let id = session.id;
+        if let Some(workspace) = self.workspace(id) {
+            self.arrange(workspace, false)?;
+        }
+        Ok(self.sessions[index].info())
+    }
+
     fn control(&mut self, index: usize, request: &Value) -> Result<Value, String> {
         let actor = actor(request)?;
         let session = &mut self.sessions[index];
@@ -1402,6 +1785,9 @@ impl Pool {
                 if session.input_owner.as_deref() != Some(actor) {
                     session.queue.bytes.clear();
                     session.queue.offset = 0;
+                    if let Some(ui) = &mut session.ui {
+                        ui.window.cancel_paste();
+                    }
                 }
                 session.input_owner = Some(actor.into());
                 if actor == "local"
@@ -1417,6 +1803,9 @@ impl Pool {
                 session.input_owner = None;
                 session.queue.bytes.clear();
                 session.queue.offset = 0;
+                if let Some(ui) = &mut session.ui {
+                    ui.window.cancel_paste();
+                }
             }
             _ => return Err("control action must be acquire or release".into()),
         }
@@ -1482,6 +1871,52 @@ impl Pool {
         }
         match op {
             "info" => Ok(Reply::Value(self.sessions[index].info())),
+            "commands" => {
+                let commands = self.sessions[index]
+                    .terminal
+                    .commands()
+                    .map(|command| {
+                        json::object([
+                            ("id", Value::from(command.id)),
+                            (
+                                "exit_status",
+                                command.exit_status.map(Value::from).unwrap_or(Value::Null),
+                            ),
+                            ("available", Value::Bool(command.available)),
+                            ("has_output", Value::Bool(command.output.is_some())),
+                            ("complete", Value::Bool(command.end.is_some())),
+                        ])
+                    })
+                    .collect();
+                Ok(Reply::Value(json::object([(
+                    "commands",
+                    Value::Array(commands),
+                )])))
+            }
+            "command-read" => {
+                let id = request
+                    .get("command_id")
+                    .and_then(Value::as_u64)
+                    .ok_or("command_id is required")?;
+                let max = bounded(request, "max_bytes", 65536, 1, 65536)?;
+                let part = request
+                    .get("part")
+                    .and_then(Value::as_str)
+                    .unwrap_or("output");
+                let terminal = &self.sessions[index].terminal;
+                let output = match part {
+                    "input" => terminal.command_input(id, max),
+                    "output" => terminal.command_output(id, max),
+                    _ => return Err("part must be input or output".into()),
+                }
+                .ok_or("command is not retained or does not contain the requested region")?;
+                Ok(Reply::Value(json::object([
+                    ("text", Value::from(output.text)),
+                    ("truncated", Value::Bool(output.truncated)),
+                    ("complete", Value::Bool(output.complete)),
+                    ("command_id", Value::from(id)),
+                ])))
+            }
             "control" => self.control(index, request).map(Reply::Value),
             "detach" => {
                 if actor(request)? != "local" {
@@ -1595,13 +2030,18 @@ impl Pool {
                 if let Some(ui) = &mut self.sessions[index].ui {
                     if read_only {
                         ui.read_only = true;
+                        ui.window.cancel_paste();
                     }
-                    if let Some(workspace) = self.workspace(self.sessions[index].id) {
+                    let observing =
+                        read_only || self.sessions[index].input_owner.as_deref() != Some("local");
+                    if let Some(workspace) = self.workspace(self.sessions[index].id)
+                        && !observing
+                    {
                         self.workspaces[workspace]
                             .layout
                             .focus(self.sessions[index].id);
                         self.arrange(workspace, true)?;
-                    } else if !read_only {
+                    } else if !observing {
                         self.sessions[index].ui.as_ref().unwrap().window.raise();
                     }
                     return Ok(Reply::Value(self.sessions[index].info()));
@@ -1747,12 +2187,40 @@ impl Pool {
                             .unwrap()
                             .window
                             .key_symbol(&mut e, false);
-                        if let Some(action) = shortcut(symbol, e.state) {
+                        if let Some(action) = actions::key_action(
+                            &self.sessions[index].appearance.bindings,
+                            symbol,
+                            e.state,
+                        ) {
                             self.shortcuts[(e.keycode as usize).min(255)] = true;
                             if let Err(error) = self.action(index, action) {
                                 os::print(2, format!("ztty: {error}\n").as_bytes());
                                 if let Some(ui) = &mut self.sessions[index].ui {
-                                    ui.window.title(&format!("ztty: {error}"));
+                                    ui.error(error);
+                                }
+                            }
+                            continue;
+                        }
+                    }
+                    if kind == x11::BUTTON_RELEASE {
+                        let button = (unsafe { event.button.button } as usize).min(7);
+                        if self.mouse_shortcuts[button] {
+                            self.mouse_shortcuts[button] = false;
+                            continue;
+                        }
+                    }
+                    if kind == x11::BUTTON_PRESS {
+                        let e = unsafe { event.button };
+                        if let Some(action) = actions::lookup(
+                            &self.sessions[index].appearance.bindings,
+                            0x1000_0000 + u64::from(e.button),
+                            e.state,
+                        ) {
+                            self.mouse_shortcuts[(e.button as usize).min(7)] = true;
+                            if let Err(error) = self.action(index, action) {
+                                os::print(2, format!("ztty: {error}\n").as_bytes());
+                                if let Some(ui) = &mut self.sessions[index].ui {
+                                    ui.error(error);
                                 }
                             }
                             continue;
@@ -1785,12 +2253,36 @@ impl Pool {
                     {
                         ui.open = false;
                     }
+                    if let Some(action) = ui.pending_action.take()
+                        && let Err(error) = self.action(index, action)
+                    {
+                        os::print(2, format!("ztty: {error}\n").as_bytes());
+                        if let Some(ui) = &mut self.sessions[index].ui {
+                            ui.error(error);
+                        }
+                    }
                 }
             }
         }
     }
 
     fn tick(&mut self, buffer: &mut [u8]) -> Option<u64> {
+        let changed = self.watcher.changed();
+        if !changed.is_empty() {
+            for index in 0..self.sessions.len() {
+                if self.sessions[index]
+                    .config_path
+                    .as_ref()
+                    .is_some_and(|p| changed.contains(p))
+                    && let Err(error) = self.reload(index)
+                {
+                    os::print(2, format!("ztty: config reload: {error}\n").as_bytes());
+                    if let Some(ui) = &mut self.sessions[index].ui {
+                        ui.error(error);
+                    }
+                }
+            }
+        }
         let mut deadline = None;
         for session in &mut self.sessions {
             session.pump(buffer);
@@ -1814,7 +2306,12 @@ impl Pool {
         for i in (0..self.sessions.len()).rev() {
             let closed = self.sessions[i].ui.as_ref().is_some_and(|ui| !ui.open);
             let ended = self.sessions[i].eof && self.sessions[i].status().is_some();
-            if !self.sessions[i].persistent && (closed || ended) {
+            let observing = self.sessions[i].input_owner.as_deref() != Some("local")
+                || self.sessions[i].ui.as_ref().is_some_and(|ui| ui.read_only);
+            if closed && observing && !ended {
+                // Closing a view cannot terminate another actor's live PTY.
+                self.detach(i);
+            } else if !self.sessions[i].persistent && (closed || ended) {
                 self.retire(i);
             } else if closed {
                 self.detach(i);
@@ -1901,6 +2398,13 @@ pub fn serve() -> Result<(), String> {
         }
         fds.clear();
         server.descriptors(&mut fds);
+        if pool.watcher.fd() >= 0 {
+            fds.push(os::PollFd {
+                fd: pool.watcher.fd(),
+                events: os::POLLIN,
+                revents: 0,
+            });
+        }
         for (_, connection) in &pool.connections {
             fds.push(os::PollFd {
                 fd: connection.fd,

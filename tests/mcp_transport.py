@@ -54,7 +54,8 @@ def stdio(binary):
         tools = line(proc)["result"]["tools"]
         assert {tool["name"] for tool in tools} == {
             "session_create", "session_list", "session_read",
-            "session_write", "session_resize", "session_close", "session_control"}
+            "session_write", "session_resize", "session_close", "session_control",
+            "session_commands", "session_command_read"}
         schemas = {tool["name"]: tool["inputSchema"] for tool in tools}
         assert schemas["session_read"]["properties"]["max_bytes"]["maximum"] == 65536
         assert schemas["session_write"]["properties"]["data"]["maxLength"] == 65536

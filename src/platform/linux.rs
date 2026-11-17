@@ -33,6 +33,9 @@ pub fn run(cfg: Config) -> Result<i32, String> {
     if let Some(cwd) = cfg.cwd {
         request.set("cwd", Value::from(cwd));
     }
+    if let Some(path) = cfg.config_path {
+        request.set("_config", Value::from(broker::hex(path.to_bytes())));
+    }
     let created = broker::request(&request)?;
     wait_session(&created)
 }
@@ -135,7 +138,14 @@ pub fn command(args: &[&CStr]) -> Result<i32, String> {
         let selector = text(1)?;
         request.set("session", Value::from(selector));
         match op {
-            "info" | "detach" if args.len() == 2 => {}
+            "info" | "detach" | "commands" if args.len() == 2 => {}
+            "command-output" if args.len() == 3 => {
+                request.set("op", Value::from("command-read"));
+                let id = text(2)?
+                    .parse::<u64>()
+                    .map_err(|_| String::from("command ID must be an integer"))?;
+                request.set("command_id", Value::from(id));
+            }
             "rename" if args.len() == 3 => request.set("name", Value::from(text(2)?)),
             "action" if args.len() == 3 => request.set("action", Value::from(text(2)?)),
             "move" if (3..=4).contains(&args.len()) => {

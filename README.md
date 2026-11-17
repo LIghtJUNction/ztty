@@ -1,5 +1,9 @@
 # ztty
 
+[![Recorded 10-terminal memory comparison](docs/benchmarks/terminals-10-windows.svg)](docs/benchmarks/verification-2026-11-18.md)
+
+Recorded Linux/Xvfb data, including application helpers: ztty **58.75 MiB RSS / 15.36 MiB PSS**, Ghostty **818.23 / 775.36**, Kitty **397.68 / 351.16**. The host was busy (load1 31.02–36.57); these measurements are a reproducible historical sample, not a quiet-host performance ranking. X server resources are separate, real GPU memory and input-to-display latency were not measured. [Raw data, workload checks and reproduction](docs/benchmarks/verification-2026-11-18.md).
+
 A lean native terminal, written in Rust without the Rust standard library.
 
 ztty runs shells and terminal applications through the operating system's
@@ -21,6 +25,12 @@ in [the performance report](docs/performance.md). Linux remains the first
 acceptance target; the platform table records what has actually been exercised.
 
 [中文介绍](README.zh-CN.md)
+
+Linux now also provides history search, a temporary command palette, configurable
+key/mouse bindings, live configuration reload and OSC 133 command navigation.
+The shell scripts support opt-in Bash, Zsh, Fish and Nushell integration.
+[Daily workflow and limits](docs/daily-workflow.md) · [Shell setup](shell/README.md)
+· [MCP permissions and command reads](docs/sessions.md).
 
 ![Actual ztty window displaying a photo and transparent PNG in Hyprland/XWayland](docs/assets/kitty-graphics-hyprland.png)
 

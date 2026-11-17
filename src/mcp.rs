@@ -11,10 +11,12 @@ use crate::os;
 mod http;
 
 pub(super) const VERSIONS: [&str; 3] = ["2025-11-25", "2025-06-18", "2025-03-26"];
-const HELP: &str = "Usage: ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n                [--read-only] [--token TOKEN] [--observer-token TOKEN]\n                [--allow-host AUTHORITY]\n\nDefaults: stdio; HTTP host 127.0.0.1, port 8732, endpoint /mcp.\nUse --port 0 to choose a free port. ZTTY_MCP_TOKEN supplies an operator token;\nZTTY_MCP_OBSERVER_TOKEN supplies an observer token. --read-only limits all\nclients to session_list/session_read, including operator-token holders.\nNon-loopback HTTP requires a token. --allow-host explicitly permits another\nHTTP Host authority (name:port), for example behind a trusted local proxy.\nHTTP authentication is required whenever either token is configured.\nMCP protocol versions: 2025-11-25, 2025-06-18, 2025-03-26.\nMCP sessions create persistent PTYs; use ztty attach to list and view them.\n";
+const HELP: &str = "Usage: ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n                [--read-only] [--token TOKEN] [--observer-token TOKEN]\n                [--allow-host AUTHORITY]\n\nDefaults: stdio; HTTP host 127.0.0.1, port 8732, endpoint /mcp.\nUse --port 0 to choose a free port. ZTTY_MCP_TOKEN supplies an operator token;\nZTTY_MCP_OBSERVER_TOKEN supplies an observer token. --read-only limits all\nclients to session and command reads, including operator-token holders.\nNon-loopback HTTP requires a token. --allow-host explicitly permits another\nHTTP Host authority (name:port), for example behind a trusted local proxy.\nHTTP authentication is required whenever either token is configured.\nMCP protocol versions: 2025-11-25, 2025-06-18, 2025-03-26.\nMCP sessions create persistent PTYs; use ztty attach to list and view them.\n";
 const TOOLS: &str = r#"[
 {"name":"session_create","description":"Create a persistent terminal session in the shared ztty process. Commands are argv; use an explicit shell for shell syntax. Attach the returned URI with ztty attach.","inputSchema":{"type":"object","properties":{"name":{"type":"string","description":"Optional unique name within this MCP transport namespace"},"command":{"type":"array","items":{"type":"string"},"minItems":1,"description":"Executable and arguments; defaults to the configured shell"},"cwd":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256},"history":{"type":"integer","minimum":0,"maximum":100000}},"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":true}},
 {"name":"session_list","description":"List terminal sessions, canonical ztty:// URIs, process state and attached windows.","inputSchema":{"type":"object","properties":{},"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
+{"name":"session_commands","description":"List up to 128 retained OSC 133 shell command boundaries, exit codes and availability. Requires shell integration; records refer to the retained terminal history.","inputSchema":{"type":"object","properties":{"session":{"type":"string"}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
+{"name":"session_command_read","description":"Read one shell command input or output from retained terminal cells, bounded to 65536 UTF-8 bytes. This is rendered text, not immutable raw stdout. Check complete and truncated.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"command_id":{"type":"integer","minimum":1},"part":{"type":"string","enum":["input","output"]},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session","command_id"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish a UTF-8 character. Reuse next_cursor; truncated reports expired output.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_write","description":"Send up to 65536 UTF-8 bytes or terminal control bytes to a session. Include a newline to submit a shell command; use \\u0003 to interrupt.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"data":{"type":"string","maxLength":65536}},"required":["session","data"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":true}},
 {"name":"session_resize","description":"Resize a session PTY and screen; attached windows use the new terminal dimensions.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256}},"required":["session","cols","rows"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":false}},
@@ -251,7 +253,10 @@ fn integer_number(token: &str) -> bool {
 }
 
 fn observable_tool(name: &str) -> bool {
-    matches!(name, "session_list" | "session_read")
+    matches!(
+        name,
+        "session_list" | "session_read" | "session_commands" | "session_command_read"
+    )
 }
 
 pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) -> Option<Value> {
@@ -405,6 +410,11 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         ),
         "session_list" => ("list", &[]),
         "session_read" => ("read", &["session", "cursor", "max_bytes"]),
+        "session_commands" => ("commands", &["session"]),
+        "session_command_read" => (
+            "command-read",
+            &["session", "command_id", "part", "max_bytes"],
+        ),
         "session_write" => ("write", &["session", "data"]),
         "session_resize" => ("resize", &["session", "cols", "rows"]),
         "session_close" => ("close", &["session"]),
@@ -461,6 +471,7 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         ("history", 0, 100000),
         ("max_bytes", 1, 65536),
         ("cursor", 0, u64::MAX),
+        ("command_id", 1, u64::MAX),
     ] {
         if let Some(value) = arguments.get(key) {
             let number = value
@@ -471,6 +482,16 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
             }
         } else if operation == "resize" && (key == "cols" || key == "rows") {
             return Err("cols and rows are required");
+        }
+    }
+    if operation == "command-read" {
+        if arguments.get("command_id").is_none() {
+            return Err("command_id is required");
+        }
+        if let Some(part) = arguments.get("part")
+            && !matches!(part.as_str(), Some("input" | "output"))
+        {
+            return Err("part must be input or output");
         }
     }
     if operation == "control" {
@@ -698,7 +719,15 @@ mod tests {
             .iter()
             .map(|value| value.get("name").unwrap().as_str().unwrap())
             .collect();
-        assert_eq!(names, ["session_list", "session_read"]);
+        assert_eq!(
+            names,
+            [
+                "session_list",
+                "session_commands",
+                "session_command_read",
+                "session_read"
+            ]
+        );
         for (name, arguments) in [
             ("session_create", object([])),
             (
@@ -787,5 +816,38 @@ mod tests {
                 .is_err()
             );
         }
+    }
+    #[test]
+    fn command_reads_validate_ids_parts_and_bounds_for_observers() {
+        for arguments in [
+            r#"{"session":"test"}"#,
+            r#"{"session":"test","command_id":0}"#,
+            r#"{"session":"test","command_id":1.5}"#,
+            r#"{"session":"test","command_id":1,"part":"raw"}"#,
+            r#"{"session":"test","command_id":1,"max_bytes":65537}"#,
+            r#"{"session":"test","command_id":1,"_actor":"local"}"#,
+        ] {
+            assert!(
+                tool_request(
+                    "session_command_read",
+                    &json::parse(arguments.as_bytes()).unwrap(),
+                    "mcp/stdio"
+                )
+                .is_err()
+            );
+        }
+        let mut session = ready(true);
+        let result=call(r#"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"session_command_read","arguments":{"session":"test","command_id":1,"part":"input","max_bytes":32}}}"#,&mut session).unwrap();
+        let request = result
+            .get("result")
+            .unwrap()
+            .get("structuredContent")
+            .unwrap();
+        assert_eq!(request.get("op").unwrap().as_str(), Some("command-read"));
+        assert_eq!(
+            request.get("_actor").unwrap().as_str(),
+            Some("trusted-test-actor")
+        );
+        assert_eq!(request.get("max_bytes").unwrap().as_u64(), Some(32));
     }
 }

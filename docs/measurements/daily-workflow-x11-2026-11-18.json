@@ -1,0 +1,49 @@
+{
+  "ok": true,
+  "checks": [
+    "OSC 133 metadata, exit codes, bounded command output and command CLI agree with the real PTY",
+    "real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input",
+    "command navigation copies the selected first and second command regions through the real clipboard",
+    "filtered command palette executes a font action, font reset restores the grid and both preserve the running PTY",
+    "custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release",
+    "command navigation skips regions invalidated by live-screen width changes and retains intact historical output",
+    "atomic config saves update pixels/font without restarting; explicit truecolor survives theme change; malformed reload retains the previous valid state",
+    "config watching recovers after the containing directory is renamed or deleted and recreated",
+    "observing an already attached workspace pane preserves the other pane's actual X input focus",
+    "closing an observer by action or WM_DELETE preserves the agent-owned PTY and permits reattachment",
+    "observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY",
+    "launch waiter exits and session/PTY resources are released"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/target/release/ztty",
+  "binary_sha256": "c17e617f76ac080eab51e82853eff58f972921cecccbd27f7599cc74db8f5ce5",
+  "source_sha256": {
+    "src/session.rs": "19d1d4f8905fee8b1111d6df88be45ffe289d112615f1ec3af3a7e7ee2b3dcdb",
+    "src/search.rs": "6262c89f7260ea534f23e258e27fc0362e24bc43b6269f6978a02d216f1b2ee6",
+    "src/actions.rs": "da2659d5313a57d9b3af1be80b421cf8772972378501c0c1e51ddedf5e66e1ea",
+    "src/config_watch.rs": "4fe12b27a19f859d822b6a661f2ac7c50e932ca868233260201632d519f2657b",
+    "src/x11.rs": "d1785018de7a4ecdb429de41082873047fa97743bb51827081075c39ac6bb3f5",
+    "src/appearance.rs": "19907be84aa48ba316c99f75f85b0847200d4e7ed9eb82eef0e9e9471cbd98fb",
+    "src/main.rs": "e618e7bb6b5dbb12820a0846a7d215fe9d040900818b88e5a41092878c59d8cb",
+    "tests/daily_workflow.py": "ade16a0776bd036e1d8076f9c953e917ed74189be095bae993d1c7c5ab9eba5d"
+  },
+  "screenshots": {
+    "history-search": {
+      "path": "docs/assets/daily-workflow/history-search.png",
+      "sha256": "1b62aaab087a3e6c9a380e2ff2cc545c39c599f0ba52b0b2f9c5324b9fb557ec"
+    },
+    "command-palette": {
+      "path": "docs/assets/daily-workflow/command-palette.png",
+      "sha256": "c73cc7a45d293c62668804cb76a23c67925858a373fe2d037fc1c9f6230f51ad"
+    },
+    "invalid-config-diagnostic": {
+      "path": "docs/assets/daily-workflow/invalid-config-diagnostic.png",
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "reloaded-terminal": {
+      "path": "docs/assets/daily-workflow/reloaded-terminal.png",
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    }
+  },
+  "stderr": "_XSERVTransSocketUNIXCreateListener: ...SocketCreateListener() failed\n_XSERVTransMakeAllCOTSServerListeners: server already running\n"
+}
