@@ -60,6 +60,23 @@ while shrinking are retained within the configured scrollback limits.
 modes into the independent `zinput::Modes` value. The input crate is re-exported
 as `zterm::input`; it is also usable without this terminal model.
 
+## Shell command metadata
+
+OSC 133 A/B/C/D marks expose prompt, input, output, and completion boundaries
+through `commands()`. Records have stable session-local IDs, absolute history
+coordinates, and optional exit codes. `command_input(id, max_bytes)` and
+`command_output(id, max_bytes)` extract current rendered text from retained
+primary-screen cells; `command_scroll_offset(id)` locates a retained prompt.
+The result reports completion and truncation explicitly.
+
+Metadata is allocated on the first marker and retains at most 128 records.
+Reads return at most 64 KiB of UTF-8 without duplicating the whole history.
+Scrolling keeps retained anchors stable. History eviction, width changes,
+and destructive screen operations can make a range unavailable; a reset clears
+records without reusing IDs. These are untrusted display markers, not proof
+of command identity or authorization. See the
+[shell setup and acceptance guide](../../shell/README.md).
+
 ## Static graphics
 
 Call `set_cell_size(width, height)` whenever physical text-cell metrics change.
@@ -119,6 +136,8 @@ Additional bounds are explicit:
 | Window title | 256 UTF-8 bytes |
 | Working-directory value | 2,048 UTF-8 bytes |
 | Kitty keyboard stack | 32 entries per screen |
+| Shell command records | 128, allocated lazily |
+| Command-text read | 65,536 UTF-8 bytes |
 | Graphics APC staging | At most a 512-byte header plus 4,096 encoded payload bytes; larger bodies stream through it |
 | Decoded graphics | 16 MiB per image; 32 MiB per screen, counting vector capacity |
 | Pending graphics transfer | 16 MiB per screen; one transfer at a time |
