@@ -327,3 +327,10 @@ See [architecture](docs/architecture.md), [protocol references](docs/protocols.m
 and [release instructions](docs/releasing.md).
 
 MIT © LIghtJUNction
+
+## Tabs and panes on Linux
+
+Shared sessions now support tabs, splits, pane focus and moves between native windows.
+Use `ztty --split-right NAME`, `ztty --tab NAME`, or Ctrl+Shift+E/T.
+`ztty detach NAME` preserves its PTY; `ztty attach --observe NAME` opens an observing view.
+[Commands, ownership and verified behavior](docs/workspaces.md).

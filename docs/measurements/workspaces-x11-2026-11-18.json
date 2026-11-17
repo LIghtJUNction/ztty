@@ -1,0 +1,27 @@
+{
+  "ok": true,
+  "checks": [
+    "two PTYs share one workspace and only the focused pane receives real keyboard input",
+    "split resize, swap, maximize and restore change real window geometry",
+    "tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell",
+    "moving panes between native windows and layouts preserves the PTY process",
+    "rename keeps the URI stable; detach and observe reattach preserve PTY/output and enforce read-only input",
+    "per-request input ownership rejects old operators and permits multiple observers",
+    "all launch/attach waiters complete and sessions release their views and PTYs"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/target/release/ztty",
+  "screenshot": "artifacts/workspaces.png",
+  "stderr": "",
+  "source_sha256": {
+    "src/layout.rs": "2a9a06a49c3bb3eaca3a4d57dd376be888898c5ee0870295a13ab9708e1e485e",
+    "src/session.rs": "685997af346ee24d4aff7007094e3eb3d3a93fa277c244047282ac92b8cc7e5d",
+    "src/x11.rs": "d8cc6df874dd3c68482e34b9bf968236cd8b99f912f2893986ea8f4f28b08f77",
+    "src/main.rs": "622160994cbac07219e9e75fd9bd043dbf9ca25acc14f5d4fc30dc53d7cf1f32",
+    "src/platform/linux.rs": "48bdf8f5d4caaaade9d9af2bb1daeb6e5a5c1dc4adb472d121200c060e83177a",
+    "src/os.rs": "e898d297a0f5f89b36a6a40ea6edb589a7a204e9951d8011ee0972f7349a794b",
+    "tests/layout.rs": "c60271ef04e59ed93d06e872a4f077cd20b2873476a3fc07867e1762439311dd",
+    "tests/workspaces.py": "b55df24f98f2f8d61cf0324caa58e7998699a3c56089e888761e7474282703f3"
+  },
+  "base_commit": "591156a0ee1d8981184aaff3619f725519f268ba"
+}

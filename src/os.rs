@@ -38,6 +38,7 @@ unsafe extern "C" {
     pub fn fork() -> c_int;
     pub fn getpid() -> c_int;
     pub fn getuid() -> u32;
+    pub fn gethostname(name: *mut c_char, len: usize) -> c_int;
     pub fn chdir(path: *const c_char) -> c_int;
     pub fn fchdir(fd: c_int) -> c_int;
     pub fn getcwd(buffer: *mut c_char, size: usize) -> *mut c_char;
@@ -101,6 +102,17 @@ pub fn milliseconds() -> u64 {
         clock_gettime(1, &mut t);
     }
     (t.seconds as u64) * 1000 + (t.nanoseconds as u64) / 1_000_000
+}
+
+pub fn unix_milliseconds() -> u64 {
+    let mut t = TimeSpec {
+        seconds: 0,
+        nanoseconds: 0,
+    };
+    unsafe {
+        clock_gettime(0, &mut t);
+    }
+    (t.seconds.max(0) as u64).saturating_mul(1000) + t.nanoseconds.max(0) as u64 / 1_000_000
 }
 pub fn print(fd: i32, bytes: &[u8]) {
     let mut remaining = bytes;

@@ -247,3 +247,10 @@ python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 
 进一步阅读：[架构](docs/architecture.md)、[协议范围](docs/protocols.md)、
 [性能](docs/performance.md)、[发布](docs/releasing.md)。
+
+## Linux 标签页与分屏
+
+共享会话支持标签页、横竖分屏、焦点切换、尺寸调整与跨窗口移动。
+使用 `ztty --split-right NAME`、`ztty --tab NAME`，或 Ctrl+Shift+E/T。
+`ztty detach NAME` 保留 PTY；`ztty attach --observe NAME` 打开观察视图。
+[操作、权限与真实验收记录](docs/workspaces.md)。
