@@ -128,11 +128,12 @@ class PublicationTests(unittest.TestCase):
 
     def test_refresh_summary_preserves_collection_identity_and_all_raw_matrix_cells(self):
         data = report(counts=(1, 10), modes=bench.MODES, repetitions=1)
-        data.update({"script_sha256": "original-collector", "git": {"head": "original-source"}})
+        data.update({"script_sha256": "original-collector", "git": {"head": "original-source"},
+                     "source_sha256": {"isolated_xvfb.py": "original-display-guard"}})
         before = copy.deepcopy(data)
         bench.refresh_summary(data)
         self.assertEqual(data["runs"], before["runs"])
-        for key in ("timestamp", "script_sha256", "git", "settings", "binaries"):
+        for key in ("timestamp", "script_sha256", "source_sha256", "git", "settings", "binaries"):
             self.assertEqual(data[key], before[key])
         self.assertEqual(len(data["summary"]), 12)
         self.assertEqual(data["derived"]["source_runs_sha256"],
