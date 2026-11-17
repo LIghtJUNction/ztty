@@ -1,0 +1,580 @@
+   Compiling zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/crates/zinput)
+   Compiling zterm v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/crates/zterm)
+   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.77s
+     Running tests/layout.rs (target/debug/build/ztty/016c580cc1d1780a/out/layout-016c580cc1d1780a)
+
+running 6 tests
+test closing_earlier_tab_keeps_current_tab_selected ... ok
+test closing_pane_collapses_only_its_parent_and_preserves_focus ... ok
+test focus_swap_resize_and_maximize_are_reversible ... ok
+test tabs_hide_other_sessions_without_losing_their_layout ... ok
+test limits_and_duplicate_ids_leave_tree_unchanged ... ok
+test tiny_window_never_emits_nonpositive_dimensions ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace_state.rs (target/debug/build/ztty/457e7ddcfe842f2e/out/workspace_state-457e7ddcfe842f2e)
+
+running 9 tests
+test duplicate_ids_uris_and_resolver_aliases_cannot_duplicate_a_session ... ok
+test focus_must_be_a_live_leaf_in_the_active_tab ... ok
+test graph_cycles_forward_references_shared_children_and_orphans_are_rejected ... ok
+test missing_sessions_and_unsafe_or_oversized_addresses_are_rejected ... ok
+test invalid_dimensions_versions_and_field_types_are_rejected ... ok
+test roundtrip_preserves_nested_tabs_geometry_focus_and_maximization ... ok
+test invalid_split_ratios_axes_and_unexpected_fields_are_rejected ... ok
+test tab_and_pane_limits_are_enforced_in_both_directions ... ok
+test deepest_supported_tree_stays_within_json_parser_depth ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/crates/zinput)
+    Checking zterm v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/crates/zterm)
+    Checking ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.43s
+   Compiling zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/crates/zinput)
+   Compiling zterm v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/crates/zterm)
+   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `release` profile [optimized] target(s) in 10.34s
+
+Resize-failure regression: ["python3", "tests/workspaces.py", "--binary", "target/release/ztty", "--output", "artifacts/layout-restore-final.json", "--screenshot", "artifacts/layout-restore-final.png"]
+Traceback (most recent call last):
+  File "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/workspaces.py", line 390, in <module>
+    main()
+    ~~~~^^
+  File "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/workspaces.py", line 240, in main
+    assert after==snapshot,(snapshot,after)
+           ^^^^^^^^^^^^^^^
+AssertionError: ({'version': 1, 'width': 940, 'height': 664, 'tabs': [2, 3], 'active_tab': 0, 'focused': 'ztty://local/beta', 'maximized': False, 'nodes': [{'pane': 'ztty://local/alpha'}, {'pane': 'ztty://local/beta'}, {'axis': 'horizontal', 'ratio': 500, 'first': 0, 'second': 1}, {'pane': 'ztty://local/gamma'}]}, {'version': 1, 'width': 940, 'height': 664, 'tabs': [2, 3], 'active_tab': 1, 'focused': 'ztty://local/gamma', 'maximized': False, 'nodes': [{'pane': 'ztty://local/alpha'}, {'pane': 'ztty://local/beta'}, {'axis': 'horizontal', 'ratio': 500, 'first': 0, 'second': 1}, {'pane': 'ztty://local/gamma'}]})
+   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.56s
+     Running tests/layout.rs (target/debug/build/ztty/016c580cc1d1780a/out/layout-016c580cc1d1780a)
+
+running 6 tests
+test closing_earlier_tab_keeps_current_tab_selected ... ok
+test tabs_hide_other_sessions_without_losing_their_layout ... ok
+test tiny_window_never_emits_nonpositive_dimensions ... ok
+test closing_pane_collapses_only_its_parent_and_preserves_focus ... ok
+test focus_swap_resize_and_maximize_are_reversible ... ok
+test limits_and_duplicate_ids_leave_tree_unchanged ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace_state.rs (target/debug/build/ztty/457e7ddcfe842f2e/out/workspace_state-457e7ddcfe842f2e)
+
+running 9 tests
+test focus_must_be_a_live_leaf_in_the_active_tab ... ok
+test duplicate_ids_uris_and_resolver_aliases_cannot_duplicate_a_session ... ok
+test invalid_dimensions_versions_and_field_types_are_rejected ... ok
+test roundtrip_preserves_nested_tabs_geometry_focus_and_maximization ... ok
+test missing_sessions_and_unsafe_or_oversized_addresses_are_rejected ... ok
+test invalid_split_ratios_axes_and_unexpected_fields_are_rejected ... ok
+test graph_cycles_forward_references_shared_children_and_orphans_are_rejected ... ok
+test tab_and_pane_limits_are_enforced_in_both_directions ... ok
+test deepest_supported_tree_stays_within_json_parser_depth ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.47s
+   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `release` profile [optimized] target(s) in 8.15s
+
+Resize-failure regression after event recovery fix: ["python3", "tests/workspaces.py", "--binary", "target/release/ztty", "--output", "artifacts/layout-restore-final.json", "--screenshot", "artifacts/layout-restore-final.png"]
+{
+  "ok": true,
+  "checks": [
+    "two PTYs share one workspace and only the focused pane receives real keyboard input",
+    "split resize, swap, maximize and restore change real window geometry",
+    "tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell",
+    "moving panes between native windows and layouts preserves the PTY process",
+    "versioned CLI layout snapshots restore tabs/splits/geometry with unchanged PTY PIDs; unknown sessions and nonlocal restores fail before mutation",
+    "injected ioctl EIO keeps both containers, every view, PTY identity and old dimensions alive; retrying the same snapshot repairs actual PTY sizes",
+    "rename keeps the URI stable; detach and observe reattach preserve PTY/output and enforce read-only input",
+    "per-request input ownership rejects old operators and permits multiple observers",
+    "all launch/attach waiters complete and sessions release their views and PTYs"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/target/release/ztty",
+  "binary_sha256": "ee13fe652f6d1e31db74fce216e986c09c8831598fff5bb8eb09cb785b11c12f",
+  "test_script_sha256": "cab7de6bd2a01a120ea29b1e08b0ef0cf43e7327bed0e222d71b525f8680cbdb",
+  "display": ":25136",
+  "xserver_pid": 1704507,
+  "xserver_ownership": {
+    "display": ":25136",
+    "pid": 1704507,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X25136",
+        "inode": 66295032,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X25136",
+        "inode": 66295031,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "fault_injection": {
+    "source": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/ioctl_resize_fault.c",
+    "source_sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "library_sha256": "fe2aed76f6906445d9192eaef4e2b95f6e59091492d85dd69ef3e3d24eb6a45f",
+    "compile_command": [
+      "/usr/bin/cc",
+      "-shared",
+      "-fPIC",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-o",
+      "/tmp/ztty-workspaces-myioeope/ioctl_resize_fault.so",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/ioctl_resize_fault.c"
+    ],
+    "compiler_stdout": "",
+    "compiler_stderr": "",
+    "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
+    "attempts": [
+      {
+        "pid": 1704644,
+        "fd": 14,
+        "rows": 26,
+        "cols": 100,
+        "errno": 5
+      },
+      {
+        "pid": 1704644,
+        "fd": 8,
+        "rows": 12,
+        "cols": 100,
+        "errno": 5
+      }
+    ],
+    "error_response": {
+      "ok": false,
+      "error": "cannot resize split PTY: Resize: OS error 5"
+    },
+    "child_pids": {
+      "alpha": 1704650,
+      "beta": 1704652,
+      "gamma": 1704654,
+      "delta": 1704687
+    },
+    "pty_sizes_before": {
+      "alpha": [
+        47,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        47,
+        12
+      ]
+    },
+    "old_container": 2097205,
+    "restored_container_after_error": 2097217,
+    "child_start_ticks": {
+      "alpha": 4601379,
+      "beta": 4601381,
+      "gamma": 4601385,
+      "delta": 4601402
+    },
+    "child_window_ids": {
+      "alpha": 2097154,
+      "beta": 2097160,
+      "gamma": 2097184,
+      "delta": 2097209
+    },
+    "pty_sizes_recovered": {
+      "alpha": [
+        100,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        100,
+        26
+      ]
+    }
+  },
+  "broker_pid": 1704644,
+  "broker_start_ticks": 4601376,
+  "screenshot": "artifacts/layout-restore-final.png",
+  "stderr": ""
+}
+   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.17s
+     Running tests/layout.rs (target/debug/build/ztty/016c580cc1d1780a/out/layout-016c580cc1d1780a)
+
+running 6 tests
+test closing_earlier_tab_keeps_current_tab_selected ... ok
+test closing_pane_collapses_only_its_parent_and_preserves_focus ... ok
+test tabs_hide_other_sessions_without_losing_their_layout ... ok
+test tiny_window_never_emits_nonpositive_dimensions ... ok
+test focus_swap_resize_and_maximize_are_reversible ... ok
+test limits_and_duplicate_ids_leave_tree_unchanged ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace_state.rs (target/debug/build/ztty/457e7ddcfe842f2e/out/workspace_state-457e7ddcfe842f2e)
+
+running 13 tests
+test a_recreated_session_with_the_same_uri_cannot_replace_the_saved_pty ... ok
+test duplicate_ids_uris_and_resolver_aliases_cannot_duplicate_a_session ... ok
+test focus_must_be_a_live_leaf_in_the_active_tab ... ok
+test graph_cycles_forward_references_shared_children_and_orphans_are_rejected ... ok
+test identity_fields_are_required_nonzero_and_exact_integers ... ok
+test identity_integer_boundaries_survive_json_without_precision_loss ... ok
+test invalid_dimensions_versions_and_field_types_are_rejected ... ok
+test missing_sessions_and_unsafe_or_oversized_addresses_are_rejected ... ok
+test legacy_uri_only_snapshots_are_rejected_before_session_lookup ... ok
+test invalid_split_ratios_axes_and_unexpected_fields_are_rejected ... ok
+test roundtrip_preserves_nested_tabs_geometry_focus_and_maximization ... ok
+test deepest_supported_tree_stays_within_json_parser_depth ... ok
+test tab_and_pane_limits_are_enforced_in_both_directions ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.99s
+   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `release` profile [optimized] target(s) in 8.01s
+
+Schema-2 incarnation + resize-failure regression: ["python3", "tests/workspaces.py", "--binary", "target/release/ztty", "--output", "artifacts/layout-restore-final.json", "--screenshot", "artifacts/layout-restore-final.png"]
+{
+  "ok": true,
+  "checks": [
+    "two PTYs share one workspace and only the focused pane receives real keyboard input",
+    "split resize, swap, maximize and restore change real window geometry",
+    "tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell",
+    "moving panes between native windows and layouts preserves the PTY process",
+    "versioned CLI layout snapshots restore tabs/splits/geometry with unchanged PTY PIDs; unknown sessions and nonlocal restores fail before mutation",
+    "injected ioctl EIO keeps both containers, every view, PTY identity and old dimensions alive; retrying the same snapshot repairs actual PTY sizes",
+    "rename keeps the URI stable; detach and observe reattach preserve PTY/output and enforce read-only input",
+    "per-request input ownership rejects old operators and permits multiple observers",
+    "a stale layout cannot adopt a new PTY that reuses the closed session's origin/name; rejection preserves the replacement view and process",
+    "all launch/attach waiters complete and sessions release their views and PTYs"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/target/release/ztty",
+  "binary_sha256": "10bee8c989d53e97491368805ae814258fe452bc643816f68a20ef1c87e1db68",
+  "test_script_sha256": "52907f889ee8a202e7e4339c72e798c5c0bc1de76103da49a327296e7862323d",
+  "display": ":11361",
+  "xserver_pid": 1790430,
+  "xserver_ownership": {
+    "display": ":11361",
+    "pid": 1790430,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X11361",
+        "inode": 66896182,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X11361",
+        "inode": 66896181,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "fault_injection": {
+    "source": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/ioctl_resize_fault.c",
+    "source_sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "library_sha256": "fe2aed76f6906445d9192eaef4e2b95f6e59091492d85dd69ef3e3d24eb6a45f",
+    "compile_command": [
+      "/usr/bin/cc",
+      "-shared",
+      "-fPIC",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-o",
+      "/tmp/ztty-workspaces-l98mosj5/ioctl_resize_fault.so",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/ioctl_resize_fault.c"
+    ],
+    "compiler_stdout": "",
+    "compiler_stderr": "",
+    "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
+    "attempts": [
+      {
+        "pid": 1790660,
+        "fd": 14,
+        "rows": 26,
+        "cols": 100,
+        "errno": 5
+      },
+      {
+        "pid": 1790660,
+        "fd": 8,
+        "rows": 12,
+        "cols": 100,
+        "errno": 5
+      }
+    ],
+    "error_response": {
+      "ok": false,
+      "error": "cannot resize split PTY: Resize: OS error 5"
+    },
+    "child_pids": {
+      "alpha": 1790666,
+      "beta": 1790669,
+      "gamma": 1790678,
+      "delta": 1790690
+    },
+    "pty_sizes_before": {
+      "alpha": [
+        47,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        47,
+        12
+      ]
+    },
+    "old_container": 2097205,
+    "restored_container_after_error": 2097217,
+    "child_start_ticks": {
+      "alpha": 4644169,
+      "beta": 4644171,
+      "gamma": 4644176,
+      "delta": 4644194
+    },
+    "child_window_ids": {
+      "alpha": 2097154,
+      "beta": 2097160,
+      "gamma": 2097184,
+      "delta": 2097209
+    },
+    "pty_sizes_recovered": {
+      "alpha": [
+        100,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        100,
+        26
+      ]
+    }
+  },
+  "broker_pid": 1790660,
+  "broker_start_ticks": 4644162,
+  "screenshot": "artifacts/layout-restore-final.png",
+  "incarnation_reuse": {
+    "uri": "ztty://local/incarnation",
+    "previous_id": 5,
+    "replacement_id": 6,
+    "previous_pid": 1790729,
+    "replacement_pid": 1790737,
+    "previous_created_at": 1794954396750,
+    "replacement_created_at": 1794954396772,
+    "rejected_restore": {
+      "ok": false,
+      "error": "workspace session identity is no longer available"
+    }
+  },
+  "stderr": ""
+}
+
+Schema-2 regression with rendered-pane screenshot fence: ["python3", "tests/workspaces.py", "--binary", "target/release/ztty", "--output", "artifacts/layout-restore-final.json", "--screenshot", "artifacts/layout-restore-final.png"]
+{
+  "ok": true,
+  "checks": [
+    "two PTYs share one workspace and only the focused pane receives real keyboard input",
+    "split resize, swap, maximize and restore change real window geometry",
+    "tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell",
+    "moving panes between native windows and layouts preserves the PTY process",
+    "versioned CLI layout snapshots restore tabs/splits/geometry with unchanged PTY PIDs; unknown sessions and nonlocal restores fail before mutation",
+    "injected ioctl EIO keeps both containers, every view, PTY identity and old dimensions alive; retrying the same snapshot repairs actual PTY sizes",
+    "rename keeps the URI stable; detach and observe reattach preserve PTY/output and enforce read-only input",
+    "per-request input ownership rejects old operators and permits multiple observers",
+    "a stale layout cannot adopt a new PTY that reuses the closed session's origin/name; rejection preserves the replacement view and process",
+    "all launch/attach waiters complete and sessions release their views and PTYs"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/target/release/ztty",
+  "binary_sha256": "10bee8c989d53e97491368805ae814258fe452bc643816f68a20ef1c87e1db68",
+  "test_script_sha256": "4b08e0c060a5a0dd5a0fd608bd9e2e9dd96d01eab5daa443f9ac649b5091b60a",
+  "display": ":6400",
+  "xserver_pid": 1813385,
+  "xserver_ownership": {
+    "display": ":6400",
+    "pid": 1813385,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X6400",
+        "inode": 67084409,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X6400",
+        "inode": 67084408,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "fault_injection": {
+    "source": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/ioctl_resize_fault.c",
+    "source_sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "library_sha256": "fe2aed76f6906445d9192eaef4e2b95f6e59091492d85dd69ef3e3d24eb6a45f",
+    "compile_command": [
+      "/usr/bin/cc",
+      "-shared",
+      "-fPIC",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-o",
+      "/tmp/ztty-workspaces-nr9_x5g_/ioctl_resize_fault.so",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/ioctl_resize_fault.c"
+    ],
+    "compiler_stdout": "",
+    "compiler_stderr": "",
+    "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
+    "attempts": [
+      {
+        "pid": 1813400,
+        "fd": 14,
+        "rows": 26,
+        "cols": 100,
+        "errno": 5
+      },
+      {
+        "pid": 1813400,
+        "fd": 8,
+        "rows": 12,
+        "cols": 100,
+        "errno": 5
+      }
+    ],
+    "error_response": {
+      "ok": false,
+      "error": "cannot resize split PTY: Resize: OS error 5"
+    },
+    "child_pids": {
+      "alpha": 1813403,
+      "beta": 1813405,
+      "gamma": 1813407,
+      "delta": 1813423
+    },
+    "pty_sizes_before": {
+      "alpha": [
+        47,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        47,
+        12
+      ]
+    },
+    "old_container": 2097205,
+    "restored_container_after_error": 2097217,
+    "child_start_ticks": {
+      "alpha": 4656194,
+      "beta": 4656196,
+      "gamma": 4656201,
+      "delta": 4656209
+    },
+    "child_window_ids": {
+      "alpha": 2097154,
+      "beta": 2097160,
+      "gamma": 2097184,
+      "delta": 2097209
+    },
+    "pty_sizes_recovered": {
+      "alpha": [
+        100,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        100,
+        26
+      ]
+    }
+  },
+  "broker_pid": 1813400,
+  "broker_start_ticks": 4656188,
+  "screenshot_glyph_pixels": {
+    "alpha": 1928,
+    "beta": 1502
+  },
+  "screenshot": "artifacts/layout-restore-final.png",
+  "incarnation_reuse": {
+    "uri": "ztty://local/incarnation",
+    "previous_id": 5,
+    "replacement_id": 6,
+    "previous_pid": 1813438,
+    "replacement_pid": 1813440,
+    "previous_created_at": 1794954516927,
+    "replacement_created_at": 1794954516950,
+    "rejected_restore": {
+      "ok": false,
+      "error": "workspace session identity is no longer available"
+    }
+  },
+  "stderr": ""
+}

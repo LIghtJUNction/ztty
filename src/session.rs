@@ -6,7 +6,7 @@ use crate::{
     json::{self, Value},
     key, key_modifiers,
     layout::{Axis, Layout},
-    modifiers, os, paste, search,
+    modifiers, os, paste, search, workspace_state,
     x11::{self, Connection, Selection, Window},
 };
 use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
@@ -468,17 +468,21 @@ impl Ui {
             }
             x11::CONFIGURE_NOTIFY => {
                 let e = unsafe { event.configure };
-                if e.width != self.window.width || e.height != self.window.height {
-                    let (cols, rows) = self.window.resize(e.width, e.height);
-                    if allow_input {
-                        terminal.resize(cols, rows);
-                        pty.resize(pty_size(cols, rows, Some(&self.window)))
-                            .map_err(|_| "cannot resize the PTY")?;
-                    }
-                    self.history = self.history.min(terminal.history_len());
-                    self.selection = None;
-                    self.force = true;
+                // Ignore geometry queued before the latest layout request.
+                // This uses Xlib sequence numbers without a server round trip.
+                if e.serial < self.window.configure_serial.get() {
+                    return Ok(());
                 }
+                let (cols, rows) = self.window.resize(e.width, e.height);
+                if allow_input && (cols != terminal.cols() || rows != terminal.rows()) {
+                    match pty.resize(pty_size(cols, rows, Some(&self.window))) {
+                        Ok(()) => terminal.resize(cols, rows),
+                        Err(error) => self.error(format!("cannot resize the PTY: {error}")),
+                    }
+                }
+                self.history = self.history.min(terminal.history_len());
+                self.selection = None;
+                self.force = true;
             }
             x11::FOCUS_IN | x11::FOCUS_OUT => {
                 let focused = unsafe { event.kind } == x11::FOCUS_IN;
@@ -1341,6 +1345,7 @@ impl Pool {
             .placements(workspace.window.width, workspace.window.height);
         let members = workspace.layout.panes();
         let active = workspace.layout.focused;
+        let mut failure = None;
         for session in &mut self.sessions {
             if !members.contains(&session.id) {
                 continue;
@@ -1358,15 +1363,26 @@ impl Pool {
                     && !ui.read_only
                     && (cols != session.terminal.cols() || rows != session.terminal.rows())
                 {
-                    session.terminal.resize(cols, rows);
-                    if !session.eof {
-                        session
-                            .pty
-                            .resize(pty_size(cols, rows, Some(&ui.window)))
-                            .map_err(|e| format!("cannot resize split PTY: {e}"))?;
+                    let resized = if session.eof {
+                        true
+                    } else {
+                        match session.pty.resize(pty_size(cols, rows, Some(&ui.window))) {
+                            Ok(()) => true,
+                            Err(error) => {
+                                if failure.is_none() {
+                                    failure = Some(format!("cannot resize split PTY: {error}"));
+                                }
+                                false
+                            }
+                        }
+                    };
+                    // Keep the model at the accepted PTY size after a failed
+                    // ioctl so the next arrange retries instead of skipping it.
+                    if resized {
+                        session.terminal.resize(cols, rows);
+                        ui.history = ui.history.min(session.terminal.history_len());
+                        ui.selection = None;
                     }
-                    ui.history = ui.history.min(session.terminal.history_len());
-                    ui.selection = None;
                 }
                 ui.window.visible(true);
                 ui.force = true;
@@ -1389,7 +1405,7 @@ impl Pool {
                 ui.window.raise();
             }
         }
-        Ok(())
+        failure.map_or(Ok(()), Err)
     }
 
     fn group(&mut self, target: u64, moved: u64, mode: &str) -> Result<(), String> {
@@ -1524,6 +1540,116 @@ impl Pool {
             request.set("layout", Value::from(mode));
         }
         self.create(&request)
+    }
+
+    fn save_layout(&self, index: usize) -> Result<Value, String> {
+        let session = &self.sessions[index];
+        let ui = session
+            .ui
+            .as_ref()
+            .filter(|ui| ui.open && ui.window.id != 0)
+            .ok_or("session has no open view")?;
+        let single;
+        let (layout, width, height) = if let Some(index) = self.workspace(session.id) {
+            let workspace = &self.workspaces[index];
+            (
+                &workspace.layout,
+                workspace.window.width,
+                workspace.window.height,
+            )
+        } else {
+            single = Layout::new(session.id);
+            (&single, ui.window.width, ui.window.height)
+        };
+        let broker_pid = unsafe { os::getpid() } as u32;
+        workspace_state::export(layout, width, height, |id| {
+            self.sessions
+                .iter()
+                .find(|s| s.id == id)
+                .map(|s| workspace_state::SessionIdentity {
+                    uri: s.uri.clone(),
+                    id: s.id,
+                    created_at: s.created_at,
+                    broker_pid,
+                })
+        })
+        .map_err(String::from)
+    }
+
+    fn restore_layout(&mut self, value: &Value) -> Result<Value, String> {
+        let broker_pid = unsafe { os::getpid() } as u32;
+        let snapshot = workspace_state::import(value, |uri, id, created_at, saved_broker| {
+            self.sessions
+                .iter()
+                .find(|s| {
+                    s.uri == uri
+                        && s.id == id
+                        && s.created_at == created_at
+                        && saved_broker == broker_pid
+                })
+                .map(|s| s.id)
+        })
+        .map_err(String::from)?;
+        let members = snapshot.layout.panes();
+        let focused = snapshot.layout.focused;
+        let active = self
+            .sessions
+            .iter()
+            .position(|s| s.id == focused)
+            .ok_or("focused session is unavailable")?;
+        let display = self.sessions[active]
+            .ui
+            .as_ref()
+            .ok_or("layout sessions must have attached views")?
+            .window
+            .display;
+        // All schema, identity and display checks finish before changing any
+        // live layout. A snapshot never starts or resurrects child processes.
+        for id in &members {
+            let ui = self
+                .sessions
+                .iter()
+                .find(|s| s.id == *id)
+                .and_then(|s| s.ui.as_ref())
+                .filter(|ui| ui.open && ui.window.id != 0)
+                .ok_or("layout sessions must have attached views")?;
+            if ui.window.display != display {
+                return Err("layout sessions must use the same display".into());
+            }
+        }
+        let mut window = x11::Container::new(&self.sessions[active].ui.as_ref().unwrap().window);
+        window.resize(snapshot.width, snapshot.height);
+        let parent = window.id;
+        for session in &mut self.sessions {
+            if members.contains(&session.id) {
+                let ui = session.ui.as_mut().unwrap();
+                ui.window.parent(Some(parent));
+                ui.workspace = Some(parent);
+            }
+        }
+        for workspace in &mut self.workspaces {
+            for id in &members {
+                workspace.layout.remove(*id);
+            }
+        }
+        self.workspaces.retain(|w| !w.layout.tabs.is_empty());
+        // Own the new parent before any fallible resize. Dropping it on an
+        // error would destroy the views we have just reparented into it.
+        self.workspaces.push(Workspace {
+            window,
+            layout: snapshot.layout,
+            title: String::new(),
+        });
+        let restored = self.workspaces.len() - 1;
+        let mut failure = None;
+        for index in 0..self.workspaces.len() {
+            if let Err(error) = self.arrange(index, index == restored)
+                && failure.is_none()
+            {
+                failure = Some(error);
+            }
+        }
+        failure.map_or_else(|| Ok(self.sessions[active].info()), Err)
     }
 
     fn action(&mut self, index: usize, action: &str) -> Result<Value, String> {
@@ -1823,6 +1949,14 @@ impl Pool {
         if op == "create" {
             return self.create(request).map(Reply::Value);
         }
+        if op == "restore-layout" {
+            if actor(request)? != "local" {
+                return Err("restoring desktop layouts requires local control".into());
+            }
+            return self
+                .restore_layout(request.get("layout").ok_or("layout snapshot is required")?)
+                .map(Reply::Value);
+        }
         if op == "list" {
             let filter = request.get("filter").and_then(Value::as_str).unwrap_or("");
             if filter.len() > 256 {
@@ -1870,6 +2004,7 @@ impl Pool {
             );
         }
         match op {
+            "save-layout" => self.save_layout(index).map(Reply::Value),
             "info" => Ok(Reply::Value(self.sessions[index].info())),
             "commands" => {
                 let commands = self.sessions[index]
@@ -2112,6 +2247,12 @@ impl Pool {
                     continue;
                 }
                 let id = event.window();
+                let kind = unsafe { event.kind };
+                if matches!(kind, x11::FOCUS_IN | x11::FOCUS_OUT)
+                    && (kind == x11::FOCUS_IN) != (x11::input_focus(connection.display) == id)
+                {
+                    continue;
+                }
                 if let Some(index) = self
                     .workspaces
                     .iter()
@@ -2121,6 +2262,9 @@ impl Pool {
                         x11::CONFIGURE_NOTIFY => {
                             let e = unsafe { event.configure };
                             let w = &mut self.workspaces[index].window;
+                            if e.serial < w.configure_serial {
+                                continue;
+                            }
                             if w.width != e.width || w.height != e.height {
                                 w.width = e.width.max(1);
                                 w.height = e.height.max(1);
@@ -2225,6 +2369,9 @@ impl Pool {
                             }
                             continue;
                         }
+                    }
+                    if kind == x11::FOCUS_IN && !self.sessions[index].ui.as_ref().unwrap().visible {
+                        continue;
                     }
                     if kind == x11::BUTTON_PRESS || kind == x11::FOCUS_IN {
                         let session_id = self.sessions[index].id;
