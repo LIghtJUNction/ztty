@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Accounting and publication regressions; all numbers below are test fixtures."""
 import base64
+import copy
+import hashlib
+import json
 from pathlib import Path
 import re
 import sys
@@ -28,14 +31,20 @@ def report(counts=(10,), modes=("shared",), workloads=("idle",), repetitions=3):
                             "ok": True, "windows": count, "mode": mode, "workload": workload,
                             "app": app, "repetition": repetition,
                             "application": {"Rss_bytes": count * 4096, "Pss_bytes": count * 2048,
-                                            "Private_bytes": count * 1024},
+                                            "Private_bytes": count * 1024, "Swap_bytes": count * 64},
+                            "xserver": {"after": {"Pss_bytes": 8192, "Swap_bytes": 128},
+                                        "delta": {"Pss_bytes": -1024}},
+                            "memory_samples": [{"application": {"Swap_bytes": count * 32}},
+                                               {"application": {"Swap_bytes": count * 64}},
+                                               {"application": {"Swap_bytes": count * 96}}],
                             "latency_p50_us": 5, "latency_p95_us": 9,
                             "output_mib_per_second": 15, "gui_process_count": 1,
                             "application_process_counts": [1, 1, 1],
                         })
     return {"schema": 2, "ok": True, "timestamp": "2026-11-18T00:00:00Z", "runs": runs,
             "settings": {"counts": list(counts), "modes": list(modes),
-                         "workloads": list(workloads), "repetitions": repetitions},
+                         "workloads": list(workloads), "repetitions": repetitions,
+                         "memory_settle_seconds": 1.0},
             "binaries": {app: {"version": {"stdout": app + " fixture"}} for app in bench.APPS}}
 
 
@@ -70,6 +79,68 @@ class AccountingTests(unittest.TestCase):
 
 
 class PublicationTests(unittest.TestCase):
+    def test_server_pss_and_swap_are_paired_before_aggregation(self):
+        data = report()
+        selected = [run for run in data["runs"] if run["app"] == "ztty"]
+        for run, app_pss, server_pss, server_swap, app_swaps in zip(
+                selected, (100, 300, 1000), (900, 100, 50), (8, 0, 100),
+                ((1, 40), (90, 2), (5, 6))):
+            run["application"]["Pss_bytes"] = app_pss
+            run["xserver"]["after"] = {"Pss_bytes": server_pss, "Swap_bytes": server_swap}
+            run["memory_samples"] = [{"application": {"Swap_bytes": value}} for value in app_swaps]
+        row = next(row for row in bench.summarize(data["runs"]) if row["app"] == "ztty")
+        self.assertEqual(row["median_app_plus_xserver_pss_bytes"], 1000)
+        self.assertEqual(row["app_plus_xserver_pss_range_bytes"], [400, 1050])
+        self.assertEqual(row["sampled_application_swap_range_bytes"], [1, 90])
+        self.assertEqual(row["sampled_app_plus_xserver_swap_range_bytes"], [2, 106])
+        self.assertEqual(row["max_sampled_app_plus_xserver_swap_bytes"], 106)
+        self.assertEqual(row["xserver_delta_pss_range_bytes"], [-1024, -1024])
+
+    def test_missing_server_pss_is_unavailable_and_cannot_draw_overview(self):
+        data = report()
+        del data["runs"][0]["xserver"]["after"]["Pss_bytes"]
+        row = next(row for row in bench.summarize(data["runs"]) if row["app"] == "ztty")
+        self.assertIsNone(row["median_app_plus_xserver_pss_bytes"])
+        self.assertIsNone(row["app_plus_xserver_pss_range_bytes"])
+        with self.assertRaisesRegex(ValueError, "unavailable"):
+            bench.svg_document(data)
+        ET.fromstring(bench.scaling_svg_document(data))
+
+    def test_missing_swap_snapshot_does_not_become_zero_or_partial_maximum(self):
+        for remove_snapshots in (False, True):
+            data = report()
+            if remove_snapshots:
+                del data["runs"][0]["memory_samples"]
+            else:
+                del data["runs"][0]["memory_samples"][0]["application"]["Swap_bytes"]
+            row = next(row for row in bench.summarize(data["runs"]) if row["app"] == "ztty")
+            self.assertIsNone(row["max_sampled_application_swap_bytes"])
+            self.assertIsNone(row["max_sampled_app_plus_xserver_swap_bytes"])
+            self.assertIsNone(row["sampled_application_swap_range_bytes"])
+            self.assertIn("unavailable", bench.scaling_svg_document(data))
+
+    def test_invalid_optional_counters_are_rejected(self):
+        for value in (-1, float("nan"), float("inf"), "unknown"):
+            data = report()
+            data["runs"][0]["memory_samples"][0]["application"]["Swap_bytes"] = value
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                bench.summarize(data["runs"])
+
+    def test_refresh_summary_preserves_collection_identity_and_all_raw_matrix_cells(self):
+        data = report(counts=(1, 10), modes=bench.MODES, repetitions=1)
+        data.update({"script_sha256": "original-collector", "git": {"head": "original-source"}})
+        before = copy.deepcopy(data)
+        bench.refresh_summary(data)
+        self.assertEqual(data["runs"], before["runs"])
+        for key in ("timestamp", "script_sha256", "git", "settings", "binaries"):
+            self.assertEqual(data[key], before[key])
+        self.assertEqual(len(data["summary"]), 12)
+        self.assertEqual(data["derived"]["source_runs_sha256"],
+                         hashlib.sha256(json.dumps(data["runs"], sort_keys=True).encode()).hexdigest())
+        self.assertEqual(data["derived"]["renderer_script_sha256"], bench.sha256(bench.__file__))
+        self.assertIn("across 1 runs", data["derived"]["combined_pss_formula"])
+        self.assertIn("Resident PSS excludes swap", bench.scaling_svg_document(data))
+
     def test_each_count_mode_workload_has_its_own_aggregate(self):
         data = report(counts=(1, 5, 10, 20), modes=bench.MODES, workloads=bench.WORKLOADS)
         bench.validate_report(data)
@@ -128,7 +199,7 @@ class PublicationTests(unittest.TestCase):
     def test_legacy_baseline_remains_renderable(self):
         data = report()
         data["schema"] = 1
-        data["settings"] = {"windows": 10, "repetitions": 3}
+        data["settings"] = {"windows": 10, "repetitions": 3, "memory_settle_seconds": 1.0}
         for run in data["runs"]:
             del run["mode"]
             del run["workload"]

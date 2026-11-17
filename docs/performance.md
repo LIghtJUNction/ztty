@@ -19,9 +19,44 @@ machines; neither establishes physical key-to-screen latency.
 
 Current measurements are presented first. The original 0.1 measurements,
 including its Kitty comparison, remain below with their historical source and
-conditions. No new comparative Kitty or Ghostty performance run was performed
-for 0.2, and native macOS/Windows performance has not been measured.
+conditions. The ten-window shared-instance comparison is recorded separately
+below. Native macOS/Windows performance has not been measured.
 
+## Ten-window terminal comparison
+
+The [current three-terminal figure](benchmarks/terminals-10-windows.svg) and
+[raw observations](benchmarks/terminals-10-windows.json) compare ten windows each
+of ztty, Ghostty and Kitty, using their shared-instance modes. This run uses the
+integrated Linux implementation with graphics support. It is separate from the
+earlier one/four/eight-window sharing comparison below.
+
+The figure reports application resident PSS and a second measure that adds the
+full dedicated Xvfb server's resident PSS. That second measure includes the
+server baseline; it is not an estimate of the marginal cost on an existing
+desktop. Application helpers are included. PTY probes and the private D-Bus
+daemon remain separate. Private memory, swap counters, XRes resources and
+individual observations remain in the JSON.
+
+DSR latency and output throughput measure logical PTY processing on software
+X11, with one active window and nine idle. They do not measure display frame
+rate or keyboard-to-photon latency. The measured machine has 24 logical CPUs
+and shared load; swap was observed. The SVG discloses maximum paired Swap
+counters, and the raw record retains every run, including negative X-server
+PSS differences. See the [method and limits](benchmarks/README.md) before using
+these measurements to compare other desktops or workloads.
+
+Rebuild the current source and regenerate the measurements, JSON and SVG:
+
+```sh
+make benchmark-terminals
+```
+
+To recompute summaries and the SVG from the existing raw observations without
+new measurements:
+
+```sh
+python3 tools/benchmark_terminals.py --render-only
+```
 ## What each measurement means
 
 | Layer | Measurement | Included | Excluded |
@@ -231,7 +266,8 @@ scene, and temporary decoding and renderer resources have separate costs; see
 
 Remaining performance acceptance includes full-history and image-heavy process
 memory, sustained mixed TUI workloads, native macOS/Windows timings, hardware GPU
-workloads, physical input-to-visible-pixel latency, and a comparable Ghostty run.
+workloads and physical input-to-visible-pixel latency. The ten-window Ghostty
+comparison covers only the software-X11 conditions described above.
 Linux's damaged-row renderer and the native frontends' full-frame paths must be
 measured separately. Functional desktop image acceptance is now complete for
 the stated Linux tests; a performance claim of overall Kitty/Ghostty superiority

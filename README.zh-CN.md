@@ -1,8 +1,12 @@
 # ztty
 
+<!-- terminal-benchmark:start -->
 [![10 个终端的实测内存对比](docs/benchmarks/terminals-10-windows.svg)](docs/benchmarks/verification-2026-11-18.md)
 
-Linux/Xvfb 历史测量包含应用启动器与辅助进程：ztty **RSS 58.75 MiB / PSS 15.36 MiB**，Ghostty **818.23 / 775.36**，Kitty **397.68 / 351.16**。当时主机 load1 为 31.02–36.57，不能据此宣传安静环境下的性能排名。X server 资源另计，真实 GPU 显存及输入到显示延迟尚未测量。[原始数据、负载验证与复查方法](docs/benchmarks/verification-2026-11-18.md)。
+每个应用开启 10 个终端。[原始测量](docs/benchmarks/terminals-10-windows.json) · [条件与限制](docs/benchmarks/verification-2026-11-18.md) · 从当前源码重新构建并测量：`make benchmark-terminals`。
+
+请同时检查主机负载和 Swap，区分 RSS 与 PSS。当前存档基线处于资源竞争环境，不能作为安静环境下的性能排名；X server 资源另计，DSR 探针不测量真实 GPU 显存或输入到显示延迟。
+<!-- terminal-benchmark:end -->
 
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。
 0.2 版本补齐了 macOS、Windows 后端，并加入静态 Kitty 图形协议。
