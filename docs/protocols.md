@@ -33,11 +33,10 @@ and runs while the cursor is focused and visible. Resizing preserves and crops
 rows, keeps the cursor visible, and can move displaced primary-screen rows into
 history; it does not reflow historical lines.
 
-Primary DA identifies the numeric VT102 profile with `CSI ? 06 c`. The leading
-zero leaves the numeric ID unchanged and satisfies the minimum response length
-used by [Kitty's graphics probe](https://github.com/kovidgoyal/kitty/blob/master/kittens/icat/detect.go).
-No additional DA capability fields are asserted. Kitty graphics support and
-transport choices are established by their own queries.
+Primary DA uses `CSI ? 62 ; 4 c`: a VT220-style identification with the Sixel
+feature field. No other optional DA features are asserted. This also satisfies
+the minimum response length used by [Kitty's graphics probe](https://github.com/kovidgoyal/kitty/blob/master/kittens/icat/detect.go).
+Kitty graphics support and transport choices are established by their own queries.
 
 ## Kitty graphics
 
@@ -116,12 +115,38 @@ new valid image after rejection. The test sources are
 | --- | --- |
 | Kitty transport | File paths, temporary files, shared memory |
 | Kitty rendering extensions | Animation, Unicode placeholders, relative placements |
-| Other image protocols | Sixel |
+| Other image protocols | ReGIS |
 | Clipboard and window protocols | OSC 52, native Wayland text-input protocols |
 | Text layout | Full complex-script shaping, complete emoji ZWJ layout, history reflow |
 
 Applications should use direct transmission and query capabilities instead of
 inferring full Kitty compatibility from successful static-image display.
+
+## Sixel
+
+The shared `no_std` core accepts `ESC P ... q` Sixel images, commits only at ST,
+and reuses the existing RGBA scene and native renderers. RGB/HLS color registers,
+repeat compression, raster extents, aspect ratio, transparent/opaque backgrounds,
+color overprinting, and arbitrary PTY chunk boundaries are implemented. Modes
+80, 1070 and 8452 control display origin/scrolling, palette scope and cursor
+placement. Default scrolling starts at the text cursor and ends at column zero
+on the following text row; display mode preserves the cursor. Details and
+resource limits are in [zgraphics](../crates/zgraphics/README.md#sixel).
+
+Sixel images use the scene's behind-text layer and remain anchored to cell rows.
+The implementation does not emulate a VT340's framebuffer for later mixed text
+and image overpainting: text remains visible over images, and partial-region
+scrolling follows the existing anchor policy. Shared palettes seed subsequent
+images; changing a register does not recolor an already completed RGBA image.
+These are explicit rendering limits, so successful decoding does not establish
+complete VT340 compatibility.
+
+Decoder validation uses the [DEC manual](https://vt100.net/docs/vt3xx-gp/chapter14.html),
+the modern [xterm control reference](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html),
+and an independent [libsixel pixel comparison](../tests/sixel_reference.py).
+The [measurement](measurements/sixel-linux.json) records source/binary hashes,
+chunk sizes, exact pixel results and reference-decoder discrepancies. Native GUI
+presentation and macOS/Windows acceptance must be recorded separately.
 
 ## Acceptance coverage
 

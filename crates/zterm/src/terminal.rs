@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 use alloc::collections::VecDeque;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -156,8 +157,8 @@ impl Modes {
 pub struct Terminal {
     parser: Parser<4096>,
     state: State,
-    // zvte intentionally does not buffer APCs. This framing layer handles only
-    // ESC _ strings and leaves all text, UTF-8, CSI, OSC and DCS work to zvte.
+    // Large image bodies bypass fixed string buffers. zvte parses VT text and
+    // DCS headers; framing distinguishes ST from cancellation for image data.
     framing: u8,
     apc: zgraphics::CommandStream,
 }
@@ -223,21 +224,29 @@ impl Terminal {
             match self.framing {
                 0 => {
                     // Keep ordinary VT chunks intact, including every CSI/SGR
-                    // in them. Only the rare APC introducer requires splitting.
+                    // in them. Only image-capable string introducers split it.
                     // `contains` uses core's byte-search specialization, so
                     // the common no-underscore path scans words, not callbacks.
                     let remaining = &bytes[offset..];
-                    let apc = if remaining.contains(&b'_') {
-                        remaining.windows(2).position(|pair| pair == b"\x1b_")
+                    let string = if remaining.contains(&b'_') || remaining.contains(&b'P') {
+                        remaining
+                            .windows(2)
+                            .position(|pair| pair[0] == 0x1b && matches!(pair[1], b'_' | b'P'))
                     } else {
                         None
                     };
-                    if let Some(start) = apc {
+                    if let Some(start) = string {
                         // First deliver ESC: zvte must cancel/dispatch an older
                         // OSC or DCS before the APC dispatcher takes ownership.
-                        self.parser
-                            .advance(&remaining[..start + 1], &mut self.state);
-                        self.begin_apc();
+                        if remaining[start + 1] == b'_' {
+                            self.parser
+                                .advance(&remaining[..start + 1], &mut self.state);
+                            self.begin_apc();
+                        } else {
+                            self.parser
+                                .advance(&remaining[..start + 2], &mut self.state);
+                            self.framing = 4;
+                        }
                         offset += start + 2;
                     } else {
                         self.parser.advance(remaining, &mut self.state);
@@ -250,6 +259,9 @@ impl Terminal {
                     offset += 1;
                     if byte == b'_' {
                         self.begin_apc();
+                    } else if byte == b'P' {
+                        self.parser.advance(&[byte], &mut self.state);
+                        self.framing = 4;
                     } else {
                         self.parser.advance(&[byte], &mut self.state);
                         self.framing = u8::from(byte == 0x1b);
@@ -285,7 +297,7 @@ impl Terminal {
                         _ => unreachable!(),
                     }
                 }
-                _ => {
+                3 => {
                     let byte = bytes[offset];
                     if byte == b'\\' {
                         offset += 1;
@@ -306,6 +318,61 @@ impl Terminal {
                         self.framing = 1;
                     }
                 }
+                4 => {
+                    // DCS headers are short, bounded by zvte's parameter array.
+                    let byte = bytes[offset];
+                    offset += 1;
+                    self.parser.advance(&[byte], &mut self.state);
+                    self.framing = match byte {
+                        0x1b => 1,
+                        0x18 | 0x1a | 0x9c => 0,
+                        0x40..=0x7e => {
+                            if self.state.sixel_active {
+                                5
+                            } else {
+                                0
+                            }
+                        }
+                        _ => 4,
+                    };
+                }
+                5 => {
+                    let end = bytes[offset..]
+                        .iter()
+                        .position(|b| matches!(*b, 0x1b | 0x18 | 0x1a | 0x9c))
+                        .map(|i| offset + i)
+                        .unwrap_or(bytes.len());
+                    for &byte in &bytes[offset..end] {
+                        self.state.graphics.sixel_put(byte);
+                    }
+                    offset = end;
+                    if offset == bytes.len() {
+                        continue;
+                    }
+                    let byte = bytes[offset];
+                    offset += 1;
+                    if byte == 0x1b {
+                        self.framing = 6;
+                    } else {
+                        self.state.sixel_complete = byte == 0x9c;
+                        self.parser.advance(&[byte], &mut self.state);
+                        self.state.sixel_complete = false;
+                        self.framing = 0;
+                    }
+                }
+                6 => {
+                    if bytes[offset] == b'\\' {
+                        offset += 1;
+                        self.state.sixel_complete = true;
+                        self.parser.advance(b"\x1b\\", &mut self.state);
+                        self.state.sixel_complete = false;
+                        self.framing = 0;
+                    } else {
+                        self.parser.advance(b"\x1b", &mut self.state);
+                        self.framing = 1;
+                    }
+                }
+                _ => unreachable!(),
             }
         }
     }
@@ -639,6 +706,12 @@ struct State {
     dcs_query: bool,
     dcs: Vec<u8>,
     dcs_overflow: bool,
+    sixel_active: bool,
+    sixel_complete: bool,
+    sixel_display: bool,
+    sixel_right: bool,
+    sixel_private: bool,
+    sixel_palette: Option<Box<zgraphics::SixelPalette>>,
     last_char: char,
     graphics: zgraphics::Graphics,
     inactive_graphics: zgraphics::Graphics,
@@ -676,6 +749,12 @@ impl State {
             dcs_query: false,
             dcs: Vec::new(),
             dcs_overflow: false,
+            sixel_active: false,
+            sixel_complete: false,
+            sixel_display: false,
+            sixel_right: false,
+            sixel_private: true,
+            sixel_palette: None,
             last_char: ' ',
             graphics: zgraphics::Graphics::default(),
             inactive_graphics: zgraphics::Graphics::default(),
@@ -800,6 +879,59 @@ impl State {
         }
     }
 
+    fn finish_sixel(&mut self) {
+        let mut context = self.graphics_context();
+        if self.sixel_display {
+            context.col = 0;
+            context.row = 0;
+        }
+        let Some(result) = self.graphics.finish_sixel(context) else {
+            return;
+        };
+        if !self.sixel_private {
+            self.sixel_palette = Some(Box::new(result.palette));
+        }
+        if result.height == 0 {
+            return;
+        }
+        if !self.sixel_display {
+            let right = context
+                .col
+                .saturating_add(result.width.div_ceil(self.cell_width) as usize);
+            let rows = result.height.div_ceil(self.cell_height) as usize;
+            // With 8452 the cursor remains beside the last image row. The
+            // default xterm behavior leaves it at the beginning of the next.
+            let advance = rows.saturating_sub(usize::from(self.sixel_right));
+            if self.screen.y <= self.screen.bottom {
+                let end = self.screen.y.saturating_add(advance);
+                let mut overflow = end.saturating_sub(self.screen.bottom);
+                let region = self.screen.bottom - self.screen.top + 1;
+                if self.screen.top != 0 || self.screen.bottom + 1 != self.screen.rows {
+                    overflow = overflow.min(region);
+                }
+                while overflow != 0 {
+                    let count = overflow.min(region);
+                    self.scroll_up(self.screen.top, self.screen.bottom, count, true);
+                    overflow -= count;
+                }
+                self.screen.y = end.min(self.screen.bottom);
+            } else {
+                self.screen.y = self
+                    .screen
+                    .y
+                    .saturating_add(advance)
+                    .min(self.screen.rows - 1);
+            }
+            self.screen.x = if self.sixel_right {
+                right.min(self.screen.cols - 1)
+            } else {
+                0
+            };
+            self.screen.wrap = false;
+        }
+        self.screen.mark_all();
+    }
+
     fn reply(&mut self, value: &str) {
         if self.responses.len() + value.len() <= MAX_RESPONSES {
             self.responses.extend_from_slice(value.as_bytes());
@@ -887,22 +1019,28 @@ impl State {
             self.shell.invalidate_screen(self.line_base);
         }
         let blank = self.style.blank();
-        for _ in 0..count {
-            if top == 0 && bottom + 1 == self.screen.rows {
-                if save_history {
-                    self.record_history_row(0);
+        if count == bottom - top + 1 && (top != 0 || bottom + 1 != self.screen.rows) {
+            for row in top..=bottom {
+                self.screen.row_mut(row).fill(blank);
+            }
+        } else {
+            for _ in 0..count {
+                if top == 0 && bottom + 1 == self.screen.rows {
+                    if save_history {
+                        self.record_history_row(0);
+                    }
+                    self.screen.row0 = (self.screen.row0 + 1) % self.screen.rows;
+                    self.screen.row_mut(bottom).fill(blank);
+                } else {
+                    for y in top..bottom {
+                        let source = self.screen.index(0, y + 1);
+                        let target = self.screen.index(0, y);
+                        self.screen
+                            .cells
+                            .copy_within(source..source + self.screen.cols, target);
+                    }
+                    self.screen.row_mut(bottom).fill(blank);
                 }
-                self.screen.row0 = (self.screen.row0 + 1) % self.screen.rows;
-                self.screen.row_mut(bottom).fill(blank);
-            } else {
-                for y in top..bottom {
-                    let source = self.screen.index(0, y + 1);
-                    let target = self.screen.index(0, y);
-                    self.screen
-                        .cells
-                        .copy_within(source..source + self.screen.cols, target);
-                }
-                self.screen.row_mut(bottom).fill(blank);
             }
         }
         self.graphics.scroll(
@@ -1169,6 +1307,9 @@ impl State {
                 self.screen.dirty[self.screen.y] = true;
             }
             47 | 1047 => self.alternate(enabled, false, mode == 1047),
+            80 => self.sixel_display = enabled,
+            1070 => self.sixel_private = enabled,
+            8452 => self.sixel_right = enabled,
             1048 => {
                 if enabled {
                     self.save_cursor();
@@ -1201,6 +1342,9 @@ impl State {
                 12 => self.modes.cursor_blink,
                 25 => Some(self.modes.cursor_visible),
                 47 | 1047 | 1049 => Some(self.modes.alternate_screen),
+                80 => Some(self.sixel_display),
+                1070 => Some(self.sixel_private),
+                8452 => Some(self.sixel_right),
                 1000 | 1002 | 1003 => Some(self.modes.mouse_tracking == mode),
                 1004 => Some(self.modes.focus_events),
                 1006 => Some(self.modes.sgr_mouse),
@@ -1542,9 +1686,8 @@ impl Perform for State {
         }
         if action == 'c' && param(groups, 0, 0) == 0 {
             match intermediates {
-                // Kitty's graphics probe requires a DA1 payload longer than
-                // three bytes. A leading zero preserves numeric VT102 ID 6.
-                b"" => self.reply("\x1b[?06c"),
+                // VT220-style DA1 advertises the implemented sixel capability.
+                b"" => self.reply("\x1b[?62;4c"),
                 b">" => self.reply("\x1b[>0;1;0c"),
                 _ => {}
             }
@@ -1790,13 +1933,46 @@ impl Perform for State {
         }
     }
 
-    fn hook(&mut self, _params: &Params, intermediates: &[u8], ignore: bool, action: char) {
+    fn hook(&mut self, params: &Params, intermediates: &[u8], ignore: bool, action: char) {
         self.dcs.clear();
         self.dcs_overflow = false;
         self.dcs_query = !ignore && intermediates == b"+" && action == 'q';
+        self.sixel_active = !ignore
+            && intermediates.is_empty()
+            && action == 'q'
+            && params.iter().count() <= 3
+            && params.iter().all(|group| group.len() == 1);
+        if self.sixel_active {
+            let aspect = params
+                .iter()
+                .next()
+                .and_then(|p| p.first())
+                .copied()
+                .unwrap_or(0);
+            let background = params
+                .iter()
+                .nth(1)
+                .and_then(|p| p.first())
+                .copied()
+                .unwrap_or(0);
+            let rgb = self.style.bg;
+            self.graphics.begin_sixel(
+                aspect,
+                background == 1,
+                [(rgb >> 16) as u8, (rgb >> 8) as u8, rgb as u8],
+                if self.sixel_private {
+                    None
+                } else {
+                    self.sixel_palette.as_deref()
+                },
+            );
+        }
     }
 
     fn put(&mut self, byte: u8) {
+        if self.sixel_active {
+            self.graphics.sixel_put(byte);
+        }
         if self.dcs_query {
             if self.dcs.len() < 512 {
                 self.dcs.push(byte);
@@ -1807,6 +1983,14 @@ impl Perform for State {
     }
 
     fn unhook(&mut self) {
+        if self.sixel_active {
+            self.sixel_active = false;
+            if self.sixel_complete {
+                self.finish_sixel();
+            } else {
+                self.graphics.abort_sixel();
+            }
+        }
         if !self.dcs_query || self.dcs_overflow {
             self.dcs_query = false;
             return;
