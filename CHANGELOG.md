@@ -19,6 +19,8 @@
 
 ### Fixed
 
+- Linux input preserves horizontal wheels and extra mouse buttons 8–11; configured bindings support all eleven X11 buttons.
+- Mouse releases follow the destination of their original press across Shift changes; focus and ownership transitions clear held input without cancelling a valid focus-loss clipboard transfer.
 - Workspace restore retains live parent/child windows and retries PTY dimensions after resize errors; stale queued focus/geometry events no longer overwrite the restored layout.
 - Saved layouts reject a replacement session that reuses a closed session's canonical URI.
 
@@ -31,6 +33,7 @@
 
 ### Verification
 
+- Twenty-seven real X11/PTY vectors cover legacy keyboard bytes, four wheel directions, extra buttons, press ownership, focus transitions, X10 mode and custom bindings. Button 11 uses explicitly recorded synthetic X11 events because the virtual pointer exposes ten buttons.
 - Six layout tests and an isolated real X11/PTY acceptance script cover geometry, actual keyboard routing, hidden output, detach/reattach and ownership.
 - Native macOS/Windows workspace UI and multi-view GUI observation remain pending.
 - Native macOS/Windows search, command palette and shared MCP runtime are not yet implemented.

@@ -66,8 +66,11 @@ struct Ui {
     title: String,
     held: [u64; 256],
     intercepted: [bool; 256],
-    local_buttons: [bool; 8],
-    swallowed_buttons: [bool; 8],
+    local_buttons: [bool; 12],
+    swallowed_buttons: [bool; 12],
+    // X11 core motion events expose masks only for buttons 1..5. Track
+    // presses actually sent to the PTY so extra-button drags keep identity.
+    reported_buttons: u16,
     sync_since: Option<u64>,
     blink_deadline: Option<u64>,
     cursor_visible: bool,
@@ -94,8 +97,9 @@ impl Ui {
             title: String::new(),
             held: [0; 256],
             intercepted: [false; 256],
-            local_buttons: [false; 8],
-            swallowed_buttons: [false; 8],
+            local_buttons: [false; 12],
+            swallowed_buttons: [false; 12],
+            reported_buttons: 0,
             sync_since: None,
             blink_deadline: None,
             cursor_visible: true,
@@ -113,6 +117,20 @@ impl Ui {
             os::milliseconds() + 5000,
         ));
         self.force = true;
+    }
+    fn reset_input(&mut self) {
+        self.held.fill(0);
+        self.intercepted.fill(false);
+        self.local_buttons.fill(false);
+        self.swallowed_buttons.fill(false);
+        self.reported_buttons = 0;
+        if let Some(selection) = &mut self.selection {
+            selection.dragging = false;
+        }
+    }
+    fn cancel_input(&mut self) {
+        self.window.cancel_paste();
+        self.reset_input();
     }
     fn find(&mut self, terminal: &Terminal, forward: bool, restart: bool) {
         let Some(search) = &mut self.search else {
@@ -177,6 +195,9 @@ impl Ui {
                 let mut e = unsafe { event.key };
                 let code = (e.keycode as usize).min(255);
                 let press = e.kind == x11::KEY_PRESS;
+                if !press && self.held[code] == 0 {
+                    return Ok(());
+                }
                 self.reset_blink |= press;
                 let symbol = if !press && self.held[code] != 0 {
                     self.held[code]
@@ -345,12 +366,18 @@ impl Ui {
             }
             x11::BUTTON_PRESS | x11::BUTTON_RELEASE => {
                 let e = unsafe { event.button };
+                if !(1..=11).contains(&e.button) {
+                    return Ok(());
+                }
                 let (col, row) =
                     self.window
                         .coordinates(e.x, e.y, terminal.cols(), terminal.rows());
                 let mods = modifiers(e.state);
                 let pressed = e.kind == x11::BUTTON_PRESS;
-                let button_index = (e.button as usize).min(7);
+                let button_index = e.button as usize;
+                let mask = 1u16 << button_index;
+                let was_reported = self.reported_buttons & mask != 0;
+                self.reported_buttons &= !mask;
                 if !pressed && self.swallowed_buttons[button_index] {
                     self.swallowed_buttons[button_index] = false;
                     return Ok(());
@@ -361,7 +388,10 @@ impl Ui {
                     self.local_buttons[button_index] = true;
                 }
                 if !pressed {
-                    local |= self.local_buttons[button_index];
+                    // A release belongs to the destination of its press,
+                    // even when Shift changes while the button is held.
+                    local =
+                        !allow_input || self.local_buttons[button_index] || !was_reported && local;
                     self.local_buttons[button_index] = false;
                 }
                 if pressed && e.button == 1 && mods.0 & 4 != 0 {
@@ -402,34 +432,27 @@ impl Ui {
                         self.force = true;
                     }
                 } else {
-                    let mouse = if e.button == 4 || e.button == 5 {
-                        if !pressed {
-                            return Ok(());
-                        }
-                        MouseEvent::Scroll {
-                            up: e.button == 4,
+                    let mouse = if pressed {
+                        MouseEvent::Press {
+                            button: (e.button - 1) as u8,
                             col,
                             row,
                         }
-                    } else if (1..=3).contains(&e.button) {
-                        if pressed {
-                            MouseEvent::Press {
-                                button: (e.button - 1) as u8,
-                                col,
-                                row,
-                            }
-                        } else {
-                            MouseEvent::Release {
-                                button: (e.button - 1) as u8,
-                                col,
-                                row,
-                            }
-                        }
                     } else {
-                        return Ok(());
+                        if !was_reported {
+                            return Ok(());
+                        }
+                        MouseEvent::Release {
+                            button: (e.button - 1) as u8,
+                            col,
+                            row,
+                        }
                     };
                     encoded.clear();
                     input::encode_mouse_into(mouse, mods, &terminal.modes().input(), encoded);
+                    if pressed && !(4..=7).contains(&e.button) && !encoded.is_empty() {
+                        self.reported_buttons |= mask;
+                    }
                     queue.push(encoded);
                 }
             }
@@ -448,15 +471,8 @@ impl Ui {
                 if !allow_input {
                     return Ok(());
                 }
-                let button = if e.state & 256 != 0 {
-                    Some(0)
-                } else if e.state & 512 != 0 {
-                    Some(1)
-                } else if e.state & 1024 != 0 {
-                    Some(2)
-                } else {
-                    None
-                };
+                let button = (self.reported_buttons != 0)
+                    .then(|| self.reported_buttons.trailing_zeros() as u8 - 1);
                 encoded.clear();
                 input::encode_mouse_into(
                     MouseEvent::Motion { button, col, row },
@@ -490,8 +506,7 @@ impl Ui {
                 self.reset_blink = true;
                 self.force = true;
                 if !focused {
-                    self.held.fill(0);
-                    self.intercepted.fill(false);
+                    self.reset_input();
                 }
                 if allow_input {
                     queue.push(&input::encode_focus(focused, &terminal.modes().input()));
@@ -889,7 +904,7 @@ struct Pool {
     finished: Vec<(String, i32)>,
     reaping: Vec<(i32, u64)>,
     shortcuts: [bool; 256],
-    mouse_shortcuts: [bool; 8],
+    mouse_shortcuts: [bool; 12],
     watcher: config_watch::Watcher,
 }
 
@@ -1009,7 +1024,7 @@ impl Pool {
             finished: Vec::new(),
             reaping: Vec::new(),
             shortcuts: [false; 256],
-            mouse_shortcuts: [false; 8],
+            mouse_shortcuts: [false; 12],
             watcher: config_watch::Watcher::new(),
         }
     }
@@ -1388,8 +1403,7 @@ impl Pool {
                 ui.force = true;
             } else {
                 ui.window.visible(false);
-                ui.held.fill(0);
-                ui.intercepted.fill(false);
+                ui.reset_input();
                 ui.blink_deadline = None;
             }
             ui.visible = placement.is_some();
@@ -1912,7 +1926,7 @@ impl Pool {
                     session.queue.bytes.clear();
                     session.queue.offset = 0;
                     if let Some(ui) = &mut session.ui {
-                        ui.window.cancel_paste();
+                        ui.cancel_input();
                     }
                 }
                 session.input_owner = Some(actor.into());
@@ -1930,7 +1944,7 @@ impl Pool {
                 session.queue.bytes.clear();
                 session.queue.offset = 0;
                 if let Some(ui) = &mut session.ui {
-                    ui.window.cancel_paste();
+                    ui.cancel_input();
                 }
             }
             _ => return Err("control action must be acquire or release".into()),
@@ -2165,7 +2179,7 @@ impl Pool {
                 if let Some(ui) = &mut self.sessions[index].ui {
                     if read_only {
                         ui.read_only = true;
-                        ui.window.cancel_paste();
+                        ui.cancel_input();
                     }
                     let observing =
                         read_only || self.sessions[index].input_owner.as_deref() != Some("local");
@@ -2347,7 +2361,10 @@ impl Pool {
                         }
                     }
                     if kind == x11::BUTTON_RELEASE {
-                        let button = (unsafe { event.button.button } as usize).min(7);
+                        let button = unsafe { event.button.button } as usize;
+                        if !(1..=11).contains(&button) {
+                            continue;
+                        }
                         if self.mouse_shortcuts[button] {
                             self.mouse_shortcuts[button] = false;
                             continue;
@@ -2355,12 +2372,15 @@ impl Pool {
                     }
                     if kind == x11::BUTTON_PRESS {
                         let e = unsafe { event.button };
+                        if !(1..=11).contains(&e.button) {
+                            continue;
+                        }
                         if let Some(action) = actions::lookup(
                             &self.sessions[index].appearance.bindings,
                             0x1000_0000 + u64::from(e.button),
                             e.state,
                         ) {
-                            self.mouse_shortcuts[(e.button as usize).min(7)] = true;
+                            self.mouse_shortcuts[e.button as usize] = true;
                             if let Err(error) = self.action(index, action) {
                                 os::print(2, format!("ztty: {error}\n").as_bytes());
                                 if let Some(ui) = &mut self.sessions[index].ui {

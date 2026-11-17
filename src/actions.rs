@@ -180,7 +180,7 @@ impl Binding {
         };
         if !key.is_empty() {
             text.push_str(key);
-        } else if (0x1000_0001..=0x1000_0007).contains(&self.symbol) {
+        } else if (0x1000_0001..=0x1000_000b).contains(&self.symbol) {
             text.push_str(&format!("button{}", self.symbol - 0x1000_0000));
         } else if (0xffbe..=0xffe0).contains(&self.symbol) {
             text.push_str(&format!("f{}", self.symbol - 0xffbd));
@@ -235,8 +235,8 @@ pub fn parse(value: &str, mouse: bool) -> Result<Binding, &'static str> {
                 + part
                     .strip_prefix("button")
                     .and_then(|s| s.parse::<u64>().ok())
-                    .filter(|n| (1..=7).contains(n))
-                    .ok_or("mouse key must be button1..button7")?
+                    .filter(|n| (1..=11).contains(n))
+                    .ok_or("mouse key must be button1..button11")?
         } else {
             match part {
                 "enter" => 0xff0d,

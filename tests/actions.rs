@@ -35,13 +35,22 @@ fn invalid_keys_modifiers_and_actions_are_rejected() {
     ] {
         assert!(actions::parse(value, false).is_err(), "{value}");
     }
-    assert!(actions::parse("button8 = copy", true).is_err());
+    assert!(actions::parse("button0 = copy", true).is_err());
+    assert!(actions::parse("button12 = copy", true).is_err());
     assert!(actions::parse("button1 = copy", false).is_err());
     assert!(actions::parse("ctrl+x = copy", true).is_err());
 }
 
 #[test]
 fn mouse_and_function_keys_are_not_ambiguous() {
+    for button in 1..=11 {
+        let binding = actions::parse(&format!("button{button} = copy"), true).unwrap();
+        assert_eq!(actions::parse(&binding.config(), true).unwrap(), binding);
+        assert_eq!(
+            actions::lookup(&[binding], 0x1000_0000 + button, 0),
+            Some("copy")
+        );
+    }
     let mouse = actions::parse("alt+button2 = paste-primary", true).unwrap();
     assert_eq!(actions::parse(&mouse.config(), true).unwrap(), mouse);
     assert_eq!(

@@ -77,7 +77,7 @@ mousebind = ctrl+button3 = palette
 Modifiers are `ctrl`, `shift`, `alt`, `super`. Keys include ASCII characters,
 `f1`–`f35`, `enter`, `escape`, `tab`, `backspace`, `space`, arrows, `home`, `end`,
 `pageup`, `pagedown`, `equal`/`plus`, and `minus`. Mouse buttons are `button1`–
-`button7`. Caps Lock and Num Lock do not change binding matching. Custom bindings
+`button11`. Caps Lock and Num Lock do not change binding matching. Custom bindings
 replace defaults for the exact chord. `none` consumes a chord without running an
 action. Each matched press and its release are withheld from application input,
 including buttons while an application has enabled mouse reports. There are at
