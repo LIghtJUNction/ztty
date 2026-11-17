@@ -1,0 +1,11 @@
+--- a/src/appearance.rs
++++ b/src/appearance.rs
+@@ -160,7 +160,7 @@
+                 .and_then(|(key, value)| appearance.set(key.trim(), value.trim()));
+             if let Err(error) = result {
+                 return Err(format!(
+-                    "{error} ({line}); {}:{}",
++                    "{}:{}: {error} ({line})",
+                     path.to_string_lossy(),
+                     index + 1
+                 ));
