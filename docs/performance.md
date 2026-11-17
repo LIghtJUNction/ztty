@@ -1,9 +1,15 @@
 # Performance and validation record
 
-Report date: **2026-11-18, Asia/Taipei**. Current production source:
-[`7535aa29f1a2728a78a446ffea6784dcbc2aae92`](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92).
+Report date: **2026-11-18, Asia/Taipei**. This report keeps measurements tied to
+their own source and workload. Native/graphics acceptance uses
+[`7535aa2`](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92).
+The shared-session and MCP work is recorded at
+[`b3fe78d`](https://github.com/LIghtJUNction/ztty/commit/b3fe78d58530d8d402452534756d11f1680ebcc8).
+The earlier paired one/four/eight-window memory comparison predates the graphics
+integration. Historical 0.1 results retain their original source below.
 
-Version 0.2 adds bounded Kitty graphics and native macOS/Windows backends while
+Version 0.2 adds bounded Kitty graphics, native macOS/Windows backends, and
+Linux shared sessions with MCP, while
 retaining the Rust `no_std` production boundary. The measured text-only initial
 core heap remains 107,676 bytes. A same-host paired core benchmark records a
 2.232 µs median amortized 1 KiB feed for the graphics implementation. A separate
@@ -13,9 +19,44 @@ machines; neither establishes physical key-to-screen latency.
 
 Current measurements are presented first. The original 0.1 measurements,
 including its Kitty comparison, remain below with their historical source and
-conditions. No new comparative Kitty or Ghostty performance run was performed
-for 0.2, and native macOS/Windows performance has not been measured.
+conditions. The ten-window shared-instance comparison is recorded separately
+below. Native macOS/Windows performance has not been measured.
 
+## Ten-window terminal comparison
+
+The [current three-terminal figure](benchmarks/terminals-10-windows.svg) and
+[raw observations](benchmarks/terminals-10-windows.json) compare ten windows each
+of ztty, Ghostty and Kitty, using their shared-instance modes. This run uses the
+integrated Linux implementation with graphics support. It is separate from the
+earlier one/four/eight-window sharing comparison below.
+
+The figure reports application resident PSS and a second measure that adds the
+full dedicated Xvfb server's resident PSS. That second measure includes the
+server baseline; it is not an estimate of the marginal cost on an existing
+desktop. Application helpers are included. PTY probes and the private D-Bus
+daemon remain separate. Private memory, swap counters, XRes resources and
+individual observations remain in the JSON.
+
+DSR latency and output throughput measure logical PTY processing on software
+X11, with one active window and nine idle. They do not measure display frame
+rate or keyboard-to-photon latency. The measured machine has 24 logical CPUs
+and shared load; swap was observed. The SVG discloses maximum paired Swap
+counters, and the raw record retains every run, including negative X-server
+PSS differences. See the [method and limits](benchmarks/README.md) before using
+these measurements to compare other desktops or workloads.
+
+Rebuild the current source and regenerate the measurements, JSON and SVG:
+
+```sh
+make benchmark-terminals
+```
+
+To recompute summaries and the SVG from the existing raw observations without
+new measurements:
+
+```sh
+python3 tools/benchmark_terminals.py --render-only
+```
 ## What each measurement means
 
 | Layer | Measurement | Included | Excluded |
@@ -27,8 +68,72 @@ for 0.2, and native macOS/Windows performance has not been measured.
 | Visible response | Physical input to changed pixels | Input device, scheduler, application, compositor, scanout | Not measured in this report |
 
 `no_std` controls the Rust runtime boundary. It does not itself prove low memory
-or low latency. The frontend uses the system C ABI, X11, Xft, font data, and a
-retained pixmap; whole-application accounting must include those separate costs.
+or low latency. The Linux frontend uses the system C ABI, X11, Xft, font data, and a retained
+pixmap; whole-application accounting must include those separate costs.
+
+## Multiple-window memory
+
+This paired measurement predates native/graphics integration. The shared
+session process reduced total ztty PSS for eight idle windows by
+67.3%, from 47.021 to 15.366 MiB. This comparison includes one GUI host and all
+eight waiting launchers in the shared case. The baseline used one GUI process
+per window. [Paired raw results](measurements/multiwindow-shared-2026-11-18.json)
+retain every process, PTY child and X server observation.
+
+The run used the i9-12900HX development machine, Rust 1.100.0 and isolated
+software Xvfb displays. Both builds requested `monospace:size=11`, a 120×32
+grid and 2,000 history rows, with opaque backgrounds, no blur and no cursor
+blink. Sampling followed the same static UTF-8/color output with mostly empty
+history. Baseline `bbb201c` and the shared build were interleaved for three
+repetitions at each window count; all 18 runs completed and cleaned up their
+owned processes.
+
+Median process memory in MiB (1,048,576 bytes). Each entry sums unique ztty
+processes; PTY children and X server allocations are recorded separately.
+
+| Windows | Baseline PSS | Shared PSS | Baseline private | Shared private |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 10.633 | 11.172 | 7.629 | 7.504 |
+| 4 | 27.275 | 12.983 | 18.848 | 9.055 |
+| 8 | 47.021 | 15.366 | 37.582 | 11.301 |
+
+Between one and eight windows, average additional PSS per window fell from
+5.198 to 0.599 MiB, calculated as `(PSS at 8 − PSS at 1) / 7`.
+The single-window case increased by 0.539 MiB PSS. Sharing therefore adds a
+small initial process cost and removes much of the repeated per-window font
+and display state; the measured savings grow with the window count.
+
+Each window still used **3,273,728 bytes of X server pixmap storage** in both
+builds. Those bytes are outside the PSS table and the 67.3% calculation.
+Shells and their workloads are also separate. The shared implementation keeps
+each session's screen/history and each window's pixmap independent, so these
+results describe reduced process duplication rather than a complete desktop
+memory total.
+
+The machine was shared with other work and used the `powersave` governor.
+PSS apportions mapped pages among active processes; private-memory totals
+provide an additional view of the same run. Full-history workloads, different
+fonts or grids, and hardware graphics paths require their own measurements.
+
+Reproduce the paired comparison with both executables available:
+
+```sh
+python3 tools/measure_multiwindow.py \
+  --binary ./target/release/ztty --label shared --expect-shared \
+  --compare-binary /path/to/baseline/ztty --compare-label baseline-bbb201c \
+  --counts 1,4,8 --repetitions 3 \
+  --output artifacts/multiwindow-memory.json
+```
+
+The current MCP acceptance uses the integrated executable. Transport checks
+passed for stdio, HTTP initialization and session lifecycle, IPv6, chunked
+input, authentication, and 16 concurrent requests behind a stalled connection.
+PTY checks passed for shared broker ownership, namespaced addressing, creator
+cwd/environment/argv, resize, UTF-8 output pages, exit status, transport-exit
+persistence and explicit session cleanup. The reproducible suites are
+[MCP transports](../tests/mcp_transport.py),
+[MCP sessions](../tests/mcp_sessions.py), and
+[shared-window GUI acceptance](../tests/shared_gui_smoke.py).
 
 ## Version 0.2 paired core measurement
 
@@ -161,7 +266,8 @@ scene, and temporary decoding and renderer resources have separate costs; see
 
 Remaining performance acceptance includes full-history and image-heavy process
 memory, sustained mixed TUI workloads, native macOS/Windows timings, hardware GPU
-workloads, physical input-to-visible-pixel latency, and a comparable Ghostty run.
+workloads and physical input-to-visible-pixel latency. The ten-window Ghostty
+comparison covers only the software-X11 conditions described above.
 Linux's damaged-row renderer and the native frontends' full-frame paths must be
 measured separately. Functional desktop image acceptance is now complete for
 the stated Linux tests; a performance claim of overall Kitty/Ghostty superiority
@@ -227,6 +333,9 @@ cargo run --locked --release -p zterm --example benchmark \
 ```
 
 ## Historical 0.1 whole-terminal measurements
+
+This section retains the earlier single-window comparison. Use the paired
+multiple-window section above to assess the shared-process change.
 
 [Four-configuration raw results](measurements/runtime-profiled-2026-11-18.json)
 and [query-only diagnostic results](measurements/runtime-query-only-2026-11-18.json).
@@ -345,6 +454,7 @@ The following results belong to the original Linux implementation at
 `9333047c0867756a73d71e29524ddef3d9f21544`, with the benchmark recorded at
 `3e2f03297c638f14d9799dcb78a915f634287813`. They are retained as historical
 observations; the 0.2 results and limits are recorded above.
+The Linux shared-session and MCP checks are recorded in the multiple-window section.
 
 | Check | Result |
 | --- | --- |
