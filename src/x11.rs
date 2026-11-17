@@ -20,6 +20,39 @@ pub struct XftDraw {
 }
 pub type Atom = c_ulong;
 pub type Xid = c_ulong;
+
+#[repr(C)]
+struct ErrorEvent {
+    kind: c_int,
+    display: *mut Display,
+    resource: Xid,
+    serial: c_ulong,
+    error_code: u8,
+    request_code: u8,
+    minor_code: u8,
+}
+type ErrorHandler = unsafe extern "C" fn(*mut Display, *mut ErrorEvent) -> c_int;
+
+// All Xlib access belongs to the single-threaded session host.
+static mut ERROR_HANDLER_INSTALLED: bool = false;
+static mut PREVIOUS_ERROR_HANDLER: Option<ErrorHandler> = None;
+
+unsafe extern "C" fn handle_error(display: *mut Display, event: *mut ErrorEvent) -> c_int {
+    unsafe {
+        // Another X client can destroy a window after Expose was queued.
+        // XCopyArea then reports BadDrawable before DestroyNotify is handled.
+        // Leave the normal event path to retire that view, without terminating
+        // every other session hosted by this process.
+        if (*event).error_code == 9 && (*event).request_code == 62 {
+            return 0;
+        }
+        if let Some(previous) = PREVIOUS_ERROR_HANDLER {
+            return previous(display, event);
+        }
+        crate::os::print(2, b"ztty: unhandled X11 protocol error\n");
+        crate::os::_exit(1);
+    }
+}
 pub const KEY_PRESS: i32 = 2;
 pub const KEY_RELEASE: i32 = 3;
 pub const BUTTON_PRESS: i32 = 4;
@@ -297,6 +330,7 @@ unsafe extern "C" {
 unsafe extern "C" {
     fn XOpenDisplay(name: *const c_char) -> *mut Display;
     fn XCloseDisplay(display: *mut Display) -> c_int;
+    fn XSetErrorHandler(handler: Option<ErrorHandler>) -> Option<ErrorHandler>;
     fn XDefaultScreen(display: *mut Display) -> c_int;
     fn XDefaultDepth(display: *mut Display, screen: c_int) -> c_int;
     fn XDefaultVisual(display: *mut Display, screen: c_int) -> *mut c_void;
@@ -616,6 +650,10 @@ impl Connection {
         unsafe {
             crate::os::setlocale(0, c"".as_ptr());
             XSetLocaleModifiers(c"".as_ptr());
+            if !ERROR_HANDLER_INSTALLED {
+                PREVIOUS_ERROR_HANDLER = XSetErrorHandler(Some(handle_error));
+                ERROR_HANDLER_INSTALLED = true;
+            }
             let display = XOpenDisplay(name.map_or(core::ptr::null(), CStr::as_ptr));
             if display.is_null() {
                 return Err("cannot open DISPLAY; ztty needs X11 or XWayland");

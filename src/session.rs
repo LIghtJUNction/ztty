@@ -11,8 +11,14 @@ use core::ffi::{CStr, c_int};
 use input::{Key, KeyEvent, MouseEvent};
 use zterm::{CursorShape, Terminal, input};
 
+struct InputBuffers {
+    text: Vec<u8>,
+    encoded: Vec<u8>,
+}
+
 struct Ui {
     window: Window,
+    attachment: u64,
     selection: Option<Selection>,
     history: usize,
     force: bool,
@@ -29,9 +35,10 @@ struct Ui {
     reset_blink: bool,
 }
 impl Ui {
-    fn new(window: Window) -> Self {
+    fn new(window: Window, attachment: u64) -> Self {
         Self {
             window,
+            attachment,
             selection: None,
             history: 0,
             force: true,
@@ -55,9 +62,12 @@ impl Ui {
         pty: &zpty::Pty,
         queue: &mut Queue,
         openers: &mut os::Openers,
-        text_buffer: &mut Vec<u8>,
-        encoded: &mut Vec<u8>,
+        buffers: &mut InputBuffers,
     ) -> Result<(), &'static str> {
+        let InputBuffers {
+            text: text_buffer,
+            encoded,
+        } = buffers;
         match unsafe { event.kind } {
             x11::KEY_PRESS | x11::KEY_RELEASE => {
                 let mut e = unsafe { event.key };
@@ -78,7 +88,7 @@ impl Ui {
                 }
                 if press && mods.0 & 5 == 5 && (symbol == b'c' as u64 || symbol == b'C' as u64) {
                     if let Some(s) = self.selection {
-                        self.window.copy(s.text(&terminal, self.history), false);
+                        self.window.copy(s.text(terminal, self.history), false);
                     }
                     self.intercepted[code] = true;
                     return Ok(());
@@ -208,7 +218,7 @@ impl Ui {
                         if let Some(ref mut s) = self.selection {
                             s.end = (col, row);
                             s.dragging = false;
-                            self.window.copy(s.text(&terminal, self.history), true);
+                            self.window.copy(s.text(terminal, self.history), true);
                             self.force = true;
                         }
                     } else if pressed && e.button == 2 {
@@ -428,6 +438,13 @@ impl Session {
             ("rows", Value::from(self.terminal.rows())),
             ("attached", Value::Bool(self.ui.is_some())),
             (
+                "attachment",
+                self.ui
+                    .as_ref()
+                    .map(|ui| Value::from(ui.attachment))
+                    .unwrap_or(Value::Null),
+            ),
+            (
                 "running",
                 Value::Bool(!self.eof && self.pty.status().is_none()),
             ),
@@ -576,6 +593,7 @@ struct Pool {
     sessions: Vec<Session>,
     connections: Vec<(String, Rc<Connection>)>,
     next: u64,
+    next_attachment: u64,
     completed: VecDeque<(String, i32)>,
     finished: Vec<(String, i32)>,
     reaping: Vec<(i32, u64)>,
@@ -632,6 +650,7 @@ impl Pool {
             sessions: Vec::new(),
             connections: Vec::new(),
             next: 1,
+            next_attachment: 1,
             completed: VecDeque::new(),
             finished: Vec::new(),
             reaping: Vec::new(),
@@ -782,8 +801,11 @@ impl Pool {
             None
         } else {
             let c = self.connection(&env)?;
+            let attachment = self.next_attachment;
+            self.next_attachment += 1;
             Some(Ui::new(
                 Window::new_shared(cols, rows, &appearance, &c).map_err(String::from)?,
+                attachment,
             ))
         };
         let directory = WorkingDirectory::enter(&cwd)?;
@@ -841,8 +863,11 @@ impl Pool {
         result.set("running", Value::Bool(false));
         result.set("attached", Value::Bool(false));
         let status = session.status().unwrap_or(0);
-        self.finished.push((session.uri.clone(), status));
-        self.completed.push_back((session.uri.clone(), status));
+        if let Some(ui) = &session.ui {
+            let token = format!("attachment:{}", ui.attachment);
+            self.finished.push((token.clone(), status));
+            self.completed.push_back((token, status));
+        }
         while self.completed.len() > 128 {
             self.completed.pop_front();
         }
@@ -871,11 +896,19 @@ impl Pool {
                 ("broker_pid", Value::from(unsafe { os::getpid() })),
             ])));
         }
-        if op == "wait" {
-            if let Some(name) = request.get("session").and_then(Value::as_str)
-                && !self.sessions.iter().any(|s| s.uri == name)
-                && let Some((_, status)) = self.completed.iter().rev().find(|(uri, _)| uri == name)
-            {
+        let attachment = if op == "wait" {
+            Some(
+                request
+                    .get("attachment")
+                    .and_then(Value::as_u64)
+                    .ok_or("attachment token is required")?,
+            )
+        } else {
+            None
+        };
+        if let Some(attachment) = attachment {
+            let token = format!("attachment:{attachment}");
+            if let Some((_, status)) = self.completed.iter().rev().find(|(key, _)| key == &token) {
                 return Ok(Reply::Value(json::object([(
                     "exit_code",
                     Value::from(*status),
@@ -937,6 +970,8 @@ impl Pool {
                 }
                 let env = environment(request)?;
                 let connection = self.connection(&env)?;
+                let attachment = self.next_attachment;
+                self.next_attachment += 1;
                 let session = &mut self.sessions[index];
                 if let Some(value) = request.get("_appearance") {
                     session.appearance = Appearance::from_json(value).map_err(String::from)?;
@@ -948,25 +983,27 @@ impl Pool {
                     &connection,
                 )
                 .map_err(String::from)?;
-                session.ui = Some(Ui::new(window));
+                session.ui = Some(Ui::new(window, attachment));
                 Ok(Reply::Value(session.info()))
             }
             "wait" => {
                 let session = &self.sessions[index];
-                if session.ui.is_none() {
-                    return Ok(Reply::Value(json::object([(
-                        "exit_code",
-                        Value::from(session.status().unwrap_or(0)),
-                    )])));
+                let attachment = attachment.ok_or("attachment token is required")?;
+                if session
+                    .ui
+                    .as_ref()
+                    .is_none_or(|ui| ui.attachment != attachment)
+                {
+                    return Err("window attachment has closed or been replaced".into());
                 }
-                Ok(Reply::Wait(session.uri.clone()))
+                Ok(Reply::Wait(format!("attachment:{attachment}")))
             }
             "close" => Ok(Reply::Value(self.retire(index))),
             _ => Err(format!("unknown session operation: {op}")),
         }
     }
 
-    fn events(&mut self, openers: &mut os::Openers, text: &mut Vec<u8>, encoded: &mut Vec<u8>) {
+    fn events(&mut self, openers: &mut os::Openers, buffers: &mut InputBuffers) {
         for (_, connection) in &self.connections {
             for _ in 0..512 {
                 if unsafe { x11::XPending(connection.display) } == 0 {
@@ -982,7 +1019,10 @@ impl Pool {
                 let id = event.window();
                 if let Some(session) = self.sessions.iter_mut().find(|s| {
                     s.ui.as_ref().is_some_and(|ui| {
-                        ui.window.id == id && ui.window.display == connection.display
+                        ui.open
+                            && ui.window.id != 0
+                            && ui.window.id == id
+                            && ui.window.display == connection.display
                     })
                 }) {
                     let ui = session.ui.as_mut().unwrap();
@@ -993,8 +1033,7 @@ impl Pool {
                             &session.pty,
                             &mut session.queue,
                             openers,
-                            text,
-                            encoded,
+                            buffers,
                         )
                         .is_err()
                     {
@@ -1010,6 +1049,8 @@ impl Pool {
         for session in &mut self.sessions {
             session.pump(buffer);
             if let Some(ui) = &mut session.ui
+                && ui.open
+                && ui.window.id != 0
                 && let Some(next) = ui.paint(&mut session.terminal, &session.appearance)
             {
                 deadline = Some(deadline.map_or(next, |old: u64| old.min(next)));
@@ -1026,13 +1067,20 @@ impl Pool {
                 self.retire(i);
             } else if closed {
                 let session = &mut self.sessions[i];
-                session.ui = None;
-                self.finished
-                    .push((session.uri.clone(), session.status().unwrap_or(0)));
+                let ui = session.ui.take().expect("closed window is present");
+                let token = format!("attachment:{}", ui.attachment);
+                let status = session.status().unwrap_or(0);
+                self.finished.push((token.clone(), status));
+                self.completed.push_back((token, status));
+                while self.completed.len() > 128 {
+                    self.completed.pop_front();
+                }
             }
         }
-        self.connections
-            .retain(|(_, connection)| Rc::strong_count(connection) > 1);
+        // Keep each display connection for the broker lifetime. A persistent PTY
+        // may reopen a view after its last window closes; reusing X11/XIM state
+        // also avoids repeatedly initializing display extensions. Font entries
+        // are weak and still release when their last window is dropped.
         let now = os::milliseconds();
         self.reaping.retain(|&(pid, start)| {
             let result = unsafe { os::waitpid(pid, core::ptr::null_mut(), 1) };
@@ -1059,12 +1107,14 @@ pub fn serve() -> Result<(), String> {
     let mut pool = Pool::new();
     let mut openers = os::Openers::new();
     let mut read_buffer = [0u8; 16384];
-    let mut text = alloc::vec![0u8;4096];
-    let mut encoded = Vec::with_capacity(128);
+    let mut buffers = InputBuffers {
+        text: alloc::vec![0u8;4096],
+        encoded: Vec::with_capacity(128),
+    };
     let mut fds = Vec::new();
     let mut idle_since = os::milliseconds();
     loop {
-        pool.events(&mut openers, &mut text, &mut encoded);
+        pool.events(&mut openers, &mut buffers);
         let deadline = pool.tick(&mut read_buffer);
         server.pump(|request| pool.handle(request));
         for (uri, status) in pool.finished.drain(..) {

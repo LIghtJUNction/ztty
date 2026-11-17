@@ -205,8 +205,11 @@ pub fn child_setup_with_env(
         c"TERM=xterm-256color".into(),
         c"COLORTERM=truecolor".into(),
         c"TERM_PROGRAM=ztty".into(),
-        c"TERM_PROGRAM_VERSION=0.1.0".into(),
     ]);
+    env.push(
+        CString::new(concat!("TERM_PROGRAM_VERSION=", env!("CARGO_PKG_VERSION")))
+            .map_err(|_| "invalid package version")?,
+    );
     Ok((executable, env))
 }
 
