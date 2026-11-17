@@ -13,6 +13,10 @@ workflow now requires six native architecture jobs: Linux x86_64/ARM64,
 macOS Intel/Apple Silicon, and Windows x86_64/ARM64. A Windows ARM64 PE built
 on x86_64 is not accepted as native ARM64 evidence. The Windows gate checks
 the operating system, Python process and tested executable architectures.
+The Windows gate also adds six Sixel pixel/cancellation/recovery groups to the
+existing nineteen named checks and saves owned-window PNG captures on success
+and failure. These new checks require execution on both native Windows runners;
+Linux validation of the test vectors does not establish Win32/ConPTY behavior.
 
 Both Linux jobs run `tests/linux_native.py` against a clean, pinned checkout
 and the freshly built ELF. The gate runs workspace restore, daily workflow,

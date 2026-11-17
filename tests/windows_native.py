@@ -5,14 +5,16 @@ python tests/windows_native.py --binary target/release/ztty.exe \
     --output artifacts/windows-native.json
 
 Uses an actual Python child behind ConPTY, Win32 window messages, and GetPixel
-on the client DC. It deliberately fails if the installed ConPTY filters Kitty
-APC traffic; a cross compilation is not a substitute for this runtime gate.
+on the client DC, plus owned-window BitBlt/GetDIBits PNG captures. Kitty and
+Sixel packets must traverse ConPTY and produce the expected actual pixels;
+a cross compilation is not a substitute for this runtime gate.
 """
 
 import argparse
 import base64
 import binascii
 import ctypes
+import hashlib
 from ctypes import wintypes
 import json
 import os
@@ -38,6 +40,114 @@ def png_rgba(width, height, pixels):
     rows = b"".join(b"\0" + pixels[row * width * 4:(row + 1) * width * 4] for row in range(height))
     return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
             + chunk(b"IDAT", zlib.compress(rows)) + chunk(b"IEND", b""))
+
+
+def sixel(width, height, indices, palette, transparent=True):
+    """Small deterministic Sixel vectors, in native pixels with a 1:1 aspect."""
+    assert len(indices) == width * height
+    body = bytearray(f'"1;1;{width};{height}'.encode("ascii"))
+    for index, rgb in palette.items():
+        body.extend((f"#{index};2;" + ";".join(map(str, rgb))).encode("ascii"))
+    for row in range(0, height, 6):
+        for index in palette:
+            body.extend(f"#{index}".encode("ascii"))
+            body.extend(63 + sum(1 << bit for bit in range(min(6, height - row))
+                                if indices[(row + bit) * width + col] == index)
+                        for col in range(width))
+            body.extend(b"$")
+        if row + 6 < height:
+            body.extend(b"-")
+    return b"\x1bP7;" + (b"1" if transparent else b"0") + b"q" + body + b"\x1b\\"
+
+
+class BitmapInfoHeader(ctypes.Structure):
+    _fields_ = [("size", ctypes.c_uint32), ("width", ctypes.c_int32),
+                ("height", ctypes.c_int32), ("planes", ctypes.c_uint16),
+                ("bit_count", ctypes.c_uint16), ("compression", ctypes.c_uint32),
+                ("image_size", ctypes.c_uint32), ("x_pixels_per_meter", ctypes.c_int32),
+                ("y_pixels_per_meter", ctypes.c_int32), ("colors_used", ctypes.c_uint32),
+                ("important_colors", ctypes.c_uint32)]
+
+
+class BitmapInfo(ctypes.Structure):
+    _fields_ = [("header", BitmapInfoHeader), ("colors", ctypes.c_uint32 * 1)]
+
+
+def capture_window(user, gdi, hwnd, expected_pid, path):
+    """Capture only our client DC; save the actual BitBlt/GetDIBits pixels."""
+    owner = wintypes.DWORD()
+    user.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
+    if owner.value != expected_pid:
+        raise AssertionError("refusing to capture a window owned by another process")
+    rect = wintypes.RECT()
+    if not user.GetClientRect(hwnd, ctypes.byref(rect)):
+        raise OSError("GetClientRect failed during window capture")
+    width, height = rect.right - rect.left, rect.bottom - rect.top
+    if not (0 < width <= 8192 and 0 < height <= 8192 and width * height <= 16 * 1024 * 1024):
+        raise AssertionError(f"invalid native capture dimensions: {width}x{height}")
+    gdi.CreateCompatibleDC.argtypes = [wintypes.HDC]
+    gdi.CreateCompatibleDC.restype = wintypes.HDC
+    gdi.CreateCompatibleBitmap.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
+    gdi.CreateCompatibleBitmap.restype = wintypes.HANDLE
+    gdi.SelectObject.argtypes = [wintypes.HDC, wintypes.HANDLE]
+    gdi.SelectObject.restype = wintypes.HANDLE
+    gdi.BitBlt.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
+                         wintypes.HDC, ctypes.c_int, ctypes.c_int, wintypes.DWORD]
+    gdi.BitBlt.restype = wintypes.BOOL
+    gdi.GetDIBits.argtypes = [wintypes.HDC, wintypes.HANDLE, wintypes.UINT, wintypes.UINT,
+                             ctypes.c_void_p, ctypes.POINTER(BitmapInfo), wintypes.UINT]
+    gdi.GetDIBits.restype = ctypes.c_int
+    gdi.DeleteObject.argtypes = [wintypes.HANDLE]
+    gdi.DeleteObject.restype = wintypes.BOOL
+    gdi.DeleteDC.argtypes = [wintypes.HDC]
+    gdi.DeleteDC.restype = wintypes.BOOL
+    dc = user.GetDC(hwnd)
+    if not dc:
+        raise OSError("GetDC failed during window capture")
+    memory = bitmap = previous = None
+    try:
+        memory = gdi.CreateCompatibleDC(dc)
+        if not memory:
+            raise OSError("CreateCompatibleDC failed")
+        bitmap = gdi.CreateCompatibleBitmap(dc, width, height)
+        if not bitmap:
+            raise OSError("CreateCompatibleBitmap failed")
+        previous = gdi.SelectObject(memory, bitmap)
+        if not previous or previous == ctypes.c_void_p(-1).value:
+            previous = None
+            raise OSError("SelectObject failed")
+        # SRCCOPY excludes other layered windows; the source is this HWND's DC.
+        if not gdi.BitBlt(memory, 0, 0, width, height, dc, 0, 0, 0x00CC0020):
+            raise OSError(f"BitBlt failed: Win32 error {ctypes.get_last_error()}")
+        # GetDIBits requires the bitmap not to be selected into any DC.
+        restored = gdi.SelectObject(memory, previous)
+        if not restored or restored == ctypes.c_void_p(-1).value:
+            raise OSError("restoring the capture DC's bitmap failed")
+        previous = None
+        info = BitmapInfo()
+        info.header = BitmapInfoHeader(ctypes.sizeof(BitmapInfoHeader), width, -height,
+                                       1, 32, 0, width * height * 4, 0, 0, 0, 0)
+        bits = ctypes.create_string_buffer(width * height * 4)
+        if gdi.GetDIBits(dc, bitmap, 0, height, bits, ctypes.byref(info), 0) != height:
+            raise OSError(f"GetDIBits did not return all rows: Win32 error {ctypes.get_last_error()}")
+        bgra = bits.raw
+        rgba = bytearray(bgra)
+        rgba[0::4], rgba[2::4] = bgra[2::4], bgra[0::4]
+        rgba[3::4] = b"\xff" * (width * height)
+        encoded = png_rgba(width, height, rgba)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(encoded)
+        return {"path": str(path), "width": width, "height": height, "window_pid": owner.value,
+                "sha256": hashlib.sha256(encoded).hexdigest(),
+                "capture": "owned Win32 client DC via BitBlt/GetDIBits"}
+    finally:
+        if previous and memory:
+            gdi.SelectObject(memory, previous)
+        if bitmap:
+            gdi.DeleteObject(bitmap)
+        if memory:
+            gdi.DeleteDC(memory)
+        user.ReleaseDC(hwnd, dc)
 
 
 def child(directory):
@@ -231,16 +341,36 @@ def run(binary, output, expected_arch=None):
                 wait_for(lambda: (directory / f"done-{sequence}").exists(), "PTY output write")
                 sequence += 1
 
-            def pixel(col, row):
+            def pixel_at(x, y):
                 dc = user.GetDC(hwnd)
                 assert dc
                 try:
-                    rgb = int(gdi.GetPixel(dc, int(col * cw), int(row * ch)))
+                    rgb = int(gdi.GetPixel(dc, int(x), int(y)))
                     if rgb == 0xFFFFFFFF:
                         raise AssertionError("GetPixel failed")
                     return [rgb & 255, (rgb >> 8) & 255, (rgb >> 16) & 255]
                 finally:
                     user.ReleaseDC(hwnd, dc)
+
+            def pixel(col, row):
+                return pixel_at(col * cw, row * ch)
+
+            def expect_pixels(name, samples):
+                actual = []
+                report["active_check"] = name
+
+                def matches():
+                    nonlocal actual
+                    actual = [pixel_at(x, y) for x, y, _ in samples]
+                    return all(all(abs(a - b) <= 1 for a, b in zip(rgb, expected))
+                               for rgb, (_, _, expected) in zip(actual, samples))
+
+                try:
+                    wait_for(matches, name)
+                except AssertionError as error:
+                    raise AssertionError(f"{name}: expected {samples}; observed {actual}") from error
+                checks.append({"name": name, "passed": True, "pixels": [
+                    {"x": x, "y": y, "rgb": rgb} for (x, y, _), rgb in zip(samples, actual)]})
 
             def expect(name, col, row, expected):
                 actual = None
@@ -295,6 +425,65 @@ def run(binary, output, expected_arch=None):
             expect("resize_clips_without_ghosts", 15.5, 1.5, [16, 24, 32])
             assert user.SetWindowPos(hwnd, None, 0, 0, old_width, old_height, 0x16)
             expect("resize_restores_visible_image", 19.5, 1.5, [255, 0, 0])
+            # Sixel must traverse the actual ConPTY and draw native pixels.
+            # A child "done" file only acknowledges its write; each vector also
+            # waits for pixels read from our HWND rather than assuming a delay.
+            width, height = 48, 24
+            x0, y0 = cw, 2 * ch
+            background = [16, 24, 32]
+            rgb = [1 + x // 16 for _ in range(height) for x in range(width)]
+            image = sixel(width, height, rgb, {1: (100, 0, 0), 2: (0, 100, 0), 3: (0, 0, 100)})
+            position = b"\x1b[3;2H"
+            send(b"\x1b[0m\x1b[2J\x1b[H" + position + image)
+            expect_pixels("sixel_rgb_native_pixels", [
+                (x0 + 8, y0 + 8, [255, 0, 0]),
+                (x0 + 24, y0 + 8, [0, 255, 0]),
+                (x0 + 40, y0 + 16, [0, 0, 255])])
+
+            green = sixel(width, height, [2] * (width * height), {2: (0, 100, 0)})
+            holes = [1 if x < width // 2 else 0 for _ in range(height) for x in range(width)]
+            transparent = sixel(width, height, holes, {1: (100, 0, 0)})
+            send(b"\x1b[2J" + position + green + position + transparent)
+            expect_pixels("sixel_transparent_preserves_underlying_image", [
+                (x0 + 8, y0 + 8, [255, 0, 0]), (x0 + 40, y0 + 8, [0, 255, 0])])
+
+            opaque = sixel(width, height, holes, {1: (100, 0, 0)}, transparent=False)
+            send(b"\x1b[48;2;16;24;32m" + position + opaque)
+            expect_pixels("sixel_opaque_uses_current_background", [
+                (x0 + 8, y0 + 8, [255, 0, 0]), (x0 + 40, y0 + 8, background)])
+
+            send(b"\x1b[2J\x1b[H")
+            blank_samples = [(x0 + x, y0 + y, background)
+                             for x, y in ((8, 8), (24, 8), (40, 16))]
+            expect_pixels("sixel_erase_display_repaints", blank_samples)
+
+            # No ST is sent for this image. CAN must discard it, and the child
+            # must still receive both a cursor response and real window input.
+            send(position + image[:-2])
+            send(b"\x18\x1b[7;9H\x1b[6n")
+            wait_for(lambda: (directory / "keyboard.bin").exists()
+                     and b"\x1b[7;9R" in (directory / "keyboard.bin").read_bytes(),
+                     "cursor response after cancelled Sixel")
+            cancelled_marker = b"ztty-sixel-cancel-43f2"
+            for byte in cancelled_marker:
+                user.SendMessageW(hwnd, 0x0102, byte, 1)
+            user.SendMessageW(hwnd, 0x0102, 13, 1)
+            wait_for(lambda: cancelled_marker in (directory / "keyboard.bin").read_bytes(),
+                     "native keyboard input after cancelled Sixel")
+            expect_pixels("sixel_cancel_and_input_recovery", blank_samples)
+
+            send(b'\x1bP7;1q"1;1;4294967295;4294967295#1!99~\x1b\\'
+                 + position + image + b"\x1b[9;3H\x1b[6n")
+            wait_for(lambda: b"\x1b[9;3R" in (directory / "keyboard.bin").read_bytes(),
+                     "cursor response after oversized Sixel and a valid image")
+            expect_pixels("sixel_recovers_after_oversized_raster", [
+                (x0 + 8, y0 + 8, [255, 0, 0]),
+                (x0 + 24, y0 + 8, [0, 255, 0]),
+                (x0 + 40, y0 + 16, [0, 0, 255])])
+            report["sixel_screenshot"] = capture_window(
+                user, gdi, hwnd, process.pid, output.with_name(output.stem + ".sixel.png"))
+            report["active_check"] = "keyboard_recovers_after_malformed_graphics"
+
             send(kitty("a=d,d=A,q=2") + kitty("a=T,f=100,i=43,q=2", b"broken PNG")
                  + kitty("a=T,f=32,s=4294967295,v=4294967295,i=44,q=2", b"bad")
                  + kitty("a=t,f=32,s=2,v=2,i=45,m=1,q=2", rgba[:3])
@@ -313,6 +502,14 @@ def run(binary, output, expected_arch=None):
         report["error"] = str(error)
         raise
     finally:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        if hwnd and process:
+            try:
+                report["screenshot"] = capture_window(user, gdi, hwnd, process.pid, output.with_suffix(".png"))
+                report["pixel_readback"] = "GetPixel checks and owned client DC BitBlt/GetDIBits PNG capture"
+            except Exception as error:
+                report["screenshot_error"] = repr(error)
+                report["passed"] = False
         if hwnd:
             user.PostMessageW(hwnd, 0x0010, 0, 0)
         if process:
@@ -326,6 +523,7 @@ def run(binary, output, expected_arch=None):
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(report, indent=2))
+    return report["passed"]
 
 
 def main():
@@ -341,8 +539,8 @@ def main():
     if args.child:
         child(args.child)
     else:
-        run(args.binary, args.output, args.arch)
+        return 0 if run(args.binary, args.output, args.arch) else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

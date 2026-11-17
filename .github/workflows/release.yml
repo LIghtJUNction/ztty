@@ -535,6 +535,7 @@ jobs:
             dist/*.zip*
             dist/*.tar.gz*
             dist/*.json*
+            dist/*.png
             dist/*.log
           if-no-files-found: error
           retention-days: 14

@@ -36,6 +36,7 @@
 
 ### Verification
 
+- Windows native gates now exercise six Sixel pixel/recovery groups and save owned-window PNG evidence; execution on x64 and ARM64 is still required.
 - Twenty-seven real X11/PTY vectors cover legacy keyboard bytes, four wheel directions, extra buttons, press ownership, focus transitions, X10 mode and custom bindings. Button 11 uses explicitly recorded synthetic X11 events because the virtual pointer exposes ten buttons.
 - Six layout tests and an isolated real X11/PTY acceptance script cover geometry, actual keyboard routing, hidden output, detach/reattach and ownership.
 - Native macOS/Windows workspace UI and multi-view GUI observation remain pending.
