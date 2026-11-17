@@ -1,5 +1,13 @@
 # ztty
 
+<!-- terminal-benchmark:start -->
+![Ten-window terminal memory and PTY performance comparison](docs/benchmarks/terminals-10-windows.svg)
+
+Ten windows per terminal, shared instances, three real runs. [Method and rerun command](docs/benchmarks/README.md) · [Raw measurements](docs/benchmarks/terminals-10-windows.json)
+
+Rerun from current source: `make benchmark-terminals`.
+<!-- terminal-benchmark:end -->
+
 A lean native terminal, written in Rust without the Rust standard library.
 
 ztty runs shells and terminal applications through the operating system's
