@@ -198,7 +198,7 @@ pub fn child_setup(program: &CStr) -> Result<(CString, Vec<CString>), &'static s
         c"TERM=xterm-256color".into(),
         c"COLORTERM=truecolor".into(),
         c"TERM_PROGRAM=ztty".into(),
-        c"TERM_PROGRAM_VERSION=0.1.0".into(),
+        CString::new(concat!("TERM_PROGRAM_VERSION=", env!("CARGO_PKG_VERSION"))).unwrap(),
     ]);
     Ok((executable, env))
 }
@@ -274,4 +274,15 @@ impl Drop for Openers {
     fn drop(&mut self) {
         self.reap();
     }
+}
+
+pub fn default_config_path() -> Option<CString> {
+    let xdg = env(c"XDG_CONFIG_HOME").filter(|p| p.starts_with(b"/"));
+    let base = xdg.or_else(|| env(c"HOME").filter(|p| p.starts_with(b"/")))?;
+    let mut bytes = base.to_vec();
+    if xdg.is_none() {
+        bytes.extend_from_slice(b"/.config");
+    }
+    bytes.extend_from_slice(b"/ztty/ztty.conf");
+    CString::new(bytes).ok()
 }

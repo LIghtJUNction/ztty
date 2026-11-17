@@ -7,7 +7,8 @@ and clipboard policy.
 
 The production library is `no_std` with `alloc` and forbids unsafe code. It uses
 [`zvte`](https://crates.io/crates/zvte) for streaming parsing,
-[`zinput`](https://crates.io/crates/zinput) for input encoding, and
+[`zinput`](https://crates.io/crates/zinput) for input encoding,
+[`zgraphics`](https://crates.io/crates/zgraphics) for static Kitty graphics, and
 [`unicode-width`](https://crates.io/crates/unicode-width) for character widths.
 Default features are disabled on every dependency. Applications must provide an
 allocator; tests and the development benchmark use `std`.
@@ -16,7 +17,7 @@ allocator; tests and the development benchmark use `std`.
 
 ```toml
 [dependencies]
-zterm = "0.1.0"
+zterm = "0.2.0"
 ```
 
 ```rust
@@ -59,6 +60,39 @@ while shrinking are retained within the configured scrollback limits.
 modes into the independent `zinput::Modes` value. The input crate is re-exported
 as `zterm::input`; it is also usable without this terminal model.
 
+## Static graphics
+
+Call `set_cell_size(width, height)` whenever physical text-cell metrics change.
+This supplies the geometry used by image placements and CSI pixel-size replies.
+`graphics_draws(history_offset)` returns an allocation-free iterator over the
+current screen's visible image placements, in z-order. Each item borrows a
+straight-alpha RGBA image and specifies source and destination rectangles.
+The frontend performs scaling, viewport clipping and alpha compositing. Negative
+z-indices are drawn behind text; values below -1,073,741,824 also go behind cells
+with explicit background colors. The graphics types are re-exported as
+`zterm::graphics`.
+
+PTY inline RGB, RGBA and PNG are supported, with optional zlib compression,
+capability queries, chunked transfers, image IDs/numbers, placement IDs, cropping,
+aspect-preserving scaling, z-order and deletion. PNG includes palette, grayscale,
+transparency, 16-bit and Adam7 input. Nonessential metadata is discarded before
+decoding; invalid CRCs, oversized dimensions and decompression-limit failures
+produce protocol errors. Filesystem/shared-memory transports, animation,
+Unicode placeholders and relative placements are not advertised as supported.
+
+Primary and alternate screens own independent bounded image scenes. Images move
+with full-screen scrolling and remain available within retained history. Resizing
+keeps their row anchors in step with text; clearing the display removes visible
+placements. Dirty rows include graphics changes, so deleting an image causes the
+underlying text and background to be repainted. A new non-continuation command or
+deletion aborts a previous incomplete transfer, except that feature queries leave
+it intact. Normal text between completed APC chunks
+continues to render. An unterminated APC can be cancelled by CAN, SUB or a new ESC
+sequence. APC headers are capped and encoded payloads stream through a fixed-size
+staging buffer. Larger single-APC transfers emitted by existing `kitten icat`
+versions and unpadded final base64 are accepted without retaining the whole
+encoded body.
+
 ## Screen and storage
 
 The visible screen is a flat cell array with a circular row origin. Full-screen
@@ -85,12 +119,20 @@ Additional bounds are explicit:
 | Window title | 256 UTF-8 bytes |
 | Working-directory value | 2,048 UTF-8 bytes |
 | Kitty keyboard stack | 32 entries per screen |
+| Graphics APC staging | At most a 512-byte header plus 4,096 encoded payload bytes; larger bodies stream through it |
+| Decoded graphics | 16 MiB per image; 32 MiB per screen, counting vector capacity |
+| Pending graphics transfer | 16 MiB per screen; one transfer at a time |
+| Graphics dimensions | At most 8,192 pixels in either dimension, also subject to byte limit |
+| Stored images / placements | 128 / 512 per screen |
 | Combining scalars | Two inline scalars per character cell |
 
 The history byte limit covers the backing cell vectors. Screen arrays,
 container metadata, parser state, titles, hyperlinks, and queued responses are
 additional bounded allocations. Passing a history limit of zero disables
 scrollback allocation.
+Image decoding uses additional bounded temporary storage. Renderer copies and
+buffers retained through `Arc` are outside the model's decoded-storage quota;
+frontends must bound and release those resources separately.
 
 ## Implemented protocol state
 
@@ -108,7 +150,7 @@ scrollback allocation.
   mouse tracking and SGR mouse encoding, and Kitty keyboard protocol flags with
   separate primary/alternate screen stacks.
 - Synchronized-output mode, DSR cursor/status replies, device attributes,
-  DECRQM mode queries, text-area size queries, and basic XTGETTCAP queries for
+  DECRQM mode queries, character/text-area/cell pixel-size queries, and basic XTGETTCAP queries for
   `TN`, `Co`, and `Tc`. Unknown capabilities return an unsupported response.
 
 The startup compatibility environment is `TERM=xterm-256color`, using the
@@ -123,6 +165,7 @@ documented timeout can call `force_end_sync()` to finish a stalled frame.
 Protocol references:
 [xterm control sequences](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html),
 [Kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/),
+[Kitty graphics protocol](https://sw.kovidgoyal.net/kitty/graphics-protocol/),
 [synchronized output](https://github.com/contour-terminal/vt-extensions/blob/master/synchronized-output.md),
 and [OSC 8 hyperlinks](https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda).
 
@@ -131,7 +174,7 @@ and [OSC 8 hyperlinks](https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9
 Resizing preserves the cursor row and crops columns that no longer fit; it
 does not reflow paragraphs or historical lines. A cell holds a base character and
 up to two additional combining scalars. Full grapheme-cluster layout, complex
-emoji ZWJ sequences, bidirectional shaping, image protocols, and OSC 52
+emoji ZWJ sequences, bidirectional shaping, Sixel, image animation, and OSC 52
 clipboard operations are outside the current implementation.
 
 The library changes screen state and returns protocol bytes. It does not

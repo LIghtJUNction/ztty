@@ -6,6 +6,7 @@ import os
 import select
 import signal
 import socket
+import subprocess
 import termios
 import time
 import tty
@@ -84,6 +85,15 @@ def main():
                     elif action == "snapshot":
                         drain()
                         reply.update(input_hex=incoming.hex(), winches=winches, pid=os.getpid(), **size())
+                    elif action == "run":
+                        # The requested tool inherits the real terminal, owns
+                        # replies while running, and writes its image stream
+                        # directly to ztty's slave PTY. No protocol replay.
+                        drain()
+                        result = subprocess.run(command["argv"], stdin=0, stdout=1,
+                                                stderr=subprocess.PIPE, timeout=20)
+                        reply.update(code=result.returncode,
+                                     stderr=result.stderr.decode("utf-8", errors="replace"))
                     elif action == "quit":
                         running = False
                     else:
