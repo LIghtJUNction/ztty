@@ -7,16 +7,20 @@ engine and input protocols are independent libraries; the desktop frontend uses
 the system X11, Xft, and Xrender libraries. The visual design is deliberately quiet: a dark
 background, readable text, generous padding, and no application toolbar.
 
-The long-term goal is to exceed Kitty and Ghostty in responsiveness and memory
-efficiency. Current measurements, their scope, and remaining work are documented
-in [the performance report](docs/performance.md). This first release is a working
-Linux terminal with an explicit compatibility boundary.
+Multiple windows automatically share one session process, display connection
+and font cache. Each window keeps its own PTY, screen and history. In the
+recorded eight-window comparison, total ztty PSS fell from 47.021 to 15.366 MiB,
+including the waiting launchers. The single-window case rose by 0.539 MiB.
+See [measurement conditions and graphics-memory accounting](docs/performance.md#multiple-window-memory).
 
 [中文介绍](README.zh-CN.md)
 
 ![Actual ztty protocol preview](docs/assets/ztty-preview.png)
 
 ## Install
+
+The examples below describe the current source tree. Release downloads follow
+the latest published tag; build from source for unreleased changes.
 
 On Arch Linux, install the AUR package with `yay -S ztty`. Other Linux
 distributions can install a prebuilt x86_64 or AArch64 binary with:
@@ -52,6 +56,41 @@ cargo build --locked --release
 Set `PREFIX` to choose another location. The default shell comes from `SHELL`,
 with `/bin/sh` as the fallback. Child sessions receive `TERM=xterm-256color`,
 `COLORTERM=truecolor`, and `TERM_PROGRAM=ztty`.
+
+## Shared sessions and MCP
+
+Run several terminals normally; resource sharing is automatic:
+
+```sh
+ztty --name work -e /bin/bash &
+ztty --name logs -e /bin/sh &
+ztty attach
+ztty attach work
+```
+
+`ztty attach` lists sessions when no name is given. A name opens or raises its
+window and waits for it to close. Local sessions have addresses such as
+`ztty://local/work`; an ambiguous short name requires the complete address.
+
+```sh
+# MCP over stdio, without opening a window
+ztty mcp
+
+# Streamable HTTP at http://127.0.0.1:8732/mcp
+ztty mcp --transport http --host 127.0.0.1 --port 8732
+
+# View a session created by an MCP client
+ztty attach ztty://mcp/stdio/checks
+ztty attach ztty://mcp/http/127.0.0.1:8732/checks
+```
+
+MCP exposes six tools to create, list, read, write, resize and close PTYs.
+MCP-created sessions keep their output when the transport exits; closing their
+window detaches it. Ordinary local windows keep the usual close-to-exit
+behavior. HTTP listeners outside loopback require a bearer token.
+
+See [sessions and MCP](docs/sessions.md) for naming, lifecycle, HTTP tokens,
+client setup and bounded UTF-8 output cursors.
 
 ## Appearance
 
@@ -184,6 +223,9 @@ cargo test --workspace --doc
 cargo run -p zpty --example capture
 cargo run --release -p zterm --example benchmark
 python3 tests/gui_smoke.py --binary ./target/release/ztty
+python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
+python3 tests/mcp_transport.py --binary ./target/release/ztty
+python3 tests/mcp_sessions.py --binary ./target/release/ztty
 # Optional: real Fcitx 5 XIM with the Pinyin addon and a private D-Bus session.
 python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 python3 tools/verify_registry.py

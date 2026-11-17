@@ -1,6 +1,8 @@
 # Performance and validation record
 
-Report date: **2026-11-18, Asia/Taipei**. Production Rust source:
+Report date: **2026-11-18, Asia/Taipei**. The multiple-window section records
+the shared-session implementation. The core and Kitty sections retain earlier
+measurements with their original conditions. Earlier validation source:
 [`9333047c0867756a73d71e29524ddef3d9f21544`](https://github.com/LIghtJUNction/ztty/commit/9333047c0867756a73d71e29524ddef3d9f21544).
 
 The current implementation has a working Linux GUI, bounded screen/history
@@ -22,6 +24,69 @@ PTY measurements below and from physical key-to-screen latency.
 `no_std` controls the Rust runtime boundary. It does not itself prove low memory
 or low latency. The frontend uses the system C ABI, X11, Xft, font data, and a
 retained pixmap; whole-application accounting must include those separate costs.
+
+## Multiple-window memory
+
+The shared session process reduced total ztty PSS for eight idle windows by
+67.3%, from 47.021 to 15.366 MiB. This comparison includes one GUI host and all
+eight waiting launchers in the shared case. The baseline used one GUI process
+per window. [Paired raw results](measurements/multiwindow-shared-2026-11-18.json)
+retain every process, PTY child and X server observation.
+
+The run used the i9-12900HX development machine, Rust 1.100.0 and isolated
+software Xvfb displays. Both builds requested `monospace:size=11`, a 120×32
+grid and 2,000 history rows, with opaque backgrounds, no blur and no cursor
+blink. Sampling followed the same static UTF-8/color output with mostly empty
+history. Baseline `bbb201c` and the shared build were interleaved for three
+repetitions at each window count; all 18 runs completed and cleaned up their
+owned processes.
+
+Median process memory in MiB (1,048,576 bytes). Each entry sums unique ztty
+processes; PTY children and X server allocations are recorded separately.
+
+| Windows | Baseline PSS | Shared PSS | Baseline private | Shared private |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 10.633 | 11.172 | 7.629 | 7.504 |
+| 4 | 27.275 | 12.983 | 18.848 | 9.055 |
+| 8 | 47.021 | 15.366 | 37.582 | 11.301 |
+
+Between one and eight windows, average additional PSS per window fell from
+5.198 to 0.599 MiB, calculated as `(PSS at 8 − PSS at 1) / 7`.
+The single-window case increased by 0.539 MiB PSS. Sharing therefore adds a
+small initial process cost and removes much of the repeated per-window font
+and display state; the measured savings grow with the window count.
+
+Each window still used **3,273,728 bytes of X server pixmap storage** in both
+builds. Those bytes are outside the PSS table and the 67.3% calculation.
+Shells and their workloads are also separate. The shared implementation keeps
+each session's screen/history and each window's pixmap independent, so these
+results describe reduced process duplication rather than a complete desktop
+memory total.
+
+The machine was shared with other work and used the `powersave` governor.
+PSS apportions mapped pages among active processes; private-memory totals
+provide an additional view of the same run. Full-history workloads, different
+fonts or grids, and hardware graphics paths require their own measurements.
+
+Reproduce the paired comparison with both executables available:
+
+```sh
+python3 tools/measure_multiwindow.py \
+  --binary ./target/release/ztty --label shared --expect-shared \
+  --compare-binary /path/to/baseline/ztty --compare-label baseline-bbb201c \
+  --counts 1,4,8 --repetitions 3 \
+  --output artifacts/multiwindow-memory.json
+```
+
+The current MCP acceptance uses the integrated executable. Transport checks
+passed for stdio, HTTP initialization and session lifecycle, IPv6, chunked
+input, authentication, and 16 concurrent requests behind a stalled connection.
+PTY checks passed for shared broker ownership, namespaced addressing, creator
+cwd/environment/argv, resize, UTF-8 output pages, exit status, transport-exit
+persistence and explicit session cleanup. The reproducible suites are
+[MCP transports](../tests/mcp_transport.py),
+[MCP sessions](../tests/mcp_sessions.py), and
+[shared-window GUI acceptance](../tests/shared_gui_smoke.py).
 
 ## Recorded core benchmark
 
@@ -80,6 +145,9 @@ cargo run --locked --release -p zterm --example benchmark \
 ```
 
 ## Whole-terminal measurements
+
+This section retains the earlier single-window comparison. Use the paired
+multiple-window section above to assess the shared-process change.
 
 [Four-configuration raw results](measurements/runtime-profiled-2026-11-18.json)
 and [query-only diagnostic results](measurements/runtime-query-only-2026-11-18.json).
@@ -194,9 +262,9 @@ python3 tools/measure_runtime.py --query-only \
 
 ## Functional validation
 
-The following results were observed on the Linux development machine. The
-production Rust files are unchanged by the subsequent publication, documentation,
-and measurement-tool commits.
+The following table records earlier release validation at the source linked
+at the top of this report. The shared-session and MCP checks are described
+in the multiple-window section above.
 
 | Check | Result |
 | --- | --- |
@@ -232,8 +300,8 @@ preserved. Detailed implemented and tested boundaries are in
 
 ## Remaining acceptance for the project goal
 
-The current data establish a small, responsive implementation under the stated
-workloads. The next acceptance work is real XWayland and input-method sessions,
+The paired shared-process results cover idle windows after static output,
+with mostly empty history. The next acceptance work is real XWayland and input-method sessions,
 full-history and alternate-screen memory, sustained TUI and Unicode workloads,
 and comparison with Ghostty. Native GPU and physical input-to-visible-pixel
 measurements need their own harness and comparable desktop conditions. These
