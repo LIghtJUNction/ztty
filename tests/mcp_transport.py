@@ -55,6 +55,13 @@ def stdio(binary):
         assert {tool["name"] for tool in tools} == {
             "session_create", "session_list", "session_read",
             "session_write", "session_resize", "session_close"}
+        schemas = {tool["name"]: tool["inputSchema"] for tool in tools}
+        assert schemas["session_read"]["properties"]["max_bytes"]["maximum"] == 65536
+        assert schemas["session_write"]["properties"]["data"]["maxLength"] == 65536
+        send(proc, packet("tools/call", 21, {"name": "session_read", "arguments": {"session": "unused", "max_bytes": 65537}}))
+        assert line(proc)["error"]["code"] == -32602
+        send(proc, packet("tools/call", 22, {"name": "session_write", "arguments": {"session": "unused", "data": "界" * 21846}}))
+        assert line(proc)["error"]["code"] == -32602
         send(proc, packet("does/not/exist", "🚀"))
         unknown = line(proc)
         assert unknown["id"] == "🚀" and unknown["error"]["code"] == -32601
@@ -208,6 +215,7 @@ if __name__ == "__main__":
     parser.add_argument("--binary", required=True)
     args = parser.parse_args()
     binary = os.path.abspath(args.binary)
+    os.environ.setdefault("ZTTY_SOCKET", f"@ztty-mcp-transport-{os.getpid()}")
     report = {}
     for test in [stdio, http_transport, authentication, ipv6]:
         report.update(test(binary))
