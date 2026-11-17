@@ -3,7 +3,9 @@ use crate::{
     Appearance, Queue,
     broker::{self, Reply},
     json::{self, Value},
-    key, key_modifiers, modifiers, os, paste,
+    key, key_modifiers,
+    layout::{Axis, Layout},
+    modifiers, os, paste,
     x11::{self, Connection, Selection, Window},
 };
 use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
@@ -35,6 +37,9 @@ fn pty_size(cols: usize, rows: usize, window: Option<&Window>) -> zpty::Size {
 
 struct Ui {
     window: Window,
+    workspace: Option<u64>,
+    visible: bool,
+    read_only: bool,
     attachment: u64,
     selection: Option<Selection>,
     history: usize,
@@ -55,6 +60,9 @@ impl Ui {
     fn new(window: Window, attachment: u64) -> Self {
         Self {
             window,
+            workspace: None,
+            visible: true,
+            read_only: false,
             attachment,
             selection: None,
             history: 0,
@@ -80,6 +88,7 @@ impl Ui {
         queue: &mut Queue,
         openers: &mut os::Openers,
         buffers: &mut InputBuffers,
+        allow_input: bool,
     ) -> Result<(), &'static str> {
         let InputBuffers {
             text: text_buffer,
@@ -111,7 +120,9 @@ impl Ui {
                     return Ok(());
                 }
                 if press && mods.0 & 5 == 5 && (symbol == b'v' as u64 || symbol == b'V' as u64) {
-                    self.window.paste(false);
+                    if allow_input {
+                        self.window.paste(false);
+                    }
                     self.intercepted[code] = true;
                     return Ok(());
                 }
@@ -141,6 +152,9 @@ impl Ui {
                 };
                 if lookup.ignored {
                     self.intercepted[code] = true;
+                    return Ok(());
+                }
+                if !allow_input {
                     return Ok(());
                 }
                 let text = core::str::from_utf8(&text_buffer[..lookup.len]).unwrap_or("");
@@ -206,7 +220,8 @@ impl Ui {
                     self.swallowed_buttons[button_index] = false;
                     return Ok(());
                 }
-                let mut local = mods.0 & 1 != 0 || terminal.modes().mouse_tracking == 0;
+                let mut local =
+                    !allow_input || mods.0 & 1 != 0 || terminal.modes().mouse_tracking == 0;
                 if pressed && local {
                     self.local_buttons[button_index] = true;
                 }
@@ -239,7 +254,9 @@ impl Ui {
                             self.force = true;
                         }
                     } else if pressed && e.button == 2 {
-                        self.window.paste(true);
+                        if allow_input {
+                            self.window.paste(true);
+                        }
                     } else if pressed && (e.button == 4 || e.button == 5) {
                         self.history = if e.button == 4 {
                             self.history.saturating_add(3).min(terminal.history_len())
@@ -293,6 +310,9 @@ impl Ui {
                     self.force = true;
                     return Ok(());
                 }
+                if !allow_input {
+                    return Ok(());
+                }
                 let button = if e.state & 256 != 0 {
                     Some(0)
                 } else if e.state & 512 != 0 {
@@ -315,9 +335,11 @@ impl Ui {
                 let e = unsafe { event.configure };
                 if e.width != self.window.width || e.height != self.window.height {
                     let (cols, rows) = self.window.resize(e.width, e.height);
-                    terminal.resize(cols, rows);
-                    pty.resize(pty_size(cols, rows, Some(&self.window)))
-                        .map_err(|_| "cannot resize the PTY")?;
+                    if allow_input {
+                        terminal.resize(cols, rows);
+                        pty.resize(pty_size(cols, rows, Some(&self.window)))
+                            .map_err(|_| "cannot resize the PTY")?;
+                    }
                     self.history = self.history.min(terminal.history_len());
                     self.selection = None;
                     self.force = true;
@@ -332,7 +354,9 @@ impl Ui {
                     self.held.fill(0);
                     self.intercepted.fill(false);
                 }
-                queue.push(&input::encode_focus(focused, &terminal.modes().input()));
+                if allow_input {
+                    queue.push(&input::encode_focus(focused, &terminal.modes().input()));
+                }
             }
             x11::EXPOSE => {
                 self.window.present();
@@ -351,12 +375,16 @@ impl Ui {
                 self.window.selection_request(unsafe { event.request });
             }
             x11::SELECTION_NOTIFY => {
-                if let Some(data) = self.window.selection_notify(unsafe { event.selection }) {
+                if let Some(data) = self.window.selection_notify(unsafe { event.selection })
+                    && allow_input
+                {
                     paste(data, terminal, queue);
                 }
             }
             x11::PROPERTY_NOTIFY => {
-                if let Some(data) = self.window.property(unsafe { event.property }) {
+                if let Some(data) = self.window.property(unsafe { event.property })
+                    && allow_input
+                {
                     paste(data, terminal, queue);
                 }
             }
@@ -365,7 +393,12 @@ impl Ui {
         }
         Ok(())
     }
-    fn paint(&mut self, terminal: &mut Terminal, appearance: &Appearance) -> Option<u64> {
+    fn paint(
+        &mut self,
+        terminal: &mut Terminal,
+        appearance: &Appearance,
+        observing: bool,
+    ) -> Option<u64> {
         let now = os::milliseconds();
         if terminal.modes().synchronized_output {
             let start = self.sync_since.get_or_insert(now);
@@ -376,9 +409,20 @@ impl Ui {
         } else {
             self.sync_since = None;
         }
-        if terminal.title() != self.title {
-            self.title.clear();
-            self.title.push_str(terminal.title());
+        let title = if observing {
+            format!(
+                "{} · observe",
+                if terminal.title().is_empty() {
+                    "ztty"
+                } else {
+                    terminal.title()
+                }
+            )
+        } else {
+            terminal.title().into()
+        };
+        if title != self.title {
+            self.title = title;
             self.window.title(&self.title);
         }
         let modes = terminal.modes();
@@ -424,6 +468,8 @@ impl Ui {
 }
 
 struct Session {
+    id: u64,
+    created_at: u64,
     uri: String,
     name: String,
     origin: String,
@@ -436,6 +482,9 @@ struct Session {
     eof: bool,
     output: VecDeque<u8>,
     output_end: u64,
+    input_owner: Option<String>,
+    launch_env: Vec<CString>,
+    initial_cwd: CString,
 }
 
 impl Session {
@@ -446,6 +495,8 @@ impl Session {
     }
     fn info(&self) -> Value {
         json::object([
+            ("id", Value::from(self.id)),
+            ("created_at", Value::from(self.created_at)),
             ("uri", Value::from(self.uri.clone())),
             ("name", Value::from(self.name.clone())),
             ("origin", Value::from(self.origin.clone())),
@@ -470,6 +521,32 @@ impl Session {
                 self.status().map(Value::from).unwrap_or(Value::Null),
             ),
             ("title", Value::from(self.terminal.title())),
+            (
+                "input_owner",
+                self.input_owner
+                    .as_ref()
+                    .map(|s| Value::from(s.clone()))
+                    .unwrap_or(Value::Null),
+            ),
+            (
+                "workspace",
+                self.ui
+                    .as_ref()
+                    .and_then(|ui| ui.workspace)
+                    .map(Value::from)
+                    .unwrap_or(Value::Null),
+            ),
+            (
+                "visible",
+                Value::Bool(self.ui.as_ref().is_some_and(|ui| ui.visible)),
+            ),
+            (
+                "window_id",
+                self.ui
+                    .as_ref()
+                    .map(|ui| Value::from(ui.window.id))
+                    .unwrap_or(Value::Null),
+            ),
         ])
     }
     fn pump(&mut self, buffer: &mut [u8]) {
@@ -606,14 +683,22 @@ impl Session {
     }
 }
 
+struct Workspace {
+    window: x11::Container,
+    layout: Layout,
+    title: String,
+}
+
 struct Pool {
     sessions: Vec<Session>,
+    workspaces: Vec<Workspace>,
     connections: Vec<(String, Rc<Connection>)>,
     next: u64,
     next_attachment: u64,
     completed: VecDeque<(String, i32)>,
     finished: Vec<(String, i32)>,
     reaping: Vec<(i32, u64)>,
+    shortcuts: [bool; 256],
 }
 
 fn bounded(
@@ -643,6 +728,91 @@ fn environment(request: &Value) -> Result<Vec<CString>, String> {
     }
 }
 
+fn actor(request: &Value) -> Result<&str, String> {
+    match request.get("_actor") {
+        None => Ok("local"),
+        Some(value) => value
+            .as_str()
+            .filter(|s| {
+                !s.is_empty()
+                    && s.len() <= 128
+                    && s.bytes()
+                        .all(|b| b.is_ascii_alphanumeric() || b"._:-".contains(&b))
+            })
+            .ok_or_else(|| String::from("invalid control identity")),
+    }
+}
+
+fn valid_name(name: &str) -> bool {
+    !name.is_empty()
+        && name.len() <= 64
+        && name != "."
+        && name != ".."
+        && name
+            .bytes()
+            .all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b))
+}
+
+fn local_directory(uri: &str) -> Option<String> {
+    let (host, path) = uri.strip_prefix("file://")?.split_once('/')?;
+    let mut hostname = [0u8; 256];
+    let actual = if unsafe { os::gethostname(hostname.as_mut_ptr().cast(), hostname.len()) } == 0 {
+        let len = hostname
+            .iter()
+            .position(|&b| b == 0)
+            .unwrap_or(hostname.len());
+        core::str::from_utf8(&hostname[..len]).ok()?
+    } else {
+        ""
+    };
+    if !host.is_empty() && host != "localhost" && host != actual {
+        return None;
+    }
+    let mut bytes = Vec::with_capacity(path.len() + 1);
+    bytes.push(b'/');
+    let mut source = path.as_bytes().iter().copied();
+    while let Some(byte) = source.next() {
+        let byte = if byte == b'%' {
+            let high = (source.next()? as char).to_digit(16)?;
+            let low = (source.next()? as char).to_digit(16)?;
+            (high * 16 + low) as u8
+        } else {
+            byte
+        };
+        if byte == 0 || byte < 32 || byte == 127 {
+            return None;
+        }
+        bytes.push(byte);
+    }
+    String::from_utf8(bytes).ok()
+}
+
+fn shortcut(symbol: u64, state: u32) -> Option<&'static str> {
+    if state & (1 | 4 | 8 | 64) != 1 | 4 {
+        return None;
+    }
+    match symbol {
+        0x54 | 0x74 => Some("new-tab"),
+        0x45 | 0x65 => Some("split-right"),
+        0x4f | 0x6f => Some("split-down"),
+        0x4e | 0x6e => Some("new-window"),
+        0x55 | 0x75 => Some("move-window"),
+        0x44 | 0x64 => Some("detach"),
+        0x57 | 0x77 => Some("close"),
+        0x47 | 0x67 => Some("take-control"),
+        0xff55 => Some("previous-tab"),
+        0xff56 => Some("next-tab"),
+        0xff51 => Some("previous-pane"),
+        0xff53 => Some("next-pane"),
+        0xff52 => Some("swap-previous"),
+        0xff54 => Some("swap-next"),
+        0xff0d => Some("maximize"),
+        0x2b | 0x3d => Some("grow"),
+        0x2d | 0x5f => Some("shrink"),
+        _ => None,
+    }
+}
+
 struct WorkingDirectory(broker::Fd);
 impl WorkingDirectory {
     fn enter(path: &CStr) -> Result<Self, String> {
@@ -665,12 +835,14 @@ impl Pool {
     fn new() -> Self {
         Self {
             sessions: Vec::new(),
+            workspaces: Vec::new(),
             connections: Vec::new(),
             next: 1,
             next_attachment: 1,
             completed: VecDeque::new(),
             finished: Vec::new(),
             reaping: Vec::new(),
+            shortcuts: [false; 256],
         }
     }
 
@@ -694,6 +866,13 @@ impl Pool {
     }
 
     fn selector(&self, request: &Value) -> Result<usize, String> {
+        if let Some(id) = request.get("session").and_then(Value::as_u64) {
+            return self
+                .sessions
+                .iter()
+                .position(|s| s.id == id)
+                .ok_or_else(|| format!("session id not found: {id}"));
+        }
         let selector = request
             .get("session")
             .and_then(Value::as_str)
@@ -716,6 +895,7 @@ impl Pool {
     }
 
     fn create(&mut self, request: &Value) -> Result<Value, String> {
+        let input_owner = actor(request)?.into();
         if self.sessions.len() >= 128 {
             return Err("session limit reached (128); close unused sessions".into());
         }
@@ -734,26 +914,24 @@ impl Pool {
         if !valid_origin {
             return Err("invalid session origin".into());
         }
-        let default = format!("session-{}", self.next);
+        let id = self.next;
+        let default = format!("session-{id}");
         self.next += 1;
         let name = match request.get("name") {
             None => default.as_str(),
             Some(value) => value.as_str().ok_or("name must be a string")?,
         };
-        if name.is_empty()
-            || name.len() > 64
-            || name == "."
-            || name == ".."
-            || !name
-                .bytes()
-                .all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b))
-        {
+        if !valid_name(name) {
             return Err(
                 "session names use 1..64 ASCII letters, digits, dot, underscore or hyphen".into(),
             );
         }
         let uri = format!("ztty://{origin}/{name}");
-        if self.sessions.iter().any(|s| s.uri == uri) {
+        if self
+            .sessions
+            .iter()
+            .any(|s| s.uri == uri || (s.origin == origin && s.name == name))
+        {
             return Err(format!("session already exists: {uri}"));
         }
         let cols = bounded(request, "cols", 120, 2, 512)?;
@@ -840,13 +1018,13 @@ impl Pool {
         env.push(CString::new(pwd).map_err(|_| "invalid working directory")?);
         let (program, env) = os::child_setup_with_env(&command[0], env).map_err(String::from)?;
         let argv: Vec<&CStr> = command.iter().map(CString::as_c_str).collect();
-        let env: Vec<&CStr> = env.iter().map(CString::as_c_str).collect();
+        let child_env: Vec<&CStr> = env.iter().map(CString::as_c_str).collect();
         let close: Vec<i32> = self.connections.iter().map(|(_, c)| c.fd).collect();
         let pty = unsafe {
             zpty::Pty::spawn(
                 &program,
                 &argv,
-                &env,
+                &child_env,
                 pty_size(cols, rows, ui.as_ref().map(|ui| &ui.window)),
                 &close,
             )
@@ -858,6 +1036,8 @@ impl Pool {
             terminal.set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
         }
         let session = Session {
+            id,
+            created_at: os::unix_milliseconds(),
             uri,
             name: name.into(),
             origin: origin.into(),
@@ -870,10 +1050,29 @@ impl Pool {
             eof: false,
             output: VecDeque::new(),
             output_end: 0,
+            input_owner: Some(input_owner),
+            launch_env: env,
+            initial_cwd: cwd,
         };
-        let result = session.info();
         self.sessions.push(session);
-        Ok(result)
+        if let Some(target) = request.get("target").and_then(Value::as_str) {
+            let target_request = json::object([("session", Value::from(target))]);
+            let result = self.selector(&target_request).and_then(|target_index| {
+                self.group(
+                    self.sessions[target_index].id,
+                    id,
+                    request
+                        .get("layout")
+                        .and_then(Value::as_str)
+                        .unwrap_or("tab"),
+                )
+            });
+            if let Err(error) = result {
+                self.retire(self.sessions.len() - 1);
+                return Err(error);
+            }
+        }
+        Ok(self.sessions.last().expect("created session").info())
     }
 
     fn retire(&mut self, index: usize) -> Value {
@@ -896,7 +1095,335 @@ impl Pool {
             self.reaping.push((session.pty.pid(), os::milliseconds()));
         }
         drop(session);
+        self.remove_from_layout(result.get("id").and_then(Value::as_u64).unwrap_or(0));
         result
+    }
+
+    fn workspace(&self, session: u64) -> Option<usize> {
+        self.workspaces
+            .iter()
+            .position(|workspace| workspace.layout.contains(session))
+    }
+
+    fn remove_from_layout(&mut self, id: u64) {
+        if let Some(index) = self.workspace(id) {
+            self.workspaces[index].layout.remove(id);
+            if self.workspaces[index].layout.tabs.is_empty() {
+                self.workspaces.remove(index);
+            } else {
+                let _ = self.arrange(index, false);
+            }
+        }
+    }
+
+    fn ensure_workspace(&mut self, id: u64) -> Result<usize, String> {
+        if let Some(index) = self.workspace(id) {
+            return Ok(index);
+        }
+        let session = self
+            .sessions
+            .iter_mut()
+            .find(|s| s.id == id)
+            .ok_or("session not found")?;
+        let ui = session
+            .ui
+            .as_mut()
+            .ok_or("attach the session before arranging its window")?;
+        let window = x11::Container::new(&ui.window);
+        ui.window.parent(Some(window.id));
+        ui.workspace = Some(window.id);
+        self.workspaces.push(Workspace {
+            window,
+            layout: Layout::new(id),
+            title: String::new(),
+        });
+        Ok(self.workspaces.len() - 1)
+    }
+
+    fn arrange(&mut self, index: usize, focus: bool) -> Result<(), String> {
+        let workspace = &self.workspaces[index];
+        let placements = workspace
+            .layout
+            .placements(workspace.window.width, workspace.window.height);
+        let members = workspace.layout.panes();
+        let active = workspace.layout.focused;
+        for session in &mut self.sessions {
+            if !members.contains(&session.id) {
+                continue;
+            }
+            let Some(ui) = &mut session.ui else {
+                continue;
+            };
+            if !ui.open || ui.window.id == 0 {
+                continue;
+            }
+            let placement = placements.iter().find(|(id, _)| *id == session.id);
+            if let Some((_, rect)) = placement {
+                let (cols, rows) = ui.window.place(*rect);
+                if session.input_owner.as_deref() == Some("local")
+                    && !ui.read_only
+                    && (cols != session.terminal.cols() || rows != session.terminal.rows())
+                {
+                    session.terminal.resize(cols, rows);
+                    if !session.eof {
+                        session
+                            .pty
+                            .resize(pty_size(cols, rows, Some(&ui.window)))
+                            .map_err(|e| format!("cannot resize split PTY: {e}"))?;
+                    }
+                    ui.history = ui.history.min(session.terminal.history_len());
+                    ui.selection = None;
+                }
+                ui.window.visible(true);
+                ui.force = true;
+            } else {
+                ui.window.visible(false);
+                ui.held.fill(0);
+                ui.intercepted.fill(false);
+                ui.blink_deadline = None;
+            }
+            ui.visible = placement.is_some();
+        }
+        if focus {
+            self.workspaces[index].window.raise();
+            if let Some(ui) = self
+                .sessions
+                .iter()
+                .find(|s| s.id == active)
+                .and_then(|s| s.ui.as_ref())
+            {
+                ui.window.raise();
+            }
+        }
+        Ok(())
+    }
+
+    fn group(&mut self, target: u64, moved: u64, mode: &str) -> Result<(), String> {
+        if target == moved {
+            return Err("cannot put a session beside itself".into());
+        }
+        let axis = match mode {
+            "tab" => None,
+            "right" => Some(Axis::Vertical),
+            "down" => Some(Axis::Horizontal),
+            _ => return Err("layout must be tab, right or down".into()),
+        };
+        let a = self
+            .sessions
+            .iter()
+            .find(|s| s.id == target)
+            .and_then(|s| s.ui.as_ref())
+            .ok_or("target has no window")?;
+        let b = self
+            .sessions
+            .iter()
+            .find(|s| s.id == moved)
+            .and_then(|s| s.ui.as_ref())
+            .ok_or("session has no window")?;
+        if a.window.display != b.window.display {
+            return Err("sessions on different displays cannot share a window".into());
+        }
+        if self
+            .workspace(target)
+            .is_some_and(|i| self.workspaces[i].layout.contains(moved))
+        {
+            return Err("session already belongs to this workspace".into());
+        }
+        let index = self.ensure_workspace(target)?;
+        let parent = self.workspaces[index].window.id;
+        let mut layout = self.workspaces[index].layout.clone();
+        layout.focus(target);
+        if let Some(axis) = axis {
+            layout.split(moved, axis)?;
+        } else {
+            layout.add_tab(moved)?;
+        }
+        // Reparent before destroying an emptied old container. X11 destroys a
+        // parent's children, so reversing these operations would kill the view.
+        let ui = self
+            .sessions
+            .iter_mut()
+            .find(|s| s.id == moved)
+            .and_then(|s| s.ui.as_mut())
+            .unwrap();
+        ui.window.parent(Some(parent));
+        ui.workspace = Some(parent);
+        self.remove_from_layout(moved);
+        let index = self
+            .workspaces
+            .iter()
+            .position(|w| w.window.id == parent)
+            .unwrap();
+        self.workspaces[index].layout = layout;
+        self.arrange(index, true)
+    }
+
+    fn popout(&mut self, id: u64) -> Result<(), String> {
+        let session = self
+            .sessions
+            .iter_mut()
+            .find(|s| s.id == id)
+            .ok_or("session not found")?;
+        let ui = session.ui.as_mut().ok_or("session has no window")?;
+        ui.window.parent(None);
+        ui.window.visible(true);
+        ui.window.raise();
+        ui.workspace = None;
+        ui.visible = true;
+        ui.force = true;
+        self.remove_from_layout(id);
+        Ok(())
+    }
+
+    fn detach(&mut self, index: usize) -> Value {
+        let session = &mut self.sessions[index];
+        session.persistent = true;
+        let id = session.id;
+        if let Some(ui) = session.ui.take() {
+            let token = format!("attachment:{}", ui.attachment);
+            let status = session.status().unwrap_or(0);
+            self.finished.push((token.clone(), status));
+            self.completed.push_back((token, status));
+            while self.completed.len() > 128 {
+                self.completed.pop_front();
+            }
+            drop(ui);
+        }
+        self.remove_from_layout(id);
+        self.sessions[index].info()
+    }
+
+    fn related(&mut self, index: usize, mode: &str) -> Result<Value, String> {
+        let session = &self.sessions[index];
+        let mut request = json::object([
+            ("op", Value::from("create")),
+            ("origin", Value::from("local")),
+            ("headless", Value::Bool(false)),
+            ("cols", Value::from(session.terminal.cols())),
+            ("rows", Value::from(session.terminal.rows())),
+            ("_appearance", session.appearance.to_json()),
+            (
+                "_cwd",
+                Value::from(broker::hex(session.initial_cwd.to_bytes())),
+            ),
+            (
+                "_env",
+                Value::Array(
+                    session
+                        .launch_env
+                        .iter()
+                        .map(|e| Value::from(broker::hex(e.to_bytes())))
+                        .collect(),
+                ),
+            ),
+        ]);
+        // OSC 7 is parsed as data. Only local absolute file URLs can influence
+        // a new local shell's cwd; an SSH host is never interpreted as local.
+        if let Some(cwd) = local_directory(session.terminal.working_directory()) {
+            request.set("cwd", Value::from(cwd));
+        }
+        if mode != "window" {
+            request.set("target", Value::from(session.uri.clone()));
+            request.set("layout", Value::from(mode));
+        }
+        self.create(&request)
+    }
+
+    fn action(&mut self, index: usize, action: &str) -> Result<Value, String> {
+        let id = self.sessions[index].id;
+        match action {
+            "new-tab" => return self.related(index, "tab"),
+            "split-right" => return self.related(index, "right"),
+            "split-down" => return self.related(index, "down"),
+            "new-window" => return self.related(index, "window"),
+            "move-window" => self.popout(id)?,
+            "detach" => return Ok(self.detach(index)),
+            "close" => {
+                if let Some(ui) = &mut self.sessions[index].ui {
+                    ui.open = false;
+                }
+            }
+            "take-control" => {
+                let request = json::object([
+                    ("action", Value::from("acquire")),
+                    ("takeover", Value::Bool(true)),
+                ]);
+                return self.control(index, &request);
+            }
+            "next-tab" | "previous-tab" | "next-pane" | "previous-pane" | "swap-next"
+            | "swap-previous" | "maximize" | "grow" | "shrink" => {
+                let workspace = self
+                    .workspace(id)
+                    .ok_or("this window has no tabs or splits")?;
+                let layout = &mut self.workspaces[workspace].layout;
+                layout.focus(id);
+                match action {
+                    "next-tab" => layout.cycle_tab(true),
+                    "previous-tab" => layout.cycle_tab(false),
+                    "next-pane" => layout.cycle_pane(true, false),
+                    "previous-pane" => layout.cycle_pane(false, false),
+                    "swap-next" => layout.cycle_pane(true, true),
+                    "swap-previous" => layout.cycle_pane(false, true),
+                    "maximize" => layout.maximized = !layout.maximized,
+                    "grow" => {
+                        layout.adjust(50);
+                    }
+                    "shrink" => {
+                        layout.adjust(-50);
+                    }
+                    _ => unreachable!(),
+                }
+                self.arrange(workspace, true)?;
+            }
+            _ => return Err(format!("unknown window action: {action}")),
+        }
+        Ok(self.sessions[index].info())
+    }
+
+    fn control(&mut self, index: usize, request: &Value) -> Result<Value, String> {
+        let actor = actor(request)?;
+        let session = &mut self.sessions[index];
+        let action = request
+            .get("action")
+            .and_then(Value::as_str)
+            .ok_or("control action is required")?;
+        match action {
+            "acquire" => {
+                if session
+                    .input_owner
+                    .as_deref()
+                    .is_some_and(|owner| owner != actor)
+                    && request.get("takeover").and_then(Value::as_bool) != Some(true)
+                {
+                    return Err(
+                        "session already has an input owner; explicit takeover is required".into(),
+                    );
+                }
+                if session.input_owner.as_deref() != Some(actor) {
+                    session.queue.bytes.clear();
+                    session.queue.offset = 0;
+                }
+                session.input_owner = Some(actor.into());
+                if actor == "local"
+                    && let Some(ui) = &mut session.ui
+                {
+                    ui.read_only = false;
+                }
+            }
+            "release" => {
+                if session.input_owner.as_deref() != Some(actor) {
+                    return Err("only the input owner can release control".into());
+                }
+                session.input_owner = None;
+                session.queue.bytes.clear();
+                session.queue.offset = 0;
+            }
+            _ => return Err("control action must be acquire or release".into()),
+        }
+        if let Some(ui) = &mut session.ui {
+            ui.force = true;
+        }
+        Ok(session.info())
     }
 
     fn handle(&mut self, request: &Value) -> Result<Reply, String> {
@@ -908,10 +1435,20 @@ impl Pool {
             return self.create(request).map(Reply::Value);
         }
         if op == "list" {
+            let filter = request.get("filter").and_then(Value::as_str).unwrap_or("");
+            if filter.len() > 256 {
+                return Err("session filter exceeds 256 bytes".into());
+            }
             return Ok(Reply::Value(json::object([
                 (
                     "sessions",
-                    Value::Array(self.sessions.iter().map(Session::info).collect()),
+                    Value::Array(
+                        self.sessions
+                            .iter()
+                            .filter(|s| s.name.contains(filter) || s.uri.contains(filter))
+                            .map(Session::info)
+                            .collect(),
+                    ),
                 ),
                 ("broker_pid", Value::from(unsafe { os::getpid() })),
             ])));
@@ -936,7 +1473,70 @@ impl Pool {
             }
         }
         let index = self.selector(request)?;
+        if matches!(op, "write" | "resize" | "close" | "rename")
+            && self.sessions[index].input_owner.as_deref() != Some(actor(request)?)
+        {
+            return Err(
+                "input control is required; acquire or explicitly take over this session".into(),
+            );
+        }
         match op {
+            "info" => Ok(Reply::Value(self.sessions[index].info())),
+            "control" => self.control(index, request).map(Reply::Value),
+            "detach" => {
+                if actor(request)? != "local" {
+                    return Err("detaching desktop views requires local control".into());
+                }
+                Ok(Reply::Value(self.detach(index)))
+            }
+            "rename" => {
+                let name = request
+                    .get("name")
+                    .and_then(Value::as_str)
+                    .filter(|s| valid_name(s))
+                    .ok_or(
+                        "session names use 1..64 ASCII letters, digits, dot, underscore or hyphen",
+                    )?;
+                if self.sessions.iter().enumerate().any(|(i, s)| {
+                    i != index && s.origin == self.sessions[index].origin && s.name == name
+                }) {
+                    return Err("session name already exists in this namespace".into());
+                }
+                self.sessions[index].name = name.into();
+                // Creation URIs remain valid after rename. Numeric IDs are also
+                // accepted by the broker for the lifetime of this process.
+                Ok(Reply::Value(self.sessions[index].info()))
+            }
+            "action" => {
+                if actor(request)? != "local" {
+                    return Err("desktop actions require local control".into());
+                }
+                let action = request
+                    .get("action")
+                    .and_then(Value::as_str)
+                    .ok_or("action is required")?;
+                self.action(index, action).map(Reply::Value)
+            }
+            "move" => {
+                if actor(request)? != "local" {
+                    return Err("moving desktop views requires local control".into());
+                }
+                let target = request
+                    .get("target")
+                    .and_then(Value::as_str)
+                    .ok_or("target is required")?;
+                let target_index =
+                    self.selector(&json::object([("session", Value::from(target))]))?;
+                self.group(
+                    self.sessions[target_index].id,
+                    self.sessions[index].id,
+                    request
+                        .get("layout")
+                        .and_then(Value::as_str)
+                        .unwrap_or("tab"),
+                )?;
+                Ok(Reply::Value(self.sessions[index].info()))
+            }
             "read" => self.sessions[index].read(request).map(Reply::Value),
             "write" => {
                 let session = &mut self.sessions[index];
@@ -988,8 +1588,22 @@ impl Pool {
                 Ok(Reply::Value(session.info()))
             }
             "attach" => {
+                let read_only = request
+                    .get("observe")
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
                 if let Some(ui) = &mut self.sessions[index].ui {
-                    ui.window.raise();
+                    if read_only {
+                        ui.read_only = true;
+                    }
+                    if let Some(workspace) = self.workspace(self.sessions[index].id) {
+                        self.workspaces[workspace]
+                            .layout
+                            .focus(self.sessions[index].id);
+                        self.arrange(workspace, true)?;
+                    } else if !read_only {
+                        self.sessions[index].ui.as_ref().unwrap().window.raise();
+                    }
                     return Ok(Reply::Value(self.sessions[index].info()));
                 }
                 let env = environment(request)?;
@@ -1000,25 +1614,30 @@ impl Pool {
                 if let Some(value) = request.get("_appearance") {
                     session.appearance = Appearance::from_json(value).map_err(String::from)?;
                 }
-                let window = Window::new_shared(
+                let observing = read_only || session.input_owner.as_deref() != Some("local");
+                let window = Window::new_view(
                     session.terminal.cols(),
                     session.terminal.rows(),
                     &session.appearance,
                     &connection,
+                    !observing,
                 )
                 .map_err(String::from)?;
-                session
-                    .pty
-                    .resize(pty_size(
-                        session.terminal.cols(),
-                        session.terminal.rows(),
-                        Some(&window),
-                    ))
-                    .map_err(|e| format!("cannot update attached PTY size: {e}"))?;
+                if !observing {
+                    session
+                        .pty
+                        .resize(pty_size(
+                            session.terminal.cols(),
+                            session.terminal.rows(),
+                            Some(&window),
+                        ))
+                        .map_err(|e| format!("cannot update attached PTY size: {e}"))?;
+                }
                 session
                     .terminal
                     .set_cell_size(window.cw as u32, window.ch as u32);
                 session.ui = Some(Ui::new(window, attachment));
+                session.ui.as_mut().unwrap().read_only = read_only;
                 Ok(Reply::Value(session.info()))
             }
             "wait" => {
@@ -1039,7 +1658,8 @@ impl Pool {
     }
 
     fn events(&mut self, openers: &mut os::Openers, buffers: &mut InputBuffers) {
-        for (_, connection) in &self.connections {
+        for connection_index in 0..self.connections.len() {
+            let connection = self.connections[connection_index].1.clone();
             for _ in 0..512 {
                 if unsafe { x11::XPending(connection.display) } == 0 {
                     break;
@@ -1052,7 +1672,58 @@ impl Pool {
                     continue;
                 }
                 let id = event.window();
-                if let Some(session) = self.sessions.iter_mut().find(|s| {
+                if let Some(index) = self
+                    .workspaces
+                    .iter()
+                    .position(|w| w.window.id == id && w.window.display() == connection.display)
+                {
+                    match unsafe { event.kind } {
+                        x11::CONFIGURE_NOTIFY => {
+                            let e = unsafe { event.configure };
+                            let w = &mut self.workspaces[index].window;
+                            if w.width != e.width || w.height != e.height {
+                                w.width = e.width.max(1);
+                                w.height = e.height.max(1);
+                                let _ = self.arrange(index, false);
+                            }
+                        }
+                        x11::FOCUS_IN => {
+                            let active = self.workspaces[index].layout.focused;
+                            if let Some(ui) = self
+                                .sessions
+                                .iter()
+                                .find(|s| s.id == active)
+                                .and_then(|s| s.ui.as_ref())
+                            {
+                                ui.window.raise();
+                            }
+                        }
+                        x11::CLIENT_MESSAGE | x11::DESTROY_NOTIFY => {
+                            let destroyed = unsafe { event.kind } == x11::DESTROY_NOTIFY;
+                            if destroyed
+                                || unsafe { event.client.data.longs[0] as u64 }
+                                    == self.workspaces[index].window.wm_delete
+                            {
+                                if destroyed {
+                                    self.workspaces[index].window.id = 0;
+                                }
+                                for session in &mut self.sessions {
+                                    if let Some(ui) = &mut session.ui
+                                        && ui.workspace == Some(id)
+                                    {
+                                        ui.open = false;
+                                        if destroyed {
+                                            ui.window.id = 0;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        _ => {}
+                    }
+                    continue;
+                }
+                if let Some(index) = self.sessions.iter().position(|s| {
                     s.ui.as_ref().is_some_and(|ui| {
                         ui.open
                             && ui.window.id != 0
@@ -1060,7 +1731,46 @@ impl Pool {
                             && ui.window.display == connection.display
                     })
                 }) {
+                    let kind = unsafe { event.kind };
+                    if kind == x11::KEY_RELEASE {
+                        let code = (unsafe { event.key.keycode } as usize).min(255);
+                        if self.shortcuts[code] {
+                            self.shortcuts[code] = false;
+                            continue;
+                        }
+                    }
+                    if kind == x11::KEY_PRESS {
+                        let mut e = unsafe { event.key };
+                        let symbol = self.sessions[index]
+                            .ui
+                            .as_ref()
+                            .unwrap()
+                            .window
+                            .key_symbol(&mut e, false);
+                        if let Some(action) = shortcut(symbol, e.state) {
+                            self.shortcuts[(e.keycode as usize).min(255)] = true;
+                            if let Err(error) = self.action(index, action) {
+                                os::print(2, format!("ztty: {error}\n").as_bytes());
+                                if let Some(ui) = &mut self.sessions[index].ui {
+                                    ui.window.title(&format!("ztty: {error}"));
+                                }
+                            }
+                            continue;
+                        }
+                    }
+                    if kind == x11::BUTTON_PRESS || kind == x11::FOCUS_IN {
+                        let session_id = self.sessions[index].id;
+                        if let Some(workspace) = self.workspace(session_id) {
+                            self.workspaces[workspace].layout.focus(session_id);
+                            if kind == x11::BUTTON_PRESS {
+                                self.sessions[index].ui.as_ref().unwrap().window.raise();
+                            }
+                        }
+                    }
+                    let session = &mut self.sessions[index];
                     let ui = session.ui.as_mut().unwrap();
+                    let allow_input =
+                        !ui.read_only && session.input_owner.as_deref() == Some("local");
                     if ui
                         .event(
                             &mut event,
@@ -1069,6 +1779,7 @@ impl Pool {
                             &mut session.queue,
                             openers,
                             buffers,
+                            allow_input,
                         )
                         .is_err()
                     {
@@ -1085,8 +1796,13 @@ impl Pool {
             session.pump(buffer);
             if let Some(ui) = &mut session.ui
                 && ui.open
+                && ui.visible
                 && ui.window.id != 0
-                && let Some(next) = ui.paint(&mut session.terminal, &session.appearance)
+                && let Some(next) = ui.paint(
+                    &mut session.terminal,
+                    &session.appearance,
+                    ui.read_only || session.input_owner.as_deref() != Some("local"),
+                )
             {
                 deadline = Some(deadline.map_or(next, |old: u64| old.min(next)));
             }
@@ -1101,14 +1817,32 @@ impl Pool {
             if !self.sessions[i].persistent && (closed || ended) {
                 self.retire(i);
             } else if closed {
-                let session = &mut self.sessions[i];
-                let ui = session.ui.take().expect("closed window is present");
-                let token = format!("attachment:{}", ui.attachment);
-                let status = session.status().unwrap_or(0);
-                self.finished.push((token.clone(), status));
-                self.completed.push_back((token, status));
-                while self.completed.len() > 128 {
-                    self.completed.pop_front();
+                self.detach(i);
+            }
+        }
+        for workspace in &mut self.workspaces {
+            if let Some(session) = self
+                .sessions
+                .iter()
+                .find(|s| s.id == workspace.layout.focused)
+            {
+                let label = if session.terminal.title().is_empty() {
+                    &session.name
+                } else {
+                    session.terminal.title()
+                };
+                let observer = session.input_owner.as_deref() != Some("local")
+                    || session.ui.as_ref().is_some_and(|ui| ui.read_only);
+                let title = format!(
+                    "ztty · {}/{} · {}{}",
+                    workspace.layout.active_tab + 1,
+                    workspace.layout.tabs.len(),
+                    label,
+                    if observer { " · observe" } else { "" }
+                );
+                if title != workspace.title {
+                    workspace.window.title(&title);
+                    workspace.title = title;
                 }
             }
         }

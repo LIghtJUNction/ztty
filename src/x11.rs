@@ -438,6 +438,22 @@ unsafe extern "C" {
     fn XDestroyWindow(display: *mut Display, window: Xid) -> c_int;
     fn XSelectInput(display: *mut Display, window: Xid, mask: c_long) -> c_int;
     fn XMapWindow(display: *mut Display, window: Xid) -> c_int;
+    fn XUnmapWindow(display: *mut Display, window: Xid) -> c_int;
+    fn XReparentWindow(
+        display: *mut Display,
+        window: Xid,
+        parent: Xid,
+        x: c_int,
+        y: c_int,
+    ) -> c_int;
+    fn XMoveResizeWindow(
+        display: *mut Display,
+        window: Xid,
+        x: c_int,
+        y: c_int,
+        width: c_uint,
+        height: c_uint,
+    ) -> c_int;
     fn XMapRaised(display: *mut Display, window: Xid) -> c_int;
     fn XResizeWindow(display: *mut Display, window: Xid, width: c_uint, height: c_uint) -> c_int;
     fn XSetInputFocus(display: *mut Display, window: Xid, revert_to: c_int, time: c_ulong)
@@ -706,6 +722,119 @@ unsafe fn alpha_visual(display: *mut Display, screen: c_int) -> Option<*mut c_vo
 
 type DrawnCursor = ((usize, usize), CursorShape);
 
+/// A workspace adds one native parent, without a duplicate terminal backing
+/// pixmap, font set or terminal model. Children retain their PTYs when moved.
+pub struct Container {
+    connection: Rc<Connection>,
+    pub id: Xid,
+    pub width: i32,
+    pub height: i32,
+    pub wm_delete: Atom,
+}
+
+impl Container {
+    pub fn new(window: &Window) -> Self {
+        let connection = window.fonts.connection.clone();
+        let display = connection.display;
+        unsafe {
+            let screen = connection.screen;
+            let mut attrs: WindowAttributes = core::mem::zeroed();
+            attrs.background_pixel = 0;
+            let id = XCreateWindow(
+                display,
+                XRootWindow(display, screen),
+                0,
+                0,
+                window.width as u32,
+                window.height as u32,
+                0,
+                XDefaultDepth(display, screen),
+                1,
+                XDefaultVisual(display, screen),
+                1 << 1,
+                &mut attrs,
+            );
+            XSelectInput(display, id, 131072 | 2097152 | 32768);
+            let mut wm_delete = XInternAtom(display, c"WM_DELETE_WINDOW".as_ptr(), 0);
+            XSetWMProtocols(display, id, &mut wm_delete, 1);
+            let mut hint = ClassHint {
+                name: c"ztty".as_ptr().cast_mut(),
+                class: c"Ztty".as_ptr().cast_mut(),
+            };
+            XSetClassHint(display, id, &mut hint);
+            let pid = crate::os::getpid() as c_ulong;
+            let pid_atom = XInternAtom(display, c"_NET_WM_PID".as_ptr(), 0);
+            XChangeProperty(
+                display,
+                id,
+                pid_atom,
+                6,
+                32,
+                0,
+                (&pid as *const c_ulong).cast(),
+                1,
+            );
+            XMapWindow(display, id);
+            XFlush(display);
+            Self {
+                connection,
+                id,
+                width: window.width,
+                height: window.height,
+                wm_delete,
+            }
+        }
+    }
+
+    pub fn display(&self) -> *mut Display {
+        self.connection.display
+    }
+
+    pub fn title(&self, text: &str) {
+        if self.id == 0 {
+            return;
+        }
+        let Ok(title) = CString::new(text) else {
+            return;
+        };
+        unsafe {
+            let display = self.display();
+            XStoreName(display, self.id, title.as_ptr());
+            let name = XInternAtom(display, c"_NET_WM_NAME".as_ptr(), 0);
+            let utf8 = XInternAtom(display, c"UTF8_STRING".as_ptr(), 0);
+            XChangeProperty(
+                display,
+                self.id,
+                name,
+                utf8,
+                8,
+                0,
+                text.as_ptr(),
+                text.len() as i32,
+            );
+        }
+    }
+
+    pub fn raise(&self) {
+        if self.id != 0 {
+            unsafe {
+                XMapRaised(self.display(), self.id);
+                XFlush(self.display());
+            }
+        }
+    }
+}
+
+impl Drop for Container {
+    fn drop(&mut self) {
+        if self.id != 0 {
+            unsafe {
+                XDestroyWindow(self.display(), self.id);
+            }
+        }
+    }
+}
+
 /// Shared X11 connection for a single-threaded host of terminal windows.
 ///
 /// Font entries are weak: closing their last window releases the faces and
@@ -890,6 +1019,7 @@ pub struct Window {
     graphics_revision: u64,
     graphics_alternate: bool,
     pub focused: bool,
+    suspended: bool,
 }
 
 impl Window {
@@ -898,6 +1028,16 @@ impl Window {
         rows: usize,
         appearance: &Appearance,
         connection: &Rc<Connection>,
+    ) -> Result<Self, &'static str> {
+        Self::new_view(cols, rows, appearance, connection, true)
+    }
+
+    pub fn new_view(
+        cols: usize,
+        rows: usize,
+        appearance: &Appearance,
+        connection: &Rc<Connection>,
+        activate: bool,
     ) -> Result<Self, &'static str> {
         let padding = appearance.padding;
         let background = appearance.theme.background;
@@ -969,6 +1109,22 @@ impl Window {
                 (&pid as *const c_ulong).cast(),
                 1,
             );
+            if !activate {
+                // EWMH user-time zero requests an initial map without activation.
+                // Explicit clicks may still focus the view for copy/search.
+                let user_time = XInternAtom(display, c"_NET_WM_USER_TIME".as_ptr(), 0);
+                let zero: c_ulong = 0;
+                XChangeProperty(
+                    display,
+                    id,
+                    user_time,
+                    6,
+                    32,
+                    0,
+                    (&zero as *const c_ulong).cast(),
+                    1,
+                );
+            }
             let pixmap = XCreatePixmap(display, id, width as u32, height as u32, depth);
             let gc = XCreateGC(display, id, 0, core::ptr::null_mut());
             let draw = XftDrawCreate(display, pixmap, visual, colormap);
@@ -1059,7 +1215,8 @@ impl Window {
                 image_clock: 0,
                 graphics_revision: 0,
                 graphics_alternate: false,
-                focused: true,
+                focused: activate,
+                suspended: false,
             };
             out.title("ztty");
             out.fill_background(background, true, 0, 0, width as u32, height as u32);
@@ -1106,6 +1263,9 @@ impl Window {
         )
     }
     pub fn present(&self) {
+        if self.suspended || self.id == 0 {
+            return;
+        }
         unsafe {
             XCopyArea(
                 self.display,
@@ -1146,7 +1306,62 @@ impl Window {
         if self.width != width.max(1) || self.height != height.max(1) {
             self.width = width.max(1);
             self.height = height.max(1);
-            unsafe {
+            if !self.suspended {
+                unsafe {
+                    let pixmap = XCreatePixmap(
+                        self.display,
+                        self.id,
+                        self.width as u32,
+                        self.height as u32,
+                        self.depth,
+                    );
+                    XftDrawChange(self.draw, pixmap);
+                    XFreePixmap(self.display, self.pixmap);
+                    self.pixmap = pixmap;
+                }
+            }
+        }
+        (
+            (((self.width - self.padding * 2) / self.cw).max(1) as usize).min(512),
+            (((self.height - self.padding * 2) / self.ch).max(1) as usize).min(256),
+        )
+    }
+
+    pub fn parent(&mut self, parent: Option<Xid>) {
+        if self.id == 0 {
+            return;
+        }
+        unsafe {
+            let root = XRootWindow(self.display, self.fonts.connection.screen);
+            XUnmapWindow(self.display, self.id);
+            XReparentWindow(self.display, self.id, parent.unwrap_or(root), 0, 0);
+            if !self.suspended {
+                XMapWindow(self.display, self.id);
+            }
+            XFlush(self.display);
+        }
+    }
+
+    pub fn place(&mut self, rect: crate::layout::Rect) -> (usize, usize) {
+        unsafe {
+            XMoveResizeWindow(
+                self.display,
+                self.id,
+                rect.x,
+                rect.y,
+                rect.width.max(1) as u32,
+                rect.height.max(1) as u32,
+            );
+        }
+        self.resize(rect.width, rect.height)
+    }
+
+    pub fn visible(&mut self, visible: bool) {
+        if self.id == 0 || visible != self.suspended {
+            return;
+        }
+        unsafe {
+            if visible {
                 let pixmap = XCreatePixmap(
                     self.display,
                     self.id,
@@ -1157,12 +1372,24 @@ impl Window {
                 XftDrawChange(self.draw, pixmap);
                 XFreePixmap(self.display, self.pixmap);
                 self.pixmap = pixmap;
+                self.last_cursor = None;
+                XMapWindow(self.display, self.id);
+            } else {
+                XUnmapWindow(self.display, self.id);
+                // Hidden tabs keep canonical pixels but release all rebuildable
+                // server uploads and their full-size retained surface.
+                while !self.images.is_empty() {
+                    self.discard_upload(self.images.len() - 1);
+                }
+                let pixmap = XCreatePixmap(self.display, self.id, 1, 1, self.depth);
+                XftDrawChange(self.draw, pixmap);
+                XFreePixmap(self.display, self.pixmap);
+                self.pixmap = pixmap;
+                self.focus(false);
             }
+            self.suspended = !visible;
+            XFlush(self.display);
         }
-        (
-            (((self.width - self.padding * 2) / self.cw).max(1) as usize).min(512),
-            (((self.height - self.padding * 2) / self.ch).max(1) as usize).min(256),
-        )
     }
     /// Resolve the current keyboard group, preserving AltGr/layout selection.
     pub fn key_symbol(&self, event: &mut KeyEvent, shifted: bool) -> c_ulong {

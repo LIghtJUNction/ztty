@@ -10,6 +10,8 @@ mod broker;
 #[cfg(target_os = "linux")]
 mod json;
 #[cfg(target_os = "linux")]
+mod layout;
+#[cfg(target_os = "linux")]
 mod mcp;
 #[cfg(target_os = "linux")]
 mod os;
@@ -76,8 +78,16 @@ fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
 const HELP: &str = "ztty — shared no_std terminal sessions for Linux\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty attach [NAME | ztty://ADDRESS]\n\
+       ztty attach --observe NAME\n\
+       ztty detach NAME | rename NAME NEW_NAME | list [FILTER]\n\
+       ztty action NAME ACTION | move NAME TARGET [tab|right|down]\n\
+       ztty control NAME acquire|release [--takeover]\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
   --name NAME          Name this local session\n\
+  --tab NAME           Open a new tab in NAME's window\n\
+  --split-right NAME   Open a pane to the right of NAME\n\
+  --split-down NAME    Open a pane below NAME\n\
+  --cwd PATH           Start the command in PATH\n\
   --config PATH        Load an appearance file\n\
   --font NAME          Fontconfig name (default: monospace:size=11)\n\
   --geometry COLSxROWS Initial character dimensions (default: 120x32)\n\
@@ -88,6 +98,9 @@ Ctrl+Shift+C copies a selection; Ctrl+Shift+V pastes.\n\
 Shift+PageUp/PageDown and the wheel browse scrollback.\n\
 Shift+drag selects while applications use the mouse; Ctrl+click opens links.\n\
 Multiple windows share one process, display connection and font cache.\n\
+Ctrl+Shift+T adds a tab; E/O splits right/down; PageUp/PageDown switches tabs.\n\
+Ctrl+Shift+Left/Right focuses panes; Up/Down swaps; Enter maximizes/restores.\n\
+Ctrl+Shift+D detaches; U moves a pane to a new window; G takes input control.\n\
 attach without a name lists all local and MCP sessions.\n\
 MCP defaults to stdio; HTTP defaults to 127.0.0.1:8732/mcp.\n\
 Runs on X11 and XWayland. Use ztty mcp --help for transport options.\n";
@@ -114,6 +127,10 @@ struct Config {
     command: Vec<CString>,
     #[cfg(target_os = "linux")]
     name: Option<String>,
+    #[cfg(target_os = "linux")]
+    target: Option<(String, &'static str)>,
+    #[cfg(target_os = "linux")]
+    cwd: Option<String>,
 }
 
 fn number(bytes: &[u8]) -> Option<usize> {
@@ -131,6 +148,10 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         command: Vec::new(),
         #[cfg(target_os = "linux")]
         name: None,
+        #[cfg(target_os = "linux")]
+        target: None,
+        #[cfg(target_os = "linux")]
+        cwd: None,
     };
     let mut i = 1;
     while i < args.len() {
@@ -157,6 +178,32 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
             b"--config" => {
                 i += 1;
                 config_path = Some(*args.get(i).ok_or("--config needs a path")?);
+            }
+            #[cfg(target_os = "linux")]
+            b"--tab" | b"--split-right" | b"--split-down" => {
+                let mode = match args[i].to_bytes() {
+                    b"--tab" => "tab",
+                    b"--split-right" => "right",
+                    _ => "down",
+                };
+                i += 1;
+                let name = args
+                    .get(i)
+                    .ok_or("layout option needs a target session")?
+                    .to_str()
+                    .map_err(|_| "session selector must be UTF-8")?;
+                cfg.target = Some((name.into(), mode));
+            }
+            #[cfg(target_os = "linux")]
+            b"--cwd" => {
+                i += 1;
+                cfg.cwd = Some(
+                    args.get(i)
+                        .ok_or("--cwd needs a path")?
+                        .to_str()
+                        .map_err(|_| "cwd must be UTF-8")?
+                        .into(),
+                );
             }
             #[cfg(target_os = "linux")]
             b"--name" => {
@@ -430,6 +477,9 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
     let result = match args.get(1).map(|s| s.to_bytes()) {
         Some(b"mcp") => mcp::run(&args[2..]),
         Some(b"attach") => platform::attach(&args[2..]),
+        Some(b"list" | b"info" | b"detach" | b"rename" | b"action" | b"move" | b"control") => {
+            platform::command(&args[1..])
+        }
         _ => launch(&args),
     };
     #[cfg(not(target_os = "linux"))]
