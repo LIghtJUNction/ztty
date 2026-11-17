@@ -53,6 +53,8 @@ struct Ui {
     workspace: Option<u64>,
     visible: bool,
     read_only: bool,
+    // A newly launched window owns its child; attaching only owns a view.
+    owns_child: bool,
     search: Option<Search>,
     palette: Option<Palette>,
     pending_action: Option<&'static str>,
@@ -84,6 +86,7 @@ impl Ui {
             workspace: None,
             visible: true,
             read_only: false,
+            owns_child: false,
             search: None,
             palette: None,
             pending_action: None,
@@ -711,6 +714,10 @@ impl Session {
             ("rows", Value::from(self.terminal.rows())),
             ("attached", Value::Bool(self.ui.is_some())),
             (
+                "read_only",
+                Value::Bool(self.ui.as_ref().is_some_and(|ui| ui.read_only)),
+            ),
+            (
                 "attachment",
                 self.ui
                     .as_ref()
@@ -1079,6 +1086,13 @@ impl Pool {
 
     fn create(&mut self, request: &Value) -> Result<Value, String> {
         let input_owner = actor(request)?.into();
+        let observe = match request.get("observe") {
+            None => false,
+            Some(value) => value.as_bool().ok_or("observe must be a boolean")?,
+        };
+        if observe && request.get("target").is_some() {
+            return Err("observing launches require a standalone view".into());
+        }
         if self.sessions.len() >= 128 {
             return Err("session limit reached (128); close unused sessions".into());
         }
@@ -1201,10 +1215,16 @@ impl Pool {
             let c = self.connection(&env)?;
             let attachment = self.next_attachment;
             self.next_attachment += 1;
-            Some(Ui::new(
-                Window::new_shared(cols, rows, &appearance, &c).map_err(String::from)?,
-                attachment,
-            ))
+            let window = if observe {
+                Window::new_view(cols, rows, &appearance, &c, false)
+            } else {
+                Window::new_shared(cols, rows, &appearance, &c)
+            }
+            .map_err(String::from)?;
+            let mut ui = Ui::new(window, attachment);
+            ui.read_only = observe;
+            ui.owns_child = true;
+            Some(ui)
         };
         let directory = WorkingDirectory::enter(&cwd)?;
         env.retain(|e| !e.to_bytes().starts_with(b"PWD="));
@@ -2179,6 +2199,7 @@ impl Pool {
                 if let Some(ui) = &mut self.sessions[index].ui {
                     if read_only {
                         ui.read_only = true;
+                        ui.owns_child = false;
                         ui.cancel_input();
                     }
                     let observing =
@@ -2475,8 +2496,10 @@ impl Pool {
             let ended = self.sessions[i].eof && self.sessions[i].status().is_some();
             let observing = self.sessions[i].input_owner.as_deref() != Some("local")
                 || self.sessions[i].ui.as_ref().is_some_and(|ui| ui.read_only);
-            if closed && observing && !ended {
-                // Closing a view cannot terminate another actor's live PTY.
+            let owns_child = self.sessions[i].input_owner.as_deref() == Some("local")
+                && self.sessions[i].ui.as_ref().is_some_and(|ui| ui.owns_child);
+            if closed && observing && !ended && !owns_child {
+                // An attached observer cannot terminate another actor's live PTY.
                 self.detach(i);
             } else if !self.sessions[i].persistent && (closed || ended) {
                 self.retire(i);

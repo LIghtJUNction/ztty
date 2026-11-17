@@ -59,7 +59,7 @@ macOS 后端不要求 X11，Windows 后端不要求 WSL。上述原生检查在
 | [`zinput`](crates/zinput) | 0.1.0 | 编码键盘、鼠标、焦点和粘贴事件 | 图形终端、远程终端、终端客户端 |
 | [`zterm`](crates/zterm) | 0.2.0 | 维护屏幕、历史、图片锚点、模式和协议回复 | 自定义终端界面、终端录制和回放 |
 | [`zpty`](crates/zpty) | 0.2.0 | 管理 Linux/macOS PTY 和 Windows ConPTY | 终端、进程控制、交互式测试工具 |
-| [`zgraphics`](crates/zgraphics) | 0.1.0 | 处理 Kitty 图形协议、图片解码、存储和放置 | 需要图片支持的终端或回放工具 |
+| [`zgraphics`](crates/zgraphics) | 0.1.0 | 处理 Kitty 图形协议、Sixel、图片解码、存储和放置 | 需要图片支持的终端或回放工具 |
 
 这些库都有独立 Cargo 包。`zinput` 和 `zpty` 没有 Cargo 依赖；
 `zterm` 复用 Project Z 的 `zinput`、`zvte`、`zgraphics` 和 `no_std`
@@ -159,7 +159,8 @@ ztty mcp --transport http --host 127.0.0.1 --port 8732
 ztty attach ztty://mcp/stdio/work
 ```
 
-六个 MCP 工具分别创建、列出、读取、输入、调整尺寸和关闭会话。MCP 会话
+九个 MCP 工具负责创建、列出、读取、输入、调整尺寸、关闭会话、输入控制权、
+命令记录和命令输出读取。MCP 会话
 在连接退出后继续保留，关闭观察窗口只会脱离显示；程序退出后仍可查看输出
 和退出码，通过 `session_close` 释放会话。普通本地窗口关闭时会结束其会话。
 
@@ -168,6 +169,16 @@ HTTP 支持配置主机和端口，端口 `0` 自动选择空闲端口。监听�
 读取按字节游标分页，单页可多返回最多 3 字节以补全 UTF-8 字符。
 
 完整的客户端配置、工具参数和生命周期见 [会话与 MCP](docs/sessions.md)。
+
+`ztty --observe -e COMMAND` 新建只读命令窗口，启动时不请求焦点；关闭时结束
+这个窗口自己创建的子进程。`ztty attach --observe NAME` 连接既有会话，关闭
+观察窗会保留原 PTY。支持 `TERMINAL -e COMMAND` 的工具可使用
+[tools/ztty-observer](tools/ztty-observer) 适配器，实际 ssmcp 联调与平台边界见
+[观察模式验收](docs/ssmcp-observer.md)。
+
+`ztty save-layout NAME > workspace.json` 保存仍存活会话的布局，
+`ztty restore-layout workspace.json` 按会话 ID、创建时间与 broker 身份验证后
+恢复，不重新启动已退出的命令。详见 [工作区](docs/workspaces.md)。
 
 ## 在终端里显示图片
 
@@ -190,6 +201,10 @@ Linux 图像验收通过真实 PTY 发送数据，再读取窗口像素检查颜
 
 ![真实 Hyprland/XWayland 中显示照片和透明 PNG](docs/assets/kitty-graphics-hyprland.png)
 
+Sixel 已使用 `no_std` 流式解码，复用 `zgraphics` 的图像存储、放置与渲染路径，
+处理透明背景、取消和有界资源。Linux 实际窗口像素已有验证，其他原生平台的
+验收范围以 [协议矩阵](docs/protocols.md) 和 [发布记录](docs/releasing.md) 为准。
+
 ## 外观
 
 Linux 默认使用 `~/.config/ztty/ztty.conf`，macOS 默认使用
@@ -197,7 +212,9 @@ Linux 默认使用 `~/.config/ztty/ztty.conf`，macOS 默认使用
 `XDG_CONFIG_HOME` 时使用其下的 `ztty/ztty.conf`。Windows 使用
 `%APPDATA%\ztty\ztty.conf`。
 也可以通过 `ztty --config PATH` 指定配置文件。
-配置在下次启动时生效，`--font` 优先于文件中的字体。
+Linux 会监听配置文件与所在目录的替换并热重载；无效配置保留原状态并显示错误，
+Ctrl+Shift+R 可手动重载。macOS/Windows 当前在下次启动时读取配置。
+`--font` 优先于文件中的字体。
 
 ```ini
 font = monospace:size=11
@@ -238,7 +255,7 @@ GDI 画布；三平台外观一致性仍待原生验收。
 核心解析、PTY 往返与实际屏幕显示延迟分别记录。
 
 当前通过 X11/XWayland 提供 Linux 窗口。原生 Wayland、专用 GPU
-渲染后端、Sixel、Kitty 文件/共享内存传输与动画、Unicode 图片占位符、
+渲染后端、Kitty 文件/共享内存传输与动画、Unicode 图片占位符、
 相对放置、OSC 52、完整复杂字形布局和历史重排是后续工作。
 “超过 Kitty/Ghostty”是项目目标，比较结论按实际完成的相同条件实验报告。
 

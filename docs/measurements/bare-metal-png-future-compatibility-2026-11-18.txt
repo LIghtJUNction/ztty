@@ -1,0 +1,41 @@
+The following warnings were discovered during the build. These warnings are an
+indication that the packages contain code that will become an error in a
+future release of Rust. These warnings typically cover changes to close
+soundness problems, unintended or undocumented behavior, or critical problems
+that cannot be fixed in a backwards-compatible fashion, and are not expected
+to be in wide use.
+
+Each warning should contain a link for more information on what the warning
+means and how to resolve it.
+
+to solve this problem, you can try the following approaches:
+
+- ensure the maintainers know of this problem (e.g. creating a bug report if needed)
+or even helping with a fix (e.g. by creating a pull request)
+  - zune-png@0.5.2
+  - repository: https://github.com/etemesi254/zune-image/tree/dev/zune-png
+  - detailed warning command: `cargo report future-incompatibilities --id 1 --package zune-png@0.5.2`
+
+- use your own version of the dependency with the `[patch]` section in `Cargo.toml`
+For more information, see:
+https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html#the-patch-section
+
+The package `zune-png v0.5.2` currently triggers the following future incompatibility lints:
+> warning: enabling the `sse` target feature on the current target is unsupported due to LLVM backend issues
+>   --> /home/lightjunction/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zune-png-0.5.2/src/utils/avx.rs:15:18
+>    |
+> 15 | #[target_feature(enable = "avx2")]
+>    |                  ^^^^^^^^^^^^^^^
+>    |
+>    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+>    = note: for more information, see issue #117938 <https://github.com/rust-lang/rust/issues/117938>
+> 
+> warning: enabling the `sse` target feature on the current target is unsupported due to LLVM backend issues
+>   --> /home/lightjunction/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zune-png-0.5.2/src/utils/sse.rs:15:18
+>    |
+> 15 | #[target_feature(enable = "ssse3")]
+>    |                  ^^^^^^^^^^^^^^^^
+>    |
+>    = warning: this was previously accepted by the compiler but is being phased out; it will become a hard error in a future release!
+>    = note: for more information, see issue #117938 <https://github.com/rust-lang/rust/issues/117938>
+> 

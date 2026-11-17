@@ -457,6 +457,58 @@ def main():
             assert info()["pid"] == child_pid
             report["checks"].append("observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY")
 
+
+            # Attaching an observer to an already visible, locally owned view
+            # must clear fresh-view ownership too. The original companion Ui
+            # was created above; this exercises the existing-Ui attach branch.
+            local_observer = subprocess.Popen(
+                [str(binary), "attach", "--observe", "companion"], env=env,
+                stdout=subprocess.DEVNULL, stderr=log, start_new_session=True,
+            )
+            owned.append(local_observer)
+            wait(lambda: rpc({"op": "info", "session": "companion"})["read_only"],
+                 "existing local view becomes an observer")
+            local_before = rpc({"op": "info", "session": "companion"})
+            assert local_before["input_owner"] == "local" and local_before["pid"] == other["pid"]
+            local_window = connection.create_resource_object("window", local_before["window_id"])
+            local_window.send_event(protocol.event.ClientMessage(
+                window=local_window, client_type=connection.intern_atom("WM_PROTOCOLS"),
+                data=(32, [connection.intern_atom("WM_DELETE_WINDOW"), X.CurrentTime, 0, 0, 0]),
+            ), event_mask=0)
+            connection.flush()
+            wait(lambda: not rpc({"op": "info", "session": "companion"})["attached"],
+                 "existing locally owned observer closes")
+            local_after = rpc({"op": "info", "session": "companion"})
+            assert local_after["running"] and local_after["pid"] == local_before["pid"]
+            assert local_after["input_owner"] == "local"
+            rpc({"op": "write", "session": "companion", "data": "local-after-observer-close\n"})
+            wait(lambda: "local-after-observer-close" in rpc({"op": "read", "session": "companion"})["screen"],
+                 "existing local PTY still echoes after observer close")
+            report["checks"].append("attach --observe on an already attached local-owned view preserves the same live PTY when the observing window closes")
+
+            fresh_observer = subprocess.Popen(
+                [str(binary), "--observe", "--name", "fresh-observer", "--config", str(config),
+                 "-e", "/usr/bin/python3", "-c", "import time; time.sleep(120)"],
+                env=env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True,
+            )
+            owned.append(fresh_observer)
+            wait(lambda: any(item["name"] == "fresh-observer" for item in rpc({"op": "list"})["sessions"]),
+                 "fresh observer startup")
+            fresh = rpc({"op": "info", "session": "fresh-observer"})
+            assert fresh["attached"] and fresh["read_only"] and fresh["input_owner"] == "local"
+            children[fresh["pid"]] = Path(f"/proc/{fresh['pid']}/stat").read_text().rsplit(")", 1)[1].split()[19]
+            fresh_window = connection.create_resource_object("window", fresh["window_id"])
+            fresh_window.send_event(protocol.event.ClientMessage(
+                window=fresh_window, client_type=connection.intern_atom("WM_PROTOCOLS"),
+                data=(32, [connection.intern_atom("WM_DELETE_WINDOW"), X.CurrentTime, 0, 0, 0]),
+            ), event_mask=0)
+            connection.flush()
+            wait(lambda: not any(item["uri"] == fresh["uri"] for item in rpc({"op": "list"})["sessions"]),
+                 "fresh observer retires its own session on window close")
+            wait(lambda: not Path(f"/proc/{fresh['pid']}").exists(), "fresh observer child is reaped")
+            fresh_observer.wait(timeout=5)
+            report["checks"].append("a fresh --observe window owns and reaps only its newly created child when closed")
+
             rpc({"op": "close", "session": "daily"})
             rpc({"op": "close", "session": "companion"})
             wait(lambda: not rpc({"op": "list"})["sessions"], "session cleanup")
@@ -468,6 +520,18 @@ def main():
             import traceback
             report["error"] = str(error)
             report["traceback"] = traceback.format_exc()
+            # Retain the live state before cleanup so an intermittent watcher
+            # failure can be diagnosed without weakening the pixel assertion.
+            try:
+                report["failure_state"] = {"session": info(), "corner_pixel": image().getpixel((1, 1)),
+                                           "config_sha256": hashlib.sha256(config.read_bytes()).hexdigest()}
+                report["failure_state"]["paths"] = {str(path): {"inode": path.stat().st_ino, "device": path.stat().st_dev}
+                    for path in (config, config.parent, config.parent.parent) if path.exists()}
+                report["failure_state"]["inotify"] = {fd.name: Path(f"/proc/{broker_pid}/fdinfo/{fd.name}").read_text()
+                    for fd in Path(f"/proc/{broker_pid}/fd").iterdir() if os.readlink(fd) == "anon_inode:inotify"}
+                capture("failure")
+            except Exception as detail:
+                report["failure_diagnostic_error"] = str(detail)
             raise
         finally:
             if connection is not None:
