@@ -876,19 +876,17 @@ def svg_document(report):
     by_app = {row["app"]: row for row in rows}
     colors = {"ztty": "#1a73e8", "ghostty": "#00897b", "kitty": "#8754c8"}
     parts = [
-        '<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760" role="img" aria-labelledby="title desc">',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="790" viewBox="0 0 1120 790" role="img" aria-labelledby="title desc">',
         '<title id="title">Ten terminal windows: memory and real PTY performance</title>',
         f'<desc id="desc">{repetitions} fresh-process runs per terminal, all using shared instances. '
         'Application PSS and private memory exclude probe workloads and the X server. '
         'Latency and throughput use DSR logical completion, not a rendered-frame fence.</desc>',
         '<style>'
-        ':root{--bg:#fff;--panel:#f8fafd;--ink:#202124;--muted:#5f6368;--line:#dfe3e8;--track:#e9edf3}'
-        '@media(prefers-color-scheme:dark){:root{--bg:#17191d;--panel:#202329;--ink:#e8eaed;--muted:#bdc1c6;--line:#41464d;--track:#30343b}}'
-        'text{font-family:Arial,Helvetica,sans-serif;fill:var(--ink)}'
-        '.muted{fill:var(--muted)}.h{font-size:20px;font-weight:600}.small{font-size:13px}'
+        'text{font-family:Arial,Helvetica,sans-serif;fill:#e8eaed}'
+        '.muted{fill:#bdc1c6}.h{font-size:20px;font-weight:600}.small{font-size:13px}'
         '.value{font-size:16px;font-weight:600}.label{font-size:15px}'
         '</style>',
-        '<rect width="1120" height="760" rx="18" fill="var(--bg)"/>',
+        '<rect width="1120" height="790" rx="18" fill="#17191d"/>',
         '<text x="36" y="47" font-size="28" font-weight="600">10 windows. Shared instances. Same workload.</text>',
         f'<text x="36" y="76" class="muted" font-size="15">Linux X11 / isolated Xvfb · software rendering · medians of {repetitions} fresh-process runs</text>',
     ]
@@ -900,7 +898,7 @@ def svg_document(report):
     ]
     for x, y, title, subtitle, key, divisor in panels:
         parts.extend([
-            f'<rect x="{x}" y="{y}" width="504" height="229" rx="12" fill="var(--panel)" stroke="var(--line)"/>',
+            f'<rect x="{x}" y="{y}" width="504" height="229" rx="12" fill="#202329" stroke="#41464d"/>',
             f'<text x="{x + 20}" y="{y + 32}" class="h">{html.escape(title)}</text>',
             f'<text x="{x + 20}" y="{y + 55}" class="small muted">{html.escape(subtitle)}</text>',
         ])
@@ -914,7 +912,7 @@ def svg_document(report):
             label = f"{values[app]:.2f}" if values[app] < 100 else f"{values[app]:.1f}"
             parts.extend([
                 f'<text x="{x + 20}" y="{yy + 5}" class="label">{NAMES[app]}</text>',
-                f'<rect x="{x + 93}" y="{yy - 12}" width="295" height="22" rx="4" fill="var(--track)"/>',
+                f'<rect x="{x + 93}" y="{yy - 12}" width="295" height="22" rx="4" fill="#30343b"/>',
                 f'<rect x="{x + 93}" y="{yy - 12}" width="{width:.3f}" height="22" rx="4" fill="{colors[app]}"/>',
                 f'<text x="{x + 484}" y="{yy + 5}" text-anchor="end" class="value">{label}</text>',
             ])
@@ -930,6 +928,16 @@ def svg_document(report):
         " · ".join(versions) + " · " + date,
         "Raw samples, exact commands, versions, source hashes and scope: docs/benchmarks/terminals-10-windows.json",
     ]
+    loads = [run[key][0] for run in focused
+             for key in ("load_average_at_start", "load_average_at_end") if run.get(key)]
+    if loads:
+        cores = report.get("machine", {}).get("logical_cpus")
+        line = f"Recorded host load1: {min(loads):.1f}–{max(loads):.1f}"
+        if cores:
+            line += f"; {cores} logical CPUs."
+            if max(loads) > cores / 2:
+                line += " Timing samples were collected on a busy host."
+        footer.append(line)
     for index, line in enumerate(footer):
         parts.append(f'<text x="36" y="{625 + index * 25}" class="small muted">{html.escape(line)}</text>')
     parts.append("</svg>")

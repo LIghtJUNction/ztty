@@ -134,6 +134,15 @@ class PublicationTests(unittest.TestCase):
             del run["workload"]
         ET.fromstring(bench.svg_document(data))
 
+    def test_legacy_busy_host_context_stays_visible_in_overview(self):
+        data = report()
+        data["machine"] = {"logical_cpus": 16}
+        for run in data["runs"]:
+            run["load_average_at_start"] = [32, 30, 28]
+        svg = bench.svg_document(data)
+        self.assertIn("32.0–32.0", svg)
+        self.assertIn("busy host", svg)
+
 
 class LaunchAndWorkloadTests(unittest.TestCase):
     def test_independent_modes_do_not_reuse_gui_process(self):
