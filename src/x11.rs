@@ -332,6 +332,7 @@ unsafe extern "C" {
     fn XSelectInput(display: *mut Display, window: Xid, mask: c_long) -> c_int;
     fn XMapWindow(display: *mut Display, window: Xid) -> c_int;
     fn XMapRaised(display: *mut Display, window: Xid) -> c_int;
+    fn XResizeWindow(display: *mut Display, window: Xid, width: c_uint, height: c_uint) -> c_int;
     fn XSetInputFocus(display: *mut Display, window: Xid, revert_to: c_int, time: c_ulong)
     -> c_int;
     fn XFreeColormap(display: *mut Display, colormap: Xid) -> c_int;
@@ -997,6 +998,26 @@ impl Window {
             XFlush(self.display);
         }
     }
+    /// Request a character-grid resize. ConfigureNotify applies the resulting
+    /// pixel size to the backing pixmap and the host's terminal model.
+    pub fn resize_grid(&self, cols: usize, rows: usize) {
+        if self.id == 0 {
+            return;
+        }
+        let width = cols
+            .saturating_mul(self.cw as usize)
+            .saturating_add((self.padding * 2) as usize)
+            .clamp(1, u16::MAX as usize);
+        let height = rows
+            .saturating_mul(self.ch as usize)
+            .saturating_add((self.padding * 2) as usize)
+            .clamp(1, u16::MAX as usize);
+        unsafe {
+            XResizeWindow(self.display, self.id, width as c_uint, height as c_uint);
+            XFlush(self.display);
+        }
+    }
+
     pub fn resize(&mut self, width: i32, height: i32) -> (usize, usize) {
         if self.width != width.max(1) || self.height != height.max(1) {
             self.width = width.max(1);
@@ -1117,6 +1138,9 @@ impl Window {
 
     /// Bring an already attached session back without opening a second window.
     pub fn raise(&self) {
+        if self.id == 0 {
+            return;
+        }
         unsafe {
             XMapRaised(self.display, self.id);
             XSetInputFocus(self.display, self.id, 1, 0);
