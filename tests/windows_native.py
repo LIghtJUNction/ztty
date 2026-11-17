@@ -99,7 +99,45 @@ def wait_for(predicate, description, timeout=10):
     raise AssertionError(f"timeout: {description}; last error: {last_error}")
 
 
-def run(binary, output):
+def process_architecture(pid=None):
+    """Record the native machine and reject emulated acceptance processes."""
+    kernel = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel.GetCurrentProcess.restype = wintypes.HANDLE
+    kernel.GetCurrentProcess.argtypes = []
+    kernel.OpenProcess.restype = wintypes.HANDLE
+    kernel.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+    kernel.CloseHandle.argtypes = [wintypes.HANDLE]
+    kernel.IsWow64Process2.restype = wintypes.BOOL
+    kernel.IsWow64Process2.argtypes = [wintypes.HANDLE, ctypes.POINTER(ctypes.c_ushort),
+                                      ctypes.POINTER(ctypes.c_ushort)]
+    handle = kernel.GetCurrentProcess() if pid is None else kernel.OpenProcess(0x1000, False, pid)
+    if not handle:
+        raise ctypes.WinError(ctypes.get_last_error())
+    process_machine = ctypes.c_ushort()
+    native_machine = ctypes.c_ushort()
+    try:
+        if not kernel.IsWow64Process2(handle, ctypes.byref(process_machine), ctypes.byref(native_machine)):
+            raise ctypes.WinError(ctypes.get_last_error())
+    finally:
+        if pid is not None:
+            kernel.CloseHandle(handle)
+    return {"process_machine": process_machine.value, "native_machine": native_machine.value,
+            "emulated": process_machine.value != 0}
+
+
+def executable_machine(binary):
+    with binary.open("rb") as stream:
+        header = stream.read(64)
+        if len(header) != 64 or header[:2] != b"MZ":
+            raise AssertionError(f"{binary}: expected a PE executable")
+        stream.seek(struct.unpack_from("<I", header, 0x3C)[0])
+        pe = stream.read(6)
+    if len(pe) != 6 or pe[:4] != b"PE\0\0":
+        raise AssertionError(f"{binary}: invalid PE header")
+    return struct.unpack_from("<H", pe, 4)[0]
+
+
+def run(binary, output, expected_arch=None):
     user = ctypes.WinDLL("user32", use_last_error=True)
     gdi = ctypes.WinDLL("gdi32", use_last_error=True)
     enum_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
@@ -126,6 +164,18 @@ def run(binary, output):
               "transport": "real ConPTY", "renderer": "Win32 retained DIB",
               "checks": checks, "passed": False}
     try:
+        interpreter = process_architecture()
+        machine = interpreter["native_machine"]
+        architecture = {0x8664: "x64", 0xAA64: "arm64"}.get(machine)
+        report["architecture"] = architecture
+        report["python_process"] = interpreter
+        report["binary_machine"] = executable_machine(binary)
+        assert architecture is not None, f"unsupported native machine: 0x{machine:04x}"
+        assert not interpreter["emulated"], f"Python acceptance process is emulated: {interpreter}"
+        assert report["binary_machine"] == machine, "ztty executable does not match the native machine"
+        if expected_arch is not None:
+            assert architecture == expected_arch, f"expected {expected_arch}; runner is {architecture}"
+        checks.append({"name": "native_python_and_binary_architecture", "passed": True})
         with tempfile.TemporaryDirectory(prefix="ztty native 图像 ") as temporary:
             directory = Path(temporary)
             clean_environment = os.environ.copy()
@@ -142,6 +192,9 @@ def run(binary, output):
             command = [str(binary.resolve()), "--config", str(config), "--geometry", "20x10",
                        "-e", sys.executable, str(Path(__file__).resolve()), "--child", str(directory)]
             process = subprocess.Popen(command)
+            report["ztty_process"] = process_architecture(process.pid)
+            assert report["ztty_process"] == interpreter, "ztty must run natively on the test machine"
+            checks.append({"name": "native_ztty_process_architecture", "passed": True})
 
             def find_window():
                 matches = []
@@ -279,6 +332,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, default=Path("target/release/ztty.exe"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/windows-native.json"))
+    parser.add_argument("--arch", choices=["x64", "arm64"],
+                        help="require this native OS, Python and executable architecture")
     parser.add_argument("--child")
     args = parser.parse_args()
     if sys.platform != "win32":
@@ -286,7 +341,7 @@ def main():
     if args.child:
         child(args.child)
     else:
-        run(args.binary, args.output)
+        run(args.binary, args.output, args.arch)
 
 
 if __name__ == "__main__":
