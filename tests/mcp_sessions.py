@@ -132,6 +132,30 @@ def main(binary):
             report["namespaces_and_ambiguity"] = "passed"
             report["exit_code"] = 7
 
+            # Separate MCP transport sessions get distinct trusted identities.
+            http_tool(http,sid,"session_write",{"session":uri,"data":"forbidden"},expect_error=True)
+            http_tool(http,sid,"session_control",{"session":uri,"action":"acquire"},expect_error=True)
+            http_tool(http,sid,"session_control",{"session":uri,"action":"acquire","takeover":True})
+            stdio.tool("session_write",{"session":uri,"data":"forbidden"},expect_error=True)
+            stdio.tool("session_resize",{"session":uri,"cols":80,"rows":24},expect_error=True)
+            stdio.tool("session_close",{"session":uri},expect_error=True)
+            http_tool(http,sid,"session_write",{"session":uri,"data":"printf 'TAKEOVER_OK\\n'\n"})
+            collect(stdio.tool,uri,needle="TAKEOVER_OK",cursor=cursor)
+            report["exclusive_input_owner_and_explicit_takeover"]="passed"
+
+            marked=stdio.tool("session_create",{"name":"command-record","command":["python3","-c", "import os; os.write(1,b'\\x1b]133;A\\x07prompt> \\x1b]133;B\\x07example\\x1b]133;C\\x07\\r\\ncommand result\\r\\n\\x1b]133;D;7\\x07')"]})
+            sessions.append(marked["uri"])
+            collect(stdio.tool,marked["uri"],needle="command result",exited=True)
+            records=http_tool(http,sid,"session_commands",{"session":marked["uri"]})["commands"]
+            assert len(records)==1 and records[0]["exit_status"]==7,records
+            record=http_tool(http,sid,"session_command_read",{"session":marked["uri"],"command_id":records[0]["id"],"max_bytes":5})
+            assert record["complete"] and record["truncated"] and len(record["text"].encode())<=5,record
+            record=http_tool(http,sid,"session_command_read",{"session":marked["uri"],"command_id":records[0]["id"]})
+            assert "command result" in record["text"] and not record["truncated"],record
+            stdio.tool("session_close",{"session":marked["uri"]})
+            sessions.remove(marked["uri"])
+            report["bounded_command_reads_across_observers"]="passed"
+
             stdio.close()
             stdio = None
             still_running = http_tool(http, sid, "session_read", {"session": uri})
@@ -147,6 +171,7 @@ def main(binary):
             report["transport_exit_persistence"] = "passed"
             report["attach_default_list"] = "passed"
             for item in sessions:
+                replacement.tool("session_control",{"session":item,"action":"acquire","takeover":True})
                 closed = replacement.tool("session_close", {"session": item})
                 assert closed["closed"] and not closed["running"] and not closed["attached"]
             sessions.clear()
@@ -159,6 +184,7 @@ def main(binary):
                     replacement = StdioClient(binary)
                 for item in sessions:
                     try:
+                        replacement.tool("session_control",{"session":item,"action":"acquire","takeover":True})
                         replacement.tool("session_close", {"session": item})
                     except Exception:
                         pass

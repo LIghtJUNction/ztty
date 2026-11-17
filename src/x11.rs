@@ -988,6 +988,7 @@ pub struct Window {
     visual: *mut c_void,
     colormap: c_ulong,
     owns_colormap: bool,
+    requested_opacity: u8,
     pixmap: Xid,
     gc: *mut c_void,
     draw: *mut XftDraw,
@@ -1020,6 +1021,8 @@ pub struct Window {
     graphics_alternate: bool,
     pub focused: bool,
     suspended: bool,
+    search_cols: usize,
+    search_bits: Vec<u64>,
 }
 
 impl Window {
@@ -1170,6 +1173,7 @@ impl Window {
                 visual,
                 colormap,
                 owns_colormap: alpha.is_some(),
+                requested_opacity: appearance.opacity,
                 pixmap,
                 gc,
                 draw,
@@ -1217,6 +1221,8 @@ impl Window {
                 graphics_alternate: false,
                 focused: activate,
                 suspended: false,
+                search_cols: 0,
+                search_bits: Vec::new(),
             };
             out.title("ztty");
             out.fill_background(background, true, 0, 0, width as u32, height as u32);
@@ -1261,6 +1267,68 @@ impl Window {
             (((x - self.padding).max(0) / self.cw) as usize).min(cols.saturating_sub(1)),
             (((y - self.padding).max(0) / self.ch) as usize).min(rows.saturating_sub(1)),
         )
+    }
+
+    pub fn reconfigure(
+        &mut self,
+        appearance: &Appearance,
+        before: impl FnOnce(usize, usize, i32, i32) -> Result<(), String>,
+    ) -> Result<(usize, usize), String> {
+        if !self.owns_colormap && appearance.opacity < 100 && self.requested_opacity == 100 {
+            return Err(
+                "this opaque window needs detach/attach to enable a transparency visual".into(),
+            );
+        }
+        let fonts = self.fonts.connection.fonts(&appearance.font)?;
+        let font = fonts.font;
+        let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
+        unsafe {
+            XftTextExtentsUtf8(self.display, font, b"M".as_ptr(), 1, &mut metrics);
+        }
+        let cw = i32::from(metrics.x_off).max(1);
+        let ch = unsafe { (*font).ascent + (*font).descent + 3 }.max(1);
+        if cw > 512 || ch > 1024 {
+            return Err("font cell size exceeds the supported limit".into());
+        }
+        let cols = (((self.width - appearance.padding * 2) / cw).max(1) as usize).min(512);
+        let rows = (((self.height - appearance.padding * 2) / ch).max(1) as usize).min(256);
+        // Font validation and the host's fallible PTY update happen before any
+        // live window state changes, so rejected reloads retain the old view.
+        before(cols, rows, cw, ch)?;
+        self.fonts = fonts;
+        self.font = font;
+        self.cw = cw;
+        self.ch = ch;
+        self.requested_opacity = appearance.opacity;
+        self.padding = appearance.padding;
+        self.background = appearance.theme.background;
+        self.cursor_color = appearance.cursor_color;
+        self.selection_colors = (
+            appearance.selection_foreground,
+            appearance.selection_background,
+        );
+        if self.owns_colormap {
+            let opacity = u32::from(appearance.opacity);
+            let component =
+                |shift: u32| (((self.background >> shift) & 255) * 257 * opacity / 100) as u16;
+            self.background_fill = Some(RenderColor {
+                red: component(16),
+                green: component(8),
+                blue: component(0),
+                alpha: (65535 * opacity / 100) as u16,
+            });
+            unsafe {
+                let blur = XInternAtom(self.display, c"_KDE_NET_WM_BLUR_BEHIND_REGION".as_ptr(), 0);
+                if appearance.blur {
+                    XChangeProperty(self.display, self.id, blur, 6, 32, 0, core::ptr::null(), 0);
+                } else {
+                    XDeleteProperty(self.display, self.id, blur);
+                }
+            }
+        }
+        self.last_cursor = None;
+        self.graphics_revision = 0;
+        Ok((cols, rows))
     }
     pub fn present(&self) {
         if self.suspended || self.id == 0 {
@@ -1540,6 +1608,94 @@ impl Window {
     pub fn cursor_changed(&self, cursor: Option<DrawnCursor>) -> bool {
         cursor != self.last_cursor
     }
+
+    pub fn search_matches(&mut self, cols: usize, bits: Vec<u64>) {
+        self.search_cols = cols;
+        self.search_bits = bits;
+    }
+
+    fn search_match(&self, col: usize, row: usize) -> bool {
+        let bit = row.saturating_mul(self.search_cols).saturating_add(col);
+        self.search_bits
+            .get(bit / 64)
+            .is_some_and(|word| word & (1 << (bit % 64)) != 0)
+    }
+
+    /// Temporary search/command UI belongs to the view, never to PTY output.
+    pub fn overlay(&mut self, text: &str) {
+        if self.suspended {
+            return;
+        }
+        let y = (self.height - self.padding - self.ch).max(0);
+        self.fill_background(
+            self.background,
+            false,
+            0,
+            y,
+            self.width as u32,
+            (self.height - y) as u32,
+        );
+        self.overlay_line(text, y);
+        self.present();
+    }
+
+    pub fn overlay_lines(&mut self, lines: &[String]) {
+        if self.suspended {
+            return;
+        }
+        let count = lines
+            .len()
+            .min(((self.height - self.padding).max(self.ch) / self.ch) as usize);
+        let y = (self.height - self.padding - self.ch * count as i32).max(0);
+        self.fill_background(
+            self.background,
+            false,
+            0,
+            y,
+            self.width as u32,
+            (self.height - y) as u32,
+        );
+        for (row, line) in lines.iter().take(count).enumerate() {
+            self.overlay_line(line, y + row as i32 * self.ch);
+        }
+        self.present();
+    }
+
+    fn overlay_line(&mut self, text: &str, y: i32) {
+        let color = self.color(0xcdd6e4);
+        let mut x = self.padding;
+        let baseline = y + unsafe { (*self.font).ascent } + 1;
+        for ch in text.chars().take(1024) {
+            let font = self.glyph_font(ch);
+            let mut bytes = [0; 4];
+            let text = ch.encode_utf8(&mut bytes);
+            let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
+            unsafe {
+                XftTextExtentsUtf8(
+                    self.display,
+                    font,
+                    text.as_ptr(),
+                    text.len() as i32,
+                    &mut metrics,
+                );
+            }
+            if x + i32::from(metrics.x_off).max(1) > self.width - self.padding {
+                break;
+            }
+            unsafe {
+                XftDrawStringUtf8(
+                    self.draw,
+                    &color,
+                    font,
+                    x,
+                    baseline,
+                    text.as_ptr(),
+                    text.len() as i32,
+                );
+            }
+            x += i32::from(metrics.x_off);
+        }
+    }
     pub fn graphics_changed(&self, terminal: &Terminal) -> bool {
         self.graphics_revision != terminal.graphics().revision()
             || self.graphics_alternate != terminal.modes().alternate_screen
@@ -1792,13 +1948,17 @@ impl Window {
             let mut col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
-                let selected = selection.is_some_and(|s| s.contains(col, row, cols));
+                let selected = selection.is_some_and(|s| s.contains(col, row, cols))
+                    || self.search_match(col, row);
                 let (_, rgb, translucent) = self.cell_colors(cell, selected);
                 let mut end = col + 1;
                 while end < cols {
                     let next = terminal.view_cell(end, row, offset);
-                    let (_, next_rgb, next_translucent) = self
-                        .cell_colors(next, selection.is_some_and(|s| s.contains(end, row, cols)));
+                    let (_, next_rgb, next_translucent) = self.cell_colors(
+                        next,
+                        selection.is_some_and(|s| s.contains(end, row, cols))
+                            || self.search_match(end, row),
+                    );
                     if (next_rgb, next_translucent) != (rgb, translucent) {
                         break;
                     }
@@ -1823,7 +1983,8 @@ impl Window {
             {
                 for col in 0..cols {
                     let cell = terminal.view_cell(col, row, offset);
-                    let selected = selection.is_some_and(|s| s.contains(col, row, cols));
+                    let selected = selection.is_some_and(|s| s.contains(col, row, cols))
+                        || self.search_match(col, row);
                     let (_, rgb, translucent) = self.cell_colors(cell, selected);
                     if !translucent {
                         self.fill_background(
@@ -1845,8 +2006,11 @@ impl Window {
                     col += 1;
                     continue;
                 }
-                let (fg, _, _) =
-                    self.cell_colors(cell, selection.is_some_and(|s| s.contains(col, row, cols)));
+                let (fg, _, _) = self.cell_colors(
+                    cell,
+                    selection.is_some_and(|s| s.contains(col, row, cols))
+                        || self.search_match(col, row),
+                );
                 let color = self.color(fg);
                 let x = self.padding + col as i32 * self.cw;
                 let baseline = y + unsafe { (*self.font).ascent } + 1;
@@ -1875,7 +2039,8 @@ impl Window {
                             || self
                                 .cell_colors(
                                     next,
-                                    selection.is_some_and(|s| s.contains(col + cells, row, cols)),
+                                    selection.is_some_and(|s| s.contains(col + cells, row, cols))
+                                        || self.search_match(col + cells, row),
                                 )
                                 .0
                                 != fg
@@ -2031,6 +2196,17 @@ impl Window {
             XFlush(self.display);
         }
     }
+    pub fn cancel_paste(&mut self) {
+        self.receiving = false;
+        self.incoming.clear();
+        self.paste_selection = 0;
+        if self.id != 0 {
+            unsafe {
+                XDeleteProperty(self.display, self.id, self.transfer);
+            }
+        }
+    }
+
     pub fn paste(&mut self, primary: bool) {
         self.receiving = false;
         self.incoming.clear();

@@ -1,5 +1,9 @@
 # ztty
 
+[![10 个终端的实测内存对比](docs/benchmarks/terminals-10-windows.svg)](docs/benchmarks/verification-2026-11-18.md)
+
+Linux/Xvfb 历史测量包含应用启动器与辅助进程：ztty **RSS 58.75 MiB / PSS 15.36 MiB**，Ghostty **818.23 / 775.36**，Kitty **397.68 / 351.16**。当时主机 load1 为 31.02–36.57，不能据此宣传安静环境下的性能排名。X server 资源另计，真实 GPU 显存及输入到显示延迟尚未测量。[原始数据、负载验证与复查方法](docs/benchmarks/verification-2026-11-18.md)。
+
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。
 0.2 版本补齐了 macOS、Windows 后端，并加入静态 Kitty 图形协议。
 项目优先验证 Linux，目标是以更低的内存占用和更快的交互响应，
@@ -7,6 +11,11 @@ ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准
 
 Linux 上的多个窗口自动复用一个会话进程、显示连接和字体缓存。
 每个窗口分别保存自己的 PTY、屏幕和历史记录。共享会话与 MCP 目前仅支持 Linux。
+
+Linux 新增历史搜索、按需命令面板、快捷键和鼠标绑定、配置热重载、
+OSC 133 命令跳转与复制输出；Bash、Zsh、Fish、Nushell 可以按需启用集成。
+[操作与边界](docs/daily-workflow.md)、[Shell 配置](shell/README.md)、
+[MCP 观察者权限与命令读取](docs/sessions.md)提供完整说明。
 
 终端的工作可以拆成三件事：把键盘操作编码后送给程序，理解程序返回的
 文字和控制指令，再把变化的内容画出来。图片也遵循这条路径：程序

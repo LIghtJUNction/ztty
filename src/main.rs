@@ -4,9 +4,13 @@
 
 extern crate alloc;
 
+#[cfg(target_os = "linux")]
+mod actions;
 mod appearance;
 #[cfg(target_os = "linux")]
 mod broker;
+#[cfg(target_os = "linux")]
+mod config_watch;
 #[cfg(target_os = "linux")]
 mod json;
 #[cfg(target_os = "linux")]
@@ -30,6 +34,8 @@ mod platform;
 #[cfg(target_os = "macos")]
 #[path = "platform/macos.rs"]
 mod platform;
+#[cfg(target_os = "linux")]
+mod search;
 #[cfg(target_os = "linux")]
 mod session;
 #[cfg(target_os = "linux")]
@@ -82,6 +88,8 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty detach NAME | rename NAME NEW_NAME | list [FILTER]\n\
        ztty action NAME ACTION | move NAME TARGET [tab|right|down]\n\
        ztty control NAME acquire|release [--takeover]\n\
+       ztty commands NAME | command-output NAME COMMAND_ID\n\
+       ztty shell-integration bash|zsh|fish|nu\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
   --name NAME          Name this local session\n\
   --tab NAME           Open a new tab in NAME's window\n\
@@ -101,6 +109,9 @@ Multiple windows share one process, display connection and font cache.\n\
 Ctrl+Shift+T adds a tab; E/O splits right/down; PageUp/PageDown switches tabs.\n\
 Ctrl+Shift+Left/Right focuses panes; Up/Down swaps; Enter maximizes/restores.\n\
 Ctrl+Shift+D detaches; U moves a pane to a new window; G takes input control.\n\
+Ctrl+Shift+F searches; P opens actions; R reloads configuration.\n\
+Ctrl+Shift+K/J browses shell commands; Y copies the selected command output.\n\
+Ctrl+Equal/Minus/0 adjusts or resets font size.\n\
 attach without a name lists all local and MCP sessions.\n\
 MCP defaults to stdio; HTTP defaults to 127.0.0.1:8732/mcp.\n\
 Runs on X11 and XWayland. Use ztty mcp --help for transport options.\n";
@@ -131,6 +142,8 @@ struct Config {
     target: Option<(String, &'static str)>,
     #[cfg(target_os = "linux")]
     cwd: Option<String>,
+    #[cfg(target_os = "linux")]
+    config_path: Option<CString>,
 }
 
 fn number(bytes: &[u8]) -> Option<usize> {
@@ -152,6 +165,8 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         target: None,
         #[cfg(target_os = "linux")]
         cwd: None,
+        #[cfg(target_os = "linux")]
+        config_path: None,
     };
     let mut i = 1;
     while i < args.len() {
@@ -267,6 +282,12 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         cfg.command.push(os::default_shell());
     }
     cfg.appearance = Appearance::load(config_path)?;
+    #[cfg(target_os = "linux")]
+    {
+        cfg.config_path = config_path
+            .map(CString::from)
+            .or_else(os::default_config_path);
+    }
     if let Some(font) = font {
         cfg.appearance.set_font(font)?;
     }
@@ -450,6 +471,21 @@ fn launch(args: &[&CStr]) -> Result<i32, String> {
     })
 }
 
+fn shell_integration(args: &[&CStr]) -> Result<i32, String> {
+    let script = match args {
+        [name] => match name.to_bytes() {
+            b"bash" => include_str!("../shell/ztty.bash"),
+            b"zsh" => include_str!("../shell/ztty.zsh"),
+            b"fish" => include_str!("../shell/ztty.fish"),
+            b"nu" | b"nushell" => include_str!("../shell/ztty.nu"),
+            _ => return Err("shell integration supports bash, zsh, fish or nu".into()),
+        },
+        _ => return Err("usage: ztty shell-integration bash|zsh|fish|nu".into()),
+    };
+    os::print(1, script.as_bytes());
+    Ok(0)
+}
+
 #[cfg(target_os = "linux")]
 pub(crate) fn serve() -> Result<(), String> {
     session::serve()
@@ -476,14 +512,23 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
     #[cfg(target_os = "linux")]
     let result = match args.get(1).map(|s| s.to_bytes()) {
         Some(b"mcp") => mcp::run(&args[2..]),
+        Some(b"shell-integration") => shell_integration(&args[2..]),
         Some(b"attach") => platform::attach(&args[2..]),
-        Some(b"list" | b"info" | b"detach" | b"rename" | b"action" | b"move" | b"control") => {
-            platform::command(&args[1..])
-        }
+        Some(
+            b"list" | b"info" | b"detach" | b"rename" | b"action" | b"move" | b"control"
+            | b"commands" | b"command-output",
+        ) => platform::command(&args[1..]),
         _ => launch(&args),
     };
     #[cfg(not(target_os = "linux"))]
-    let result = launch(&args);
+    let result = if args
+        .get(1)
+        .is_some_and(|arg| arg.to_bytes() == b"shell-integration")
+    {
+        shell_integration(&args[2..])
+    } else {
+        launch(&args)
+    };
     match result {
         Ok(status) => status,
         Err(message) => {

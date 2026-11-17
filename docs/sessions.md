@@ -62,6 +62,11 @@ to a remote machine.
 | MCP transport exits or HTTP transport session is deleted | Unaffected | Keep the terminal session |
 | `session_close` tool | Close the session and release its resources | Close the session and release its resources |
 
+The first row applies to a local operator view. Closing a read-only view, or a
+view whose input is owned by another actor, detaches it and keeps the PTY alive.
+This also applies to the window manager's close action. An observing attach to
+an existing workspace leaves its active tab and X input focus unchanged.
+
 Detaching removes that session's window resources. The broker drops unreferenced
 font sets after their last window closes, but keeps opened X11 connections until
 it exits. It exits after approximately
@@ -132,7 +137,7 @@ the negotiated `Mcp-Protocol-Version`. DELETE removes that HTTP
 transport session while leaving its terminal sessions available. Idle HTTP
 transport sessions expire after 30 minutes; retained terminals remain available.
 
-The server validates Origin, local Host headers, content types and protocol
+The server validates Origin, Host headers on every bind address, content types and protocol
 versions. It supports `2025-11-25`, `2025-06-18` and
 `2025-03-26`, with negotiation following the
 [MCP lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle).
@@ -144,9 +149,44 @@ versions. It supports `2025-11-25`, `2025-06-18` and
 | `session_create` | Optional `name`, `command`, `cwd`, `cols`, `rows`, `history` | URI, child/broker PIDs, dimensions and state |
 | `session_list` | None | All local and MCP sessions |
 | `session_read` | `session`; optional `cursor`, `max_bytes` | Output page, screen snapshot, next cursor and state |
+| `session_commands` | `session` | At most 128 OSC 133 records, exit status and availability |
+| `session_command_read` | `session`, `command_id`; optional `part`, `max_bytes` | Rendered command input/output, `complete` and `truncated` |
 | `session_write` | `session`, `data` | Queued input and session state |
 | `session_resize` | `session`, `cols`, `rows` | Updated PTY and screen dimensions |
 | `session_close` | `session` | Closed session metadata |
+| `session_control` | `session`, `action`; optional `takeover` | Acquire/release input ownership; takeover is explicit |
+
+### Observation and input ownership
+
+Run `ztty mcp --read-only` to expose only the four session/command reading tools.
+For an HTTP listener that accepts both roles, set `ZTTY_MCP_TOKEN` for operators
+and a different `ZTTY_MCP_OBSERVER_TOKEN` for observers. When either is configured,
+every request must authenticate; a transport session cannot switch roles by
+changing its bearer token. Observers cannot create, resize, write, close or
+acquire control, even if they manually submit a hidden tool name.
+
+Each MCP connection receives an independent trusted actor identity. Creation
+grants input ownership to that actor. A replacement connection can read retained
+output immediately; it must call `session_control` with `action: "acquire"` and
+`takeover: true` to replace a previous owner. A plain acquire refuses an existing
+owner. The broker clears unsent input and cancels pending GUI paste transfers
+when ownership changes. Bytes already delivered to the child cannot be recalled.
+The actor identifier in metadata is not the HTTP transport-session credential.
+
+Local GUI input resumes after Ctrl+Shift+G, or `ztty control NAME acquire --takeover`.
+Input authority and visibility are separate: read-only viewing does not grant
+typing, paste, mouse reports, focus reports or PTY resize. The child still receives
+normal terminal protocol replies such as DSR while observed or detached.
+
+`--allow-host name:port` adds an explicit HTTP authority, for example behind a
+trusted reverse proxy. An Origin header must agree with the request Host. The
+transport implements the 2025-11-25 JSON response lifecycle; it does not claim
+conformance with newer MCP revisions or provide an unsolicited SSE subscription.
+
+Command reads use the terminal's retained physical cells. They are bounded text
+extraction, not a second raw stdout archive. A resized or overwritten region can
+be unavailable, and completed commands can leave the history buffer. Check both
+`complete` and `truncated`; see [daily workflow](daily-workflow.md).
 
 `command` is an executable-and-arguments array. Use an explicit shell
 when shell expansion, pipelines or redirection are needed. With no command,
@@ -197,13 +237,15 @@ Screen history grows on demand and has its own 8 MiB cell-storage cap. The
 broker allows 128 terminal sessions; close completed sessions to release
 their retained state. Each HTTP server allows 64 transport sessions and 64
 concurrent connections, with a 1 MiB message limit, a 4 MiB aggregate incoming
-buffer limit and a ten-second request deadline.
+and queued-response buffer limit and a ten-second request deadline.
 
 ## Verify
 
 ```sh
 python3 tests/mcp_transport.py --binary ./target/release/ztty
 python3 tests/mcp_sessions.py --binary ./target/release/ztty
+python3 tests/mcp_security.py --binary ./target/release/ztty
+python3 tests/daily_workflow.py --binary ./target/release/ztty
 python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
 ```
 

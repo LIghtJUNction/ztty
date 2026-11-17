@@ -4,6 +4,7 @@ use zterm::{CursorShape, Theme};
 
 use crate::os;
 
+#[derive(Clone)]
 pub struct Appearance {
     pub font: String,
     pub theme: Theme,
@@ -16,6 +17,8 @@ pub struct Appearance {
     pub cursor_blink_interval: u64,
     pub selection_foreground: u32,
     pub selection_background: u32,
+    #[cfg(target_os = "linux")]
+    pub bindings: alloc::vec::Vec<crate::actions::Binding>,
 }
 
 impl Default for Appearance {
@@ -40,6 +43,8 @@ impl Default for Appearance {
             cursor_blink_interval: 500,
             selection_foreground: 0xf0f4fa,
             selection_background: 0x394969,
+            #[cfg(target_os = "linux")]
+            bindings: alloc::vec::Vec::new(),
         }
     }
 }
@@ -81,6 +86,16 @@ impl Appearance {
         for (index, color) in self.theme.palette.iter().enumerate() {
             entries.push(("palette", format!("{index}=#{color:06x}")));
         }
+        for binding in &self.bindings {
+            entries.push((
+                if binding.symbol >= 0x1000_0000 {
+                    "mousebind"
+                } else {
+                    "keybind"
+                },
+                binding.config(),
+            ));
+        }
         Value::Array(
             entries
                 .into_iter()
@@ -92,7 +107,7 @@ impl Appearance {
     #[cfg(target_os = "linux")]
     pub fn from_json(value: &crate::json::Value) -> Result<Self, &'static str> {
         let entries = value.as_array().ok_or("invalid appearance")?;
-        if entries.len() > 64 {
+        if entries.len() > 192 {
             return Err("too many appearance options");
         }
         let mut appearance = Self::default();
@@ -145,7 +160,7 @@ impl Appearance {
                 .and_then(|(key, value)| appearance.set(key.trim(), value.trim()));
             if let Err(error) = result {
                 return Err(format!(
-                    "{}:{}: {error} ({line})",
+                    "{error} ({line}); {}:{}",
                     path.to_string_lossy(),
                     index + 1
                 ));
@@ -178,6 +193,13 @@ impl Appearance {
         let color = || rgb(value);
         match key {
             "font" => self.set_font(value)?,
+            #[cfg(target_os = "linux")]
+            "keybind" | "mousebind" => {
+                crate::actions::set(
+                    &mut self.bindings,
+                    crate::actions::parse(value, key == "mousebind")?,
+                )?;
+            }
             "foreground" => self.theme.foreground = color()?,
             "background" => self.theme.background = color()?,
             "window-padding" => self.padding = number(0, 128)? as i32,
