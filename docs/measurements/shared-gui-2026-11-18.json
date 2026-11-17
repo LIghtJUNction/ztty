@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/memory-worktree/artifacts/ztty-shared-measured",
+  "checks": [
+    {
+      "name": "concurrent_start_and_independent_pty_input",
+      "ok": true,
+      "windows": 3,
+      "gui_owner_pid": 4064731,
+      "different_font_sizes": [
+        11,
+        13
+      ]
+    },
+    {
+      "name": "attach_reuses_window",
+      "ok": true
+    },
+    {
+      "name": "close_one_preserves_shared_font_peer",
+      "ok": true
+    },
+    {
+      "name": "reload_font_group_with_other_windows_alive",
+      "ok": true
+    },
+    {
+      "name": "close_all_windows",
+      "ok": true
+    }
+  ],
+  "remaining_owned_pids": [],
+  "terminal_stderr": ""
+}

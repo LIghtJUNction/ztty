@@ -118,7 +118,7 @@ def measure(binary, count, repetition, expect_shared):
                 environment.update(
                     DISPLAY=display_name, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
                     LIBGL_ALWAYS_SOFTWARE="1", ZTTY_MEMORY_TAG=temporary,
-                    ZTTY_SOCKET=str(directory / "host.sock"),
+                    ZTTY_SOCKET="@ztty-multiwindow-" + directory.name,
                     XDG_RUNTIME_DIR=str(directory),
                 )
                 start = time.monotonic()
@@ -213,6 +213,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--label", required=True)
+    parser.add_argument("--compare-binary", type=Path,
+                        help="interleave an independent baseline with this binary")
+    parser.add_argument("--compare-label", default="baseline")
     parser.add_argument("--counts", default="1,4,8")
     parser.add_argument("--repetitions", type=int, default=3)
     parser.add_argument("--expect-shared", action="store_true")
@@ -227,27 +230,40 @@ def main():
     # Reap detached owned hosts after cleanup instead of leaving orphan zombies.
     if ctypes.CDLL(None).prctl(36, 1, 0, 0, 0) != 0:
         raise OSError("cannot enable child subreaper")
+    configurations = [(args.label, binary, args.expect_shared)]
+    if args.compare_binary is not None:
+        configurations.insert(0, (args.compare_label, args.compare_binary.resolve(strict=True), False))
+    if len({label for label, _, _ in configurations}) != len(configurations):
+        parser.error("comparison labels must differ")
     rows = []
     for repetition in range(1, args.repetitions + 1):
+        ordered = configurations if repetition % 2 else list(reversed(configurations))
         for count in counts:
-            row = measure(binary, count, repetition, args.expect_shared)
-            rows.append(row)
-            print(json.dumps({"windows": count, "repetition": repetition, "ok": row["ok"],
-                              "application": row.get("application"), "error": row.get("error")}), flush=True)
+            for label, executable, expect_shared in ordered:
+                row = measure(executable, count, repetition, expect_shared)
+                row["label"] = label
+                rows.append(row)
+                print(json.dumps({"label": label, "windows": count, "repetition": repetition,
+                                  "ok": row["ok"], "application": row.get("application"),
+                                  "error": row.get("error")}), flush=True)
     summary = []
-    for count in counts:
-        values = [row for row in rows if row["windows"] == count and row["ok"]]
-        if values:
-            summary.append({
-                "windows": count, "successful_runs": len(values),
-                "median_pss_bytes": statistics.median(row["application"]["Pss_bytes"] for row in values),
-                "median_private_bytes": statistics.median(row["application"]["Private_bytes"] for row in values),
-                "median_rss_bytes": statistics.median(row["application"]["Rss_bytes"] for row in values),
-                "gui_process_counts": sorted({row["gui_process_count"] for row in values}),
-                "ztty_process_counts": sorted({row["ztty_process_count"] for row in values}),
-            })
+    for label, _, _ in configurations:
+        for count in counts:
+            values = [row for row in rows if row["label"] == label and row["windows"] == count and row["ok"]]
+            if values:
+                summary.append({
+                    "label": label, "windows": count, "successful_runs": len(values),
+                    "median_pss_bytes": statistics.median(row["application"]["Pss_bytes"] for row in values),
+                    "median_private_bytes": statistics.median(row["application"]["Private_bytes"] for row in values),
+                    "median_private_dirty_bytes": statistics.median(row["application"]["Private_Dirty_bytes"] for row in values),
+                    "median_rss_bytes": statistics.median(row["application"]["Rss_bytes"] for row in values),
+                    "gui_process_counts": sorted({row["gui_process_count"] for row in values}),
+                    "ztty_process_counts": sorted({row["ztty_process_count"] for row in values}),
+                })
     result = {
         "schema": 1, "label": args.label, "binary": str(binary),
+        "configurations": [{"label": label, "binary": str(executable), "expect_shared": shared}
+                           for label, executable, shared in configurations],
         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "machine": machine(), "settings": {"font": "monospace:size=11", "geometry": "120x32",
                                           "scrollback": 2000, "appearance": SETTINGS},
