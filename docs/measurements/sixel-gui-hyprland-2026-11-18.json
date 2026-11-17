@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "ok": false,
+  "timestamp_utc": "2026-11-17T22:15:40.691872+00:00",
+  "platform": "Linux-7.3.4-arch1-1-x86_64-with-glibc2.44",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/sixel-layout-candidate-ztty",
+  "binary_sha256": "794b053a3a299bac199a3d713f118cb1603064d619fb4f357efa9c7f03c4c716",
+  "test_sha256": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+  "checks": [],
+  "display_helper_sha256": "782728e291be46b2a084041ebb82e76fd3b3264186544c83fc50e99ef80f632d",
+  "source_snapshot_sha256": {
+    "crates/zgraphics/src/lib.rs": "6de28c07f898b929c5fc292ca6c9b86e332d5763afb4ea2746d0e2fd8d7acdae",
+    "crates/zgraphics/src/sixel.rs": "94d893643d8147b3e98f5ad8b4d4c5e23366d106c6ff0077117a18bdd073c41f",
+    "crates/zterm/src/terminal.rs": "a6add38c9f57d37c316458640120b10d7b2ed8334136552d631d55c8a3d55f28",
+    "src/session.rs": "1883bcd015965e6e6215802afa49bf470159c669ed5fa304f2b59ee0e71db396",
+    "src/x11.rs": "5ef8ea2917c6044141da65c069aef9a13c640a37caf5b39cd45d8d40751a8e1e"
+  },
+  "source_snapshot_note": "Checkout hashes at test start; match binary identity to the build log independently.",
+  "input_transport": "MCP stdio operator to real PTY",
+  "attachment": "observe",
+  "screenshot_method": "XGetImage of owned native window",
+  "limitations": [
+    "Xvfb verifies X11 rendering, not native Wayland or GPU scanout.",
+    "Existing-display screenshots capture X11 client pixels, not compositor scanout timing.",
+    "No macOS or Windows execution is claimed."
+  ],
+  "source_git": {
+    "commit": "e10bf9b4be4f4eccd981963f52ce5fafa843b292",
+    "tracked_changes": [
+      " M CHANGELOG.md",
+      " M docs/benchmarks/roadmap-idle-verification-2026-11-18.md",
+      " M docs/workspaces.md",
+      " M src/main.rs",
+      " M src/platform/linux.rs",
+      " M src/session.rs",
+      " M src/x11.rs",
+      " M tests/workspaces.py"
+    ]
+  },
+  "desktop": {
+    "kind": "Hyprland/XWayland",
+    "display": ":0",
+    "hyprland_version": "0.57.2",
+    "endpoints": {
+      "display": ":0",
+      "files": [
+        {
+          "path": "/tmp/.X0-lock",
+          "exists": true,
+          "device": 65,
+          "inode": 552,
+          "ctime_unix": 1794907997.9029415,
+          "socket": false,
+          "symlink": false
+        },
+        {
+          "path": "/tmp/.X11-unix/X0",
+          "exists": false
+        },
+        {
+          "path": "/tmp/.X11-unix/X0_",
+          "exists": true,
+          "device": 65,
+          "inode": 553,
+          "ctime_unix": 1794907997.9029415,
+          "socket": true,
+          "symlink": false
+        }
+      ],
+      "listeners": [
+        {
+          "path": "/tmp/.X11-unix/X0_",
+          "inode": 60990,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "/tmp/.X11-unix/X0",
+          "inode": 60991,
+          "state": "01",
+          "type": "0001"
+        }
+      ]
+    }
+  },
+  "error": "DisplayConnectionError(':0', '[Errno 111] Connection refused')",
+  "stderr_tail": "",
+  "cleanup_errors": []
+}
