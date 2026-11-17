@@ -9,6 +9,7 @@ pub fn run(cfg: Config) -> Result<i32, String> {
         ("op", Value::from("create")),
         ("origin", Value::from("local")),
         ("headless", Value::Bool(false)),
+        ("observe", Value::Bool(cfg.observe)),
         ("cols", Value::from(cfg.cols)),
         ("rows", Value::from(cfg.rows)),
         ("history", Value::from(cfg.history)),
@@ -146,7 +147,7 @@ pub fn command(args: &[&CStr]) -> Result<i32, String> {
         let selector = text(1)?;
         request.set("session", Value::from(selector));
         match op {
-            "info" | "detach" | "commands" | "save-layout" if args.len() == 2 => {}
+            "info" | "detach" | "close" | "commands" | "save-layout" if args.len() == 2 => {}
             "command-output" if args.len() == 3 => {
                 request.set("op", Value::from("command-read"));
                 let id = text(2)?

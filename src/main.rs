@@ -87,7 +87,7 @@ const HELP: &str = "ztty — shared no_std terminal sessions for Linux\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty attach [NAME | ztty://ADDRESS]\n\
        ztty attach --observe NAME\n\
-       ztty detach NAME | rename NAME NEW_NAME | list [FILTER]\n\
+       ztty detach NAME | close NAME | rename NAME NEW_NAME | list [FILTER]\n\
        ztty action NAME ACTION | move NAME TARGET [tab|right|down]\n\
        ztty control NAME acquire|release [--takeover]\n\
        ztty commands NAME | command-output NAME COMMAND_ID\n\
@@ -96,6 +96,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty restore-layout workspace.json\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
   --name NAME          Name this local session\n\
+  --observe            Open a standalone read-only view without requesting focus\n\
   --tab NAME           Open a new tab in NAME's window\n\
   --split-right NAME   Open a pane to the right of NAME\n\
   --split-down NAME    Open a pane below NAME\n\
@@ -143,6 +144,8 @@ struct Config {
     #[cfg(target_os = "linux")]
     name: Option<String>,
     #[cfg(target_os = "linux")]
+    observe: bool,
+    #[cfg(target_os = "linux")]
     target: Option<(String, &'static str)>,
     #[cfg(target_os = "linux")]
     cwd: Option<String>,
@@ -165,6 +168,8 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         command: Vec::new(),
         #[cfg(target_os = "linux")]
         name: None,
+        #[cfg(target_os = "linux")]
+        observe: false,
         #[cfg(target_os = "linux")]
         target: None,
         #[cfg(target_os = "linux")]
@@ -198,6 +203,8 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
                 i += 1;
                 config_path = Some(*args.get(i).ok_or("--config needs a path")?);
             }
+            #[cfg(target_os = "linux")]
+            b"--observe" => cfg.observe = true,
             #[cfg(target_os = "linux")]
             b"--tab" | b"--split-right" | b"--split-down" => {
                 let mode = match args[i].to_bytes() {
@@ -272,6 +279,13 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
             _ => return Err("unknown argument; run ztty --help".into()),
         }
         i += 1;
+    }
+    #[cfg(target_os = "linux")]
+    if cfg.observe && cfg.target.is_some() {
+        return Err(
+            "--observe opens a standalone view; it cannot be combined with tab/split options"
+                .into(),
+        );
     }
     if cfg.command.is_empty() {
         #[cfg(unix)]
@@ -519,7 +533,7 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
         Some(b"shell-integration") => shell_integration(&args[2..]),
         Some(b"attach") => platform::attach(&args[2..]),
         Some(
-            b"list" | b"info" | b"detach" | b"rename" | b"action" | b"move" | b"control"
+            b"list" | b"info" | b"detach" | b"close" | b"rename" | b"action" | b"move" | b"control"
             | b"commands" | b"command-output" | b"save-layout" | b"restore-layout",
         ) => platform::command(&args[1..]),
         _ => launch(&args),

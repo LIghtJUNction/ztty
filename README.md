@@ -157,7 +157,8 @@ ztty attach ztty://mcp/stdio/checks
 ztty attach ztty://mcp/http/127.0.0.1:8732/checks
 ```
 
-MCP exposes six tools to create, list, read, write, resize and close PTYs.
+MCP exposes nine tools to create, list, read, write, resize and close PTYs,
+manage input ownership, list shell commands and read their retained output.
 MCP-created sessions keep their output when the transport exits; closing their
 window detaches it. Ordinary local windows keep the usual close-to-exit
 behavior. HTTP listeners outside loopback require a bearer token.
@@ -283,7 +284,9 @@ enabled production feature graph.
 - OSC 0/2 titles, OSC 7 working-directory metadata, OSC 8 hyperlinks, palette
   queries, character/cell/pixel size reports, DSR, DA, DECRQM, and a bounded
   subset of XTGETTCAP.
-- Static Kitty graphics with bounded image storage and transfer buffers.
+- Static Kitty graphics and streaming Sixel decoding with bounded image storage
+  and transfer buffers. Sixel shares the existing image store and render paths;
+  native acceptance boundaries are recorded in [the protocol matrix](docs/protocols.md).
 - On Linux: XIM input, font fallback, selection, clipboard/primary selection,
   and INCR clipboard reception.
 
@@ -297,7 +300,7 @@ when images are received; its quotas are documented in
 ## Current boundaries
 
 The Linux backend uses X11/XWayland. Native Wayland, a dedicated GPU renderer,
-Sixel, Kitty file/shared-memory transport and animation, OSC 52 clipboard access,
+Kitty file/shared-memory transport and animation, OSC 52 clipboard access,
 complex text shaping / full emoji ZWJ layout, and history reflow are future work.
 Kitty Unicode placeholders and relative placements are also deferred.
 Resizing preserves and crops existing rows; shrinking vertically keeps the
@@ -342,11 +345,22 @@ acceptance gaps are listed in [protocol acceptance](docs/protocols.md#acceptance
 See [architecture](docs/architecture.md), [protocol references](docs/protocols.md),
 and [release instructions](docs/releasing.md).
 
-MIT © LIghtJUNction
-
 ## Tabs and panes on Linux
 
 Shared sessions now support tabs, splits, pane focus and moves between native windows.
 Use `ztty --split-right NAME`, `ztty --tab NAME`, or Ctrl+Shift+E/T.
 `ztty detach NAME` preserves its PTY; `ztty attach --observe NAME` opens an observing view.
 [Commands, ownership and verified behavior](docs/workspaces.md).
+
+`ztty save-layout NAME > workspace.json` records the live workspace.
+`ztty restore-layout workspace.json` restores only matching, still-attached
+session incarnations; it does not restart exited commands.
+
+`ztty --observe -e COMMAND` starts a standalone read-only command window without
+requesting focus. Closing that window ends the child it created.
+`ztty attach --observe NAME` observes an existing session; closing that view
+preserves its live PTY. External tools using `TERMINAL -e COMMAND`, including
+`ssmcp --tty`, can use [tools/ztty-observer](tools/ztty-observer).
+[Real integration, lifecycle and remaining platform boundaries](docs/ssmcp-observer.md).
+
+MIT © LIghtJUNction
