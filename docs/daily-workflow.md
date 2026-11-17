@@ -139,3 +139,24 @@ linked final records are the passing reruns.
 ![Actual history search](assets/daily-workflow/history-search.png)
 
 ![Actual temporary command palette](assets/daily-workflow/command-palette.png)
+
+## Configuration-directory race regression
+
+A real GUI run exposed a missed reload when the config directory was renamed
+and rebuilt. A replacement directory could appear after the direct watch failed
+but before its ancestor watch was installed. If its file was then written after
+reconnect, the ancestor did not receive that child-directory write.
+
+Reconnect now installs the nearest existing ancestor watch before probing each
+child directory again. It either reaches the new parent or keeps the watch that
+will report its future creation. This adds no polling timer or permanent extra
+watch. Shared descriptors remain alive until their last configured path is removed.
+
+[Three real inotify tests](../tests/config_watch.rs) schedule this filesystem
+race precisely and use the real libc watch calls. The old implementation fails
+both race cases; the fixed implementation passes all three cases. The third
+case checks shared-descriptor retention and final release. See the
+[source/test hashes and comparison record](measurements/config-watch-regression-2026-11-18.json),
+[old failure log](measurements/config-watch-before-fix-2026-11-18.log), and
+[fixed trace](measurements/config-watch-after-fix-2026-11-18.log).
+The normal local gate now runs all Rust integration tests and MCP security tests.

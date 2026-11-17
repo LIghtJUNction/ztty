@@ -1,0 +1,5 @@
+{"command": ["cargo", "clippy", "--test", "config_watch", "--", "-D", "warnings"], "source_sha256": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1", "test_sha256": "c4e5f5179e79826888ea45eb86d89652b552314a81d6455afec8d9e4096e38dc"}
+    Checking ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.18s
+
+CARGO_EXIT=0

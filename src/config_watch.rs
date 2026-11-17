@@ -36,7 +36,7 @@ impl Watcher {
         let bytes = path.to_bytes();
         let mut split = bytes.iter().rposition(|&b| b == b'/')?;
         let direct_split = split;
-        loop {
+        let add = |split: usize| {
             let directory = CString::new(&bytes[..split.max(1)]).ok()?;
             let descriptor = unsafe {
                 inotify_add_watch(
@@ -45,18 +45,37 @@ impl Watcher {
                     0x8 | 0x80 | 0x100 | 0x200 | 0x400 | 0x800,
                 )
             };
-            if descriptor >= 0 {
-                let rest = &bytes[split + 1..];
-                let end = rest.iter().position(|&b| b == b'/').unwrap_or(rest.len());
-                return Some((descriptor, rest[..end].to_vec(), split == direct_split));
+            (descriptor >= 0).then_some(descriptor)
+        };
+        let mut descriptor = loop {
+            if let Some(descriptor) = add(split) {
+                break descriptor;
             }
             if split == 0 {
                 return None;
             }
-            // Watch the nearest existing ancestor, even before the default
-            // config directory exists, without timers or idle wakeups.
             split = bytes[..split].iter().rposition(|&b| b == b'/')?;
+        };
+        // A missing child may have appeared before its ancestor watch was
+        // installed. Probe downward only after watching its parent: either
+        // the child is now watched, or its future creation queues an event.
+        while split < direct_split {
+            let next = bytes[split + 1..direct_split]
+                .iter()
+                .position(|&b| b == b'/')
+                .map_or(direct_split, |offset| split + 1 + offset);
+            let Some(child) = add(next) else {
+                break;
+            };
+            if descriptor != child {
+                self.release(descriptor);
+            }
+            descriptor = child;
+            split = next;
         }
+        let rest = &bytes[split + 1..];
+        let end = rest.iter().position(|&b| b == b'/').unwrap_or(rest.len());
+        Some((descriptor, rest[..end].to_vec(), split == direct_split))
     }
     fn release(&self, descriptor: i32) {
         if descriptor >= 0 && !self.watches.iter().any(|w| w.descriptor == descriptor) {
