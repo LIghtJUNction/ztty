@@ -45,7 +45,7 @@ cargo add zvte@0.1.3 --no-default-features
 
 ## 运行
 
-安装 Rust 1.100.0、X11/Xft 开发库和等宽字体后：
+安装 Rust 1.100.0、X11/Xft/Xrender 开发库和等宽字体后：
 
 ```sh
 cargo build --locked --release
@@ -58,6 +58,36 @@ Ctrl+Shift+V 粘贴，Shift+拖拽在捕获鼠标的应用中选择文字，
 Shift+PageUp/PageDown 浏览历史，Ctrl+点击打开链接。
 应用捕获鼠标时，按住 Shift 可使用本地选择、滚轮历史和中键粘贴。
 
+## 外观
+
+编辑 `~/.config/ztty/ztty.conf`，设置 `XDG_CONFIG_HOME` 时使用其下的
+`ztty/ztty.conf`。也可以通过 `ztty --config PATH` 指定配置文件。
+配置在下次启动时生效，`--font` 优先于文件中的字体。
+
+```ini
+font = monospace:size=11
+window-padding = 16
+foreground = #e1e7f0
+background = #161a23
+background-opacity = 92
+background-blur = true
+cursor-shape = underline
+cursor-blink = true
+cursor-blink-interval = 500
+cursor-color = #b1ccff
+selection-foreground = #f0f4fa
+selection-background = #394969
+palette = 1=#e06c75
+```
+
+透明度用百分比表示，仅作用于默认背景。模糊由桌面合成器实现，
+`background-blur` 控制兼容 KWin 的 X11 请求，Hyprland 使用自己的
+窗口规则。设为 `background-opacity = 100` 可让窗口完全不透明。
+
+光标支持方块 `block`、下划线 `underline` 和竖线 `bar`，闪烁间隔
+以毫秒为单位。终端应用可以通过 DECSCUSR 和 DEC 私有模式 12
+控制当前光标。完整选项和范围见 [英文说明](README.md#appearance)。
+
 ## 性能与当前范围
 
 性能数据分开记录核心解析与屏幕更新、PTY 往返、完整进程内存和图形
@@ -67,6 +97,5 @@ Shift+PageUp/PageDown 浏览历史，Ctrl+点击打开链接。
 
 当前通过 X11/XWayland 提供 Linux 窗口；原生 Wayland、专用 GPU
 渲染后端、图像协议、完整复杂字形布局和历史重排是后续工作。
-自动化界面验收使用 Xvfb/X11；真实 XWayland 会话和 IBus/Fcitx
-输入法会话尚未验收，不能把接口实现等同于这些环境已通过测试。
+自动化界面验收使用 Xvfb/X11。
 “超过 Kitty/Ghostty”是项目目标，比较结论按实际完成的相同条件实验报告。

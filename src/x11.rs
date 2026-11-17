@@ -4,7 +4,9 @@ use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::ffi::{c_char, c_int, c_long, c_uint, c_ulong, c_void};
-use zterm::{BOLD, Cell, DEFAULT_BG, DIM, HIDDEN, INVERSE, STRIKE, Terminal, UNDERLINE};
+use zterm::{
+    BOLD, Cell, CursorShape, DIM, EXPLICIT_BG, HIDDEN, INVERSE, STRIKE, Terminal, UNDERLINE,
+};
 
 #[repr(C)]
 pub struct Display {
@@ -31,7 +33,7 @@ pub const SELECTION_CLEAR: i32 = 29;
 pub const SELECTION_REQUEST: i32 = 30;
 pub const SELECTION_NOTIFY: i32 = 31;
 pub const CLIENT_MESSAGE: i32 = 33;
-pub const PAD: i32 = 12;
+use crate::appearance::Appearance;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -216,6 +218,64 @@ struct ClassHint {
     class: *mut c_char,
 }
 
+#[repr(C)]
+struct VisualInfo {
+    visual: *mut c_void,
+    id: Xid,
+    screen: c_int,
+    depth: c_int,
+    class: c_int,
+    red_mask: c_ulong,
+    green_mask: c_ulong,
+    blue_mask: c_ulong,
+    colormap_size: c_int,
+    bits_per_rgb: c_int,
+}
+
+#[repr(C)]
+struct WindowAttributes {
+    background_pixmap: Xid,
+    background_pixel: c_ulong,
+    border_pixmap: Xid,
+    border_pixel: c_ulong,
+    bit_gravity: c_int,
+    win_gravity: c_int,
+    backing_store: c_int,
+    backing_planes: c_ulong,
+    backing_pixel: c_ulong,
+    save_under: c_int,
+    event_mask: c_long,
+    do_not_propagate_mask: c_long,
+    override_redirect: c_int,
+    colormap: Xid,
+    cursor: Xid,
+}
+
+#[repr(C)]
+struct PictureFormat {
+    id: Xid,
+    kind: c_int,
+    depth: c_int,
+    // Shift and mask pairs in R, G, B, A order.
+    direct: [i16; 8],
+    colormap: Xid,
+}
+
+#[link(name = "Xrender")]
+unsafe extern "C" {
+    fn XRenderFindVisualFormat(display: *mut Display, visual: *mut c_void) -> *mut PictureFormat;
+    fn XRenderFillRectangle(
+        display: *mut Display,
+        op: c_int,
+        dst: Xid,
+        color: *const RenderColor,
+        x: c_int,
+        y: c_int,
+        width: c_uint,
+        height: c_uint,
+    );
+}
+
 #[link(name = "X11")]
 unsafe extern "C" {
     fn XOpenDisplay(name: *const c_char) -> *mut Display;
@@ -225,7 +285,19 @@ unsafe extern "C" {
     fn XDefaultVisual(display: *mut Display, screen: c_int) -> *mut c_void;
     fn XDefaultColormap(display: *mut Display, screen: c_int) -> c_ulong;
     fn XRootWindow(display: *mut Display, screen: c_int) -> Xid;
-    fn XCreateSimpleWindow(
+    fn XGetVisualInfo(
+        display: *mut Display,
+        mask: c_long,
+        filter: *mut VisualInfo,
+        count: *mut c_int,
+    ) -> *mut VisualInfo;
+    fn XCreateColormap(
+        display: *mut Display,
+        window: Xid,
+        visual: *mut c_void,
+        alloc: c_int,
+    ) -> Xid;
+    fn XCreateWindow(
         display: *mut Display,
         parent: Xid,
         x: c_int,
@@ -233,8 +305,11 @@ unsafe extern "C" {
         width: c_uint,
         height: c_uint,
         border_width: c_uint,
-        border: c_ulong,
-        background: c_ulong,
+        depth: c_int,
+        class: c_uint,
+        visual: *mut c_void,
+        mask: c_ulong,
+        attrs: *mut WindowAttributes,
     ) -> Xid;
     fn XDestroyWindow(display: *mut Display, window: Xid) -> c_int;
     fn XSelectInput(display: *mut Display, window: Xid, mask: c_long) -> c_int;
@@ -380,6 +455,7 @@ unsafe extern "C" {
         length: c_int,
         extents: *mut GlyphInfo,
     );
+    fn XftDrawPicture(draw: *mut XftDraw) -> Xid;
     fn XftDrawCreate(
         display: *mut Display,
         drawable: Xid,
@@ -474,6 +550,32 @@ pub struct Lookup {
     pub text_only: bool,
     pub ignored: bool,
 }
+/// Find a TrueColor visual whose depth includes an actual alpha channel.
+unsafe fn alpha_visual(display: *mut Display, screen: c_int) -> Option<*mut c_void> {
+    unsafe {
+        let mut filter: VisualInfo = core::mem::zeroed();
+        filter.screen = screen;
+        filter.depth = 32;
+        filter.class = 4; // TrueColor
+        let mut count = 0;
+        let infos = XGetVisualInfo(display, 2 | 4 | 8, &mut filter, &mut count);
+        if infos.is_null() {
+            return None;
+        }
+        let visual = core::slice::from_raw_parts(infos, count as usize)
+            .iter()
+            .find(|info| {
+                let format = XRenderFindVisualFormat(display, info.visual);
+                !format.is_null() && (*format).kind == 1 && (*format).direct[7] != 0
+            })
+            .map(|info| info.visual);
+        XFree(infos.cast());
+        visual
+    }
+}
+
+type DrawnCursor = ((usize, usize), CursorShape);
+
 pub struct Window {
     pub display: *mut Display,
     pub id: Xid,
@@ -508,13 +610,21 @@ pub struct Window {
     incoming: Vec<u8>,
     receiving: bool,
     paste_selection: Atom,
-    last_cursor: (usize, usize),
+    last_cursor: Option<DrawnCursor>,
+    padding: i32,
+    background: u32,
+    background_fill: Option<RenderColor>,
+    cursor_color: u32,
+    selection_colors: (u32, u32),
     pub focused: bool,
 }
 
 impl Window {
-    pub fn new(cols: usize, rows: usize, font_name: &str) -> Result<Self, &'static str> {
-        let name = CString::new(font_name).map_err(|_| "invalid font name")?;
+    pub fn new(cols: usize, rows: usize, appearance: &Appearance) -> Result<Self, &'static str> {
+        let font_name = &appearance.font;
+        let padding = appearance.padding;
+        let background = appearance.theme.background;
+        let name = CString::new(font_name.as_str()).map_err(|_| "invalid font name")?;
         unsafe {
             crate::os::setlocale(0, c"".as_ptr());
             XSetLocaleModifiers(c"".as_ptr());
@@ -523,9 +633,21 @@ impl Window {
                 return Err("cannot open DISPLAY; ztty needs X11 or XWayland");
             }
             let screen = XDefaultScreen(display);
-            let visual = XDefaultVisual(display, screen);
-            let colormap = XDefaultColormap(display, screen);
-            let depth = XDefaultDepth(display, screen) as u32;
+            let root = XRootWindow(display, screen);
+            let alpha = if appearance.opacity < 100 {
+                alpha_visual(display, screen)
+            } else {
+                None
+            };
+            let (visual, colormap, depth) = if let Some(visual) = alpha {
+                (visual, XCreateColormap(display, root, visual, 0), 32)
+            } else {
+                (
+                    XDefaultVisual(display, screen),
+                    XDefaultColormap(display, screen),
+                    XDefaultDepth(display, screen) as u32,
+                )
+            };
             let font = XftFontOpenName(display, screen, name.as_ptr());
             if font.is_null() {
                 XCloseDisplay(display);
@@ -535,10 +657,11 @@ impl Window {
             XftTextExtentsUtf8(display, font, b"M".as_ptr(), 1, &mut ext);
             let cw = i32::from(ext.x_off).max(1);
             let ch = ((*font).ascent + (*font).descent + 3).max(1);
-            let width = cols as i32 * cw + PAD * 2;
-            let height = rows as i32 * ch + PAD * 2;
-            let root = XRootWindow(display, screen);
-            let id = XCreateSimpleWindow(
+            let width = cols as i32 * cw + padding * 2;
+            let height = rows as i32 * ch + padding * 2;
+            let mut attrs: WindowAttributes = core::mem::zeroed();
+            attrs.colormap = colormap;
+            let id = XCreateWindow(
                 display,
                 root,
                 0,
@@ -546,9 +669,17 @@ impl Window {
                 width as u32,
                 height as u32,
                 0,
-                0,
-                DEFAULT_BG as c_ulong,
+                depth as c_int,
+                1,
+                visual,
+                (1 << 3) | (1 << 13),
+                &mut attrs,
             );
+            if alpha.is_some() && appearance.blur {
+                let blur = XInternAtom(display, c"_KDE_NET_WM_BLUR_BEHIND_REGION".as_ptr(), 0);
+                // An empty CARDINAL region requests blur across the window.
+                XChangeProperty(display, id, blur, 6, 32, 0, core::ptr::null(), 0);
+            }
             XSelectInput(
                 display,
                 id,
@@ -617,7 +748,7 @@ impl Window {
                 gc,
                 draw,
                 font,
-                font_name: String::from(font_name),
+                font_name: font_name.clone(),
                 fallbacks: Vec::new(),
                 colors: Vec::with_capacity(256),
                 next_color: 0,
@@ -634,12 +765,31 @@ impl Window {
                 incoming: Vec::new(),
                 receiving: false,
                 paste_selection: 0,
-                last_cursor: (usize::MAX, usize::MAX),
+                last_cursor: None,
+                padding,
+                background,
+                background_fill: alpha.map(|_| {
+                    let opacity = u32::from(appearance.opacity);
+                    let component = |shift: u32| {
+                        let channel = (background >> shift) & 255;
+                        (channel * 257 * opacity / 100) as u16
+                    };
+                    RenderColor {
+                        red: component(16),
+                        green: component(8),
+                        blue: component(0),
+                        alpha: (65535 * opacity / 100) as u16,
+                    }
+                }),
+                cursor_color: appearance.cursor_color,
+                selection_colors: (
+                    appearance.selection_foreground,
+                    appearance.selection_background,
+                ),
                 focused: true,
             };
             out.title("ztty");
-            let background = out.color(DEFAULT_BG);
-            XftDrawRect(draw, &background, 0, 0, width as u32, height as u32);
+            out.fill_background(background, true, 0, 0, width as u32, height as u32);
             XMapWindow(display, id);
             XFlush(display);
             Ok(out)
@@ -678,8 +828,8 @@ impl Window {
     }
     pub fn coordinates(&self, x: i32, y: i32, cols: usize, rows: usize) -> (usize, usize) {
         (
-            (((x - PAD).max(0) / self.cw) as usize).min(cols.saturating_sub(1)),
-            (((y - PAD).max(0) / self.ch) as usize).min(rows.saturating_sub(1)),
+            (((x - self.padding).max(0) / self.cw) as usize).min(cols.saturating_sub(1)),
+            (((y - self.padding).max(0) / self.ch) as usize).min(rows.saturating_sub(1)),
         )
     }
     pub fn present(&self) {
@@ -717,8 +867,8 @@ impl Window {
             }
         }
         (
-            (((self.width - PAD * 2) / self.cw).max(1) as usize).min(512),
-            (((self.height - PAD * 2) / self.ch).max(1) as usize).min(256),
+            (((self.width - self.padding * 2) / self.cw).max(1) as usize).min(512),
+            (((self.height - self.padding * 2) / self.ch).max(1) as usize).min(256),
         )
     }
     /// Resolve the current keyboard group, preserving AltGr/layout selection.
@@ -839,7 +989,7 @@ impl Window {
         }
         self.font
     }
-    fn cell_colors(cell: &Cell, selected: bool) -> (u32, u32) {
+    fn cell_colors(&self, cell: &Cell, selected: bool) -> (u32, u32, bool) {
         let (mut fg, mut bg) = if cell.flags & INVERSE != 0 {
             (cell.bg, cell.fg)
         } else {
@@ -849,13 +999,36 @@ impl Window {
             fg = ((fg & 0xfefefe) >> 1) + ((bg & 0xfefefe) >> 1);
         }
         if selected {
-            bg = 0x24405b;
-            fg = 0xf2f7ff;
+            (fg, bg) = self.selection_colors;
         }
         if cell.flags & HIDDEN != 0 {
             fg = bg;
         }
-        (fg, bg)
+        let translucent = !selected && cell.flags & (INVERSE | EXPLICIT_BG) == 0;
+        (fg, bg, translucent)
+    }
+    fn fill_background(&mut self, rgb: u32, translucent: bool, x: i32, y: i32, w: u32, h: u32) {
+        if let Some(color) = self.background_fill.as_ref().filter(|_| translucent) {
+            // Replace the retained pixels, including alpha, on every damaged row.
+            unsafe {
+                XRenderFillRectangle(
+                    self.display,
+                    1,
+                    XftDrawPicture(self.draw),
+                    color,
+                    x,
+                    y,
+                    w,
+                    h,
+                )
+            };
+        } else {
+            let color = self.color(rgb);
+            unsafe { XftDrawRect(self.draw, &color, x, y, w, h) };
+        }
+    }
+    pub fn cursor_changed(&self, cursor: Option<DrawnCursor>) -> bool {
+        cursor != self.last_cursor
     }
     pub fn render(
         &mut self,
@@ -863,56 +1036,58 @@ impl Window {
         offset: usize,
         selection: Option<Selection>,
         force: bool,
+        cursor: Option<DrawnCursor>,
     ) {
         let cols = terminal.cols();
         let rows = terminal.rows();
-        let cursor = terminal.cursor();
         let cursor_changed = cursor != self.last_cursor;
         if force {
-            let bg = self.color(DEFAULT_BG);
-            unsafe {
-                XftDrawRect(self.draw, &bg, 0, 0, self.width as u32, self.height as u32);
-            }
+            self.fill_background(
+                self.background,
+                true,
+                0,
+                0,
+                self.width as u32,
+                self.height as u32,
+            );
         }
         let mut changed = force;
         for row in 0..rows {
             if !(force
                 || terminal.row_dirty(row)
-                || (cursor_changed && (row == cursor.1 || row == self.last_cursor.1)))
+                || (cursor_changed
+                    && [cursor, self.last_cursor]
+                        .into_iter()
+                        .flatten()
+                        .any(|((_, y), _)| y == row)))
             {
                 continue;
             }
             changed = true;
-            let y = PAD + row as i32 * self.ch;
+            let y = self.padding + row as i32 * self.ch;
             let mut col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
                 let selected = selection.is_some_and(|s| s.contains(col, row, cols));
-                let (_, rgb) = Self::cell_colors(cell, selected);
+                let (_, rgb, translucent) = self.cell_colors(cell, selected);
                 let mut end = col + 1;
                 while end < cols {
                     let next = terminal.view_cell(end, row, offset);
-                    if Self::cell_colors(
-                        next,
-                        selection.is_some_and(|s| s.contains(end, row, cols)),
-                    )
-                    .1 != rgb
-                    {
+                    let (_, next_rgb, next_translucent) = self
+                        .cell_colors(next, selection.is_some_and(|s| s.contains(end, row, cols)));
+                    if (next_rgb, next_translucent) != (rgb, translucent) {
                         break;
                     }
                     end += 1;
                 }
-                let color = self.color(rgb);
-                unsafe {
-                    XftDrawRect(
-                        self.draw,
-                        &color,
-                        PAD + col as i32 * self.cw,
-                        y,
-                        ((end - col) as i32 * self.cw) as u32,
-                        self.ch as u32,
-                    );
-                }
+                self.fill_background(
+                    rgb,
+                    translucent,
+                    self.padding + col as i32 * self.cw,
+                    y,
+                    ((end - col) as i32 * self.cw) as u32,
+                    self.ch as u32,
+                );
                 col = end;
             }
             col = 0;
@@ -922,10 +1097,10 @@ impl Window {
                     col += 1;
                     continue;
                 }
-                let (fg, _) =
-                    Self::cell_colors(cell, selection.is_some_and(|s| s.contains(col, row, cols)));
+                let (fg, _, _) =
+                    self.cell_colors(cell, selection.is_some_and(|s| s.contains(col, row, cols)));
                 let color = self.color(fg);
-                let x = PAD + col as i32 * self.cw;
+                let x = self.padding + col as i32 * self.cw;
                 let baseline = y + unsafe { (*self.font).ascent } + 1;
                 let mut text = [0u8; 2048];
                 let mut len = 0;
@@ -949,11 +1124,13 @@ impl Window {
                             || next.combining != ['\0'; 2]
                             || next.flags != cell.flags
                             || next.link_id != cell.link_id
-                            || Self::cell_colors(
-                                next,
-                                selection.is_some_and(|s| s.contains(col + cells, row, cols)),
-                            )
-                            .0 != fg
+                            || self
+                                .cell_colors(
+                                    next,
+                                    selection.is_some_and(|s| s.contains(col + cells, row, cols)),
+                                )
+                                .0
+                                != fg
                         {
                             break;
                         }
@@ -993,18 +1170,8 @@ impl Window {
                 }
                 col += cells;
             }
-            if offset == 0 && row == cursor.1 && terminal.modes().cursor_visible {
-                let color = self.color(if self.focused { 0x8ab4f8 } else { 0x58687b });
-                unsafe {
-                    XftDrawRect(
-                        self.draw,
-                        &color,
-                        PAD + cursor.0.min(cols - 1) as i32 * self.cw,
-                        y + self.ch - 2,
-                        self.cw as u32,
-                        2,
-                    );
-                }
+            if let Some(((column, _), shape)) = cursor.filter(|((_, y), _)| *y == row) {
+                self.draw_cursor(terminal, column.min(cols - 1), row, y, shape);
             }
             // Publish complete rows from the retained pixmap; an expose can
             // redraw without reparsing or moving terminal screen contents.
@@ -1047,6 +1214,59 @@ impl Window {
         self.last_cursor = cursor;
         terminal.clear_dirty();
     }
+    fn draw_cursor(
+        &mut self,
+        terminal: &Terminal,
+        column: usize,
+        row: usize,
+        y: i32,
+        shape: CursorShape,
+    ) {
+        let cell = terminal.cell(column, row);
+        let rgb = if self.focused {
+            self.cursor_color
+        } else {
+            ((self.cursor_color & 0xfefefe) >> 1) + ((self.background & 0xfefefe) >> 1)
+        };
+        let color = self.color(rgb);
+        let x = self.padding + column as i32 * self.cw;
+        let (top, width, height) = match shape {
+            CursorShape::Block => (y, self.cw * i32::from(cell.width.max(1)), self.ch),
+            CursorShape::Underline => (y + self.ch - 2, self.cw, 2),
+            CursorShape::Bar => (y, self.cw.min(2), self.ch),
+        };
+        unsafe { XftDrawRect(self.draw, &color, x, top, width as u32, height as u32) };
+        if shape == CursorShape::Block && cell.width > 0 && cell.flags & HIDDEN == 0 {
+            let contrast =
+                if ((rgb >> 16) * 299 + ((rgb >> 8) & 255) * 587 + (rgb & 255) * 114) >= 128000 {
+                    0x000000
+                } else {
+                    0xffffff
+                };
+            let fg = self.color(contrast);
+            let font = self.glyph_font(cell.ch);
+            let mut bytes = [0; 12];
+            let mut len = 0;
+            for ch in [cell.ch, cell.combining[0], cell.combining[1]] {
+                if ch != '\0' {
+                    len += ch.encode_utf8(&mut bytes[len..]).len();
+                }
+            }
+            let baseline = y + unsafe { (*self.font).ascent } + 1;
+            unsafe {
+                XftDrawStringUtf8(
+                    self.draw,
+                    &fg,
+                    font,
+                    x,
+                    baseline,
+                    bytes.as_ptr(),
+                    len as i32,
+                )
+            };
+        }
+    }
+
     pub fn copy(&mut self, text: String, primary: bool) {
         let selection = if primary {
             self.primary_text = text;

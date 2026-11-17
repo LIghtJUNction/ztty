@@ -12,6 +12,7 @@ coverage below distinguishes implementation from environments actually tested.
 | Kitty keyboard | Flags 1/2/4/8/16, event reports, shifted alternatives, associated text, independent screen stacks; the frontend does not supply a base-layout alternative |
 | Mouse | DEC 1000/1002/1003 tracking; legacy and SGR 1006 encoding |
 | Focus | DEC 1004 |
+| Cursor appearance | DECSCUSR block, underline, and bar with steady or blinking variants; DEC private modes 12 and 25 |
 | Bracketed paste | DEC 2004; bounded paste with control-character sanitization |
 | Synchronized output | DEC 2026, DECRQM, retained last frame, 150 ms recovery timeout |
 | OSC 0/2 | Window title |
@@ -26,15 +27,15 @@ OSC 52, Sixel, Kitty graphics, native Wayland text-input protocols, complex
 script shaping, full emoji ZWJ grapheme layout, and history reflow are outside
 the current release. Each cell can retain two combining scalars; additional
 scalars are ignored. Core state can retain an italic attribute, while the
-initial renderer uses the configured face. Blink does not add a redraw timer.
+initial renderer uses the configured face. Text blink attributes are not animated. Cursor blink redraws its row when focused and visible.
 
 ## Acceptance coverage
 
-The automated suite has passed 11 checks under an isolated Xvfb/X11 server:
+The automated suite has passed 12 checks under an isolated Xvfb/X11 server:
 legacy keyboard input; Kitty disambiguation; all five Kitty flags with modifier,
 repeat, and release events; resize and SIGWINCH; ASCII/CJK selection and clipboard;
 bracketed paste with control stripping; a 139,264-byte paste under backpressure;
-SGR mouse input; Shift gesture ownership; explicit OSC 8 opening; and synchronized
+SGR mouse input; Shift gesture ownership; explicit OSC 8 opening; configured ARGB background and cursor rendering; and synchronized
 output across writes and Expose events. The large-paste assertion includes the
 12 bytes of bracketed-paste delimiters, for 139,276 delivered bytes.
 

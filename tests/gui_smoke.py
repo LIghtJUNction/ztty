@@ -87,8 +87,15 @@ class Gui:
         environment["PATH"] = str(executable_dir) + os.pathsep + environment.get("PATH", "")
         environment["ZTTY_GUI_OPEN_LOG"] = str(self.directory / "opened.jsonl")
         socket_path = self.directory / "control.sock"
+        config = self.directory / "ztty.conf"
+        config.write_text(
+            "window-padding = 12\nbackground = #203040\nbackground-opacity = 75\n"
+            "palette = 1=#c04060\ncursor-color = #e0c080\n"
+            "cursor-shape = bar\ncursor-blink-interval = 150\n",
+            encoding="utf-8",
+        )
         self.terminal = subprocess.Popen(
-            [str(binary), "--font", font, "--geometry", "120x32", "-e", sys.executable,
+            [str(binary), "--config", str(config), "--font", font, "--geometry", "120x32", "-e", sys.executable,
              str(ROOT / "tests/gui_child.py"), "--socket", str(socket_path),
              "--log", str(self.directory / "child.jsonl")],
             env=environment, stdout=subprocess.DEVNULL, stderr=self.tlog,
@@ -582,6 +589,40 @@ def synchronized_output(gui):
     return {"separate_pty_writes": 3, "expose_retained_previous_frame": True}
 
 
+def appearance_and_cursor(gui):
+    gui.reset()
+    assert gui.window.get_geometry().depth == 32
+    hint = gui.d.intern_atom("_KDE_NET_WM_BLUR_BEHIND_REGION")
+    prop = gui.window.get_full_property(hint, gui.Xatom.CARDINAL)
+    assert prop is not None and prop.format == 32 and len(prop.value) == 0
+
+    def pixel(x, y):
+        data = gui.window.get_image(x, y, 1, 1, gui.X.ZPixmap, 0xffffffff).data
+        return tuple(data[2::-1]) + (data[3],)
+
+    x, y = 12, 12
+    background = (24, 36, 48, 191)
+    cursor = (224, 192, 128, 255)
+    gui.emit("\x1b[?25h")
+    gui.wait(lambda: pixel(x, y) == cursor, "configured bar cursor appears")
+    assert pixel(x + gui.cw - 1, y) == background
+    gui.wait(lambda: pixel(x, y) == background, "cursor blinks off")
+    gui.wait(lambda: pixel(x, y) == cursor, "cursor blinks on again")
+
+    gui.emit("\x1b[2 q")
+    gui.wait(lambda: pixel(x + gui.cw - 1, y) == cursor, "DECSCUSR steady block")
+    deadline = time.monotonic() + 0.35
+    while time.monotonic() < deadline:
+        assert pixel(x, y) == cursor, "steady cursor blinked"
+        time.sleep(0.02)
+    gui.emit("\x1b[?25l\x1b[41m \x1b[49m \x1b[48;2;32;48;64m \x1b[44m \x1b[0m")
+    gui.wait(lambda: pixel(x, y) == (192, 64, 96, 255), "opaque customized ANSI background")
+    assert pixel(x + gui.cw, y) == background
+    assert pixel(x + 2 * gui.cw, y) == (32, 48, 64, 255)
+    assert pixel(x + 3 * gui.cw, y) == (145, 181, 241, 255)
+    return {"argb_depth": 32, "background_alpha": 191, "cursor_phases_verified": True}
+
+
 def preview(gui, output):
     gui.reset()
     gui.window.configure(width=112 * gui.cw + 24, height=28 * gui.ch + 24)
@@ -624,7 +665,7 @@ def main():
     result = {"schema": 1, "ok": False, "binary": str(args.binary.resolve()), "display": "owned Xvfb", "checks": []}
     tests = [legacy_keyboard, kitty_disambiguation, kitty_events_and_text, resize_signal,
              selection_clipboard, clipboard_bracketed_paste, large_paste_backpressure,
-             sgr_mouse_drag, shift_selection_release, osc8_open, synchronized_output]
+             sgr_mouse_drag, shift_selection_release, osc8_open, synchronized_output, appearance_and_cursor]
     gui = None
     with tempfile.TemporaryDirectory(prefix="ztty-gui-") as directory:
         try:
