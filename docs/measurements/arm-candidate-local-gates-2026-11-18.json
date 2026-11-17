@@ -1,0 +1,61 @@
+{
+  "exit_code": 0,
+  "duration_seconds": 11.485,
+  "source_sha": "799b95752b36853bee1aa49d771ecf4ce21a74d8",
+  "dirty_files": [
+    " M .github/workflows/release.yml",
+    " M src/main.rs",
+    " M src/session.rs",
+    " M tests/windows_native.py",
+    "?? src/working_directory.rs",
+    "?? tests/working_directory.rs"
+  ],
+  "log": "docs/measurements/arm-candidate-local-gates-2026-11-18.log",
+  "sha256": "2570067f7137db0529d309de7b4fd7d8d0608015ddb88ec9e7f15890b648af2c",
+  "rust_tests_passed": 174,
+  "tested_production_source_sha256": {
+    "src/actions.rs": "8650d63e1fa4543a1ee7d6a1fb0e340c5bcfb6d7fc48ecb828f2125dc853e075",
+    "src/appearance.rs": "19907be84aa48ba316c99f75f85b0847200d4e7ed9eb82eef0e9e9471cbd98fb",
+    "src/broker.rs": "46568ce102ef93cbe4d3a3659e669a4ced44fad8c2350fa7b4d4260fb8a74e16",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "src/json.rs": "8dc363b989aafb3cf5e94a9b734270afd4b20c0192ed86a1189757d7dd681f36",
+    "src/layout.rs": "2a9a06a49c3bb3eaca3a4d57dd376be888898c5ee0870295a13ab9708e1e485e",
+    "src/main.rs": "6af9fbf389b6e4aa29f41b09fe91aef2b1dccc77590719972cd3b93df621f5ff",
+    "src/mcp.rs": "ba72199de9284ac0b67cd9a6dbb395d196808032830d6a57ed381ba34bac67ef",
+    "src/mcp_http.rs": "c7b4bd585d6091c4403bb646acf3b58265282cecce52f9dc46b1d09fa0b4b78e",
+    "src/os.rs": "e898d297a0f5f89b36a6a40ea6edb589a7a204e9951d8011ee0972f7349a794b",
+    "src/os_macos.rs": "3205fb0568f20f8aa25c6a32928469d96865741e328b64f5acc8b8671eee4505",
+    "src/os_windows.rs": "93d68d994f7e25fcb9406cb4752b7bc766b3154252e91d8b7fd5360fe8b42e18",
+    "src/search.rs": "6262c89f7260ea534f23e258e27fc0362e24bc43b6269f6978a02d216f1b2ee6",
+    "src/session.rs": "059af2698cd8015d7d74f6c64d4c44565909ddb92a391a1c250aeacdc1e6457a",
+    "src/working_directory.rs": "2536b043f536c180b5bb00395c4f5d0dac9c21c2c57a8449cf5b17f454385d21",
+    "src/workspace_state.rs": "2ccd9f84dee4edb6bf4bf68142e75483f925a3342163efac921d6816365f5b48",
+    "src/x11.rs": "587410686c51358e759310b69061113c62ed7eb953c01c5195cf5a0e96853825"
+  },
+  "working_directory_regression": {
+    "exit_code": 0,
+    "running": false,
+    "stderr": "   Compiling ztty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.56s\n     Running tests/working_directory.rs (target/debug/build/ztty/78bfaebf73efae8f/out/working_directory-78bfaebf73efae8f)\n",
+    "stdout": "\nrunning 4 tests\ntest failed_target_preserves_cwd_errno_and_descriptor_count ... ok\ntest saved_directory_failure_reports_original_emfile_before_target_lookup ... ok\ntest search_only_original_directory_can_be_saved_and_restored ... ok\ntest switches_restores_and_closes_a_cloexec_path_handle ... ok\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--test",
+      "working_directory",
+      "--",
+      "--test-threads=1"
+    ],
+    "uid": 1000,
+    "machine": "x86_64",
+    "source_commit": "799b95752b36853bee1aa49d771ecf4ce21a74d8",
+    "source_sha256": {
+      "src/working_directory.rs": "2536b043f536c180b5bb00395c4f5d0dac9c21c2c57a8449cf5b17f454385d21",
+      "tests/working_directory.rs": "4a520097f2f05d689289107652f910727196b93541df85df81755c099cd84b58",
+      "src/main.rs": "6af9fbf389b6e4aa29f41b09fe91aef2b1dccc77590719972cd3b93df621f5ff",
+      "src/session.rs": "369eb1eca3534ee71425e3407383b39a87188967aada97a0f732800471fdb523",
+      ".github/workflows/release.yml": "28a3610a4795b4ba0b692112bbb4fe04d7655d7ce372d35fc97cdcc494676cd0"
+    }
+  },
+  "source_patch_sha256": "32496b995a2f313c430b2af2f595bad49e841e54a7609d35f14d349f5781a585"
+}

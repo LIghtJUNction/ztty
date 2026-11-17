@@ -22,6 +22,8 @@
 
 ### Fixed
 
+- Linux sessions save cwd with portable O_PATH/CLOEXEC flags, fixing ARM64 startup and supporting search-only original directories; save and enter failures retain their own errno.
+- Windows native pixel gates verify on-screen ownership and clipping, record resize-stage PNGs and report the actual final RGB without relaxing color or timeout requirements.
 - Custom benchmark charts now link their actual raw-data path; renderer-only updates preserve collection identity and historical evidence.
 - Closing a newly launched observer retires its own viewer child, allowing the next ssmcp task to reopen visibly; attaching to an existing session still preserves that session on close.
 - Config reload reconnects without losing a directory created before its ancestor watch is installed; deterministic real inotify regressions prove the old failure and the repaired behavior.

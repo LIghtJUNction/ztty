@@ -60,6 +60,23 @@ def sixel(width, height, indices, palette, transparent=True):
     return b"\x1bP7;" + (b"1" if transparent else b"0") + b"q" + body + b"\x1b\\"
 
 
+class NativePoint(ctypes.Structure):
+    _fields_ = [("x", ctypes.c_int32), ("y", ctypes.c_int32)]
+
+
+class NativeRect(ctypes.Structure):
+    _fields_ = [(name, ctypes.c_int32) for name in ("left", "top", "right", "bottom")]
+
+
+class MonitorInfo(ctypes.Structure):
+    _fields_ = [("size", ctypes.c_uint32), ("monitor", NativeRect),
+                ("work", NativeRect), ("flags", ctypes.c_uint32)]
+
+
+def rect_values(rect):
+    return [rect.left, rect.top, rect.right, rect.bottom]
+
+
 class BitmapInfoHeader(ctypes.Structure):
     _fields_ = [("size", ctypes.c_uint32), ("width", ctypes.c_int32),
                 ("height", ctypes.c_int32), ("planes", ctypes.c_uint16),
@@ -94,6 +111,8 @@ def capture_window(user, gdi, hwnd, expected_pid, path):
     gdi.BitBlt.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int,
                          wintypes.HDC, ctypes.c_int, ctypes.c_int, wintypes.DWORD]
     gdi.BitBlt.restype = wintypes.BOOL
+    gdi.PatBlt.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_int, wintypes.DWORD]
+    gdi.PatBlt.restype = wintypes.BOOL
     gdi.GetDIBits.argtypes = [wintypes.HDC, wintypes.HANDLE, wintypes.UINT, wintypes.UINT,
                              ctypes.c_void_p, ctypes.POINTER(BitmapInfo), wintypes.UINT]
     gdi.GetDIBits.restype = ctypes.c_int
@@ -116,6 +135,11 @@ def capture_window(user, gdi, hwnd, expected_pid, path):
         if not previous or previous == ctypes.c_void_p(-1).value:
             previous = None
             raise OSError("SelectObject failed")
+        # A clipped source must not expose uninitialized compatible-bitmap
+        # memory in failure evidence. Pixel assertions independently require
+        # each sample to be visible and owned by this window.
+        if not gdi.PatBlt(memory, 0, 0, width, height, 0x00000042):
+            raise OSError("clearing the capture bitmap failed")
         # SRCCOPY excludes other layered windows; the source is this HWND's DC.
         if not gdi.BitBlt(memory, 0, 0, width, height, dc, 0, 0, 0x00CC0020):
             raise OSError(f"BitBlt failed: Win32 error {ctypes.get_last_error()}")
@@ -266,6 +290,28 @@ def run(binary, output, expected_arch=None):
     user.SetForegroundWindow.argtypes = [wintypes.HWND]
     gdi.GetPixel.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
     gdi.GetPixel.restype = wintypes.DWORD
+    user.ClientToScreen.argtypes = [wintypes.HWND, ctypes.POINTER(NativePoint)]
+    user.ClientToScreen.restype = wintypes.BOOL
+    user.MonitorFromWindow.argtypes = [wintypes.HWND, wintypes.DWORD]
+    user.MonitorFromWindow.restype = wintypes.HANDLE
+    user.GetMonitorInfoW.argtypes = [wintypes.HANDLE, ctypes.POINTER(MonitorInfo)]
+    user.GetMonitorInfoW.restype = wintypes.BOOL
+    user.WindowFromPoint.argtypes = [NativePoint]
+    user.WindowFromPoint.restype = wintypes.HWND
+    user.GetAncestor.argtypes = [wintypes.HWND, wintypes.UINT]
+    user.GetAncestor.restype = wintypes.HWND
+    user.GetForegroundWindow.argtypes = []
+    user.GetForegroundWindow.restype = wintypes.HWND
+    user.IsWindowVisible.argtypes = [wintypes.HWND]
+    user.IsWindowVisible.restype = wintypes.BOOL
+    user.IsIconic.argtypes = [wintypes.HWND]
+    user.IsIconic.restype = wintypes.BOOL
+    user.GetDpiForWindow.argtypes = [wintypes.HWND]
+    user.GetDpiForWindow.restype = wintypes.UINT
+    gdi.GetClipBox.argtypes = [wintypes.HDC, ctypes.POINTER(wintypes.RECT)]
+    gdi.GetClipBox.restype = ctypes.c_int
+    gdi.PtVisible.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
+    gdi.PtVisible.restype = wintypes.BOOL
     user.SetProcessDPIAware()
     checks = []
     process = None
@@ -273,6 +319,84 @@ def run(binary, output, expected_arch=None):
     report = {"platform": sys.platform, "binary": str(binary.resolve()),
               "transport": "real ConPTY", "renderer": "Win32 retained DIB",
               "checks": checks, "passed": False}
+    def window_pid(window):
+        pid = wintypes.DWORD()
+        if window:
+            user.GetWindowThreadProcessId(window, ctypes.byref(pid))
+        return pid.value
+
+    def screen_point(x, y):
+        point = NativePoint(int(x), int(y))
+        if not user.ClientToScreen(hwnd, ctypes.byref(point)):
+            raise OSError("ClientToScreen failed")
+        return point
+
+    def window_geometry(samples=()):
+        client, outer, clip = wintypes.RECT(), wintypes.RECT(), wintypes.RECT()
+        if not user.GetClientRect(hwnd, ctypes.byref(client)) or not user.GetWindowRect(hwnd, ctypes.byref(outer)):
+            raise OSError("cannot read native window geometry")
+        top_left = screen_point(0, 0)
+        bottom_right = screen_point(client.right, client.bottom)
+        monitor = user.MonitorFromWindow(hwnd, 2)
+        info = MonitorInfo()
+        info.size = ctypes.sizeof(MonitorInfo)
+        if not monitor or not user.GetMonitorInfoW(monitor, ctypes.byref(info)):
+            raise OSError("cannot read native monitor work area")
+        dc = user.GetDC(hwnd)
+        if not dc:
+            raise OSError("cannot inspect native window DC")
+        try:
+            clip_type = gdi.GetClipBox(dc, ctypes.byref(clip))
+            points = []
+            for x, y in samples:
+                screen = screen_point(x, y)
+                hit = user.WindowFromPoint(screen)
+                root_window = user.GetAncestor(hit, 2) if hit else None
+                color = int(gdi.GetPixel(dc, int(x), int(y)))
+                points.append({"client": [int(x), int(y)], "screen": [screen.x, screen.y],
+                               "point_visible": bool(gdi.PtVisible(dc, int(x), int(y))),
+                               "window_from_point": int(hit or 0), "root_window": int(root_window or 0),
+                               "window_from_point_pid": window_pid(hit),
+                               "owned_window_at_point": root_window == hwnd and window_pid(hit) == process.pid,
+                               "rgb": None if color == 0xFFFFFFFF else
+                               [color & 255, (color >> 8) & 255, (color >> 16) & 255]})
+        finally:
+            user.ReleaseDC(hwnd, dc)
+        return {"client": rect_values(client), "outer": rect_values(outer),
+                "client_screen": [top_left.x, top_left.y, bottom_right.x, bottom_right.y],
+                "dpi": int(user.GetDpiForWindow(hwnd)), "visible": bool(user.IsWindowVisible(hwnd)),
+                "minimized": bool(user.IsIconic(hwnd)), "window_pid": window_pid(hwnd),
+                "foreground_pid": window_pid(user.GetForegroundWindow()),
+                "monitor": {"rect": rect_values(info.monitor), "work": rect_values(info.work),
+                            "primary": bool(info.flags & 1)},
+                "clip_type": clip_type, "clip_box": rect_values(clip), "samples": points}
+
+    def place_owned_window():
+        before = window_geometry()
+        if before["window_pid"] != process.pid:
+            raise AssertionError("native test window changed ownership")
+        left, top, right, bottom = before["monitor"]["work"]
+        outer = before["outer"]
+        width, height = outer[2] - outer[0], outer[3] - outer[1]
+        if width > right - left or height > bottom - top:
+            raise AssertionError("test window does not fit the monitor work area")
+        x = left + min(32, (right - left - width) // 2)
+        y = top + min(32, (bottom - top - height) // 2)
+        # Move only this new test window, without resizing or activating another
+        # process. Topmost placement keeps GetPixel away from unrelated windows.
+        if not user.SetWindowPos(hwnd, ctypes.c_void_p(-1), x, y, 0, 0, 0x0011):
+            raise OSError("cannot place the owned test window inside its monitor")
+
+        def visible_inside_work_area():
+            state = window_geometry()
+            bounds = state["client_screen"]
+            return (state["visible"] and not state["minimized"] and
+                    left <= bounds[0] < bounds[2] <= right and top <= bounds[1] < bounds[3] <= bottom)
+
+        wait_for(visible_inside_work_area, "owned native window visible inside monitor work area")
+        report["window_placement"] = {"before": before, "placed": window_geometry(),
+                                      "requested_topmost": True, "position": [x, y]}
+
     try:
         interpreter = process_architecture()
         machine = interpreter["native_machine"]
@@ -321,6 +445,7 @@ def run(binary, output, expected_arch=None):
                 return matches[0] if matches else None
 
             hwnd = wait_for(find_window, "native ztty window")
+            place_owned_window()
             user.SetForegroundWindow(hwnd)
             wait_for(lambda: (directory / "ready").exists(), "Unicode command arguments and ConPTY child")
             checks.append({"name": "unicode_arguments_and_native_child", "passed": True})
@@ -330,6 +455,17 @@ def run(binary, output, expected_arch=None):
             assert cw > 0 and ch > 0
             report["client_pixels"] = [rect.right, rect.bottom]
             report["cell_pixels"] = [cw, ch]
+            def record_resize(stage):
+                state = {"monotonic_seconds": time.monotonic()}
+                try:
+                    state.update(window_geometry([(19.5 * cw, 1.5 * ch), (15.5 * cw, 1.5 * ch)]))
+                    state["screenshot"] = capture_window(
+                        user, gdi, hwnd, process.pid,
+                        output.with_name(output.stem + f".resize-{stage}.png"))
+                except Exception as error:
+                    state["diagnostic_error"] = repr(error)
+                report.setdefault("resize_stages", {})[stage] = state
+
             sequence = 0
 
             def send(data):
@@ -345,6 +481,12 @@ def run(binary, output, expected_arch=None):
                 dc = user.GetDC(hwnd)
                 assert dc
                 try:
+                    screen = screen_point(x, y)
+                    hit = user.WindowFromPoint(screen)
+                    root_window = user.GetAncestor(hit, 2) if hit else None
+                    if (root_window != hwnd or window_pid(hit) != process.pid or
+                            not gdi.PtVisible(dc, int(x), int(y))):
+                        raise OSError(f"sample ({int(x)}, {int(y)}) is clipped or covered by another window")
                     rgb = int(gdi.GetPixel(dc, int(x), int(y)))
                     if rgb == 0xFFFFFFFF:
                         raise AssertionError("GetPixel failed")
@@ -380,7 +522,17 @@ def run(binary, output, expected_arch=None):
                     actual = pixel(col, row)
                     return all(abs(a - b) <= 1 for a, b in zip(actual, expected))
 
-                wait_for(matches, f"{name}: expected {expected}, last {actual}")
+                try:
+                    wait_for(matches, name)
+                except AssertionError as error:
+                    failure = {"name": name, "expected": expected, "actual": actual,
+                               "client_sample": [int(col * cw), int(row * ch)]}
+                    try:
+                        failure["window"] = window_geometry([(col * cw, row * ch)])
+                    except Exception as diagnostic_error:
+                        failure["diagnostic_error"] = repr(diagnostic_error)
+                    report["failed_pixel"] = failure
+                    raise AssertionError(f"{name}: expected {expected}, last RGB {actual}; {error}") from error
                 checks.append({"name": name, "passed": True, "pixel": actual})
 
             rgba = bytes([255, 0, 0, 255, 0, 255, 0, 128,
@@ -411,20 +563,29 @@ def run(binary, output, expected_arch=None):
             send(kitty("a=d,d=I,i=47,q=2"))
             send(b"\x1b[2;20H" + kitty("a=T,f=32,s=2,v=2,i=42,c=4,r=2,C=1,q=2", rgba))
             expect("right_edge_clips_image", 19.5, 1.5, [255, 0, 0])
+            record_resize("before")
             outer = wintypes.RECT()
             assert user.GetWindowRect(hwnd, ctypes.byref(outer))
             old_width, old_height = outer.right - outer.left, outer.bottom - outer.top
             assert user.SetWindowPos(hwnd, None, 0, 0, old_width - 4 * cw, old_height, 0x16)
 
-            def resized():
+            def resized(columns):
                 current = wintypes.RECT()
-                user.GetClientRect(hwnd, ctypes.byref(current))
-                return current.right == 16 * cw
+                if not user.GetClientRect(hwnd, ctypes.byref(current)):
+                    raise OSError("cannot read client geometry after resize")
+                return current.right == columns * cw and current.bottom == 10 * ch
 
-            wait_for(resized, "native client resize")
-            expect("resize_clips_without_ghosts", 15.5, 1.5, [16, 24, 32])
+            try:
+                wait_for(lambda: resized(16), "native client resize")
+                expect("resize_clips_without_ghosts", 15.5, 1.5, [16, 24, 32])
+            finally:
+                record_resize("shrunk")
             assert user.SetWindowPos(hwnd, None, 0, 0, old_width, old_height, 0x16)
-            expect("resize_restores_visible_image", 19.5, 1.5, [255, 0, 0])
+            try:
+                wait_for(lambda: resized(20), "native client restore to original geometry")
+                expect("resize_restores_visible_image", 19.5, 1.5, [255, 0, 0])
+            finally:
+                record_resize("restored")
             # Sixel must traverse the actual ConPTY and draw native pixels.
             # A child "done" file only acknowledges its write; each vector also
             # waits for pixels read from our HWND rather than assuming a delay.
@@ -496,6 +657,8 @@ def run(binary, output, expected_arch=None):
                      and keyboard_marker in (directory / "keyboard.bin").read_bytes(),
                      "keyboard input after malformed and incomplete images")
             checks.append({"name": "keyboard_recovers_after_malformed_graphics", "passed": True})
+            assert all("screenshot" in report.get("resize_stages", {}).get(stage, {})
+                       for stage in ("before", "shrunk", "restored")), "resize evidence capture failed"
             assert process.poll() is None, "ztty exited unexpectedly"
             report["passed"] = True
     except BaseException as error:
