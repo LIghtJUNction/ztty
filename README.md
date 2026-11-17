@@ -1,12 +1,13 @@
 # ztty
 
 <!-- terminal-benchmark:start -->
-[![Recorded 10-terminal memory comparison](docs/benchmarks/terminals-10-windows.svg)](docs/benchmarks/verification-2026-11-18.md)
+[![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 
-Ten terminals per app. [Raw measurements](docs/benchmarks/terminals-10-windows.json) · [Conditions and limits](docs/benchmarks/verification-2026-11-18.md) · rerun from current source: `make benchmark-terminals`.
+Three fresh-process runs per cell, at 1 and 10 shared idle windows; the figure shows 10. [Raw measurements](docs/benchmarks/guarded-idle-1-10-2026-11-18.json) · [Conditions, provenance and limits](docs/benchmarks/guarded-idle-1-10-2026-11-18.md) · rerun from current source: `make benchmark-terminals`.
 
-Read the recorded host load and Swap alongside RSS/PSS. The archived baseline was collected under resource contention; it does not establish a quiet-host ranking. X server resources are separate; real GPU memory and input-to-display latency are not measured by the DSR probe.
-Display-server ownership was not verified in this historical baseline. Current runs use a guarded private X server; treat the server-attributed figures here as provisional until the guarded rerun.
+Measured source: `fa2f2017`; immutable binary: `a339a7d2…1b6d4d`. All 18 scenarios verified their private Xvfb listener ownership and cleaned up their owned processes. A single ztty terminal used **22.02 MiB RSS**; the below-10-MiB target remains unmet.
+
+Linux software-X11 results: host load1 4.46–10.58 on 24 CPUs, with 17.34–17.96 GiB host swap already in use. RSS, PSS and Swap remain separate. Real GPU memory, first presented frame and input-to-display latency were not measured; the guarded 5/20-window, independent-instance and remaining-workload matrix is still incomplete.
 
 <!-- terminal-benchmark:end -->
 

@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import tempfile
 import unittest
 from unittest.mock import patch
 import xml.etree.ElementTree as ET
@@ -177,10 +178,31 @@ class PublicationTests(unittest.TestCase):
     def test_overview_uses_only_ten_shared_idle_windows(self):
         data = report(counts=(1, 10), modes=bench.MODES, workloads=("idle", "history"))
         self.assertTrue(bench.overview_available(data))
-        svg = bench.svg_document(data)
-        ET.fromstring(svg)
+        svg = bench.svg_document(data, Path("reports/<run&>.json"))
+        tree = ET.fromstring(svg)
         self.assertIn("10 windows. Shared instances.", svg)
+        self.assertIn("reports/&lt;run&amp;&gt;.json", svg)
+        self.assertIn("reports/<run&>.json", "".join(tree.itertext()))
+        self.assertNotIn("docs/benchmarks/terminals-10-windows.json", svg)
+        self.assertIn("docs/benchmarks/terminals-10-windows.json", bench.svg_document(data))
         ET.fromstring(bench.scaling_svg_document(data))
+        # A reviewed dated graph must not break the next normal publication.
+        start, end = "<!-- terminal-benchmark:start -->", "<!-- terminal-benchmark:end -->"
+        with tempfile.TemporaryDirectory() as directory:
+            temporary = Path(directory)
+            for name in ("README.md", "README.zh-CN.md"):
+                (temporary / name).write_text(
+                    f"# ztty\n\n{start}\n![Dated](guarded-dated.svg)\n{end}\n\nKeep this project text.\n")
+            with patch.object(bench, "ROOT", temporary):
+                bench.update_readmes(3)
+            for name in ("README.md", "README.zh-CN.md"):
+                text = (temporary / name).read_text()
+                self.assertEqual(text.count(start), 1)
+                self.assertEqual(text.count(end), 1)
+                self.assertIn("docs/benchmarks/terminals-10-windows.svg", text)
+                self.assertIn("docs/benchmarks/terminals-10-windows.json", text)
+                self.assertNotIn("guarded-dated.svg", text)
+                self.assertTrue(text.endswith("\n\nKeep this project text.\n"))
 
     def test_partial_smoke_dataset_never_publishes_ten_window_claim(self):
         data = report(counts=(1,), repetitions=1)

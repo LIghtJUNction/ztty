@@ -1,12 +1,13 @@
 # ztty
 
 <!-- terminal-benchmark:start -->
-[![10 个终端的实测内存对比](docs/benchmarks/terminals-10-windows.svg)](docs/benchmarks/verification-2026-11-18.md)
+[![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 
-每个应用开启 10 个终端。[原始测量](docs/benchmarks/terminals-10-windows.json) · [条件与限制](docs/benchmarks/verification-2026-11-18.md) · 从当前源码重新构建并测量：`make benchmark-terminals`。
+本次测量 1、10 个共享空闲终端，每格独立启动 3 轮取中位数；图中展示 10 终端结果。[原始数据](docs/benchmarks/guarded-idle-1-10-2026-11-18.json) · [条件、来源与限制](docs/benchmarks/guarded-idle-1-10-2026-11-18.md) · 从当前源码重新构建并测量：`make benchmark-terminals`。
 
-请同时检查主机负载和 Swap，区分 RSS 与 PSS。当前存档基线处于资源竞争环境，不能作为安静环境下的性能排名；X server 资源另计，DSR 探针不测量真实 GPU 显存或输入到显示延迟。
-此历史基线未核验 X 显示服务的套接字归属。新脚本已使用受保护的独立显示服务；在重新运行前，涉及显示服务的归因数值仍属暂定。
+实测源码为 `fa2f2017`，固定二进制为 `a339a7d2…1b6d4d`。18 个场景均核验了独立 Xvfb 监听端点归属，并完成所属进程清理。单个 ztty 终端实测 **22.02 MiB RSS**，尚未达到低于 10 MiB 的目标。
+
+范围为 Linux 软件 X11 渲染：24 个逻辑 CPU，主机 load1 为 4.46–10.58，已有 Swap 占用为 17.34–17.96 GiB。RSS、PSS、Swap 分开报告；真实 GPU 显存、首个显示帧和输入到显示延迟未测。具备显示归属核验的 5/20 终端、独立进程及其他负载矩阵仍未补齐。
 
 <!-- terminal-benchmark:end -->
 

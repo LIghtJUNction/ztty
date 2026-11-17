@@ -4,6 +4,7 @@
 
 ### Added
 
+- Three-run guarded 1/10-window benchmark evidence and README charts, including measured RSS/PSS/Swap, source hashes, the unmet 10 MiB RSS target and the PTY throughput gap.
 - Linux standalone `--observe` command windows and the `ztty-observer` external-terminal adapter; `close NAME` follows existing input ownership authorization.
 - Linux x86_64/ARM64 release gates now require four real X11/PTY suites with source, executable and display ownership evidence; Windows ARM64 must execute natively.
 - Versioned Linux workspace snapshots restore live tabs, split ratios, focus and geometry without replacing PTYs; bounded schema/identity checks reject invalid layouts before UI mutation.
@@ -21,6 +22,7 @@
 
 ### Fixed
 
+- Custom benchmark charts now link their actual raw-data path; renderer-only updates preserve collection identity and historical evidence.
 - Closing a newly launched observer retires its own viewer child, allowing the next ssmcp task to reopen visibly; attaching to an existing session still preserves that session on close.
 - Config reload reconnects without losing a directory created before its ancestor watch is installed; deterministic real inotify regressions prove the old failure and the repaired behavior.
 - Native Linux evidence is archived and read back before staging cleanup, preserving the flat Release checksum contract; incomplete gates cannot produce accepted artifacts.
