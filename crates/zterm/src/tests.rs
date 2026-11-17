@@ -612,3 +612,21 @@ fn large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding
         assert_eq!(&line(&t, 1)[..2], "OK");
     }
 }
+
+#[test]
+fn x10_mouse_mode_negotiation_preserves_other_tracking_modes() {
+    let mut terminal = Terminal::new(20, 8, 0);
+    terminal.feed(b"\x1b[?9h\x1b[?9$p");
+    assert_eq!(terminal.modes().mouse_tracking, 9);
+    assert_eq!(terminal.responses(), b"\x1b[?9;1$y");
+    terminal.clear_responses();
+    terminal.feed(b"\x1b[?1002h\x1b[?9l\x1b[?9$p\x1b[?1002$p");
+    assert_eq!(terminal.modes().mouse_tracking, 1002);
+    assert_eq!(terminal.responses(), b"\x1b[?9;2$y\x1b[?1002;1$y");
+    terminal.feed(b"\x1b[?9h\x1b[?1002l");
+    assert_eq!(terminal.modes().mouse_tracking, 9);
+    terminal.feed(b"\x1b[?1000h\x1b[?9l");
+    assert_eq!(terminal.modes().mouse_tracking, 1000);
+    terminal.feed(b"\x1b[?1000l");
+    assert_eq!(terminal.modes().mouse_tracking, 0);
+}
