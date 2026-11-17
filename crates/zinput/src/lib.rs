@@ -24,7 +24,7 @@ pub struct Modes {
     pub bracketed_paste: bool,
     pub focus_events: bool,
     pub sgr_mouse: bool,
-    /// Zero disables tracking; supported values are 1000, 1002 and 1003.
+    /// Zero disables tracking; supported values are 9, 1000, 1002 and 1003.
     pub mouse_tracking: u16,
     /// Kitty progressive enhancement flags: 1, 2, 4, 8 and 16.
     pub kitty_keyboard: u8,
@@ -163,7 +163,10 @@ pub struct KeyAlternates {
     pub base_layout: Option<char>,
 }
 
-/// Mouse coordinates are zero-based; buttons are 0=left, 1=middle, 2=right.
+/// Mouse coordinates and button numbers are zero-based: 0=left, 1=middle,
+/// 2=right, 3/4=wheel up/down, 5/6=horizontal wheel, and 7..=10=extra buttons.
+/// Wheel releases/motion and buttons beyond xterm's unambiguous range are
+/// ignored. `Scroll` is a convenience alias for wheel up/down presses.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum MouseEvent {
     Press {
@@ -290,7 +293,12 @@ pub fn encode_key_with_alternates_into(
                 || modifiers.contains(Modifiers::CTRL | Modifiers::ALT)))
         || (events && !text_key && !legacy_exception)
         || (matches!(key, Key::Character(_))
-            && modifiers.contains(Modifiers::SUPER | Modifiers::HYPER | Modifiers::META));
+            && modifiers.contains(Modifiers::SUPER | Modifiers::HYPER | Modifiers::META))
+        // Kitty and Ghostty preserve Ctrl+Shift text-key shortcuts even in
+        // legacy mode. Space retains its documented C0/NUL exception.
+        || (matches!(key, Key::Character(c) if c != ' ' && printable(c))
+            && modifiers.0 & (Modifiers::CTRL | Modifiers::SHIFT)
+                == (Modifiers::CTRL | Modifiers::SHIFT));
 
     if event == KeyEvent::Release && (!events || !enhanced || (!all && legacy_exception)) {
         return;
@@ -302,8 +310,12 @@ pub fn encode_key_with_alternates_into(
                 && flags & REPORT_TEXT != 0
                 && event != KeyEvent::Release
                 && text.chars().any(printable);
-            // Text-producing keys omit lock state unless report-all is enabled.
-            let modifier = if all || !text_key || modifiers.contains(Modifiers::CTRL) {
+            // Legacy combinations omit lock state. Enhanced non-text/control
+            // keys retain it; report-all also retains it for text keys.
+            let modifier = if all
+                || (flags & (DISAMBIGUATE | REPORT_EVENTS) != 0
+                    && (!text_key || modifiers.contains(Modifiers::CTRL)))
+            {
                 modifiers.keyboard()
             } else {
                 modifiers.legacy_keyboard()
@@ -387,18 +399,41 @@ pub fn encode_mouse_into(
     modes: &Modes,
     output: &mut Vec<u8>,
 ) {
-    if !matches!(modes.mouse_tracking, 1000 | 1002 | 1003) {
+    if !matches!(modes.mouse_tracking, 9 | 1000 | 1002 | 1003) {
+        return;
+    }
+    let x10 = modes.mouse_tracking == 9;
+    if x10 && !matches!(event, MouseEvent::Press { button: 0..=2, .. }) {
         return;
     }
     let (button, col, row, release) = match event {
-        MouseEvent::Press { button, col, row } if button < 3 => (button, col, row, false),
-        MouseEvent::Release { button, col, row } if button < 3 => (button, col, row, true),
+        MouseEvent::Press { button, col, row } => {
+            let Some(button) = mouse_button(button) else {
+                return;
+            };
+            (button, col, row, false)
+        }
+        MouseEvent::Release { button, col, row } if !wheel_button(button) => {
+            let Some(button) = mouse_button(button) else {
+                return;
+            };
+            (button, col, row, true)
+        }
         MouseEvent::Motion { button, col, row }
             if (modes.mouse_tracking == 1003
                 || modes.mouse_tracking == 1002 && button.is_some())
-                && button.is_none_or(|b| b < 3) =>
+                && button.is_none_or(|b| !wheel_button(b)) =>
         {
-            (32 + button.unwrap_or(3), col, row, false)
+            let button = match button {
+                Some(button) => {
+                    let Some(button) = mouse_button(button) else {
+                        return;
+                    };
+                    button
+                }
+                None => 3,
+            };
+            (32 | button, col, row, false)
         }
         MouseEvent::Scroll { up, col, row } => (if up { 64 } else { 65 }, col, row, false),
         _ => return,
@@ -406,9 +441,10 @@ pub fn encode_mouse_into(
     let (Some(x), Some(y)) = (col.checked_add(1), row.checked_add(1)) else {
         return;
     };
+    let modifiers = if x10 { 0 } else { modifiers.mouse() };
     if modes.sgr_mouse {
         output.extend_from_slice(b"\x1b[<");
-        decimal((button | modifiers.mouse()) as usize, output);
+        decimal((button | modifiers) as usize, output);
         output.push(b';');
         decimal(x, output);
         output.push(b';');
@@ -420,11 +456,24 @@ pub fn encode_mouse_into(
             0x1b,
             b'[',
             b'M',
-            (button | modifiers.mouse()) + 32,
+            (button | modifiers) + 32,
             x as u8 + 32,
             y as u8 + 32,
         ]);
     }
+}
+
+fn wheel_button(button: u8) -> bool {
+    (3..=6).contains(&button)
+}
+
+fn mouse_button(button: u8) -> Option<u8> {
+    Some(match button {
+        0..=2 => button,
+        3..=6 => 64 + button - 3,
+        7..=10 => 128 + button - 7,
+        _ => return None,
+    })
 }
 
 /// Encode application focus changes if DEC mode 1004 is enabled.
@@ -686,7 +735,7 @@ fn control(c: char) -> Option<u8> {
         '[' | '3' => Some(27),
         '\\' | '4' => Some(28),
         ']' | '5' => Some(29),
-        '^' | '6' => Some(30),
+        '^' | '~' | '6' => Some(30),
         '_' | '/' | '7' => Some(31),
         '?' | '8' => Some(127),
         _ => None,
@@ -1139,5 +1188,400 @@ mod tests {
         encode_key_into(Key::Up, Modifiers(0), KeyEvent::Press, "", &m, &mut buffer);
         assert_eq!(buffer, b"prefix\x1b[A");
         assert_eq!(buffer.capacity(), capacity);
+    }
+
+    #[test]
+    fn legacy_ctrl_shift_shortcuts_do_not_collapse_to_control_characters() {
+        for flags in [0, REPORT_ALTERNATES, REPORT_TEXT] {
+            let m = modes(flags);
+            for (key, expected) in [
+                ('i', b"\x1b[105;6u".as_slice()),
+                ('3', b"\x1b[51;6u".as_slice()),
+                (';', b"\x1b[59;6u".as_slice()),
+            ] {
+                for locks in [0, Modifiers::CAPS_LOCK, Modifiers::NUM_LOCK, 192] {
+                    let event = encode_key_with_alternates(
+                        Key::Character(key),
+                        Modifiers(Modifiers::CTRL | Modifiers::SHIFT | locks),
+                        KeyEvent::Press,
+                        "",
+                        KeyAlternates::default(),
+                        &m,
+                    );
+                    assert_eq!(event, expected, "flags={flags} key={key} locks={locks}");
+                }
+            }
+            assert_eq!(
+                encode_key(Key::Character('i'), Modifiers(7), KeyEvent::Repeat, "", &m),
+                if flags & REPORT_ALTERNATES != 0 {
+                    b"\x1b[105:73;8u".as_slice()
+                } else {
+                    b"\x1b[105;8u".as_slice()
+                }
+            );
+            assert!(
+                encode_key(Key::Character('i'), Modifiers(5), KeyEvent::Release, "", &m).is_empty()
+            );
+        }
+        // Legacy control and reset-key exceptions are intentionally retained.
+        for (key, modifiers, expected) in [
+            (Key::Character('i'), 4, b"\t".as_slice()),
+            (Key::Character(' '), 5, b"\0".as_slice()),
+            (Key::Character(' '), 7, b"\x1b\0".as_slice()),
+            (Key::Character('~'), 4, b"\x1e".as_slice()),
+            (Key::Enter, 5, b"\r".as_slice()),
+            (Key::Tab, 5, b"\x1b[Z".as_slice()),
+            (Key::Backspace, 5, b"\x08".as_slice()),
+        ] {
+            assert_eq!(
+                encode_key(key, Modifiers(modifiers), KeyEvent::Press, "", &modes(0)),
+                expected
+            );
+        }
+    }
+
+    #[test]
+    fn alternate_fields_and_release_text_obey_negotiated_flags() {
+        let alternatives = KeyAlternates {
+            shifted: Some('Ф'),
+            base_layout: Some('a'),
+        };
+        assert_eq!(
+            encode_key_with_alternates(
+                Key::Character('ф'),
+                Modifiers(5),
+                KeyEvent::Repeat,
+                "Ф",
+                alternatives,
+                &modes(31)
+            ),
+            b"\x1b[1092:1060:97;6:2;1060u"
+        );
+        assert_eq!(
+            encode_key_with_alternates(
+                Key::Character('ф'),
+                Modifiers(5),
+                KeyEvent::Release,
+                "stale committed text",
+                alternatives,
+                &modes(31)
+            ),
+            b"\x1b[1092:1060:97;6:3u"
+        );
+        assert_eq!(
+            encode_key_with_alternates(
+                Key::Character('ф'),
+                Modifiers(4),
+                KeyEvent::Press,
+                "",
+                alternatives,
+                &modes(5)
+            ),
+            b"\x1b[1092::97;5u"
+        );
+        // The alternate-key flag alone cannot turn ordinary text into a CSI.
+        assert_eq!(
+            encode_key_with_alternates(
+                Key::Character('ф'),
+                Modifiers(1),
+                KeyEvent::Press,
+                "Ф",
+                alternatives,
+                &modes(REPORT_ALTERNATES)
+            ),
+            "Ф".as_bytes()
+        );
+    }
+
+    #[test]
+    fn all_keyboard_flag_combinations_preserve_reset_key_release_rules() {
+        for flags in 0..32 {
+            for (key, legacy, code) in [
+                (Key::Enter, b'\r', 13),
+                (Key::Tab, b'\t', 9),
+                (Key::Backspace, 127, 127),
+            ] {
+                let m = modes(flags);
+                let press = encode_key(key, Modifiers(0), KeyEvent::Press, "", &m);
+                if flags & REPORT_ALL == 0 {
+                    assert_eq!(press, [legacy], "flags={flags} key={key:?}");
+                } else if flags & REPORT_EVENTS != 0 {
+                    assert_eq!(press, alloc::format!("\x1b[{code};1:1u").as_bytes());
+                } else {
+                    assert_eq!(press, alloc::format!("\x1b[{code}u").as_bytes());
+                }
+                let release = encode_key(key, Modifiers(0), KeyEvent::Release, "", &m);
+                if flags & (REPORT_ALL | REPORT_EVENTS) == (REPORT_ALL | REPORT_EVENTS) {
+                    assert_eq!(release, alloc::format!("\x1b[{code};1:3u").as_bytes());
+                } else {
+                    assert!(release.is_empty(), "flags={flags} key={key:?}");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn x10_tracking_sends_only_primary_presses_without_modifiers() {
+        for sgr_mouse in [false, true] {
+            let m = Modes {
+                mouse_tracking: 9,
+                sgr_mouse,
+                ..Modes::default()
+            };
+            for button in 0..=2 {
+                let bytes = encode_mouse(
+                    MouseEvent::Press {
+                        button,
+                        col: 4,
+                        row: 6,
+                    },
+                    Modifiers(255),
+                    &m,
+                );
+                if sgr_mouse {
+                    assert_eq!(bytes, alloc::format!("\x1b[<{button};5;7M").as_bytes());
+                } else {
+                    assert_eq!(bytes, [27, b'[', b'M', 32 + button, 37, 39]);
+                }
+            }
+            for event in [
+                MouseEvent::Release {
+                    button: 0,
+                    col: 0,
+                    row: 0,
+                },
+                MouseEvent::Motion {
+                    button: Some(0),
+                    col: 1,
+                    row: 1,
+                },
+                MouseEvent::Motion {
+                    button: None,
+                    col: 1,
+                    row: 1,
+                },
+                MouseEvent::Scroll {
+                    up: true,
+                    col: 0,
+                    row: 0,
+                },
+                MouseEvent::Press {
+                    button: 3,
+                    col: 0,
+                    row: 0,
+                },
+                MouseEvent::Press {
+                    button: 7,
+                    col: 0,
+                    row: 0,
+                },
+            ] {
+                assert!(
+                    encode_mouse(event, Modifiers(0), &m).is_empty(),
+                    "{event:?}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn all_xterm_mouse_buttons_have_distinct_press_codes() {
+        let codes = [0, 1, 2, 64, 65, 66, 67, 128, 129, 130, 131];
+        for sgr_mouse in [false, true] {
+            let m = Modes {
+                mouse_tracking: 1000,
+                sgr_mouse,
+                ..Modes::default()
+            };
+            for (button, code) in codes.into_iter().enumerate() {
+                let bytes = encode_mouse(
+                    MouseEvent::Press {
+                        button: button as u8,
+                        col: 1,
+                        row: 2,
+                    },
+                    Modifiers(7),
+                    &m,
+                );
+                if sgr_mouse {
+                    assert_eq!(bytes, alloc::format!("\x1b[<{};2;3M", code | 28).as_bytes());
+                } else {
+                    assert_eq!(bytes, [27, b'[', b'M', (code | 28) + 32, 34, 35]);
+                }
+            }
+            for (up, button) in [(true, 3), (false, 4)] {
+                assert_eq!(
+                    encode_mouse(MouseEvent::Scroll { up, col: 0, row: 0 }, Modifiers(0), &m),
+                    encode_mouse(
+                        MouseEvent::Press {
+                            button,
+                            col: 0,
+                            row: 0
+                        },
+                        Modifiers(0),
+                        &m
+                    )
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn wheel_releases_and_motion_are_suppressed_but_extra_buttons_can_drag() {
+        for sgr_mouse in [false, true] {
+            let mut m = Modes {
+                mouse_tracking: 1002,
+                sgr_mouse,
+                ..Modes::default()
+            };
+            for button in 3..=6 {
+                assert!(
+                    encode_mouse(
+                        MouseEvent::Release {
+                            button,
+                            col: 0,
+                            row: 0
+                        },
+                        Modifiers(0),
+                        &m
+                    )
+                    .is_empty()
+                );
+                assert!(
+                    encode_mouse(
+                        MouseEvent::Motion {
+                            button: Some(button),
+                            col: 0,
+                            row: 0
+                        },
+                        Modifiers(0),
+                        &m
+                    )
+                    .is_empty()
+                );
+            }
+            for button in 7..=10 {
+                let motion = encode_mouse(
+                    MouseEvent::Motion {
+                        button: Some(button),
+                        col: 0,
+                        row: 0,
+                    },
+                    Modifiers(4),
+                    &m,
+                );
+                let release = encode_mouse(
+                    MouseEvent::Release {
+                        button,
+                        col: 0,
+                        row: 0,
+                    },
+                    Modifiers(4),
+                    &m,
+                );
+                if sgr_mouse {
+                    assert_eq!(
+                        motion,
+                        alloc::format!("\x1b[<{};1;1M", 176 + button - 7).as_bytes()
+                    );
+                    assert_eq!(
+                        release,
+                        alloc::format!("\x1b[<{};1;1m", 144 + button - 7).as_bytes()
+                    );
+                } else {
+                    assert_eq!(motion, [27, b'[', b'M', 208 + button - 7, 33, 33]);
+                    assert_eq!(release, [27, b'[', b'M', 51, 33, 33]);
+                }
+            }
+            assert!(
+                encode_mouse(
+                    MouseEvent::Motion {
+                        button: None,
+                        col: 0,
+                        row: 0
+                    },
+                    Modifiers(0),
+                    &m
+                )
+                .is_empty()
+            );
+            m.mouse_tracking = 1003;
+            assert!(
+                !encode_mouse(
+                    MouseEvent::Motion {
+                        button: None,
+                        col: 0,
+                        row: 0
+                    },
+                    Modifiers(0),
+                    &m
+                )
+                .is_empty()
+            );
+        }
+    }
+
+    #[test]
+    fn invalid_mouse_inputs_never_append_partial_bytes() {
+        let mut output = Vec::with_capacity(128);
+        output.extend_from_slice(b"already queued");
+        let capacity = output.capacity();
+        let m = Modes {
+            mouse_tracking: 1003,
+            sgr_mouse: true,
+            ..Modes::default()
+        };
+        for button in 11..=u8::MAX {
+            for event in [
+                MouseEvent::Press {
+                    button,
+                    col: 0,
+                    row: 0,
+                },
+                MouseEvent::Release {
+                    button,
+                    col: 0,
+                    row: 0,
+                },
+                MouseEvent::Motion {
+                    button: Some(button),
+                    col: 0,
+                    row: 0,
+                },
+            ] {
+                encode_mouse_into(event, Modifiers(255), &m, &mut output);
+            }
+        }
+        for event in [
+            MouseEvent::Press {
+                button: 0,
+                col: usize::MAX,
+                row: 0,
+            },
+            MouseEvent::Release {
+                button: 7,
+                col: 0,
+                row: usize::MAX,
+            },
+        ] {
+            encode_mouse_into(event, Modifiers(255), &m, &mut output);
+        }
+        assert_eq!(output, b"already queued");
+        assert_eq!(output.capacity(), capacity);
+        encode_mouse_into(
+            MouseEvent::Press {
+                button: 10,
+                col: 222,
+                row: 222,
+            },
+            Modifiers(255),
+            &Modes {
+                sgr_mouse: false,
+                ..m
+            },
+            &mut output,
+        );
+        assert_eq!(&output[14..], &[27, b'[', b'M', 191, 255, 255]);
+        assert_eq!(output.capacity(), capacity);
     }
 }

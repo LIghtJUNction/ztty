@@ -74,9 +74,9 @@ return a new `Vec<u8>`.
 
 | Input | Behavior |
 |---|---|
-| Legacy keyboard | UTF-8 text, Control/Alt combinations, application cursor and keypad modes, function keys and modifiers |
+| Legacy keyboard | UTF-8 text, Control/Alt combinations, distinct Ctrl+Shift character shortcuts, application cursor and keypad modes, function keys and modifiers |
 | Kitty keyboard | Progressive enhancement flags 1/2/4/8/16, press/repeat/release, alternate keys, modifier keys, keypad identity and associated text |
-| Mouse | Tracking modes 1000/1002/1003, SGR 1006 and legacy encoding, modifiers and wheel events |
+| Mouse | Tracking modes 9/1000/1002/1003, SGR 1006 and legacy encoding, modifiers, vertical/horizontal wheel and xterm buttons 1–11 |
 | Paste | Optional bracketed-paste delimiters; tabs and line endings preserved; other control characters removed |
 | Focus | Focus-in/out sequences when focus reporting is enabled |
 
@@ -91,8 +91,19 @@ enabled. Function key F3 uses `CSI 13~` in enhanced mode to avoid cursor-report
 ambiguity. Modifier-key events require flag 8, and release reports require
 flag 2.
 
+In legacy mode, Ctrl+Shift character shortcuts retain the Shift distinction
+using CSI-u, as in Kitty and Ghostty. Ctrl+Shift+Space keeps the legacy NUL
+exception. Lock state remains absent from legacy sequences. Ctrl+tilde emits
+the documented ASCII control value 30.
+
 Mouse positions are zero-based at the API boundary. The encoder converts them
-to one-based protocol coordinates. Buttons are 0=left, 1=middle and 2=right.
+to one-based protocol coordinates. Buttons are 0=left, 1=middle, 2=right,
+3/4=vertical wheel, 5/6=horizontal wheel and 7–10=extra buttons. These are
+zero-based xterm/X11 button numbers; platform frontends must normalize their
+native button order. Wheel releases and wheel-button motion are ignored.
+Extra-button releases identify their button in SGR and use the common release
+code in legacy encoding. Motion with an extra button follows mode 1002/1003.
+Mode 9 reports only left/middle/right presses and omits modifiers.
 SGR encoding alone does not enable tracking. Legacy coordinates beyond its
 representable range produce no event. The host should suppress mouse motion
 that remains inside the same character cell.
@@ -114,15 +125,19 @@ cargo test -p zinput
 cargo check -p zinput --lib
 ```
 
-The unit tests cover mode-dependent keyboard behavior, multi-character IME
-commits, mouse tracking and coordinate limits, clipboard delimiter injection,
-focus reporting and buffer reuse. Test tooling uses Rust's normal test harness;
+The unit tests cover all 32 keyboard flag combinations for reset-key behavior,
+alternate-key and release-text boundaries, multi-character IME commits, xterm
+button ranges, mouse tracking and coordinate limits, clipboard delimiter
+injection, focus reporting and buffer reuse. Test tooling uses Rust's normal test harness;
 the published library remains `no_std`.
 
 ## Protocol references
 
 - [Kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/)
 - [XTerm control sequences](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html)
+- [Ghostty input guide](https://lib.ghostty.org/vt/guide-input.html)
+- [Ghostty keyboard encoder](https://github.com/ghostty-org/ghostty/blob/main/src/input/key_encode.zig)
+- [Ghostty mouse encoder](https://github.com/ghostty-org/ghostty/blob/main/src/input/mouse_encode.zig)
 
 ## License
 
