@@ -1275,7 +1275,9 @@ impl Perform for State {
         }
         if action == 'c' && param(groups, 0, 0) == 0 {
             match intermediates {
-                b"" => self.reply("\x1b[?6c"),
+                // Kitty's graphics probe requires a DA1 payload longer than
+                // three bytes. A leading zero preserves numeric VT102 ID 6.
+                b"" => self.reply("\x1b[?06c"),
                 b">" => self.reply("\x1b[>0;1;0c"),
                 _ => {}
             }

@@ -201,10 +201,12 @@ def kitten_icat(gui, artifacts):
     old_timeout=gui.control.gettimeout();gui.control.settimeout(25)
     results=[]
     try:
-        for image,place in [(ROOT/"tests/fixtures/graphics/hopper.jpg","30x12@2x2"),(path,"16x8@40x2")]:
-            result=gui.command("run",argv=["kitten","icat","--transfer-mode=stream","--scale-up","--place="+place,"--align=left",str(image)])
+        detected=gui.command("run",argv=["kitten","icat","--detect-support","--detection-timeout=3"])
+        assert detected["code"]==0 and detected["stderr"].strip()=="stream",detected
+        for image,place,transport in [(ROOT/"tests/fixtures/graphics/hopper.jpg","30x12@2x2",["--transfer-mode=stream"]),(path,"16x8@40x2",[])]:
+            result=gui.command("run",argv=["kitten","icat",*transport,"--scale-up","--place="+place,"--align=left",str(image)])
             assert result["code"]==0,result
-            results.append({"file":image.name,"exit_code":result["code"],"stderr":result["stderr"]})
+            results.append({"file":image.name,"exit_code":result["code"],"stderr":result["stderr"],"transport":"explicit stream" if transport else "automatic detection"})
     finally:
         gui.control.settimeout(old_timeout)
     gui.emit(ESC+"[?25l")
@@ -215,7 +217,7 @@ def kitten_icat(gui, artifacts):
         colors=crop.getcolors(crop.width*crop.height) or []
         assert len(colors)>32,(left,len(colors))
     frame.save(artifacts/"kitty-graphics-xvfb.png")
-    return {"tools":results,"preview":"kitty-graphics-xvfb.png"}
+    return {"detected_transport":detected["stderr"].strip(),"tools":results,"preview":"kitty-graphics-xvfb.png"}
 
 
 def main():

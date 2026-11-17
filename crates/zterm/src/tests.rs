@@ -458,6 +458,40 @@ fn graphics_query_precedes_device_attributes_and_reports_actual_cell_size() {
 }
 
 #[test]
+fn icat_probe_finishes_on_da1_without_advertising_additional_capabilities() {
+    let probe = b"\x1b_Ga=q,f=24,s=1,v=1,S=3,i=1;MTIz\x1b\\\
+                  \x1b_Ga=q,t=t,f=24,s=1,v=1,i=2;L3RtcC9pY2F0\x1b\\\
+                  \x1b_Ga=q,t=s,f=24,s=1,v=1,i=3;aWNhdA==\x1b\\\x1b[c";
+    for chunk_size in [1, 2, 7, probe.len()] {
+        let mut t = Terminal::new(20, 4, 8);
+        for chunk in probe.chunks(chunk_size) {
+            t.feed(chunk);
+        }
+        assert_eq!(
+            t.responses(),
+            b"\x1b_Gi=1;OK\x1b\\\
+              \x1b_Gi=2;ENOTSUP:only direct transmission is supported\x1b\\\
+              \x1b_Gi=3;ENOTSUP:only direct transmission is supported\x1b\\\x1b[?06c"
+        );
+        let start = t
+            .responses()
+            .iter()
+            .rposition(|byte| *byte == 0x1b)
+            .unwrap();
+        let da1 = &t.responses()[start + 2..];
+        // Existing icat recognizes this final reply only when len > 3.
+        assert!(da1.len() > 3 && da1[0] == b'?' && da1[da1.len() - 1] == b'c');
+        let numeric_id = core::str::from_utf8(&da1[1..da1.len() - 1])
+            .unwrap()
+            .parse::<u16>()
+            .unwrap();
+        assert_eq!(numeric_id, 6);
+        assert_eq!(t.graphics().image_count(), 0);
+        assert_eq!(t.cursor(), (0, 0));
+    }
+}
+
+#[test]
 fn incomplete_graphics_transfers_do_not_consume_following_text() {
     let mut t = Terminal::new(20, 4, 8);
     t.feed(b"\x1b_Ga=T,i=1,s=2,v=1,m=1,C=1;/wAA\x1b\\hello");
