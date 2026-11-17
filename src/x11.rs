@@ -261,9 +261,57 @@ struct PictureFormat {
     colormap: Xid,
 }
 
+#[repr(C)]
+struct Transform {
+    matrix: [[i32; 3]; 3],
+}
+
+#[repr(C)]
+struct XImage {
+    _private: [u8; 0],
+}
+
+#[link(name = "c")]
+unsafe extern "C" {
+    fn malloc(bytes: usize) -> *mut c_void;
+    fn free(pointer: *mut c_void);
+}
+
 #[link(name = "Xrender")]
 unsafe extern "C" {
     fn XRenderFindVisualFormat(display: *mut Display, visual: *mut c_void) -> *mut PictureFormat;
+    fn XRenderFindStandardFormat(display: *mut Display, format: c_int) -> *mut PictureFormat;
+    fn XRenderCreatePicture(
+        display: *mut Display,
+        drawable: Xid,
+        format: *const PictureFormat,
+        mask: c_ulong,
+        attributes: *const c_void,
+    ) -> Xid;
+    fn XRenderFreePicture(display: *mut Display, picture: Xid);
+    fn XRenderSetPictureTransform(display: *mut Display, picture: Xid, transform: *const Transform);
+    fn XRenderSetPictureFilter(
+        display: *mut Display,
+        picture: Xid,
+        filter: *const c_char,
+        parameters: *const i32,
+        count: c_int,
+    );
+    fn XRenderComposite(
+        display: *mut Display,
+        op: c_int,
+        source: Xid,
+        mask: Xid,
+        destination: Xid,
+        source_x: c_int,
+        source_y: c_int,
+        mask_x: c_int,
+        mask_y: c_int,
+        destination_x: c_int,
+        destination_y: c_int,
+        width: c_uint,
+        height: c_uint,
+    );
     fn XRenderFillRectangle(
         display: *mut Display,
         op: c_int,
@@ -278,6 +326,31 @@ unsafe extern "C" {
 
 #[link(name = "X11")]
 unsafe extern "C" {
+    fn XCreateImage(
+        display: *mut Display,
+        visual: *mut c_void,
+        depth: c_uint,
+        format: c_int,
+        offset: c_int,
+        data: *mut c_char,
+        width: c_uint,
+        height: c_uint,
+        bitmap_pad: c_int,
+        bytes_per_line: c_int,
+    ) -> *mut XImage;
+    fn XDestroyImage(image: *mut XImage) -> c_int;
+    fn XPutImage(
+        display: *mut Display,
+        drawable: Xid,
+        gc: *mut c_void,
+        image: *mut XImage,
+        source_x: c_int,
+        source_y: c_int,
+        destination_x: c_int,
+        destination_y: c_int,
+        width: c_uint,
+        height: c_uint,
+    ) -> c_int;
     fn XOpenDisplay(name: *const c_char) -> *mut Display;
     fn XCloseDisplay(display: *mut Display) -> c_int;
     fn XDefaultScreen(display: *mut Display) -> c_int;
@@ -577,6 +650,17 @@ unsafe fn alpha_visual(display: *mut Display, screen: c_int) -> Option<*mut c_vo
 
 type DrawnCursor = ((usize, usize), CursorShape);
 
+/// The canonical image stays in zgraphics. This bounded server-side cache only
+/// owns premultiplied ARGB uploads, reused by every placement and damaged row.
+struct ImageUpload {
+    image_id: u32,
+    generation: u64,
+    picture: Xid,
+    pixmap: Xid,
+    bytes: usize,
+    used: u64,
+}
+
 pub struct Window {
     pub display: *mut Display,
     pub id: Xid,
@@ -617,6 +701,11 @@ pub struct Window {
     background_fill: Option<RenderColor>,
     cursor_color: u32,
     selection_colors: (u32, u32),
+    images: Vec<ImageUpload>,
+    image_bytes: usize,
+    image_clock: u64,
+    graphics_revision: u64,
+    graphics_alternate: bool,
     pub focused: bool,
 }
 
@@ -797,6 +886,11 @@ impl Window {
                     appearance.selection_foreground,
                     appearance.selection_background,
                 ),
+                images: Vec::new(),
+                image_bytes: 0,
+                image_clock: 0,
+                graphics_revision: 0,
+                graphics_alternate: false,
                 focused: true,
             };
             out.title("ztty");
@@ -1041,6 +1135,201 @@ impl Window {
     pub fn cursor_changed(&self, cursor: Option<DrawnCursor>) -> bool {
         cursor != self.last_cursor
     }
+    pub fn graphics_changed(&self, terminal: &Terminal) -> bool {
+        self.graphics_revision != terminal.graphics().revision()
+            || self.graphics_alternate != terminal.modes().alternate_screen
+    }
+
+    fn discard_upload(&mut self, index: usize) {
+        let upload = self.images.swap_remove(index);
+        self.image_bytes = self.image_bytes.saturating_sub(upload.bytes);
+        unsafe {
+            XRenderFreePicture(self.display, upload.picture);
+            XFreePixmap(self.display, upload.pixmap);
+        }
+    }
+
+    fn image_picture(&mut self, image_id: u32, image: &zterm::graphics::Image) -> Option<Xid> {
+        const CACHE_LIMIT: usize = 64 * 1024 * 1024;
+        self.image_clock = self.image_clock.wrapping_add(1);
+        if let Some(upload) = self
+            .images
+            .iter_mut()
+            .find(|entry| entry.image_id == image_id && entry.generation == image.generation)
+        {
+            upload.used = self.image_clock;
+            return Some(upload.picture);
+        }
+        let bytes = (image.width as usize)
+            .checked_mul(image.height as usize)?
+            .checked_mul(4)?;
+        if bytes == 0 || bytes > CACHE_LIMIT || bytes != image.pixels.len() {
+            return None;
+        }
+        while self.image_bytes.saturating_add(bytes) > CACHE_LIMIT || self.images.len() >= 256 {
+            let index = self
+                .images
+                .iter()
+                .enumerate()
+                .min_by_key(|(_, entry)| entry.used)?
+                .0;
+            self.discard_upload(index);
+        }
+        unsafe {
+            // XDestroyImage owns and frees this C allocation. Rust never hands
+            // an alloc-owned buffer to Xlib's free callback.
+            let data = malloc(bytes).cast::<u32>();
+            if data.is_null() {
+                return None;
+            }
+            for (index, pixel) in image.pixels.as_chunks::<4>().0.iter().enumerate() {
+                let alpha = u32::from(pixel[3]);
+                let premultiply = |channel: u8| (u32::from(channel) * alpha + 127) / 255;
+                data.add(index).write(
+                    (alpha << 24)
+                        | (premultiply(pixel[0]) << 16)
+                        | (premultiply(pixel[1]) << 8)
+                        | premultiply(pixel[2]),
+                );
+            }
+            let ximage = XCreateImage(
+                self.display,
+                self.visual,
+                32,
+                2,
+                0,
+                data.cast(),
+                image.width,
+                image.height,
+                32,
+                (image.width * 4) as i32,
+            );
+            if ximage.is_null() {
+                free(data.cast());
+                return None;
+            }
+            let format = XRenderFindStandardFormat(self.display, 0); // PictStandardARGB32
+            if format.is_null() {
+                XDestroyImage(ximage);
+                return None;
+            }
+            let pixmap = XCreatePixmap(self.display, self.id, image.width, image.height, 32);
+            let gc = XCreateGC(self.display, pixmap, 0, core::ptr::null_mut());
+            if pixmap == 0 || gc.is_null() {
+                if !gc.is_null() {
+                    XFreeGC(self.display, gc);
+                }
+                if pixmap != 0 {
+                    XFreePixmap(self.display, pixmap);
+                }
+                XDestroyImage(ximage);
+                return None;
+            }
+            XPutImage(
+                self.display,
+                pixmap,
+                gc,
+                ximage,
+                0,
+                0,
+                0,
+                0,
+                image.width,
+                image.height,
+            );
+            XFreeGC(self.display, gc);
+            XDestroyImage(ximage);
+            let picture = XRenderCreatePicture(self.display, pixmap, format, 0, core::ptr::null());
+            if picture == 0 {
+                XFreePixmap(self.display, pixmap);
+                return None;
+            }
+            XRenderSetPictureFilter(
+                self.display,
+                picture,
+                c"nearest".as_ptr(),
+                core::ptr::null(),
+                0,
+            );
+            self.images.push(ImageUpload {
+                image_id,
+                generation: image.generation,
+                picture,
+                pixmap,
+                bytes,
+                used: self.image_clock,
+            });
+            self.image_bytes += bytes;
+            Some(picture)
+        }
+    }
+
+    /// Composite only the damaged row. The transform maps destination pixels
+    /// back into the requested source crop, without allocating a resized image.
+    fn draw_images(&mut self, terminal: &Terminal, offset: usize, row: usize, layer: u8) {
+        let width = terminal.cols() as i64 * i64::from(self.cw);
+        let row_top = row as i64 * i64::from(self.ch);
+        for placement in terminal.graphics_draws(offset) {
+            let wanted_layer = if placement.z < -1_073_741_824 {
+                0
+            } else if placement.z < 0 {
+                1
+            } else {
+                2
+            };
+            if layer != wanted_layer || placement.dest.width == 0 || placement.dest.height == 0 {
+                continue;
+            }
+            let dx = i64::from(placement.dest.x);
+            let dy = i64::from(placement.dest.y);
+            let left = dx.max(0);
+            let top = dy.max(row_top);
+            let right = (dx + i64::from(placement.dest.width)).min(width);
+            let bottom = (dy + i64::from(placement.dest.height)).min(row_top + i64::from(self.ch));
+            if left >= right || top >= bottom {
+                continue;
+            }
+            let Some(picture) = self.image_picture(placement.image_id, placement.image) else {
+                continue;
+            };
+            let fixed = |source: u32, destination: u32| {
+                ((u64::from(source) << 16) / u64::from(destination)).min(i32::MAX as u64) as i32
+            };
+            let transform = Transform {
+                matrix: [
+                    [
+                        fixed(placement.source.width, placement.dest.width),
+                        0,
+                        (placement.source.x as i32) << 16,
+                    ],
+                    [
+                        0,
+                        fixed(placement.source.height, placement.dest.height),
+                        (placement.source.y as i32) << 16,
+                    ],
+                    [0, 0, 1 << 16],
+                ],
+            };
+            unsafe {
+                XRenderSetPictureTransform(self.display, picture, &transform);
+                XRenderComposite(
+                    self.display,
+                    3,
+                    picture,
+                    0,
+                    XftDrawPicture(self.draw),
+                    (left - dx) as i32,
+                    (top - dy) as i32,
+                    0,
+                    0,
+                    left as i32 + self.padding,
+                    top as i32 + self.padding,
+                    (right - left) as u32,
+                    (bottom - top) as u32,
+                );
+            }
+        }
+    }
     pub fn render(
         &mut self,
         terminal: &mut Terminal,
@@ -1049,6 +1338,25 @@ impl Window {
         force: bool,
         cursor: Option<DrawnCursor>,
     ) {
+        // A scene change can remove pixels outside the new placement. Rebuild
+        // the visible frame on structural changes; ordinary text still damages
+        // only its own rows and re-composites the images intersecting those rows.
+        let force = force || self.graphics_changed(terminal);
+        if self.graphics_alternate != terminal.modes().alternate_screen {
+            while !self.images.is_empty() {
+                self.discard_upload(self.images.len() - 1);
+            }
+        }
+        if self.graphics_changed(terminal) {
+            for index in (0..self.images.len()).rev() {
+                let upload = &self.images[index];
+                if !terminal.graphics_draws(offset).any(|draw| {
+                    draw.image_id == upload.image_id && draw.image.generation == upload.generation
+                }) {
+                    self.discard_upload(index);
+                }
+            }
+        }
         let cols = terminal.cols();
         let rows = terminal.rows();
         let cursor_changed = cursor != self.last_cursor;
@@ -1101,6 +1409,30 @@ impl Window {
                 );
                 col = end;
             }
+            self.draw_images(terminal, offset, row, 0);
+            // Very negative z is below explicitly colored cells. Reapply only
+            // those backgrounds after the bottom image layer.
+            if terminal
+                .graphics_draws(offset)
+                .any(|draw| draw.z < -1_073_741_824)
+            {
+                for col in 0..cols {
+                    let cell = terminal.view_cell(col, row, offset);
+                    let selected = selection.is_some_and(|s| s.contains(col, row, cols));
+                    let (_, rgb, translucent) = self.cell_colors(cell, selected);
+                    if !translucent {
+                        self.fill_background(
+                            rgb,
+                            false,
+                            self.padding + col as i32 * self.cw,
+                            y,
+                            self.cw as u32,
+                            self.ch as u32,
+                        );
+                    }
+                }
+            }
+            self.draw_images(terminal, offset, row, 1);
             col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
@@ -1181,6 +1513,7 @@ impl Window {
                 }
                 col += cells;
             }
+            self.draw_images(terminal, offset, row, 2);
             if let Some(((column, _), shape)) = cursor.filter(|((_, y), _)| *y == row) {
                 self.draw_cursor(terminal, column.min(cols - 1), row, y, shape);
             }
@@ -1223,6 +1556,8 @@ impl Window {
             }
         }
         self.last_cursor = cursor;
+        self.graphics_revision = terminal.graphics().revision();
+        self.graphics_alternate = terminal.modes().alternate_screen;
         terminal.clear_dirty();
     }
     fn draw_cursor(
@@ -1496,6 +1831,9 @@ impl Window {
 
 impl Drop for Window {
     fn drop(&mut self) {
+        while !self.images.is_empty() {
+            self.discard_upload(self.images.len() - 1);
+        }
         unsafe {
             if !self.ic.is_null() {
                 XDestroyIC(self.ic);

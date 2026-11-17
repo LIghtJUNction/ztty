@@ -15,8 +15,8 @@ import tomllib
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PACKAGES = ("zinput", "zpty", "zterm")
-VERSION = "0.1.0"
+VERSIONS = {"zinput": "0.1.0", "zgraphics": "0.1.0", "zpty": "0.2.0", "zterm": "0.2.0"}
+PACKAGES = tuple(VERSIONS)
 CRATES_IO_SOURCES = {
     "registry+https://github.com/rust-lang/crates.io-index",
     "registry+https://index.crates.io/",
@@ -26,7 +26,7 @@ CRATES_IO_SOURCES = {
 
 def manifest(selected, name):
     dependencies = "\n".join(
-        f'{package} = {{ version = "={VERSION}", default-features = false }}'
+        f'{package} = {{ version = "={VERSIONS[package]}", default-features = false }}'
         for package in selected
     )
     return f'''[package]
@@ -42,12 +42,23 @@ edition = "2024"
 
 
 def library(selected):
-    source = "#![no_std]\n\npub fn exercise() {\n"
+    source = "#![no_std]\nextern crate alloc;\n\npub fn exercise() {\n"
     if "zinput" in selected:
         source += r'''    let modes = zinput::Modes { kitty_keyboard: 1, ..Default::default() };
     let bytes = zinput::encode_key(zinput::Key::Character('c'),
         zinput::Modifiers(4), zinput::KeyEvent::Press, "", &modes);
     assert_eq!(bytes, b"\x1b[99;5u");
+'''
+    if "zgraphics" in selected:
+        source += r'''    let mut scene = zgraphics::Graphics::default();
+    let mut replies = alloc::vec::Vec::new();
+    let context = zgraphics::Context { col: 0, row: 0, cols: 80, rows: 24,
+        cell_width: 8, cell_height: 16 };
+    scene.command(b"Ga=T,f=32,s=1,v=1,i=7,C=1;/wAA/w==", context, &mut replies);
+    assert_eq!(scene.image(7).unwrap().pixels.as_slice(), &[255,0,0,255]);
+    assert_eq!(scene.draws(0).count(), 1);
+    scene.command(b"Ga=d,d=I,i=7", context, &mut replies);
+    assert_eq!(scene.image_count(), 0);
 '''
     if "zterm" in selected:
         source += r'''    let mut terminal = zterm::Terminal::new(80, 24, 20);
@@ -156,7 +167,7 @@ def check(selected, directory):
             result["packages"].append(actual)
             if actual["selected"]:
                 found.add(package["name"])
-                if package["version"] != VERSION:
+                if package["version"] != VERSIONS[package["name"]]:
                     raise AssertionError(f"unexpected version for {package['name']}: {package['version']}")
                 if package["source"] not in CRATES_IO_SOURCES:
                     raise AssertionError(f"{package['name']} did not resolve from crates.io")
@@ -175,12 +186,12 @@ def check(selected, directory):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--packages", nargs="+", choices=PACKAGES, default=list(PACKAGES),
-                        help="crates to verify; default: zinput zpty zterm")
+                        help="crates to verify; default: zinput zgraphics zpty zterm")
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "artifacts/registry-consumer.json")
     args = parser.parse_args()
     selected = list(dict.fromkeys(args.packages))
-    result = {"schema": 2, "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-              "requested_packages": selected, "version": VERSION, "ok": False,
+    result = {"schema": 3, "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              "requested_packages": selected, "versions": VERSIONS, "ok": False,
               "packages": [], "individual_checks": [], "combined_check": None,
               "scope": "actual crates.io consumers; library code is no_std, executable harness uses std; zpty runs a real PTY"}
     args.output.parent.mkdir(parents=True, exist_ok=True)

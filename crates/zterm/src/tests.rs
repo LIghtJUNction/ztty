@@ -422,3 +422,158 @@ fn cell_storage_has_no_heap_pointer_and_is_compact() {
     }
     assert_eq!(t.history_len(), 0);
 }
+
+#[test]
+fn kitty_graphics_framing_is_independent_of_every_pty_chunk_boundary() {
+    let bytes = b"before\x1b_Ga=T,i=12,p=4,f=24,s=1,v=1,C=1;/wAA\x1b\\after\x1b[6n";
+    for split in 0..=bytes.len() {
+        let mut t = Terminal::new(20, 4, 8);
+        t.set_cell_size(10, 20);
+        t.feed(&bytes[..split]);
+        t.feed(&bytes[split..]);
+        assert_eq!(line(&t, 0), "beforeafter         ");
+        assert_eq!(
+            t.graphics().image(12).unwrap().pixels.as_slice(),
+            [255, 0, 0, 255]
+        );
+        let draw = t.graphics_draws(0).next().unwrap();
+        assert_eq!((draw.dest.x, draw.dest.y, draw.placement_id), (60, 0, 4));
+        assert_eq!(t.responses(), b"\x1b_Gi=12,p=4;OK\x1b\\\x1b[1;12R");
+    }
+}
+
+#[test]
+fn graphics_query_precedes_device_attributes_and_reports_actual_cell_size() {
+    let mut t = Terminal::new(20, 4, 8);
+    t.set_cell_size(9, 18);
+    t.feed(b"\x1b_Ga=q,i=42,f=24,s=1,v=1;AAAA\x1b\\\x1b[c\x1b[14t\x1b[16t\x1b[18t");
+    assert!(t.responses().starts_with(b"\x1b_Gi=42;OK\x1b\\\x1b[?"));
+    assert!(
+        t.responses()
+            .ends_with(b"\x1b[4;72;180t\x1b[6;18;9t\x1b[8;4;20t")
+    );
+    assert_eq!(t.graphics().image_count(), 0);
+    t.feed(b"\x1bc\x1b[16t");
+    assert_eq!(t.responses(), b"\x1b[6;18;9t");
+}
+
+#[test]
+fn incomplete_graphics_transfers_do_not_consume_following_text() {
+    let mut t = Terminal::new(20, 4, 8);
+    t.feed(b"\x1b_Ga=T,i=1,s=2,v=1,m=1,C=1;/wAA\x1b\\hello");
+    assert_eq!(&line(&t, 0)[..5], "hello");
+    assert_eq!(t.graphics().pending_bytes(), 3);
+    assert_eq!(t.graphics().image_count(), 0);
+    t.feed(b"\x1b_Gm=0;/wD/AIA=\x1b\\!");
+    assert_eq!(&line(&t, 0)[..6], "hello!");
+    assert_eq!(t.graphics_draws(0).next().unwrap().dest.x, 40);
+    assert_eq!(t.graphics().pending_bytes(), 0);
+}
+
+#[test]
+fn missing_st_unknown_apc_and_oversize_apc_recover_on_cancellation() {
+    for ending in [b"\x18OK".as_slice(), b"\x1aOK", b"\x1b[0mOK"] {
+        let mut t = Terminal::new(20, 4, 8);
+        t.feed(b"\x1b_Ga=T,i=1,s=1,v=1;AAAA");
+        t.feed(ending);
+        assert_eq!(&line(&t, 0)[..2], "OK");
+        assert_eq!(t.graphics().image_count(), 0);
+    }
+    let mut t = Terminal::new(20, 4, 8);
+    t.feed(b"\x1b_unknown;ignored\x1b\\OK");
+    assert_eq!(&line(&t, 0)[..2], "OK");
+    t.feed(b"\r\x1b_Ga=T,i=1,s=1,v=1;");
+    for _ in 0..20 {
+        t.feed(&[b'A'; 1024]);
+    }
+    t.feed(b"\x1b\\good\x1b[6n");
+    assert_eq!(&line(&t, 0)[..4], "good");
+    assert_eq!(
+        (t.graphics().image_count(), t.graphics().pending_bytes()),
+        (0, 0)
+    );
+    assert!(t.responses().ends_with(b"\x1b[1;5R"));
+}
+
+#[test]
+fn graphics_dispatch_cancels_previous_osc_and_dcs_without_text_leakage() {
+    let mut t = Terminal::new(20, 4, 8);
+    t.feed(b"\x1b]2;title\x1b_Ga=q,i=1,f=24,s=1,v=1;AAAA\x1b\\");
+    assert_eq!(t.title(), "title");
+    assert_eq!(line(&t, 0), "                    ");
+    assert_eq!(t.responses(), b"\x1b_Gi=1;OK\x1b\\");
+    t.clear_responses();
+    t.feed(b"\x1bP+q544e\x1b_Ga=q,i=2,f=24,s=1,v=1;AAAA\x1b\\OK");
+    assert_eq!(&line(&t, 0)[..2], "OK");
+    assert!(t.responses().ends_with(b"\x1b_Gi=2;OK\x1b\\"));
+}
+
+#[test]
+fn graphics_follow_scroll_resize_alternate_screen_and_deletion() {
+    let mut t = Terminal::new(20, 4, 8);
+    t.set_cell_size(8, 16);
+    t.feed(b"\x1b[2;1H\x1b_Ga=T,i=1,s=1,v=1,r=2,C=1;AQIDBA==\x1b\\");
+    assert_eq!(t.graphics_draws(0).next().unwrap().dest.y, 16);
+    t.feed(b"\x1b[4;1H\n");
+    assert_eq!(t.graphics_draws(0).next().unwrap().dest.y, 0);
+    t.resize(20, 2);
+    assert!(t.graphics_draws(0).next().is_none());
+    assert_eq!(t.graphics_draws(2).next().unwrap().dest.y, 0);
+    t.feed(b"\x1b[?1049h");
+    assert_eq!(t.graphics().image_count(), 0);
+    t.feed(b"\x1b_Ga=T,i=1,s=1,v=1,C=1;BQYHCA==\x1b\\");
+    assert_eq!(
+        t.graphics().image(1).unwrap().pixels.as_slice(),
+        [5, 6, 7, 8]
+    );
+    t.feed(b"\x1b[?1049l");
+    assert_eq!(
+        t.graphics().image(1).unwrap().pixels.as_slice(),
+        [1, 2, 3, 4]
+    );
+    t.clear_dirty();
+    t.feed(b"\x1b_Ga=d,d=I,i=1\x1b\\");
+    assert_eq!(t.graphics().image_count(), 0);
+    assert!(t.dirty());
+    t.feed(b"\x1b[?1049h");
+    assert_eq!(t.graphics().image_count(), 0);
+}
+
+#[test]
+fn graphics_cursor_policy_and_reset_generation_are_stable() {
+    let mut t = Terminal::new(20, 4, 8);
+    t.set_cell_size(8, 16);
+    t.feed(b"\x1b_Ga=T,i=1,s=1,v=1,c=2,r=2;AQIDBA==\x1b\\");
+    assert_eq!(t.cursor(), (2, 2));
+    let before = t.graphics().image(1).unwrap().generation;
+    t.feed(b"\x1bc\x1b_Ga=T,i=1,s=1,v=1,C=1;AQIDBA==\x1b\\");
+    assert_eq!(t.cursor(), (0, 0));
+    assert!(t.graphics().image(1).unwrap().generation > before);
+    t.feed(b"\x1b[2J");
+    assert_eq!(t.graphics().placement_count(), 0);
+}
+
+#[test]
+fn large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding() {
+    // A raw RGB body over 51 KiB, with a final unpadded RGBA tail for a second
+    // command. The compressed, large single-APC case is tested by zgraphics.
+    let mut bytes = b"\x1b_Ga=T,q=2,f=24,C=1,s=128,v=128;".to_vec();
+    bytes.extend_from_slice(&b"/wAA".repeat(128 * 128));
+    bytes.extend_from_slice(b"\x1b\\\x1b[2;1H\x1b_Ga=T,i=9,C=1,s=1,v=1;AQIDBA\x1b\\OK");
+    for chunk in [1, 17, 4096, 65536] {
+        let mut t = Terminal::new(80, 24, 8);
+        for part in bytes.chunks(chunk) {
+            t.feed(part);
+        }
+        assert_eq!(t.graphics().image_count(), 2);
+        assert_eq!(
+            t.graphics_draws(0).next().unwrap().image.pixels.len(),
+            128 * 128 * 4
+        );
+        assert_eq!(
+            t.graphics().image(9).unwrap().pixels.as_slice(),
+            [1, 2, 3, 4]
+        );
+        assert_eq!(&line(&t, 1)[..2], "OK");
+    }
+}

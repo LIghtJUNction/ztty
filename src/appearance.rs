@@ -1,4 +1,4 @@
-use alloc::{ffi::CString, format, string::String};
+use alloc::{format, string::String};
 use core::ffi::CStr;
 use zterm::{CursorShape, Theme};
 
@@ -21,7 +21,7 @@ pub struct Appearance {
 impl Default for Appearance {
     fn default() -> Self {
         Self {
-            font: String::from("monospace:size=11"),
+            font: String::from(default_font()),
             theme: Theme {
                 foreground: 0xe1e7f0,
                 background: 0x161a23,
@@ -51,18 +51,10 @@ impl Appearance {
         let path = match explicit {
             Some(path) => path,
             None => {
-                let Some(base) = os::env(c"XDG_CONFIG_HOME")
-                    .filter(|p| p.starts_with(b"/"))
-                    .or_else(|| os::env(c"HOME").filter(|p| p.starts_with(b"/")))
-                else {
+                let Some(path) = os::default_config_path() else {
                     return Ok(appearance);
                 };
-                let mut bytes = base.to_vec();
-                if os::env(c"XDG_CONFIG_HOME").is_none_or(|p| !p.starts_with(b"/")) {
-                    bytes.extend_from_slice(b"/.config");
-                }
-                bytes.extend_from_slice(b"/ztty/ztty.conf");
-                default = CString::new(bytes).map_err(|_| "invalid config path")?;
+                default = path;
                 &default
             }
         };
@@ -100,7 +92,7 @@ impl Appearance {
 
     pub fn set_font(&mut self, value: &str) -> Result<(), &'static str> {
         if value.is_empty() || value.len() > 1024 || value.contains('\0') {
-            return Err("expected a Fontconfig name of 1..1024 bytes");
+            return Err("expected a font name of 1..1024 bytes");
         }
         self.font = String::from(value);
         Ok(())
@@ -164,4 +156,19 @@ fn rgb(value: &str) -> Result<u32, &'static str> {
         .filter(|s| s.len() == 6 && s.bytes().all(|c| c.is_ascii_hexdigit()))
         .and_then(|s| u32::from_str_radix(s, 16).ok())
         .ok_or("expected #RRGGBB")
+}
+
+fn default_font() -> &'static str {
+    #[cfg(target_os = "windows")]
+    {
+        "Consolas:size=11"
+    }
+    #[cfg(target_os = "macos")]
+    {
+        "Menlo:size=11"
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    {
+        "monospace:size=11"
+    }
 }
