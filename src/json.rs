@@ -196,9 +196,6 @@ impl Parser<'_> {
                 loop {
                     self.whitespace();
                     let key = self.string()?;
-                    if fields.iter().any(|(existing, _)| existing == &key) {
-                        return Err("duplicate JSON object key");
-                    }
                     self.whitespace();
                     if !self.take(b':') {
                         return Err("expected colon in object");
@@ -206,6 +203,7 @@ impl Parser<'_> {
                     fields.push((key, self.value(depth + 1)?));
                     self.whitespace();
                     if self.take(b'}') {
+                        unique_keys(&fields)?;
                         return Ok(Value::Object(fields));
                     }
                     if !self.take(b',') {
@@ -358,6 +356,28 @@ impl Parser<'_> {
                 None => return Err("unterminated JSON string"),
             }
         }
+    }
+}
+
+/// Preserve object order without quadratic work for attacker-controlled objects.
+/// Most messages have only a few keys and need no temporary allocation.
+fn unique_keys(fields: &[(String, Value)]) -> Result<(), &'static str> {
+    let duplicate = if fields.len() <= 32 {
+        fields
+            .iter()
+            .enumerate()
+            .any(|(index, (key, _))| fields[..index].iter().any(|(previous, _)| previous == key))
+    } else {
+        let mut order: Vec<usize> = (0..fields.len()).collect();
+        order.sort_unstable_by(|left, right| fields[*left].0.cmp(&fields[*right].0));
+        order
+            .windows(2)
+            .any(|pair| fields[pair[0]].0 == fields[pair[1]].0)
+    };
+    if duplicate {
+        Err("duplicate JSON object key")
+    } else {
+        Ok(())
     }
 }
 
