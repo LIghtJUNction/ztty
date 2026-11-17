@@ -1189,7 +1189,7 @@ def main():
         "machine": machine(), "command": [sys.executable, str(Path(__file__).resolve()), *sys.argv[1:]],
         "script_sha256": sha256(__file__),
         "source_sha256": {name: sha256(ROOT / "tools" / name) for name in
-                          ("benchmark_terminals.py", "measure_runtime.py", "measure_multiwindow.py")},
+                          ("benchmark_terminals.py", "measure_runtime.py", "measure_multiwindow.py", "isolated_xvfb.py")},
         "git": {
             "head": capture(["git", "-C", str(ROOT), "rev-parse", "HEAD"]),
             "status": capture(["git", "-C", str(ROOT), "status", "--short"]),

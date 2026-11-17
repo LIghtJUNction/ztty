@@ -19,6 +19,7 @@
 
 ### Fixed
 
+- Benchmark reports now pin the isolated Xvfb helper hash and preserve collection-time identity when regenerating charts.
 - Linux input preserves horizontal wheels and extra mouse buttons 8–11; configured bindings support all eleven X11 buttons.
 - Mouse releases follow the destination of their original press across Shift changes; focus and ownership transitions clear held input without cancelling a valid focus-loss clipboard transfer.
 - Workspace restore retains live parent/child windows and retries PTY dimensions after resize errors; stale queued focus/geometry events no longer overwrite the restored layout.
