@@ -360,18 +360,22 @@ fn run(cfg: Config) -> Result<i32, String> {
         request.set("name", Value::from(name));
     }
     let created = broker::request(&request)?;
-    wait_session(
-        created
-            .get("uri")
-            .and_then(Value::as_str)
-            .ok_or("missing session address")?,
-    )
+    wait_session(&created)
 }
 
-fn wait_session(uri: &str) -> Result<i32, String> {
+fn wait_session(session: &json::Value) -> Result<i32, String> {
+    let uri = session
+        .get("uri")
+        .and_then(json::Value::as_str)
+        .ok_or("missing session address")?;
+    let attachment = session
+        .get("attachment")
+        .and_then(json::Value::as_u64)
+        .ok_or("missing attachment token")?;
     let value = broker::request(&json::object([
         ("op", json::Value::from("wait")),
         ("session", json::Value::from(uri)),
+        ("attachment", json::Value::from(attachment)),
     ]))?;
     Ok(value
         .get("exit_code")
@@ -425,12 +429,7 @@ fn attach(args: &[&CStr]) -> Result<i32, String> {
         ("session", Value::from(name)),
         ("_appearance", appearance.to_json()),
     ]))?;
-    wait_session(
-        value
-            .get("uri")
-            .and_then(Value::as_str)
-            .ok_or("missing session address")?,
-    )
+    wait_session(&value)
 }
 
 pub(crate) fn serve() -> Result<(), String> {
