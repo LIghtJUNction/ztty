@@ -632,9 +632,27 @@ def summarize(runs):
         selected = [run for run in runs if run["app"] == app and run["ok"]]
         if len(selected) != REPETITIONS:
             raise ValueError(f"{app} has {len(selected)} completed runs; requires {REPETITIONS}")
+        combined_pss = [run["application"]["Pss_bytes"] + run["xserver"]["after"]["Pss_bytes"] for run in selected]
+        app_swaps = [sample["application"]["Swap_bytes"] for run in selected for sample in run["memory_samples"]]
+        combined_swaps = [sample["application"]["Swap_bytes"] + run["xserver"]["after"]["Swap_bytes"]
+                          for run in selected for sample in run["memory_samples"]]
         rows.append({
             "app": app, "windows": WINDOWS, "successful_runs": len(selected),
             "median_pss_bytes": statistics.median(run["application"]["Pss_bytes"] for run in selected),
+            "median_app_plus_xserver_pss_bytes": statistics.median(combined_pss),
+            "app_plus_xserver_pss_range_bytes": [min(combined_pss), max(combined_pss)],
+            "sampled_application_swap_range_bytes": [min(app_swaps), max(app_swaps)],
+            "max_sampled_application_swap_bytes": max(app_swaps),
+            "sampled_app_plus_xserver_swap_range_bytes": [min(combined_swaps), max(combined_swaps)],
+            "max_sampled_app_plus_xserver_swap_bytes": max(combined_swaps),
+            "xserver_after_swap_range_bytes": [
+                min(run["xserver"]["after"]["Swap_bytes"] for run in selected),
+                max(run["xserver"]["after"]["Swap_bytes"] for run in selected),
+            ],
+            "xserver_delta_pss_range_bytes": [
+                min(run["xserver"]["delta"]["Pss_bytes"] for run in selected),
+                max(run["xserver"]["delta"]["Pss_bytes"] for run in selected),
+            ],
             "median_private_bytes": statistics.median(run["application"]["Private_bytes"] for run in selected),
             "median_latency_p50_us": statistics.median(run["latency_p50_us"] for run in selected),
             "median_latency_p95_us": statistics.median(run["latency_p95_us"] for run in selected),
@@ -653,6 +671,19 @@ def summarize(runs):
     return rows
 
 
+def refresh_summary(report):
+    # Collection identity and every raw observation remain untouched.
+    report["summary"] = summarize(report["runs"])
+    report["derived"] = {
+        "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "renderer_script_sha256": sha256(__file__),
+        "source_runs_sha256": hashlib.sha256(
+            json.dumps(report["runs"], sort_keys=True).encode()).hexdigest(),
+        "combined_pss_formula": "median across three runs of (run.application.Pss_bytes + run.xserver.after.Pss_bytes); includes full dedicated Xvfb baseline",
+        "swap_formula": "range/max over every recorded application memory snapshot; for the combined counter add xserver.after.Swap_bytes from the same run before taking range/max",
+        "scope": "resident PSS excludes swap; Swap counters remain separate and are not added to PSS as a unique physical-memory total",
+    }
+
 def svg_document(report):
     if not report.get("ok") or len(report.get("runs", [])) != len(APPS) * REPETITIONS:
         raise ValueError("refusing to render incomplete comparison data")
@@ -660,10 +691,10 @@ def svg_document(report):
     by_app = {row["app"]: row for row in rows}
     colors = {"ztty": "#1a73e8", "ghostty": "#00897b", "kitty": "#8754c8"}
     parts = [
-        '<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="760" viewBox="0 0 1120 760" role="img" aria-labelledby="title desc">',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="790" viewBox="0 0 1120 790" role="img" aria-labelledby="title desc">',
         '<title id="title">Ten terminal windows: memory and real PTY performance</title>',
         '<desc id="desc">Three fresh-process runs per terminal, all using shared instances. '
-        'Application PSS and private memory exclude probe workloads and the X server. '
+        'Application PSS excludes the display server; a second panel adds full dedicated Xvfb PSS. Probe workloads and private D-Bus are separate. '
         'Latency and throughput use DSR logical completion, not a rendered-frame fence.</desc>',
         '<style>'
         ':root{--bg:#fff;--panel:#f8fafd;--ink:#202124;--muted:#5f6368;--line:#dfe3e8;--track:#e9edf3}'
@@ -672,13 +703,13 @@ def svg_document(report):
         '.muted{fill:var(--muted)}.h{font-size:20px;font-weight:600}.small{font-size:13px}'
         '.value{font-size:16px;font-weight:600}.label{font-size:15px}'
         '</style>',
-        '<rect width="1120" height="760" rx="18" fill="var(--bg)"/>',
+        '<rect width="1120" height="790" rx="18" fill="var(--bg)"/>',
         '<text x="36" y="47" font-size="28" font-weight="600">10 windows. Shared instances. Same workload.</text>',
         '<text x="36" y="76" class="muted" font-size="15">Linux X11 / isolated Xvfb · software rendering · medians of 3 fresh-process runs</text>',
     ]
     panels = [
-        (36, 102, "Application PSS", "MiB · lower is better", "median_pss_bytes", 1024 * 1024),
-        (580, 102, "Application private memory", "MiB · lower is better", "median_private_bytes", 1024 * 1024),
+        (36, 102, "Application PSS", "MiB resident · lower is better", "median_pss_bytes", 1024 * 1024),
+        (580, 102, "App + full X server PSS", "MiB resident · lower is better", "median_app_plus_xserver_pss_bytes", 1024 * 1024),
         (36, 355, "PTY round-trip latency (p50)", "µs · lower is better", "median_latency_p50_us", 1),
         (580, 355, "Output processing throughput", "MiB/s · higher is better", "median_output_mib_per_second", 1),
     ]
@@ -707,12 +738,16 @@ def svg_document(report):
     for app in APPS:
         first = report["binaries"][app]["version"].get("stdout", "").splitlines()
         versions.append(first[0] if first else NAMES[app])
+    swap_line = "Max sampled Swap (app + X server counters): " + " · ".join(
+        NAMES[app] + " " + f"{by_app[app]['max_sampled_app_plus_xserver_swap_bytes'] / (1024 * 1024):.2f} MiB"
+        for app in APPS)
     footer = [
-        "PSS includes every surviving terminal process, launcher and helper. PTY children and X-server memory are separate.",
-        "Performance: one focused window at a time, nine idle; write → DSR reply. This is logical completion, not display frame rate.",
-        "Memory: fixed UTF-8/color frame, fonts warmed, empty history. 120 × 32 cells, monospace 11 pt; no disk-cache flush.",
-        " · ".join(versions) + " · " + date,
-        "Raw samples, exact commands, versions, source hashes and scope: docs/benchmarks/terminals-10-windows.json",
+        "App PSS counts all terminal processes. The second panel includes the full dedicated 7680×2160 Xvfb baseline.",
+        "PTY probes and private D-Bus are separate. PSS covers resident pages only; this is not total GPU/VRAM accounting.",
+        f"One active window, nine idle; write → DSR reply. Logical completion, not frame rate. Memory: fixed frame + {report['settings']['memory_settle_seconds']:g}s settle.",
+        swap_line,
+        " · ".join(versions) + " · " + date + " · 120×32 cells · monospace 11 pt",
+        "Raw samples, versions, hashes and scope: docs/benchmarks/terminals-10-windows.json",
     ]
     for index, line in enumerate(footer):
         parts.append(f'<text x="36" y="{625 + index * 25}" class="small muted">{html.escape(line)}</text>')
@@ -733,12 +768,14 @@ def update_readmes():
          "![Ten-window terminal memory and PTY performance comparison](docs/benchmarks/terminals-10-windows.svg)\n\n"
          "Ten windows per terminal, shared instances, three real runs. "
          "[Method and rerun command](docs/benchmarks/README.md) · "
-         "[Raw measurements](docs/benchmarks/terminals-10-windows.json)\n"),
+         "[Raw measurements](docs/benchmarks/terminals-10-windows.json)\n\n"
+         "Rerun from current source: `make benchmark-terminals`.\n"),
         ("README.zh-CN.md",
          "![十窗口终端内存与 PTY 性能比较](docs/benchmarks/terminals-10-windows.svg)\n\n"
          "每个终端均开启 10 个窗口、使用共享实例，实测 3 轮。"
          "[测量方法与复跑命令](docs/benchmarks/README.md) · "
-         "[原始数据](docs/benchmarks/terminals-10-windows.json)\n"),
+         "[原始数据](docs/benchmarks/terminals-10-windows.json)\n\n"
+         "从当前源码重新构建并实测：`make benchmark-terminals`。\n"),
     ]
     start, end = "<!-- terminal-benchmark:start -->", "<!-- terminal-benchmark:end -->"
     for filename, content in entries:
@@ -764,13 +801,15 @@ def main():
     parser.add_argument("--json", type=Path, default=REPORT)
     parser.add_argument("--svg", type=Path, default=SVG)
     parser.add_argument("--render-only", action="store_true",
-                        help="regenerate SVG from completed measured JSON without running terminals")
+                        help="recompute summary and SVG from completed raw JSON without running terminals")
     parser.add_argument("--settle-seconds", type=float, default=1.0)
     parser.add_argument("--no-readme", action="store_true", help="leave README image references unchanged")
     args = parser.parse_args()
     if args.render_only:
         report = json.loads(args.json.read_text())
+        refresh_summary(report)
         svg = svg_document(report)
+        atomic_write(args.json, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
         atomic_write(args.svg, svg)
         if not args.no_readme:
             update_readmes()
@@ -864,7 +903,7 @@ def main():
                 print("Benchmark failed; prior JSON/SVG preserved. Diagnostic: " + str(failure),
                       file=sys.stderr)
                 return 1
-    report["summary"] = summarize(report["runs"])
+    refresh_summary(report)
     report["completed_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     report["ok"] = True
     svg = svg_document(report)

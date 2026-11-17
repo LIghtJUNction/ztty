@@ -1,5 +1,13 @@
 # ztty
 
+<!-- terminal-benchmark:start -->
+![十窗口终端内存与 PTY 性能比较](docs/benchmarks/terminals-10-windows.svg)
+
+每个终端均开启 10 个窗口、使用共享实例，实测 3 轮。[测量方法与复跑命令](docs/benchmarks/README.md) · [原始数据](docs/benchmarks/terminals-10-windows.json)
+
+从当前源码重新构建并实测：`make benchmark-terminals`。
+<!-- terminal-benchmark:end -->
+
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。
 0.2 版本补齐了 macOS、Windows 后端，并加入静态 Kitty 图形协议。
 项目优先验证 Linux，目标是以更低的内存占用和更快的交互响应，
