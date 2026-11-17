@@ -5,7 +5,7 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::ffi::{CStr, c_char, c_int, c_void};
 
-use super::{RpcSession, VERSIONS, dispatch, error};
+use super::{MessageKind, RpcSession, VERSIONS, dispatch, error, message_kind};
 use crate::json::{self, Value};
 use crate::os;
 
@@ -135,11 +135,19 @@ struct Session {
 struct Settings<'a> {
     origin: String,
     authorities: Vec<String>,
-    local: bool,
     token: Option<&'a str>,
+    observer_token: Option<&'a str>,
+    read_only: bool,
 }
 
-pub(super) fn run(host: &str, port: u16, token: Option<&str>) -> Result<i32, String> {
+pub(super) fn run(
+    host: &str,
+    port: u16,
+    token: Option<&str>,
+    observer_token: Option<&str>,
+    read_only: bool,
+    allowed_hosts: &[String],
+) -> Result<i32, String> {
     let host = host
         .strip_prefix('[')
         .and_then(|s| s.strip_suffix(']'))
@@ -152,8 +160,9 @@ pub(super) fn run(host: &str, port: u16, token: Option<&str>) -> Result<i32, Str
     {
         return Err("invalid HTTP host".into());
     }
-    let (listener, actual_port, local) = bind_listener(host, port, token.is_some())?;
-    let authority = authority(host, actual_port);
+    let (listener, actual_port, local) =
+        bind_listener(host, port, token.is_some() || observer_token.is_some())?;
+    let authority = authority_for(host, actual_port);
     let mut authorities = alloc::vec![authority.clone()];
     if local {
         for name in ["localhost", "127.0.0.1", "::1"] {
@@ -163,11 +172,13 @@ pub(super) fn run(host: &str, port: u16, token: Option<&str>) -> Result<i32, Str
             }
         }
     }
+    authorities.extend(allowed_hosts.iter().cloned());
     let settings = Settings {
         origin: format!("mcp/http/{authority}"),
         authorities,
-        local,
         token,
+        observer_token,
+        read_only,
     };
     os::print(
         2,
@@ -252,7 +263,7 @@ pub(super) fn run(host: &str, port: u16, token: Option<&str>) -> Result<i32, Str
                         }
                         break;
                     }
-                    let buffered: usize = clients.iter().map(|c| c.input.len()).sum();
+                    let buffered = buffered_bytes(&clients);
                     if buffered + count as usize > MAX_BUFFERED
                         || clients[index].input.len() + count as usize > json::MAX_MESSAGE + 65536
                     {
@@ -265,7 +276,14 @@ pub(super) fn run(host: &str, port: u16, token: Option<&str>) -> Result<i32, Str
                     match parse_request(&clients[index].input) {
                         Ok(Some(request)) => {
                             let (status, body, id) = respond(request, &settings, &mut sessions);
-                            clients[index].reply(status, &body, id.as_deref());
+                            // Account for slow readers as well as slow request senders.
+                            let retained =
+                                buffered_bytes(&clients).saturating_sub(clients[index].input.len());
+                            if retained.saturating_add(body.len()) > MAX_BUFFERED {
+                                clients[index].reply(503, &[], None);
+                            } else {
+                                clients[index].reply(status, &body, id.as_deref());
+                            }
                             break;
                         }
                         Ok(None) => {}
@@ -304,8 +322,45 @@ pub(super) fn run(host: &str, port: u16, token: Option<&str>) -> Result<i32, Str
     }
 }
 
-fn authority(host: &str, port: u16) -> String {
-    authority_for(host, port)
+fn buffered_bytes(clients: &[Client]) -> usize {
+    clients
+        .iter()
+        .map(|client| client.input.len() + client.output.len())
+        .sum()
+}
+
+/// Host authorities are explicit allowlist entries, never URL prefixes.
+pub(super) fn valid_authority(value: &str) -> bool {
+    let Some((host, port)) = value.rsplit_once(':') else {
+        return false;
+    };
+    if value.len() > 320
+        || port.is_empty()
+        || !port.bytes().all(|b| b.is_ascii_digit())
+        || !port.parse::<u16>().is_ok_and(|port| port != 0)
+    {
+        return false;
+    }
+    if let Some(host) = host.strip_prefix('[').and_then(|h| h.strip_suffix(']')) {
+        !host.is_empty()
+            && host.contains(':')
+            && host
+                .bytes()
+                .all(|b| b.is_ascii_hexdigit() || matches!(b, b':' | b'.'))
+    } else {
+        !host.is_empty()
+            && host.len() <= 253
+            && host
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'.'))
+    }
+}
+
+fn authority_matches(allowed: &str, received: &str) -> bool {
+    allowed.eq_ignore_ascii_case(received)
+        || allowed
+            .strip_suffix(":80")
+            .is_some_and(|host| host.eq_ignore_ascii_case(received))
 }
 fn authority_for(host: &str, port: u16) -> String {
     if host.contains(':') {
@@ -387,7 +442,7 @@ fn bind_listener(host: &str, port: u16, authenticated: bool) -> Result<(Fd, u16,
     }
     selected.ok_or_else(|| {
         if denied {
-            "non-loopback HTTP listeners require ZTTY_MCP_TOKEN or --token".into()
+            "non-loopback HTTP listeners require an operator or observer bearer token".into()
         } else {
             "cannot bind MCP HTTP listener".into()
         }
@@ -417,6 +472,27 @@ impl Request {
     }
 }
 
+fn token_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric()
+        || matches!(
+            byte,
+            b'!' | b'#'
+                | b'$'
+                | b'%'
+                | b'&'
+                | b'\''
+                | b'*'
+                | b'+'
+                | b'-'
+                | b'.'
+                | b'^'
+                | b'_'
+                | b'`'
+                | b'|'
+                | b'~'
+        )
+}
+
 fn parse_request(bytes: &[u8]) -> Result<Option<Request>, u16> {
     let Some(end) = bytes.windows(4).position(|s| s == b"\r\n\r\n") else {
         return if bytes.len() > MAX_HEADERS {
@@ -436,7 +512,9 @@ fn parse_request(bytes: &[u8]) -> Result<Option<Request>, u16> {
     if parts.next() != Some("HTTP/1.1")
         || parts.next().is_some()
         || method.is_empty()
+        || !method.bytes().all(token_byte)
         || target.is_empty()
+        || !target.bytes().all(|byte| (0x21..=0x7e).contains(&byte))
     {
         return Err(400);
     }
@@ -444,8 +522,8 @@ fn parse_request(bytes: &[u8]) -> Result<Option<Request>, u16> {
     for line in lines {
         let (key, value) = line.split_once(':').ok_or(400u16)?;
         if key.is_empty()
-            || !key.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
-            || value.bytes().any(|b| b < 0x20 && b != b'\t')
+            || !key.bytes().all(token_byte)
+            || value.bytes().any(|b| (b < 0x20 && b != b'\t') || b == 0x7f)
         {
             return Err(400);
         }
@@ -453,7 +531,7 @@ fn parse_request(bytes: &[u8]) -> Result<Option<Request>, u16> {
         if headers.iter().any(|(old, _)| old == &key) {
             return Err(400);
         }
-        headers.push((key, value.trim().into()));
+        headers.push((key, value.trim_matches([' ', '\t']).into()));
         if headers.len() > 100 {
             return Err(431);
         }
@@ -464,7 +542,7 @@ fn parse_request(bytes: &[u8]) -> Result<Option<Request>, u16> {
             .find(|(name, _)| name == key)
             .map(|(_, value)| value.as_str())
     };
-    if get("host").is_none() {
+    if get("host").is_none_or(str::is_empty) {
         return Err(400);
     }
     let raw = &bytes[end + 4..];
@@ -487,10 +565,17 @@ fn parse_request(bytes: &[u8]) -> Result<Option<Request>, u16> {
         if raw.len() < length {
             return Ok(None);
         }
-        raw[..length].to_vec()
+        if raw.len() != length {
+            // One request per connection; reject ambiguous pipelining.
+            return Err(400);
+        }
+        raw.to_vec()
     } else if method == "POST" {
         return Err(411);
     } else {
+        if !raw.is_empty() {
+            return Err(400);
+        }
         Vec::new()
     };
     Ok(Some(Request {
@@ -504,14 +589,26 @@ fn parse_request(bytes: &[u8]) -> Result<Option<Request>, u16> {
 fn chunks(bytes: &[u8]) -> Result<Option<Vec<u8>>, u16> {
     let mut offset = 0;
     let mut output = Vec::new();
+    let mut chunk_count = 0;
     loop {
         let Some(line) = bytes[offset..].windows(2).position(|s| s == b"\r\n") else {
-            return Ok(None);
+            return if bytes.len() - offset > 1024 {
+                Err(400)
+            } else {
+                Ok(None)
+            };
         };
         if line > 1024 {
             return Err(400);
         }
+        chunk_count += 1;
+        if chunk_count > 16384 {
+            return Err(413);
+        }
         let text = core::str::from_utf8(&bytes[offset..offset + line]).map_err(|_| 400u16)?;
+        if text.bytes().any(|byte| byte < 0x20 || byte == 0x7f) {
+            return Err(400);
+        }
         let size = text.split(';').next().ok_or(400u16)?;
         if size.is_empty() || !size.bytes().all(|b| b.is_ascii_hexdigit()) {
             return Err(400);
@@ -519,16 +616,49 @@ fn chunks(bytes: &[u8]) -> Result<Option<Vec<u8>>, u16> {
         let size = usize::from_str_radix(size, 16).map_err(|_| 413u16)?;
         offset += line + 2;
         if size == 0 {
-            if bytes.get(offset..offset + 2) == Some(b"\r\n") {
-                return Ok(Some(output));
+            let trailer_start = offset;
+            loop {
+                let Some(line) = bytes[offset..].windows(2).position(|s| s == b"\r\n") else {
+                    return if bytes.len() - trailer_start > MAX_HEADERS {
+                        Err(431)
+                    } else {
+                        Ok(None)
+                    };
+                };
+                if offset + line + 2 - trailer_start > MAX_HEADERS {
+                    return Err(431);
+                }
+                if line == 0 {
+                    return if bytes.len() == offset + 2 {
+                        Ok(Some(output))
+                    } else {
+                        Err(400)
+                    };
+                }
+                let text =
+                    core::str::from_utf8(&bytes[offset..offset + line]).map_err(|_| 400u16)?;
+                let (name, value) = text.split_once(':').ok_or(400u16)?;
+                if name.is_empty()
+                    || !name.bytes().all(token_byte)
+                    || value
+                        .bytes()
+                        .any(|byte| (byte < 0x20 && byte != b'\t') || byte == 0x7f)
+                    || [
+                        "host",
+                        "content-length",
+                        "transfer-encoding",
+                        "authorization",
+                        "origin",
+                        "mcp-session-id",
+                        "mcp-protocol-version",
+                    ]
+                    .iter()
+                    .any(|blocked| name.eq_ignore_ascii_case(blocked))
+                {
+                    return Err(400);
+                }
+                offset += line + 2;
             }
-            let Some(end) = bytes[offset..].windows(4).position(|s| s == b"\r\n\r\n") else {
-                return Ok(None);
-            };
-            if end > MAX_HEADERS {
-                return Err(431);
-            }
-            return Ok(Some(output));
         }
         if output.len().saturating_add(size) > json::MAX_MESSAGE {
             return Err(413);
@@ -548,9 +678,20 @@ fn chunks(bytes: &[u8]) -> Result<Option<Vec<u8>>, u16> {
 fn contains_type(value: Option<&str>, mime: &str) -> bool {
     value.is_some_and(|value| {
         value.split(',').any(|part| {
-            part.split(';')
+            let mut parts = part.split(';');
+            parts
                 .next()
-                .is_some_and(|part| part.trim().eq_ignore_ascii_case(mime))
+                .is_some_and(|kind| kind.trim().eq_ignore_ascii_case(mime))
+                && parts.all(|parameter| {
+                    let Some((name, value)) = parameter.split_once('=') else {
+                        return true;
+                    };
+                    !name.trim().eq_ignore_ascii_case("q")
+                        || value
+                            .trim()
+                            .parse::<f32>()
+                            .is_ok_and(|q| q > 0.0 && q <= 1.0)
+                })
         })
     })
 }
@@ -570,32 +711,47 @@ fn respond(
     settings: &Settings<'_>,
     sessions: &mut Vec<Session>,
 ) -> (u16, Vec<u8>, Option<String>) {
-    if let Some(token) = settings.token {
-        let received = request
-            .header("authorization")
-            .and_then(|s| s.strip_prefix("Bearer "));
-        if received.is_none_or(|value| !token_matches(token, value)) {
+    let read_only = if settings.token.is_some() || settings.observer_token.is_some() {
+        let received = request.header("authorization").and_then(|value| {
+            let (scheme, token) = value.split_once(' ')?;
+            (scheme.eq_ignore_ascii_case("bearer") && !token.is_empty()).then_some(token)
+        });
+        let Some(received) = received else {
+            return (401, Vec::new(), None);
+        };
+        if settings
+            .token
+            .is_some_and(|token| token_matches(token, received))
+        {
+            settings.read_only
+        } else if settings
+            .observer_token
+            .is_some_and(|token| token_matches(token, received))
+        {
+            true
+        } else {
             return (401, Vec::new(), None);
         }
-    }
-    if settings.local
-        && request.header("host").is_none_or(|host| {
-            !settings
-                .authorities
-                .iter()
-                .any(|allowed| allowed.eq_ignore_ascii_case(host))
-        })
+    } else {
+        settings.read_only
+    };
+    let Some(host) = request.header("host") else {
+        return (400, Vec::new(), None);
+    };
+    if !settings
+        .authorities
+        .iter()
+        .any(|allowed| authority_matches(allowed, host))
     {
         return (403, Vec::new(), None);
     }
     if let Some(origin) = request.header("origin") {
+        // Both the request authority and Origin must match. An allowlisted alias
+        // is not permission for a cross-origin browser request to another alias.
         let accepted = ["http://", "https://"].iter().any(|prefix| {
-            origin.strip_prefix(prefix).is_some_and(|authority| {
-                settings
-                    .authorities
-                    .iter()
-                    .any(|allowed| allowed.eq_ignore_ascii_case(authority))
-            })
+            origin
+                .strip_prefix(prefix)
+                .is_some_and(|authority| authority.eq_ignore_ascii_case(host))
         });
         if !accepted {
             return (403, Vec::new(), None);
@@ -618,6 +774,9 @@ fn respond(
     }
     let existing = existing.flatten();
     if let Some(index) = existing {
+        if sessions[index].rpc.read_only != read_only {
+            return (403, Vec::new(), None);
+        }
         if request
             .header("mcp-protocol-version")
             .is_some_and(|version| version != sessions[index].rpc.version)
@@ -662,8 +821,25 @@ fn respond(
             );
         }
     };
-    let is_initialize = message.get("method").and_then(Value::as_str) == Some("initialize")
-        && message.get("id").is_some();
+    let kind = match message_kind(&message) {
+        Ok(kind) => kind,
+        Err(()) => {
+            return (
+                400,
+                json::stringify(&error(Value::Null, -32600, "Invalid Request")).into_bytes(),
+                None,
+            );
+        }
+    };
+    if kind == MessageKind::Notification
+        && message
+            .get("params")
+            .is_some_and(|params| !matches!(params, Value::Object(_)))
+    {
+        return (400, Vec::new(), None);
+    }
+    let is_initialize = kind == MessageKind::Request
+        && message.get("method").and_then(Value::as_str) == Some("initialize");
     let (response, session_id) = if let Some(index) = existing {
         (
             dispatch(&message, &mut sessions[index].rpc, &settings.origin),
@@ -673,7 +849,11 @@ fn respond(
         if sessions.len() >= MAX_SESSIONS {
             return (503, Vec::new(), None);
         }
-        let mut rpc = RpcSession::new();
+        let actor = match random_id() {
+            Ok(actor) => format!("mcp:{actor}"),
+            Err(()) => return (503, Vec::new(), None),
+        };
+        let mut rpc = RpcSession::new(read_only, actor);
         let response = dispatch(&message, &mut rpc, &settings.origin);
         if rpc.initialized {
             let id = match random_id() {
@@ -698,7 +878,7 @@ fn respond(
     }
 }
 
-fn random_id() -> Result<String, ()> {
+pub(super) fn random_id() -> Result<String, ()> {
     let mut random = [0u8; 24];
     let mut done = 0;
     while done < random.len() {
@@ -719,4 +899,199 @@ fn random_id() -> Result<String, ()> {
         output.push(HEX[(byte & 15) as usize] as char);
     }
     Ok(output)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn settings() -> Settings<'static> {
+        Settings {
+            origin: "mcp/http/127.0.0.1:8732".into(),
+            authorities: alloc::vec!["127.0.0.1:8732".into(), "localhost:8732".into()],
+            token: None,
+            observer_token: None,
+            read_only: false,
+        }
+    }
+
+    fn request(body: &str) -> Request {
+        Request {
+            method: "POST".into(),
+            target: "/mcp".into(),
+            headers: alloc::vec![
+                ("host".into(), "127.0.0.1:8732".into()),
+                ("content-type".into(), "application/json".into()),
+                (
+                    "accept".into(),
+                    "application/json, text/event-stream".into()
+                ),
+            ],
+            body: body.as_bytes().to_vec(),
+        }
+    }
+
+    const INIT: &str = r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}"#;
+
+    #[test]
+    fn framing_rejects_smuggling_controls_and_duplicate_headers() {
+        for bytes in [
+            &b"POST /mcp HTTP/1.1\r\nHost: h\r\nContent-Length: 0\r\nContent-Length: 0\r\n\r\n"[..],
+            &b"POST /mcp HTTP/1.1\r\nHost: h\r\nContent-Length: 0\r\nTransfer-Encoding: chunked\r\n\r\n0\r\n\r\n"[..],
+            &b"POST /mcp HTTP/1.1\r\nHost: h\x7f\r\nContent-Length: 0\r\n\r\n"[..],
+            &b"POST /mcp HTTP/1.1\r\nHost: \r\nContent-Length: 0\r\n\r\n"[..],
+            &b"POST /mcp HTTP/1.1\r\nHost: h\r\nContent-Length: 0\r\n\r\njunk"[..],
+            &b"POST /mc\x01p HTTP/1.1\r\nHost: h\r\nContent-Length: 0\r\n\r\n"[..],
+            &b"PO\x01ST /mcp HTTP/1.1\r\nHost: h\r\nContent-Length: 0\r\n\r\n"[..],
+        ] {
+            assert!(matches!(parse_request(bytes), Err(400)), "{bytes:?}");
+        }
+        assert!(matches!(
+            parse_request(
+                b"POST /mcp HTTP/1.1\r\nHost: h\r\nX_Test: ok\r\nContent-Length: 0\r\n\r\n"
+            ),
+            Ok(Some(_))
+        ));
+    }
+
+    #[test]
+    fn chunk_parser_handles_fragmentation_and_rejects_unsafe_trailers() {
+        let wire = b"2;x=y\r\n{}\r\n0\r\nX-Checksum: abc\r\n\r\n";
+        for length in 0..wire.len() {
+            assert!(
+                chunks(&wire[..length]).unwrap().is_none(),
+                "prefix {length}"
+            );
+        }
+        assert_eq!(chunks(wire).unwrap().unwrap(), b"{}");
+        for bytes in [
+            &b"0\r\nHost: attacker.invalid\r\n\r\n"[..],
+            &b"0\r\nAuthorization: Bearer injected\r\n\r\n"[..],
+            &b"0\r\nbad trailer\r\n\r\n"[..],
+            &b"0\r\nX-Data: \x7f\r\n\r\n"[..],
+            &b"0\r\n\r\nextra"[..],
+            &b"1;evil=\x01\r\nx\r\n0\r\n\r\n"[..],
+        ] {
+            assert!(matches!(chunks(bytes), Err(400)), "{bytes:?}");
+        }
+        assert_eq!(chunks(&alloc::vec![b'x'; 1025]), Err(400));
+        assert_eq!(chunks(b"100001\r\n"), Err(413));
+        let mut trailer = b"0\r\n".to_vec();
+        trailer.extend(alloc::vec![b'x'; MAX_HEADERS + 1]);
+        assert_eq!(chunks(&trailer), Err(431));
+    }
+
+    #[test]
+    fn host_and_origin_must_both_match_the_endpoint() {
+        let settings = settings();
+        let mut sessions = Vec::new();
+        for (header, value) in [
+            ("host", "attacker.invalid:8732"),
+            ("origin", "https://attacker.invalid"),
+            ("origin", "http://localhost:8732"),
+            ("origin", "http://127.0.0.1:8732/path"),
+            ("origin", "null"),
+        ] {
+            let mut request = request(INIT);
+            request.headers.retain(|(name, _)| name != header);
+            request.headers.push((header.into(), value.into()));
+            assert_eq!(respond(request, &settings, &mut sessions).0, 403);
+        }
+        assert!(sessions.is_empty());
+        let mut request = request(INIT);
+        request
+            .headers
+            .push(("origin".into(), "http://127.0.0.1:8732".into()));
+        assert_eq!(respond(request, &settings, &mut sessions).0, 200);
+    }
+
+    #[test]
+    fn authentication_binds_role_and_keeps_actor_separate_from_session_secret() {
+        let mut settings = settings();
+        settings.token = Some("operator-secret");
+        settings.observer_token = Some("observer-secret");
+        let mut sessions = Vec::new();
+        assert_eq!(respond(request(INIT), &settings, &mut sessions).0, 401);
+        let mut init = request(INIT);
+        init.headers
+            .push(("authorization".into(), "bearer operator-secret".into()));
+        let (status, _, id) = respond(init, &settings, &mut sessions);
+        assert_eq!(status, 200);
+        let id = id.unwrap();
+        assert_ne!(sessions[0].rpc.actor, format!("mcp:{id}"));
+        assert!(!sessions[0].rpc.read_only);
+        let mut borrowed = request(r#"{"jsonrpc":"2.0","id":2,"method":"ping"}"#);
+        borrowed.headers.extend([
+            ("authorization".into(), "Bearer observer-secret".into()),
+            ("mcp-session-id".into(), id),
+        ]);
+        assert_eq!(respond(borrowed, &settings, &mut sessions).0, 403);
+        let mut observer = request(INIT);
+        observer
+            .headers
+            .push(("authorization".into(), "Bearer observer-secret".into()));
+        assert_eq!(respond(observer, &settings, &mut sessions).0, 200);
+        assert!(sessions[1].rpc.read_only);
+    }
+
+    #[test]
+    fn invalid_envelopes_return_http_400_and_never_create_sessions() {
+        let mut sessions = Vec::new();
+        for body in [
+            "null",
+            "[]",
+            r#"{"jsonrpc":"2.0","method":"initialize","id":1,"result":{}}"#,
+            r#"{"jsonrpc":"2.0","method":"initialize","id":false}"#,
+        ] {
+            let (status, bytes, _) = respond(request(body), &settings(), &mut sessions);
+            assert_eq!(status, 400);
+            assert_eq!(
+                json::parse(&bytes)
+                    .unwrap()
+                    .get("error")
+                    .unwrap()
+                    .get("code")
+                    .unwrap()
+                    .as_i64(),
+                Some(-32600)
+            );
+        }
+        assert!(sessions.is_empty());
+    }
+
+    #[test]
+    fn accept_quality_zero_is_not_an_accepted_representation() {
+        assert!(!contains_type(
+            Some("application/json;q=0, text/event-stream"),
+            "application/json"
+        ));
+        assert!(contains_type(
+            Some("application/json; q=0.5"),
+            "application/json"
+        ));
+        assert!(!contains_type(
+            Some("application/json; q=NaN"),
+            "application/json"
+        ));
+    }
+
+    #[test]
+    fn authority_allowlist_rejects_urls_userinfo_and_controls() {
+        for value in ["terminal.example:8732", "[::1]:8732", "127.0.0.1:80"] {
+            assert!(valid_authority(value));
+        }
+        for value in [
+            "https://example:8732",
+            "user@example:8732",
+            "x:0",
+            "x:00",
+            "x:65536",
+            "x:2/path",
+            "x:2\r\nHost:y",
+            "*:80",
+            ":80",
+        ] {
+            assert!(!valid_authority(value), "{value}");
+        }
+    }
 }
