@@ -1,0 +1,39 @@
+{
+  "schema": 1,
+  "scope": "parser plus screen model; no PTY, renderer or display",
+  "geometry": [
+    120,
+    32
+  ],
+  "cell_bytes": 28,
+  "initial_core_heap_bytes": 107676,
+  "ascii_mib_s": 232.927,
+  "ascii_full_history_mib_s": 177.049,
+  "sgr_mib_s": 125.111,
+  "unicode_mib_s": 97.722,
+  "steady_state_allocations": 0,
+  "edit_ns": {
+    "p50": 37,
+    "p95": 41,
+    "p99": 43,
+    "allocations": 0
+  },
+  "burst_1024_ns": {
+    "p50": 3138,
+    "p95": 4119,
+    "p99": 4495,
+    "allocations": 0
+  },
+  "measurement_environment": {
+    "origin": "development_machine",
+    "is_development_machine": true,
+    "cpu_model": "12th Gen Intel(R) Core(TM) i9-12900HX",
+    "logical_cpus": 24,
+    "kernel": "7.3.4-arch1-1",
+    "architecture": "x86_64",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "source_ref": "3e2f03297c638f14d9799dcb78a915f634287813",
+    "measured_at_utc": "2026-11-17T17:47:40.286591+00:00",
+    "command": "cargo run --locked --release -p zterm --example benchmark"
+  }
+}

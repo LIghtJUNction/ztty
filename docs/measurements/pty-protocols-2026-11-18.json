@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "checks": [
+    "status",
+    "cursor",
+    "private_cursor",
+    "sync_reset",
+    "sync_set",
+    "sync_end",
+    "bracketed_paste_set",
+    "kitty_push",
+    "kitty_alternate_stack",
+    "kitty_primary_stack",
+    "kitty_pop",
+    "unknown_mode"
+  ],
+  "ok": true,
+  "pty_roundtrip_us": {
+    "p50": 10.416,
+    "p95": 15.275,
+    "p99": 24.211,
+    "samples": 1000,
+    "scope": "child write, PTY, parser/grid, response, PTY, child read; excludes scanout"
+  },
+  "environment": {
+    "TERM": "xterm-256color",
+    "COLORTERM": "truecolor",
+    "TERM_PROGRAM": "ztty"
+  }
+}
