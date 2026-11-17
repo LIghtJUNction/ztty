@@ -1,0 +1,18 @@
+[package]
+name = "zpty"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.100"
+description = "A small no_std Linux PTY owner with nonblocking I/O and explicit child lifecycle"
+license = "MIT"
+repository = "https://github.com/LIghtJUNction/ztty"
+readme = "README.md"
+keywords = ["pty", "terminal", "no-std", "linux"]
+categories = ["os::unix-apis", "no-std"]
+include = ["src/**", "examples/**", "Cargo.toml", "README.md", "LICENSE"]
+
+[dependencies]
+
+[[example]]
+name = "capture"
+path = "examples/capture.rs"

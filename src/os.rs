@@ -1,0 +1,247 @@
+//! Small Linux C-ABI boundary. Production Rust does not link `std`.
+use alloc::ffi::CString;
+use alloc::vec::Vec;
+use core::alloc::{GlobalAlloc, Layout};
+use core::ffi::{CStr, c_char, c_int, c_long, c_void};
+
+pub const POLLIN: i16 = 1;
+pub const POLLOUT: i16 = 4;
+pub const POLLERR: i16 = 8;
+pub const POLLHUP: i16 = 16;
+pub const EINTR: i32 = 4;
+
+#[repr(C)]
+pub struct PollFd {
+    pub fd: c_int,
+    pub events: i16,
+    pub revents: i16,
+}
+#[repr(C)]
+struct TimeSpec {
+    seconds: c_long,
+    nanoseconds: c_long,
+}
+
+#[link(name = "c")]
+unsafe extern "C" {
+    pub fn write(fd: c_int, data: *const c_void, size: usize) -> isize;
+    pub fn close(fd: c_int) -> c_int;
+    pub fn poll(fds: *mut PollFd, count: usize, timeout: c_int) -> c_int;
+    pub fn fcntl(fd: c_int, command: c_int, ...) -> c_int;
+    pub fn getenv(name: *const c_char) -> *mut c_char;
+    pub fn setlocale(category: c_int, locale: *const c_char) -> *mut c_char;
+    fn execve(file: *const c_char, argv: *const *const c_char, env: *const *const c_char) -> c_int;
+    fn access(path: *const c_char, mode: c_int) -> c_int;
+    static mut environ: *mut *mut c_char;
+    pub fn fork() -> c_int;
+    pub fn getpid() -> c_int;
+    pub fn waitpid(pid: c_int, status: *mut c_int, options: c_int) -> c_int;
+    pub fn _exit(status: c_int) -> !;
+    pub fn __errno_location() -> *mut c_int;
+    fn clock_gettime(clock: c_int, time: *mut TimeSpec) -> c_int;
+    fn malloc(size: usize) -> *mut c_void;
+    fn realloc(ptr: *mut c_void, size: usize) -> *mut c_void;
+    fn free(ptr: *mut c_void);
+    fn posix_memalign(ptr: *mut *mut c_void, alignment: usize, size: usize) -> c_int;
+}
+
+pub struct Allocator;
+// libc allocations are process-wide and thread-safe; all Rust allocation layouts
+// are honored, including alignments greater than malloc's native alignment.
+unsafe impl GlobalAlloc for Allocator {
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        if layout.align() <= 16 {
+            unsafe { malloc(layout.size().max(1)).cast() }
+        } else {
+            let mut p = core::ptr::null_mut();
+            if unsafe { posix_memalign(&mut p, layout.align(), layout.size().max(1)) } == 0 {
+                p.cast()
+            } else {
+                core::ptr::null_mut()
+            }
+        }
+    }
+    unsafe fn dealloc(&self, p: *mut u8, _: Layout) {
+        unsafe { free(p.cast()) };
+    }
+    unsafe fn realloc(&self, p: *mut u8, layout: Layout, size: usize) -> *mut u8 {
+        if layout.align() <= 16 {
+            return unsafe { realloc(p.cast(), size.max(1)).cast() };
+        }
+        let Ok(next) = Layout::from_size_align(size.max(1), layout.align()) else {
+            return core::ptr::null_mut();
+        };
+        let out = unsafe { self.alloc(next) };
+        if !out.is_null() {
+            unsafe {
+                core::ptr::copy_nonoverlapping(p, out, layout.size().min(size));
+                self.dealloc(p, layout);
+            }
+        }
+        out
+    }
+}
+
+pub fn errno() -> i32 {
+    unsafe { *__errno_location() }
+}
+pub fn milliseconds() -> u64 {
+    let mut t = TimeSpec {
+        seconds: 0,
+        nanoseconds: 0,
+    };
+    unsafe {
+        clock_gettime(1, &mut t);
+    }
+    (t.seconds as u64) * 1000 + (t.nanoseconds as u64) / 1_000_000
+}
+pub fn print(fd: i32, bytes: &[u8]) {
+    let mut remaining = bytes;
+    while !remaining.is_empty() {
+        let n = unsafe { write(fd, remaining.as_ptr().cast(), remaining.len()) };
+        if n > 0 {
+            remaining = &remaining[n as usize..];
+        } else if n < 0 && errno() == EINTR {
+            continue;
+        } else {
+            break;
+        }
+    }
+}
+
+/// Copy the inherited environment before any fork. Environment entries stay in
+/// their original byte encoding; UTF-8 is not imposed on Unix process metadata.
+fn environment() -> Vec<CString> {
+    let mut output = Vec::new();
+    let mut pointer = unsafe { environ };
+    if !pointer.is_null() {
+        unsafe {
+            while !(*pointer).is_null() {
+                output.push(CStr::from_ptr(*pointer).into());
+                pointer = pointer.add(1);
+            }
+        }
+    }
+    output
+}
+
+fn resolve(program: &CStr, environment: &[CString]) -> Option<CString> {
+    if program.to_bytes().contains(&b'/') {
+        return Some(program.into());
+    }
+    let path = environment
+        .iter()
+        .find_map(|s| s.to_bytes().strip_prefix(b"PATH="))
+        .unwrap_or(b"/usr/bin:/bin");
+    for directory in path.split(|&b| b == b':') {
+        let mut candidate = Vec::with_capacity(directory.len() + program.to_bytes().len() + 2);
+        if directory.is_empty() {
+            candidate.extend_from_slice(b".");
+        } else {
+            candidate.extend_from_slice(directory);
+        }
+        candidate.push(b'/');
+        candidate.extend_from_slice(program.to_bytes());
+        let path = CString::new(candidate).ok()?;
+        if unsafe { access(path.as_ptr(), 1) } == 0 {
+            return Some(path);
+        }
+    }
+    None
+}
+
+/// Prepare every byte of the shell's environment and resolve PATH in the parent.
+pub fn child_setup(program: &CStr) -> Result<(CString, Vec<CString>), &'static str> {
+    let mut env = environment();
+    let executable = resolve(program, &env).ok_or("command not found on PATH")?;
+    env.retain(|entry| {
+        ![
+            b"TERM=".as_slice(),
+            b"COLORTERM=",
+            b"TERM_PROGRAM=",
+            b"TERM_PROGRAM_VERSION=",
+        ]
+        .iter()
+        .any(|prefix| entry.to_bytes().starts_with(prefix))
+    });
+    env.extend([
+        c"TERM=xterm-256color".into(),
+        c"COLORTERM=truecolor".into(),
+        c"TERM_PROGRAM=ztty".into(),
+        c"TERM_PROGRAM_VERSION=0.1.0".into(),
+    ]);
+    Ok((executable, env))
+}
+
+/// Children launched by explicit hyperlink clicks are owned independently from
+/// the shell PTY, so reaping them cannot consume an unrelated child's status.
+pub struct Openers {
+    children: Vec<i32>,
+}
+impl Openers {
+    pub fn new() -> Self {
+        Self {
+            children: Vec::new(),
+        }
+    }
+    pub fn pending(&self) -> bool {
+        !self.children.is_empty()
+    }
+    pub fn reap(&mut self) {
+        self.children.retain(|&pid| {
+            let result = unsafe { waitpid(pid, core::ptr::null_mut(), 1) };
+            result == 0 || (result < 0 && errno() == EINTR)
+        });
+    }
+    pub fn open(&mut self, uri: &str, xfd: i32, ptyfd: i32) {
+        self.reap();
+        if self.children.len() >= 32
+            || uri.len() > 8192
+            || uri.chars().any(|c| c.is_control())
+            || !(uri.starts_with("https://")
+                || uri.starts_with("http://")
+                || uri.starts_with("mailto:"))
+        {
+            return;
+        }
+        let Ok(uri) = CString::new(uri) else { return };
+        let env = environment();
+        let Some(program) = resolve(c"xdg-open", &env) else {
+            return;
+        };
+        let argv = [c"xdg-open".as_ptr(), uri.as_ptr(), core::ptr::null()];
+        let mut envp: Vec<*const c_char> = env.iter().map(|s| s.as_ptr()).collect();
+        envp.push(core::ptr::null());
+        // ztty is a single-threaded host with no custom signal handlers.
+        // Every allocation and PATH/environment operation precedes fork.
+        let pid = unsafe { fork() };
+        if pid == 0 {
+            unsafe {
+                if xfd > 2 {
+                    close(xfd);
+                }
+                if ptyfd > 2 {
+                    close(ptyfd);
+                }
+                // Detach the desktop opener. The directly owned child only
+                // forks and exits, and is reaped by the UI event loop.
+                let grandchild = fork();
+                if grandchild > 0 {
+                    _exit(0);
+                }
+                if grandchild < 0 {
+                    _exit(127);
+                }
+                execve(program.as_ptr(), argv.as_ptr(), envp.as_ptr());
+                _exit(127);
+            }
+        } else if pid > 0 {
+            self.children.push(pid);
+        }
+    }
+}
+impl Drop for Openers {
+    fn drop(&mut self) {
+        self.reap();
+    }
+}

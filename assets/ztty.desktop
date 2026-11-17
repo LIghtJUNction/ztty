@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=ztty
+GenericName=Terminal
+Comment=A lean terminal built on Project Z
+Exec=ztty
+Icon=utilities-terminal
+Terminal=false
+Categories=System;TerminalEmulator;
+Keywords=terminal;shell;console;
+StartupWMClass=ztty

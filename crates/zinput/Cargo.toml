@@ -1,0 +1,15 @@
+[package]
+name = "zinput"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "Zero-dependency no_std terminal keyboard, mouse and paste encoding"
+readme = "README.md"
+keywords = ["terminal", "no-std", "keyboard", "kitty", "input"]
+categories = ["no-std", "encoding", "command-line-interface"]
+include = ["src/**", "Cargo.toml", "README.md", "LICENSE"]
+
+[dependencies]
