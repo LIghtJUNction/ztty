@@ -911,7 +911,13 @@ def refresh_summary(report):
         "missing_counters": "Derived values remain null if any required counter or sampled snapshot is unavailable; missing values are never zero-filled.",
     }
 
-def svg_document(report):
+def svg_document(report, source_path=REPORT):
+    source_path = Path(source_path)
+    if source_path.is_absolute():
+        try:
+            source_path = source_path.relative_to(ROOT)
+        except ValueError:
+            pass
     repetitions = validate_report(report)
     if not overview_available(report):
         raise ValueError("README overview requires comparison data")
@@ -980,7 +986,7 @@ def svg_document(report):
         f"One active window, nine idle; write → DSR reply. Logical completion, not frame rate. Memory: fixed frame + {report['settings']['memory_settle_seconds']:g}s settle.",
         swap_line,
         " · ".join(versions) + " · " + date + " · 120×32 cells · monospace 11 pt",
-        "Raw samples, versions, hashes and scope: docs/benchmarks/terminals-10-windows.json",
+        f"Raw samples, versions, hashes and scope: {source_path}",
     ]
     loads = [run[key][0] for run in focused
              for key in ("load_average_at_start", "load_average_at_end") if run.get(key)]
@@ -1154,7 +1160,7 @@ def main():
         if not args.no_readme and not overview:
             parser.error("README overview requires all three apps at 10 shared idle windows; use --no-readme")
         scaling = scaling_svg_document(report)
-        svg = svg_document(report) if overview else scaling
+        svg = svg_document(report, args.json) if overview else scaling
         atomic_write(args.json, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
         atomic_write(args.svg, svg)
         atomic_write(scaling_path, scaling)
@@ -1277,7 +1283,7 @@ def main():
     report["ok"] = True
     refresh_summary(report)
     scaling = scaling_svg_document(report)
-    svg = svg_document(report) if overview_available(report) else scaling
+    svg = svg_document(report, args.json) if overview_available(report) else scaling
     # Validate and build everything before replacing either tracked artifact.
     serialized = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
     atomic_write(args.json, serialized)
