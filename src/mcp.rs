@@ -11,13 +11,14 @@ use crate::os;
 mod http;
 
 pub(super) const VERSIONS: [&str; 3] = ["2025-11-25", "2025-06-18", "2025-03-26"];
-const HELP: &str = "Usage: ztty mcp [--transport stdio|http] [--host HOST] [--port PORT] [--token TOKEN]\n\nDefaults: stdio; HTTP host 127.0.0.1, port 8732, endpoint /mcp.\nUse --port 0 to choose a free port. ZTTY_MCP_TOKEN supplies a bearer token.\nA bearer token is required for a non-loopback HTTP listener.\nMCP sessions create persistent PTYs; use ztty attach to list and view them.\n";
+const HELP: &str = "Usage: ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n                [--read-only] [--token TOKEN] [--observer-token TOKEN]\n                [--allow-host AUTHORITY]\n\nDefaults: stdio; HTTP host 127.0.0.1, port 8732, endpoint /mcp.\nUse --port 0 to choose a free port. ZTTY_MCP_TOKEN supplies an operator token;\nZTTY_MCP_OBSERVER_TOKEN supplies an observer token. --read-only limits all\nclients to session_list/session_read, including operator-token holders.\nNon-loopback HTTP requires a token. --allow-host explicitly permits another\nHTTP Host authority (name:port), for example behind a trusted local proxy.\nHTTP authentication is required whenever either token is configured.\nMCP protocol versions: 2025-11-25, 2025-06-18, 2025-03-26.\nMCP sessions create persistent PTYs; use ztty attach to list and view them.\n";
 const TOOLS: &str = r#"[
 {"name":"session_create","description":"Create a persistent terminal session in the shared ztty process. Commands are argv; use an explicit shell for shell syntax. Attach the returned URI with ztty attach.","inputSchema":{"type":"object","properties":{"name":{"type":"string","description":"Optional unique name within this MCP transport namespace"},"command":{"type":"array","items":{"type":"string"},"minItems":1,"description":"Executable and arguments; defaults to the configured shell"},"cwd":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256},"history":{"type":"integer","minimum":0,"maximum":100000}},"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":true}},
 {"name":"session_list","description":"List terminal sessions, canonical ztty:// URIs, process state and attached windows.","inputSchema":{"type":"object","properties":{},"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish a UTF-8 character. Reuse next_cursor; truncated reports expired output.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_write","description":"Send up to 65536 UTF-8 bytes or terminal control bytes to a session. Include a newline to submit a shell command; use \\u0003 to interrupt.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"data":{"type":"string","maxLength":65536}},"required":["session","data"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":true}},
 {"name":"session_resize","description":"Resize a session PTY and screen; attached windows use the new terminal dimensions.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256}},"required":["session","cols","rows"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":false}},
+{"name":"session_control","description":"Acquire or release exclusive input control. takeover=true explicitly replaces another operator; observers cannot acquire control.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"action":{"type":"string","enum":["acquire","release"]},"takeover":{"type":"boolean"}},"required":["session","action"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}},
 {"name":"session_close","description":"Close a terminal session, hang up its child process and release its window/history.","inputSchema":{"type":"object","properties":{"session":{"type":"string"}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}}
 ]"#;
 
@@ -33,6 +34,12 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
         .map(|bytes| core::str::from_utf8(bytes).map(ToString::to_string))
         .transpose()
         .map_err(|_| "ZTTY_MCP_TOKEN must be UTF-8")?;
+    let mut observer_token = os::env(c"ZTTY_MCP_OBSERVER_TOKEN")
+        .map(|bytes| core::str::from_utf8(bytes).map(ToString::to_string))
+        .transpose()
+        .map_err(|_| "ZTTY_MCP_OBSERVER_TOKEN must be UTF-8")?;
+    let mut read_only = false;
+    let mut allowed_hosts = Vec::new();
     let mut http_option = false;
     let mut index = 0;
     while index < args.len() {
@@ -46,7 +53,9 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
             }
             "--stdio" => transport = "stdio",
             "--http" => transport = "http",
-            "--transport" | "--host" | "--port" | "--token" => {
+            "--read-only" => read_only = true,
+            "--transport" | "--host" | "--port" | "--token" | "--observer-token"
+            | "--allow-host" => {
                 index += 1;
                 let value = args
                     .get(index)
@@ -67,6 +76,20 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
                         token = Some(value.into());
                         http_option = true;
                     }
+                    "--observer-token" => {
+                        observer_token = Some(value.into());
+                        http_option = true;
+                    }
+                    "--allow-host" => {
+                        if !http::valid_authority(value) {
+                            return Err("--allow-host must be a host:port authority".into());
+                        }
+                        if allowed_hosts.len() >= 32 {
+                            return Err("at most 32 --allow-host entries are supported".into());
+                        }
+                        allowed_hosts.push(value.to_string());
+                        http_option = true;
+                    }
                     _ => unreachable!(),
                 }
             }
@@ -74,15 +97,31 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
         }
         index += 1;
     }
-    if token.as_ref().is_some_and(|t| {
-        t.is_empty() || t.len() > 4096 || t.bytes().any(|b| b <= 0x20 || b >= 0x7f)
-    }) {
-        return Err("MCP bearer token must be 1..4096 visible ASCII bytes".into());
+    for token in [token.as_deref(), observer_token.as_deref()]
+        .into_iter()
+        .flatten()
+    {
+        if token.is_empty() || token.len() > 4096 || token.bytes().any(|b| b <= 0x20 || b >= 0x7f) {
+            return Err("MCP bearer token must be 1..4096 visible ASCII bytes".into());
+        }
+    }
+    if token.is_some() && token == observer_token {
+        return Err("operator and observer tokens must be different".into());
     }
     match transport {
-        "stdio" if http_option => Err("--host, --port and --token require --transport http".into()),
-        "stdio" => stdio(),
-        "http" | "streamable-http" => http::run(host, port, token.as_deref()),
+        "stdio" if http_option => Err(
+            "--host, --port, --token, --observer-token and --allow-host require --transport http"
+                .into(),
+        ),
+        "stdio" => stdio(read_only),
+        "http" | "streamable-http" => http::run(
+            host,
+            port,
+            token.as_deref(),
+            observer_token.as_deref(),
+            read_only,
+            &allowed_hosts,
+        ),
         _ => Err("--transport must be stdio or http".into()),
     }
 }
@@ -91,14 +130,20 @@ pub(super) struct RpcSession {
     initialized: bool,
     ready: bool,
     pub(super) version: String,
+    /// Trusted configuration/authentication result, never a tool argument.
+    pub(super) read_only: bool,
+    /// Independent of HTTP credentials because owners are public metadata.
+    actor: String,
 }
 
 impl RpcSession {
-    pub(super) fn new() -> Self {
+    pub(super) fn new(read_only: bool, actor: String) -> Self {
         Self {
             initialized: false,
             ready: false,
             version: VERSIONS[0].into(),
+            read_only,
+            actor,
         }
     }
 }
@@ -118,27 +163,121 @@ fn success(id: Value, result: Value) -> Value {
     object([("jsonrpc", "2.0".into()), ("id", id), ("result", result)])
 }
 
-pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) -> Option<Value> {
-    let id = message.get("id").cloned();
-    let valid_id = matches!(&id, None | Some(Value::String(_) | Value::Number(_)));
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) enum MessageKind {
+    Request,
+    Notification,
+    Response,
+}
+
+/// Check the envelope before interpreting any method or changing state.
+pub(super) fn message_kind(message: &Value) -> Result<MessageKind, ()> {
     if !matches!(message, Value::Object(_))
         || message.get("jsonrpc").and_then(Value::as_str) != Some("2.0")
-        || !valid_id
     {
-        return Some(error(Value::Null, -32600, "Invalid Request"));
+        return Err(());
     }
-    let Some(method) = message.get("method").and_then(Value::as_str) else {
-        if id.is_some() && (message.get("result").is_some() ^ message.get("error").is_some()) {
+    let id = message.get("id");
+    if id.is_some_and(|id| match id {
+        Value::String(_) => false,
+        Value::Number(number) => !integer_number(number),
+        _ => true,
+    }) {
+        return Err(());
+    }
+    if let Some(method) = message.get("method") {
+        if method.as_str().is_none()
+            || message.get("result").is_some()
+            || message.get("error").is_some()
+        {
+            return Err(());
+        }
+        return Ok(if id.is_some() {
+            MessageKind::Request
+        } else {
+            MessageKind::Notification
+        });
+    }
+    if message.get("params").is_some() {
+        return Err(());
+    }
+    match (message.get("result"), message.get("error")) {
+        (Some(Value::Object(_)), None) if id.is_some() => Ok(MessageKind::Response),
+        (None, Some(Value::Object(fields))) => {
+            let code = fields
+                .iter()
+                .find(|(key, _)| key == "code")
+                .map(|(_, value)| value);
+            let message = fields
+                .iter()
+                .find(|(key, _)| key == "message")
+                .map(|(_, value)| value);
+            if matches!(code, Some(Value::Number(number)) if integer_number(number))
+                && message.and_then(Value::as_str).is_some()
+            {
+                Ok(MessageKind::Response)
+            } else {
+                Err(())
+            }
+        }
+        _ => Err(()),
+    }
+}
+
+/// JSON integer values can use decimal/exponent syntax. Check exactly, without
+/// float rounding or expanding arbitrarily large exponents/request IDs.
+fn integer_number(token: &str) -> bool {
+    let token = token.strip_prefix('-').unwrap_or(token);
+    let (mantissa, exponent) = token.split_once(['e', 'E']).unwrap_or((token, "0"));
+    if mantissa.bytes().all(|byte| matches!(byte, b'0' | b'.')) {
+        return true;
+    }
+    let exponent = match exponent.parse::<i64>() {
+        Ok(value) => value,
+        Err(_) => return !exponent.starts_with('-'),
+    };
+    let fraction = mantissa
+        .split_once('.')
+        .map_or(0, |(_, digits)| digits.len()) as i64;
+    let zeroes_needed = fraction.saturating_sub(exponent);
+    zeroes_needed <= 0
+        || mantissa
+            .bytes()
+            .rev()
+            .filter(|byte| *byte != b'.')
+            .take_while(|byte| *byte == b'0')
+            .count() as i64
+            >= zeroes_needed
+}
+
+fn observable_tool(name: &str) -> bool {
+    matches!(name, "session_list" | "session_read")
+}
+
+pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) -> Option<Value> {
+    let kind = match message_kind(message) {
+        Ok(kind) => kind,
+        Err(()) => return Some(error(Value::Null, -32600, "Invalid Request")),
+    };
+    if kind == MessageKind::Response {
+        // This server issues no requests. Never interpret an unsolicited
+        // response as an executable request.
+        return None;
+    }
+    let method = message.get("method").and_then(Value::as_str).unwrap_or("");
+    if kind == MessageKind::Notification {
+        if message
+            .get("params")
+            .is_some_and(|params| !matches!(params, Value::Object(_)))
+        {
             return None;
         }
-        return Some(error(Value::Null, -32600, "Invalid Request"));
-    };
-    if id.is_none() {
         if method == "notifications/initialized" && session.initialized {
             session.ready = true;
         }
         return None;
     }
+    let id = message.get("id").cloned();
     let id = id.unwrap_or(Value::Null);
     let empty = object([]);
     let params = message.get("params").unwrap_or(&empty);
@@ -181,7 +320,11 @@ pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) 
             ("protocolVersion", session.version.clone().into()),
             ("capabilities", object([("tools", object([("listChanged", false.into())]))])),
             ("serverInfo", object([("name", "ztty".into()), ("version", env!("CARGO_PKG_VERSION").into())])),
-            ("instructions", "Create persistent PTYs, read output incrementally, write input, and attach their ztty:// URIs in a desktop window.".into()),
+            ("instructions", if session.read_only {
+                "Observer access: list sessions and read output. Input, session creation and control changes are denied."
+            } else {
+                "Create persistent PTYs, read output incrementally, acquire input control, write input, and attach their ztty:// URIs in a desktop window."
+            }.into()),
         ])));
     }
     if method == "ping" {
@@ -199,23 +342,35 @@ pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) 
             if params.get("cursor").is_some() {
                 return Some(error(id, -32602, "No pagination cursor is supported"));
             }
-            Some(success(
-                id,
-                object([(
-                    "tools",
-                    json::parse(TOOLS.as_bytes()).expect("static tool schema"),
-                )]),
-            ))
+            let mut tools = json::parse(TOOLS.as_bytes()).expect("static tool schema");
+            if session.read_only
+                && let Value::Array(values) = &mut tools
+            {
+                values.retain(|tool| {
+                    tool.get("name")
+                        .and_then(Value::as_str)
+                        .is_some_and(observable_tool)
+                });
+            }
+            Some(success(id, object([("tools", tools)])))
         }
         "tools/call" => {
             let Some(name) = params.get("name").and_then(Value::as_str) else {
                 return Some(error(id, -32602, "tool name is required"));
             };
             let arguments = params.get("arguments").unwrap_or(&empty);
-            let request = match tool_request(name, arguments, origin) {
+            let mut request = match tool_request(name, arguments, origin) {
                 Ok(request) => request,
                 Err(message) => return Some(error(id, -32602, message)),
             };
+            if session.read_only && !observable_tool(name) {
+                return Some(error(
+                    id,
+                    -32001,
+                    "Observer access does not permit this tool",
+                ));
+            }
+            request.set("_actor", session.actor.clone().into());
             let (result, failed) = match crate::broker::request(&request) {
                 Ok(value) => (value, false),
                 Err(message) => (object([("error", message.into())]), true),
@@ -253,6 +408,7 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         "session_write" => ("write", &["session", "data"]),
         "session_resize" => ("resize", &["session", "cols", "rows"]),
         "session_close" => ("close", &["session"]),
+        "session_control" => ("control", &["session", "action", "takeover"]),
         _ => return Err("Unknown tool"),
     };
     if fields
@@ -317,6 +473,23 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
             return Err("cols and rows are required");
         }
     }
+    if operation == "control" {
+        let action = arguments
+            .get("action")
+            .and_then(Value::as_str)
+            .ok_or("action is required")?;
+        if !matches!(action, "acquire" | "release") {
+            return Err("action must be acquire or release");
+        }
+        if let Some(takeover) = arguments.get("takeover") {
+            if takeover.as_bool().is_none() {
+                return Err("takeover must be a boolean");
+            }
+            if action != "acquire" {
+                return Err("takeover is only valid when acquiring control");
+            }
+        }
+    }
     if operation == "write" {
         let data = arguments
             .get("data")
@@ -329,8 +502,9 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
     Ok(request)
 }
 
-fn stdio() -> Result<i32, String> {
-    let mut session = RpcSession::new();
+fn stdio(read_only: bool) -> Result<i32, String> {
+    let actor = http::random_id().map_err(|()| "cannot create secure MCP actor identity")?;
+    let mut session = RpcSession::new(read_only, format!("mcp:{actor}"));
     let mut pending = Vec::new();
     let mut buffer = [0u8; 8192];
     let mut discard = false;
@@ -385,4 +559,233 @@ fn emit(response: Value) {
     let mut bytes = json::stringify(&response);
     bytes.push('\n');
     os::print(1, bytes.as_bytes());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn call(message: &str, session: &mut RpcSession) -> Option<Value> {
+        dispatch(
+            &json::parse(message.as_bytes()).unwrap(),
+            session,
+            "mcp/stdio",
+        )
+    }
+
+    fn ready(read_only: bool) -> RpcSession {
+        let mut session = RpcSession::new(read_only, "trusted-test-actor".into());
+        session.initialized = true;
+        session.ready = true;
+        session
+    }
+
+    fn code(value: &Value) -> Option<i64> {
+        value
+            .get("error")
+            .and_then(|value| value.get("code"))
+            .and_then(Value::as_i64)
+    }
+
+    #[test]
+    fn request_ids_are_exact_integers_without_float_rounding() {
+        for number in [
+            "1.0",
+            "1e0",
+            "1.25e2",
+            "100e-2",
+            "0e-99999999999999999999999",
+            "9007199254740993123456789",
+            "1e99999999999999999999999999",
+        ] {
+            assert!(integer_number(number), "{number}");
+        }
+        for number in [
+            "1.5",
+            "1.00000000000000001",
+            "1e-1",
+            "1e-99999999999999999999999",
+        ] {
+            assert!(!integer_number(number), "{number}");
+        }
+    }
+
+    #[test]
+    fn malformed_envelopes_never_run_requests() {
+        let mut session = ready(false);
+        for message in [
+            r#"{"jsonrpc":"2.0","id":1,"method":"ping","result":{}}"#,
+            r#"{"jsonrpc":"2.0","id":1,"method":"ping","error":{"code":1,"message":"x"}}"#,
+            r#"{"jsonrpc":"2.0","id":1.5,"method":"ping"}"#,
+            r#"{"jsonrpc":"2.0","id":true,"method":"ping"}"#,
+            r#"{"jsonrpc":"2.0","id":null,"method":"ping"}"#,
+            r#"{"jsonrpc":"2.0","id":1,"result":{},"error":{"code":1,"message":"x"}}"#,
+            r#"{"jsonrpc":"2.0","id":1,"error":{"code":"bad","message":"x"}}"#,
+            r#"{"jsonrpc":"2.0","id":1,"method":5}"#,
+            r#"{"jsonrpc":"2.0","result":{}}"#,
+            "[]",
+            "null",
+        ] {
+            assert_eq!(
+                code(&call(message, &mut session).unwrap()),
+                Some(-32600),
+                "{message}"
+            );
+        }
+        assert!(call(r#"{"jsonrpc":"2.0","id":2,"result":{}}"#, &mut session).is_none());
+        assert!(
+            call(
+                r#"{"jsonrpc":"2.0","id":2,"error":{"code":-32601,"message":"unknown"}}"#,
+                &mut session
+            )
+            .is_none()
+        );
+    }
+
+    #[test]
+    fn uncorrelated_error_responses_are_accepted_without_dispatch() {
+        let mut session = ready(false);
+        for message in [
+            r#"{"jsonrpc":"2.0","error":{"code":-32700,"message":"parse error"}}"#,
+            r#"{"jsonrpc":"2.0","id":"unused","error":{"code":-32601.0,"message":"unknown"}}"#,
+        ] {
+            let value = json::parse(message.as_bytes()).unwrap();
+            assert_eq!(message_kind(&value), Ok(MessageKind::Response));
+            assert!(dispatch(&value, &mut session, "test").is_none());
+        }
+        let value =
+            json::parse(br#"{"jsonrpc":"2.0","error":{"code":0.1,"message":"invalid"}}"#).unwrap();
+        assert_eq!(message_kind(&value), Err(()));
+    }
+
+    #[test]
+    fn malformed_ready_notification_does_not_advance_lifecycle() {
+        let mut session = RpcSession::new(false, "actor".into());
+        session.initialized = true;
+        assert!(
+            call(
+                r#"{"jsonrpc":"2.0","method":"notifications/initialized","params":null}"#,
+                &mut session
+            )
+            .is_none()
+        );
+        assert!(!session.ready);
+        assert!(
+            call(
+                r#"{"jsonrpc":"2.0","method":"notifications/initialized"}"#,
+                &mut session
+            )
+            .is_none()
+        );
+        assert!(session.ready);
+    }
+
+    #[test]
+    fn observer_catalog_and_dispatch_enforce_same_permissions() {
+        let mut session = ready(true);
+        let listed = call(
+            r#"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#,
+            &mut session,
+        )
+        .unwrap();
+        let names: Vec<_> = listed
+            .get("result")
+            .unwrap()
+            .get("tools")
+            .unwrap()
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|value| value.get("name").unwrap().as_str().unwrap())
+            .collect();
+        assert_eq!(names, ["session_list", "session_read"]);
+        for (name, arguments) in [
+            ("session_create", object([])),
+            (
+                "session_write",
+                object([("session", "test".into()), ("data", "x".into())]),
+            ),
+            (
+                "session_resize",
+                object([
+                    ("session", "test".into()),
+                    ("cols", 80u32.into()),
+                    ("rows", 24u32.into()),
+                ]),
+            ),
+            ("session_close", object([("session", "test".into())])),
+            (
+                "session_control",
+                object([
+                    ("session", "test".into()),
+                    ("action", "acquire".into()),
+                    ("takeover", true.into()),
+                ]),
+            ),
+        ] {
+            let message = object([
+                ("jsonrpc", "2.0".into()),
+                ("id", 2i32.into()),
+                ("method", "tools/call".into()),
+                (
+                    "params",
+                    object([("name", name.into()), ("arguments", arguments)]),
+                ),
+            ]);
+            assert_eq!(
+                code(&dispatch(&message, &mut session, "mcp/stdio").unwrap()),
+                Some(-32001),
+                "{name}"
+            );
+        }
+        let read = call(r#"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"session_read","arguments":{"session":"test"}}}"#, &mut session).unwrap();
+        assert_eq!(
+            read.get("result")
+                .unwrap()
+                .get("structuredContent")
+                .unwrap()
+                .get("_actor")
+                .unwrap()
+                .as_str(),
+            Some("trusted-test-actor")
+        );
+    }
+
+    #[test]
+    fn actor_cannot_be_forged_by_tool_arguments() {
+        let mut session = ready(false);
+        let value = call(r#"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"session_write","arguments":{"session":"test","data":"x","_actor":"victim"}}}"#, &mut session).unwrap();
+        assert_eq!(code(&value), Some(-32602));
+    }
+
+    #[test]
+    fn input_control_maps_only_explicit_valid_actions() {
+        let mut session = ready(false);
+        let result = call(r#"{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"session_control","arguments":{"session":"test","action":"acquire","takeover":true}}}"#, &mut session).unwrap();
+        let request = result
+            .get("result")
+            .unwrap()
+            .get("structuredContent")
+            .unwrap();
+        assert_eq!(request.get("op").unwrap().as_str(), Some("control"));
+        assert_eq!(
+            request.get("_actor").unwrap().as_str(),
+            Some("trusted-test-actor")
+        );
+        for arguments in [
+            r#"{"session":"test","action":"steal"}"#,
+            r#"{"session":"test","action":"release","takeover":true}"#,
+            r#"{"session":"test","action":"acquire","takeover":"true"}"#,
+            r#"{"session":"test"}"#,
+        ] {
+            assert!(
+                tool_request(
+                    "session_control",
+                    &json::parse(arguments.as_bytes()).unwrap(),
+                    "mcp/stdio"
+                )
+                .is_err()
+            );
+        }
+    }
 }
