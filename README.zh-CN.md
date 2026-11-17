@@ -43,6 +43,20 @@ cargo add zterm@0.1.0 --no-default-features
 cargo add zvte@0.1.3 --no-default-features
 ```
 
+## 安装
+
+Arch Linux 可使用 `yay -S ztty`。其他 Linux 发行版可用一键安装脚本，
+自动选择 x86_64 或 ARM64 预编译包并校验 SHA256。
+
+```sh
+curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/install.sh
+sh install.sh
+```
+
+脚本默认安装到 `~/.local/bin`。预编译版需要 glibc、X11、Xft 和 Xrender
+运行库。macOS（Intel / Apple Silicon）与 Windows（x64 / ARM64）的
+原生后端暂列为后续工作。
+
 ## 运行
 
 安装 Rust 1.100.0、X11/Xft/Xrender 开发库和等宽字体后：

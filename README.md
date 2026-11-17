@@ -16,6 +16,19 @@ Linux terminal with an explicit compatibility boundary.
 
 ![Actual ztty protocol preview](docs/assets/ztty-preview.png)
 
+## Install
+
+On Arch Linux, install the AUR package with `yay -S ztty`. Other Linux
+distributions can install a prebuilt x86_64 or AArch64 binary with:
+
+```sh
+curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/install.sh
+sh install.sh
+```
+
+The script verifies the archive and installs to `~/.local/bin`. The binary
+requires glibc, X11, Xft, and Xrender. Native macOS and Windows builds are planned.
+
 ## Build and run
 
 Requirements: Linux, Rust 1.100.0, a C linker, X11/Xft/Xrender development libraries, and a

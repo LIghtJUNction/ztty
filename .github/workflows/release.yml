@@ -32,8 +32,41 @@ jobs:
     needs: version
     uses: ./.github/workflows/verify.yml
 
-  publish:
+  linux:
     needs: [version, verify]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: x86_64
+          - runner: ubuntu-24.04-arm
+            arch: aarch64
+    runs-on: ${{ matrix.runner }}
+    env:
+      ARCH: ${{ matrix.arch }}
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Build and smoke-test precompiled binary
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxft-dev libxrender-dev
+          test "$(uname -m)" = "$ARCH"
+          cargo build --locked --release
+          target/release/ztty --version | grep -Fx "ztty $VERSION"
+          mkdir -p dist
+          cp target/release/ztty LICENSE dist/
+          (cd dist && tar -czf "ztty-linux-$ARCH.tar.gz" ztty LICENSE
+           sha256sum "ztty-linux-$ARCH.tar.gz" > "ztty-linux-$ARCH.tar.gz.sha256")
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ztty-linux-${{ matrix.arch }}
+          path: dist/*.tar.gz*
+          if-no-files-found: error
+
+  publish:
+    needs: [version, linux]
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -57,19 +90,34 @@ jobs:
             pacman -U --noconfirm ztty-*.pkg.tar.zst
             ztty --version | grep -Fx "ztty $VERSION"
           '
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: ztty-linux-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/ztty-release/bin
       - name: Publish or verify GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           out="$RUNNER_TEMP/ztty-release"
+          cp install.sh "$out/bin/"
+          assets=("$out/ztty-$VERSION.tar.gz" "$out/SHA256SUMS" "$out/bin/"*)
+          for arch in x86_64 aarch64; do
+            (cd "$out/bin" && sha256sum -c "ztty-linux-$arch.tar.gz.sha256")
+          done
           if gh release view "v$VERSION" >/dev/null 2>&1; then
             readback=$(mktemp -d)
-            gh release download "v$VERSION" --dir "$readback" --pattern "ztty-$VERSION.tar.gz" --pattern SHA256SUMS
+            patterns=()
+            for asset in "${assets[@]}"; do patterns+=(--pattern "${asset##*/}"); done
+            gh release download "v$VERSION" --dir "$readback" "${patterns[@]}"
             cmp "$out/SHA256SUMS" "$readback/SHA256SUMS"
             (cd "$readback" && sha256sum --check SHA256SUMS)
+            for arch in x86_64 aarch64; do
+              (cd "$readback" && sha256sum --check "ztty-linux-$arch.tar.gz.sha256")
+            done
+            cmp install.sh "$readback/install.sh"
           else
-            gh release create "v$VERSION" --verify-tag --generate-notes \
-              "$out/ztty-$VERSION.tar.gz" "$out/SHA256SUMS"
+            gh release create "v$VERSION" --verify-tag --generate-notes "${assets[@]}"
           fi
       - name: Update AUR
         env:

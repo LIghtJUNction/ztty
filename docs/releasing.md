@@ -64,7 +64,7 @@ Routine development checks can run locally. Pull requests and release tags also 
 
 ## GitHub and AUR
 
-The application release uses the workspace version in `Cargo.toml`. After
+The application release uses the application package version in `Cargo.toml`. After
 merging a version update, push the matching tag to publish it.
 
 ```sh
@@ -74,7 +74,8 @@ git push origin refs/tags/vX.Y.Z
 
 The tag workflow runs the same checks as pull request CI, including the Xvfb
 GUI suite. It generates a deterministic source archive and SHA256 checksum,
-builds and installs the Arch package in a clean container, then publishes the
+builds native Linux x86_64 and AArch64 binaries on separate runners, builds
+and installs the Arch package in a clean container, then publishes the
 GitHub Release and pushes the generated PKGBUILD and .SRCINFO to the AUR.
 Retry a failed run on the same tag. Existing release assets are checked before
 the AUR update, and an older tag cannot downgrade the AUR package.
@@ -82,3 +83,15 @@ the AUR update, and an older tag cannot downgrade the AUR package.
 The release workflow uses the repository secret `AUR_SSH_KEY`. Its public key
 must be registered to an account that can maintain `ztty` on the AUR.
 `packaging/aur/known_hosts` pins the AUR SSH host key.
+
+
+| Platform | Architectures | Status |
+| --- | --- | --- |
+| Linux (glibc, X11/XWayland) | x86_64, aarch64 | Prebuilt archives and `install.sh` |
+| macOS | x86_64, arm64 | Planned native PTY and window backend |
+| Windows | x86_64, arm64 | Planned ConPTY and native window backend |
+
+Linux archives include the executable and license. Each binary archive has
+its own SHA256 file. The installer picks the architecture, verifies the
+download, checks that the binary runs, and installs it in `~/.local/bin`.
+Set `ZTTY_INSTALL_DIR` to install elsewhere and `ZTTY_VERSION` to pin a tag.

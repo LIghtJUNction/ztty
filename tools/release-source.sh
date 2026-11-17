@@ -2,7 +2,7 @@
 set -euo pipefail
 
 out=${1:?usage: tools/release-source.sh OUTPUT_DIR}
-version=$(python3 -c 'import tomllib; print(tomllib.load(open("Cargo.toml", "rb"))["workspace"]["package"]["version"])')
+version=$(python3 -c 'import tomllib; print(tomllib.load(open("Cargo.toml", "rb"))["package"]["version"])')
 if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "Expected a stable X.Y.Z workspace version" >&2
     exit 1
