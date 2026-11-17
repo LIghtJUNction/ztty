@@ -62,7 +62,12 @@ def terminal_windows(display):
 
 
 def totals(samples):
-    return {key: sum(sample.get(key, 0) for sample in samples) for key in FIELDS}
+    pids = [sample["pid"] for sample in samples]
+    if len(pids) != len(set(pids)):
+        raise ValueError("a process was included more than once")
+    if any(key not in sample for sample in samples for key in FIELDS):
+        raise ValueError("required process memory counter is unavailable")
+    return {key: sum(sample[key] for sample in samples) for key in FIELDS}
 
 
 def cleanup(identities):
@@ -216,7 +221,7 @@ def main():
     parser.add_argument("--compare-binary", type=Path,
                         help="interleave an independent baseline with this binary")
     parser.add_argument("--compare-label", default="baseline")
-    parser.add_argument("--counts", default="1,4,8")
+    parser.add_argument("--counts", default="1,5,10,20")
     parser.add_argument("--repetitions", type=int, default=3)
     parser.add_argument("--expect-shared", action="store_true")
     parser.add_argument("--output", type=Path, default=ROOT / "artifacts/multiwindow-memory.json")
