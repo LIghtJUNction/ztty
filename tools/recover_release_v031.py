@@ -166,7 +166,8 @@ class GitHub:
             "Authorization": "Bearer " + self.token,
             "User-Agent": "ztty-release-recovery/0.3.1",
             "X-GitHub-Api-Version": "2022-11-28",
-            "Accept": "application/octet-stream" if binary else "application/vnd.github+json",
+            "Accept": ("application/octet-stream" if binary and "/releases/assets/" in path
+                       else "application/vnd.github+json"),
         }
         if data is not None:
             headers["Content-Type"] = "application/octet-stream" if upload else "application/json"
