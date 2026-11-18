@@ -29,6 +29,8 @@ mod platform;
 #[path = "platform/macos.rs"]
 mod platform;
 #[cfg(target_os = "linux")]
+mod repaint;
+#[cfg(target_os = "linux")]
 mod session;
 #[cfg(target_os = "linux")]
 mod x11;
