@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "f10e0daaae4ad611d79f21ca1d3788725b1043f5",
+  "run_id": 44324788860,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44324788860",
+  "production_change": "Remove the unconditional main-loop UpdateWindow call and its unused FFI; leave InvalidateRect and normal message-pump dispatch intact.",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": false,
+  "original_runtime_trace_enabled": false,
+  "status": "failed",
+  "accepted": false,
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "x86_64": {
+    "original_attempted": 1,
+    "completed": 0,
+    "original_base_checks_completed": 23,
+    "failed_check": "resize_restores_visible_image",
+    "actual": [
+      0,
+      0,
+      0
+    ],
+    "original_warm_completed": 0,
+    "original_back_to_back_completed": 0,
+    "diagnostic_rapid": {
+      "passed": true,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "runtime_trace_enabled": true
+    },
+    "diagnostic_staged": {
+      "passed": true,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "runtime_trace_enabled": true
+    },
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "original_attempted": 1,
+    "completed": 0,
+    "original_base_checks_completed": 23,
+    "failed_check": "resize_restores_visible_image",
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "original_warm_completed": 0,
+    "original_back_to_back_completed": 0,
+    "diagnostic_rapid": {
+      "passed": true,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "runtime_trace_enabled": true
+    },
+    "diagnostic_staged": {
+      "passed": false,
+      "base_checks": 31,
+      "base_16_20_column_child_and_query_ack_passed": true,
+      "first_failed_warm_iteration": 1,
+      "warm_iteration_has_staged_ack": false,
+      "warm_completed": 0,
+      "back_to_back_completed": 0,
+      "failed_check": "resize_restores_visible_image",
+      "actual": [
+        20,
+        20,
+        20
+      ],
+      "runtime_trace_enabled": true
+    },
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "both_original_failure_snapshots": {
+    "cpu_and_source_rgb_sampled_only_after_failure": [
+      255,
+      0,
+      0
+    ],
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_and_pty": [
+      20,
+      10
+    ],
+    "dispatch_resize_pending": false,
+    "dispatch_paint_pending": false,
+    "deferred_paints": 0,
+    "last_paint_sequence": 19,
+    "last_paint_region": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "bitblt_return": 1,
+    "target_after_blit": null,
+    "changing_flags_in": "0x16",
+    "changing_flags_submitted": "0x116",
+    "changed_flags_reported": "0x1116",
+    "latest_recorded_default_exit_sequence": 205,
+    "last_paint_start_event_sequence": 210,
+    "last_paint_end_event_sequence": 211,
+    "last_paint_default_message": 0,
+    "last_paint_default_depth": 0,
+    "snapshot_event_sequence": 212,
+    "flush_did_not_restore_window": true,
+    "normal_repaint_restored_window": true
+  },
+  "workspace": "not_entered_on_either_architecture",
+  "png_verification": {
+    "x86_64": {
+      "pngs": 96,
+      "window_samples_including_post_failure": 157,
+      "resize_stage_samples": 155,
+      "unexpected_resize_samples": 1
+    },
+    "aarch64": {
+      "pngs": 61,
+      "window_samples_including_post_failure": 94,
+      "resize_stage_samples": 90,
+      "unexpected_resize_samples": 2
+    }
+  },
+  "cleanup": "All six application processes (two original gate processes and four separate diagnostics) exited. All six temporary directories were actually removed on the first attempt; outer Jobs were empty and desktops restored.",
+  "worker_elapsed_seconds": {
+    "x86_64": 19.127,
+    "aarch64": 26.636
+  },
+  "worker_exit_codes": {
+    "x86_64": 1,
+    "aarch64": 1
+  },
+  "inference_limits": [
+    "Removing the unconditional UpdateWindow did not eliminate the original failure; this does not establish an internal presentation root cause.",
+    "The original gate is untraced, while both independent diagnostic processes are traced; diagnostic results cannot substitute for original acceptance.",
+    "Extra paint DC diagnostics are false and target_after_blit is null, so this run has no new immediate post-BitBlt clip/origin or RGB sample.",
+    "Receiver-thread callback order does not prove another thread SetWindowPos return or internal backing-surface/compositor/copy completion.",
+    "The source red pixel is observed only after failure."
+  ],
+  "delivery_scope": "Windows build-only candidate; no Release publication or device installation is claimed. The failed formal v0.3.0 tag and its evidence remain unchanged."
+}
