@@ -324,6 +324,48 @@ fn alternate_screen_restores_primary_cursor_style_and_content() {
 }
 
 #[test]
+fn alternate_1047_preserves_retained_content_on_entry() {
+    let mut t = Terminal::new(8, 2, 4);
+    t.feed(b"main\x1b[?47hALT\x1b[?47l");
+    assert_eq!(line(&t, 0), "main    ");
+    t.feed(b"\x1b[?1047h!");
+    assert_eq!(line(&t, 0), "ALT!    ");
+}
+
+#[test]
+fn alternate_1047_clears_text_and_images_on_exit() {
+    let mut t = Terminal::new(8, 2, 4);
+    t.set_cell_size(8, 16);
+    t.feed(b"main\x1b_Ga=T,i=1,s=1,v=1,C=1;AQIDBA==\x1b\\");
+    t.feed(b"\x1b[?47hALT\x1b_Ga=T,i=2,s=1,v=1,C=1;BQYHCA==\x1b\\");
+    assert_eq!(t.graphics().image_count(), 1);
+    t.feed(b"\x1b[?1047l");
+    assert!(!t.modes().alternate_screen);
+    assert_eq!(line(&t, 0), "main    ");
+    assert_eq!(t.cursor(), (4, 0));
+    assert_eq!(t.graphics().image_count(), 1);
+    assert!(t.graphics().image(1).is_some());
+    assert_eq!(t.history_len(), 0);
+    t.feed(b"\x1b[?47h");
+    assert_eq!(line(&t, 0), "        ");
+    assert_eq!(line(&t, 1), "        ");
+    assert_eq!(t.graphics().image_count(), 0);
+    assert!(t.graphics_draws(0).next().is_none());
+}
+
+#[test]
+fn alternate_1047_reset_on_primary_preserves_both_screens() {
+    let mut t = Terminal::new(8, 2, 4);
+    t.feed(b"main\x1b[?47hALT\x1b_Ga=T,i=2,s=1,v=1,C=1;AQIDBA==\x1b\\");
+    t.feed(b"\x1b[?47l\x1b[?1047l");
+    assert_eq!(line(&t, 0), "main    ");
+    t.feed(b"\x1b[?47h");
+    assert_eq!(line(&t, 0), "ALT     ");
+    assert_eq!(t.graphics().image_count(), 1);
+    assert!(t.graphics().image(2).is_some());
+}
+
+#[test]
 fn insert_delete_characters_and_lines_are_bounded() {
     let mut t = Terminal::new(8, 3, 0);
     t.feed(b"abcdef\r\x1b[3C\x1b[2@XY");

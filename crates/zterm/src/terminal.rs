@@ -1409,7 +1409,15 @@ impl State {
                 self.modes.cursor_visible = enabled;
                 self.screen.dirty[self.screen.y] = true;
             }
-            47 | 1047 => self.alternate(enabled, false, mode == 1047),
+            47 => self.alternate(enabled, false, false),
+            1047 => {
+                // DEC 1047 clears the alternate screen on exit, before it is cached.
+                if !enabled && self.modes.alternate_screen {
+                    self.screen.clear(self.style.blank());
+                    self.graphics.clear();
+                }
+                self.alternate(enabled, false, false);
+            }
             80 => self.sixel_display = enabled,
             1070 => self.sixel_private = enabled,
             8452 => self.sixel_right = enabled,
