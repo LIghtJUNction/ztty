@@ -21,16 +21,29 @@ The launch commands wait for their view to close; use separate shells or append 
 | --- | --- |
 | Ctrl+Shift+T | New tab |
 | Ctrl+Shift+E / O | Split right / below |
-| Ctrl+Shift+PageUp / PageDown | Previous / next tab |
+| Ctrl+Tab / Ctrl+Shift+Tab | Next / previous tab |
+| Ctrl+Shift+PageUp / PageDown | Previous / next tab (additional bindings) |
 | Ctrl+Shift+Left / Right | Previous / next pane |
 | Ctrl+Shift+Up / Down | Swap with previous / next pane |
 | Ctrl+Shift+Enter | Maximize / restore the focused pane |
-| Ctrl+Shift+Plus / Minus | Grow / shrink the nearest split |
+| Ctrl+Alt+Shift+Equal / Minus | Grow / shrink the nearest split |
+| Ctrl+Plus / Minus / 0 | Increase, decrease or reset font size |
 | Ctrl+Shift+N / U | New window / move current pane to its own window |
 | Ctrl+Shift+D / W | Detach / close the current view |
 | Ctrl+Shift+G | Explicitly take input control |
 
-The native window title shows the active tab number. There is no permanent toolbar. Hidden tabs keep reading PTY output; their Xrender image uploads and full-size backing pixmaps are released and rebuilt when shown. A workspace is bounded to 32 tabs and 64 panes; the broker retains its separate 128-session limit.
+Font zoom, Ctrl+Tab / Ctrl+Shift+Tab, and Ctrl+Alt+Shift+Equal / Minus also work
+in the native Windows workspace. Zoom preserves the current window and PTYs;
+Windows updates the font metrics for all panes. Ctrl+Shift+Equal/Minus and
+Ctrl+0 provide additional zoom/reset bindings; Linux also accepts Ctrl+Shift+0.
+On Windows, [Ctrl+Shift+0 can be reserved by the system](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size)
+when multiple keyboard layouts are active; use Ctrl+0, or the shifted alias only
+when delivered. Ctrl+keypad Add/Subtract/0 also works, with Num Lock required for
+keypad 0. The shared-session commands and
+lifecycle below use the Linux broker. macOS does not yet have workspace UI or
+these font-size shortcuts.
+
+The Linux workspace window title shows the active tab number. There is no permanent toolbar. Hidden tabs keep reading PTY output; their Xrender image uploads and full-size backing pixmaps are released and rebuilt when shown. A workspace is bounded to 32 tabs and 64 panes; the broker retains its separate 128-session limit.
 
 ## Session lifecycle and control
 

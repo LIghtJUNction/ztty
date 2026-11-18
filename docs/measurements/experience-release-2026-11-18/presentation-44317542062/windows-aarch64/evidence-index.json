@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "source_sha": "04cfd7bb9a516fe7914dc34daff380fa4c232cf2",
+  "run_id": 44317542062,
+  "architecture": "aarch64",
+  "passed": false,
+  "status": "failed",
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/summary.json",
+      "bytes": 13636,
+      "sha256": "1b0c03b8f50593c59a82ddebefbe5968e027745e55bbcd3d92910e378a470a73",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 42494,
+      "sha256": "445a282adaaf51f864a7fbc04512181ae7a6af286718b145dab50af476341a33",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 975
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.json",
+      "bytes": 41825,
+      "sha256": "1ed3c82d385302205d764b8076ed78736b3bc2d51759ed0b8468f6bf2f45c6eb",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2000
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.post-failure.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.json",
+      "bytes": 850,
+      "sha256": "de83980389b8855401b8d77dcf7a7d2071bd20914851ebc2e5b88291ddbd309e",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.resize-restored.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.post-failure.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.post-repaint.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "scope": "Compact evidence for the seventh cold-start native failure and the same-run successful temporary-directory sharing-conflict retry. Full earlier passing cold runs and 216 PNGs remain in the verified original artifact; they are indexed by hash in summary.json, not all copied here.",
+  "notes": [
+    "Raw JSON, line endings and PNG bytes are preserved.",
+    "The failure-frame PNG and post-flush PNG have the same bytes; separate original filenames retain their phases.",
+    "The root report and root manifest were not modified by this evidence preparation.",
+    "The successful cleanup retry did not change the original pixel failure or accept this candidate."
+  ]
+}

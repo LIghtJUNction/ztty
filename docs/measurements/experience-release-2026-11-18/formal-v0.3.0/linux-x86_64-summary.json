@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "repo": "LIghtJUNction/ztty",
+  "run_id": 44309412482,
+  "job_id": 134819423866,
+  "job_url": null,
+  "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "source_ref": "refs/tags/v0.3.0",
+  "version": "0.3.0",
+  "build_only": false,
+  "candidate_platform": "all",
+  "status": "accepted",
+  "passed": true,
+  "architecture": "x86_64",
+  "artifact_id": 14430530082,
+  "artifact_zip_sha256": "74a7a423f2add741bbedd342bf2fafac768bd425ccf3f5ee084a2efaaaeeec60",
+  "artifact_zip_hash_verified": true,
+  "build_report_hash_verified": true,
+  "build_file_hashes_verified": 6,
+  "evidence_file_hashes_verified": 47,
+  "binary_bytes": 731280,
+  "binary_sha256": "4b9e2f354dc09cc32641b75bcd0238f14a2886074bfa66e091b992103ea38586",
+  "binary_matches_native_before_after_and_package": true,
+  "native_elf_architecture_verified": true,
+  "source_clean_before_and_after": true,
+  "version_stdout": "ztty 0.3.0",
+  "gui_suites": [
+    {
+      "name": "workspaces",
+      "passed": true,
+      "checks": 17,
+      "pngs": 2,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      }
+    },
+    {
+      "name": "daily_workflow",
+      "passed": true,
+      "checks": 18,
+      "pngs": 10,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      }
+    },
+    {
+      "name": "session_switcher",
+      "passed": true,
+      "checks": 6,
+      "pngs": 7,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      }
+    },
+    {
+      "name": "sixel_gui",
+      "passed": true,
+      "checks": 10,
+      "pngs": 1,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      }
+    },
+    {
+      "name": "input_gui",
+      "passed": true,
+      "checks": 9,
+      "pngs": 1,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      }
+    },
+    {
+      "name": "repaint_gui",
+      "passed": true,
+      "checks": 7,
+      "pngs": 6,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      }
+    }
+  ],
+  "gui_total_groups": 67,
+  "pngs_verified": 27,
+  "working_directory_tests_passed": 4,
+  "native_gate_contract_tests_passed": 10,
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "native": "success",
+    "package": "success",
+    "evidence": "success"
+  },
+  "scope": "Native Linux ELF and real PTY/X11 GUI acceptance under guarded private Xvfb",
+  "limitations": [
+    "No native Wayland or hardware GPU/scanout acceptance.",
+    "No physical input-to-display latency measurement."
+  ],
+  "release_publication_audited_here": false
+}

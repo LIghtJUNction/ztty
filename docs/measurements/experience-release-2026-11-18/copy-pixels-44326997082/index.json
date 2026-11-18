@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "7e16300df2d13647c2307873790695668f34f2dd",
+  "run_id": 44326997082,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44326997082",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "acceptance_credit": false,
+  "status": "failed",
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "both_cold_results": {
+    "cold1": "31+10+10 passed with explicit diagnostics",
+    "cold2": "23 base checks passed, then original resize_restores_visible_image failed; warm and back-to-back not entered",
+    "cold3_to_8": "not_entered",
+    "workspace": "not_entered"
+  },
+  "copy_stage_sequence": [
+    "kernel read of own CPU DIB at [178,95]",
+    "BitBlt",
+    "GdiFlush with recorded return",
+    "target GetPixel at [178,95]",
+    "source GetPixel at [178,95]",
+    "GetClipBox and GetDCOrgEx",
+    "EndPaint"
+  ],
+  "both_copy_stage_observations": {
+    "sample": [
+      178,
+      95
+    ],
+    "expected_background": [
+      16,
+      24,
+      32
+    ],
+    "cpu_before_blit_rgb": [
+      16,
+      24,
+      32
+    ],
+    "gdi_flush_after_blit_return": 1,
+    "target_after_flush_rgb": [
+      16,
+      24,
+      32
+    ],
+    "source_after_target_read_rgb": [
+      16,
+      24,
+      32
+    ],
+    "clip_type": 2,
+    "clip": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "origin": [
+      40,
+      63
+    ]
+  },
+  "x86_64": {
+    "failed_cold_start": 2,
+    "completed": 1,
+    "attempted": 2,
+    "failed_gate_sample": [
+      175,
+      28
+    ],
+    "failed_gate_expected": [
+      255,
+      0,
+      0
+    ],
+    "failed_gate_actual": [
+      16,
+      24,
+      32
+    ],
+    "later_failed_png_at_copy_stage_sample": [
+      16,
+      24,
+      32
+    ],
+    "copy_stage_sample_changed_later": false,
+    "visible_color_fragments": "Failed red/blue bounds match an upward 32px displacement with clipping; this is a description of observed fragments, not proof of a specific internal copy operation.",
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "failed_cold_start": 2,
+    "completed": 1,
+    "attempted": 2,
+    "failed_gate_sample": [
+      175,
+      28
+    ],
+    "failed_gate_expected": [
+      255,
+      0,
+      0
+    ],
+    "failed_gate_actual": [
+      20,
+      20,
+      20
+    ],
+    "later_failed_png_at_copy_stage_sample": [
+      20,
+      20,
+      20
+    ],
+    "copy_stage_sample_changed_later": true,
+    "scope_of_change_observation": "Only ARM at [178,95], from the before-EndPaint target DC record to the later failed PNG. This does not sample the red gate pixel during BitBlt.",
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "both_post_failure_observations": {
+    "gate_sample": [
+      175,
+      28
+    ],
+    "cpu_and_source_rgb_sampled_after_failure": [
+      255,
+      0,
+      0
+    ],
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_and_pty": [
+      20,
+      10
+    ],
+    "deferred_paints": 0,
+    "flush_did_not_restore_gate_pixel": true,
+    "normal_repaint_restored_gate_pixel": true,
+    "failed_png_identical_after_flush": true,
+    "before_png_identical_after_repaint": true
+  },
+  "png_verification": {
+    "x86_64": {
+      "pngs": 51,
+      "window_samples_including_post_failure": 82
+    },
+    "aarch64": {
+      "pngs": 51,
+      "window_samples_including_post_failure": 82
+    }
+  },
+  "cleanup": {
+    "application_processes_exited": 4,
+    "temporary_directories_actually_removed": 4,
+    "x64_all_removal_attempts": [
+      1,
+      1
+    ],
+    "arm_all_removal_attempts": [
+      1,
+      2
+    ],
+    "arm_cold2_first_winerror": 32,
+    "arm_cold2_removal_elapsed_seconds": 0.05665870000001405,
+    "outer_jobs_empty_and_desktops_restored": true
+  },
+  "worker_elapsed_seconds": {
+    "x86_64": 12.381,
+    "aarch64": 13.393
+  },
+  "worker_exit_codes": {
+    "x86_64": 1,
+    "aarch64": 1
+  },
+  "inference_limits": [
+    "Explicit probes can alter GDI timing; no ordinary acceptance is awarded.",
+    "Only ARM proves a later change at the generic [178,95] target point; x64 does not.",
+    "Neither architecture sampled the red gate point [175,28] during the last BitBlt.",
+    "The observations do not identify an internal backing/compositor/copy mechanism or another thread SetWindowPos completion.",
+    "Successful repaint and earlier cold1 completion do not supersede the original cold2 failure."
+  ],
+  "delivery_scope": "Windows build-only diagnostic candidate; no Release publication or device installation is claimed. The failed formal v0.3.0 tag and its evidence remain unchanged."
+}

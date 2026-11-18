@@ -1,5 +1,10 @@
 # ztty
 
+**0.3.1 is being prepared.** The source version awaits a new tagged Verify run
+and all six native architecture gates. Download only assets listed in the
+[official Releases](https://github.com/LIghtJUNction/ztty/releases).
+[Current preparation and earlier release history](docs/releasing.md#031-preparation).
+
 <!-- terminal-benchmark:start -->
 [![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 
@@ -24,7 +29,7 @@ workspace candidate has its own verification record.
 A lean native terminal, written in Rust without the Rust standard library.
 
 ztty runs shells and terminal applications through the operating system's
-pseudo-terminal interface. Version 0.2 adds native macOS and Windows backends and
+pseudo-terminal interface, with native Linux, macOS and Windows backends and
 static Kitty Graphics Protocol support. Screen state, input encoding, PTY
 ownership, and image processing are reusable libraries. The visual design is
 deliberately quiet: a dark background, readable text, generous padding, and no
@@ -44,9 +49,9 @@ pixels; the three after samples varied from 130.97 to 278.57 MiB/s. See the
 This is a scoped scheduling result; hardware display latency and new multi-terminal
 memory/performance comparisons remain unmeasured.
 
-The long-term goal is to exceed Kitty and Ghostty in responsiveness and memory
-efficiency. Current measurements, their scope, and remaining work are documented
-in [the performance report](docs/performance.md). Linux remains the first
+Responsiveness and memory work is measured against specific workloads.
+Current results, their limits and remaining work are documented in
+[the performance report](docs/performance.md). Linux remains the first
 acceptance target; the platform table records what has actually been exercised.
 
 [中文介绍](README.zh-CN.md)
@@ -73,31 +78,40 @@ The shared-session UI, attach and MCP runtime remain Linux features.
 
 | Platform | Native implementation | Source-bound verification record |
 | --- | --- | --- |
-| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 2ac46e2 passed all six GUI suites on native x86_64 and ARM64 under guarded Xvfb |
-| macOS Apple Silicon | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Source 2ac46e2 passed 8 threaded-spawn checks and 24 native checks, with 13 gate stages, 10 PNG captures and no remaining owned processes |
-| macOS Intel | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Source 2ac46e2 passed the same 8 spawn and 24 native checks, with 13 gate stages, 10 PNG captures and no remaining owned processes |
-| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | Source 3418b82 passed all 31 base checks and 19 workspace groups on native x64 and ARM64, including rapid shrink/restore, redirected-host startup, pane history and selection; owned-process and desktop cleanup passed |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Formal source 9b5497d passed six GUI suites, 67 groups and 27 PNG captures on each native x86_64 and ARM64 runner under guarded Xvfb; source, binary identity and cleanup verified |
+| macOS Apple Silicon | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Formal source 9b5497d passed 8 threaded-spawn checks and 24 native checks, with 13 stages, 10 PNG captures and no remaining owned processes |
+| macOS Intel | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Formal source 9b5497d passed the same 8 spawn and 24 native checks, with 13 stages, 10 PNG captures and no remaining owned processes |
+| Windows x64 | Win32 window, GDI text, own RGBA compositing, ConPTY | Candidate 2f2fae44 passed eight fresh processes, each with 31 base checks, 10 warm rapid resizes and 10 back-to-back resize pairs, plus 19 workspace groups; owned-resource cleanup passed |
+| Windows ARM64 | The same native Win32 / ConPTY backend | The same normal-mode 2f2fae44 candidate passed the complete eight-process and workspace gate natively on ARM64 |
 
 macOS now uses a fresh-exec PTY helper that can create sessions after AppKit
 starts threads. [Implementation and native test scope](docs/darwin-threaded-pty.md)
 record the controlling-terminal, descriptor and error-handling contracts.
-[Candidate run 44298970562](https://github.com/LIghtJUNction/ztty/actions/runs/44298970562)
-contains the accepted Linux and macOS results and earlier Windows failures.
-[Windows candidate 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420)
-records the later acceptance of both Windows architectures at `3418b82`.
-The [release record](docs/releasing.md) retains earlier successes and failures
-by source. macOS IME/keyboard input and physical display latency remain outside
-these native window checks.
-These records cover their named candidate sources; the release gate requires
-all six native architecture jobs to accept the final tagged source.
-The 0.3.0 release and device installation remain pending.
+[Windows candidate run 44349551432](https://github.com/LIghtJUNction/ztty/actions/runs/44349551432)
+used the application's default frame policy with painting and NC-policy
+diagnostics disabled. The application requests disabled DWM nonclient rendering;
+the final readback confirmed it on both architectures. Windows keeps the standard
+system frame, with a classic light-blue title bar and minimize/maximize/close
+buttons in the captured runner theme. It does not retain the modern dark DWM
+frame. This candidate is separate from final-tag acceptance.
+
+The earlier formal `v0.3.0` tag remains fixed at `9b5497d`. Its Windows ARM
+rapid-resize failure prevented publication, and the Release-by-tag API returned
+404. A later local Linux candidate, source `19274145`, was installed as
+`ztty 0.3.0-1`; that installation used different source and was not an official
+Release download. The [release record](docs/releasing.md) preserves both outcomes.
+The new `0.3.1` formal Verify, six-platform acceptance and official installation
+are still pending. macOS IME/keyboard input and physical display latency remain
+outside the recorded native window checks.
 
 Windows preserves pane history and selection when silent modifier keys are
 pressed or released, so releasing Shift after Shift+PageUp keeps the scrolled
 view. Actual terminal input returns to the newest output. ConPTY children also
 retain their console input/output when ztty's own standard streams are
 redirected. These fixes entered at `3418b82` and `e334cf7`, respectively;
-the Windows candidate above exercises both.
+the earlier [Windows candidate 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420)
+exercised both on x64 and ARM64. That source's acceptance remains separate from
+the later formal ARM resize failure.
 
 The macOS and Windows backends use their native APIs. macOS does not require
 X11, and Windows does not require WSL. Cross-target compilation does not establish
@@ -112,7 +126,9 @@ acceptance scopes.
 ## Install on Linux
 
 The examples below describe the current source tree. Release downloads follow
-the latest published tag; build from source for unreleased changes.
+the latest published [GitHub Release](https://github.com/LIghtJUNction/ztty/releases),
+not every Git tag; build from source for unreleased changes. The `0.3.1`
+preparation above does not make that version available to the installer yet.
 
 On Arch Linux, install the AUR package with `yay -S ztty`. Other Linux
 distributions can install a prebuilt x86_64 or AArch64 binary with:
@@ -255,6 +271,11 @@ MCP-created sessions keep their output when the transport exits; closing their
 window detaches it. Ordinary local windows keep the usual close-to-exit
 behavior. HTTP listeners outside loopback require a bearer token.
 
+Clients can pass `expected_session` from a previous create/list/read result to
+read, write, resize, control or close the same session instance. A mismatched
+URI, ID, creation time or broker PID is rejected before a guarded mutation,
+so a reused name cannot silently redirect the operation to a replacement PTY.
+
 See [sessions and MCP](docs/sessions.md) for naming, lifecycle, HTTP tokens,
 client setup, JSON/SSE response modes and bounded UTF-8 output cursors.
 
@@ -310,6 +331,10 @@ GDI surface. Appearance parity across the three backends has not been validated.
 | Copy selection | Ctrl + Shift + C |
 | Paste clipboard | Ctrl + Shift + V |
 | Paste primary selection | Middle mouse button |
+| Increase / decrease font size | Ctrl + Plus / Minus; Ctrl + Equal and Ctrl + Shift + Minus also work |
+| Reset font size to configuration | Ctrl + 0 or Ctrl + Shift + 0 |
+| Keypad zoom / reset | Ctrl + keypad Add / Subtract / 0 (Num Lock on for keypad 0) |
+| Next / previous tab | Ctrl + Tab / Ctrl + Shift + Tab |
 | Browse history | Mouse wheel or Shift + PageUp / PageDown |
 | Return to newest output | Click **Back to live ↓** while browsing history |
 | Open an OSC 8 link | Ctrl + click |
@@ -317,6 +342,21 @@ GDI surface. Appearance parity across the three backends has not been validated.
 | Search retained text | Ctrl + Shift + F |
 | Open the command palette | Ctrl + Shift + P |
 | Reload configuration | Ctrl + Shift + R |
+
+On Linux, Plus follows the active keyboard layout, including Ctrl + Shift + Equal
+on common layouts and a different shifted key on others. Split resizing uses
+Ctrl + Alt + Shift + Equal / Minus.
+Custom bindings take priority over these defaults, including bindings to `none`.
+
+Font zoom, tab cycling and split resizing also use these shortcuts in the native
+Windows frontend. Zoom keeps the window and running PTYs; Windows applies the
+new font to every pane in that workspace. Reset restores the latest successfully
+loaded configuration font on Linux and the startup configuration font on Windows.
+Use Ctrl+0 on Windows: the system can reserve Ctrl+Shift+0 when multiple keyboard
+layouts are active, so that alias works only if delivered to ztty.
+[Microsoft documents this system shortcut](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size).
+The macOS frontend does not yet implement these zoom or workspace shortcuts;
+its copy/paste shortcuts are Command+C/V or Ctrl+Shift+C/V.
 
 The return control appears only while the view is above the newest output.
 If more output arrives, it changes to **New output · Back to live ↓** with a
@@ -376,32 +416,30 @@ can be used without the graphical application.
 
 | Package | Source version | Responsibility | Direct Rust dependencies |
 | --- | --- | --- | --- |
-| [zinput](crates/zinput) | 0.1.0 | Legacy / Kitty keyboard, mouse, focus, and paste encoding | None |
-| [zpty](crates/zpty) | 0.2.0 | Linux/macOS PTY, Windows ConPTY, explicit child lifecycle | None |
-| [zterm](crates/zterm) | 0.2.1 | Screen, scrollback, VT state, image anchoring, queries, damage | zinput, zvte, zgraphics, unicode-width |
-| [zgraphics](crates/zgraphics) | 0.1.0 | Bounded Kitty graphics, PNG/RGB/RGBA decoding, image storage and placement | zune-core, zune-png, zune-inflate |
+| [zinput](crates/zinput) | 0.1.1 | Legacy / Kitty keyboard, mouse, focus, and paste encoding | None |
+| [zpty](crates/zpty) | 0.2.1 | Linux/macOS PTY, Windows ConPTY, explicit child lifecycle | None |
+| [zterm](crates/zterm) | 0.3.0 | Screen, scrollback, VT state, image anchoring, queries, damage | zinput, zvte, zgraphics, unicode-width |
+| [zgraphics](crates/zgraphics) | 0.1.1 | Bounded Kitty graphics, PNG/RGB/RGBA decoding, image storage and placement | zune-core, zune-png, zune-inflate |
 | [zvte](https://github.com/LIghtJUNction/zvte) | 0.1.3 | Allocation-free streaming ANSI/VT parser | None |
 
 The reusable packages are available from crates.io:
 
 ```sh
-cargo add zinput@0.1.0 --no-default-features
-cargo add zgraphics@0.1.0 --no-default-features
-cargo add zpty@0.2.0 --no-default-features
-cargo add zterm@0.2.0 --no-default-features
+cargo add zinput@0.1.1 --no-default-features
+cargo add zgraphics@0.1.1 --no-default-features
+cargo add zpty@0.2.1 --no-default-features
+cargo add zterm@0.3.0 --no-default-features
 # For applications that need only the parser:
 cargo add zvte@0.1.3 --no-default-features
 ```
 
-[`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0),
-[`zgraphics 0.1.0`](https://crates.io/crates/zgraphics/0.1.0),
-[`zpty 0.2.0`](https://crates.io/crates/zpty/0.2.0), and
-[`zterm 0.2.0`](https://crates.io/crates/zterm/0.2.0) are published.
-All four packages passed individual and combined consumers using exact
-registry versions outside this workspace, including a real PTY session.
-See [the release record](docs/releasing.md) for the verified publication state.
-The source tree contains zterm 0.2.1; that version has not been published to
-crates.io in this update.
+[`zinput 0.1.1`](https://crates.io/crates/zinput/0.1.1),
+[`zgraphics 0.1.1`](https://crates.io/crates/zgraphics/0.1.1),
+[`zpty 0.2.1`](https://crates.io/crates/zpty/0.2.1), and
+[`zterm 0.3.0`](https://crates.io/crates/zterm/0.3.0) are published on crates.io.
+Their publication is independent of the `ztty 0.3.1` application release.
+The [registry record](docs/releasing.md#published-packages) distinguishes current
+API/version checks from the earlier versions' independent consumer tests.
 
 Production Rust compiles without `std`. The Project Z crates use `#![no_std]`;
 the PNG, DEFLATE, checksum, and Unicode-width dependencies are selected with
@@ -420,8 +458,10 @@ enabled production feature graph.
 
 - Streaming UTF-8, CJK double-width cells, and two inline combining scalars per
   cell; input works across arbitrary byte boundaries.
-- Main and alternate screens, cursor save/restore, scrolling regions, tabs,
-  insert/delete/erase, DEC line drawing, 16/256 colors, and RGB colors.
+- Main and alternate screens, cursor save/restore including G0/G1 designations
+  and the selected character set, scrolling regions, tabs, insert/delete/erase,
+  DEC line drawing, 16/256 colors, and RGB colors. Leaving mode 1047 clears its
+  cached alternate text and images; height-only resize preserves pending wrap.
 - Kitty keyboard progressive enhancement flags 1, 2, 4, 8, and 16, including
   independent main/alternate flag stacks and event reports.
 - SGR and legacy mouse reports, focus events, bracketed paste, and synchronized
@@ -437,7 +477,8 @@ enabled production feature graph.
 
 The screen model stores 28 bytes per cell on the tested x86_64 target. Full-screen
 scrolling rotates row indices; retained history grows lazily, is limited to
-8 MiB of cells, and reuses old rows once full. The Linux event loop waits in
+8 MiB of retained cells and soft-wrap metadata, and reuses old rows once full.
+The Linux event loop waits in
 `poll` and redraws damaged rows. Image storage is separate and allocated only
 when images are received; its quotas are documented in
 [the architecture](docs/architecture.md#image-lifecycle-and-memory).

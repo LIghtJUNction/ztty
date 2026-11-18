@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "kind": "derived-checkpoint-index",
+  "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "source_ref": "refs/tags/v0.3.0",
+  "annotated_tag_object_sha": "9317806ac9b098c772f1a05514d222942268d2d5",
+  "run_id": 44309412482,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482",
+  "run_attempt": 1,
+  "build_only": false,
+  "candidate_platform": "all",
+  "status": "formal_gate_failed",
+  "run_conclusion": "failure",
+  "tag_policy": "Retain v0.3.0 at this commit. A repaired release requires a new tag; this record does not change Cargo version.",
+  "github_observation": "github-status.json",
+  "platforms": {
+    "verify": {
+      "passed": true,
+      "summary": "verify-summary.json",
+      "rust_regular": 271,
+      "doctests_unique": 6,
+      "session_core_custom": 8,
+      "gui_smoke_groups": 12
+    },
+    "linux": {
+      "x86_64": {
+        "passed": true,
+        "summary": "linux-x86_64-summary.json",
+        "gui_suites": 6,
+        "gui_groups": 67,
+        "pngs": 27,
+        "binary_sha256": "4b9e2f354dc09cc32641b75bcd0238f14a2886074bfa66e091b992103ea38586"
+      },
+      "aarch64": {
+        "passed": true,
+        "summary": "linux-aarch64-summary.json",
+        "gui_suites": 6,
+        "gui_groups": 67,
+        "pngs": 27,
+        "binary_sha256": "700b154987505b2a44b8e98805f5debb212f64e5d890e149a0ab6b54074097e5"
+      }
+    },
+    "macos": {
+      "x86_64": {
+        "passed": true,
+        "summary": "macos-x86_64-summary.json",
+        "spawn_checks": 8,
+        "native_checks": 24,
+        "stages": 13,
+        "pngs": 10,
+        "signature": "ad-hoc-verified",
+        "notarized": false
+      },
+      "aarch64": {
+        "passed": true,
+        "summary": "macos-aarch64-summary.json",
+        "spawn_checks": 8,
+        "native_checks": 24,
+        "stages": 13,
+        "pngs": 10,
+        "signature": "ad-hoc-verified",
+        "notarized": false
+      }
+    },
+    "windows": {
+      "x86_64": {
+        "passed": true,
+        "summary": "windows-x86_64-summary.json",
+        "base_checks_passed": 31,
+        "base_checks_required": 31,
+        "workspace": "passed",
+        "workspace_checks_passed": 19,
+        "workspace_checks_required": 19,
+        "original_resize_path": "rapid",
+        "runtime_trace_enabled": false
+      },
+      "aarch64": {
+        "passed": false,
+        "summary": "windows-aarch64-summary.json",
+        "base_checks_passed": 23,
+        "base_checks_required": 31,
+        "workspace": "not_entered",
+        "workspace_checks_passed": 0,
+        "workspace_checks_required": 19,
+        "original_resize_path": "rapid",
+        "runtime_trace_enabled": false
+      }
+    }
+  },
+  "formal_failure": {
+    "architecture": "windows-aarch64",
+    "check": "resize_restores_visible_image",
+    "expected_rgb": [
+      255,
+      0,
+      0
+    ],
+    "actual_rgb": [
+      20,
+      20,
+      20
+    ],
+    "timeout_seconds": 10,
+    "base_checks_completed": 23,
+    "workspace": "not_entered",
+    "owned_resources_cleanup": "passed",
+    "diagnostics": "Two separate fresh processes with runtime trace enabled passed rapid and staged paths. These results are diagnostic only and leave the original formal gate failed.",
+    "root_cause": "not established"
+  },
+  "publication": {
+    "publish_job": "skipped",
+    "release_by_tag_http_status": 404,
+    "observed_at": "2026-11-18 13:11:00 UTC",
+    "github_release_created": false,
+    "official_asset_readback": "not_possible_no_release"
+  },
+  "installation": {
+    "performed": false,
+    "status": "not_installed",
+    "basis": "No approved release assets were published; the installation step was not performed in this iteration."
+  },
+  "evidence_policy": "Small audited platform summaries and the Windows ARM failure JSON, one original failure PNG and traced diagnostic JSON/logs are retained. The complete source artifacts remain under artifacts/release-audit/formal-44309412482; this directory is not a mirror of all PNGs or job logs.",
+  "scope_limits": [
+    "Passing native jobs do not override the failed Windows ARM release gate.",
+    "The formal Linux binaries were built from this tag; they are distinct from the earlier 3730b28 development-machine binary.",
+    "No claim of native Wayland, GPU/VRAM, physical display latency, full input/IME acceptance, notarization or Windows signing is made."
+  ]
+}

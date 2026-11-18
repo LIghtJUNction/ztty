@@ -1,0 +1,449 @@
+{
+  "run_id": 44330414544,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44330414544",
+  "job_id": 134893220945,
+  "artifact_id": 14438108951,
+  "source_sha": "07851a38374f5794e1f0013de0821d0be76ae32b",
+  "source_ref": "refs/heads/fix/windows-resize-release-20261118",
+  "run_attempt": 1,
+  "build_only": true,
+  "candidate_platform": "windows",
+  "architecture": "aarch64",
+  "status": "failed",
+  "accepted": false,
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "binary_sha256": "26b0fab392fad60c5ee682416050c266c93af2a01d5a27d3b66487c6575b04c2",
+  "artifact_zip_sha256": "1490a6b79fd3c47af367a50a226203cac417779c3ece9f8b5ce836b276abe95c",
+  "build_files_verified": 250,
+  "checksum_sidecars_verified": 3,
+  "package_manifest_files_verified": 5,
+  "contract_tests": 29,
+  "cold_required": 8,
+  "cold_completed": 5,
+  "cold_attempted": 6,
+  "workspace_entered": false,
+  "reports": [
+    {
+      "report": "ztty-windows-aarch64.native.cold-01.json",
+      "report_sha256": "2a3986fb4ac7159d6924be3b2c7834cc789a605449aa0a9d5004f0739e296eb1",
+      "passed": true,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "window_pid": 6132,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006791100000100414,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "error": null
+    },
+    {
+      "report": "ztty-windows-aarch64.native.cold-02.json",
+      "report_sha256": "3e27cbb3a9804b39587ddbcad7cf0636335e7ed75abb9aba0c09a86d52df8cd3",
+      "passed": true,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "window_pid": 7404,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006230299999970157,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "error": null
+    },
+    {
+      "report": "ztty-windows-aarch64.native.cold-03.json",
+      "report_sha256": "7c403c83185cc1e939560d67e5b9d40862ad2e0ebcb401132b2bce4373c32f83",
+      "passed": true,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "window_pid": 10300,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006753699999990204,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "error": null
+    },
+    {
+      "report": "ztty-windows-aarch64.native.cold-04.json",
+      "report_sha256": "7592a8fbf3bfa4ca710775ab0d2813e655ed5aa26e0c39ce1652d8583ee914ad",
+      "passed": true,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "window_pid": 2428,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006754199999932098,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "error": null
+    },
+    {
+      "report": "ztty-windows-aarch64.native.cold-05.json",
+      "report_sha256": "680fc7cd1368b9d74841ab2e7438f75a980364c5f5dd0ba7cbfac3f093b883c4",
+      "passed": true,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "window_pid": 1044,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006578700000090976,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "error": null
+    },
+    {
+      "report": "ztty-windows-aarch64.native.cold-06.json",
+      "report_sha256": "00181c5ba658fdf05bf5a9ab5fbc9c3aee60fd5c56cc0f70b985704e312b1bf5",
+      "passed": false,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 23,
+      "warm_completed": 0,
+      "back_to_back_completed": 0,
+      "window_pid": 8544,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.004265100000111488,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "error": "resize_restores_visible_image: expected [255, 0, 0], last RGB [20, 20, 20]; timeout: resize_restores_visible_image; last error: None"
+    }
+  ],
+  "pngs_verified": 231,
+  "geometry_samples_verified": 382,
+  "failed_sample": [
+    175,
+    28
+  ],
+  "failed_expected": [
+    255,
+    0,
+    0
+  ],
+  "failed_actual": [
+    20,
+    20,
+    20
+  ],
+  "snapshot": {
+    "schema": 1,
+    "paint_diagnostics_enabled": false,
+    "pid": 8544,
+    "hwnd": 1769876,
+    "sample": [
+      175,
+      28
+    ],
+    "before": {
+      "surface": {
+        "size": [
+          180,
+          190
+        ],
+        "clip": [
+          0,
+          0,
+          180,
+          190
+        ]
+      },
+      "cpu_rgb": [
+        255,
+        0,
+        0
+      ],
+      "dispatch_resize_pending": false,
+      "dispatch_paint_pending": false,
+      "deferred_paints": 0,
+      "app_resize_pending": false,
+      "full_redraw": false,
+      "pane": {
+        "rect": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "grid": [
+          20,
+          10
+        ],
+        "pty": [
+          20,
+          10
+        ],
+        "images": 1,
+        "placements": 1,
+        "dirty": false,
+        "terminal_dirty": false,
+        "grid_ready": true,
+        "synchronized_output": false
+      },
+      "last_paint": {
+        "sequence": 19,
+        "surface": [
+          180,
+          190
+        ],
+        "region": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "blit": 1,
+        "start_event_sequence": 210,
+        "end_event_sequence": 211,
+        "default_message": 0,
+        "default_depth": 0,
+        "target_after_blit": null
+      },
+      "events": {
+        "enabled": true,
+        "sequence": 212,
+        "default_message": 0,
+        "default_depth": 0,
+        "messages": [
+          {
+            "message": 70,
+            "received": 186,
+            "default_enter": 187,
+            "default_exit": 191
+          },
+          {
+            "message": 71,
+            "received": 202,
+            "default_enter": 203,
+            "default_exit": 205
+          },
+          {
+            "message": 136,
+            "received": 195,
+            "default_enter": 196,
+            "default_exit": 201
+          },
+          {
+            "message": 133,
+            "received": 197,
+            "default_enter": 198,
+            "default_exit": 199
+          },
+          {
+            "message": 20,
+            "received": 200,
+            "default_enter": 0,
+            "default_exit": 0
+          },
+          {
+            "message": 5,
+            "received": 204,
+            "default_enter": 0,
+            "default_exit": 0
+          }
+        ],
+        "changing": {
+          "sequence": 186,
+          "flags_in": 22,
+          "flags_submitted": 278,
+          "position": [
+            0,
+            0,
+            196,
+            229
+          ],
+          "current_outer": [
+            32,
+            32,
+            192,
+            261
+          ]
+        },
+        "changed": {
+          "sequence": 202,
+          "flags_reported": 4374,
+          "position": [
+            32,
+            32,
+            196,
+            229
+          ]
+        },
+        "last_size": {
+          "kind": 0,
+          "size": [
+            180,
+            190
+          ]
+        }
+      }
+    },
+    "client_ok": true,
+    "client": [
+      180,
+      190
+    ],
+    "update_pending": false,
+    "update_rect": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "after_flush": {
+      "flush": 1,
+      "cpu_rgb": [
+        255,
+        0,
+        0
+      ],
+      "bitmap_read": 32,
+      "bitmap": [
+        180,
+        190
+      ],
+      "bitmap_matches": true,
+      "source_rgb": [
+        255,
+        0,
+        0
+      ],
+      "target_rgb": [
+        20,
+        20,
+        20
+      ],
+      "source_clip_type": 2,
+      "source_clip": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "target_clip_type": 2,
+      "target_clip": [
+        0,
+        0,
+        180,
+        190
+      ]
+    }
+  },
+  "phase_pixels": {
+    "resize-before": {
+      "diagnostic_point_178_95": [
+        16,
+        24,
+        32
+      ],
+      "gate_point_175_28": [
+        255,
+        0,
+        0
+      ]
+    },
+    "resize-restored": {
+      "diagnostic_point_178_95": [
+        20,
+        20,
+        20
+      ],
+      "gate_point_175_28": [
+        20,
+        20,
+        20
+      ]
+    },
+    "post-failure": {
+      "diagnostic_point_178_95": [
+        20,
+        20,
+        20
+      ],
+      "gate_point_175_28": [
+        20,
+        20,
+        20
+      ]
+    },
+    "post-repaint": {
+      "diagnostic_point_178_95": [
+        16,
+        24,
+        32
+      ],
+      "gate_point_175_28": [
+        255,
+        0,
+        0
+      ]
+    }
+  },
+  "cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-10572-6aeaf3c0008d43daa1b207852da22d0c",
+    "input_after_restore": "Default"
+  },
+  "desktop_elapsed_seconds": 19.514,
+  "scope": "Normal-mode preserve-none candidate only. Cold6 failed the original restore pixel gate after each of cold1 through cold5 completed 31+10+10. All six raw reports have paint diagnostics and runtime trace disabled. Failure-only snapshot still shows a correct CPU/source image, a gray target after explicit flush and recovery only after ordinary repaint. This does not identify the underlying cause. No retry, extra binary execution or CI dispatch was performed during audit."
+}

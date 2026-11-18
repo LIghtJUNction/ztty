@@ -108,7 +108,9 @@ Shift+PageUp/PageDown and the wheel browse scrollback.\n\
 Shift+drag selects while applications use the mouse; Ctrl+click opens links.\n\
 Multiple windows share one process, display connection and font cache.\n\
 Ctrl+Shift+T adds a tab; E/O splits right/down; PageUp/PageDown switches tabs.\n\
+Ctrl+Tab / Ctrl+Shift+Tab also switches to the next / previous tab.\n\
 Ctrl+Shift+Left/Right focuses panes; Up/Down swaps; Enter maximizes/restores.\n\
+Ctrl+Alt+Shift+Equal/Minus grows or shrinks the nearest split.\n\
 Ctrl+Shift+D detaches; U moves a pane to a new window; G takes input control.\n\
 Ctrl+Shift+S opens the session switcher (action: sessions).\n\
 Type name/title/URI words; Up/Down selects; Enter focuses or explicitly attaches.\n\
@@ -118,7 +120,9 @@ Copy joins soft-wrapped rows and preserves explicit line breaks.\n\
 Ctrl+Shift+P opens actions: filter with multiple words and see effective bindings.\n\
 Ctrl+U clears an overlay query; Esc closes it. Ctrl+Shift+R reloads configuration.\n\
 Ctrl+Shift+K/J browses shell commands; Y copies the selected command output.\n\
-Ctrl+Equal/Minus/0 adjusts or resets font size.\n\
+Ctrl+Plus/Equal or Ctrl+Shift+Equal increases font size; Ctrl+Minus decreases it.\n\
+Ctrl+Shift+Minus also decreases; Ctrl+0 or Ctrl+Shift+0 resets to the config font.\n\
+Ctrl+keypad Add/Subtract/0 adjusts or resets; keypad 0 requires Num Lock on.\n\
 Lock keys stay silent in legacy mode.\n\
 With Num Lock off, keypad zero sends Insert in normal keypad mode.\n\
 attach without a name lists all local and MCP sessions.\n\

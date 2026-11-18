@@ -100,8 +100,14 @@ exist only in the benchmark executable; production code forbids unsafe code.
 
 The output reports allocations, reallocations and requested allocation bytes,
 not peak live memory or RSS. Timings include the allocator instrumentation.
-Unchanged nodes retain their buffers; a changed progress node currently clones
-its retained label while staging a transaction. The measurements can therefore
-guide further optimization without assuming that incremental updates allocate
-nothing. Record the commit, toolchain, CPU and repeated samples before comparing
-results. The existing zterm benchmark separately checks ordinary VT throughput.
+
+A batch whose `set` entries contain only `id` and integer `value` fields in
+`0..=10000` can update progress values in place. It verifies the surface and
+revision, each target's ID and type, and duplicate IDs before any mutation.
+Existing labels, tree structure and retained text stay unchanged, so this path
+reuses their earlier validation. Updates with other node properties retain the
+general staging and validation path. The parser still allocates its entries
+vector, even for a single numeric update.
+
+Record the commit, toolchain, CPU and repeated samples before comparing results.
+The existing zterm benchmark separately checks ordinary VT throughput.

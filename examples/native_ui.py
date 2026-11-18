@@ -104,6 +104,7 @@ def main():
     saved = termios.tcgetattr(0)
     decoder = Decoder()
     revision = None
+    entered = False
     try:
         tty.setraw(0)
         write(frame({"v": 1, "op": "capabilities"}))
@@ -123,6 +124,7 @@ def main():
         if revision is None:
             write(b"ZUI/1 is unavailable in this terminal.\r\n")
             return
+        entered = True
         write(b"\x1b[?1049h\x1b[?25l")
         write(image_bytes())
         write(frame(scene(revision)))
@@ -152,10 +154,15 @@ def main():
                 }))
                 revision = next_revision
     finally:
-        if revision is not None:
-            write(frame({"v": 1, "op": "clear", "surface": 1, "base_rev": revision, "rev": revision + 1}))
-        write(b"\x1b[?25h\x1b[?1049l")
-        termios.tcsetattr(0, termios.TCSADRAIN, saved)
+        try:
+            if entered:
+                try:
+                    if revision is not None:
+                        write(frame({"v": 1, "op": "clear", "surface": 1, "base_rev": revision, "rev": revision + 1}))
+                finally:
+                    write(b'\x1b[?25h\x1b[?1049l')
+        finally:
+            termios.tcsetattr(0, termios.TCSADRAIN, saved)
 
 
 if __name__ == "__main__":

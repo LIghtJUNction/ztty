@@ -18,6 +18,13 @@ pub struct Display {
 pub struct XftDraw {
     _private: [u8; 0],
 }
+#[repr(C)]
+struct ClipRectangle {
+    x: i16,
+    y: i16,
+    width: u16,
+    height: u16,
+}
 pub type Atom = c_ulong;
 pub type Xid = c_ulong;
 
@@ -610,6 +617,14 @@ unsafe extern "C" {
         visual: *mut c_void,
         colormap: c_ulong,
     ) -> *mut XftDraw;
+    fn XftDrawSetClip(draw: *mut XftDraw, region: *mut c_void) -> c_int;
+    fn XftDrawSetClipRectangles(
+        draw: *mut XftDraw,
+        x_origin: c_int,
+        y_origin: c_int,
+        rectangles: *const ClipRectangle,
+        count: c_int,
+    ) -> c_int;
     fn XftDrawDestroy(draw: *mut XftDraw);
     fn XftDrawChange(draw: *mut XftDraw, drawable: Xid);
     fn XftDrawStringUtf8(
@@ -1816,6 +1831,21 @@ impl Window {
     }
 
     fn native_ui_text(&mut self, text: &str, rect: crate::layout::Rect, rgb: u32) {
+        if rect.width <= 0 || rect.height <= 0 {
+            return;
+        }
+        let clip = ClipRectangle {
+            x: 0,
+            y: 0,
+            width: rect.width.min(i32::from(u16::MAX)) as u16,
+            height: rect.height.min(i32::from(u16::MAX)) as u16,
+        };
+        // Glyph ink, including fallback/combining marks, may exceed its advance.
+        // Restrict these new native UI draws without clipping terminal/palette draws.
+        if unsafe { XftDrawSetClipRectangles(self.draw, rect.x, rect.y, &clip, 1) } == 0 {
+            return;
+        }
+
         let color = self.color(rgb);
         let right = rect.x + rect.width;
         let rows = (rect.height / self.ch).max(0) as usize;
@@ -1872,6 +1902,9 @@ impl Window {
                 x += i32::from(metrics.x_off);
             }
             flush(run_font, run_x, &run[..used]);
+        }
+        unsafe {
+            XftDrawSetClip(self.draw, core::ptr::null_mut());
         }
     }
 

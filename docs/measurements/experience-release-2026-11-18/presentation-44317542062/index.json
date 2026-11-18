@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "04cfd7bb9a516fe7914dc34daff380fa4c232cf2",
+  "run_id": 44317542062,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44317542062",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "passed": false,
+  "status": "failed",
+  "required_cold_starts_per_architecture": 8,
+  "x86_64": {
+    "completed": 2,
+    "failed_cold_start": 3,
+    "failed_check": "resize_restores_visible_image",
+    "actual": [
+      0,
+      0,
+      0
+    ],
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "completed": 6,
+    "failed_cold_start": 7,
+    "failed_check": "resize_restores_visible_image",
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "both_failure_snapshots": {
+    "cpu_and_source_rgb": [
+      255,
+      0,
+      0
+    ],
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_and_pty": [
+      20,
+      10
+    ],
+    "dispatch_resize_pending": false,
+    "dispatch_paint_pending": false,
+    "deferred_paints": 0,
+    "flush_did_not_restore_window": true,
+    "normal_repaint_restored_window": true
+  },
+  "workspace": "not_entered_on_either_architecture",
+  "cleanup": "all_started_application_processes_and_directories_cleaned; outer Jobs empty and desktops restored",
+  "arm_real_cleanup_retry": {
+    "failed_cold_start": 7,
+    "application_exit_code": 0,
+    "errno": 13,
+    "winerror": 32,
+    "attempts": 2,
+    "elapsed_seconds": 0.055527,
+    "actually_removed": true,
+    "original_pixel_failure_remains_failed": true
+  },
+  "inference_limit": "Neither failed process experienced a guard-rejected paint. These records do not establish the internal window-management copy/clip ordering. The production resize-pixel-preservation candidate must pass a new native gate."
+}

@@ -77,6 +77,44 @@ def rect_values(rect):
     return [rect.left, rect.top, rect.right, rect.bottom]
 
 
+def configure_nc_rendering_diagnostic(user, hwnd, process, report):
+    """Opt-in control for this owned HWND; never part of release acceptance."""
+    if os.environ.get("ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS") != "1":
+        return
+    user.IsWindow.argtypes = [wintypes.HWND]
+    user.IsWindow.restype = wintypes.BOOL
+    record = report["nc_rendering_diagnostic"] = {
+        "diagnostic_only": True, "requested_policy": 1, "attribute": 2,
+        "hwnd": int(hwnd), "pid": process.pid}
+
+    def require_owned():
+        owner = wintypes.DWORD()
+        user.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
+        assert process.poll() is None and owner.value == process.pid and user.IsWindow(hwnd), \
+            "NC diagnostic window ownership changed"
+
+    require_owned()
+    dwm = ctypes.WinDLL("dwmapi", use_last_error=True)
+    dwm.DwmGetWindowAttribute.argtypes = [wintypes.HWND, wintypes.DWORD,
+                                        ctypes.c_void_p, wintypes.DWORD]
+    dwm.DwmGetWindowAttribute.restype = ctypes.c_int32
+    dwm.DwmSetWindowAttribute.argtypes = [wintypes.HWND, wintypes.DWORD,
+                                        ctypes.c_void_p, wintypes.DWORD]
+    dwm.DwmSetWindowAttribute.restype = ctypes.c_int32
+    before, after, policy = wintypes.BOOL(), wintypes.BOOL(), ctypes.c_int32(1)
+    before_status = dwm.DwmGetWindowAttribute(hwnd, 1, ctypes.byref(before), ctypes.sizeof(before))
+    record.update(before_hresult=before_status, before_enabled=bool(before.value))
+    assert before_status == 0 and before.value, "NC control requires initially enabled rendering"
+    require_owned()
+    set_status = dwm.DwmSetWindowAttribute(hwnd, 2, ctypes.byref(policy), ctypes.sizeof(policy))
+    record["set_hresult"] = set_status
+    assert set_status == 0, "disabling owned-window NC rendering failed"
+    after_status = dwm.DwmGetWindowAttribute(hwnd, 1, ctypes.byref(after), ctypes.sizeof(after))
+    record.update(after_hresult=after_status, after_enabled=bool(after.value))
+    require_owned()
+    assert after_status == 0 and not after.value, "NC rendering remained enabled"
+
+
 class BitmapInfoHeader(ctypes.Structure):
     _fields_ = [("size", ctypes.c_uint32), ("width", ctypes.c_int32),
                 ("height", ctypes.c_int32), ("planes", ctypes.c_uint16),
@@ -90,15 +128,16 @@ class BitmapInfo(ctypes.Structure):
     _fields_ = [("header", BitmapInfoHeader), ("colors", ctypes.c_uint32 * 1)]
 
 
-def capture_window(user, gdi, hwnd, expected_pid, path):
-    """Capture only our client DC; save the actual BitBlt/GetDIBits pixels."""
+def capture_window(user, gdi, hwnd, expected_pid, path, include_frame=False):
+    """Capture an owned client DC, or its full frame for appearance review."""
     owner = wintypes.DWORD()
     user.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
     if owner.value != expected_pid:
         raise AssertionError("refusing to capture a window owned by another process")
     rect = wintypes.RECT()
-    if not user.GetClientRect(hwnd, ctypes.byref(rect)):
-        raise OSError("GetClientRect failed during window capture")
+    get_rect = user.GetWindowRect if include_frame else user.GetClientRect
+    if not get_rect(hwnd, ctypes.byref(rect)):
+        raise OSError("window dimensions unavailable during capture")
     width, height = rect.right - rect.left, rect.bottom - rect.top
     if not (0 < width <= 8192 and 0 < height <= 8192 and width * height <= 16 * 1024 * 1024):
         raise AssertionError(f"invalid native capture dimensions: {width}x{height}")
@@ -120,7 +159,10 @@ def capture_window(user, gdi, hwnd, expected_pid, path):
     gdi.DeleteObject.restype = wintypes.BOOL
     gdi.DeleteDC.argtypes = [wintypes.HDC]
     gdi.DeleteDC.restype = wintypes.BOOL
-    dc = user.GetDC(hwnd)
+    if include_frame:
+        user.GetWindowDC.argtypes = [wintypes.HWND]
+        user.GetWindowDC.restype = wintypes.HDC
+    dc = user.GetWindowDC(hwnd) if include_frame else user.GetDC(hwnd)
     if not dc:
         raise OSError("GetDC failed during window capture")
     memory = bitmap = previous = None
@@ -163,7 +205,8 @@ def capture_window(user, gdi, hwnd, expected_pid, path):
         path.write_bytes(encoded)
         return {"path": str(path), "width": width, "height": height, "window_pid": owner.value,
                 "sha256": hashlib.sha256(encoded).hexdigest(),
-                "capture": "owned Win32 client DC via BitBlt/GetDIBits"}
+                "capture": ("owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+                            if include_frame else "owned Win32 client DC via BitBlt/GetDIBits")}
     finally:
         if previous and memory:
             gdi.SelectObject(memory, previous)
@@ -373,6 +416,43 @@ def desktop_state(user):
             user.CloseDesktop(handle)
 
 
+def remove_owned_directory(temporary_directory, cleanup):
+    """Retry only Windows sharing/lock violations within one fixed deadline."""
+    started = time.monotonic()
+    deadline = started + 2.0
+    removal = {"attempts": 0, "elapsed_seconds": 0.0, "retry_timeout_seconds": 2.0}
+    cleanup["directory_removal"] = removal
+    last_error = None
+    try:
+        while True:
+            # A delayed wake must not start another attempt after the budget.
+            if removal["attempts"] and time.monotonic() >= deadline:
+                cleanup["directory_error"] = repr(last_error)
+                return
+            removal["attempts"] += 1
+            try:
+                temporary_directory.cleanup()
+                cleanup["temporary_directory_removed"] = not Path(temporary_directory.name).exists()
+                if not cleanup["temporary_directory_removed"]:
+                    cleanup["directory_error"] = "temporary directory still exists after cleanup"
+                return
+            except Exception as error:
+                last_error = error
+                removal.setdefault("first_error", {
+                    "type": type(error).__name__, "repr": repr(error),
+                    "errno": getattr(error, "errno", None),
+                    "winerror": getattr(error, "winerror", None),
+                })
+                remaining = deadline - time.monotonic()
+                if (sys.platform != "win32" or not isinstance(error, OSError)
+                        or getattr(error, "winerror", None) not in (32, 33) or remaining <= 0):
+                    cleanup["directory_error"] = repr(error)
+                    return
+                time.sleep(min(0.05, remaining))
+    finally:
+        removal["elapsed_seconds"] = time.monotonic() - started
+
+
 def cleanup_owned(process, close_window, temporary_directory, report):
     """Finish owned processes before deleting paths, retaining the first error."""
     cleanup = {"process_exited": process is None, "temporary_directory_removed": temporary_directory is None}
@@ -396,15 +476,20 @@ def cleanup_owned(process, close_window, temporary_directory, report):
         except Exception as error:
             cleanup["process_error"] = repr(error)
             report["passed"] = False
-    # Windows locks a process's current directory until it exits. Dispose
-    # the owned process before removing its directory on every exit path.
+    # Windows may briefly retain a sharing lock after the owned process exits.
+    # Never delete its directory until that exit has actually been observed.
     if temporary_directory:
-        try:
-            temporary_directory.cleanup()
-            cleanup["temporary_directory_removed"] = not Path(temporary_directory.name).exists()
-        except Exception as error:
-            cleanup["directory_error"] = repr(error)
-            report["passed"] = False
+        if cleanup["process_exited"]:
+            try:
+                remove_owned_directory(temporary_directory, cleanup)
+            except Exception as error:
+                cleanup["directory_error"] = repr(error)
+                report["passed"] = False
+        else:
+            cleanup["directory_removal"] = {
+                "attempts": 0, "elapsed_seconds": 0.0, "retry_timeout_seconds": 2.0,
+                "skipped": "owned process exit was not confirmed",
+            }
     if not cleanup["process_exited"] or not cleanup["temporary_directory_removed"]:
         report["passed"] = False
 
@@ -426,6 +511,11 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
     user.ReleaseDC.argtypes = [wintypes.HWND, wintypes.HDC]
     user.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
     user.SendMessageW.restype = wintypes.LPARAM
+    user.SendMessageTimeoutW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM,
+        wintypes.LPARAM, wintypes.UINT, wintypes.UINT, ctypes.POINTER(ctypes.c_size_t)]
+    user.SendMessageTimeoutW.restype = ctypes.c_ssize_t
+    user.InvalidateRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT), wintypes.BOOL]
+    user.InvalidateRect.restype = wintypes.BOOL
     user.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
     user.SetForegroundWindow.argtypes = [wintypes.HWND]
     gdi.GetPixel.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
@@ -468,7 +558,11 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
     report = {"platform": sys.platform, "binary": str(binary.resolve()),
               "transport": "real ConPTY", "renderer": "Win32 retained DIB",
               "runtime_trace_enabled": trace_runtime,
+              "paint_diagnostics_enabled": os.environ.get("ZTTY_NATIVE_PAINT_DIAGNOSTICS") == "1",
+              "nc_rendering_diagnostics_enabled": os.environ.get("ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS") == "1",
               "resize_path": "staged" if staged_resize else "rapid",
+              "rapid_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
+              "back_to_back_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
               "checks": checks, "passed": False, "status": "running"}
     def window_pid(window):
         pid = wintypes.DWORD()
@@ -651,7 +745,9 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         if expected_arch is not None:
             assert architecture == expected_arch, f"expected {expected_arch}; runner is {architecture}"
         checks.append({"name": "native_python_and_binary_architecture", "passed": True})
-        temporary_directory = tempfile.TemporaryDirectory(prefix="ztty native 图像 ")
+        # Only cleanup_owned may delete it, after confirming the owned exit.
+        # A finalizer must not try again behind a still-running failed child.
+        temporary_directory = tempfile.TemporaryDirectory(prefix="ztty native 图像 ", delete=False)
         directory = Path(temporary_directory.name)
         clean_environment = os.environ.copy()
         clean_environment["APPDATA"] = str(directory / "missing-parent" / "config")
@@ -717,7 +813,8 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
             runtime_path.parent.mkdir(parents=True, exist_ok=True)
             runtime_stream = runtime_path.open("wb")
         environment = dict(os.environ, ZTTY_NATIVE_TRACE="1" if trace_runtime else "0",
-                           ZTTY_NATIVE_GEOMETRY="1" if trace_runtime or staged_resize else "0")
+                           ZTTY_NATIVE_GEOMETRY="1" if trace_runtime or staged_resize else "0",
+                           ZTTY_NATIVE_SNAPSHOT=str(directory / "failure-state.json"))
         process = subprocess.Popen(command, cwd=directory, env=environment, stderr=runtime_stream)
         report["ztty_process"] = process_architecture(process.pid)
         assert report["ztty_process"] == interpreter, "ztty must run natively on the test machine"
@@ -747,20 +844,40 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                                        "actual": startup_state["cwd"],
                                        "relative_config": "appearance.conf"}
         checks.append({"name": "unicode_cwd_and_relative_config", "passed": True})
+        configure_nc_rendering_diagnostic(user, hwnd, process, report)
         rect = wintypes.RECT()
         assert user.GetClientRect(hwnd, ctypes.byref(rect))
         cw, ch = rect.right // 20, rect.bottom // 10
         assert cw > 0 and ch > 0
         report["client_pixels"] = [rect.right, rect.bottom]
         report["cell_pixels"] = [cw, ch]
-        def record_resize(stage):
-            state = report.setdefault("resize_stages", {}).setdefault(stage, {})
+
+        def client_sample(col, row):
+            return [int(col * cw), int(row * ch)]
+
+        if report["paint_diagnostics_enabled"]:
+            x, y = client_sample(19.5, 1.5)
+            assert 0 <= x <= 65535 and 0 <= y <= 65535
+            assert process.poll() is None and window_pid(hwnd) == process.pid, "paint sample window ownership changed"
+            result = ctypes.c_size_t()
+            ctypes.set_last_error(0)
+            delivered = user.SendMessageTimeoutW(hwnd, 0x85A2, 0x5A545459, x | (y << 16),
+                                                  0x0003, 2000, ctypes.byref(result))
+            report["paint_sample_configuration"] = {"client_sample": [x, y],
+                "delivered": bool(delivered), "result": result.value,
+                "last_error": ctypes.get_last_error(), "timeout_ms": 2000}
+            assert delivered and result.value == 1, "paint sample configuration was unavailable or timed out"
+
+        def record_resize(stage, stages=None, prefix="resize"):
+            if stages is None:
+                stages = report.setdefault("resize_stages", {})
+            state = stages.setdefault(stage, {})
             state["monotonic_seconds"] = time.monotonic()
             try:
-                state.update(window_geometry([(19.5 * cw, 1.5 * ch), (15.5 * cw, 1.5 * ch)]))
+                state.update(window_geometry([client_sample(19.5, 1.5), client_sample(15.5, 1.5)]))
                 state["screenshot"] = capture_window(
                     user, gdi, hwnd, process.pid,
-                    output.with_name(output.stem + f".resize-{stage}.png"))
+                    output.with_name(output.stem + f".{prefix}-{stage}.png"))
             except Exception as error:
                 state["diagnostic_error"] = repr(error)
 
@@ -812,7 +929,61 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                 user.ReleaseDC(hwnd, dc)
 
         def pixel(col, row):
-            return pixel_at(col * cw, row * ch)
+            return pixel_at(*client_sample(col, row))
+
+        def post_failure_snapshot():
+            # This path is reached only after the original pixel assertion
+            # failed. Preserve its image before any message can flush/repaint.
+            diagnostic = report["post_failure_snapshot"] = {"original_gate_remains_failed": True}
+            try:
+                x, y = report["failed_pixel"]["client_sample"]
+                assert 0 <= x <= 65535 and 0 <= y <= 65535
+                assert process.poll() is None and window_pid(hwnd) == process.pid, "snapshot window ownership changed"
+                report["screenshot"] = capture_window(user, gdi, hwnd, process.pid, output.with_suffix(".png"))
+                diagnostic["before"] = window_geometry([(x, y)], diagnostics=True)
+                result = ctypes.c_size_t()
+                ctypes.set_last_error(0)
+                delivered = user.SendMessageTimeoutW(hwnd, 0x85A1, 0x5A545459, x | (y << 16),
+                                                      0x0003, 2000, ctypes.byref(result))
+                diagnostic["message"] = {"delivered": bool(delivered), "result": result.value,
+                                         "last_error": ctypes.get_last_error(), "timeout_ms": 2000}
+                assert delivered and result.value == 1, "failure snapshot was unavailable, busy or timed out"
+                source = directory / "failure-state.json"
+                assert source.stat().st_size <= 8192, "failure snapshot exceeded its bound"
+                raw = source.read_bytes()
+                state = json.loads(raw)
+                assert (state["schema"] == 1 and state["pid"] == process.pid
+                        and state["hwnd"] == int(hwnd) and state["sample"] == [x, y]), state
+                saved = output.with_name(output.stem + ".post-failure.json")
+                saved.write_bytes(raw)
+                diagnostic["record"] = {"path": str(saved), "bytes": len(raw),
+                                         "sha256": hashlib.sha256(raw).hexdigest()}
+                diagnostic["state"] = state
+                diagnostic["after_flush"] = window_geometry([(x, y)], diagnostics=True)
+                diagnostic["after_flush_screenshot"] = capture_window(user, gdi, hwnd, process.pid,
+                    output.with_name(output.stem + ".post-failure.png"))
+                # A separate bounded repaint distinguishes a missing update
+                # from a flush effect. It cannot change the failed assertion.
+                assert process.poll() is None and window_pid(hwnd) == process.pid, "repaint window ownership changed"
+                assert user.InvalidateRect(hwnd, None, False)
+                update = wintypes.RECT()
+                def repaint_processed():
+                    assert process.poll() is None and window_pid(hwnd) == process.pid, "repaint window ownership changed"
+                    return not user.GetUpdateRect(hwnd, ctypes.byref(update), False)
+                wait_for(repaint_processed, "diagnostic repaint update region", timeout=2)
+                diagnostic["after_repaint"] = window_geometry([(x, y)], diagnostics=True)
+                diagnostic["after_repaint_screenshot"] = capture_window(user, gdi, hwnd, process.pid,
+                    output.with_name(output.stem + ".post-repaint.png"))
+                # Compare probe coordinates only after all original/flush/repaint
+                # evidence is saved. This never changes the failed pixel result.
+                alignment = diagnostic["paint_sample_alignment"] = {"failed_client_sample": [x, y]}
+                for label, field in (("before_end_paint", "target_after_blit"),
+                                     ("after_end_paint", "target_after_end_paint")):
+                    sample = (state["before"]["last_paint"].get(field) or {}).get("sample")
+                    alignment[label] = {"client_sample": sample,
+                        "matches_failed_pixel": None if sample is None else sample == [x, y]}
+            except Exception as error:
+                diagnostic["error"] = repr(error)
 
         def expect_pixels(name, samples):
             actual = []
@@ -831,7 +1002,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
             checks.append({"name": name, "passed": True, "pixels": [
                 {"x": x, "y": y, "rgb": rgb} for (x, y, _), rgb in zip(samples, actual)]})
 
-        def expect(name, col, row, expected):
+        def expect(name, col, row, expected, record=True):
             actual = None
 
             def matches():
@@ -843,14 +1014,16 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                 wait_for(matches, name)
             except AssertionError as error:
                 failure = {"name": name, "expected": expected, "actual": actual,
-                           "client_sample": [int(col * cw), int(row * ch)]}
+                           "client_sample": client_sample(col, row)}
                 try:
-                    failure["window"] = window_geometry([(col * cw, row * ch)], diagnostics=True)
+                    failure["window"] = window_geometry([client_sample(col, row)], diagnostics=True)
                 except Exception as diagnostic_error:
                     failure["diagnostic_error"] = repr(diagnostic_error)
                 report["failed_pixel"] = failure
                 raise AssertionError(f"{name}: expected {expected}, last RGB {actual}; {error}") from error
-            checks.append({"name": name, "passed": True, "pixel": actual})
+            if record:
+                checks.append({"name": name, "passed": True, "pixel": actual})
+            return actual
 
         rgba = bytes([255, 0, 0, 255, 0, 255, 0, 128,
                       0, 0, 255, 255, 255, 255, 255, 0])
@@ -983,20 +1156,89 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                  and keyboard_marker in (directory / "keyboard.bin").read_bytes(),
                  "keyboard input after malformed and incomplete images")
         checks.append({"name": "keyboard_recovers_after_malformed_graphics", "passed": True})
+        # Preserve the original 31 checks, then independently require ten
+        # repetitions of their rapid resize path. Later Sixel/recovery vectors
+        # removed the earlier edge image, so recreate that exact fixture first.
+        repetitions = report["rapid_resize_repetitions"]
+        send(b"\x1b[0m\x1b[2J\x1b[?25l\x1b[2;20H"
+             + kitty("a=T,f=32,s=2,v=2,i=42,c=4,r=2,C=1,q=2", rgba))
+        expect("rapid_resize_fixture", 19.5, 1.5, [255, 0, 0], record=False)
+        for number in range(1, repetitions["required"] + 1):
+            iteration = {"number": number, "passed": False, "resize_stages": {}}
+            repetitions["iterations"].append(iteration)
+            prefix = f"rapid-{number:02d}"
+            record_resize("before", iteration["resize_stages"], prefix)
+            assert user.SetWindowPos(hwnd, None, 0, 0, old_width - 4 * cw, old_height, 0x16)
+            try:
+                wait_for(lambda: resized(16), "native client resize")
+                iteration["shrunk_pixel"] = expect("resize_clips_without_ghosts", 15.5, 1.5,
+                                                      [16, 24, 32], record=False)
+            finally:
+                record_resize("shrunk", iteration["resize_stages"], prefix)
+            assert user.SetWindowPos(hwnd, None, 0, 0, old_width, old_height, 0x16)
+            try:
+                wait_for(lambda: resized(20), "native client restore to original geometry")
+                iteration["restored_pixel"] = expect("resize_restores_visible_image", 19.5, 1.5,
+                                                        [255, 0, 0], record=False)
+            finally:
+                record_resize("restored", iteration["resize_stages"], prefix)
+            assert all("screenshot" in iteration["resize_stages"].get(stage, {})
+                       for stage in ("before", "shrunk", "restored")), "rapid resize evidence capture failed"
+            iteration["passed"] = True
+            repetitions["completed"] += 1
+        assert repetitions["completed"] == repetitions["required"] == 10
+        repetitions["passed"] = True
         assert all("screenshot" in report.get("resize_stages", {}).get(stage, {})
                    for stage in ("before", "shrunk", "restored")), "resize evidence capture failed"
+        # Observing the shrunk background above can wait for a repaint. This
+        # separate gate makes both size requests without any observation,
+        # screenshot, PTY roundtrip or wait between them. Keep the same flags.
+        burst = report["back_to_back_resize_repetitions"]
+        report["active_check"] = "back_to_back_resize_restores_visible_image"
+        for number in range(1, burst["required"] + 1):
+            iteration = {"number": number, "passed": False, "resize_stages": {}}
+            burst["iterations"].append(iteration)
+            try:
+                shrunk = user.SetWindowPos(hwnd, None, 0, 0, old_width - 4 * cw, old_height, 0x16)
+                restored = user.SetWindowPos(hwnd, None, 0, 0, old_width, old_height, 0x16)
+                assert shrunk and restored, "back-to-back native resize requests failed"
+                iteration["restored_pixel"] = expect("back_to_back_resize_restores_visible_image",
+                                                     19.5, 1.5, [255, 0, 0], record=False)
+            finally:
+                record_resize("restored", iteration["resize_stages"], f"back-to-back-{number:02d}")
+            assert "screenshot" in iteration["resize_stages"].get("restored", {}), "back-to-back resize evidence capture failed"
+            iteration["passed"] = True
+            burst["completed"] += 1
+        assert burst["completed"] == burst["required"] == 10
+        burst["passed"] = True
         assert process.poll() is None, "ztty exited unexpectedly"
+        # Read only after every original pixel/resize requirement has passed.
+        # Normal acceptance never changes the application's window policy.
+        report["final_dwm_state"] = dwm_state()
+        assert report["final_dwm_state"].get("nonclient_rendering") == {"hresult": 0, "value": 0}, \
+            "the native GDI window did not retain its nonclient rendering policy"
+        report["window_frame"] = capture_window(user, gdi, hwnd, process.pid,
+            output.with_name(output.stem + ".window-frame.png"), include_frame=True)
         report["passed"] = True
     except BaseException as error:
         report["passed"] = False
         report["status"] = "blocked" if isinstance(error, DesktopBlocked) else "failed"
         report["error"] = str(error)
+        if report.get("active_check") == "back_to_back_resize_restores_visible_image":
+            # A failed size request/capture also retains this process's state;
+            # no diagnostic rerun can replace the failed burst.
+            report.setdefault("failed_pixel", {"name": "back_to_back_resize_restores_visible_image",
+                "expected": [255, 0, 0], "actual": None, "client_sample": client_sample(19.5, 1.5)})
+        if report.get("failed_pixel", {}).get("name") in (
+                "resize_restores_visible_image", "back_to_back_resize_restores_visible_image"):
+            post_failure_snapshot()
         raise
     finally:
         output.parent.mkdir(parents=True, exist_ok=True)
         if hwnd and process:
             try:
-                report["screenshot"] = capture_window(user, gdi, hwnd, process.pid, output.with_suffix(".png"))
+                if "screenshot" not in report:
+                    report["screenshot"] = capture_window(user, gdi, hwnd, process.pid, output.with_suffix(".png"))
                 visible_checks = sum("pixel" in check or "pixels" in check for check in checks)
                 report["visible_pixel_checks_completed"] = visible_checks
                 report["pixel_readback"] = (

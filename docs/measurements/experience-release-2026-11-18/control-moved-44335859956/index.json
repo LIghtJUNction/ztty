@@ -1,0 +1,901 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "ce176ffb96f6e000e71af88f8f8ce5395e085967",
+  "run_id": 44335859956,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44335859956",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "status": "failed",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "ordinary_acceptance_credit": false,
+  "production_fix_claimed": false,
+  "windows_frontend_source_identity": {
+    "path": "src/platform/windows.rs",
+    "previous_source": "ab79d233da56e063539a5562a0b985293ffc4106",
+    "current_source": "ce176ffb96f6e000e71af88f8f8ce5395e085967",
+    "byte_identical": true,
+    "bytes": 125864,
+    "sha256": "6da18d9c60dff983c966578ff19a85b46149929a4ffae1116f0fa5ac7970f176"
+  },
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "x86_64": {
+    "completed_cold_starts": 4,
+    "failed_cold_start": 5,
+    "failed_pid": 2196,
+    "original_checks_completed_before_failure": 23,
+    "failed_gate_rgb": [
+      0,
+      0,
+      0
+    ],
+    "workspace_entered": false,
+    "native_pngs_verified": 186,
+    "native_geometry_samples_verified": 307,
+    "control_completed": 16,
+    "control_required": 16,
+    "control_pngs_verified": 48,
+    "control_geometry_samples_verified": 144,
+    "native_failed_outer_before_placement": [
+      52,
+      52,
+      248,
+      281
+    ],
+    "summary": "windows-x86_64/summary.json",
+    "control_summary": "windows-x86_64/control-summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "completed_cold_starts": 3,
+    "failed_cold_start": 4,
+    "failed_pid": 3764,
+    "original_checks_completed_before_failure": 23,
+    "failed_gate_rgb": [
+      20,
+      20,
+      20
+    ],
+    "workspace_entered": false,
+    "native_pngs_verified": 141,
+    "native_geometry_samples_verified": 232,
+    "control_completed": 16,
+    "control_required": 16,
+    "control_pngs_verified": 48,
+    "control_geometry_samples_verified": 144,
+    "native_failed_outer_before_placement": [
+      156,
+      156,
+      352,
+      385
+    ],
+    "summary": "windows-aarch64/summary.json",
+    "control_summary": "windows-aarch64/control-summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "both_native_failure_observations": {
+    "gate_point": [
+      175,
+      28
+    ],
+    "gate_expected": [
+      255,
+      0,
+      0
+    ],
+    "generic_point": [
+      178,
+      95
+    ],
+    "generic_before_EndPaint_target": [
+      16,
+      24,
+      32
+    ],
+    "generic_later_failed_rgb": {
+      "x86_64": [
+        0,
+        0,
+        0
+      ],
+      "aarch64": [
+        20,
+        20,
+        20
+      ]
+    },
+    "red_gate_source_measured_only_after_failure": true,
+    "nccalc_submitted_return": 1024,
+    "nccalc_source_destination_valid_rects": [
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "deferred_paints": 0,
+    "failed_png_identical_after_flush": true,
+    "before_png_identical_after_repaint": true
+  },
+  "control_experiment": {
+    "diagnostic_only": true,
+    "creation_position": "CW_USEDEFAULT",
+    "per_architecture_required": 16,
+    "per_architecture_completed": 16,
+    "all_32_actual_moves_verified": true,
+    "before_after_geometry_owner_visibility_verified": true,
+    "every_record_has_nonzero_actual_position_delta": true,
+    "per_architecture_initial_xy_values": [
+      [
+        26,
+        26
+      ],
+      [
+        52,
+        52
+      ],
+      [
+        78,
+        78
+      ],
+      [
+        104,
+        104
+      ],
+      [
+        130,
+        130
+      ],
+      [
+        156,
+        156
+      ]
+    ],
+    "final_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "positioning_flags": 1,
+    "requested_topmost": true,
+    "shrink_restore_flags": 22,
+    "shrink_restore_xy": [
+      0,
+      0
+    ],
+    "per_process_checks": [
+      "before",
+      "shrunk",
+      "restored"
+    ],
+    "default_frame_and_valid_rect_policy": true,
+    "nocopybits_added": false,
+    "broad_creation_and_visible_move_policy_matched": true,
+    "all_other_runtime_details_matched": false,
+    "moves": {
+      "x86_64": [
+        {
+          "number": 1,
+          "pid": 1208,
+          "before": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -46,
+            -46
+          ],
+          "moved": true
+        },
+        {
+          "number": 2,
+          "pid": 6812,
+          "before": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -72,
+            -72
+          ],
+          "moved": true
+        },
+        {
+          "number": 3,
+          "pid": 1928,
+          "before": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -98,
+            -98
+          ],
+          "moved": true
+        },
+        {
+          "number": 4,
+          "pid": 1288,
+          "before": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -124,
+            -124
+          ],
+          "moved": true
+        },
+        {
+          "number": 5,
+          "pid": 8788,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 6,
+          "pid": 5552,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 7,
+          "pid": 8740,
+          "before": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -20,
+            -20
+          ],
+          "moved": true
+        },
+        {
+          "number": 8,
+          "pid": 2232,
+          "before": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -46,
+            -46
+          ],
+          "moved": true
+        },
+        {
+          "number": 9,
+          "pid": 8700,
+          "before": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -72,
+            -72
+          ],
+          "moved": true
+        },
+        {
+          "number": 10,
+          "pid": 8828,
+          "before": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -98,
+            -98
+          ],
+          "moved": true
+        },
+        {
+          "number": 11,
+          "pid": 1152,
+          "before": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -124,
+            -124
+          ],
+          "moved": true
+        },
+        {
+          "number": 12,
+          "pid": 3088,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 13,
+          "pid": 1240,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 14,
+          "pid": 6404,
+          "before": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -20,
+            -20
+          ],
+          "moved": true
+        },
+        {
+          "number": 15,
+          "pid": 4768,
+          "before": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -46,
+            -46
+          ],
+          "moved": true
+        },
+        {
+          "number": 16,
+          "pid": 1344,
+          "before": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -72,
+            -72
+          ],
+          "moved": true
+        }
+      ],
+      "aarch64": [
+        {
+          "number": 1,
+          "pid": 10924,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 2,
+          "pid": 4092,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 3,
+          "pid": 2664,
+          "before": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -20,
+            -20
+          ],
+          "moved": true
+        },
+        {
+          "number": 4,
+          "pid": 7132,
+          "before": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -46,
+            -46
+          ],
+          "moved": true
+        },
+        {
+          "number": 5,
+          "pid": 10764,
+          "before": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -72,
+            -72
+          ],
+          "moved": true
+        },
+        {
+          "number": 6,
+          "pid": 10468,
+          "before": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -98,
+            -98
+          ],
+          "moved": true
+        },
+        {
+          "number": 7,
+          "pid": 8844,
+          "before": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -124,
+            -124
+          ],
+          "moved": true
+        },
+        {
+          "number": 8,
+          "pid": 6824,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 9,
+          "pid": 4652,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 10,
+          "pid": 1984,
+          "before": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -20,
+            -20
+          ],
+          "moved": true
+        },
+        {
+          "number": 11,
+          "pid": 9740,
+          "before": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -46,
+            -46
+          ],
+          "moved": true
+        },
+        {
+          "number": 12,
+          "pid": 5920,
+          "before": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -72,
+            -72
+          ],
+          "moved": true
+        },
+        {
+          "number": 13,
+          "pid": 11180,
+          "before": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -98,
+            -98
+          ],
+          "moved": true
+        },
+        {
+          "number": 14,
+          "pid": 7584,
+          "before": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            -124,
+            -124
+          ],
+          "moved": true
+        },
+        {
+          "number": 15,
+          "pid": 5308,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        },
+        {
+          "number": 16,
+          "pid": 11176,
+          "before": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "after": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "delta": [
+            6,
+            6
+          ],
+          "moved": true
+        }
+      ]
+    },
+    "limit": "The fixed-position-request/missing-before-geometry limitation of the previous control is resolved for this sample. Its retained-DIB rendering, absence of terminal/PTY work, message schedule and default valid-rectangle policy still differ from ztty; success is not a production fix or proof excluding all system paths."
+  },
+  "control_source_identity": {
+    "immutable_source_commit": "ce176ffb96f6e000e71af88f8f8ce5395e085967",
+    "immutable_source_path": "tests/windows_resize_control.c",
+    "immutable_source_url": "https://github.com/LIghtJUNction/ztty/blob/ce176ffb96f6e000e71af88f8f8ce5395e085967/tests/windows_resize_control.c",
+    "raw_artifact_bytes": 5900,
+    "raw_artifact_sha256": "50a2a1aeb3b436b75b35e7992f93ed9d4e004bed2496f9cfd6fe04a4dc898de9",
+    "crlf_lines": 150,
+    "immutable_git_bytes": 5750,
+    "immutable_git_sha256": "aa6300e5f0d6088a1c7f44dbd5522186abd02d1bc5334e3a0e8c817477871325",
+    "lf_normalized_raw_equals_git_source": true,
+    "working_tree_source_used": false
+  },
+  "cleanup": {
+    "native_processes_exited": 9,
+    "native_temporary_directories_actually_removed": 9,
+    "control_processes_exited": 32,
+    "control_per_run_temporary_directories_created": false,
+    "all_four_owned_jobs_empty_and_desktops_restored": true
+  },
+  "worker_elapsed_seconds": {
+    "x86_64_native": 17.331,
+    "aarch64_native": 16.278,
+    "x86_64_control": 0.836,
+    "aarch64_control": 1.25
+  },
+  "worker_exit_codes": {
+    "x86_64_native": 1,
+    "aarch64_native": 1,
+    "x86_64_control": 0,
+    "aarch64_control": 0
+  },
+  "delivery_scope": "Explicit Windows-only diagnostic candidate. The terminal original gate still failed on both architectures. No Release publication or device installation; all older source-bound results remain unchanged."
+}

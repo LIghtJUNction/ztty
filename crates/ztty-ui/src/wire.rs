@@ -205,6 +205,15 @@ impl<'a> Fields<'a> {
         Ok(f)
     }
 
+    pub fn progress_value(&self) -> Option<u16> {
+        if self.seen != (1 | 32) {
+            return None;
+        }
+        self.value
+            .filter(|value| *value <= 10_000)
+            .map(|value| value as u16)
+    }
+
     pub fn into_node(self, base: Option<&Node>) -> Result<Node, Error> {
         let id = self.id.filter(|id| *id != 0).ok_or(Error::Value)?;
         if base.is_some() && self.kind.is_some() {

@@ -15,6 +15,16 @@ on:
         required: true
         default: all
         options: [all, linux, macos, windows]
+      windows_paint_diagnostics:
+        description: 'Build-only Windows paint DC diagnostics; cannot be used for publication'
+        type: boolean
+        required: true
+        default: false
+      windows_nc_rendering_diagnostics:
+        description: 'Build-only owned-window nonclient rendering isolation; cannot be used for publication'
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -49,6 +59,8 @@ jobs:
         env:
           BUILD_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.build_only || false }}
           CANDIDATE_PLATFORM: ${{ inputs.candidate_platform || 'all' }}
+          WINDOWS_PAINT_DIAGNOSTICS: ${{ inputs.windows_paint_diagnostics && 'true' || 'false' }}
+          WINDOWS_NC_RENDERING_DIAGNOSTICS: ${{ inputs.windows_nc_rendering_diagnostics && 'true' || 'false' }}
         run: |
           case "$CANDIDATE_PLATFORM" in
             all|linux|macos|windows) ;;
@@ -56,6 +68,14 @@ jobs:
           esac
           if [[ "$BUILD_ONLY" != true && "$CANDIDATE_PLATFORM" != all ]]; then
             echo "Publishing requires all native platforms; scoped builds require build_only=true." >&2
+            exit 1
+          fi
+          if [[ "$WINDOWS_PAINT_DIAGNOSTICS" == true && "$BUILD_ONLY" != true ]]; then
+            echo "Paint diagnostics change GDI query timing and cannot be used for publication." >&2
+            exit 1
+          fi
+          if [[ "$WINDOWS_NC_RENDERING_DIAGNOSTICS" == true && "$BUILD_ONLY" != true ]]; then
+            echo "Nonclient rendering isolation changes window policy and cannot be used for publication." >&2
             exit 1
           fi
           version=$(bash tools/release-source.sh "$RUNNER_TEMP/ztty-release")
@@ -464,6 +484,8 @@ jobs:
       BUILD_ONLY: ${{ needs.version.outputs.build_only }}
       CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
       ARTIFACT_STEM: ztty-windows-${{ matrix.arch }}
+      ZTTY_NATIVE_PAINT_DIAGNOSTICS: ${{ inputs.windows_paint_diagnostics && '1' || '0' }}
+      ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS: ${{ inputs.windows_nc_rendering_diagnostics && '1' || '0' }}
       # SHA-256 digests from the official 20261104 release assets API.
       # https://github.com/mstorsjo/llvm-mingw/releases/tag/20261104
       LLVM_MINGW_VERSION: '20261104'
@@ -500,6 +522,8 @@ jobs:
           metadata["rust_host"] = os.environ["RUST_HOST"]
           metadata["rust_target"] = os.environ["RUST_TARGET"]
           metadata["windows_architecture"] = os.environ["WINDOWS_ARCH"]
+          metadata["paint_diagnostics_enabled"] = os.environ["ZTTY_NATIVE_PAINT_DIAGNOSTICS"] == "1"
+          metadata["nc_rendering_diagnostics_enabled"] = os.environ["ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS"] == "1"
           (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
           (out / f"{stem}.native.json").write_text(json.dumps({"source_sha": source, "passed": False,
               "status": "not_run", "pixel_readback": "not_performed"}, indent=2) + "\n", encoding="utf-8")
@@ -610,6 +634,35 @@ jobs:
           report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
           print(json.dumps(report, indent=2))
           raise SystemExit(0 if report["passed"] else 1)
+      - name: Run an independent Win32 resize control diagnostic
+        id: resize_control
+        if: ${{ always() && needs.version.outputs.build_only == 'true' && (inputs.windows_paint_diagnostics || inputs.windows_nc_rendering_diagnostics) && steps.package.outcome == 'success' }}
+        shell: python {0}
+        run: |
+          import hashlib, json, os, subprocess, sys, zipfile
+          from pathlib import Path
+          stem = os.environ["ARTIFACT_STEM"]
+          source = Path("tests/windows_resize_control.c")
+          binary = Path(os.environ["RUNNER_TEMP"]) / "ztty-resize-control.exe"
+          compiler = Path(os.environ["LLVM_MINGW_BIN"]) / (os.environ["ARCH"] + "-w64-mingw32-clang.exe")
+          subprocess.run([str(compiler), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-municode",
+                          str(source), "-o", str(binary), "-luser32", "-lgdi32"], check=True, timeout=60)
+          archive = Path("dist") / f"{stem}.resize-control.zip"
+          manifest = {"diagnostic_only": True, "source_sha": os.environ["SOURCE_SHA"],
+                      "run_id": os.environ["GITHUB_RUN_ID"], "architecture": os.environ["ARCH"],
+                      "files": {p.name: {"bytes": p.stat().st_size,
+                          "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in (source, binary)}}
+          with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as package:
+              package.write(source, source.name)
+              package.write(binary, binary.name)
+              package.writestr("manifest.json", json.dumps(manifest, indent=2) + "\n")
+          Path(str(archive) + ".sha256").write_text(
+              f"{hashlib.sha256(archive.read_bytes()).hexdigest()}  {archive.name}\n", encoding="ascii")
+          # Runs after the unchanged native gate in a separate owned desktop.
+          # Its result cannot replace a failed ztty pixel or cleanup assertion.
+          subprocess.run([sys.executable, "tests/windows_resize_control.py", "--isolated-desktop",
+                          "--binary", str(binary), "--output", f"dist/{stem}.resize-control.json",
+                          "--arch", os.environ["WINDOWS_ARCH"]], check=True, timeout=180)
       - name: Finalize source-bound artifact report
         if: ${{ always() && steps.source.outcome == 'success' }}
         env:
@@ -617,6 +670,7 @@ jobs:
           OUTCOME_BUILD: ${{ steps.build.outcome }}
           OUTCOME_NATIVE: ${{ steps.native.outcome }}
           OUTCOME_PACKAGE: ${{ steps.package.outcome }}
+          OUTCOME_RESIZE_CONTROL: ${{ steps.resize_control.outcome }}
         shell: python {0}
         run: |
           import hashlib, json, os
@@ -626,6 +680,9 @@ jobs:
           path = out / f"{stem}.build.json"
           report = json.loads(path.read_text(encoding="utf-8"))
           report["outcomes"] = {key: os.environ[f"OUTCOME_{key.upper()}"] for key in ("toolchain", "build", "native", "package")}
+          report["resize_control_diagnostic"] = {"requested": (os.environ["ZTTY_NATIVE_PAINT_DIAGNOSTICS"] == "1"
+                                                    or os.environ["ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS"] == "1"),
+                                                "outcome": os.environ["OUTCOME_RESIZE_CONTROL"]}
           report["passed"] = all(value == "success" for value in report["outcomes"].values())
           report["status"] = "accepted" if report["passed"] else "failed"
           report["files"] = {file.name: {"bytes": file.stat().st_size, "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}

@@ -214,6 +214,45 @@ impl State {
                 }
                 if command.op == wire::Op::Clear {
                     self.scene = None;
+                } else if command
+                    .entries
+                    .iter()
+                    .all(|fields| fields.progress_value().is_some())
+                {
+                    // Scalar values preserve the already-validated graph and text budget.
+                    // Check every target before mutating any value.
+                    let mut seen = [false; MAX_NODES];
+                    let mut duplicate = false;
+                    for fields in &command.entries {
+                        let id = fields.id.ok_or(Error::Value)?;
+                        let index = scene
+                            .nodes
+                            .binary_search_by_key(&id, |node| node.id)
+                            .map_err(|_| Error::Graph)?;
+                        if !matches!(&scene.nodes[index].kind, Kind::Progress { .. }) {
+                            return Err(Error::UnknownField);
+                        }
+                        duplicate |= core::mem::replace(&mut seen[index], true);
+                    }
+                    // Preserve the general transaction's per-entry error precedence.
+                    if duplicate {
+                        return Err(Error::Graph);
+                    }
+                    let scene = self.scene.as_mut().ok_or(Error::Surface)?;
+                    for fields in command.entries {
+                        let index = scene
+                            .nodes
+                            .binary_search_by_key(
+                                &fields.id.expect("validated progress id"),
+                                |node| node.id,
+                            )
+                            .expect("validated progress node");
+                        let Kind::Progress { value, .. } = &mut scene.nodes[index].kind else {
+                            unreachable!("validated progress kind")
+                        };
+                        *value = fields.progress_value().expect("validated progress value");
+                    }
+                    scene.revision = revision;
                 } else {
                     // Stage only changed nodes. Unmodified nodes are not cloned; a changed node retains owned properties.
                     let mut updates = Vec::with_capacity(command.entries.len());

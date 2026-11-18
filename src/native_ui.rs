@@ -50,7 +50,7 @@ fn contains(rect: Rect, x: i32, y: i32) -> bool {
 }
 
 fn index(scene: &Scene, id: u32) -> Option<usize> {
-    scene.nodes.iter().position(|node| node.id == id)
+    scene.nodes.binary_search_by_key(&id, |node| node.id).ok()
 }
 
 fn height(scene: &Scene, id: u32, ch: i32, depth: usize) -> i32 {
@@ -264,12 +264,24 @@ impl View {
         self.displayed = None;
     }
 
+    /// A different view received the release; the host consumed it globally.
+    pub fn cancel_button(&mut self, button: u32) {
+        if (1..=11).contains(&button) {
+            self.swallowed &= !(1u16 << button);
+            if button == 1 {
+                self.pressed = None;
+            }
+        }
+    }
+
     pub fn focused_node(&self) -> Option<u32> {
         self.focused.map(|hit| hit.node)
     }
 
     pub fn blocks_motion(&self, x: i32, y: i32) -> bool {
-        self.swallowed != 0
+        // Core X11 exposes held state only for buttons 1–5. Extended buttons
+        // consume press/release without taking ownership of pointer motion.
+        self.swallowed & 0x3e != 0
             || self
                 .layout
                 .as_ref()
@@ -550,5 +562,20 @@ mod tests {
         assert!(!view.pointer(&mut terminal, 20, 20, 1, true, true).0);
         assert!(view.refresh(&terminal, geometry(), true, true));
         assert!(view.layout.is_some());
+    }
+    #[test]
+    fn extended_button_release_is_consumed_without_latching_motion() {
+        let mut terminal = Terminal::new(100, 24, 0);
+        scene(&mut terminal, 1);
+        let mut view = View::default();
+        view.refresh(&terminal, geometry(), true, true);
+        let (x, y) = first(&view);
+        assert!(view.pointer(&mut terminal, x, y, 8, true, true).0);
+        view.invalidate();
+        assert!(!view.blocks_motion(790, 470));
+        let (handled, action) = view.pointer(&mut terminal, 790, 470, 8, false, false);
+        assert!(handled);
+        assert!(action.is_none());
+        assert!(!view.pointer(&mut terminal, 790, 470, 8, false, false).0);
     }
 }
