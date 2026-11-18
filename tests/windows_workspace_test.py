@@ -20,8 +20,11 @@ def complete_report():
             "cleanup": {"process_exited": True, "temporary_directory_removed": True,
                         "all_probe_processes_exited": True, "returncode": 0},
             "screenshots": {name: {"sha256": "a" * 64} for name in
-                            ("split-right", "three-panes", "resized", "tab-restored", "surviving-tab")}}
+                            ("split-right", "hold-focus", "hold-resize", "three-panes", "resized", "tab-restored", "surviving-tab")}}
     report["checks"][2]["pixels"] = [{"owned": True, "visible": True, "rgb": [255, 0, 0], "expected": [255, 0, 0]}]
+    report["checks"][2]["synchronized_layout"] = {
+        name: {"elapsed_seconds": 0.050, "pixels": copy.deepcopy(report["checks"][2]["pixels"])}
+        for name in ("focus", "resize")}
     return report
 
 
@@ -69,6 +72,9 @@ class WorkspaceContract(unittest.TestCase):
             changed = copy.deepcopy(report)
             changed["checks"][2]["pixels"][0][field] = value
             self.assertFalse(workspace.validate_report(changed))
+        changed = copy.deepcopy(report)
+        changed["checks"][2]["synchronized_layout"]["resize"]["elapsed_seconds"] = 0.151
+        self.assertFalse(workspace.validate_report(changed))
 
     def test_merge_preserves_original_thirty_checks_and_first_error(self):
         original = {"passed": True, "status": "passed",

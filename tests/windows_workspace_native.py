@@ -82,18 +82,29 @@ def validate_report(report):
         return (isinstance(rgb, list) and isinstance(expected, list) and len(rgb) == len(expected) == 3
                 and all(isinstance(value, int) and 0 <= value <= 255 for value in rgb + expected)
                 and all(abs(actual - wanted) <= 1 for actual, wanted in zip(rgb, expected)))
+    holds = next((check.get("synchronized_layout", {}) for check in checks
+                  if check.get("name") == "split_viewport_pixels"), {})
+    def accepted_hold(name):
+        if not isinstance(holds, dict) or not isinstance(holds.get(name), dict):
+            return False
+        hold = holds[name]
+        elapsed, pixels = hold.get("elapsed_seconds"), hold.get("pixels")
+        return (isinstance(elapsed, (int, float)) and 0 <= elapsed < 0.150
+                and isinstance(pixels, list) and bool(pixels) and all(map(accepted_pixel, pixels)))
     return (report.get("passed") is True and report.get("status") == "passed"
             and [check.get("name") for check in checks] == list(REQUIRED_CHECKS)
             and all(check.get("passed") is True for check in checks)
             and bool(pixel_checks) and report.get("visible_pixel_checks_completed") == len(pixel_checks)
             and all(isinstance(samples, list) and bool(samples) and all(map(accepted_pixel, samples))
                     for samples in pixel_checks)
+            and accepted_hold("focus") and accepted_hold("resize")
             and report.get("cleanup", {}).get("process_exited") is True
             and report.get("cleanup", {}).get("temporary_directory_removed") is True
             and report.get("cleanup", {}).get("all_probe_processes_exited") is True
             and report.get("cleanup", {}).get("returncode") == 0
             and all(screenshots.get(name, {}).get("sha256")
-                    for name in ("split-right", "three-panes", "resized", "tab-restored", "surviving-tab")))
+                    for name in ("split-right", "hold-focus", "hold-resize", "three-panes",
+                                 "resized", "tab-restored", "surviving-tab")))
 
 
 def merge_reports(original, workspace):
@@ -371,6 +382,7 @@ class Probe:
         self.name, self.path, self.window, self.sequence = name, directory / name, window, 0
         self.path.mkdir(exist_ok=True)
         self.handle = None
+        self.queries = {}
 
     def ready(self):
         native.wait_for(lambda: (self.path / "state.json").exists(), "actual ConPTY child " + self.name)
@@ -390,12 +402,20 @@ class Probe:
 
     def queue(self, payload):
         sequence = self.sequence
+        query_id = 0x70000000 + ord(self.name) * 65536 + sequence
+        marker = f"i={query_id};OK".encode("ascii")
+        # WriteFile completion is not a frontend parse barrier. This query is
+        # answered by ztty's graphics parser, including while output is held.
+        payload += native.kitty(f"a=q,t=d,f=24,s=1,v=1,i={query_id}", bytes([1, 2, 3]))
+        self.queries[sequence] = marker
         write_json(self.path / f"command-{sequence}.json", {"output": base64.b64encode(payload).decode("ascii")})
         self.sequence += 1
         return sequence
 
     def done(self, sequence):
         native.wait_for(lambda: (self.path / f"done-{sequence}").exists(), "PTY output from " + self.name)
+        marker = self.queries.pop(sequence)
+        native.wait_for(lambda: marker in self.input(), "frontend parse barrier for pane " + self.name)
 
     def send(self, payload):
         self.done(self.queue(payload))
@@ -502,7 +522,40 @@ def run(binary, output, expected_arch=None):
                    (PADDING + cols * cell[0] + 1, PADDING + 2 * cell[1] + 3, BLACK),
                    (left[2], PADDING + 2 * cell[1] + 3, BLACK),
                    (right[0] + 2, PADDING + 2 * cell[1] + 3, BLACK)]
-        check("split_viewport_pixels", pixels=window.expect("split_viewport_pixels", samples))
+        pixels = window.expect("split_viewport_pixels", samples)
+        focus("a", 0x25)
+        held = {}
+        for kind in ("focus", "resize"):
+            a.render()
+            window.expect("committed frame before hold", [image_sample(left, "a")])
+            start = time.monotonic()
+            a.send(b"\x1b[?2026h\x1b[2J\x1b[H"
+                   + native.sixel(24, 18, [1] * (24 * 18), {1: (0, 100, 0)}))
+            if kind == "focus":
+                focus("b", 0x27)
+                held_rect = left
+            else:
+                window.chord(0xBB)
+                held_rect, grown_right = split_rect(whole, True, 550)
+                a.wait_grid(held_rect, cell)
+                b.wait_grid(grown_right, cell)
+            held_pixels = window.expect("committed pixels survive hold " + kind, [image_sample(held_rect, "a")])
+            window.capture(output, "hold-" + kind)
+            elapsed = time.monotonic() - start
+            assert elapsed < 0.150, f"hold observation missed the production 150ms deadline: {kind} {elapsed:.6f}s"
+            held[kind] = {"elapsed_seconds": elapsed, "pixels": held_pixels}
+            a.send(b"\x1b[?2026l")
+            window.expect("held update becomes visible", [(held_rect[0] + PADDING + 4, held_rect[1] + PADDING + 4, [0, 255, 0])])
+            if kind == "focus":
+                focus("a", 0x25)
+            else:
+                window.chord(0xBD)
+                a.wait_grid(left, cell)
+                b.wait_grid(right, cell)
+        a.render()
+        a.send(edge)
+        focus("b", 0x27)
+        check("split_viewport_pixels", pixels=pixels, synchronized_layout=held)
         window.capture(output, "split-right")
 
         marker_b, marker_a = b"workspace-b-input-74", b"workspace-a-input-92"
@@ -524,8 +577,32 @@ def run(binary, output, expected_arch=None):
                      120 << 16, screen=True)
         native.wait_for(lambda: b"\x1b[<64;3;3M" in b.input(), "hover scroll reaches inactive pane B")
         assert a.input() == before
-        b.send(b"\x1b[?1000l\x1b[?1006l")
-        check("inactive_pane_mouse_tracking", response=b.input().hex(), active_title=window.title())
+        a.send(b"\x1b[?1002h\x1b[?1006h")
+        b.send(b"\x1b[?1000l\x1b[?1002h")
+        a_start, b_start = len(a.input()), len(b.input())
+        ax, by = PADDING + 2 * cell[0] + 2, PADDING + 2 * cell[1] + 2
+        bx = right[0] + PADDING + 2 * cell[0] + 2
+        window.mouse(0x0201, ax, by, 1)
+        window.mouse(0x0200, bx, by, 1)
+        window.mouse(0x0202, bx, by)
+        a.send(b"")
+        b.send(b"")
+        a_events, b_events = a.input()[a_start:], b.input()[b_start:]
+        for event in (b"\x1b[<0;3;3M", f"\x1b[<32;{cols};3M".encode(), f"\x1b[<0;{cols};3m".encode()):
+            assert event in a_events, (event, a_events)
+        assert b"\x1b[<" not in b_events, "drag crossed into a different pane's PTY"
+        window.mouse(0x0201, ax, by, 1)
+        focus("b", 0x27)
+        b_start = len(b.input())
+        window.mouse(0x0200, bx, by, 1)
+        window.mouse(0x0202, bx, by)
+        b.send(b"")
+        assert b"\x1b[<" not in b.input()[b_start:], "cancelled drag released into the newly focused pane"
+        a.send(b"\x1b[?1002l\x1b[?1006l")
+        b.send(b"\x1b[?1002l\x1b[?1006l")
+        focus("a", 0x25)
+        check("inactive_pane_mouse_tracking", response=b.input().hex(), drag_events=a_events.hex(),
+              cancelled_drag_recipient=b.input()[b_start:].hex(), active_title=window.title())
 
         a.send(b"\x1b[0m\x1b[2J\x1b[H\x1b[48;2;0;0;255m"
                + (b" " * cols + b"\r\n") * 48 + b"\x1b[0m")
