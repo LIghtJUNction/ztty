@@ -139,7 +139,7 @@ and deferred features.
 
 ## Shared sessions and MCP (Linux)
 
-Reacquiring input control preserves already accepted input and restores an explicitly observing local view; [state rules and real PTY evidence](docs/session-core.md) describe the boundary.
+Reacquiring input control preserves already accepted input and restores an explicitly observing local view; [state rules and real PTY evidence](docs/session-core.md) describe the boundary. Output cursors also retain split UTF-8 characters after malformed bytes.
 
 On Linux, run several terminals normally; resource sharing is automatic:
 

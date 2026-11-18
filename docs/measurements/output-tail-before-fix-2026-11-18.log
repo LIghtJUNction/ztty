@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/lightjunction/Documents/GITHUB/ztty/artifacts/session-control-worktree/tests/mcp_sessions.py", line 318, in <module>
+    print(json.dumps(main(os.path.abspath(args.binary)), indent=2, ensure_ascii=False))
+                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lightjunction/Documents/GITHUB/ztty/artifacts/session-control-worktree/tests/mcp_sessions.py", line 226, in main
+    report["invalid_prefix_split_utf8"] = invalid_prefix_split_utf8(
+                                          ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        stdio, directory, sessions)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/lightjunction/Documents/GITHUB/ztty/artifacts/session-control-worktree/tests/mcp_sessions.py", line 166, in invalid_prefix_split_utf8
+    assert partial["output"] == "\ufffd" and partial["next_cursor"] == 1, partial
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'id': 5, 'created_at': 1794961529185, 'uri': 'ztty://mcp/stdio/invalid-prefix-utf8', 'name': 'invalid-prefix-utf8', 'origin': 'mcp/stdio', 'pid': 3175468, 'broker_pid': 3175403, 'cols': 120, 'rows': 32, 'attached': False, 'read_only': False, 'attachment': None, 'running': True, 'exit_code': None, 'title': 'ztty', 'input_owner': 'mcp:4a970b13619512bee249178e3c45f9e03fcaabc4db14d779', 'workspace': None, 'visible': False, 'window_id': None, 'output': '��', 'cursor': 3, 'next_cursor': 3, 'first_cursor': 0, 'truncated': False, 'has_more': False, 'screen': '�\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n', 'screen_truncated': False}

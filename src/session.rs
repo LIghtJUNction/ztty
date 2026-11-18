@@ -6,7 +6,9 @@ use crate::{
     json::{self, Value},
     key, key_modifiers,
     layout::{Axis, Layout},
-    modifiers, os, paste, search,
+    modifiers, os,
+    output_tail::OutputTail,
+    paste, search,
     session_control::{self, SessionControl},
     working_directory::WorkingDirectory,
     workspace_state,
@@ -689,8 +691,7 @@ struct Session {
     ui: Option<Ui>,
     persistent: bool,
     eof: bool,
-    output: VecDeque<u8>,
-    output_end: u64,
+    output: OutputTail,
     control: SessionControl,
     launch_env: Vec<CString>,
     initial_cwd: CString,
@@ -787,20 +788,7 @@ impl Session {
                         .min(self.terminal.history_len());
                     ui.force = true;
                 }
-                let cap = if self.persistent {
-                    256 * 1024
-                } else {
-                    64 * 1024
-                };
-                self.output_end = self.output_end.saturating_add(n as u64);
-                if n >= cap {
-                    self.output.clear();
-                    self.output.extend(&buffer[n - cap..n]);
-                } else {
-                    let remove = self.output.len().saturating_add(n).saturating_sub(cap);
-                    self.output.drain(..remove);
-                    self.output.extend(&buffer[..n]);
-                }
+                self.output.append(&buffer[..n], self.persistent);
             }
         }
         if !self.terminal.responses().is_empty() {
@@ -818,43 +806,10 @@ impl Session {
                 .ok_or("cursor must be a nonnegative byte offset")?,
         };
         let max = match request.get("max_bytes") {
-            None => 16384,
-            Some(v) => v
-                .as_u64()
-                .filter(|&v| v > 0 && v <= 65536)
-                .ok_or("max_bytes must be 1..65536")? as usize,
+            None => None,
+            Some(v) => Some(v.as_u64().ok_or("max_bytes must be 1..65536")?),
         };
-        if cursor > self.output_end {
-            return Err("cursor is beyond the available output".into());
-        }
-        let first = self.output_end - self.output.len() as u64;
-        let mut start = cursor.max(first);
-        if cursor < first {
-            while start < self.output_end && self.output[(start - first) as usize] & 0xc0 == 0x80 {
-                start += 1;
-            }
-        }
-        let mut bytes: Vec<u8> = self
-            .output
-            .iter()
-            .skip((start - first) as usize)
-            .take(max + 3)
-            .copied()
-            .collect();
-        if bytes.len() > max {
-            let mut end = max;
-            while end < bytes.len() && bytes[end] & 0xc0 == 0x80 {
-                end += 1;
-            }
-            bytes.truncate(end);
-        }
-        if !self.eof
-            && let Err(error) = core::str::from_utf8(&bytes)
-            && error.error_len().is_none()
-        {
-            bytes.truncate(error.valid_up_to());
-        }
-        let next = start + bytes.len() as u64;
+        let chunk = self.output.read(cursor, max, self.eof)?;
         let mut screen = String::new();
         let mut clipped = false;
         'rows: for y in 0..self.terminal.rows() {
@@ -882,13 +837,13 @@ impl Session {
         let mut value = self.info();
         value.set(
             "output",
-            Value::from(String::from_utf8_lossy(&bytes).into_owned()),
+            Value::from(String::from_utf8_lossy(&chunk.bytes).into_owned()),
         );
-        value.set("cursor", Value::from(next));
-        value.set("next_cursor", Value::from(next));
-        value.set("first_cursor", Value::from(first));
-        value.set("truncated", Value::Bool(cursor < first));
-        value.set("has_more", Value::Bool(next < self.output_end));
+        value.set("cursor", Value::from(chunk.next_cursor));
+        value.set("next_cursor", Value::from(chunk.next_cursor));
+        value.set("first_cursor", Value::from(chunk.first_cursor));
+        value.set("truncated", Value::Bool(chunk.truncated));
+        value.set("has_more", Value::Bool(chunk.has_more));
         value.set("screen", Value::from(screen));
         value.set("screen_truncated", Value::Bool(clipped));
         Ok(value)
@@ -1249,8 +1204,7 @@ impl Pool {
             ui,
             persistent: origin != "local",
             eof: false,
-            output: VecDeque::new(),
-            output_end: 0,
+            output: OutputTail::new(),
             control: SessionControl::new(input_owner),
             launch_env: env,
             initial_cwd: cwd,

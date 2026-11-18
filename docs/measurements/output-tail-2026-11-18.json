@@ -1,0 +1,24 @@
+{
+  "base_commit": "81c1c068c42868d4e1fdfb1e97e9046c4094f361",
+  "imported_commit": "e6df870e316008585bcb6b7d6671db281ab24e1d",
+  "source_sha256": {
+    "src/main.rs": "906d00bc4c753de38c045e211697cf1e12cf2cc7219a0555cd033dd6523248d2",
+    "src/session.rs": "915a2ab976569b1769b8ec0663920d962afc183c352645b6662bae961c7d8d14",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/output_tail.rs": "44f8dd3ff249c1fbc89152dce6e4eb815a4bba5cfcde5a2743a112ea72b4b3ba",
+    "tests/output_tail.rs": "626981d53d2932a1f95ccb3889b997e823c833c39cb33fd5103207580385b2e4",
+    "tests/mcp_sessions.py": "ab9268b6f1a3903187fde0c636a8a40abc5fd2c13685bf48d9959957753b68d0",
+    "tests/daily_workflow.py": "b2d15e53d132311e61f5d146d70b13c0bc35a8c5b6815251abedba53b4c8be62",
+    "build.rs": "c2b617e0471c0e8d35e4a41b417589f0e97b9770f7ee800522b8c3695d5345ef"
+  },
+  "binary_sha256": "c54340a9041e935ce15c850a292bbc3d36e02837d0c836453cc9186c1a80002d",
+  "rust_tests_passed": 200,
+  "check_command": "CARGO_BUILD_JOBS=1 ZTTY_BARE_METAL=1 sh tools/check.sh",
+  "check_exit_code": 0,
+  "check_log_sha256": "c87ab12cd8dead31e2aabedfcad07559ce5f609a446073ffed9bb234e9535f20",
+  "daily_exit_code": 0,
+  "daily_checks": 15,
+  "daily_report_sha256": "ada4a1d858f053c6bf26c5b23dba1ff7a04ca16faffa3e18894452a0f517270f",
+  "native_runtime_scope": "Linux uses this core; native macOS/Windows shared runtime is not implemented.",
+  "known_warning": "zune-png 0.5.2 bare-metal future incompatibility"
+}

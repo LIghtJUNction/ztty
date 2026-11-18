@@ -60,3 +60,53 @@ tests. The optional bare-metal library check passed with the already recorded
 [15-check GUI evidence](measurements/session-control-daily-2026-11-18.json)
 retain the actual execution scope. Native macOS/Windows ownership, shared PTYs
 and tabs still require their runtime integration and native acceptance.
+
+## Bounded output and independent byte cursors
+
+`OutputTail` now owns the retained raw output used by the Linux broker.
+It imports only `core + alloc`. Screen snapshots stay in `Session`, where
+the current terminal cells are available. This is a shared state component;
+native macOS/Windows session APIs are still not implemented.
+
+Ordinary sessions retain up to 64 KiB, persistent sessions up to 256 KiB.
+A read does not modify shared state. Each observer can keep a byte cursor,
+disconnect and resume independently. A cursor older than the retained window
+gets `truncated=true`; increasing retention cannot recover discarded bytes.
+The read limit defaults to 16,384, accepts 1–65,536 and may extend by at most
+three bytes to finish a UTF-8 character. Cursors count original bytes, not
+characters in the lossy text representation.
+
+### Confirmed split UTF-8 repair
+
+The old production binary was tested with a real PTY child that first wrote
+`FF F0 9F`, then waited for an explicit file gate before writing more bytes.
+The initial illegal `FF` hid the incomplete four-byte character at the end
+from a check that inspected only the first UTF-8 error.
+
+| Stage | Old behavior | Corrected behavior |
+| --- | --- | --- |
+| Only `FF F0 9F` has arrived | Two replacement characters; cursor 3 | One replacement character; cursor 1 |
+| `9A 80 END` arrives later | The character prefix has already been consumed | Reconstructs `�🚀END`; cursor 8 |
+
+The correction scans past already determined invalid sequences and retains
+the still incomplete suffix. The scan and allocation remain bounded by the
+requested page size. At EOF, incomplete bytes are consumed using the existing
+lossy conversion. While a suffix is waiting for more bytes, `has_more` can be
+true even when the returned text is empty; clients should wait before retrying
+a cursor that made no progress.
+
+Seventeen new regressions cover independent replay and eviction, bytewise
+four-byte characters with a one-byte page limit, multiple malformed
+sequences, EOF, invalid read limits, retention changes and storage bounds.
+Empty output does not preallocate a retained buffer.
+
+The integrated full gate passed **200 Rust tests**, Clippy, release, no_std,
+the optional bare-metal component check, all real MCP tests and daily GUI
+**15/15**. The existing zune-png bare-metal future warning remains. The same
+gated MCP regression failed on the old binary and passed after integration.
+
+- [Integrated hashes and commands](measurements/output-tail-2026-11-18.json)
+- [Full integrated gate log](measurements/output-tail-2026-11-18.log)
+- [Original real-MCP failure](measurements/output-tail-before-fix-2026-11-18.log)
+- [Original reproduction identity](measurements/output-tail-origin-2026-11-18.json)
+- [Integrated daily GUI evidence](measurements/output-tail-daily-2026-11-18.json)

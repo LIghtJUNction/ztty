@@ -25,6 +25,7 @@
 
 ### Fixed
 
+- Bounded shared output cursors retain a split UTF-8 suffix even after earlier malformed bytes; a gated real PTY regression proves the prior loss and the corrected byte offsets.
 - Native acceptance now disposes owned Windows processes before their cwd, preserves original failures, and uniquely selects the titled macOS terminal before pinning WindowID; actual third-run Linux ARM64 acceptance and remaining failures are retained.
 - Linux links the real system unwinder after Rust archives so GNU ld --as-needed cannot discard it before debug alloc cleanup references.
 - Windows native gates search for a visible location for their own window and record covering-window identities, while retaining the pixel ownership checks and original assertions.

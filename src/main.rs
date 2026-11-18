@@ -26,6 +26,8 @@ mod os;
 #[path = "os_macos.rs"]
 mod os;
 #[cfg(target_os = "linux")]
+mod output_tail;
+#[cfg(target_os = "linux")]
 #[path = "platform/linux.rs"]
 mod platform;
 #[cfg(target_os = "windows")]
