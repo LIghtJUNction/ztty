@@ -517,6 +517,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
               "runtime_trace_enabled": trace_runtime,
               "resize_path": "staged" if staged_resize else "rapid",
               "rapid_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
+              "back_to_back_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
               "checks": checks, "passed": False, "status": "running"}
     def window_pid(window):
         pid = wintypes.DWORD()
@@ -1118,13 +1119,40 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         repetitions["passed"] = True
         assert all("screenshot" in report.get("resize_stages", {}).get(stage, {})
                    for stage in ("before", "shrunk", "restored")), "resize evidence capture failed"
+        # Observing the shrunk background above can wait for a repaint. This
+        # separate gate makes both size requests without any observation,
+        # screenshot, PTY roundtrip or wait between them. Keep the same flags.
+        burst = report["back_to_back_resize_repetitions"]
+        report["active_check"] = "back_to_back_resize_restores_visible_image"
+        for number in range(1, burst["required"] + 1):
+            iteration = {"number": number, "passed": False, "resize_stages": {}}
+            burst["iterations"].append(iteration)
+            try:
+                shrunk = user.SetWindowPos(hwnd, None, 0, 0, old_width - 4 * cw, old_height, 0x16)
+                restored = user.SetWindowPos(hwnd, None, 0, 0, old_width, old_height, 0x16)
+                assert shrunk and restored, "back-to-back native resize requests failed"
+                iteration["restored_pixel"] = expect("back_to_back_resize_restores_visible_image",
+                                                     19.5, 1.5, [255, 0, 0], record=False)
+            finally:
+                record_resize("restored", iteration["resize_stages"], f"back-to-back-{number:02d}")
+            assert "screenshot" in iteration["resize_stages"].get("restored", {}), "back-to-back resize evidence capture failed"
+            iteration["passed"] = True
+            burst["completed"] += 1
+        assert burst["completed"] == burst["required"] == 10
+        burst["passed"] = True
         assert process.poll() is None, "ztty exited unexpectedly"
         report["passed"] = True
     except BaseException as error:
         report["passed"] = False
         report["status"] = "blocked" if isinstance(error, DesktopBlocked) else "failed"
         report["error"] = str(error)
-        if report.get("failed_pixel", {}).get("name") == "resize_restores_visible_image":
+        if report.get("active_check") == "back_to_back_resize_restores_visible_image":
+            # A failed size request/capture also retains this process's state;
+            # no diagnostic rerun can replace the failed burst.
+            report.setdefault("failed_pixel", {"name": "back_to_back_resize_restores_visible_image",
+                "expected": [255, 0, 0], "actual": None, "client_sample": [int(19.5 * cw), int(1.5 * ch)]})
+        if report.get("failed_pixel", {}).get("name") in (
+                "resize_restores_visible_image", "back_to_back_resize_restores_visible_image"):
             post_failure_snapshot()
         raise
     finally:
