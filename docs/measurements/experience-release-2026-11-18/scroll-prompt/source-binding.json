@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "runtime_source_sha": "3730b28a16f48b15809581213bccab284f6f4f22",
+  "harness_source_sha": "aef55d95747c38aad34d161043ad1b9c72127b44",
+  "harness_sha256": "5f1b1bf3c9d3cff127e8fc677d4134a881441912c77e00e5f71c2f0c37c457d2",
+  "binary_sha256": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada",
+  "binary_hash_origin": "SHA-256 computed by the device harness over the executable it ran; copied from the unchanged raw report.",
+  "source_hashes_verified_against_git": {
+    "src/session.rs": "76242966307ff6a3f3d1e1ff190258e9a81279962f22f04225a268325f1957d9",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/output_tail.rs": "3a8435adbc9645df51e1e0b21a7c8c2e63891a6f2bb51ab9e8b5cfdd77df8e68",
+    "src/session_core.rs": "7eed11c01eb96780f739ce08877e825c7aee15137c4ed20f6801f9778bcd5d58",
+    "src/input_queue.rs": "e34883d0376d2439454e93920fcb813657fbf69007c5937dfae8dd6c4929c44d",
+    "src/search.rs": "99b22e23fbde5c13a0ef9a9c18ab082950fc142294bc7cafc25cb9eeca4f3df5",
+    "src/scroll_prompt.rs": "27e9b9edb16d4bed1c6b63f600122c774f42bc6b701f90cc9cf51d867cad75ff",
+    "src/actions.rs": "88a2148301dc665266a3aaa323a9870c16f8665aafdd1570016281d69caef260",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "src/x11.rs": "584f6e81dd962a654ec62e72c57d80de50a17a58f81f7f722c13ff01ae1cf807",
+    "src/appearance.rs": "0e8135892dbb42d3053a01c287f8e180cb4599f21699cc6febb7676e79f1c2bf",
+    "src/main.rs": "2c06838a41a374a30d39f05d33d139f43c9e2e9eb9837fab5c5913d2d72acd7d",
+    "tests/daily_workflow.py": "5f1b1bf3c9d3cff127e8fc677d4134a881441912c77e00e5f71c2f0c37c457d2"
+  },
+  "runtime_source_files_match_harness_checkpoint": true,
+  "device_report_source": "aef55d95747c38aad34d161043ad1b9c72127b44",
+  "exit_code": 0,
+  "passed_groups": 18,
+  "screenshots_in_raw_run": 10,
+  "screenshots_copied": [
+    "scrollback-return",
+    "scrollback-new-output",
+    "scrollback-live",
+    "scrollback-search",
+    "scrollback-palette",
+    "scrollback-observer"
+  ],
+  "source_archive_sha256": "226c7221bf4a7c6bcd0f395b5d8407753a5df74490c0d60ae71d9c697553bf8d",
+  "source_archive_copied": false,
+  "scope": "Linux development-machine private Xvfb, real PTY, actual window pixels and synthetic XTEST input; no physical-display latency claim.",
+  "release_status": "pending",
+  "device_installation_status": "pending",
+  "notes": [
+    "The raw report retains its original source-machine paths. The copied six PNGs are the new scrollback captures, excluding the four earlier workflow captures.",
+    "Original 0563554 checkpoint evidence, performance samples and failure records remain unchanged. Native follow-up summaries are separately source-bound."
+  ],
+  "changes_between_runtime_and_harness": [
+    "docs/daily-workflow.md",
+    "tests/daily_workflow.py"
+  ],
+  "all_changes_between_runtime_and_harness_are_tests_or_docs": true
+}

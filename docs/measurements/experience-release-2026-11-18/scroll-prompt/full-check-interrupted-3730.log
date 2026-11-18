@@ -1,0 +1,12 @@
+sh tools/check.sh
+   Compiling simd-adler32 v0.3.10
+   Compiling zune-core v0.5.3
+   Compiling zune-inflate v0.2.54
+   Compiling zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zinput)
+   Compiling zune-png v0.5.2
+   Compiling unicode-width v0.2.3
+   Compiling zgraphics v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zgraphics)
+   Compiling zvte v0.1.3
+   Compiling zterm v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zterm)
+   Compiling ztty v0.3.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree)
+   Compiling zpty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zpty)

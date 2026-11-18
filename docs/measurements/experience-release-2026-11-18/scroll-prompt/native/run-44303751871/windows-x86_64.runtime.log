@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "D:\a\ztty\ztty\tests\windows_native.py", line 1001, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "D:\a\ztty\ztty\tests\windows_native.py", line 995, in main
+    child(args.child)
+    ~~~~~^^^^^^^^^^^^
+  File "D:\a\ztty\ztty\tests\windows_native.py", line 187, in child
+    raise ctypes.WinError(ctypes.get_last_error())
+OSError: [WinError 6] The handle is invalid.
