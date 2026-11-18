@@ -1,5 +1,6 @@
 //! Native AppKit frontend. All Objective-C and Core Foundation objects stay on
-//! the main thread. The PTY is created before AppKit can start helper threads.
+//! the main thread. PTY creation uses a fresh-exec helper and is safe after
+//! AppKit starts worker threads.
 //! File-descriptor readiness is integrated with the AppKit run loop; no polling
 //! thread or periodic read timer is required.
 
@@ -1820,20 +1821,17 @@ fn menu(app: Id, target: Id) {
 }
 
 pub fn run(cfg: Config) -> Result<i32, &'static str> {
-    // forkpty must precede CTFont/NSApplication: Apple frameworks can create
-    // helper threads, while the child-side fork contract forbids them.
+    let helper = zpty::current_executable().map_err(|_| "cannot resolve the Darwin PTY helper")?;
     let (program, environment) = os::child_setup(&cfg.command[0])?;
     let arguments: Vec<&CStr> = cfg.command.iter().map(CString::as_c_str).collect();
     let environment: Vec<&CStr> = environment.iter().map(CString::as_c_str).collect();
-    let pty = unsafe {
-        zpty::Pty::spawn(
-            &program,
-            &arguments,
-            &environment,
-            zpty::Size::new(cfg.cols as u16, cfg.rows as u16),
-            &[],
-        )
-    }
+    let pty = zpty::Pty::spawn_with_helper(
+        &helper,
+        &program,
+        &arguments,
+        &environment,
+        zpty::Size::new(cfg.cols as u16, cfg.rows as u16),
+    )
     .map_err(|_| "cannot create a Darwin PTY")?;
     let outer_pool = send!(class(c"NSAutoreleasePool"), c"new", Id);
     let result = run_app(cfg, pty);
