@@ -1,0 +1,41 @@
+{
+  "source_sha": "a045871a76ff51c1acd29881ff280869e093efbb",
+  "source_ref": "refs/heads/feat/experience-release-20261118",
+  "version": "0.3.0",
+  "architecture": "x86_64",
+  "runner": "macos-15-intel",
+  "runner_image": "20260824.0482.1",
+  "platform": "macOS-15.7.9-x86_64-i386-64bit-Mach-O",
+  "rust_toolchain": "1.100.0",
+  "run_id": "44293476047",
+  "run_attempt": "1",
+  "build_only": true,
+  "candidate_platform": "macos",
+  "passed": false,
+  "status": "failed",
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "spawn": "failure",
+    "native": "skipped",
+    "package": "skipped"
+  },
+  "files": {
+    "ztty-macos-x86_64.native.json": {
+      "bytes": 142,
+      "sha256": "7a9ade98c85b364bbbd655149dad7f6a6d24fb0eb44fd350f0ac2e44acd5e0d0"
+    },
+    "ztty-macos-x86_64.spawn.json": {
+      "bytes": 1007,
+      "sha256": "7cc4f44dae9dce3ed6fe7d97e2a37bdb534ad181923056c84b8779b173de9525"
+    },
+    "ztty-macos-x86_64.spawn.stderr.log": {
+      "bytes": 452,
+      "sha256": "d5ab57dc60d994713edfa4ea0121fcce603717cd528eb6b890e1a217e666f114"
+    },
+    "ztty-macos-x86_64.spawn.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

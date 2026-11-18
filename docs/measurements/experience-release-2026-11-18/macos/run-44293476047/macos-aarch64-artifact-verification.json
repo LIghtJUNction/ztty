@@ -1,0 +1,662 @@
+{
+  "run_id": 44293476047,
+  "job_id": 134764495524,
+  "source_sha": "a045871a76ff51c1acd29881ff280869e093efbb",
+  "artifact_id": 14423160837,
+  "artifact_size": 439737,
+  "archive_sha256": "4b4f77491df013899d6d6d008603d529dd83755921e1872c0c3cf362d1369d34",
+  "files": [
+    {
+      "file": "ztty-macos-aarch64.build.json",
+      "bytes": 11983,
+      "sha256": "d117cb4e66b9af808ed2966a845170befe3843635271359e0d115b83c2161e2b"
+    },
+    {
+      "file": "ztty-macos-aarch64.build.json.sha256",
+      "bytes": 96,
+      "sha256": "711169880215fcc419ee1993741847cadc9bbad6a3a5b4d7b6682e5efd015c2c"
+    },
+    {
+      "file": "ztty-macos-aarch64.manifest.json",
+      "bytes": 2967,
+      "sha256": "e5b3c58442369dc00171e5f6d62cc7ce67ff4585880e9d7556e43f5e1aea21bb"
+    },
+    {
+      "file": "ztty-macos-aarch64.manifest.json.sha256",
+      "bytes": 99,
+      "sha256": "eda69157293e568c1466f595aee669716069ba4e5c46fa85ba75fa9efba57601"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.contract.log",
+      "bytes": 1049,
+      "sha256": "f020e6462f3534687e33e2adb1ee5a9c878a66604a59befd978c83661936ea6c"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.json",
+      "bytes": 66348,
+      "sha256": "33b1b7feef2936a544b7633d24d1f97bf9f2f5bf8df7148de21fc7a7bfcfa91d"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_before_resize.png",
+      "bytes": 6423,
+      "sha256": "7ce53e3e0600a65167a7e2e0e7605099ed210e5b71e80e61b31266b329d3cf21"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_cancel_and_pty_recovery.png",
+      "bytes": 6075,
+      "sha256": "c522be3cbf0c6d14a6c8bfc52755260611b65de85d09462e1ebcd231c9af7fa3"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_erase_display_repaints.png",
+      "bytes": 6075,
+      "sha256": "c522be3cbf0c6d14a6c8bfc52755260611b65de85d09462e1ebcd231c9af7fa3"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_minimize_restore_visible_image.png",
+      "bytes": 6423,
+      "sha256": "7ce53e3e0600a65167a7e2e0e7605099ed210e5b71e80e61b31266b329d3cf21"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_opaque_uses_current_background.png",
+      "bytes": 6409,
+      "sha256": "747d5c1ef44f513619c507026548844b89bc89831991eba95f5ed9586b89f580"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_recovers_after_oversized_raster.png",
+      "bytes": 6376,
+      "sha256": "0a98fb4e6624720c6d43f7532cae74825bd3aa12343b536e682448cc691e2f7a"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_resize_clips_without_ghosts.png",
+      "bytes": 5408,
+      "sha256": "85ee56f54be7d06dcdd7d6a0218aa5aef9dc7441735b47e481fcbdf20d3ea60b"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_resize_restores_visible_image.png",
+      "bytes": 6423,
+      "sha256": "7ce53e3e0600a65167a7e2e0e7605099ed210e5b71e80e61b31266b329d3cf21"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_rgb_native_pixels.png",
+      "bytes": 6376,
+      "sha256": "0a98fb4e6624720c6d43f7532cae74825bd3aa12343b536e682448cc691e2f7a"
+    },
+    {
+      "file": "ztty-macos-aarch64.native.sixel_transparent_preserves_underlying_image.png",
+      "bytes": 6402,
+      "sha256": "0ce2c76cf46f90c50bbc2b786ad9258ed6fce2c2fb174ada97c281e1e997b39a"
+    },
+    {
+      "file": "ztty-macos-aarch64.spawn.json",
+      "bytes": 1788,
+      "sha256": "8d6c5d5e9bdf5ac76918698b8edc933e6704a348c27b01b37eaa020910836dff"
+    },
+    {
+      "file": "ztty-macos-aarch64.spawn.stdout.log",
+      "bytes": 798,
+      "sha256": "0bd9eccb6b3a21e453ea17556ecb5a4fef2fc06c325a947494bc0a8d19b5f4e0"
+    }
+  ],
+  "screenshots": [
+    {
+      "stage": "sixel_rgb_native_pixels",
+      "file": "ztty-macos-aarch64.native.sixel_rgb_native_pixels.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "0a98fb4e6624720c6d43f7532cae74825bd3aa12343b536e682448cc691e2f7a",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            16,
+            38
+          ],
+          "png_rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected_rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "client": [
+            32,
+            38
+          ],
+          "png_rgba": [
+            1,
+            255,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            1,
+            255,
+            0
+          ],
+          "expected_rgb": [
+            0,
+            255,
+            0
+          ]
+        },
+        {
+          "client": [
+            48,
+            46
+          ],
+          "png_rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "native_normalized_rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected_rgb": [
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_transparent_preserves_underlying_image",
+      "file": "ztty-macos-aarch64.native.sixel_transparent_preserves_underlying_image.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "0ce2c76cf46f90c50bbc2b786ad9258ed6fce2c2fb174ada97c281e1e997b39a",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            16,
+            38
+          ],
+          "png_rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected_rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "client": [
+            48,
+            38
+          ],
+          "png_rgba": [
+            1,
+            255,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            1,
+            255,
+            0
+          ],
+          "expected_rgb": [
+            0,
+            255,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_opaque_uses_current_background",
+      "file": "ztty-macos-aarch64.native.sixel_opaque_uses_current_background.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "747d5c1ef44f513619c507026548844b89bc89831991eba95f5ed9586b89f580",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            16,
+            38
+          ],
+          "png_rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected_rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "client": [
+            48,
+            38
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_erase_display_repaints",
+      "file": "ztty-macos-aarch64.native.sixel_erase_display_repaints.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "c522be3cbf0c6d14a6c8bfc52755260611b65de85d09462e1ebcd231c9af7fa3",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            16,
+            38
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            32,
+            38
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            48,
+            46
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_cancel_and_pty_recovery",
+      "file": "ztty-macos-aarch64.native.sixel_cancel_and_pty_recovery.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "c522be3cbf0c6d14a6c8bfc52755260611b65de85d09462e1ebcd231c9af7fa3",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            16,
+            38
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            32,
+            38
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            48,
+            46
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_recovers_after_oversized_raster",
+      "file": "ztty-macos-aarch64.native.sixel_recovers_after_oversized_raster.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "0a98fb4e6624720c6d43f7532cae74825bd3aa12343b536e682448cc691e2f7a",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            16,
+            38
+          ],
+          "png_rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected_rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "client": [
+            32,
+            38
+          ],
+          "png_rgba": [
+            1,
+            255,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            1,
+            255,
+            0
+          ],
+          "expected_rgb": [
+            0,
+            255,
+            0
+          ]
+        },
+        {
+          "client": [
+            48,
+            46
+          ],
+          "png_rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "native_normalized_rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected_rgb": [
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_before_resize",
+      "file": "ztty-macos-aarch64.native.sixel_before_resize.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "7ce53e3e0600a65167a7e2e0e7605099ed210e5b71e80e61b31266b329d3cf21",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            304,
+            22
+          ],
+          "png_rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected_rgb": [
+            255,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_resize_clips_without_ghosts",
+      "file": "ztty-macos-aarch64.native.sixel_resize_clips_without_ghosts.png",
+      "dimensions": [
+        256,
+        208
+      ],
+      "sha256": "85ee56f54be7d06dcdd7d6a0218aa5aef9dc7441735b47e481fcbdf20d3ea60b",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            252,
+            22
+          ],
+          "png_rgba": [
+            16,
+            24,
+            32,
+            255
+          ],
+          "native_normalized_rgb": [
+            16,
+            24,
+            32
+          ],
+          "expected_rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_resize_restores_visible_image",
+      "file": "ztty-macos-aarch64.native.sixel_resize_restores_visible_image.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "7ce53e3e0600a65167a7e2e0e7605099ed210e5b71e80e61b31266b329d3cf21",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            304,
+            22
+          ],
+          "png_rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected_rgb": [
+            255,
+            0,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "stage": "sixel_minimize_restore_visible_image",
+      "file": "ztty-macos-aarch64.native.sixel_minimize_restore_visible_image.png",
+      "dimensions": [
+        320,
+        208
+      ],
+      "sha256": "7ce53e3e0600a65167a7e2e0e7605099ed210e5b71e80e61b31266b329d3cf21",
+      "icc_profile_bytes": 0,
+      "samples": [
+        {
+          "client": [
+            304,
+            22
+          ],
+          "png_rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "native_normalized_rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected_rgb": [
+            255,
+            0,
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}

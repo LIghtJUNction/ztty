@@ -1,0 +1,48 @@
+{
+  "source_sha": "cfc7ae80e785e4d3de11ffa5e1fba3f63d158222",
+  "binary_sha256": "c6e6a8105c30e9b16be7def46a558eb3aee6154c9539c0f74b3a6501698e3ae6",
+  "checks": [
+    {
+      "name": "install_test",
+      "exit_code": 0,
+      "seconds": 1.383549361000405,
+      "log": "install_test.log"
+    },
+    {
+      "name": "bash_integration",
+      "exit_code": 0,
+      "seconds": 0.3522650799995972,
+      "log": "bash_integration.log"
+    },
+    {
+      "name": "mcp_transport",
+      "exit_code": 0,
+      "seconds": 0.6501782069999535,
+      "log": "mcp_transport.log"
+    },
+    {
+      "name": "mcp_sessions",
+      "exit_code": 0,
+      "seconds": 0.833596724999552,
+      "log": "mcp_sessions.log"
+    },
+    {
+      "name": "mcp_security",
+      "exit_code": 0,
+      "seconds": 0.13288833099977637,
+      "log": "mcp_security.log"
+    },
+    {
+      "name": "mcp_wait",
+      "exit_code": 0,
+      "seconds": 15.71826163500009,
+      "log": "mcp_wait.log"
+    },
+    {
+      "name": "mcp_sse",
+      "exit_code": 0,
+      "seconds": 5.826434288999735,
+      "log": "mcp_sse.log"
+    }
+  ]
+}

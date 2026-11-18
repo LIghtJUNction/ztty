@@ -1,0 +1,53 @@
+{
+  "variants": {
+    "before": {
+      "source": "072111be0fb13062d2d5369ac4a5d58b64cfaa35",
+      "checkout": "/workspace/scratch/130f1831bee7/ztty-perf-before-072111be",
+      "target": "/workspace/scratch/130f1831bee7/ztty-core-perf-target-before",
+      "source_sha256": {
+        "crates/zterm/examples/benchmark.rs": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+        "crates/zterm/src/screen.rs": "cd001b2dcbe8463038cebf88dd440a9f600ef9cde07a82048e783033308f9549",
+        "crates/zterm/src/terminal.rs": "d86bcad159dd2bee987f2c169c2b4a6ea5956299ba30c5c37024ebc876d9d91a",
+        "crates/zinput/src/lib.rs": "17e8083ea6ebf28ab2f53e46f010ae20a8ce08e11a0233ec88a09bb46db1b265",
+        "Cargo.lock": "8f715d57c334ed0f8944f4fb14a11cb089033560e6572851a0cffa99c211831c",
+        "Cargo.toml": "479ead8d66ab7b4394304399d59db38a5ca3934bfbd5ff3037d19290ae8983b0"
+      },
+      "binary_path": "/workspace/scratch/130f1831bee7/ztty-core-perf-target-before/release/examples/benchmark"
+    },
+    "after": {
+      "source": "114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847",
+      "checkout": "/workspace/scratch/130f1831bee7/ztty-perf-after-114ca5bb",
+      "target": "/workspace/scratch/130f1831bee7/ztty-core-perf-target-after",
+      "source_sha256": {
+        "crates/zterm/examples/benchmark.rs": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+        "crates/zterm/src/screen.rs": "b736c9a698a68f3284b8b219fb2650c29f01d64b6cfe629a7811a7c2514ba4a6",
+        "crates/zterm/src/terminal.rs": "7c4fc02f627a16394c619e57f885767bdff0f129d4e6eed9ed90154f2a80c97a",
+        "crates/zinput/src/lib.rs": "54cd002f1355f6c98bb5c54ffbd101e27ecfcc2b9dda8a7f0bc9553e2ea8b5eb",
+        "Cargo.lock": "8f715d57c334ed0f8944f4fb14a11cb089033560e6572851a0cffa99c211831c",
+        "Cargo.toml": "479ead8d66ab7b4394304399d59db38a5ca3934bfbd5ff3037d19290ae8983b0"
+      },
+      "binary_path": "/workspace/scratch/130f1831bee7/ztty-core-perf-target-after/release/examples/benchmark"
+    }
+  },
+  "environment": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "affinity_available": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "benchmark_cpu": 8,
+    "build_env": {
+      "RUSTFLAGS": null,
+      "CARGO_ENCODED_RUSTFLAGS": null,
+      "CARGO_PROFILE_RELEASE_OPT_LEVEL": null,
+      "CARGO_PROFILE_RELEASE_LTO": null
+    }
+  }
+}
