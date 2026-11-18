@@ -8,6 +8,7 @@ responses, process identities and shutdown are the acceptance evidence.
 import argparse
 import base64
 import ctypes
+import errno
 import hashlib
 import json
 import os
@@ -57,6 +58,50 @@ def write_bytes(path, value):
 
 def write_json(path, value):
     write_bytes(path, (json.dumps(value, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+
+
+def read_probe_bytes(path, report):
+    """Bound sharing-conflict recovery to this probe's atomically replaced snapshots."""
+    assert path.name in ("state.json", "keyboard.bin")
+    try:
+        return path.read_bytes()
+    except PermissionError as error:
+        if (sys.platform != "win32" or error.errno != errno.EACCES
+                or getattr(error, "winerror", None) not in (None, 5, 32, 33)):
+            raise
+        started = time.monotonic()
+        deadline = started + 1.0
+        first = {"type": type(error).__name__, "errno": error.errno,
+                 "winerror": getattr(error, "winerror", None)}
+        last_error, attempts, outcome = error, 1, "failed"
+        try:
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise last_error
+                time.sleep(min(0.005, remaining))
+                if time.monotonic() >= deadline:
+                    raise last_error
+                attempts += 1
+                try:
+                    value = path.read_bytes()
+                except PermissionError as repeated:
+                    if (repeated.errno != errno.EACCES
+                            or getattr(repeated, "winerror", None) not in (None, 5, 32, 33)):
+                        raise
+                    last_error = repeated
+                else:
+                    outcome = "read"
+                    return value
+        finally:
+            events = report.setdefault("probe_file_read_retries", [])
+            if len(events) < 64:
+                events.append({"path": str(path), "attempts": attempts, "retries": attempts - 1,
+                    "elapsed_seconds": round(time.monotonic() - started, 6),
+                    "retry_timeout_seconds": 1.0, "retry_interval_seconds": 0.005,
+                    "first_error": first, "outcome": outcome})
+            else:
+                report["probe_file_read_retries_omitted"] = report.get("probe_file_read_retries_omitted", 0) + 1
 
 
 def split_rect(rect, vertical, ratio=500):
@@ -415,11 +460,14 @@ class Probe:
         return state
 
     def state(self):
-        return json.loads((self.path / "state.json").read_text(encoding="utf-8"))
+        return json.loads(read_probe_bytes(self.path / "state.json", self.window.report).decode("utf-8"))
 
     def input(self):
         path = self.path / "keyboard.bin"
-        return path.read_bytes() if path.exists() else b""
+        try:
+            return read_probe_bytes(path, self.window.report)
+        except FileNotFoundError:
+            return b""
 
     def queue(self, payload):
         sequence = self.sequence
@@ -769,7 +817,8 @@ def run(binary, output, expected_arch=None):
         visible_panes = (("a", left), ("b", top), ("c", bottom))
 
         def font_trial(label, vk, accepted, shift=True):
-            hidden_before = [d.state()["cols"], d.state()["rows"]]
+            hidden_state = d.state()
+            hidden_before = [hidden_state["cols"], hidden_state["rows"]]
             window.chord(vk, shift=shift)
             def ready():
                 current = a.cell_pixels()
