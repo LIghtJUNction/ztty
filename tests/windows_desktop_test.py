@@ -11,6 +11,7 @@ import unittest
 from unittest.mock import patch
 
 import windows_desktop as desktop
+from windows_workspace_test import complete_report
 
 
 class FakeAPI:
@@ -232,10 +233,12 @@ class DesktopContract(unittest.TestCase):
                   "visible_pixel_checks_completed": 20,
                   "cleanup": {"process_exited": True, "temporary_directory_removed": True},
                   "desktop": {"thread": {"name": name}, "input": {"name": name}}}
+        native["workspace"] = complete_report() | {"desktop": native["desktop"]}
         self.assertTrue(desktop.combine(copy.deepcopy(native), controller, worker)["passed"])
         for changed in (native | {"passed": False}, native | {"checks": []},
                         native | {"visible_pixel_checks_completed": 0},
                         native | {"cleanup": {"process_exited": False}},
+                        native | {"workspace": {}},
                         native | {"desktop": {"thread": {"name": "Default"}}}):
             self.assertFalse(desktop.combine(copy.deepcopy(changed), controller, worker)["passed"])
         self.assertFalse(desktop.combine(copy.deepcopy(native), controller | {"passed": False}, worker)["passed"])

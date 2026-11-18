@@ -475,22 +475,24 @@ def run_isolated(api, command, desktop, stdout, stderr, timeout, checkpoint=lamb
 
 def combine(native, desktop, worker):
     """A desktop/cleanup success cannot replace the existing visible pixel gate."""
+    from windows_workspace_native import validate_report
     checks = native.get("checks")
     native_ok = (native.get("passed") is True and native.get("status") == "passed"
                  and isinstance(checks, list) and bool(checks)
                  and all(check.get("passed") is True for check in checks)
                  and native.get("visible_pixel_checks_completed", 0) > 0
                  and native.get("cleanup", {}).get("process_exited") is True
-                 and native.get("cleanup", {}).get("temporary_directory_removed") is True)
-    state = native.get("desktop", {})
+                 and native.get("cleanup", {}).get("temporary_directory_removed") is True
+                 and validate_report(native.get("workspace", {})))
     worker_ok = (worker.get("passed") is True and worker.get("pid") == desktop.get("worker_pid")
                  and worker.get("desktop") == desktop.get("desktop"))
     try:
         require_context(worker.get("context", {}), desktop["desktop"])
         if native_ok:
-            for key in ("thread", "input"):
-                if state.get(key, {}).get("name") != desktop["desktop"]:
-                    raise DesktopBlocked("native pixel gate did not observe its owned input/thread desktop")
+            for suite in (native, native["workspace"]):
+                for key in ("thread", "input"):
+                    if suite.get("desktop", {}).get(key, {}).get("name") != desktop["desktop"]:
+                        raise DesktopBlocked("native pixel gate did not observe its owned input/thread desktop")
     except (DesktopBlocked, KeyError):
         worker_ok = False
     passed = native_ok and worker_ok and desktop.get("passed") is True
@@ -524,12 +526,33 @@ def worker(args, state_path):
         write_json(state_path, state)
     import windows_native
     try:
-        return 0 if windows_native.run(args.binary, args.output, args.arch) else 1
+        if not windows_native.run(args.binary, args.output, args.arch):
+            return 1
     except BaseException:
         # windows_native.run writes its checks, original error, PNGs and cleanup
         # from finally. Preserve that evidence instead of replacing its report.
         traceback.print_exc()
         return 1
+    # Preserve the original thirty checks in their original report. The second
+    # suite has its own JSON/PNG evidence and must also pass on this desktop.
+    import windows_workspace_native
+    original = json.loads(args.output.read_text(encoding="utf-8"))
+    workspace_path = args.output.with_suffix(".workspace.json")
+    try:
+        windows_workspace_native.run(args.binary, workspace_path, args.arch)
+        workspace = json.loads(workspace_path.read_text(encoding="utf-8"))
+    except BaseException as error:
+        traceback.print_exc()
+        try:
+            workspace = json.loads(workspace_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            workspace = {"checks": []}
+        workspace.update({"passed": False, "status": "failed"})
+        workspace.setdefault("error", repr(error))
+        write_json(workspace_path, workspace)
+    result = windows_workspace_native.merge_reports(original, workspace)
+    write_json(args.output, result)
+    return 0 if result["passed"] else 1
 
 
 def main():
