@@ -29,6 +29,8 @@
 
 ### Fixed
 
+- Isolate the Windows CI pixel gate on its own visible desktop and owned Job, with explicit handle inheritance, secure-desktop refusal and verified restoration; actual native validation remains pending.
+
 - Initialize the macOS pixel helper through NSApplication.shared and retain real helper exit/signal and capture-stage evidence before JSON decoding.
 
 - Bounded shared output cursors retain a split UTF-8 suffix even after earlier malformed bytes; a gated real PTY regression proves the prior loss and the corrected byte offsets.
