@@ -41,23 +41,14 @@ _ztty_bash_prompt() {
 
 # Keep each existing PROMPT_COMMAND array entry, or the complete original string,
 # between the status capture and prompt wrapping. Themes can still replace PS1.
+# Bash before 5.1 executes PROMPT_COMMAND as one string, not an array.
 if (( BASH_VERSINFO[0] < 5 || (BASH_VERSINFO[0] == 5 && BASH_VERSINFO[1] < 1) )); then
-    PROMPT_COMMAND="_ztty_bash_precmd"
-    PROMPT_COMMAND=(_ztty_bash_precmd "${PROMPT_COMMAND[@]}" _ztty_bash_prompt)
-else
-    PROMPT_COMMAND=(_ztty_bash_precmd "${PROMPT_COMMAND-}" _ztty_bash_prompt)
-fi
-PS0=$'\e]133;C\a'${PS0-}
-\n'"${PROMPT_COMMAND-}"
-    PROMPT_COMMAND=(_ztty_bash_precmd "${PROMPT_COMMAND[@]}" _ztty_bash_prompt)
-else
-    PROMPT_COMMAND=(_ztty_bash_precmd "${PROMPT_COMMAND-}" _ztty_bash_prompt)
-fi
-PS0=$'\e]133;C\a'${PS0-}
-\n'"_ztty_bash_prompt"
+    PROMPT_COMMAND=$'_ztty_bash_precmd\n'"${PROMPT_COMMAND-}"$'\n_ztty_bash_prompt'
 elif [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == 'declare -a '* ]]; then
     PROMPT_COMMAND=(_ztty_bash_precmd "${PROMPT_COMMAND[@]}" _ztty_bash_prompt)
 else
     PROMPT_COMMAND=(_ztty_bash_precmd "${PROMPT_COMMAND-}" _ztty_bash_prompt)
 fi
-PS0=$'\e]133;C\a'${PS0-}
+# PS0 may be exported into a nested interactive shell. Preserve its suffix
+# without prepending the execution marker twice.
+[[ ${PS0-} == $'\e]133;C\a'* ]] || PS0=$'\e]133;C\a'${PS0-}
