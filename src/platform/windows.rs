@@ -2987,8 +2987,8 @@ unsafe extern "system" fn window_proc(
             .unwrap_or(0);
     }
     if message == WM_SIZE {
-        // Sent WM_SIZE can arrive while another callback owns App. Retain it
-        // without borrowing App; the outer loop reads the latest client size.
+        // Record sent WM_SIZE before trying App so a reentrant request remains
+        // pending for WM_PAINT or the outer loop when App is already borrowed.
         state.dispatch.resize_event(wparam == 1);
         state.native_events.update(|record| {
             record.size = [
@@ -3006,6 +3006,13 @@ unsafe extern "system" fn window_proc(
                 "{{\"event\":\"wm-size\",\"ms\":{},\"kind\":{},\"message_size\":[{},{}],\"client\":[{},{}]}}",
                 os::milliseconds(), wparam, lparam as u16, (lparam >> 16) as u16,
                 client.right, client.bottom));
+        }
+        if wparam != 1 {
+            state.with(|app| {
+                if !app.panes.is_empty() && state.dispatch.take_resize() {
+                    app.resize();
+                }
+            });
         }
         return 0;
     }
