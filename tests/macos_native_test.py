@@ -110,6 +110,7 @@ class GateContract(unittest.TestCase):
             "process_translated": False,
             "permissions": {"screen_capture": False, "accessibility": True},
             "pixel_layout_vector": "passed",
+            "window_selection_vector": "passed",
         }
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)

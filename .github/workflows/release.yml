@@ -493,7 +493,15 @@ jobs:
           report_path = Path("dist") / f"{stem}.native.json"
           report = {"passed": False, "source_sha": os.environ["SOURCE_SHA"], "status": "failed"}
           stdout = stderr = ""
+          contract_log = Path(f"dist/{stem}.native.contract.log")
+          report["contract_tests"] = {"passed": False, "log": contract_log.name}
           try:
+              with contract_log.open("w", encoding="utf-8") as stream:
+                  contract = subprocess.run([sys.executable, "tests/windows_native_test.py"],
+                                            stdout=stream, stderr=subprocess.STDOUT, timeout=30)
+              report["contract_tests"].update({"passed": contract.returncode == 0,
+                                               "exit_code": contract.returncode})
+              assert contract.returncode == 0, f"Windows cleanup contract tests failed; see {contract_log}"
               environment = dict(os.environ)
               compiler = os.path.normcase(os.path.normpath(environment["LLVM_MINGW_BIN"]))
               environment["PATH"] = os.pathsep.join(path for path in environment["PATH"].split(os.pathsep)
@@ -506,7 +514,7 @@ jobs:
               report.update(json.loads(report_path.read_text(encoding="utf-8")))
               report["exit_code"] = result.returncode
               report["passed"] = bool(report.get("passed")) and result.returncode == 0
-              report["status"] = "passed" if report["passed"] else "failed"
+              report["status"] = "passed" if report["passed"] else ("blocked" if report.get("status") == "blocked" else "failed")
           except Exception as error:
               report["error"] = repr(error)
               report["passed"] = False

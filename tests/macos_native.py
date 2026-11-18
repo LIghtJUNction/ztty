@@ -149,6 +149,8 @@ def run(binary: Path, helper: Path, prefix: Path) -> tuple[dict, int]:
 
     with tempfile.TemporaryDirectory(prefix="ztty-macos-native-") as temporary:
         directory = Path(temporary).resolve()
+        window_title = "ztty-native-" + directory.name
+        report["window_title"] = window_title
         cwd = directory / "cwd with 空格与Unicode"
         cwd.mkdir()
         config = directory / "ztty.conf"
@@ -165,7 +167,8 @@ def run(binary: Path, helper: Path, prefix: Path) -> tuple[dict, int]:
             report["active_check"] = name
             png = prefix.with_name(prefix.name + f".{name}.png")
             request = {"action": action, "pid": process.pid if process else 0,
-                       "window_id": window_id, "png": str(png), "timeout": 10, **values}
+                       "window_id": window_id, "window_title": window_title,
+                       "png": str(png), "timeout": 10, **values}
             request_path = directory / f"helper-{name}.json"
             write_json(request_path, request)
             result = None
@@ -183,8 +186,9 @@ def run(binary: Path, helper: Path, prefix: Path) -> tuple[dict, int]:
                     value["png"] = screenshot_metadata(png)
                 if action in ("capture", "resize", "restore") and value.get("passed"):
                     window = value.get("window", {})
-                    if window.get("pid") != process.pid or not window.get("window_id"):
-                        raise AssertionError("native capture does not belong to the launched ztty PID")
+                    if (window.get("pid") != process.pid or not window.get("window_id")
+                            or window.get("title") != window_title):
+                        raise AssertionError("native capture does not match the launched PID and unique terminal title")
                     if window_id is not None and window["window_id"] != window_id:
                         raise AssertionError("native capture changed its owned WindowID")
                     window_id = window["window_id"]
@@ -302,8 +306,10 @@ def run(binary: Path, helper: Path, prefix: Path) -> tuple[dict, int]:
                 background = [16, 24, 32]
 
                 preflight = invoke("permissions", "preflight")
-                if preflight.get("permissions") != {"screen_capture": True, "accessibility": True} or preflight.get("pixel_layout_vector") != "passed":
-                    raise NativeFailure("native helper did not verify both permissions and capture pixel layout")
+                if (preflight.get("permissions") != {"screen_capture": True, "accessibility": True}
+                        or preflight.get("pixel_layout_vector") != "passed"
+                        or preflight.get("window_selection_vector") != "passed"):
+                    raise NativeFailure("native helper did not verify both permissions, capture pixel layout and window selection")
                 if preflight.get("architecture") != platform.machine() or preflight.get("process_translated") is not False:
                     raise NativeFailure("helper architecture is not the native Python/runner architecture")
                 architectures = subprocess.check_output(
@@ -340,7 +346,8 @@ def run(binary: Path, helper: Path, prefix: Path) -> tuple[dict, int]:
                 rgb_samples = [(x0 + 8, y0 + 8, [255, 0, 0]),
                                (x0 + 24, y0 + 8, [0, 255, 0]),
                                (x0 + 40, y0 + 16, [0, 0, 255])]
-                command(b"\x1b[0m\x1b[2J\x1b[H\x1b[?25l" + position + image)
+                command(b"\x1b]2;" + window_title.encode("ascii") + b"\x07"
+                        + b"\x1b[0m\x1b[2J\x1b[H\x1b[?25l" + position + image)
                 capture("sixel_rgb_native_pixels", rgb_samples)
                 green = sixel(width, height, [2] * (width * height), {2: (0, 100, 0)})
                 holes = [1 if x < width // 2 else 0 for _ in range(height) for x in range(width)]
