@@ -6,7 +6,7 @@
 
 - Export the common action, JSON, pane-layout and workspace-state modules from the no_std library; Linux and regression tests consume the same implementations.
 
-- Export a shared no_std session library and route Windows/macOS PTY reads, bounded writes and resize commits through it; native runtime acceptance is pending.
+- Export a shared no_std session library and route Windows/macOS PTY reads, bounded writes and resize commits through it; Windows x64/ARM64 now pass the native 30-check gate; macOS acceptance is pending.
 
 - Shared no_std PTY pump and bounded input queue, now used by the Linux broker, with per-read history anchors and PTY-first resize commits.
 
@@ -15,7 +15,7 @@
 - macOS WindowServer capture and owned-window resize/minimize acceptance, retaining existing PTY checks and recording Screen Recording/Accessibility blockers explicitly.
 - Three-run guarded 1/10-window benchmark evidence and README charts, including measured RSS/PSS/Swap, source hashes, the unmet 10 MiB RSS target and the PTY throughput gap.
 - Linux standalone `--observe` command windows and the `ztty-observer` external-terminal adapter; `close NAME` follows existing input ownership authorization.
-- Linux x86_64/ARM64 release gates now require four real X11/PTY suites with source, executable and display ownership evidence; Windows ARM64 must execute natively.
+- Linux x86_64/ARM64 release gates now require five real X11/PTY suites with source, executable and display ownership evidence; Windows ARM64 must execute natively.
 - Versioned Linux workspace snapshots restore live tabs, split ratios, focus and geometry without replacing PTYs; bounded schema/identity checks reject invalid layouts before UI mutation.
 
 - Linux workspace tabs and horizontal/vertical split panes in the shared broker, with pane focus, swap, resizing, maximize/restore and moves between native windows.
@@ -31,7 +31,9 @@
 
 ### Fixed
 
-- Isolate the Windows CI pixel gate on its own visible desktop and owned Job, with explicit handle inheritance, secure-desktop refusal and verified restoration; actual native validation remains pending.
+- Call the macOS helper activation-policy method correctly after both native compilers rejected property syntax; preserve the fifth-run failure evidence and require a native rerun.
+
+- Isolate the Windows CI pixel gate on its own visible desktop and owned Job, with explicit handle inheritance, secure-desktop refusal and verified restoration; verified with all 30 checks and desktop restoration on native Windows x64 and ARM64.
 
 - Initialize the macOS pixel helper through NSApplication.shared and retain real helper exit/signal and capture-stage evidence before JSON decoding.
 

@@ -181,12 +181,12 @@ final class WindowProbe {
         // or screenshot APIs. Prohibited policy prevents helper windows/activation.
         let application = NSApplication.shared
         guard application.setActivationPolicy(.prohibited),
-              application.activationPolicy == .prohibited else {
+              application.activationPolicy() == .prohibited else {
             throw GateError("cannot initialize AppKit with prohibited activation")
         }
         report["appkit"] = [
             "initialized": true, "main_thread": Thread.isMainThread,
-            "activation_policy": application.activationPolicy.rawValue,
+            "activation_policy": application.activationPolicy().rawValue,
         ]
     }
 

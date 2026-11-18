@@ -311,13 +311,54 @@ This follows the documented [SwitchDesktop](https://learn.microsoft.com/en-us/wi
 and [Job lifecycle](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)
 contracts. No security settings or permissions are modified.
 
+## Fifth native run: Windows ARM64 accepted
+
+[Run 44217268331](https://github.com/LIghtJUNction/ztty/actions/runs/44217268331)
+uses `7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610` in build-only mode.
+Windows x64 and ARM64 both pass the original 30 checks, including 19 visible
+pixel checks, real ConPTY input, image alpha/scroll/resize, six Sixel groups
+and recovery after malformed images. Python and ztty report native execution,
+with no architecture emulation. The ARM64 Sixel PNG was visually reviewed:
+the red, green and blue regions are present on the expected dark background.
+
+Both desktop reports record an empty owned Job, no remaining Job PIDs,
+worker exit, input and thread restoration to `Default`, closed handles and
+closed owned desktops. Cleanup reports contain no errors. Native process
+and temporary-directory cleanup also pass. The earlier full-screen foreign
+runner window remains untouched; the new evidence comes from the uniquely
+owned visible desktop. These checks accept the existing native frontend and
+shared SessionCore, not the still developing native Tabs/Splits feature.
+
+Linux ARM64 passes five native GUI suites: workspace 10, daily workflow 15,
+Sixel 10, input 8 groups with 27 vectors, and repaint 7. All owned-process
+cleanup reports are empty. Its 30 nested evidence files were independently
+checked against the native manifest. Linux x86_64 is still installing its
+native dependencies at this checkpoint; the accepted fourth-run evidence
+remains separate.
+
+Both macOS jobs stop while compiling the Swift helper, before running the
+native gate. `NSApplication.activationPolicy` was incorrectly used as a
+property at two sites. Apple's [method signature](https://developer.apple.com/documentation/appkit/nsapplication/activationpolicy%28%29)
+and the native compiler diagnostics require `activationPolicy()`.
+Both calls are corrected, and the existing ten Python failure contracts
+pass. Linux cannot validate Swift/AppKit compilation or WindowServer pixels;
+a subsequent source-pinned native candidate must do that. The fifth Mac
+reports correctly retain `status=not_run` and `pixel_readback=not_performed`.
+
+The [fifth-run record](measurements/native-fifth-run-2026-11-18.json) retains
+artifact IDs, ZIP and build-manifest hashes, checked member counts, exact
+Drive archive links, cleanup evidence and original compiler errors. All five
+available artifacts were verified against GitHub byte counts and SHA-256;
+all build-manifest members and sidecars match. Failed Mac artifacts are
+explicitly named as helper-compilation failures. No Release was published.
+
 ## Remaining release gates
 
-The fourth run accepted both Linux architectures and Windows x86_64.
-macOS helper initialization still requires a source-pinned native rerun;
-Windows ARM64 needs an unobstructed, owned test desktop while preserving
-real visible-pixel checks. Native Wayland, GPU/VRAM, macOS pixels/IME,
-physical input matrices and macOS/Windows shared sessions remain incomplete.
+The fifth run accepts both Windows architectures and Linux ARM64; both Linux
+architectures were accepted on the fourth source. The corrected macOS helper
+requires native compilation and pixel acceptance. Native Wayland, GPU/VRAM,
+macOS pixels/IME, physical input matrices and macOS/Windows shared sessions
+remain incomplete.
 Apple Developer ID/notarization and Windows signing have not been supplied.
 No full production-release or all-platform feature-parity claim follows
 from these candidate gates.

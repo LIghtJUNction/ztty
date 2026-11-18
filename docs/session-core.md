@@ -175,8 +175,11 @@ The [integration record](measurements/native-core-port-2026-11-18.json)
 contains source and binary hashes. Linux passes 200 regular Rust tests,
 eight real-PTY core checks, strict Clippy, release/no_std and MCP checks,
 plus the fifteen-check daily GUI suite. Windows GNU and both Darwin targets
-pass `cargo check`. Actual execution of these frontend changes remains
-pending on the source-pinned native candidate.
+pass `cargo check`. The fifth native candidate at `7a1d06b` now accepts the
+Windows integration on native x64 and ARM64 with all 30 checks and full
+cleanup. The macOS helper still needs a successful native compilation and
+pixel run; [candidate evidence](native-candidates-2026-11-18.md) records that
+remaining boundary.
 
 The shared core is groundwork for native shared runtime, tabs/splits,
 attach and MCP. Those features are not implemented by this extraction.
