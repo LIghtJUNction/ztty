@@ -1,4 +1,4 @@
-//! Bounded, single-threaded Streamable HTTP transport (JSON response mode).
+//! Bounded, single-threaded Streamable HTTP transport with JSON or POST SSE replies.
 use alloc::ffi::CString;
 use alloc::format;
 use alloc::string::{String, ToString};
@@ -18,6 +18,7 @@ const MAX_WAITING: usize = 32;
 const MAX_HEADERS: usize = 16384;
 const MAX_BUFFERED: usize = 4 * 1024 * 1024;
 const REQUEST_TIMEOUT: u64 = 10000;
+const HEARTBEAT_INTERVAL: u64 = 5000;
 const SESSION_TIMEOUT: u64 = 30 * 60 * 1000;
 const SOCK_STREAM: i32 = 1;
 const SOCK_NONBLOCK: i32 = 0o4000;
@@ -64,6 +65,13 @@ impl Drop for Fd {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ResponseState {
+    Json,
+    Sse,
+    Streaming,
+}
+
 struct Client {
     fd: Fd,
     input: Vec<u8>,
@@ -75,6 +83,8 @@ struct Client {
     input_closed: bool,
     pending: Option<PendingCall>,
     session: Option<String>,
+    response: ResponseState,
+    heartbeat_at: u64,
 }
 
 impl Client {
@@ -90,12 +100,71 @@ impl Client {
             input_closed: false,
             pending: None,
             session: None,
+            response: ResponseState::Json,
+            heartbeat_at: u64::MAX,
         }
+    }
+
+    fn has_output(&self) -> bool {
+        self.written < self.output.len()
+    }
+
+    fn start_stream(&mut self, session: Option<&str>) {
+        self.response = ResponseState::Streaming;
+        self.output = b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nTransfer-Encoding: chunked\r\nConnection: close\r\nCache-Control: no-store\r\n".to_vec();
+        if let Some(id) = session {
+            self.output
+                .extend_from_slice(format!("Mcp-Session-Id: {id}\r\n").as_bytes());
+        }
+        self.output.extend_from_slice(b"\r\n");
+        append_chunk(&mut self.output, b": ztty\n\n");
+        self.written = 0;
+        let now = os::milliseconds();
+        self.deadline = now + REQUEST_TIMEOUT;
+        self.heartbeat_at = now + HEARTBEAT_INTERVAL;
+    }
+
+    fn heartbeat_deadline(&self) -> Option<u64> {
+        (self.response == ResponseState::Streaming && !self.replied && !self.has_output())
+            .then_some(self.heartbeat_at)
+    }
+
+    fn heartbeat(&mut self, now: u64) {
+        // At most one small comment is queued. A slow consumer cannot build up
+        // heartbeat frames or extend its delivery deadline by staying connected.
+        debug_assert!(!self.has_output());
+        self.output.clear();
+        self.written = 0;
+        append_chunk(&mut self.output, b": keepalive\n\n");
+        self.deadline = now + REQUEST_TIMEOUT;
+        self.heartbeat_at = now + HEARTBEAT_INTERVAL;
     }
 
     fn reply(&mut self, status: u16, body: &[u8], session: Option<&str>) {
         self.pending = None;
         self.deadline = os::milliseconds() + REQUEST_TIMEOUT;
+        if self.response != ResponseState::Json && status == 200 && !body.is_empty() {
+            if self.response == ResponseState::Sse {
+                self.start_stream(session);
+            }
+            // Preserve a partially delivered header/comment. JSON stringify
+            // escapes CR/LF inside strings, so the payload is one SSE data line.
+            let length = b"event: message\ndata: ".len() + body.len() + 2;
+            self.output
+                .extend_from_slice(format!("{length:x}\r\n").as_bytes());
+            self.output.extend_from_slice(b"event: message\ndata: ");
+            self.output.extend_from_slice(body);
+            self.output.extend_from_slice(b"\n\n\r\n0\r\n\r\n");
+            self.input = Vec::new();
+            self.replied = true;
+            return;
+        }
+        if self.response == ResponseState::Streaming {
+            // HTTP headers have already been sent. In particular, overload
+            // must close this stream rather than inject a second HTTP response.
+            self.closed = true;
+            return;
+        }
         let reason = match status {
             200 => "OK",
             202 => "Accepted",
@@ -138,6 +207,12 @@ impl Client {
     }
 }
 
+fn append_chunk(output: &mut Vec<u8>, payload: &[u8]) {
+    output.extend_from_slice(format!("{:x}\r\n", payload.len()).as_bytes());
+    output.extend_from_slice(payload);
+    output.extend_from_slice(b"\r\n");
+}
+
 struct Session {
     id: String,
     rpc: RpcSession,
@@ -150,6 +225,7 @@ struct Settings<'a> {
     token: Option<&'a str>,
     observer_token: Option<&'a str>,
     read_only: bool,
+    sse: bool,
 }
 
 enum ScopedAction {
@@ -172,6 +248,7 @@ pub(super) fn run(
     observer_token: Option<&str>,
     read_only: bool,
     allowed_hosts: &[String],
+    sse: bool,
 ) -> Result<i32, String> {
     let host = host
         .strip_prefix('[')
@@ -204,6 +281,7 @@ pub(super) fn run(
         token,
         observer_token,
         read_only,
+        sse,
     };
     os::print(
         2,
@@ -240,6 +318,17 @@ pub(super) fn run(
                 let body = json::stringify(&response).into_bytes();
                 reply_bounded(&mut clients, index, 200, &body, None);
             }
+            if clients[index]
+                .heartbeat_deadline()
+                .is_some_and(|deadline| deadline <= now)
+            {
+                if buffered_bytes(&clients).saturating_add(32) > MAX_BUFFERED {
+                    clients[index].closed = true;
+                    clients[index].pending = None;
+                } else {
+                    clients[index].heartbeat(now);
+                }
+            }
         }
         if buffered_bytes(&clients) > MAX_BUFFERED {
             // Pending broker reads can grow between HTTP events. Bound their
@@ -262,16 +351,17 @@ pub(super) fn run(
         });
         for client in &clients {
             fds.push(os::PollFd {
-                fd: if client.closed || (client.input_closed && !client.replied) {
+                fd: if client.closed || (client.input_closed && !client.has_output()) {
                     -1
                 } else {
                     client.fd.0
                 },
-                events: if client.replied {
-                    os::POLLOUT
-                } else {
-                    os::POLLIN
-                },
+                events: (if client.has_output() { os::POLLOUT } else { 0 })
+                    | if !client.replied && !client.input_closed {
+                        os::POLLIN
+                    } else {
+                        0
+                    },
                 revents: 0,
             });
         }
@@ -285,6 +375,7 @@ pub(super) fn run(
         let timeout = clients
             .iter()
             .map(|client| client.deadline)
+            .chain(clients.iter().filter_map(Client::heartbeat_deadline))
             .chain(clients.iter().filter_map(|client| {
                 client
                     .pending
@@ -312,7 +403,7 @@ pub(super) fn run(
                 clients[index].pending = None;
                 continue;
             }
-            if clients[index].replied && events & os::POLLOUT != 0 {
+            if clients[index].has_output() && events & os::POLLOUT != 0 {
                 let client = &mut clients[index];
                 let pending = &client.output[client.written..];
                 let count = unsafe {
@@ -325,10 +416,22 @@ pub(super) fn run(
                 };
                 if count > 0 {
                     client.written += count as usize;
+                    if !client.has_output() && !client.replied {
+                        client.output.clear();
+                        client.written = 0;
+                        // Once a streaming header/comment is delivered, the
+                        // existing broker deadline owns the wait again.
+                        client.deadline = u64::MAX;
+                    }
                 } else if count == 0 || !matches!(os::errno(), 4 | 11) {
                     client.closed = true;
                 }
-            } else if clients[index].pending.is_some() && events & (os::POLLIN | os::POLLHUP) != 0 {
+            }
+            if clients[index].closed {
+                clients[index].pending = None;
+                continue;
+            }
+            if clients[index].pending.is_some() && events & (os::POLLIN | os::POLLHUP) != 0 {
                 // A complete ordinary POST survives a write-side half-close.
                 // Timed reads require both directions to stay open so closing
                 // an observer promptly releases its broker waiter.
@@ -381,6 +484,9 @@ pub(super) fn run(
                         .extend_from_slice(&buffer[..count as usize]);
                     match parse_request(&clients[index].input) {
                         Ok(Some(request)) => {
+                            if settings.sse && request.method == "POST" {
+                                clients[index].response = ResponseState::Sse;
+                            }
                             let mut action = None;
                             let (status, body, id) =
                                 respond(request, &settings, &mut sessions, &clients, &mut action);
@@ -426,6 +532,16 @@ pub(super) fn run(
                                                 client.deadline = u64::MAX;
                                                 if buffered_bytes(&clients) > MAX_BUFFERED {
                                                     clients[index].reply(503, &[], None);
+                                                } else if clients[index].response
+                                                    == ResponseState::Sse
+                                                {
+                                                    if buffered_bytes(&clients).saturating_add(512)
+                                                        > MAX_BUFFERED
+                                                    {
+                                                        clients[index].reply(503, &[], None);
+                                                    } else {
+                                                        clients[index].start_stream(None);
+                                                    }
                                                 }
                                             }
                                             Err(response) => reply_bounded(
@@ -522,6 +638,9 @@ pub(super) fn run(
 
 fn reply_bounded(clients: &mut [Client], index: usize, status: u16, body: &[u8], id: Option<&str>) {
     let retained = buffered_bytes(clients).saturating_sub(clients[index].input.len());
+    // Includes an unsent SSE header/comment already in output. The extra 512
+    // bytes cover either HTTP representation, the 48-byte session header,
+    // chunk sizes, SSE fields and the terminating chunk (tested below).
     if retained.saturating_add(body.len() + 512) > MAX_BUFFERED {
         clients[index].reply(503, &[], None);
     } else {
@@ -1172,6 +1291,7 @@ mod tests {
             token: None,
             observer_token: None,
             read_only: false,
+            sse: false,
         }
     }
 
@@ -1192,6 +1312,122 @@ mod tests {
     }
 
     const INIT: &str = r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}"#;
+
+    #[test]
+    fn sse_frames_one_json_response_and_preserves_initial_session_header() {
+        let response = error(
+            "line\r\ndata: injected\n界".into(),
+            -32601,
+            "unknown method",
+        );
+        let body = json::stringify(&response);
+        let session = "a".repeat(48);
+        let mut client = Client::new(-1);
+        client.response = ResponseState::Sse;
+        client.reply(200, body.as_bytes(), Some(&session));
+        let end = client
+            .output
+            .windows(4)
+            .position(|s| s == b"\r\n\r\n")
+            .unwrap();
+        let header = core::str::from_utf8(&client.output[..end]).unwrap();
+        assert!(header.contains("Content-Type: text/event-stream\r\n"));
+        assert!(header.contains("Transfer-Encoding: chunked\r\n"));
+        assert!(header.ends_with(&format!("Mcp-Session-Id: {session}")));
+        assert!(!header.contains("Content-Length"));
+        let payload = chunks(&client.output[end + 4..]).unwrap().unwrap();
+        assert_eq!(
+            payload,
+            format!(": ztty\n\nevent: message\ndata: {body}\n\n").as_bytes()
+        );
+        assert!(client.replied && !client.closed);
+        assert!(client.output.len() <= body.len() + 512);
+    }
+
+    #[test]
+    fn sse_final_response_keeps_partially_written_comments() {
+        let mut client = Client::new(-1);
+        client.start_stream(None);
+        client.written = client.output.len() - 3;
+        let queued = client.output.clone();
+        let written = client.written;
+        client.reply(200, b"{\"jsonrpc\":\"2.0\",\"id\":1,\"result\":{}}", None);
+        assert!(client.output.starts_with(&queued));
+        assert_eq!(client.written, written);
+        assert!(client.output.ends_with(b"\n\n\r\n0\r\n\r\n"));
+        assert!(client.heartbeat_deadline().is_none());
+    }
+
+    #[test]
+    fn sse_heartbeat_waits_for_delivery_and_overload_never_restarts_http() {
+        let mut client = Client::new(-1);
+        client.start_stream(None);
+        assert!(client.heartbeat_deadline().is_none());
+        client.written = client.output.len();
+        let heartbeat = client.heartbeat_deadline().unwrap();
+        client.heartbeat(heartbeat);
+        assert_eq!(
+            chunks(&[client.output.as_slice(), b"0\r\n\r\n"].concat())
+                .unwrap()
+                .unwrap(),
+            b": keepalive\n\n"
+        );
+        assert!(client.heartbeat_deadline().is_none());
+        assert_eq!(client.deadline, heartbeat + REQUEST_TIMEOUT);
+        let queued = client.output.clone();
+        client.reply(503, &[], None);
+        assert!(client.closed);
+        assert_eq!(client.output, queued);
+    }
+
+    #[test]
+    fn sse_buffer_budget_includes_framing_and_existing_unsent_bytes() {
+        let body = alloc::vec![b'x'; 65536];
+        let mut clients = alloc::vec![Client::new(-1), Client::new(-1)];
+        clients[0].response = ResponseState::Sse;
+        clients[1].input = alloc::vec![0; MAX_BUFFERED - body.len() - 512];
+        reply_bounded(&mut clients, 0, 200, &body, Some(&"a".repeat(48)));
+        assert_eq!(clients[0].response, ResponseState::Streaming);
+        assert!(buffered_bytes(&clients) <= MAX_BUFFERED);
+
+        clients[0] = Client::new(-1);
+        clients[0].response = ResponseState::Sse;
+        clients[1].input.push(0);
+        reply_bounded(&mut clients, 0, 200, &body, None);
+        assert!(clients[0].output.starts_with(b"HTTP/1.1 503"));
+        assert!(buffered_bytes(&clients) <= MAX_BUFFERED);
+
+        clients[0] = Client::new(-1);
+        clients[0].start_stream(None);
+        reply_bounded(&mut clients, 0, 200, &body, None);
+        assert!(clients[0].closed);
+        assert!(buffered_bytes(&clients) <= MAX_BUFFERED);
+    }
+
+    #[test]
+    fn sse_selection_keeps_http_errors_notifications_and_delete_nonstreaming() {
+        for (status, body) in [
+            (202, &b""[..]),
+            (200, b""),
+            (400, b"{\"error\":{}}"),
+            (401, b""),
+        ] {
+            let mut client = Client::new(-1);
+            client.response = ResponseState::Sse;
+            client.reply(status, body, None);
+            assert!(
+                client
+                    .output
+                    .starts_with(format!("HTTP/1.1 {status} ").as_bytes())
+            );
+            assert!(
+                !core::str::from_utf8(&client.output)
+                    .unwrap()
+                    .contains("text/event-stream")
+            );
+            assert!(client.replied && !client.closed);
+        }
+    }
 
     #[test]
     fn framing_rejects_smuggling_controls_and_duplicate_headers() {
