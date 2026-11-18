@@ -612,12 +612,29 @@ def run(binary, output, expected_arch=None):
         window.chord(0x21, control=False)
         history_sample = (PADDING + 5 * cell[0] + 2, PADDING + 3, [0, 0, 255])
         pixels = window.expect("pane A history", [history_sample, image_sample(right, "b")])
+        before = a.input()
+        # The complete shortcut includes Shift release. Further silent
+        # modifier pairs must also preserve history and send no PTY input.
+        window.inputs([(key, 0, flags) for key in (0x10, 0x11) for flags in (0, 2)])
         focus("b", 0x27)
         window.expect("history survives pane focus", [history_sample, image_sample(right, "b")])
+        sequence = a.queue(b"")
+        response = b"\x1b_G" + a.queries[sequence] + b"\x1b\\"
+        a.done(sequence)
+        assert a.input() == before + response, "silent keys or focus shortcut reached pane A's PTY"
         window.mouse(0x020A, PADDING + 5 * cell[0], PADDING + 2 * cell[1],
                      ((-120 * 50) & 65535) << 16, screen=True)
         window.expect("hover history return", [image_sample(left, "a"), image_sample(right, "b")])
-        check("pane_history_isolation", pixels=pixels)
+        focus("a", 0x25)
+        window.chord(0x21, control=False)
+        window.expect("history before actual input", [history_sample, image_sample(right, "b")])
+        before = a.input()
+        window.chord(0x0D, control=False, shift=False)
+        native.wait_for(lambda: a.input() == before + b"\r", "actual input from history")
+        live_pixels = window.expect("actual input returns to live", [image_sample(left, "a"), image_sample(right, "b")])
+        focus("b", 0x27)
+        check("pane_history_isolation", pixels=pixels, silent_modifiers=["shift", "control"],
+              actual_input="0d", live_pixels=live_pixels)
 
         selection_y = PADDING + 4 * cell[1] + 3
         start, end = right[0] + PADDING + 2 * cell[0] + 2, right[0] + PADDING + 6 * cell[0] + 2
@@ -626,6 +643,7 @@ def run(binary, output, expected_arch=None):
         window.mouse(0x0202, end, selection_y)
         selected = (right[0] + PADDING + 4 * cell[0] + 2, selection_y, [34, 68, 102])
         pixels = window.expect("pane B selection", [selected, (PADDING + 4 * cell[0] + 2, selection_y, BLACK)])
+        window.inputs([(key, 0, flags) for key in (0x10, 0x11) for flags in (0, 2)])
         focus("a", 0x25)
         window.expect("selection survives pane focus", [selected, image_sample(left, "a")])
         check("pane_selection_isolation", pixels=pixels)
