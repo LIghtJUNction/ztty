@@ -193,7 +193,7 @@ Icon=utilities-terminal
 Terminal=false
 Categories=System;TerminalEmulator;
 Keywords=terminal;shell;console;
-StartupWMClass=ztty
+StartupWMClass=Ztty
 DESKTOP
 chmod 644 "$desktop_stage"
 
