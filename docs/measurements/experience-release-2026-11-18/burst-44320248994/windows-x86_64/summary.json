@@ -1,0 +1,328 @@
+{
+  "run_id": 44320248994,
+  "source_sha": "65dcd2ce3e69a4cbadcb98c7d9e08f431962270f",
+  "architecture": "x86_64",
+  "job_id": 134857155733,
+  "artifact_id": 14434541912,
+  "artifact_zip_sha256": "6a61e66e090a82f1ce4d129283b968dd28ce0b0be708904088f1834379df3dd4",
+  "binary_sha256": "433d5ec17d840487e64b786c77f43b58bc2fc61986eb118e35e8d8a93127a043",
+  "passed": false,
+  "build_status": "failed",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "required_cold_starts": 8,
+  "completed_cold_starts": 1,
+  "attempted_cold_starts": 2,
+  "cold_runs": [
+    {
+      "number": 1,
+      "raw_report": "ztty-windows-x86_64.native.cold-01.json",
+      "raw_report_sha256": "1d57978c648106fb12953362f364c1cb841ed51059de31c781e6af696fa16551",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "burst_completed": 10,
+      "pid": 7320,
+      "hwnd": 458852,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.010832200000010062,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 2,
+      "raw_report": "ztty-windows-x86_64.native.cold-02.json",
+      "raw_report_sha256": "676321e49c643b8b71757472130ab9286913fa88be0aaa8e8f19c4997afbdcd9",
+      "passed": false,
+      "checks": 23,
+      "warm_completed": 0,
+      "burst_completed": 0,
+      "pid": 8384,
+      "hwnd": 852446,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.0072548999999924035,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    }
+  ],
+  "workspace": {
+    "executed": false,
+    "checks": 0
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-7032-9f9cb9efed6b4833a78ccaf2d7a6934a",
+    "input_after_restore": "Default"
+  },
+  "worker_elapsed_seconds": 12.749,
+  "worker_exit_code": 1,
+  "png_count": 51,
+  "png_reference_hashes_dimensions_verified": true,
+  "resize_samples_verified_against_png": 80,
+  "failure": {
+    "raw_report": "ztty-windows-x86_64.native.cold-02.json",
+    "raw_report_sha256": "676321e49c643b8b71757472130ab9286913fa88be0aaa8e8f19c4997afbdcd9",
+    "name": "resize_restores_visible_image",
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      0,
+      0,
+      0
+    ],
+    "pid": 8384,
+    "hwnd": 852446,
+    "client": [
+      180,
+      190
+    ],
+    "sample": [
+      175,
+      28
+    ],
+    "snapshot_raw": "ztty-windows-x86_64.native.cold-02.post-failure.json",
+    "snapshot_sha256": "6f7e615ce1d9703a3c2f643337874f3759343abf98370480ad64fd0c086dcbd2",
+    "snapshot_state": {
+      "schema": 1,
+      "pid": 8384,
+      "hwnd": 852446,
+      "sample": [
+        175,
+        28
+      ],
+      "before": {
+        "surface": {
+          "size": [
+            180,
+            190
+          ],
+          "clip": [
+            0,
+            0,
+            180,
+            190
+          ]
+        },
+        "cpu_rgb": [
+          255,
+          0,
+          0
+        ],
+        "dispatch_resize_pending": false,
+        "dispatch_paint_pending": false,
+        "deferred_paints": 0,
+        "app_resize_pending": false,
+        "full_redraw": false,
+        "pane": {
+          "rect": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "grid": [
+            20,
+            10
+          ],
+          "pty": [
+            20,
+            10
+          ],
+          "images": 1,
+          "placements": 1,
+          "dirty": false,
+          "terminal_dirty": false,
+          "grid_ready": true,
+          "synchronized_output": false
+        },
+        "last_paint": {
+          "sequence": 19,
+          "surface": [
+            180,
+            190
+          ],
+          "region": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "blit": 1
+        }
+      },
+      "client_ok": true,
+      "client": [
+        180,
+        190
+      ],
+      "update_pending": false,
+      "update_rect": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "after_flush": {
+        "flush": 1,
+        "cpu_rgb": [
+          255,
+          0,
+          0
+        ],
+        "bitmap_read": 32,
+        "bitmap": [
+          180,
+          190
+        ],
+        "bitmap_matches": true,
+        "source_rgb": [
+          255,
+          0,
+          0
+        ],
+        "target_rgb": [
+          0,
+          0,
+          0
+        ],
+        "source_clip_type": 2,
+        "source_clip": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "target_clip_type": 2,
+        "target_clip": [
+          0,
+          0,
+          180,
+          190
+        ]
+      }
+    },
+    "after_flush_client_rgb": [
+      0,
+      0,
+      0
+    ],
+    "after_flush_screen_rgb": [
+      0,
+      0,
+      0
+    ],
+    "after_repaint_client_rgb": [
+      255,
+      0,
+      0
+    ],
+    "after_repaint_screen_rgb": [
+      255,
+      0,
+      0
+    ],
+    "original_gate_remains_failed": true,
+    "png_vertical_regions": {
+      "rows_0_through_188": [
+        [
+          0,
+          151,
+          [
+            16,
+            24,
+            32
+          ]
+        ],
+        [
+          152,
+          178,
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        [
+          179,
+          179,
+          [
+            47,
+            47,
+            47
+          ]
+        ]
+      ],
+      "row_189": [
+        [
+          0,
+          151,
+          [
+            16,
+            24,
+            32
+          ]
+        ],
+        [
+          152,
+          179,
+          [
+            47,
+            47,
+            47
+          ]
+        ]
+      ]
+    },
+    "failed_and_after_flush_png_identical": true,
+    "before_and_after_repaint_png_identical": true
+  },
+  "scope": "Actual original untraced rapid failure on cold start 2; surface/model/source pixel correct; explicit GDI flush does not recover target; normal repaint recovers. Deferred paint count is zero, so this failure did not reject any WM_PAINT at the mutable guard; no acceptance inferred from diagnostic recovery.",
+  "visual_review": {
+    "png_files": 51,
+    "failure_and_repaint_directly_inspected": true,
+    "all_four_unique_png_contents_match_prior_visually_reviewed_hashes": true
+  },
+  "pixel_expected_result_audit": {
+    "total_samples": 80,
+    "exact_expected_matches": 79,
+    "observed_failures": [
+      {
+        "cold": 2,
+        "sequence": "base",
+        "stage": "restored",
+        "client": [
+          175,
+          28
+        ],
+        "rgb": [
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "first_failure_category": "actual original pixel failure, not back-to-back contract rejection"
+}

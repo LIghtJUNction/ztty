@@ -1,0 +1,711 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+  "run_id": 44349551432,
+  "job_id": 134961279252,
+  "architecture": "x86_64",
+  "artifact_id": 14446459584,
+  "artifact_zip_sha256": "3d2de7e2b7f4afb40acbf8370df42cf315866195e159320e46628aa9a847ff05",
+  "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "formal_release_eligible": false,
+  "required_cold_starts": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "completed_cold_starts": 8,
+  "attempted_cold_starts": 8,
+  "resize_control_diagnostic": {
+    "requested": false,
+    "outcome": "skipped"
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-4504-5d378d49b3594a75b95a65890a94f9bc",
+    "input_after_restore": "Default"
+  },
+  "worker_exit_code": 0,
+  "worker_elapsed_seconds": 16.262,
+  "status": "accepted-normal-windows-candidate",
+  "native_gate_passed": true,
+  "ordinary_acceptance_credit": true,
+  "nc_rendering_diagnostics_enabled": false,
+  "workspace_checks_passed": 19,
+  "workspace_nc_override_record_present": false,
+  "workspace_nc_actual_state_recorded": false,
+  "native_nc_records": [
+    {
+      "number": 1,
+      "raw_report": "ztty-windows-x86_64.native.cold-01.json",
+      "raw_report_sha256": "02c2d742097f8b5c076aee4d752533b590b55e9d521f90dfd69c2aead0a949ea",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 9836,
+      "hwnd": 328030,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 9836,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "number": 2,
+      "raw_report": "ztty-windows-x86_64.native.cold-02.json",
+      "raw_report_sha256": "037447491fabefb4e9c3756bb030412907bea75c2bf4a8505f5db4e7935e4f6b",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 6996,
+      "hwnd": 524628,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.cold-02.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 6996,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "number": 3,
+      "raw_report": "ztty-windows-x86_64.native.cold-03.json",
+      "raw_report_sha256": "d5ffe4d6582e7d43dabeb03ec1c8aaf16d63bd7f9da3400b9a9fc82a49f8a745",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 7496,
+      "hwnd": 917624,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.cold-03.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 7496,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "number": 4,
+      "raw_report": "ztty-windows-x86_64.native.cold-04.json",
+      "raw_report_sha256": "4eab31cca0de506763ab67f62afd4f487a4e072d6d543e7d9d83dd4f0587f468",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 2268,
+      "hwnd": 1376592,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.cold-04.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 2268,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "number": 5,
+      "raw_report": "ztty-windows-x86_64.native.cold-05.json",
+      "raw_report_sha256": "41bb84b8409df5d8dab693252d3165ef1959de3ca273f5092f1b326c2bfe30e0",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 7560,
+      "hwnd": 1704278,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.cold-05.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 7560,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "number": 6,
+      "raw_report": "ztty-windows-x86_64.native.cold-06.json",
+      "raw_report_sha256": "95d35d2c3beafcfa00023691a1adc5d312f763305c1c90c8b84198d78973334f",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 8404,
+      "hwnd": 1900876,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.cold-06.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 8404,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "number": 7,
+      "raw_report": "ztty-windows-x86_64.native.cold-07.json",
+      "raw_report_sha256": "f3ca338b1146c90f8921695dd367a9e97624811ce3cde2aad6a8fe53e07ad7d5",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 7788,
+      "hwnd": 2097502,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.cold-07.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 7788,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "number": 8,
+      "raw_report": "ztty-windows-x86_64.native.cold-08.json",
+      "raw_report_sha256": "b3de1e8a7d18e20942583841541b8435c2b577fd4e1d85e6cd2ade7bbb1b8fb3",
+      "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+      "binary_sha256": "1e7788b38be899f069c279de84591785bd7174277e5f8efa24813fde9e1298cb",
+      "pid": 1984,
+      "hwnd": 2294100,
+      "final_dwm_state": {
+        "composition": {
+          "hresult": 0,
+          "reported_enabled": true
+        },
+        "extended_frame_bounds": {
+          "hresult": 0,
+          "value": [
+            32,
+            32,
+            228,
+            261
+          ]
+        },
+        "cloaked": {
+          "hresult": 0,
+          "value": 0
+        },
+        "nonclient_rendering": {
+          "hresult": 0,
+          "value": 0
+        }
+      },
+      "harness_override_present": false,
+      "window_frame": {
+        "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.cold-08.window-frame.png",
+        "width": 196,
+        "height": 229,
+        "window_pid": 1984,
+        "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+        "capture": "owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+      },
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_offset_in_frame": [
+        8,
+        31
+      ],
+      "client_crop_equals_final_client_png": true,
+      "client_gate_point": [
+        175,
+        28
+      ],
+      "frame_gate_point": [
+        183,
+        59
+      ],
+      "frame_rgb": [
+        255,
+        0,
+        0
+      ]
+    }
+  ],
+  "all8_raw_sources_binary_and_report_hashes_verified": true,
+  "all8_native_processes_and_workspace_process_exited": true,
+  "all4_workspace_probe_processes_exited": true,
+  "workspace_cleanup": {
+    "process_exited": true,
+    "temporary_directory_removed": true,
+    "returncode": 0,
+    "directory_removal": {
+      "attempts": 1,
+      "elapsed_seconds": 0.01584850000000415,
+      "retry_timeout_seconds": 2.0
+    },
+    "all_probe_processes_exited": true
+  },
+  "final_nc_disabled_windows": 8,
+  "harness_nc_overrides": 0,
+  "frame_png_count": 8,
+  "all8_frame_pngs_byte_identical": true,
+  "frame_png_sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+  "frame_dimensions": [
+    196,
+    229
+  ],
+  "frame_capture_order": "After every original pixel and resize requirement; before cleanup. No NC setter is called by normal acceptance.",
+  "appearance_review": "A standard light-blue Win32 frame/titlebar surrounds the dark client with visible minimize/maximize/close controls. All eight measured client crops match their final client images.",
+  "scope": "Ordinary scoped Windows candidate passed. Both diagnostic flags and runtime trace are false. Production applies the per-window disabled DWM NC policy; post-gate readback confirms it for the eight native windows. Workspace has no additional NC readback. Additional window-frame captures are not client-coordinate gate images. No formal six-platform release or device installation is implied.",
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/summary.json",
+      "bytes": 26160,
+      "sha256": "c7b5837a0c21dfcbe233befeba14aa55e6ea81df6af2ef0dee6a44a54cbf3afa",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 71506,
+      "sha256": "4ff450a130a0c2aa7cd666fcf37ab3c83a84aa440d6d99fac07ba443ff5b490f",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 1621
+    },
+    {
+      "path": "ztty-windows-x86_64.native.json",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/ztty-windows-x86_64.native.json",
+      "bytes": 256780,
+      "sha256": "f6c7c4c59d1a8dd1c0b371646a9aef7f4acf4484d38ae8a817f0102f5958e7d7",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 9741
+    },
+    {
+      "path": "ztty-windows-x86_64.native.workspace.json",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/ztty-windows-x86_64.native.workspace.json",
+      "bytes": 26221,
+      "sha256": "22648fe1e6b44fee0f96d6544c7d5774bd26de40f5db5730d752015c4dd98a73",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-08.json",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/ztty-windows-x86_64.native.cold-08.json",
+      "bytes": 216769,
+      "sha256": "b3de1e8a7d18e20942583841541b8435c2b577fd4e1d85e6cd2ade7bbb1b8fb3",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 8186
+    },
+    {
+      "path": "ztty-windows-x86_64.native.window-frame.png",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/ztty-windows-x86_64.native.window-frame.png",
+      "bytes": 3746,
+      "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.workspace.three-panes.png",
+      "source_path": "artifacts/release-audit/nc-default-44349551432/windows-x86_64/ztty-windows-x86_64.native.workspace.three-panes.png",
+      "bytes": 2241,
+      "sha256": "ccf7dec33d1f03a0d35abe33556cae7e4fd39bd1e00d9e3c2137324d5e00a357",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ]
+}

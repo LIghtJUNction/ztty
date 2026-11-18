@@ -1,0 +1,98 @@
+{
+  "diagnostic_only": true,
+  "passed": false,
+  "status": "failed",
+  "required": 16,
+  "completed": 0,
+  "runs": [
+    {
+      "number": 1,
+      "report": "ztty-windows-aarch64.resize-control.cold-01.json",
+      "passed": false,
+      "report_sha256": "7f2ad78bcaad921d5401498e4ed3630bdd234addbee737035dadd2474c678b96"
+    }
+  ],
+  "desktop": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d",
+  "python_process": {
+    "process_machine": 0,
+    "native_machine": 43620,
+    "emulated": false
+  },
+  "binary_machine": 43620,
+  "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+  "binary_sha256": "d91177f9f12b19941532e5f3cd00e2f40255a787f838a19cf877542a9ffaa342",
+  "run_id": "44343658618",
+  "c_source_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6",
+  "error": "control 1/16 failed: AssertionError('timeout: restored; last error: None')",
+  "desktop_isolation": {
+    "passed": false,
+    "status": "failed",
+    "desktop": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d",
+    "creation_flags": 134742020,
+    "inherited_handles": [
+      "NUL stdin",
+      "stdout log",
+      "stderr log"
+    ],
+    "kill_on_job_close": true,
+    "worker_resumed": true,
+    "observed_job_pids": [
+      5832,
+      7428,
+      8656,
+      9252
+    ],
+    "cleanup": {
+      "errors": [],
+      "job_empty": true,
+      "worker_exited": true,
+      "input_restored": true,
+      "thread_restored": true,
+      "owned_desktop_closed": true,
+      "handles_closed": true,
+      "job_pids_after": [],
+      "input_before_restore": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d",
+      "input_after_restore": "Default"
+    },
+    "before": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "Default",
+      "input": "Default"
+    },
+    "created_desktop": true,
+    "worker_pid": 8656,
+    "worker_tid": 5260,
+    "created_suspended": true,
+    "worker_assigned": true,
+    "assigned_job_pids": [
+      8656
+    ],
+    "last_input_desktop": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d",
+    "switched_to_owned": true,
+    "worker_exit_code": 1,
+    "error": "RuntimeError: native worker exited with 1; see its JSON and stderr log",
+    "after": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "Default",
+      "input": "Default"
+    },
+    "elapsed_seconds": 10.265
+  },
+  "worker_state": {
+    "passed": true,
+    "pid": 8656,
+    "desktop": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d",
+    "context": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d",
+      "input": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d"
+    },
+    "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+    "binary_sha256": "d91177f9f12b19941532e5f3cd00e2f40255a787f838a19cf877542a9ffaa342",
+    "run_id": "44343658618",
+    "c_source_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6"
+  }
+}

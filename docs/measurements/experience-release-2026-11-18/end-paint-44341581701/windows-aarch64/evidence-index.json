@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+  "run_id": 44341581701,
+  "job_id": 134932800917,
+  "architecture": "aarch64",
+  "artifact_id": 14444471148,
+  "artifact_zip_sha256": "433059a77831cee9b190594cc5ccb5871310342cf941d31def5eca3efe465953",
+  "binary_sha256": "ba2ee02f9e9af47cf04fde139956500fb70ec4647425c7c84157c5e957ade4ca",
+  "build_only": true,
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "ordinary_acceptance_credit": false,
+  "formal_release_eligible": false,
+  "native_passed": false,
+  "cold_required": 8,
+  "cold_completed": 6,
+  "cold_attempted": 7,
+  "control": {
+    "diagnostic_only": true,
+    "passed": true,
+    "required": 16,
+    "completed": 16,
+    "attempted": 16,
+    "binary_sha256": "ac9c78852a23161260d52dfa31e057c68906dd5c106df13f602c3b30e1747bf1",
+    "raw_c_source": {
+      "raw_artifact_bytes": 5900,
+      "raw_artifact_sha256": "50a2a1aeb3b436b75b35e7992f93ed9d4e004bed2496f9cfd6fe04a4dc898de9",
+      "crlf_lines": 150,
+      "immutable_git_source": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f:tests/windows_resize_control.c",
+      "immutable_git_bytes": 5750,
+      "immutable_git_sha256": "aa6300e5f0d6088a1c7f44dbd5522186abd02d1bc5334e3a0e8c817477871325",
+      "lf_normalized_raw_equals_immutable_git": true,
+      "working_tree_source_used": false
+    },
+    "worker_exit_code": 0,
+    "cleanup": {
+      "errors": [],
+      "job_empty": true,
+      "worker_exited": true,
+      "input_restored": true,
+      "thread_restored": true,
+      "owned_desktop_closed": true,
+      "handles_closed": true,
+      "job_pids_after": [],
+      "input_before_restore": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682",
+      "input_after_restore": "Default"
+    }
+  },
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/summary.json",
+      "bytes": 27427,
+      "sha256": "73211ec36972e234d9848528e74dd34fe31fa17b537addcf9f9686668ffd49d8",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 72051,
+      "sha256": "d3413793cb3f0444f0da24f2c26a923a63f67dd7c66bb4a6ab312f25724a6d0c",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 1632
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.json",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.native.cold-07.json",
+      "bytes": 47914,
+      "sha256": "01c74833e495630605ff17a0f8bb0b1c23835da0b8dbf08e68c185452ca558cb",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2262
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.post-failure.json",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.json",
+      "bytes": 2698,
+      "sha256": "896e9fef665eb305d15cff8d6175d298339370b18fb52557037961004302956e",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.resize-restored.png",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.native.cold-07.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.post-failure.png",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-07.post-repaint.png",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "control-summary.json",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/control-summary.json",
+      "bytes": 37682,
+      "sha256": "5bb3d21b7e8dbaf30b76613f005a96b506ebcf584ea6a241d8c127e011f2e767",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.resize-control.json",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.resize-control.json",
+      "bytes": 6272,
+      "sha256": "a428b7c93b0012dd5b6992836f86c1bd8ba9b5498b1781521671c70bb381bfbb",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 194
+    },
+    {
+      "path": "ztty-windows-aarch64.resize-control.cold-01.json",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.resize-control.cold-01.json",
+      "bytes": 11296,
+      "sha256": "3f603bf55245c6c1704d77e450267242dd89244db027f83270a46d78caad8935",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 539
+    },
+    {
+      "path": "ztty-windows-aarch64.resize-control.cold-01.restored.png",
+      "source_path": "artifacts/release-audit/end-paint-44341581701/windows-aarch64/ztty-windows-aarch64.resize-control.cold-01.restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "scope": "Selected source/binary/raw-hash-bound diagnostic evidence. Raw bytes and original failures are preserved. Complete cold reports, remaining images and logs remain in the verified original Actions artifact; omitted files are not claimed to be mirrored. Diagnostic passes and independent retries do not accept the original or same-source other-architecture failure."
+}

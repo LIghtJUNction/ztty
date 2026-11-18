@@ -1,0 +1,469 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-summary",
+  "source_sha": "04cfd7bb9a516fe7914dc34daff380fa4c232cf2",
+  "source_ref": "refs/heads/fix/windows-resize-release-20261118",
+  "version": "0.3.0",
+  "run_id": 44317542062,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44317542062",
+  "run_attempt": 1,
+  "build_only": true,
+  "candidate_platform": "windows",
+  "architecture": "aarch64",
+  "runner": "windows-11-arm",
+  "runner_image": "20261112.217.1",
+  "native_process_emulated": false,
+  "status": "failed",
+  "passed": false,
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "native": "failure",
+    "package": "success"
+  },
+  "binary_sha256": "6b4a9ca42d8f6b6f9fab3142a190a76c20a74c5ae4fb94f31b452baa383e4284",
+  "binary_bytes": 381440,
+  "artifact_id": 14432488474,
+  "artifact_zip_bytes": 932363,
+  "artifact_zip_sha256": "372c9cee15d7ae51174cfa55a6aed1087fc570daf868fd1ab9f0c2ddf5d0ff9e",
+  "independent_audit": {
+    "artifact_zip_hash_verified": true,
+    "build_files_verified": 236,
+    "package_files_verified": 5,
+    "local_source_files_byte_identical_to_archive": 237,
+    "archive_pngs_verified": 216,
+    "reported_png_hashes_and_dimensions_verified": 216,
+    "cold_report_source_and_hash_bindings_verified": 7,
+    "distinct_application_pids": 7
+  },
+  "cold_starts": {
+    "required": 8,
+    "attempted": 7,
+    "completed_passed": 6,
+    "failed_number": 7,
+    "remaining_not_started": [
+      8
+    ],
+    "runs": [
+      {
+        "number": 1,
+        "report": "ztty-windows-aarch64.native.cold-01.json",
+        "report_bytes": 166105,
+        "report_sha256": "be0a875f2aafee5f1f301df3bccb33777a659a3f85b91a4806065a87a5fbd728",
+        "application_pid": 6652,
+        "passed": true,
+        "base_checks_passed": 31,
+        "base_checks_required": 31,
+        "warm_resize_completed": 10,
+        "warm_resize_required": 10,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0,
+          "directory_removal": {
+            "attempts": 1,
+            "elapsed_seconds": 0.007770600000014838,
+            "retry_timeout_seconds": 2.0
+          }
+        }
+      },
+      {
+        "number": 2,
+        "report": "ztty-windows-aarch64.native.cold-02.json",
+        "report_bytes": 166676,
+        "report_sha256": "491c5435d975e9a57ca1e37d4e930f241f8e4b124db8b23c85a343b650f3ee61",
+        "application_pid": 11080,
+        "passed": true,
+        "base_checks_passed": 31,
+        "base_checks_required": 31,
+        "warm_resize_completed": 10,
+        "warm_resize_required": 10,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0,
+          "directory_removal": {
+            "attempts": 1,
+            "elapsed_seconds": 0.0061201000000039585,
+            "retry_timeout_seconds": 2.0
+          }
+        }
+      },
+      {
+        "number": 3,
+        "report": "ztty-windows-aarch64.native.cold-03.json",
+        "report_bytes": 167057,
+        "report_sha256": "0f2b136cba59ddb89bfabed1f42b915850c22a448960252030c35eb4747f17fb",
+        "application_pid": 11016,
+        "passed": true,
+        "base_checks_passed": 31,
+        "base_checks_required": 31,
+        "warm_resize_completed": 10,
+        "warm_resize_required": 10,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0,
+          "directory_removal": {
+            "attempts": 1,
+            "elapsed_seconds": 0.006523799999996527,
+            "retry_timeout_seconds": 2.0
+          }
+        }
+      },
+      {
+        "number": 4,
+        "report": "ztty-windows-aarch64.native.cold-04.json",
+        "report_bytes": 166757,
+        "report_sha256": "29c931cf16dabc4d2c94d39dd79711438113da46e53448fbea9f9ecf25ce53a3",
+        "application_pid": 7132,
+        "passed": true,
+        "base_checks_passed": 31,
+        "base_checks_required": 31,
+        "warm_resize_completed": 10,
+        "warm_resize_required": 10,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0,
+          "directory_removal": {
+            "attempts": 1,
+            "elapsed_seconds": 0.00609810000000266,
+            "retry_timeout_seconds": 2.0
+          }
+        }
+      },
+      {
+        "number": 5,
+        "report": "ztty-windows-aarch64.native.cold-05.json",
+        "report_bytes": 166755,
+        "report_sha256": "a89c4fe73602623fe176d4a6e1d2e94e4bd6c3a485a15d477f328ba1251d6e7f",
+        "application_pid": 4308,
+        "passed": true,
+        "base_checks_passed": 31,
+        "base_checks_required": 31,
+        "warm_resize_completed": 10,
+        "warm_resize_required": 10,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0,
+          "directory_removal": {
+            "attempts": 1,
+            "elapsed_seconds": 0.00842049999999972,
+            "retry_timeout_seconds": 2.0
+          }
+        }
+      },
+      {
+        "number": 6,
+        "report": "ztty-windows-aarch64.native.cold-06.json",
+        "report_bytes": 166764,
+        "report_sha256": "d2fd05f95cccdb9c8b621f832cc59541fce3ee09dbacffa7847428f6e7f42eed",
+        "application_pid": 8452,
+        "passed": true,
+        "base_checks_passed": 31,
+        "base_checks_required": 31,
+        "warm_resize_completed": 10,
+        "warm_resize_required": 10,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0,
+          "directory_removal": {
+            "attempts": 1,
+            "elapsed_seconds": 0.006563099999993938,
+            "retry_timeout_seconds": 2.0
+          }
+        }
+      },
+      {
+        "number": 7,
+        "report": "ztty-windows-aarch64.native.cold-07.json",
+        "report_bytes": 41825,
+        "report_sha256": "1ed3c82d385302205d764b8076ed78736b3bc2d51759ed0b8468f6bf2f45c6eb",
+        "application_pid": 10036,
+        "passed": false,
+        "base_checks_passed": 23,
+        "base_checks_required": 31,
+        "warm_resize_completed": 0,
+        "warm_resize_required": 10,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0,
+          "directory_removal": {
+            "attempts": 2,
+            "elapsed_seconds": 0.05552699999998367,
+            "retry_timeout_seconds": 2.0,
+            "first_error": {
+              "type": "PermissionError",
+              "repr": "PermissionError(13, 'The process cannot access the file because it is being used by another process')",
+              "errno": 13,
+              "winerror": 32
+            }
+          }
+        }
+      }
+    ]
+  },
+  "workspace": {
+    "status": "not_entered",
+    "groups_completed": 0,
+    "groups_required": 19
+  },
+  "original_failure": {
+    "check": "resize_restores_visible_image",
+    "expected_rgb": [
+      255,
+      0,
+      0
+    ],
+    "actual_rgb": [
+      20,
+      20,
+      20
+    ],
+    "wait_timeout_seconds": 10,
+    "runtime_trace_enabled": false,
+    "resize_path": "rapid",
+    "base_checks_passed": 23,
+    "base_checks_required": 31,
+    "warm_repetitions_completed": 0,
+    "same_process_snapshot": "ztty-windows-aarch64.native.cold-07.post-failure.json",
+    "observed_state": {
+      "schema": 1,
+      "pid": 10036,
+      "hwnd": 2097792,
+      "sample": [
+        175,
+        28
+      ],
+      "before": {
+        "surface": {
+          "size": [
+            180,
+            190
+          ],
+          "clip": [
+            0,
+            0,
+            180,
+            190
+          ]
+        },
+        "cpu_rgb": [
+          255,
+          0,
+          0
+        ],
+        "dispatch_resize_pending": false,
+        "dispatch_paint_pending": false,
+        "deferred_paints": 0,
+        "app_resize_pending": false,
+        "full_redraw": false,
+        "pane": {
+          "rect": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "grid": [
+            20,
+            10
+          ],
+          "pty": [
+            20,
+            10
+          ],
+          "images": 1,
+          "placements": 1,
+          "dirty": false,
+          "terminal_dirty": false,
+          "grid_ready": true,
+          "synchronized_output": false
+        },
+        "last_paint": {
+          "sequence": 19,
+          "surface": [
+            180,
+            190
+          ],
+          "region": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "blit": 1
+        }
+      },
+      "client_ok": true,
+      "client": [
+        180,
+        190
+      ],
+      "update_pending": false,
+      "update_rect": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "after_flush": {
+        "flush": 1,
+        "cpu_rgb": [
+          255,
+          0,
+          0
+        ],
+        "bitmap_read": 32,
+        "bitmap": [
+          180,
+          190
+        ],
+        "bitmap_matches": true,
+        "source_rgb": [
+          255,
+          0,
+          0
+        ],
+        "target_rgb": [
+          20,
+          20,
+          20
+        ],
+        "source_clip_type": 2,
+        "source_clip": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "target_clip_type": 2,
+        "target_clip": [
+          0,
+          0,
+          180,
+          190
+        ]
+      }
+    },
+    "pixel_phases": [
+      {
+        "phase": "original_failure",
+        "file": "ztty-windows-aarch64.native.cold-07.resize-restored.png",
+        "bytes": 621,
+        "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+        "width": 180,
+        "height": 190,
+        "sample": [
+          175,
+          28
+        ],
+        "rgb": [
+          20,
+          20,
+          20
+        ]
+      },
+      {
+        "phase": "after_explicit_flush",
+        "file": "ztty-windows-aarch64.native.cold-07.post-failure.png",
+        "bytes": 621,
+        "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+        "width": 180,
+        "height": 190,
+        "sample": [
+          175,
+          28
+        ],
+        "rgb": [
+          20,
+          20,
+          20
+        ]
+      },
+      {
+        "phase": "after_normal_repaint",
+        "file": "ztty-windows-aarch64.native.cold-07.post-repaint.png",
+        "bytes": 599,
+        "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+        "width": 180,
+        "height": 190,
+        "sample": [
+          175,
+          28
+        ],
+        "rgb": [
+          255,
+          0,
+          0
+        ]
+      }
+    ],
+    "interpretation": "At the failed sample, the CPU DIB and source DC were red and the matching 180x190 window target remained gray; explicit GdiFlush did not correct it and a subsequent normal repaint did. deferred_paints=0 does not support a deferred/reentrant paint as the cause of this observed failure. These observations do not establish the underlying presentation race or accept the original gate."
+  },
+  "cleanup_retry_real_evidence": {
+    "cold_start": 7,
+    "application_pid": 10036,
+    "process_returncode": 0,
+    "process_exited": true,
+    "temporary_directory_removed": true,
+    "attempts": 2,
+    "elapsed_seconds": 0.05552699999998367,
+    "retry_timeout_seconds": 2.0,
+    "first_error": {
+      "type": "PermissionError",
+      "repr": "PermissionError(13, 'The process cannot access the file because it is being used by another process')",
+      "errno": 13,
+      "winerror": 32
+    },
+    "original_pixel_failure_preserved": true,
+    "scope": "The harness recovered from one observed transient Windows sharing conflict. This is not a claim to have repaired a production child-process lifecycle defect."
+  },
+  "all_attempted_process_and_directory_cleanup_passed": true,
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-2912-b80dbf11db664fd2852e1e385795cef9",
+    "input_after_restore": "Default"
+  },
+  "desktop_worker_exit_code": 1,
+  "desktop_worker_elapsed_seconds": 20.213,
+  "limits": [
+    "This build-only Windows candidate failed; no formal release acceptance or installation is established.",
+    "The top-level native record retains the first cold run fields; the failed run is cold-07, and cold_start_runs completed counts only the six passes.",
+    "Failure-time diagnostics and repaint observations do not change the failed assertion.",
+    "Successful cleanup retries do not convert a failed native result to passed."
+  ],
+  "evidence_sources": [
+    {
+      "file": "ztty-windows-aarch64.build.json",
+      "bytes": 42494,
+      "sha256": "445a282adaaf51f864a7fbc04512181ae7a6af286718b145dab50af476341a33"
+    },
+    {
+      "file": "ztty-windows-aarch64.native.json",
+      "bytes": 176464,
+      "sha256": "5dda149e6f61bb7145a80f9b34ae79e05926b52e289e6738a345e01851116639"
+    },
+    {
+      "file": "ztty-windows-aarch64.native.cold-07.json",
+      "bytes": 41825,
+      "sha256": "1ed3c82d385302205d764b8076ed78736b3bc2d51759ed0b8468f6bf2f45c6eb"
+    },
+    {
+      "file": "ztty-windows-aarch64.native.cold-07.post-failure.json",
+      "bytes": 850,
+      "sha256": "de83980389b8855401b8d77dcf7a7d2071bd20914851ebc2e5b88291ddbd309e"
+    }
+  ]
+}

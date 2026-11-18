@@ -1,5 +1,10 @@
 # ztty
 
+**ztty 0.3.1** 为 Linux 和 Windows 加入常用字号缩放与标签切换快捷键，
+修复 Windows 窗口缩放显示，并加强终端状态和 MCP 会话身份校验。
+下载入口为 [官方 Releases](https://github.com/LIghtJUNction/ztty/releases)。
+[发布门禁与源码记录](docs/releasing.md#031-release-gate)分别记录候选验证、正式发布和设备安装。
+
 <!-- terminal-benchmark:start -->
 [![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 
@@ -11,18 +16,18 @@
 
 <!-- terminal-benchmark:end -->
 
-**2026-11-18 开发进展：** 已修复 Bash 加载与提示符钩子，MCP 输出读取新增原会话身份校验和读取终止标记。当前候选通过 225 项 Rust 测试、6 项文档测试、四种 Shell 集成、11 组 Bash 检查、17 项实际 Linux 工作区检查及三套 MCP 检查。[实现与证据](docs/shell-resume-2026-11-18.md) · [上一轮 Unicode 测量](docs/integration-unicode-2026-11-18.md)。
+**2026-11-18 较早的 Shell 检查点：** 已修复 Bash 加载与提示符钩子，MCP 输出读取新增原会话身份校验和读取终止标记。该次候选通过 225 项 Rust 测试、6 项文档测试、四种 Shell 集成、11 组 Bash 检查、17 项实际 Linux 工作区检查及三套 MCP 检查。[实现与证据](docs/shell-resume-2026-11-18.md) · [上一轮 Unicode 测量](docs/integration-unicode-2026-11-18.md)。
 
 **2026-11-18 输出吞吐记录：** 源码 `dfe949c7`（ztty 0.2.1）的另一批十窗口测试测得 **227.58 MiB/s**。
 独立的旧／新配对测试为 19.48 → 200.52 MiB/s，提升 **10.29 倍**，应用 PSS 基本持平。
 负载为 Xvfb 软件渲染下的 ASCII／颜色原地更新；源码和批次与上方 guarded 图表分开记录。
-整合后的工作区候选版本见上方开发进展，其测量与验收记录单独保存。
+对应的较早整合检查点见 Shell 记录；这些测量不等于当前版本的完整验收。
 [实测、实现与正确性证据](docs/benchmarks/throughput-2026-11-18.md)。
 
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。
-0.2 版本补齐了 macOS、Windows 后端，并加入静态 Kitty 图形协议。
-项目优先验证 Linux，目标是以更低的内存占用和更快的交互响应，
-逐步超过 Kitty 与 Ghostty。
+它通过 Linux、macOS、Windows 的系统接口运行真实 shell 和终端程序，
+支持静态 Kitty 图形协议。项目优先验证 Linux，按具体负载测量
+内存占用和交互行为，比较结论以对应实验的范围为准。
 
 Linux 上的多个窗口自动复用一个会话进程、显示连接和字体缓存。
 每个窗口分别保存自己的 PTY、屏幕和历史记录。共享会话与 MCP 目前仅支持 Linux。
@@ -33,8 +38,10 @@ Linux 持续 PTY 输出现使用 8 ms 重绘合并预算，同时继续解析数
 [原始测量、最终帧检查与限制](docs/benchmarks/repaint-ab-2026-11-18.md)记录完整证据。
 该结果只适用于本次调度负载，真实硬件显示延迟及新版本多终端内存、性能对比仍待测量。
 
-Linux 新增历史搜索、按需命令面板、快捷键和鼠标绑定、配置热重载、
-OSC 133 命令跳转与复制输出；Bash、Zsh、Fish、Nushell 可以按需启用集成。
+Linux 支持跨软换行的历史搜索、临时会话切换器和命令面板、快捷键与鼠标绑定、
+配置热重载、OSC 133 命令跳转与复制输出。上翻历史时会显示 **Back to live ↓**
+入口；新输出到达时显示提示，点击后回到底部，底部没有常驻工具栏。
+Bash、Zsh、Fish、Nushell 可以按需启用集成。
 [操作与边界](docs/daily-workflow.md)、[Shell 配置](shell/README.md)、
 [MCP 观察者权限与命令读取](docs/sessions.md)提供完整说明。
 
@@ -51,20 +58,28 @@ Kitty 增强键盘和同步输出协议。图片支持内联 PNG、RGB、RGBA，
 透明度、裁剪、缩放、滚动、主备屏隔离和删除。界面采用深色背景、
 等宽字体和留白。具体平台上的验证范围如下。
 
-| 平台 | 原生实现 | 当前验收状态 |
+| 平台 | 原生实现 | 绑定源码的验收记录 |
 | --- | --- | --- |
-| Linux | X11/XWayland 窗口、Xft 文字、Xrender 图片合成、Linux PTY | 81c1c06 在 x86_64、ARM64 通过四套 guarded Xvfb GUI 及目录回归 |
-| macOS | AppKit 窗口、CoreText/CoreGraphics 渲染、Darwin PTY | 两种架构通过12项协议及启动检查；首个像素探针触发辅助程序初始化断言 |
-| Windows | Win32 窗口、GDI 文字、自行合成 RGBA、ConPTY | x86_64 的30项功能检查及清理通过；ARM64 通过10项独立检查及清理，可见像素仍被运行器窗口遮挡 |
+| Linux | X11/XWayland 窗口、Xft 文字、Xrender 图片合成、Linux PTY | 较早的正式尝试 9b5497d 在 x86_64、ARM64 各通过六套 GUI、67 组检查与 27 张 PNG；校验源码、二进制和自有资源清理 |
+| macOS | AppKit 窗口、CoreText/CoreGraphics 渲染、Darwin PTY | 同一 9b5497d 在 Intel、Apple Silicon 各通过 8 项 spawn 和 24 项原生检查，覆盖 13 阶段、10 张 PNG；进程清理通过 |
+| Windows | Win32 窗口、GDI 文字、自行合成 RGBA、ConPTY | 普通候选 2f2fae44 在 x64、ARM64 各通过 8 个新进程，每进程 31 项基础检查、10 次 warm 快速缩放、10 对背靠背缩放，以及独立的 19 组工作区检查；清理通过 |
 
 macOS 后端不要求 X11，Windows 后端不要求 WSL。上述原生检查在
-对应操作系统运行；表中明确区分已检查的项目和仍需补齐的验证。
-安装包状态见 [发布记录](docs/releasing.md)，对应源码与验收范围见
-[协议说明](docs/protocols.md#acceptance-coverage)。
-[当前候选记录](docs/native-candidates-2026-11-18.md)保留两轮 ARM64 失败及后续修复。
-Hyprland 图片属于历史验收，当前开发桌面的标准 Xwayland 端点不可用。
+对应操作系统运行，跨目标编译本身不代表运行或画面正确。
+[Windows 普通候选运行 44349551432](https://github.com/LIghtJUNction/ztty/actions/runs/44349551432)
+关闭了 paint 和 NC-policy 诊断；应用自身设置 DWM 非客户区策略，最终读回两种架构
+均已关闭 DWM 非客户区渲染。窗口保留标准系统边框及最小化、最大化、关闭按钮；
+本轮实际截图是经典浅蓝标题栏，不是现代深色 DWM 外框。
 
-默认显示 120×32 个字符。历史记录按需增长，字符存储最多 8 MiB；
+旧 `v0.3.0` tag 固定在 `9b5497d`，当时 Windows ARM 快速缩放失败，正式发布被跳过，
+Release-by-tag API 返回 404。设备后来确实安装了源码 `19274145` 的本地候选
+`ztty 0.3.0-1`，它与失败的 tag 不同源，也不是官方 Release 下载。
+完整 `0.3.1` 候选源码 `90ec70fe` 已在[运行 44365691692](https://github.com/LIghtJUNction/ztty/actions/runs/44365691692)
+通过六个原生架构任务；正式 tag 验证、实际发布资产和设备安装各有独立记录。
+[发布记录](docs/releasing.md)保留这些不同阶段；[协议说明](docs/protocols.md#acceptance-coverage)
+记录能力范围。Hyprland 图片属于历史验收，Xvfb 检查也不代表物理显示延迟或完整输入法矩阵。
+
+默认显示 120×32 个字符。历史记录按需增长，保留的字符与软换行元数据合计最多 8 MiB；
 历史达到上限后复用旧行。详细协议范围以 [英文 README](README.md)
 和 [协议说明](docs/protocols.md) 为准。
 
@@ -73,10 +88,10 @@ Hyprland 图片属于历史验收，当前开发桌面的标准 Xwayland 端点�
 | 库 | 当前源码版本 | 做什么 | 使用场景 |
 | --- | --- | --- | --- |
 | [`zvte`](https://github.com/LIghtJUNction/zvte) | 0.1.3 | 解析 ANSI/VT 字节流 | 只需要理解终端控制序列的程序 |
-| [`zinput`](crates/zinput) | 0.1.0 | 编码键盘、鼠标、焦点和粘贴事件 | 图形终端、远程终端、终端客户端 |
-| [`zterm`](crates/zterm) | 0.2.1 | 维护屏幕、历史、图片锚点、模式和协议回复 | 自定义终端界面、终端录制和回放 |
-| [`zpty`](crates/zpty) | 0.2.0 | 管理 Linux/macOS PTY 和 Windows ConPTY | 终端、进程控制、交互式测试工具 |
-| [`zgraphics`](crates/zgraphics) | 0.1.0 | 处理 Kitty 图形协议、Sixel、图片解码、存储和放置 | 需要图片支持的终端或回放工具 |
+| [`zinput`](crates/zinput) | 0.1.1 | 编码键盘、鼠标、焦点和粘贴事件 | 图形终端、远程终端、终端客户端 |
+| [`zterm`](crates/zterm) | 0.3.0 | 维护屏幕、历史、图片锚点、模式和协议回复 | 自定义终端界面、终端录制和回放 |
+| [`zpty`](crates/zpty) | 0.2.1 | 管理 Linux/macOS PTY 和 Windows ConPTY | 终端、进程控制、交互式测试工具 |
+| [`zgraphics`](crates/zgraphics) | 0.1.1 | 处理 Kitty 图形协议、Sixel、图片解码、存储和放置 | 需要图片支持的终端或回放工具 |
 
 这些库都有独立 Cargo 包。`zinput` 和 `zpty` 没有 Cargo 依赖；
 `zterm` 复用 Project Z 的 `zinput`、`zvte`、`zgraphics` 和 `no_std`
@@ -89,27 +104,27 @@ Unicode 宽度表。`zgraphics` 使用第三方 `zune-png`、`zune-core` 和
 不依赖 Rust 标准库仍然需要系统 API：Linux 使用 X11 等系统库，
 macOS 使用 Apple 框架，Windows 使用 Win32 和 ConPTY。
 
-[`zinput 0.1.0`](https://crates.io/crates/zinput/0.1.0)、
-[`zgraphics 0.1.0`](https://crates.io/crates/zgraphics/0.1.0)、
-[`zpty 0.2.0`](https://crates.io/crates/zpty/0.2.0) 和
-[`zterm 0.2.0`](https://crates.io/crates/zterm/0.2.0) 已发布到 crates.io。
-四个包均已在工作区之外验证单独及组合使用，依赖全部来自注册表，
-包括真实 PTY 会话与图像放置/删除。源码提交、包校验和与制品位置见
-[发布记录](docs/releasing.md)。
-当前源码中的 zterm 0.2.1 尚未在本轮发布到 crates.io。
+[`zinput 0.1.1`](https://crates.io/crates/zinput/0.1.1)、
+[`zgraphics 0.1.1`](https://crates.io/crates/zgraphics/0.1.1)、
+[`zpty 0.2.1`](https://crates.io/crates/zpty/0.2.1) 和
+[`zterm 0.3.0`](https://crates.io/crates/zterm/0.3.0) 已发布到 crates.io，
+与 `ztty 0.3.1` 应用的正式发布分别记录。
+[注册表记录](docs/releasing.md#published-packages)区分当前版本的 API 与校验和确认，
+以及较早版本在工作区外的独立消费者测试。
 
 ```sh
-cargo add zinput@0.1.0 --no-default-features
-cargo add zgraphics@0.1.0 --no-default-features
-cargo add zpty@0.2.0 --no-default-features
-cargo add zterm@0.2.0 --no-default-features
+cargo add zinput@0.1.1 --no-default-features
+cargo add zgraphics@0.1.1 --no-default-features
+cargo add zpty@0.2.1 --no-default-features
+cargo add zterm@0.3.0 --no-default-features
 cargo add zvte@0.1.3 --no-default-features
 ```
 
 ## Linux 安装与运行
 
-本文命令对应当前源码。安装脚本下载最新已发布标签的版本；尚未发布的改动
-请通过源码构建使用。
+本文命令对应当前源码。安装脚本下载最新已发布的
+[GitHub Release](https://github.com/LIghtJUNction/ztty/releases)，并非任意已有 tag；
+目前不会因为源码版本已改为 `0.3.1` 就下载到它。尚未发布的改动请通过源码构建使用。
 
 Arch Linux 可使用 `yay -S ztty`。其他 Linux 发行版可用一键安装脚本，
 自动选择 x86_64 或 ARM64 预编译包并校验 SHA256。
@@ -131,10 +146,35 @@ cargo build --locked --release
 ./target/release/ztty --font 'monospace:size=12' --geometry 100x28
 ```
 
-`make install` 安装到当前用户的 `~/.local`。Linux 下 Ctrl+Shift+C 复制，
+`make install` 通过安装器安装到当前用户的 `~/.local`；也可用
+`sh install.sh --from-binary ./target/release/ztty` 安装本地构建。
+安装器先暂存、校验再原子替换，保留一份旧文件供回滚；正在运行的共享 broker
+继续使用已加载的版本，不会因文件更新自动重启。
+Linux 下 Ctrl+Shift+C 复制，
 Ctrl+Shift+V 粘贴，Shift+拖拽在捕获鼠标的应用中选择文字，
-Shift+PageUp/PageDown 浏览历史，Ctrl+点击打开链接。
+Shift+PageUp/PageDown 或滚轮浏览历史，历史中的 **Back to live ↓** 入口回到底部，
+Ctrl+点击打开链接。
 应用捕获鼠标时，按住 Shift 可使用本地选择、滚轮历史和中键粘贴。
+
+Linux 和 Windows 的字体、标签页与分屏快捷键如下；macOS 尚未实现这组窗口操作，
+其复制、粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
+
+| 操作 | 快捷键 |
+| --- | --- |
+| 放大字体 | Ctrl+Plus 或 Ctrl+Equal；也可使用 Ctrl+Shift+Equal |
+| 缩小字体 | Ctrl+Minus 或 Ctrl+Shift+Minus |
+| 恢复配置中的字体 | Ctrl+0；Linux 也支持 Ctrl+Shift+0 |
+| 小键盘放大、缩小、恢复 | Ctrl+小键盘 Add / Subtract / 0；小键盘 0 需开启 Num Lock |
+| 下一个、上一个标签页 | Ctrl+Tab / Ctrl+Shift+Tab |
+| 增大、缩小当前分屏 | Ctrl+Alt+Shift+Equal / Minus |
+
+字体缩放保留窗口和正在运行的 PTY；Windows 会协调同一工作区的所有窗格。
+恢复字体时，Linux 使用最近成功加载的配置，Windows 使用启动时的配置。
+Windows 在多键盘布局下可能保留 Ctrl+Shift+0，因此优先使用 Ctrl+0；
+带 Shift 的别名仅在系统把按键交给 ztty 时生效。
+[微软对这一系统快捷键的说明](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size)。
+Linux 按当前键盘布局识别加号，包括通过 Shift 产生加号的按键。
+自定义绑定优先于默认绑定；Num Lock 关闭时，小键盘 0 仍按 Insert 处理。
 
 Linux/macOS 默认使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用
 `COMSPEC`，缺省为 `cmd.exe`。用 `-e` 指定其他命令、`--cwd PATH` 指定初始目录；
@@ -196,6 +236,10 @@ HTTP 支持配置主机和端口，端口 `0` 自动选择空闲端口。监听�
 HTTP 默认返回 JSON；SSE 模式先建立响应流，等待期间每五秒保活，完成后发送
 一个 JSON-RPC 结果并关闭连接。完整的客户端配置、工具参数和生命周期见
 [会话与 MCP](docs/sessions.md)。
+
+客户端可把先前创建、列出或读取结果中的会话身份作为 `expected_session`，
+用于读取、写入、改尺寸、申请控制权或关闭操作。URI、ID、创建时间或 broker PID
+不匹配时，带校验的修改会在执行前被拒绝，防止同名会话重建后操作了另一 PTY。
 
 `ztty --observe -e COMMAND` 新建只读命令窗口，启动时不请求焦点；关闭时结束
 这个窗口自己创建的子进程。`ztty attach --observe NAME` 连接既有会话，关闭
@@ -262,8 +306,9 @@ palette = 1=#e06c75
 Linux 透明度用百分比表示，仅作用于默认背景。模糊由桌面合成器实现，
 `background-blur` 控制兼容 KWin 的 X11 请求，Hyprland 使用自己的
 窗口规则。设为 `background-opacity = 100` 可让 Linux 窗口完全不透明。
-macOS 实现使用原生视觉效果视图提供模糊，Windows 当前使用不透明
-GDI 画布；三平台外观一致性仍待原生验收。
+macOS 实现使用原生视觉效果视图提供模糊，Windows 使用不透明 GDI 画布，
+当前候选采用系统标准非客户区边框，关闭 DWM 非客户区渲染。
+标题栏外观随系统主题而变；本轮 Windows 截图为经典浅蓝边框。
 
 光标支持方块 `block`、下划线 `underline` 和竖线 `bar`，闪烁间隔
 以毫秒为单位。终端应用可以通过 DECSCUSR 和 DEC 私有模式 12
@@ -316,6 +361,10 @@ python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 `ztty detach NAME` 保留 PTY；`ztty attach --observe NAME` 打开观察视图。
 [操作、权限与真实验收记录](docs/workspaces.md)。
 
-三个前端已接入同一 no_std 会话库，统一 PTY 读写、有界输入和终端状态。[核心说明与真实 PTY 验收](docs/session-core.md)覆盖部分写入与尺寸提交顺序。Linux 集成及跨目标类型检查通过；新 macOS、Windows 路径仍需下一轮原生执行，原生共享会话、Attach 和 MCP 尚未补齐。
+三个前端使用同一 no_std 会话库处理 PTY 读写、有界输入和终端状态。
+[核心说明与真实 PTY 验收](docs/session-core.md)覆盖部分写入与尺寸提交顺序。
+Windows 已有本地标签页与分屏；跨窗口共享会话、Attach 和 MCP 仍是 Linux 功能，
+macOS 工作区界面也尚未补齐。各原生版本的实际验收以本页平台表和发布记录为准。
 
-下一轮 Windows 候选将在测试自有的可见桌面运行原有像素检查，并强制核验进程清理与桌面恢复。[原生验收机制](docs/native-candidates-2026-11-18.md#owned-windows-ci-desktop)。
+Windows 门禁在测试自有的可见桌面执行原像素检查，并核验进程清理与桌面恢复。
+[原生验收机制](docs/native-candidates-2026-11-18.md#owned-windows-ci-desktop)。

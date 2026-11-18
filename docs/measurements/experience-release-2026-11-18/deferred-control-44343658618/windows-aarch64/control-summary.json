@@ -1,0 +1,405 @@
+{
+  "run_id": 44343658618,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44343658618",
+  "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+  "architecture": "aarch64",
+  "job_id": 134940244157,
+  "artifact_id": 14445626121,
+  "diagnostic_only": true,
+  "ordinary_acceptance_credit": false,
+  "passed": false,
+  "required": 16,
+  "completed": 0,
+  "attempted": 1,
+  "distinct_control_pids": 1,
+  "failed_control": {
+    "number": 1,
+    "pid": 9252,
+    "hwnd": 2687012,
+    "client_sample": [
+      175,
+      28
+    ],
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "blue_sample_175_45": [
+      20,
+      20,
+      20
+    ],
+    "generic_sample_178_95": [
+      20,
+      20,
+      20
+    ],
+    "difference_bbox": [
+      152,
+      0,
+      180,
+      190
+    ],
+    "restored_equals_failure_png": true,
+    "failure_png": "ztty-windows-aarch64.resize-control.cold-01.failure.png",
+    "failed_pixels": {
+      "name": "restored",
+      "samples": [
+        {
+          "client": [
+            175,
+            28
+          ],
+          "screen": [
+            215,
+            91
+          ],
+          "rgb": [
+            20,
+            20,
+            20
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2687012,
+          "pid_at_point": 9252,
+          "owned": true,
+          "visible": true
+        }
+      ],
+      "window": {
+        "client": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "monitor": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "dpi": 96,
+        "hwnd": 2687012,
+        "pid": 9252,
+        "foreground": 2687012,
+        "visible": true,
+        "minimized": false
+      }
+    },
+    "startup": {
+      "pid": 9252,
+      "dpi_awareness": -4,
+      "class_style": 3,
+      "window_style": 13565952,
+      "background_brush_null": true,
+      "creation_position": {
+        "x": "CW_USEDEFAULT",
+        "y": "CW_USEDEFAULT"
+      },
+      "resize_policy": "deferred_until_paint",
+      "dark_attribute": 20,
+      "dark_value": 1,
+      "dark_hresult": 0,
+      "valid_rect_policy": "default",
+      "nocopybits_added": false
+    },
+    "window_placement": {
+      "before": {
+        "client": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "outer": [
+          26,
+          26,
+          222,
+          255
+        ],
+        "monitor": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "dpi": 96,
+        "hwnd": 2687012,
+        "pid": 9252,
+        "foreground": 2687012,
+        "visible": true,
+        "minimized": false
+      },
+      "requested_position": [
+        32,
+        32
+      ],
+      "placement_flags": 1,
+      "requested_topmost": true,
+      "visible_before_required": true,
+      "after": {
+        "client": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "monitor": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "dpi": 96,
+        "hwnd": 2687012,
+        "pid": 9252,
+        "foreground": 2687012,
+        "visible": true,
+        "minimized": false
+      },
+      "moved": true,
+      "position_delta": [
+        6,
+        6
+      ]
+    },
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 0
+    }
+  },
+  "control_binary_sha256": "d91177f9f12b19941532e5f3cd00e2f40255a787f838a19cf877542a9ffaa342",
+  "raw_report": "ztty-windows-aarch64.resize-control.json",
+  "raw_report_sha256": "c1cdddb6ebe629fdecc3ac8d70285c23542725855b571204aac48fd0e82bea3c",
+  "raw_c_source_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6",
+  "immutable_git_c_sha256": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+  "raw_c_crlf_lines": 155,
+  "reports": [
+    {
+      "number": 1,
+      "report": "ztty-windows-aarch64.resize-control.cold-01.json",
+      "report_sha256": "6484bc7b3138b7a02cb3fee4d50a5f7f57aff3054a070a6a6892aab116675460",
+      "passed": false,
+      "pid": 9252,
+      "hwnd": 2687012,
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2687012,
+          "pid": 9252,
+          "foreground": 2687012,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2687012,
+          "pid": 9252,
+          "foreground": 2687012,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    }
+  ],
+  "pngs_verified": 4,
+  "geometry_samples_verified": 9,
+  "unique_png_contents": 3,
+  "startup_contract": {
+    "pid": 9252,
+    "dpi_awareness": -4,
+    "class_style": 3,
+    "window_style": 13565952,
+    "background_brush_null": true,
+    "creation_position": {
+      "x": "CW_USEDEFAULT",
+      "y": "CW_USEDEFAULT"
+    },
+    "resize_policy": "deferred_until_paint",
+    "dark_attribute": 20,
+    "dark_value": 1,
+    "dark_hresult": 0,
+    "valid_rect_policy": "default",
+    "nocopybits_added": false
+  },
+  "all_startup_pid_values_matched_their_process": true,
+  "window_geometry": {
+    "before_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "shrunk_outer": [
+      32,
+      32,
+      192,
+      261
+    ],
+    "restored_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "client_origin": [
+      40,
+      63
+    ],
+    "dpi": 96
+  },
+  "creation_and_placement_scope": {
+    "immutable_c_requests_creation_xy": [
+      "CW_USEDEFAULT",
+      "CW_USEDEFAULT"
+    ],
+    "harness_requests_placement_xy": [
+      32,
+      32
+    ],
+    "actual_pre_placement_outer_was_recorded": true,
+    "all_attempted_moved": true,
+    "observed_creation_positions": [
+      [
+        26,
+        26
+      ]
+    ],
+    "limit": "Actual visible placement moves are observed in every attempted control. Compared with ee4fb3, the independent C program changes only resize application timing fromWM_SIZE toWM_PAINT plus its descriptive startup field; the Python harness is byte-identical. The control has no terminal/PTY and still reproduces a gray strip, supporting a focused synchronous-WM_SIZE candidate. It does not observe internal compositor/copy operations or prove a production fix."
+  },
+  "cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-control-11044-118863cb0e7d45b1a839ad0446b4710d",
+    "input_after_restore": "Default"
+  },
+  "worker_elapsed_seconds": 10.265,
+  "worker_exit_code": 1,
+  "temporary_directory_scope": "Control creates no per-run TemporaryDirectory. Owned process exits and Job/desktop cleanup are verified; the generic cleanup flag does not assert deletion of sixteen nonexistent directories.",
+  "scope": "Independent retained-DIB Win32 diagnostic control with deferred resize. The first failed restore stops the fixed16-run sequence: x64 has7 complete then cold8 fails; ARM fails cold1. Both failures are exact gray20,20,20 at175,28 with owned visible windows, difference bounds152,0,180,190 and complete cleanup. Failure remains failure; no native process was rerun during audit.",
+  "artifact_verification": "control-artifact-verification.json",
+  "png_analysis": "control-png-analysis.json"
+}

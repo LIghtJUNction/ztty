@@ -1,0 +1,640 @@
+{
+  "diagnostic_only": true,
+  "run_id": 44335859956,
+  "source_sha": "ce176ffb96f6e000e71af88f8f8ce5395e085967",
+  "architecture": "aarch64",
+  "status": "passed",
+  "required": 16,
+  "completed": 16,
+  "independent_pids": [
+    10924,
+    4092,
+    2664,
+    7132,
+    10764,
+    10468,
+    8844,
+    6824,
+    4652,
+    1984,
+    9740,
+    5920,
+    11180,
+    7584,
+    5308,
+    11176
+  ],
+  "independent_pid_count": 16,
+  "reports": [
+    {
+      "number": 1,
+      "report": "ztty-windows-aarch64.resize-control.cold-01.json",
+      "report_sha256": "ea02b8a85540f0da0bfe09a4a6541ab7e62e492344653bde2a67d84556ede13c",
+      "pid": 10924,
+      "hwnd": 1311214,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          26,
+          26,
+          222,
+          255
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "report": "ztty-windows-aarch64.resize-control.cold-02.json",
+      "report_sha256": "4279a3ddfe3638a32be9e4f4cd13b3b8d7b60ab1a0367535fda43e8c8db4b929",
+      "pid": 4092,
+      "hwnd": 1376750,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          26,
+          26,
+          222,
+          255
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "number": 3,
+      "report": "ztty-windows-aarch64.resize-control.cold-03.json",
+      "report_sha256": "4749abee9a14d20fbe09d53def24df9ded8514dc61da5be8409d25514f5a18ca",
+      "pid": 2664,
+      "hwnd": 1442286,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          52,
+          52,
+          248,
+          281
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      }
+    },
+    {
+      "number": 4,
+      "report": "ztty-windows-aarch64.resize-control.cold-04.json",
+      "report_sha256": "f05a7044b797098b9227cd8203b8073cc9bfec55f9bf2a9badced1824efc3c12",
+      "pid": 7132,
+      "hwnd": 1507822,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          78,
+          78,
+          274,
+          307
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -46,
+          -46
+        ]
+      }
+    },
+    {
+      "number": 5,
+      "report": "ztty-windows-aarch64.resize-control.cold-05.json",
+      "report_sha256": "f8b7b5b4b1b734ddc1dfb71cc65ee18414fafd7c3f587b4d12e7b7374670be82",
+      "pid": 10764,
+      "hwnd": 1573358,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          104,
+          104,
+          300,
+          333
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -72,
+          -72
+        ]
+      }
+    },
+    {
+      "number": 6,
+      "report": "ztty-windows-aarch64.resize-control.cold-06.json",
+      "report_sha256": "1e1d4864982487daff25079fe605feed2a6bc0d4e2c9a148ae28f08cc1dfd0aa",
+      "pid": 10468,
+      "hwnd": 1638894,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          130,
+          130,
+          326,
+          359
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -98,
+          -98
+        ]
+      }
+    },
+    {
+      "number": 7,
+      "report": "ztty-windows-aarch64.resize-control.cold-07.json",
+      "report_sha256": "f27f886a77f71b1bbaad28ace82e12460ef03dae172db861ba1b3352efb8466f",
+      "pid": 8844,
+      "hwnd": 1704430,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          156,
+          156,
+          352,
+          385
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -124,
+          -124
+        ]
+      }
+    },
+    {
+      "number": 8,
+      "report": "ztty-windows-aarch64.resize-control.cold-08.json",
+      "report_sha256": "17b7fd380c5ae7adedc1c16beab9adc56bb13681f7ae5e09287362204ff4260b",
+      "pid": 6824,
+      "hwnd": 1769966,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          26,
+          26,
+          222,
+          255
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "number": 9,
+      "report": "ztty-windows-aarch64.resize-control.cold-09.json",
+      "report_sha256": "339e7ab38a7a37834b21efa0046a16abd28da5bc9ff33dee031641d58d0d34c0",
+      "pid": 4652,
+      "hwnd": 1835502,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          26,
+          26,
+          222,
+          255
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "number": 10,
+      "report": "ztty-windows-aarch64.resize-control.cold-10.json",
+      "report_sha256": "0009b984b46d8a265a6d1326dbdd2c88fbdfa6c799d97562e4f210912ca36034",
+      "pid": 1984,
+      "hwnd": 1901038,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          52,
+          52,
+          248,
+          281
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      }
+    },
+    {
+      "number": 11,
+      "report": "ztty-windows-aarch64.resize-control.cold-11.json",
+      "report_sha256": "616a5ec4a98e4c0186bc5871a2bdd189c8d5b095d0fa0337a42ecdcad430758e",
+      "pid": 9740,
+      "hwnd": 1966574,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          78,
+          78,
+          274,
+          307
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -46,
+          -46
+        ]
+      }
+    },
+    {
+      "number": 12,
+      "report": "ztty-windows-aarch64.resize-control.cold-12.json",
+      "report_sha256": "4666f7a5d32696a5e90976e1cf3672ef74198c390e9e7c7ee13d66ec469e9495",
+      "pid": 5920,
+      "hwnd": 2032110,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          104,
+          104,
+          300,
+          333
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -72,
+          -72
+        ]
+      }
+    },
+    {
+      "number": 13,
+      "report": "ztty-windows-aarch64.resize-control.cold-13.json",
+      "report_sha256": "595b1ce3838bc6af3bf4afefc55440c424971e6be77ee166ebe57136f89b6e64",
+      "pid": 11180,
+      "hwnd": 2097646,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          130,
+          130,
+          326,
+          359
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -98,
+          -98
+        ]
+      }
+    },
+    {
+      "number": 14,
+      "report": "ztty-windows-aarch64.resize-control.cold-14.json",
+      "report_sha256": "2b7a932ba59e8041ee02cc8ef3dff96bdb20d776b311af2913ea60f6b029d675",
+      "pid": 7584,
+      "hwnd": 2163182,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          156,
+          156,
+          352,
+          385
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          -124,
+          -124
+        ]
+      }
+    },
+    {
+      "number": 15,
+      "report": "ztty-windows-aarch64.resize-control.cold-15.json",
+      "report_sha256": "2be578c0e7672ffafc5fe60e18fb54fa51311c0d6af9945aa283e0a549cd4153",
+      "pid": 5308,
+      "hwnd": 2228718,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          26,
+          26,
+          222,
+          255
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      }
+    },
+    {
+      "number": 16,
+      "report": "ztty-windows-aarch64.resize-control.cold-16.json",
+      "report_sha256": "41aaf99afb9e9e20061a261c106d7e20fe38d986e96ffe12597f686bb164dd90",
+      "pid": 11176,
+      "hwnd": 2294254,
+      "checks": 3,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "placement": {
+        "before_outer": [
+          26,
+          26,
+          222,
+          255
+        ],
+        "after_outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      }
+    }
+  ],
+  "binary_sha256": "7cd8f49b170a19a978e2ed235d75161811ae66b372c39c010774bd602ac3c94d",
+  "package": {
+    "zip_sha256": "833acb57001e6db389195329da7b94e3a782cf2faf927d4a240617b3c765ad47",
+    "files_verified": [
+      "windows_resize_control.c",
+      "ztty-resize-control.exe"
+    ],
+    "manifest_source_run_architecture_verified": true,
+    "binary_sha256": "7cd8f49b170a19a978e2ed235d75161811ae66b372c39c010774bd602ac3c94d",
+    "binary_machine": 43620,
+    "c_source_raw_sha256": "50a2a1aeb3b436b75b35e7992f93ed9d4e004bed2496f9cfd6fe04a4dc898de9",
+    "c_source_commit_sha256": "aa6300e5f0d6088a1c7f44dbd5522186abd02d1bc5334e3a0e8c817477871325",
+    "c_source_raw_bytes": 5900,
+    "c_source_commit_bytes": 5750,
+    "c_source_crlf_lines": 150,
+    "source_matches_commit_after_crlf_to_lf": true,
+    "source_matching_rule": "Only CRLF to LF; all other bytes match immutable commit."
+  },
+  "pngs_verified": 48,
+  "pixel_samples_verified": 144,
+  "cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-control-1976-ee4444e76b8b4b76b581c1b2d662f37d",
+    "input_after_restore": "Default"
+  },
+  "desktop_elapsed_seconds": 1.25,
+  "starting_position_scope": {
+    "control_requested_creation_position": "CW_USEDEFAULT",
+    "control_pre_placement_position_recorded": true,
+    "control_measurement_position": [
+      32,
+      32
+    ],
+    "all_16_actual_moves_observed": true,
+    "default_creation_then_real_move_verified": true,
+    "control_initial_positions": [
+      [
+        26,
+        26
+      ],
+      [
+        52,
+        52
+      ],
+      [
+        78,
+        78
+      ],
+      [
+        104,
+        104
+      ],
+      [
+        130,
+        130
+      ],
+      [
+        156,
+        156
+      ]
+    ],
+    "ztty_failed_process_outer_before_placement": [
+      156,
+      156,
+      352,
+      385
+    ],
+    "ztty_measurement_outer": [
+      32,
+      32,
+      228,
+      261
+    ]
+  },
+  "scope": "The independent standard Win32 control passed all sixteen owned processes after default-position creation and a verified actual move to [32,32]. Every process retained the original ignored [0,0] and 0x16 resize calls, the original geometry and the ten-second pixel criterion. This matches that creation/movement sequence but does not eliminate other application paint-state, threading or timing differences. The original ztty gate remains failed. No CI rerun or extra binary execution was performed during this audit."
+}

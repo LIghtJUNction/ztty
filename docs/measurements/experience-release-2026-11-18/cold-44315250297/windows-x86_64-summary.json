@@ -1,0 +1,383 @@
+{
+  "run_id": 44315250297,
+  "source_sha": "504fa770a97069e32bed4d8f45616066d5c4dbc5",
+  "architecture": "x86_64",
+  "job_id": 134839617647,
+  "artifact_id": 14432830932,
+  "artifact_zip_sha256": "f814c2ac32c01c6d7d23924bd1727bf947a162c76445671ef11091793faded62",
+  "binary_sha256": "23962f6b31bb81670226fd7023c239c507d31f91ad5af4d04ed8d445334f20f0",
+  "passed": false,
+  "build_status": "failed",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "required_cold_starts": 8,
+  "completed_cold_starts": 7,
+  "attempted_cold_starts": 8,
+  "cold_runs": [
+    {
+      "number": 1,
+      "raw_report": "ztty-windows-x86_64.native.cold-01.json",
+      "raw_report_sha256": "1f29b4af13ddc7d503fc31aae48abaa7764fc54d41ba2184c5c5117bacf51a1b",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "pid": 6876,
+      "hwnd": 393284,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 2,
+      "raw_report": "ztty-windows-x86_64.native.cold-02.json",
+      "raw_report_sha256": "c2f3c9dd22102d760cf1b2d6242730c8447427ec63d6da7363ac694e1013bcdb",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "pid": 6572,
+      "hwnd": 524660,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 3,
+      "raw_report": "ztty-windows-x86_64.native.cold-03.json",
+      "raw_report_sha256": "e91bee1eac37487283c5c25ec32978c73d19366939ce7936e54c8c979ccbb01f",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "pid": 1292,
+      "hwnd": 852100,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 4,
+      "raw_report": "ztty-windows-x86_64.native.cold-04.json",
+      "raw_report_sha256": "5ed7ed90ce2aee2465146051e3f7defd94acd818f3901355ef9394878d6ea574",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "pid": 2812,
+      "hwnd": 1638416,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 5,
+      "raw_report": "ztty-windows-x86_64.native.cold-05.json",
+      "raw_report_sha256": "0c0a14db576414e8891c20911c792bb45046ea8e533b6aa297726559c1151510",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "pid": 6620,
+      "hwnd": 1573204,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 6,
+      "raw_report": "ztty-windows-x86_64.native.cold-06.json",
+      "raw_report_sha256": "94653dfc3db751e740c7dc4829c6c1694d82fda960fd74ac51be71f10ff4270d",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "pid": 3480,
+      "hwnd": 2031724,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 7,
+      "raw_report": "ztty-windows-x86_64.native.cold-07.json",
+      "raw_report_sha256": "8489abb1d143296ae693a6d6cde885d763dcde1a80457c2de4a10e91ccf8f1b3",
+      "passed": true,
+      "checks": 31,
+      "warm_completed": 10,
+      "pid": 3152,
+      "hwnd": 2162756,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 8,
+      "raw_report": "ztty-windows-x86_64.native.cold-08.json",
+      "raw_report_sha256": "6ef6fada7f313dc520cc66ae4b3266261b5f85ef542afa33d9d38ece86923c74",
+      "passed": false,
+      "checks": 23,
+      "warm_completed": 0,
+      "pid": 8576,
+      "hwnd": 2294132,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    }
+  ],
+  "workspace": {
+    "executed": false,
+    "checks": 0
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-8288-36a2ccc3a33f4c2daf042862a2d4faec",
+    "input_after_restore": "Default"
+  },
+  "worker_elapsed_seconds": 20.206,
+  "worker_exit_code": 1,
+  "png_count": 251,
+  "png_reference_hashes_dimensions_verified": true,
+  "resize_samples_verified_against_png": 390,
+  "failure": {
+    "raw_report": "ztty-windows-x86_64.native.cold-08.json",
+    "raw_report_sha256": "6ef6fada7f313dc520cc66ae4b3266261b5f85ef542afa33d9d38ece86923c74",
+    "name": "resize_restores_visible_image",
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      0,
+      0,
+      0
+    ],
+    "pid": 8576,
+    "hwnd": 2294132,
+    "client": [
+      180,
+      190
+    ],
+    "sample": [
+      175,
+      28
+    ],
+    "snapshot_raw": "ztty-windows-x86_64.native.cold-08.post-failure.json",
+    "snapshot_sha256": "22ec63c960a683cbb8d955acbdbd524c829a01448492a51a0dd4012627c50c41",
+    "snapshot_state": {
+      "schema": 1,
+      "pid": 8576,
+      "hwnd": 2294132,
+      "sample": [
+        175,
+        28
+      ],
+      "before": {
+        "surface": {
+          "size": [
+            180,
+            190
+          ],
+          "clip": [
+            0,
+            0,
+            180,
+            190
+          ]
+        },
+        "cpu_rgb": [
+          255,
+          0,
+          0
+        ],
+        "dispatch_resize_pending": false,
+        "app_resize_pending": false,
+        "full_redraw": false,
+        "pane": {
+          "rect": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "grid": [
+            20,
+            10
+          ],
+          "pty": [
+            20,
+            10
+          ],
+          "images": 1,
+          "placements": 1,
+          "dirty": false,
+          "terminal_dirty": false,
+          "grid_ready": true,
+          "synchronized_output": false
+        },
+        "last_paint": {
+          "sequence": 21,
+          "surface": [
+            180,
+            190
+          ],
+          "region": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "blit": 1
+        }
+      },
+      "client_ok": true,
+      "client": [
+        180,
+        190
+      ],
+      "update_pending": false,
+      "update_rect": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "after_flush": {
+        "flush": 1,
+        "cpu_rgb": [
+          255,
+          0,
+          0
+        ],
+        "bitmap_read": 32,
+        "bitmap": [
+          180,
+          190
+        ],
+        "bitmap_matches": true,
+        "source_rgb": [
+          255,
+          0,
+          0
+        ],
+        "target_rgb": [
+          0,
+          0,
+          0
+        ],
+        "source_clip_type": 2,
+        "source_clip": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "target_clip_type": 2,
+        "target_clip": [
+          0,
+          0,
+          180,
+          190
+        ]
+      }
+    },
+    "after_flush_client_rgb": [
+      0,
+      0,
+      0
+    ],
+    "after_flush_screen_rgb": [
+      0,
+      0,
+      0
+    ],
+    "after_repaint_client_rgb": [
+      255,
+      0,
+      0
+    ],
+    "after_repaint_screen_rgb": [
+      255,
+      0,
+      0
+    ],
+    "original_gate_remains_failed": true,
+    "png_vertical_regions": {
+      "rows_0_through_188": [
+        [
+          0,
+          151,
+          [
+            16,
+            24,
+            32
+          ]
+        ],
+        [
+          152,
+          178,
+          [
+            0,
+            0,
+            0
+          ]
+        ],
+        [
+          179,
+          179,
+          [
+            47,
+            47,
+            47
+          ]
+        ]
+      ],
+      "row_189": [
+        [
+          0,
+          151,
+          [
+            16,
+            24,
+            32
+          ]
+        ],
+        [
+          152,
+          179,
+          [
+            47,
+            47,
+            47
+          ]
+        ]
+      ]
+    },
+    "failed_and_after_flush_png_identical": true,
+    "before_and_after_repaint_png_identical": true
+  },
+  "scope": "Actual original untraced rapid failure on cold start 8; surface/model/source pixel correct; explicit GDI flush does not recover target; normal repaint recovers. No production fix or acceptance inferred from diagnostic recovery.",
+  "visual_review": {
+    "png_files": 251,
+    "unique_images_inspected": 4,
+    "duplicates_verified_by_sha256": true
+  }
+}

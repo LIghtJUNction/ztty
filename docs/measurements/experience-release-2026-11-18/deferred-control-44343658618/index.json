@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "run_id": 44343658618,
+  "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44343658618",
+  "status": "failed",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "ordinary_acceptance_credit": false,
+  "formal_release_eligible": false,
+  "native": {
+    "x86_64": {
+      "completed_cold": 0,
+      "failed_original_process": 1,
+      "original_checks_completed_before_failure": 23,
+      "failed_pid": 6392,
+      "failed_pixel": [
+        0,
+        0,
+        0
+      ],
+      "workspace_entered": false
+    },
+    "aarch64": {
+      "completed_cold": 7,
+      "failed_cold": 8,
+      "original_checks_completed_before_failure": 23,
+      "failed_pid": 7208,
+      "failed_pixel": [
+        20,
+        20,
+        20
+      ],
+      "workspace_entered": false
+    }
+  },
+  "control": {
+    "x86_64": {
+      "required": 16,
+      "completed": 7,
+      "failed_run": 8,
+      "failed_pid": 2452,
+      "failed_pixel": [
+        20,
+        20,
+        20
+      ]
+    },
+    "aarch64": {
+      "required": 16,
+      "completed": 0,
+      "failed_run": 1,
+      "failed_pid": 9252,
+      "failed_pixel": [
+        20,
+        20,
+        20
+      ]
+    }
+  },
+  "dib_resize_evidence": {
+    "count_including_initial_allocation": 3,
+    "last_from": [
+      144,
+      190
+    ],
+    "last_to": [
+      180,
+      190
+    ],
+    "scope": "Both original failed terminal processes show this actual successful surface-size change; the smaller DIB was not skipped in these failures."
+  },
+  "source_comparison": {
+    "previous_source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+    "changed_paths": [
+      "src/platform/windows.rs",
+      "tests/windows_resize_control.c"
+    ],
+    "unchanged_harnesses": {
+      "tests/windows_resize_control.py": {
+        "old_sha256": "791e79ce9338ac44461bfe6d1781ce0d900533b31b19aeb032a780dcc8ad1b37",
+        "new_sha256": "791e79ce9338ac44461bfe6d1781ce0d900533b31b19aeb032a780dcc8ad1b37"
+      },
+      "tests/windows_native.py": {
+        "old_sha256": "51724c30edf0a1b0d649fdc9ec6d4f6d3c26df44aa9f6ff4e428ad618c2b2ee4",
+        "new_sha256": "51724c30edf0a1b0d649fdc9ec6d4f6d3c26df44aa9f6ff4e428ad618c2b2ee4"
+      },
+      "tests/windows_desktop.py": {
+        "old_sha256": "c05c9a8a0045418a1750f08e5039c0b1ae960036627e34d09dbc187f0d1dfd5b",
+        "new_sha256": "c05c9a8a0045418a1750f08e5039c0b1ae960036627e34d09dbc187f0d1dfd5b"
+      }
+    },
+    "control_change": "Only resize application timing: WM_SIZE sets pending/invalidate; WM_PAINT consumes latest client size and prepares DIB before BeginPaint, retaining any nested pending invalidation. Startup gains a descriptive resize_policy field.",
+    "runtime_change": "Only failure-snapshot DIB allocation/size-change diagnostics, no production resize-policy fix."
+  },
+  "architecture_indexes": [
+    "windows-x86_64/evidence-index.json",
+    "windows-aarch64/evidence-index.json"
+  ],
+  "limits": [
+    "Both controls failed under the unchanged10-second pixel gate; no later control could overwrite failure.",
+    "A terminal-free and PTY-free Win32 program reproduces a similar right-edge region after deferring resize. This supports a focused timing hypothesis, not proof of internal system causality or a completed production repair.",
+    "x64 terminal actual black differs from both control actual gray. Similar bounding rectangles do not make every pixel identical.",
+    "Original x64 failure, independent rapid trace failure, and independent staged trace pass are separate records. Staged warm8 ScreenDC is theme while ClientDC/PNG is red.",
+    "These separate CI executions are not failure-rate estimates. Diagnostic flags and queries may affect timing.",
+    "A subsequent synchronous-WM_SIZE normal-mode candidate also failed; its independent evidence belongs to a later section.",
+    "All WndProc entries for each failed HWND are counted. The231→232 increment is the snapshot entry, so there is no other same-HWND entry after the post-EndPaint sample. Detailed phases cover six message types; other HWNDs/threads, internal copy/composition and SetWindowPos return time remain outside this observation."
+  ],
+  "wndproc_counter_scope": {
+    "counter_coverage": "Every WndProc entry for this initialized HWND is counted before message-specific dispatch while diagnostics are enabled.",
+    "detailed_message_phases_retained": 6,
+    "after_end_sample_sequence": 231,
+    "snapshot_message_entry_sequence": 232,
+    "intervening_other_same_hwnd_wndproc_entries": 0,
+    "interpretation": "The single increment from231 to232 is the WM_NATIVE_SNAPSHOT entry itself; it excludes any other same-HWND WndProc entry in between, not merely the six detailed message types.",
+    "not_observed": [
+      "Other HWNDs",
+      "Other threads",
+      "Window Manager internal backing copies or composition",
+      "The return time of SetWindowPos on another thread"
+    ],
+    "source_code_review": [
+      {
+        "source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+        "file_sha256": "ba77fa5a6869ac6215a3686227beaf9f75564a58340a6d0859041c31b5958bbc",
+        "received_sha256": "f59802c4b29359ff83e1cf51b26b8444a2d655dd9124b71b455f0a8c1d597727",
+        "all_entry_count_before_filter": true,
+        "same_counter_after_EndPaint_and_snapshot_entry": true
+      },
+      {
+        "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+        "file_sha256": "8ca782f9cf91eb30af109ab37c8febb2e96eece5d8b882c04416a8a935e9418a",
+        "received_sha256": "f59802c4b29359ff83e1cf51b26b8444a2d655dd9124b71b455f0a8c1d597727",
+        "all_entry_count_before_filter": true,
+        "same_counter_after_EndPaint_and_snapshot_entry": true
+      }
+    ]
+  },
+  "frozen_summary_interpretation_note": "All copied audit summaries and raw reports retain their frozen bytes and hashes. Where an earlier summary describes only tracked position/nonclient callbacks or uninstrumented messages, use the clarified counter scope here: entry counting covers all messages for this HWND, while only six message types retain detailed phases."
+}

@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "run_id": 44341581701,
+  "source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44341581701",
+  "status": "failed",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "ordinary_acceptance_credit": false,
+  "formal_release_eligible": false,
+  "native": {
+    "x86_64": {
+      "completed_cold": 8,
+      "workspace_checks": 19,
+      "passed": true
+    },
+    "aarch64": {
+      "completed_cold": 6,
+      "failed_cold": 7,
+      "original_checks_completed_before_failure": 23,
+      "failed_pid": 7404,
+      "failed_pixel": [
+        20,
+        20,
+        20
+      ],
+      "workspace_entered": false
+    }
+  },
+  "control": {
+    "x86_64": {
+      "completed": 16,
+      "passed": true
+    },
+    "aarch64": {
+      "completed": 16,
+      "passed": true
+    }
+  },
+  "exact_point_evidence": {
+    "sample": [
+      175,
+      28
+    ],
+    "before_end_paint": [
+      255,
+      0,
+      0
+    ],
+    "after_end_paint": [
+      255,
+      0,
+      0
+    ],
+    "later_failed": [
+      20,
+      20,
+      20
+    ],
+    "paint_end_event": 230,
+    "after_end_sample_event": 231,
+    "snapshot_event": 232
+  },
+  "architecture_indexes": [
+    "windows-x86_64/evidence-index.json",
+    "windows-aarch64/evidence-index.json"
+  ],
+  "limits": [
+    "Extra paint queries are explicitly enabled; successful runs receive no ordinary acceptance credit.",
+    "All WndProc entries for this HWND are counted; detailed phases are retained for six message types. The231→232 increment excludes another same-HWND entry before the snapshot. Other HWNDs, other threads, system-internal copy/composition and SetWindowPos return time remain unobserved.",
+    "The same gate point is sampled across EndPaint; the later color change is observed, but its mechanism remains unknown.",
+    "Control uses a retained DIB with immediate WM_SIZE resize, default valid rectangles and no terminal/PTY. Its success does not exclude all paths in the terminal.",
+    "No formal release or official-asset installation is established by this run."
+  ],
+  "wndproc_counter_scope": {
+    "counter_coverage": "Every WndProc entry for this initialized HWND is counted before message-specific dispatch while diagnostics are enabled.",
+    "detailed_message_phases_retained": 6,
+    "after_end_sample_sequence": 231,
+    "snapshot_message_entry_sequence": 232,
+    "intervening_other_same_hwnd_wndproc_entries": 0,
+    "interpretation": "The single increment from231 to232 is the WM_NATIVE_SNAPSHOT entry itself; it excludes any other same-HWND WndProc entry in between, not merely the six detailed message types.",
+    "not_observed": [
+      "Other HWNDs",
+      "Other threads",
+      "Window Manager internal backing copies or composition",
+      "The return time of SetWindowPos on another thread"
+    ],
+    "source_code_review": [
+      {
+        "source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+        "file_sha256": "ba77fa5a6869ac6215a3686227beaf9f75564a58340a6d0859041c31b5958bbc",
+        "received_sha256": "f59802c4b29359ff83e1cf51b26b8444a2d655dd9124b71b455f0a8c1d597727",
+        "all_entry_count_before_filter": true,
+        "same_counter_after_EndPaint_and_snapshot_entry": true
+      },
+      {
+        "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+        "file_sha256": "8ca782f9cf91eb30af109ab37c8febb2e96eece5d8b882c04416a8a935e9418a",
+        "received_sha256": "f59802c4b29359ff83e1cf51b26b8444a2d655dd9124b71b455f0a8c1d597727",
+        "all_entry_count_before_filter": true,
+        "same_counter_after_EndPaint_and_snapshot_entry": true
+      }
+    ]
+  },
+  "frozen_summary_interpretation_note": "All copied audit summaries and raw reports retain their frozen bytes and hashes. Where an earlier summary describes only tracked position/nonclient callbacks or uninstrumented messages, use the clarified counter scope here: entry counting covers all messages for this HWND, while only six message types retain detailed phases."
+}

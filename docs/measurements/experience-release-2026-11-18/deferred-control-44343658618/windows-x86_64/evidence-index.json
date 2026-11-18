@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+  "run_id": 44343658618,
+  "job_id": 134940244128,
+  "architecture": "x86_64",
+  "artifact_id": 14443863946,
+  "artifact_zip_sha256": "e9405c7afba7e26a353d48c92ee361f5eca78d230629f467486b97d66cd5c474",
+  "binary_sha256": "2ed5e2b2d53a0498eb9cb13ae305abaa24ed6cb5e9e4883d33e41e9f68b18e01",
+  "build_only": true,
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "ordinary_acceptance_credit": false,
+  "formal_release_eligible": false,
+  "native_passed": false,
+  "cold_required": 8,
+  "cold_completed": 0,
+  "cold_attempted": 1,
+  "control": {
+    "diagnostic_only": true,
+    "passed": false,
+    "required": 16,
+    "completed": 7,
+    "attempted": 8,
+    "binary_sha256": "b0a78958ef8ba817a1d5dbdd4ff54a49011b4e4fa9c07a41bb8e7b6c6e6f94c5",
+    "raw_c_source": {
+      "raw_artifact_bytes": 6198,
+      "raw_artifact_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6",
+      "crlf_lines": 155,
+      "immutable_git_source": "85779b5cb13c9626df7eeebc728eb648a6c8f366:tests/windows_resize_control.c",
+      "immutable_git_bytes": 6043,
+      "immutable_git_sha256": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+      "lf_normalized_raw_equals_immutable_git": true,
+      "working_tree_source_used": false
+    },
+    "worker_exit_code": 1,
+    "cleanup": {
+      "errors": [],
+      "job_empty": true,
+      "worker_exited": true,
+      "input_restored": true,
+      "thread_restored": true,
+      "owned_desktop_closed": true,
+      "handles_closed": true,
+      "job_pids_after": [],
+      "input_before_restore": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11",
+      "input_after_restore": "Default"
+    }
+  },
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/summary.json",
+      "bytes": 13041,
+      "sha256": "ce8c997ec0dcf907927ab2b3d64fe06a410dd05f38fd359e2adcf8a1706c06a5",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 24894,
+      "sha256": "518b7eb853d41dc8ec507267f3695bfe2b088ecf11f8bb51d4e8cf9fe2128e0a",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 560
+    },
+    {
+      "path": "ztty-windows-x86_64.native.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.json",
+      "bytes": 51499,
+      "sha256": "b1f639570c38415d8e5af2a4f65064c0eeff5f71e28717b32c7c7167cdd64151",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2390
+    },
+    {
+      "path": "ztty-windows-x86_64.native.post-failure.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.post-failure.json",
+      "bytes": 2762,
+      "sha256": "684eadd3a0860d78db43e61465a8be97cf24525a76097bcd78ea3402e5978c78",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.native.resize-restored.png",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.resize-restored.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.post-failure.png",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.post-failure.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.post-repaint.png",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.resize-rapid-diagnostic.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.resize-rapid-diagnostic.json",
+      "bytes": 54046,
+      "sha256": "eda7ec79e1aa62fa323ceaf495571b6be21843d3f42476b8e371d42e01a52057",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2596
+    },
+    {
+      "path": "ztty-windows-x86_64.native.resize-staged-diagnostic.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.resize-staged-diagnostic.json",
+      "bytes": 281514,
+      "sha256": "bfbe194d56314bd828f3c091e027af7a4206ec0ec2fe34748092a09edbf1cb6f",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 10997
+    },
+    {
+      "path": "ztty-windows-x86_64.native.resize-staged-diagnostic.rapid-08-restored.png",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.native.resize-staged-diagnostic.rapid-08-restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "control-summary.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/control-summary.json",
+      "bytes": 24268,
+      "sha256": "b6cf3291e0183fd054a1dd02a0b3e583dc48f5e798935692dded6cb528ac497d",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.resize-control.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.resize-control.json",
+      "bytes": 4653,
+      "sha256": "a5ab807cc3d4703d45e07ce23835b08a6f2a1b740e619446d8e541ead99a81f1",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 145
+    },
+    {
+      "path": "ztty-windows-x86_64.resize-control.cold-08.json",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.resize-control.cold-08.json",
+      "bytes": 12998,
+      "sha256": "6cc4ada228f7d7d8c963b58dd046b9753413ddf806b2f285d611cfb1f30fc624",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 614
+    },
+    {
+      "path": "ztty-windows-x86_64.resize-control.cold-08.before.png",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.resize-control.cold-08.before.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.resize-control.cold-08.shrunk.png",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.resize-control.cold-08.shrunk.png",
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.resize-control.cold-08.restored.png",
+      "source_path": "artifacts/release-audit/deferred-control-44343658618/windows-x86_64/ztty-windows-x86_64.resize-control.cold-08.restored.png",
+      "bytes": 603,
+      "sha256": "6d1477fc52e94f7802901891afec0238059872d3ed093fefccaed87f38e55724",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "scope": "Selected source/binary/raw-hash-bound diagnostic evidence. Raw bytes and original failures are preserved. Complete cold reports, remaining images and logs remain in the verified original Actions artifact; omitted files are not claimed to be mirrored. Diagnostic passes and independent retries do not accept the original or same-source other-architecture failure.",
+  "independent_retries": [
+    {
+      "kind": "rapid-diagnostic",
+      "passed": false,
+      "base_checks": 23,
+      "warm_completed": 0,
+      "back_to_back_completed": 0
+    },
+    {
+      "kind": "staged-diagnostic",
+      "passed": true,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10
+    }
+  ],
+  "staged_screen_client_difference": [
+    {
+      "scope": "staged-diagnostic/rapid_resize_repetitions/8/restored",
+      "client": [
+        175,
+        28
+      ],
+      "client_rgb": [
+        255,
+        0,
+        0
+      ],
+      "screen_rgb": [
+        16,
+        24,
+        32
+      ],
+      "matches": false
+    }
+  ],
+  "frozen_summary_scope_clarification": {
+    "summary_bytes_unchanged": true,
+    "summary_sha256": "ce8c997ec0dcf907927ab2b3d64fe06a410dd05f38fd359e2adcf8a1706c06a5",
+    "counter_scope": {
+      "counter_coverage": "Every WndProc entry for this initialized HWND is counted before message-specific dispatch while diagnostics are enabled.",
+      "detailed_message_phases_retained": 6,
+      "after_end_sample_sequence": 231,
+      "snapshot_message_entry_sequence": 232,
+      "intervening_other_same_hwnd_wndproc_entries": 0,
+      "interpretation": "The single increment from231 to232 is the WM_NATIVE_SNAPSHOT entry itself; it excludes any other same-HWND WndProc entry in between, not merely the six detailed message types.",
+      "not_observed": [
+        "Other HWNDs",
+        "Other threads",
+        "Window Manager internal backing copies or composition",
+        "The return time of SetWindowPos on another thread"
+      ],
+      "source_code_review": [
+        {
+          "source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+          "file_sha256": "ba77fa5a6869ac6215a3686227beaf9f75564a58340a6d0859041c31b5958bbc",
+          "received_sha256": "f59802c4b29359ff83e1cf51b26b8444a2d655dd9124b71b455f0a8c1d597727",
+          "all_entry_count_before_filter": true,
+          "same_counter_after_EndPaint_and_snapshot_entry": true
+        },
+        {
+          "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+          "file_sha256": "8ca782f9cf91eb30af109ab37c8febb2e96eece5d8b882c04416a8a935e9418a",
+          "received_sha256": "f59802c4b29359ff83e1cf51b26b8444a2d655dd9124b71b455f0a8c1d597727",
+          "all_entry_count_before_filter": true,
+          "same_counter_after_EndPaint_and_snapshot_entry": true
+        }
+      ]
+    },
+    "note": "The frozen summary phrase about uninstrumented messages does not mean this HWND has uncounted WndProc entries. All entries are counted; only six message classes retain detailed phases. Other HWNDs and threads remain outside this evidence."
+  }
+}

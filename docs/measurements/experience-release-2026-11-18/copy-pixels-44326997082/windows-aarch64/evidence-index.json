@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "7e16300df2d13647c2307873790695668f34f2dd",
+  "run_id": 44326997082,
+  "architecture": "aarch64",
+  "artifact_id": 14436494438,
+  "artifact_zip_sha256": "e668c78abb92a5ce090fa7b10f32fe38aa0807bf0cf8dd6a90b31cb9b5cb719f",
+  "binary_sha256": "7cdca1e078f1034d683294dcfe5acb6e67f9a8b60036ef384e5d22f8125e8475",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "acceptance_credit": false,
+  "status": "failed",
+  "completed_cold_starts": 1,
+  "attempted_cold_starts": 2,
+  "failed_cold_start": 2,
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-aarch64/summary.json",
+      "bytes": 9010,
+      "sha256": "2e9d115a4004f0508b45322663f1d067854a9f873453d298d2de2741dc210752",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 12222,
+      "sha256": "1e4d996cdfa98b7f90ea5c8fd3be801e6c61b966ef892e5276c8ea3d18bad337",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 296
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.json",
+      "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.native.cold-02.json",
+      "bytes": 44780,
+      "sha256": "fb33d7213b7aadd1ffc637c4b1dbd7a6697ecb19f7a09b726d22809df950da29",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2124
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.post-failure.json",
+      "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-failure.json",
+      "bytes": 1960,
+      "sha256": "389ada8c008c684b35acd45e65b2d59596a26dba50b0bbbdb44b4613274c879e",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.resize-restored.png",
+      "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.native.cold-02.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.post-failure.png",
+      "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.post-repaint.png",
+      "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "copy_stage_sample": [
+    178,
+    95
+  ],
+  "gate_sample": [
+    175,
+    28
+  ],
+  "copy_stage_target_rgb": [
+    16,
+    24,
+    32
+  ],
+  "later_failed_png_copy_stage_sample_rgb": [
+    20,
+    20,
+    20
+  ],
+  "copy_stage_sample_changed_later": true,
+  "scope": "Compact failed cold2 report, build identity, same-process snapshot and three original PNGs. The successful cold1 raw report and other PNGs remain in the verified original artifact and are source/binary/hash indexed by the summary.",
+  "notes": [
+    "Raw JSON, original line endings and PNG bytes are preserved.",
+    "All native runs used explicit paint diagnostics; no ordinary acceptance credit is assigned.",
+    "The measured copy-stage point [178,95] is an expected background point, distinct from the red gate point [175,28].",
+    "CPU is read before BitBlt; the added GdiFlush return, target GetPixel and then source GetPixel are captured before EndPaint.",
+    "There is no copy-time red pixel measurement at [175,28]; its red source value is sampled after failure.",
+    "No internal backing/compositor/copy cause or other-thread SetWindowPos completion is established.",
+    "Only this architecture observes [178,95] change from expected background at the paint target to gray in the later failed PNG."
+  ]
+}

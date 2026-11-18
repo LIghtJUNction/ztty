@@ -1,0 +1,137 @@
+{
+  "reports": {
+    "installed.json": {
+      "source": "19274145e37a591d800f638fe21c2717730b6431",
+      "kind": "locally verified Linux candidate, not formal GitHub release",
+      "candidate_version": "0.3.0",
+      "before": {
+        "package": "0.1.2-1",
+        "system_binary_sha256": "64d40492718253831287763f298c25e0cbd030526c395a0738078b876e5bff8c",
+        "custom_desktop_sha256": "0de1d1e4c17fc4f639a709e5bc105ccb4de6c768cc7623c443abddf5a2bfc390",
+        "custom_launcher_sha256": "ad1ee6f528c45b788035d74d5d5452e6fc84463243e53b05ceb7d4bb7b25a0c6",
+        "user_binary_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b",
+        "candidate_sha256": "57a27b7af8464643cd90889e4930c79e8b97691f2b5d231c28e05830cef7d85c",
+        "source": "19274145e37a591d800f638fe21c2717730b6431"
+      },
+      "running_before": [
+        {
+          "pid": 12652,
+          "start_ticks": "4355",
+          "exe": "/usr/bin/ztty"
+        },
+        {
+          "pid": 13937,
+          "start_ticks": "5186",
+          "exe": "/usr/bin/ztty"
+        },
+        {
+          "pid": 22199,
+          "start_ticks": "1866365",
+          "exe": "/usr/bin/ztty"
+        },
+        {
+          "pid": 65046,
+          "start_ticks": "1887549",
+          "exe": "/usr/bin/ztty"
+        },
+        {
+          "pid": 389676,
+          "start_ticks": "2030716",
+          "exe": "/usr/bin/ztty"
+        }
+      ],
+      "rollback_package": "/home/lightjunction/Backups/ztty/2026-11-18-followup/ztty-0.1.2-1-x86_64.pkg.tar.zst",
+      "candidate_package_sha256": "0fa82ba7f5de41b69ae5f1595a5a7f5f7a595cb0c7f50c6bef07ac349ae3ac3f",
+      "started_unix": 1795017408.5403895,
+      "pacman_exit_code": 0,
+      "package": "ztty 0.3.0-1",
+      "integrity": "ztty: 9 全部文件，0 变化的文件",
+      "system_binary_sha256": "57a27b7af8464643cd90889e4930c79e8b97691f2b5d231c28e05830cef7d85c",
+      "system_version": "ztty 0.3.0",
+      "user_version": "ztty 0.3.0",
+      "user_binary_target": "/usr/bin/ztty",
+      "wrapper_version": "ztty 0.3.0",
+      "custom_desktop_unchanged": true,
+      "custom_launcher_unchanged": true,
+      "running_after": [
+        {
+          "pid": 12652,
+          "start_ticks": "4355",
+          "exe": "/usr/bin/ztty (deleted)"
+        },
+        {
+          "pid": 13937,
+          "start_ticks": "5186",
+          "exe": "/usr/bin/ztty (deleted)"
+        },
+        {
+          "pid": 22199,
+          "start_ticks": "1866365",
+          "exe": "/usr/bin/ztty (deleted)"
+        },
+        {
+          "pid": 65046,
+          "start_ticks": "1887549",
+          "exe": "/usr/bin/ztty (deleted)"
+        },
+        {
+          "pid": 389676,
+          "start_ticks": "2030716",
+          "exe": "/usr/bin/ztty (deleted)"
+        }
+      ],
+      "original_processes_still_running": true,
+      "finished_unix": 1795017409.678783
+    },
+    "installed-validation.json": {
+      "command": [
+        "python3",
+        "tests/input_gui.py",
+        "--binary",
+        "/usr/bin/ztty",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/punctuation-bindings-worktree",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/followup-local-install-20261118/installed-input-gui.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/followup-local-install-20261118/installed-input-gui.png"
+      ],
+      "exit_code": 0,
+      "seconds": 6.39,
+      "installed_binary_sha256": "57a27b7af8464643cd90889e4930c79e8b97691f2b5d231c28e05830cef7d85c",
+      "source": "19274145e37a591d800f638fe21c2717730b6431"
+    }
+  },
+  "files": {
+    "/usr/bin/ztty": {
+      "symlink": false,
+      "link_target": null,
+      "bytes": 743048,
+      "sha256": "57a27b7af8464643cd90889e4930c79e8b97691f2b5d231c28e05830cef7d85c",
+      "mode": "0o755"
+    },
+    "/home/lightjunction/.local/bin/ztty": {
+      "symlink": true,
+      "link_target": "/usr/bin/ztty",
+      "bytes": 743048,
+      "sha256": "57a27b7af8464643cd90889e4930c79e8b97691f2b5d231c28e05830cef7d85c",
+      "mode": "0o777"
+    },
+    "/home/lightjunction/.local/bin/ztty-launch": {
+      "symlink": false,
+      "link_target": null,
+      "bytes": 369,
+      "sha256": "ad1ee6f528c45b788035d74d5d5452e6fc84463243e53b05ceb7d4bb7b25a0c6",
+      "mode": "0o755"
+    },
+    "/home/lightjunction/.local/share/applications/ztty.desktop": {
+      "symlink": false,
+      "link_target": null,
+      "bytes": 295,
+      "sha256": "0de1d1e4c17fc4f639a709e5bc105ccb4de6c768cc7623c443abddf5a2bfc390",
+      "mode": "0o644"
+    }
+  },
+  "version": "ztty 0.3.0",
+  "unix_socket_entries": []
+}

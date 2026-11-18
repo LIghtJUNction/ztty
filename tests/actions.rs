@@ -205,3 +205,180 @@ fn shifted_custom_binding_wins_and_unshifted_defaults_remain_available() {
         Some("font-increase")
     );
 }
+
+#[test]
+fn common_zoom_aliases_ignore_locks_and_keep_split_resize_distinct() {
+    for (symbol, modifiers, expected) in [
+        (b'=' as u64, 4, "font-increase"),
+        (b'+' as u64, 5, "font-increase"),
+        (b'=' as u64, 5, "font-increase"),
+        (b'-' as u64, 4, "font-decrease"),
+        (b'_' as u64, 5, "font-decrease"),
+        (b'-' as u64, 5, "font-decrease"),
+        (b'0' as u64, 4, "font-reset"),
+        (b'0' as u64, 5, "font-reset"),
+        (0xffab, 4, "font-increase"),
+        (0xffad, 4, "font-decrease"),
+        (0xffb0, 4, "font-reset"),
+        (b'+' as u64, 13, "grow"),
+        (b'_' as u64, 13, "shrink"),
+    ] {
+        for locks in [0, 2, 16, 2 | 16] {
+            assert_eq!(
+                actions::key_action(&[], symbol, modifiers | locks),
+                Some(expected)
+            );
+        }
+        assert_eq!(actions::key_action(&[], symbol, modifiers | 64), None);
+    }
+    assert_eq!(
+        actions::key_action(&[], 0xff9e, 4),
+        None,
+        "Num Lock off keypad Insert remains application input"
+    );
+    assert_eq!(actions::key_action(&[], b'=' as u64, 4 | 8), None);
+    assert_eq!(
+        actions::shortcut(&[], "grow").as_deref(),
+        Some("Ctrl+Shift+Alt+Equal")
+    );
+    assert_eq!(
+        actions::shortcut(&[], "shrink").as_deref(),
+        Some("Ctrl+Shift+Alt+Minus")
+    );
+}
+
+#[test]
+fn default_zoom_uses_shifted_layout_with_no_custom_bindings() {
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'^' as u64, Some(b'+' as u64), 5),
+        Some("font-increase")
+    );
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'^' as u64, Some(b'+' as u64), 5 | 2 | 16),
+        Some("font-increase")
+    );
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'^' as u64, Some(b'+' as u64), 4),
+        None
+    );
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'0' as u64, Some(b')' as u64), 5),
+        Some("font-reset")
+    );
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'=' as u64, Some(b'+' as u64), 13),
+        Some("grow")
+    );
+}
+
+#[test]
+fn custom_shifted_and_base_bindings_override_new_zoom_defaults() {
+    let mut bindings = vec![actions::parse("ctrl+shift+^ = none", false).unwrap()];
+    assert_eq!(
+        actions::key_action_with_shifted(&bindings, b'^' as u64, Some(b'+' as u64), 5),
+        Some("none")
+    );
+    actions::set(
+        &mut bindings,
+        actions::parse("ctrl+shift+plus = palette", false).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        actions::key_action_with_shifted(&bindings, b'^' as u64, Some(b'+' as u64), 5),
+        Some("palette")
+    );
+    actions::set(
+        &mut bindings,
+        actions::parse("ctrl+shift+plus = none", false).unwrap(),
+    )
+    .unwrap();
+    actions::set(
+        &mut bindings,
+        actions::parse("ctrl+shift+^ = search", false).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        actions::key_action_with_shifted(&bindings, b'^' as u64, Some(b'+' as u64), 5),
+        Some("none")
+    );
+    bindings.retain(|binding| binding.symbol != b'=' as u64);
+    assert_eq!(
+        actions::key_action_with_shifted(&bindings, b'^' as u64, Some(b'+' as u64), 5),
+        Some("search")
+    );
+    actions::set(
+        &mut bindings,
+        actions::parse("ctrl+kp-add = font-decrease", false).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        actions::key_action(&bindings, 0xffab, 4),
+        Some("font-decrease")
+    );
+    assert_eq!(
+        actions::key_action(&bindings, b'+' as u64, 4),
+        Some("font-increase")
+    );
+}
+
+#[test]
+fn tab_aliases_preserve_application_tab_and_respect_custom_remaps() {
+    for locks in [0, 2 | 16] {
+        assert_eq!(
+            actions::key_action(&[], 0xff09, 4 | locks),
+            Some("next-tab")
+        );
+        assert_eq!(
+            actions::key_action(&[], 0xff09, 5 | locks),
+            Some("previous-tab")
+        );
+        assert_eq!(
+            actions::key_action(&[], 0xfe20, 5 | locks),
+            Some("previous-tab")
+        );
+    }
+    assert_eq!(actions::key_action(&[], 0xff09, 0), None);
+    assert_eq!(actions::key_action(&[], 0xfe20, 1), None);
+    assert_eq!(actions::key_action(&[], 0xff09, 4 | 8), None);
+    let mut bindings = vec![actions::parse("ctrl+tab = none", false).unwrap()];
+    assert_eq!(actions::key_action(&bindings, 0xff09, 4), Some("none"));
+    assert_eq!(
+        actions::shortcut(&bindings, "next-tab").as_deref(),
+        Some("Ctrl+Shift+Pagedown")
+    );
+    actions::set(
+        &mut bindings,
+        actions::parse("ctrl+shift+tab = copy", false).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(actions::key_action(&bindings, 0xfe20, 5), Some("copy"));
+    assert_eq!(
+        actions::shortcut(&bindings, "previous-tab").as_deref(),
+        Some("Ctrl+Shift+Pageup")
+    );
+}
+
+#[test]
+fn keypad_binding_names_round_trip_and_hints_follow_overrides() {
+    for (key, symbol, action) in [
+        ("kp-add", 0xffab, "font-increase"),
+        ("kp-subtract", 0xffad, "font-decrease"),
+        ("kp-0", 0xffb0, "font-reset"),
+    ] {
+        let binding = actions::parse(&format!("ctrl+{key} = {action}"), false).unwrap();
+        assert_eq!(binding.symbol, symbol);
+        assert_eq!(actions::parse(&binding.config(), false).unwrap(), binding);
+        assert_eq!(
+            actions::key_action(&[binding], symbol, 4 | 16),
+            Some(action)
+        );
+    }
+    let bindings = [
+        actions::parse("ctrl+equal = none", false).unwrap(),
+        actions::parse("ctrl+shift+equal = none", false).unwrap(),
+    ];
+    assert_eq!(
+        actions::shortcut(&bindings, "font-increase").as_deref(),
+        Some("Ctrl+Kp-add")
+    );
+}
