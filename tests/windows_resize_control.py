@@ -46,7 +46,8 @@ class ControlWindow(Window):
         def visit(hwnd, _):
             name = ctypes.create_unicode_buffer(256)
             self.user.GetClassNameW(hwnd, name, len(name))
-            if self.pid(hwnd) == self.process.pid and name.value == CLASS_NAME:
+            if (self.pid(hwnd) == self.process.pid and name.value == CLASS_NAME
+                    and self.user.IsWindowVisible(hwnd)):
                 result.append(hwnd)
             return True
         self.user.EnumWindows(visit, 0)
@@ -105,12 +106,22 @@ def run_one(args, output, number, expected_identity):
                 window = ControlWindow(process, report)
                 report["hwnd"] = int(window.hwnd)
                 window.require_owned()
+                before = window.geometry()
+                placement = report["window_placement"] = {
+                    "before": before, "requested_position": [32, 32],
+                    "placement_flags": 1, "requested_topmost": True,
+                    "visible_before_required": True}
+                if before["pid"] != process.pid or not before["visible"]:
+                    raise native.DesktopBlocked("control must be owned and visible before initial placement")
                 if not window.user.SetWindowPos(window.hwnd, ctypes.c_void_p(-1), 32, 32, 0, 0, 1):
                     raise OSError("placing the owned control window failed")
                 window.user.SetForegroundWindow(window.hwnd)
                 native.wait_for(lambda: window.user.GetForegroundWindow() == window.hwnd,
                                 "owned control foreground")
                 state = window.geometry()
+                placement.update({"after": state,
+                    "moved": before["outer"][:2] != state["outer"][:2],
+                    "position_delta": [state["outer"][axis] - before["outer"][axis] for axis in (0, 1)]})
                 if state["outer"] != [32, 32, 228, 261] or state["client"] != [0, 0, 180, 190] or state["dpi"] != 96:
                     raise native.DesktopBlocked(f"control geometry differs from the resize fixture: {state}")
                 window.expect("before", [(175, 28, RED)])
@@ -149,6 +160,7 @@ def run_one(args, output, number, expected_identity):
         if (startup.get("pid") != report.get("pid") or startup.get("dpi_awareness") != -4
                 or startup.get("class_style") != 3 or startup.get("window_style") != 0x00CF0000
                 or startup.get("background_brush_null") is not True
+                or startup.get("creation_position") != {"x": "CW_USEDEFAULT", "y": "CW_USEDEFAULT"}
                 or startup.get("dark_attribute") != 20 or startup.get("dark_value") != 1
                 or startup.get("dark_hresult") != 0 or startup.get("valid_rect_policy") != "default"
                 or startup.get("nocopybits_added") is not False):

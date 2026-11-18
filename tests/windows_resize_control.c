@@ -106,7 +106,7 @@ int wmain(void) {
     if (!RegisterClassExW(&cls)) goto failure;
     registered = 1;
     hwnd = CreateWindowExW(0, CLASS_NAME, L"Win32 resize control", WS_OVERLAPPEDWINDOW,
-                           32, 32, 196, 229, NULL, NULL, instance, NULL);
+                           CW_USEDEFAULT, CW_USEDEFAULT, 196, 229, NULL, NULL, instance, NULL);
     if (!hwnd) goto failure;
     dwm = LoadLibraryW(L"dwmapi.dll");
     if (!dwm) goto failure;
@@ -120,6 +120,7 @@ int wmain(void) {
     if (FAILED(dark_result)) goto failure;
     printf("{\"pid\":%lu,\"dpi_awareness\":-4,\"class_style\":3,"
            "\"window_style\":%lu,\"background_brush_null\":true,"
+           "\"creation_position\":{\"x\":\"CW_USEDEFAULT\",\"y\":\"CW_USEDEFAULT\"},"
            "\"dark_attribute\":20,\"dark_value\":1,\"dark_hresult\":%ld,"
            "\"valid_rect_policy\":\"default\",\"nocopybits_added\":false}\n",
            (unsigned long)GetCurrentProcessId(), (unsigned long)WS_OVERLAPPEDWINDOW,
