@@ -1,0 +1,103 @@
+{
+  "schema": 1,
+  "observed_at": "2026-11-18 13:11:00 UTC",
+  "repo": "LIghtJUNction/ztty",
+  "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "run": {
+    "id": 44309412482,
+    "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482",
+    "head_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+    "head_branch": "v0.3.0",
+    "event": "push",
+    "run_attempt": 1,
+    "status": "completed",
+    "conclusion": "failure",
+    "updated_at": "2026-11-18T13:03:37Z"
+  },
+  "jobs": [
+    {
+      "id": 134819341245,
+      "name": "version",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819341245"
+    },
+    {
+      "id": 134819423837,
+      "name": "linux (ubuntu-24.04-arm, aarch64, arm64)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819423837"
+    },
+    {
+      "id": 134819423851,
+      "name": "macos (macos-15-intel, x86_64, x86_64, x64, x86_64-apple-darwin)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819423851"
+    },
+    {
+      "id": 134819423861,
+      "name": "windows (windows-11-arm, aarch64, arm64, aarch64-pc-windows-msvc, aarch64-pc-windows-gnullvm, 7d7...",
+      "status": "completed",
+      "conclusion": "failure",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819423861"
+    },
+    {
+      "id": 134819423866,
+      "name": "linux (ubuntu-24.04, x86_64, x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819423866"
+    },
+    {
+      "id": 134819423872,
+      "name": "macos (macos-15, aarch64, arm64, arm64, aarch64-apple-darwin)",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819423872"
+    },
+    {
+      "id": 134819424029,
+      "name": "windows (windows-2025, x86_64, x64, x86_64-pc-windows-msvc, x86_64-pc-windows-gnullvm, 552191b575...",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819424029"
+    },
+    {
+      "id": 134819424395,
+      "name": "verify / checks",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819424395"
+    },
+    {
+      "id": 134820944708,
+      "name": "publish",
+      "status": "completed",
+      "conclusion": "skipped",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134820944708"
+    }
+  ],
+  "tag": {
+    "ref": "refs/tags/v0.3.0",
+    "tag_object_sha": "9317806ac9b098c772f1a05514d222942268d2d5",
+    "target": {
+      "sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+      "type": "commit",
+      "url": "https://api.github.com/repos/LIghtJUNction/ztty/git/commits/9b5497dac5402603ba0f633152fa4b07e6c11c9e"
+    }
+  },
+  "release_by_tag": {
+    "url": "https://api.github.com/repos/LIghtJUNction/ztty/releases/tags/v0.3.0",
+    "http_status": 404,
+    "error_code": "NOT_FOUND",
+    "response": {
+      "message": "Not Found",
+      "documentation_url": "https://docs.github.com/rest/releases/releases#get-a-release-by-tag-name",
+      "status": "404"
+    },
+    "tool_error": "GitHub API error 404: {\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-a-release-by-tag-name\",\"status\":\"404\"}"
+  },
+  "scope": "Read-only GitHub API observations. This derived summary preserves the returned status fields; it is not a raw HTTP capture."
+}

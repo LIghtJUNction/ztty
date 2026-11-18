@@ -2671,7 +2671,8 @@ impl Pool {
                         let window = &self.sessions[index].ui.as_ref().unwrap().window;
                         let symbol = window.key_symbol(&mut e, false);
                         let bindings = &self.sessions[index].appearance.bindings;
-                        let shifted = (e.state & 1 != 0 && !bindings.is_empty())
+                        let shifted = (e.state & 1 != 0
+                            && (!bindings.is_empty() || e.state & 4 != 0))
                             .then(|| window.key_symbol(&mut e, true));
                         if let Some(action) =
                             actions::key_action_with_shifted(bindings, symbol, shifted, e.state)

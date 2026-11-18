@@ -1,0 +1,887 @@
+{
+  "run_id": 44333731432,
+  "source_sha": "ab79d233da56e063539a5562a0b985293ffc4106",
+  "diagnostic_only": true,
+  "passed": true,
+  "required": 16,
+  "completed": 16,
+  "control_binary_sha256": "25c515605b9e716c90ae5662cdae917bc4df482dc8d6a09eac4d3cb6978b00bc",
+  "raw_c_source_sha256": "d3518baa435734ef12279c75b02b4817eb8dfe7a424fbb9cbe36d1929b793d50",
+  "immutable_git_c_sha256": "8d8c4ae100e48627d92161506636a87508a303296bb516a127613d674663b388",
+  "raw_c_crlf_lines": 149,
+  "source_normalization": "CRLF to LF equals immutable git ab79 source byte-for-byte; no working tree source read.",
+  "reports": [
+    {
+      "number": 1,
+      "report": "ztty-windows-x86_64.resize-control.cold-01.json",
+      "report_sha256": "d3002e763f0cf8dd66a6581543c78f5ef41b39707b3f5f0264c563566ca977f3",
+      "pid": 8648,
+      "hwnd": 590154,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 2,
+      "report": "ztty-windows-x86_64.resize-control.cold-02.json",
+      "report_sha256": "f1c3c5b9e5bb8bff857bf6f42192f1e24920117f584b9fd5891efee3fafe0cb3",
+      "pid": 5360,
+      "hwnd": 655690,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 3,
+      "report": "ztty-windows-x86_64.resize-control.cold-03.json",
+      "report_sha256": "9d7058a4327f2f5f745eaff7ecefbff7d3b4cfa624eb4b3397ad5794c2a109ff",
+      "pid": 6428,
+      "hwnd": 721226,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 4,
+      "report": "ztty-windows-x86_64.resize-control.cold-04.json",
+      "report_sha256": "698528d3372a9ae358d5361a87ef4bc8400ee817d65f07476518a29fd5186ec1",
+      "pid": 8700,
+      "hwnd": 786762,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 5,
+      "report": "ztty-windows-x86_64.resize-control.cold-05.json",
+      "report_sha256": "c30add97f91482151a5aed5126540c73d1fac085ab0798d6f61c7d25dccee509",
+      "pid": 8004,
+      "hwnd": 852298,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 6,
+      "report": "ztty-windows-x86_64.resize-control.cold-06.json",
+      "report_sha256": "1fe6074c7a38e52489247fa3fa793495ba24fcafae86809816764895970212a0",
+      "pid": 4144,
+      "hwnd": 917834,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 7,
+      "report": "ztty-windows-x86_64.resize-control.cold-07.json",
+      "report_sha256": "ed75a8802f4605139bb17b942d1ae7a3b5f1b68259821e2c5ac19d8d9c45fc0b",
+      "pid": 3576,
+      "hwnd": 983370,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 8,
+      "report": "ztty-windows-x86_64.resize-control.cold-08.json",
+      "report_sha256": "5181f071b9797237cb3437ceb47a1ebe4a3a64da69a56709838bdf1cb2889a41",
+      "pid": 3168,
+      "hwnd": 1048906,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 9,
+      "report": "ztty-windows-x86_64.resize-control.cold-09.json",
+      "report_sha256": "6e8781145f0f56d0d7446482939f321f74dbd90264fd01d5a07ce154edd1e7db",
+      "pid": 7040,
+      "hwnd": 1114442,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 10,
+      "report": "ztty-windows-x86_64.resize-control.cold-10.json",
+      "report_sha256": "37373b63717edd68090fcec55ef46480a9336deabdce8cfedbdbf1855c30eb7f",
+      "pid": 7424,
+      "hwnd": 1179978,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 11,
+      "report": "ztty-windows-x86_64.resize-control.cold-11.json",
+      "report_sha256": "7cc0b70bbfbe1d9e524f09955f162e05a83f032f4719e1b95ead9d02f6541dd2",
+      "pid": 7576,
+      "hwnd": 1245514,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 12,
+      "report": "ztty-windows-x86_64.resize-control.cold-12.json",
+      "report_sha256": "6125834da9e2e5578dcd6a054aa051f702ec32fe8396ca813f28c521879a80ae",
+      "pid": 5808,
+      "hwnd": 1311050,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 13,
+      "report": "ztty-windows-x86_64.resize-control.cold-13.json",
+      "report_sha256": "b7c162367da0c503513d82a33b25a6c33ed0c1d4f1ccb84ec478687daee2d3a9",
+      "pid": 7228,
+      "hwnd": 1376586,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 14,
+      "report": "ztty-windows-x86_64.resize-control.cold-14.json",
+      "report_sha256": "492eb8ccf6431792d66c55eb7016934db12ae6553b5e0fa9c07c12908c1e2ec4",
+      "pid": 3644,
+      "hwnd": 1442122,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 15,
+      "report": "ztty-windows-x86_64.resize-control.cold-15.json",
+      "report_sha256": "69018f2d99c69150b44cf58ef7993192eba3f5d4682cd9c48e26648e07d04988",
+      "pid": 7064,
+      "hwnd": 1507658,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 16,
+      "report": "ztty-windows-x86_64.resize-control.cold-16.json",
+      "report_sha256": "c07461f63024600c60e7f8bc42c10f9859d07198d7c3343deab8004d69fda02c",
+      "pid": 604,
+      "hwnd": 1573194,
+      "passed": true,
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    }
+  ],
+  "pngs_verified": 48,
+  "geometry_samples_verified": 144,
+  "startup_contract": {
+    "pid": 8648,
+    "dpi_awareness": -4,
+    "class_style": 3,
+    "window_style": 13565952,
+    "background_brush_null": true,
+    "dark_attribute": 20,
+    "dark_value": 1,
+    "dark_hresult": 0,
+    "valid_rect_policy": "default",
+    "nocopybits_added": false
+  },
+  "all_startup_pid_values_matched_their_process": true,
+  "distinct_control_pids": 16,
+  "window_geometry": {
+    "observed_before_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "observed_shrunk_outer": [
+      32,
+      32,
+      192,
+      261
+    ],
+    "observed_restored_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "client_origin": [
+      40,
+      63
+    ],
+    "dpi": 96
+  },
+  "creation_and_placement_scope": {
+    "immutable_c_requests_creation_xy": [
+      32,
+      32
+    ],
+    "harness_requests_placement_xy": [
+      32,
+      32
+    ],
+    "actual_pre_placement_outer_was_recorded": false,
+    "production_failed_native_window_placement": {
+      "before": {
+        "client": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "outer": [
+          78,
+          78,
+          274,
+          307
+        ],
+        "client_screen": [
+          86,
+          109,
+          266,
+          299
+        ],
+        "dpi": 96,
+        "visible": true,
+        "minimized": false,
+        "window_pid": 2288,
+        "foreground_pid": 2288,
+        "foreground_window": {
+          "hwnd": 524618,
+          "pid": 2288,
+          "rect": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "class": "ztty.NativeWindow",
+          "process_image": {
+            "name": "ztty.exe"
+          },
+          "topmost": false,
+          "visible": true,
+          "root": 524618
+        },
+        "owned_window": {
+          "hwnd": 524618,
+          "pid": 2288,
+          "rect": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "class": "ztty.NativeWindow",
+          "process_image": {
+            "name": "ztty.exe"
+          },
+          "topmost": false,
+          "visible": true,
+          "root": 524618
+        },
+        "monitor": {
+          "rect": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "primary": true
+        },
+        "clip_type": 2,
+        "clip_box": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "samples": []
+      },
+      "requested_topmost": true,
+      "attempts": [
+        {
+          "position": [
+            32,
+            32
+          ],
+          "visible": true
+        }
+      ],
+      "placed": {
+        "client": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "outer": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "client_screen": [
+          40,
+          63,
+          220,
+          253
+        ],
+        "dpi": 96,
+        "visible": true,
+        "minimized": false,
+        "window_pid": 2288,
+        "foreground_pid": 2288,
+        "foreground_window": {
+          "hwnd": 524618,
+          "pid": 2288,
+          "rect": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "class": "ztty.NativeWindow",
+          "process_image": {
+            "name": "ztty.exe"
+          },
+          "topmost": true,
+          "visible": true,
+          "root": 524618
+        },
+        "owned_window": {
+          "hwnd": 524618,
+          "pid": 2288,
+          "rect": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "class": "ztty.NativeWindow",
+          "process_image": {
+            "name": "ztty.exe"
+          },
+          "topmost": true,
+          "visible": true,
+          "root": 524618
+        },
+        "monitor": {
+          "rect": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "primary": true
+        },
+        "clip_type": 2,
+        "clip_box": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "samples": [
+          {
+            "client": [
+              1,
+              1
+            ],
+            "screen": [
+              41,
+              64
+            ],
+            "point_visible": true,
+            "window_from_point": 524618,
+            "root_window": 524618,
+            "window_from_point_pid": 2288,
+            "hit_window": {
+              "hwnd": 524618,
+              "pid": 2288,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 524618
+            },
+            "owned_window_at_point": true,
+            "screen_rgb": null,
+            "rgb": [
+              16,
+              24,
+              32
+            ]
+          },
+          {
+            "client": [
+              178,
+              1
+            ],
+            "screen": [
+              218,
+              64
+            ],
+            "point_visible": true,
+            "window_from_point": 524618,
+            "root_window": 524618,
+            "window_from_point_pid": 2288,
+            "hit_window": {
+              "hwnd": 524618,
+              "pid": 2288,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 524618
+            },
+            "owned_window_at_point": true,
+            "screen_rgb": null,
+            "rgb": [
+              16,
+              24,
+              32
+            ]
+          },
+          {
+            "client": [
+              1,
+              188
+            ],
+            "screen": [
+              41,
+              251
+            ],
+            "point_visible": true,
+            "window_from_point": 524618,
+            "root_window": 524618,
+            "window_from_point_pid": 2288,
+            "hit_window": {
+              "hwnd": 524618,
+              "pid": 2288,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 524618
+            },
+            "owned_window_at_point": true,
+            "screen_rgb": null,
+            "rgb": [
+              16,
+              24,
+              32
+            ]
+          },
+          {
+            "client": [
+              178,
+              188
+            ],
+            "screen": [
+              218,
+              251
+            ],
+            "point_visible": true,
+            "window_from_point": 524618,
+            "root_window": 524618,
+            "window_from_point_pid": 2288,
+            "hit_window": {
+              "hwnd": 524618,
+              "pid": 2288,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 524618
+            },
+            "owned_window_at_point": true,
+            "screen_rgb": null,
+            "rgb": [
+              16,
+              24,
+              32
+            ]
+          },
+          {
+            "client": [
+              90,
+              95
+            ],
+            "screen": [
+              130,
+              158
+            ],
+            "point_visible": true,
+            "window_from_point": 524618,
+            "root_window": 524618,
+            "window_from_point_pid": 2288,
+            "hit_window": {
+              "hwnd": 524618,
+              "pid": 2288,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 524618
+            },
+            "owned_window_at_point": true,
+            "screen_rgb": null,
+            "rgb": [
+              16,
+              24,
+              32
+            ]
+          }
+        ]
+      },
+      "position": [
+        32,
+        32
+      ]
+    },
+    "limit": "The C control requests its final position at creation. ztty uses CW_USEDEFAULT then the harness places the window; the native report records that prior geometry. This control did not record its pre-placement rectangle, so source setup and positioning history differ and a system path conditional on that history or timing is not excluded."
+  },
+  "cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-control-5052-bf50be67f6004582afe05eb9c417c685",
+    "input_after_restore": "Default"
+  },
+  "worker_elapsed_seconds": 1.096,
+  "worker_exit_code": 0,
+  "temporary_directory_scope": "Control starts owned processes without a per-run TemporaryDirectory; process exit and isolated Job/desktop cleanup are verified. The generic cleanup field does not claim deletion of sixteen nonexistent directories.",
+  "scope": "Independent retained-DIB Win32 control, diagnostic only. All16 pass does not supersede the terminal original failure, establish a production fix, or exclude all OS/window-history paths."
+}

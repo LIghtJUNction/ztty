@@ -1,0 +1,6352 @@
+{
+  "platform": "win32",
+  "binary": "C:\\a\\_temp\\ztty-windows-native\\ztty.exe",
+  "transport": "real ConPTY",
+  "renderer": "Win32 retained DIB",
+  "runtime_trace_enabled": false,
+  "resize_path": "rapid",
+  "rapid_resize_repetitions": {
+    "required": 10,
+    "completed": 10,
+    "passed": true,
+    "iterations": [
+      {
+        "number": 1,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.068306,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-01-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.0721358,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-01-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.0962178,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-01-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 2,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.0988267,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-02-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.1022839,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-02-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.1259265,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-02-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 3,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.1288177,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-03-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.1330591,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-03-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.1567935,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-03-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 4,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.1593915,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-04-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.1627623,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-04-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.1863738,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-04-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 5,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.1892042,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-05-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.1926025,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-05-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.2196211,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-05-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 6,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.2224073,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-06-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.2260067,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-06-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.2496518,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-06-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 7,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.2526639,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-07-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.2559578,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-07-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.2796211,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-07-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 8,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.2824032,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-08-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.2857761,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-08-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.3095719,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-08-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 9,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.3127453,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-09-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.3160786,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-09-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.3400014,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-09-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      },
+      {
+        "number": 10,
+        "passed": true,
+        "resize_stages": {
+          "before": {
+            "monotonic_seconds": 727.3426955,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-10-before.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "shrunk": {
+            "monotonic_seconds": 727.346577,
+            "client": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              184,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                192,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              144,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": false,
+                "window_from_point": 0,
+                "root_window": 0,
+                "window_from_point_pid": 0,
+                "hit_window": {
+                  "hwnd": 0,
+                  "pid": 0
+                },
+                "owned_window_at_point": false,
+                "screen_rgb": null,
+                "rgb": null
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    192,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-10-shrunk.png",
+              "width": 144,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          },
+          "restored": {
+            "monotonic_seconds": 727.3699788,
+            "client": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "outer": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "client_screen": [
+              40,
+              63,
+              220,
+              253
+            ],
+            "dpi": 96,
+            "visible": true,
+            "minimized": false,
+            "window_pid": 3256,
+            "foreground_pid": 3256,
+            "foreground_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "owned_window": {
+              "hwnd": 1704560,
+              "pid": 3256,
+              "rect": [
+                32,
+                32,
+                228,
+                261
+              ],
+              "class": "ztty.NativeWindow",
+              "process_image": {
+                "name": "ztty.exe"
+              },
+              "topmost": true,
+              "visible": true,
+              "root": 1704560
+            },
+            "monitor": {
+              "rect": [
+                0,
+                0,
+                1024,
+                768
+              ],
+              "work": [
+                0,
+                0,
+                1024,
+                720
+              ],
+              "primary": true
+            },
+            "clip_type": 2,
+            "clip_box": [
+              0,
+              0,
+              180,
+              190
+            ],
+            "samples": [
+              {
+                "client": [
+                  175,
+                  28
+                ],
+                "screen": [
+                  215,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ]
+              },
+              {
+                "client": [
+                  139,
+                  28
+                ],
+                "screen": [
+                  179,
+                  91
+                ],
+                "point_visible": true,
+                "window_from_point": 1704560,
+                "root_window": 1704560,
+                "window_from_point_pid": 3256,
+                "hit_window": {
+                  "hwnd": 1704560,
+                  "pid": 3256,
+                  "rect": [
+                    32,
+                    32,
+                    228,
+                    261
+                  ],
+                  "class": "ztty.NativeWindow",
+                  "process_image": {
+                    "name": "ztty.exe"
+                  },
+                  "topmost": true,
+                  "visible": true,
+                  "root": 1704560
+                },
+                "owned_window_at_point": true,
+                "screen_rgb": null,
+                "rgb": [
+                  16,
+                  24,
+                  32
+                ]
+              }
+            ],
+            "screenshot": {
+              "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.rapid-10-restored.png",
+              "width": 180,
+              "height": 190,
+              "window_pid": 3256,
+              "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+              "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+            }
+          }
+        },
+        "shrunk_pixel": [
+          16,
+          24,
+          32
+        ],
+        "restored_pixel": [
+          255,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "checks": [
+    {
+      "name": "native_python_and_binary_architecture",
+      "passed": true
+    },
+    {
+      "name": "absent_default_config_and_cmd_exit",
+      "passed": true
+    },
+    {
+      "name": "invalid_cwd_missing_rejected",
+      "passed": true,
+      "exit_code": 1,
+      "stderr": "ztty: cannot enter command working directory (OS error 2)"
+    },
+    {
+      "name": "invalid_cwd_regular_file_rejected",
+      "passed": true,
+      "exit_code": 1,
+      "stderr": "ztty: cannot enter command working directory (OS error 267)"
+    },
+    {
+      "name": "invalid_cwd_empty_rejected",
+      "passed": true,
+      "exit_code": 1,
+      "stderr": "ztty: cannot enter command working directory (OS error 123)"
+    },
+    {
+      "name": "relative_program_uses_requested_cwd",
+      "passed": true
+    },
+    {
+      "name": "redirected_host_uses_conpty_standard_handles",
+      "passed": true
+    },
+    {
+      "name": "native_ztty_process_architecture",
+      "passed": true
+    },
+    {
+      "name": "unicode_arguments_and_native_child",
+      "passed": true
+    },
+    {
+      "name": "unicode_cwd_and_relative_config",
+      "passed": true
+    },
+    {
+      "name": "capability_query_roundtrip",
+      "passed": true
+    },
+    {
+      "name": "opaque_red",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "half_alpha_green",
+      "passed": true,
+      "pixel": [
+        8,
+        140,
+        16
+      ]
+    },
+    {
+      "name": "fully_transparent",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "image_scrolls_with_content",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "old_image_position_repainted",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "alternate_hides_primary_image",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "primary_image_restored",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "deletion_repaints_image",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "png_decode_and_alpha",
+      "passed": true,
+      "pixel": [
+        8,
+        140,
+        16
+      ]
+    },
+    {
+      "name": "rgb24_decode",
+      "passed": true,
+      "pixel": [
+        12,
+        34,
+        56
+      ]
+    },
+    {
+      "name": "right_edge_clips_image",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "resize_clips_without_ghosts",
+      "passed": true,
+      "pixel": [
+        16,
+        24,
+        32
+      ]
+    },
+    {
+      "name": "resize_restores_visible_image",
+      "passed": true,
+      "pixel": [
+        255,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "sixel_rgb_native_pixels",
+      "passed": true,
+      "pixels": [
+        {
+          "x": 17,
+          "y": 46,
+          "rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 33,
+          "y": 46,
+          "rgb": [
+            0,
+            255,
+            0
+          ]
+        },
+        {
+          "x": 49,
+          "y": 54,
+          "rgb": [
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sixel_transparent_preserves_underlying_image",
+      "passed": true,
+      "pixels": [
+        {
+          "x": 17,
+          "y": 46,
+          "rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 49,
+          "y": 46,
+          "rgb": [
+            0,
+            255,
+            0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sixel_opaque_uses_current_background",
+      "passed": true,
+      "pixels": [
+        {
+          "x": 17,
+          "y": 46,
+          "rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 49,
+          "y": 46,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sixel_erase_display_repaints",
+      "passed": true,
+      "pixels": [
+        {
+          "x": 17,
+          "y": 46,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "x": 33,
+          "y": 46,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "x": 49,
+          "y": 54,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sixel_cancel_and_input_recovery",
+      "passed": true,
+      "pixels": [
+        {
+          "x": 17,
+          "y": 46,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "x": 33,
+          "y": 46,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "x": 49,
+          "y": 54,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sixel_recovers_after_oversized_raster",
+      "passed": true,
+      "pixels": [
+        {
+          "x": 17,
+          "y": 46,
+          "rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "x": 33,
+          "y": 46,
+          "rgb": [
+            0,
+            255,
+            0
+          ]
+        },
+        {
+          "x": 49,
+          "y": 54,
+          "rgb": [
+            0,
+            0,
+            255
+          ]
+        }
+      ]
+    },
+    {
+      "name": "keyboard_recovers_after_malformed_graphics",
+      "passed": true
+    }
+  ],
+  "passed": false,
+  "status": "failed",
+  "architecture": "arm64",
+  "python_process": {
+    "process_machine": 0,
+    "native_machine": 43620,
+    "emulated": false
+  },
+  "binary_machine": 43620,
+  "redirected_host_stdio": {
+    "returncode": 0,
+    "child": {
+      "pid": 10184,
+      "parent_pid": 3676,
+      "handles": {
+        "stdin": {
+          "handle": 104,
+          "console": true,
+          "console_mode": 503,
+          "file_type": 2,
+          "error": 0
+        },
+        "stdout": {
+          "handle": 112,
+          "console": true,
+          "console_mode": 7,
+          "file_type": 2,
+          "error": 0
+        },
+        "stderr": {
+          "handle": 116,
+          "console": true,
+          "console_mode": 7,
+          "file_type": 2,
+          "error": 0
+        }
+      },
+      "columns": 20,
+      "rows": 10
+    },
+    "stdout_bytes": 0,
+    "stderr": ""
+  },
+  "ztty_process": {
+    "process_machine": 0,
+    "native_machine": 43620,
+    "emulated": false
+  },
+  "startup_directory": {
+    "requested": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty native \u56fe\u50cf h5srwuxv\\\u5de5\u4f5c \u76ee\u5f55 \ud83e\udd80",
+    "actual": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty native \u56fe\u50cf h5srwuxv\\\u5de5\u4f5c \u76ee\u5f55 \ud83e\udd80",
+    "relative_config": "appearance.conf"
+  },
+  "client_pixels": [
+    180,
+    190
+  ],
+  "cell_pixels": [
+    9,
+    19
+  ],
+  "desktop": {
+    "thread": {
+      "name": "ztty-native-1684-5170d8c373b3475e8b368f5ec7de2f81"
+    },
+    "input": {
+      "name": "ztty-native-1684-5170d8c373b3475e8b368f5ec7de2f81"
+    }
+  },
+  "window_placement": {
+    "before": {
+      "client": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "outer": [
+        52,
+        52,
+        248,
+        281
+      ],
+      "client_screen": [
+        60,
+        83,
+        240,
+        273
+      ],
+      "dpi": 96,
+      "visible": true,
+      "minimized": false,
+      "window_pid": 3256,
+      "foreground_pid": 3256,
+      "foreground_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          52,
+          52,
+          248,
+          281
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": false,
+        "visible": true,
+        "root": 1704560
+      },
+      "owned_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          52,
+          52,
+          248,
+          281
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": false,
+        "visible": true,
+        "root": 1704560
+      },
+      "monitor": {
+        "rect": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "primary": true
+      },
+      "clip_type": 2,
+      "clip_box": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "samples": []
+    },
+    "requested_topmost": true,
+    "attempts": [
+      {
+        "position": [
+          32,
+          32
+        ],
+        "visible": true
+      }
+    ],
+    "placed": {
+      "client": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "dpi": 96,
+      "visible": true,
+      "minimized": false,
+      "window_pid": 3256,
+      "foreground_pid": 3256,
+      "foreground_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "owned_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "monitor": {
+        "rect": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "primary": true
+      },
+      "clip_type": 2,
+      "clip_box": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "samples": [
+        {
+          "client": [
+            1,
+            1
+          ],
+          "screen": [
+            41,
+            64
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            178,
+            1
+          ],
+          "screen": [
+            218,
+            64
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            1,
+            188
+          ],
+          "screen": [
+            41,
+            251
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            178,
+            188
+          ],
+          "screen": [
+            218,
+            251
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        },
+        {
+          "client": [
+            90,
+            95
+          ],
+          "screen": [
+            130,
+            158
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ]
+    },
+    "position": [
+      32,
+      32
+    ]
+  },
+  "resize_stages": {
+    "before": {
+      "monotonic_seconds": 726.7982234,
+      "client": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "dpi": 96,
+      "visible": true,
+      "minimized": false,
+      "window_pid": 3256,
+      "foreground_pid": 3256,
+      "foreground_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "owned_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "monitor": {
+        "rect": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "primary": true
+      },
+      "clip_type": 2,
+      "clip_box": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "samples": [
+        {
+          "client": [
+            175,
+            28
+          ],
+          "screen": [
+            215,
+            91
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "client": [
+            139,
+            28
+          ],
+          "screen": [
+            179,
+            91
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ],
+      "screenshot": {
+        "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.resize-before.png",
+        "width": 180,
+        "height": 190,
+        "window_pid": 3256,
+        "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+        "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+      }
+    },
+    "shrunk": {
+      "monotonic_seconds": 726.8024796,
+      "client": [
+        0,
+        0,
+        144,
+        190
+      ],
+      "outer": [
+        32,
+        32,
+        192,
+        261
+      ],
+      "client_screen": [
+        40,
+        63,
+        184,
+        253
+      ],
+      "dpi": 96,
+      "visible": true,
+      "minimized": false,
+      "window_pid": 3256,
+      "foreground_pid": 3256,
+      "foreground_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          192,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "owned_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          192,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "monitor": {
+        "rect": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "primary": true
+      },
+      "clip_type": 2,
+      "clip_box": [
+        0,
+        0,
+        144,
+        190
+      ],
+      "samples": [
+        {
+          "client": [
+            175,
+            28
+          ],
+          "screen": [
+            215,
+            91
+          ],
+          "point_visible": false,
+          "window_from_point": 0,
+          "root_window": 0,
+          "window_from_point_pid": 0,
+          "hit_window": {
+            "hwnd": 0,
+            "pid": 0
+          },
+          "owned_window_at_point": false,
+          "screen_rgb": null,
+          "rgb": null
+        },
+        {
+          "client": [
+            139,
+            28
+          ],
+          "screen": [
+            179,
+            91
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              192,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ],
+      "screenshot": {
+        "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.resize-shrunk.png",
+        "width": 144,
+        "height": 190,
+        "window_pid": 3256,
+        "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+        "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+      }
+    },
+    "restored": {
+      "monotonic_seconds": 726.8361781,
+      "client": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "outer": [
+        32,
+        32,
+        228,
+        261
+      ],
+      "client_screen": [
+        40,
+        63,
+        220,
+        253
+      ],
+      "dpi": 96,
+      "visible": true,
+      "minimized": false,
+      "window_pid": 3256,
+      "foreground_pid": 3256,
+      "foreground_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "owned_window": {
+        "hwnd": 1704560,
+        "pid": 3256,
+        "rect": [
+          32,
+          32,
+          228,
+          261
+        ],
+        "class": "ztty.NativeWindow",
+        "process_image": {
+          "name": "ztty.exe"
+        },
+        "topmost": true,
+        "visible": true,
+        "root": 1704560
+      },
+      "monitor": {
+        "rect": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "primary": true
+      },
+      "clip_type": 2,
+      "clip_box": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "samples": [
+        {
+          "client": [
+            175,
+            28
+          ],
+          "screen": [
+            215,
+            91
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            255,
+            0,
+            0
+          ]
+        },
+        {
+          "client": [
+            139,
+            28
+          ],
+          "screen": [
+            179,
+            91
+          ],
+          "point_visible": true,
+          "window_from_point": 1704560,
+          "root_window": 1704560,
+          "window_from_point_pid": 3256,
+          "hit_window": {
+            "hwnd": 1704560,
+            "pid": 3256,
+            "rect": [
+              32,
+              32,
+              228,
+              261
+            ],
+            "class": "ztty.NativeWindow",
+            "process_image": {
+              "name": "ztty.exe"
+            },
+            "topmost": true,
+            "visible": true,
+            "root": 1704560
+          },
+          "owned_window_at_point": true,
+          "screen_rgb": null,
+          "rgb": [
+            16,
+            24,
+            32
+          ]
+        }
+      ],
+      "screenshot": {
+        "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.resize-restored.png",
+        "width": 180,
+        "height": 190,
+        "window_pid": 3256,
+        "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+        "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+      }
+    }
+  },
+  "active_check": "keyboard_recovers_after_malformed_graphics",
+  "sixel_screenshot": {
+    "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.sixel.png",
+    "width": 180,
+    "height": 190,
+    "window_pid": 3256,
+    "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174",
+    "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+  },
+  "screenshot": {
+    "path": "C:\\a\\ztty\\ztty\\dist\\ztty-windows-aarch64.native.cold-04.png",
+    "width": 180,
+    "height": 190,
+    "window_pid": 3256,
+    "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+    "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+  },
+  "visible_pixel_checks_completed": 19,
+  "pixel_readback": "GetPixel assertions plus owned client DC BitBlt/GetDIBits PNG capture",
+  "cleanup": {
+    "process_exited": true,
+    "temporary_directory_removed": false,
+    "returncode": 0,
+    "directory_error": "PermissionError(13, 'The process cannot access the file because it is being used by another process')"
+  }
+}

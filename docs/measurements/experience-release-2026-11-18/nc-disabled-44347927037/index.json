@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+  "run_id": 44347927037,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44347927037",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "version": "0.3.0",
+  "status": "diagnostic-passed-no-ordinary-credit",
+  "formal_release_eligible": false,
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "nc_rendering_diagnostics_enabled": true,
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "workspace_required_checks": 19,
+  "x86_64": {
+    "native_gate_passed": true,
+    "ordinary_acceptance_credit": false,
+    "completed_cold_starts": 8,
+    "workspace_checks": 19,
+    "native_pngs_verified": 367,
+    "native_png_samples_exact": 600,
+    "workspace_live_samples_exact": 34,
+    "workspace_png_samples_exact": 19,
+    "control_completed": 16,
+    "control_pngs_verified": 48,
+    "control_png_samples_exact": 144,
+    "native_and_control_nc_true_to_false_windows": 24,
+    "all_nc_hresult_zero": true,
+    "workspace_nc_state_not_recorded": true,
+    "native_worker_elapsed_seconds": 16.054,
+    "control_worker_elapsed_seconds": 1.398,
+    "worker_exit_codes": [
+      0,
+      0
+    ],
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "native_gate_passed": true,
+    "ordinary_acceptance_credit": false,
+    "completed_cold_starts": 8,
+    "workspace_checks": 19,
+    "native_pngs_verified": 367,
+    "native_png_samples_exact": 600,
+    "workspace_live_samples_exact": 34,
+    "workspace_png_samples_exact": 19,
+    "control_completed": 16,
+    "control_pngs_verified": 48,
+    "control_png_samples_exact": 144,
+    "native_and_control_nc_true_to_false_windows": 24,
+    "all_nc_hresult_zero": true,
+    "workspace_nc_state_not_recorded": true,
+    "native_worker_elapsed_seconds": 16.368,
+    "control_worker_elapsed_seconds": 1.555,
+    "worker_exit_codes": [
+      0,
+      0
+    ],
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "ordinary_acceptance_credit": false,
+  "same_source_files_as_previous_normal_failure": [
+    {
+      "path": "src/platform/windows.rs",
+      "previous_source": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "current_source": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "previous_file_sha256": "5faa18077ad030215ee119147906dad0e23d15dae11d2f9af6664653c90f041d",
+      "current_file_sha256": "5faa18077ad030215ee119147906dad0e23d15dae11d2f9af6664653c90f041d",
+      "byte_identical": true
+    },
+    {
+      "path": "tests/windows_resize_control.c",
+      "previous_source": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "current_source": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "previous_file_sha256": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+      "current_file_sha256": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+      "byte_identical": true
+    },
+    {
+      "path": "tests/windows_workspace_native.py",
+      "previous_source": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "current_source": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "previous_file_sha256": "c13d8260c12cf073049ca5577a6e7c79143325981eee66d48331d395f8f52f34",
+      "current_file_sha256": "c13d8260c12cf073049ca5577a6e7c79143325981eee66d48331d395f8f52f34",
+      "byte_identical": true
+    }
+  ],
+  "binary_identity_boundary": {
+    "previous": {
+      "x86_64": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "aarch64": "f0caf9814cdb335dfb56305be67c9e3635034acc8620fba292f0cf6425114d0a"
+    },
+    "current": {
+      "x86_64": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "aarch64": "47939b94da0cc402d9d12d3e8f76cd5edef04269e6f372df8d26623068468efc"
+    },
+    "same_binary_claimed": false
+  },
+  "harness_change": "Set per-owned-HWND DWMWA_NCRENDERING_POLICY to DWMNCRP_DISABLED and read NC rendering enabled before/set/after; diagnostic workflow input only.",
+  "nc_policy_records": {
+    "native_windows": 16,
+    "control_windows": 32,
+    "all48_before_enabled": true,
+    "all48_set_hresult_zero": true,
+    "all48_after_enabled": false,
+    "owned_hwnd_pid_matched": true
+  },
+  "independent_control": {
+    "required_each": 16,
+    "completed_each": 16,
+    "resize_policy": "deferred_until_paint",
+    "valid_rect_policy": "default",
+    "nocopybits_added": false,
+    "immutable_c_sha256": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+    "raw_package_c_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6",
+    "raw_crlf_lines": 155
+  },
+  "inference_limits": [
+    "The harness changed the NC policy before native/control pixel sequences, so these successful runs are diagnostic evidence and have no ordinary acceptance credit.",
+    "Workspace ran its existing19 checks without the diagnostic NC setter; its actual NC state was not independently recorded.",
+    "Production Windows source, control C source and workspace harness are byte-identical to8b14, but executable artifacts are separately built and have different hashes.",
+    "Successful ClientDC gates/PNGs are not independent ScreenDC captures and do not show titlebar/frame appearance.",
+    "The observed policy isolation supports a production candidate; it does not identify a specific internal writer, guarantee a failure rate, or accept prior failures."
+  ],
+  "cleanup": {
+    "native_window_processes_exited_per_architecture": 9,
+    "workspace_probe_processes_exited_per_architecture": 4,
+    "control_processes_exited_per_architecture": 16,
+    "all_application_temporary_directories_removed": true,
+    "all_jobs_empty_and_desktops_restored": true,
+    "per_control_temporary_directories_created": false
+  },
+  "delivery_scope": "Diagnostic-only Windows build-only result, not formal publication or installation. The installed Linux candidate remains source19274145/version0.3.0."
+}

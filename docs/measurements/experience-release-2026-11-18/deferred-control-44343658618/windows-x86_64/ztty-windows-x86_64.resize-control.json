@@ -1,0 +1,145 @@
+{
+  "diagnostic_only": true,
+  "passed": false,
+  "status": "failed",
+  "required": 16,
+  "completed": 7,
+  "runs": [
+    {
+      "number": 1,
+      "report": "ztty-windows-x86_64.resize-control.cold-01.json",
+      "passed": true,
+      "report_sha256": "e1ccc48f081e97358523d21cf5bdcffc92929826e264c4e08b26aea7eb0b7804"
+    },
+    {
+      "number": 2,
+      "report": "ztty-windows-x86_64.resize-control.cold-02.json",
+      "passed": true,
+      "report_sha256": "d101a0a8327fa2549fcc6b22309f599c3ba882ab26e72b05c4a8d26f99d1e11a"
+    },
+    {
+      "number": 3,
+      "report": "ztty-windows-x86_64.resize-control.cold-03.json",
+      "passed": true,
+      "report_sha256": "38b10e36c0abc4a6f107fa97605c1db825c06c84bee52ba83e9ca1eecfe4aa07"
+    },
+    {
+      "number": 4,
+      "report": "ztty-windows-x86_64.resize-control.cold-04.json",
+      "passed": true,
+      "report_sha256": "dfff7dfed8c92dbdb99284d848f3a5b762b727627aed75490431bdac3eed376d"
+    },
+    {
+      "number": 5,
+      "report": "ztty-windows-x86_64.resize-control.cold-05.json",
+      "passed": true,
+      "report_sha256": "5d108e0ce6ad6cdaa53101175f52e56fc1583537d0c18ccc8835a88c79c0b85d"
+    },
+    {
+      "number": 6,
+      "report": "ztty-windows-x86_64.resize-control.cold-06.json",
+      "passed": true,
+      "report_sha256": "67153665fc16c2cb2d3246a5eba536a567b6a2ee6157144bc2d762ba01057866"
+    },
+    {
+      "number": 7,
+      "report": "ztty-windows-x86_64.resize-control.cold-07.json",
+      "passed": true,
+      "report_sha256": "1734d4b8e28c83279d7b844d180f5ae49dce52f193f3fc15472e42d13a14b868"
+    },
+    {
+      "number": 8,
+      "report": "ztty-windows-x86_64.resize-control.cold-08.json",
+      "passed": false,
+      "report_sha256": "6cc4ada228f7d7d8c963b58dd046b9753413ddf806b2f285d611cfb1f30fc624"
+    }
+  ],
+  "desktop": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11",
+  "python_process": {
+    "process_machine": 0,
+    "native_machine": 34404,
+    "emulated": false
+  },
+  "binary_machine": 34404,
+  "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+  "binary_sha256": "b0a78958ef8ba817a1d5dbdd4ff54a49011b4e4fa9c07a41bb8e7b6c6e6f94c5",
+  "run_id": "44343658618",
+  "c_source_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6",
+  "error": "control 8/16 failed: AssertionError('timeout: restored; last error: None')",
+  "desktop_isolation": {
+    "passed": false,
+    "status": "failed",
+    "desktop": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11",
+    "creation_flags": 134742020,
+    "inherited_handles": [
+      "NUL stdin",
+      "stdout log",
+      "stderr log"
+    ],
+    "kill_on_job_close": true,
+    "worker_resumed": true,
+    "observed_job_pids": [
+      1272,
+      2016,
+      2452,
+      2528,
+      3176,
+      3792,
+      6772,
+      8360,
+      9056
+    ],
+    "cleanup": {
+      "errors": [],
+      "job_empty": true,
+      "worker_exited": true,
+      "input_restored": true,
+      "thread_restored": true,
+      "owned_desktop_closed": true,
+      "handles_closed": true,
+      "job_pids_after": [],
+      "input_before_restore": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11",
+      "input_after_restore": "Default"
+    },
+    "before": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "Default",
+      "input": "Default"
+    },
+    "created_desktop": true,
+    "worker_pid": 1272,
+    "worker_tid": 1264,
+    "created_suspended": true,
+    "worker_assigned": true,
+    "assigned_job_pids": [
+      1272
+    ],
+    "last_input_desktop": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11",
+    "switched_to_owned": true,
+    "worker_exit_code": 1,
+    "error": "RuntimeError: native worker exited with 1; see its JSON and stderr log",
+    "after": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "Default",
+      "input": "Default"
+    },
+    "elapsed_seconds": 10.93
+  },
+  "worker_state": {
+    "passed": true,
+    "pid": 1272,
+    "desktop": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11",
+    "context": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11",
+      "input": "ztty-control-3400-b900268c05c540fcbc5026b764d1cb11"
+    },
+    "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+    "binary_sha256": "b0a78958ef8ba817a1d5dbdd4ff54a49011b4e4fa9c07a41bb8e7b6c6e6f94c5",
+    "run_id": "44343658618",
+    "c_source_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6"
+  }
+}

@@ -1,0 +1,357 @@
+{
+  "run_id": 44324788860,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44324788860",
+  "job_id": 134873173833,
+  "artifact_id": 14435449610,
+  "source_sha": "f10e0daaae4ad611d79f21ca1d3788725b1043f5",
+  "source_ref": "refs/heads/fix/windows-resize-release-20261118",
+  "run_attempt": "1",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "architecture": "x86_64",
+  "status": "failed",
+  "accepted": false,
+  "paint_diagnostics_enabled": false,
+  "binary_sha256": "0ad37f885107591a4bda47ca722b6bac89ed4404d76df8568ab073445dd6d5ec",
+  "artifact_zip_sha256": "fff153027e53f014d37497b647fb563c560b2d4bc6a93e7686aab51bf2b403bc",
+  "build_files_verified": 113,
+  "checksum_sidecars_verified": 3,
+  "package_manifest_files_verified": 5,
+  "original_base_checks_completed": 23,
+  "cold_required": 8,
+  "cold_completed": 0,
+  "cold_attempted": 1,
+  "warm_required_per_cold": 10,
+  "back_to_back_required_per_cold": 10,
+  "workspace_entered": false,
+  "reports": [
+    {
+      "report": "ztty-windows-x86_64.native.json",
+      "report_sha256": "74e2be30b5a085824f7d0b5e05b941b1c4743b168336f0b6d56857d792945d3a",
+      "scope": "original gate",
+      "passed": false,
+      "base_checks": 23,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "resize_path": "rapid",
+      "window_pid": 8220,
+      "warm_completed": 0,
+      "back_to_back_completed": 0,
+      "error": "resize_restores_visible_image: expected [255, 0, 0], last RGB [0, 0, 0]; timeout: resize_restores_visible_image; last error: None",
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.004875400000003083,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "report": "ztty-windows-x86_64.native.resize-rapid-diagnostic.json",
+      "report_sha256": "de310a3f9c2ac8f393cd615b104368ac0b17d1678c9e550b142b62a3eb8b5ab4",
+      "scope": "independent diagnostic only",
+      "passed": true,
+      "base_checks": 31,
+      "runtime_trace_enabled": true,
+      "paint_diagnostics_enabled": false,
+      "resize_path": "rapid",
+      "window_pid": 5916,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "error": null,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.025502299999971,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "report": "ztty-windows-x86_64.native.resize-staged-diagnostic.json",
+      "report_sha256": "3ebf1ba2640228a766de729bc66b8e99ecdded4aa246e64c8d4785414b556225",
+      "scope": "independent diagnostic only",
+      "passed": true,
+      "base_checks": 31,
+      "runtime_trace_enabled": true,
+      "paint_diagnostics_enabled": false,
+      "resize_path": "staged",
+      "window_pid": 7804,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "error": null,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.026545999999996184,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    }
+  ],
+  "pngs_verified": 96,
+  "geometry_samples_verified": 157,
+  "resize_stage_samples_verified": 155,
+  "resize_stage_expected_mismatches": [
+    {
+      "report": "ztty-windows-x86_64.native.json",
+      "sequence": "base",
+      "stage": "restored",
+      "client": [
+        175,
+        28
+      ],
+      "rgb": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "failed_sample": [
+    175,
+    28
+  ],
+  "failed_expected": [
+    255,
+    0,
+    0
+  ],
+  "failed_actual": [
+    0,
+    0,
+    0
+  ],
+  "snapshot": {
+    "schema": 1,
+    "paint_diagnostics_enabled": false,
+    "pid": 8220,
+    "hwnd": 458870,
+    "sample": [
+      175,
+      28
+    ],
+    "before": {
+      "surface": {
+        "size": [
+          180,
+          190
+        ],
+        "clip": [
+          0,
+          0,
+          180,
+          190
+        ]
+      },
+      "cpu_rgb": [
+        255,
+        0,
+        0
+      ],
+      "dispatch_resize_pending": false,
+      "dispatch_paint_pending": false,
+      "deferred_paints": 0,
+      "app_resize_pending": false,
+      "full_redraw": false,
+      "pane": {
+        "rect": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "grid": [
+          20,
+          10
+        ],
+        "pty": [
+          20,
+          10
+        ],
+        "images": 1,
+        "placements": 1,
+        "dirty": false,
+        "terminal_dirty": false,
+        "grid_ready": true,
+        "synchronized_output": false
+      },
+      "last_paint": {
+        "sequence": 19,
+        "surface": [
+          180,
+          190
+        ],
+        "region": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "blit": 1,
+        "start_event_sequence": 210,
+        "end_event_sequence": 211,
+        "default_message": 0,
+        "default_depth": 0,
+        "target_after_blit": null
+      },
+      "events": {
+        "enabled": true,
+        "sequence": 212,
+        "default_message": 0,
+        "default_depth": 0,
+        "messages": [
+          {
+            "message": 70,
+            "received": 186,
+            "default_enter": 187,
+            "default_exit": 191
+          },
+          {
+            "message": 71,
+            "received": 202,
+            "default_enter": 203,
+            "default_exit": 205
+          },
+          {
+            "message": 136,
+            "received": 195,
+            "default_enter": 196,
+            "default_exit": 201
+          },
+          {
+            "message": 133,
+            "received": 197,
+            "default_enter": 198,
+            "default_exit": 199
+          },
+          {
+            "message": 20,
+            "received": 200,
+            "default_enter": 0,
+            "default_exit": 0
+          },
+          {
+            "message": 5,
+            "received": 204,
+            "default_enter": 0,
+            "default_exit": 0
+          }
+        ],
+        "changing": {
+          "sequence": 186,
+          "flags_in": 22,
+          "flags_submitted": 278,
+          "position": [
+            0,
+            0,
+            196,
+            229
+          ],
+          "current_outer": [
+            32,
+            32,
+            192,
+            261
+          ]
+        },
+        "changed": {
+          "sequence": 202,
+          "flags_reported": 4374,
+          "position": [
+            32,
+            32,
+            196,
+            229
+          ]
+        },
+        "last_size": {
+          "kind": 0,
+          "size": [
+            180,
+            190
+          ]
+        }
+      }
+    },
+    "client_ok": true,
+    "client": [
+      180,
+      190
+    ],
+    "update_pending": false,
+    "update_rect": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "after_flush": {
+      "flush": 1,
+      "cpu_rgb": [
+        255,
+        0,
+        0
+      ],
+      "bitmap_read": 32,
+      "bitmap": [
+        180,
+        190
+      ],
+      "bitmap_matches": true,
+      "source_rgb": [
+        255,
+        0,
+        0
+      ],
+      "target_rgb": [
+        0,
+        0,
+        0
+      ],
+      "source_clip_type": 2,
+      "source_clip": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "target_clip_type": 2,
+      "target_clip": [
+        0,
+        0,
+        180,
+        190
+      ]
+    }
+  },
+  "after_repaint_rgb": [
+    255,
+    0,
+    0
+  ],
+  "cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-2660-cb93ad1d7cc74a5f917f8aaa16690edf",
+    "input_after_restore": "Default"
+  },
+  "desktop_elapsed_seconds": 19.127,
+  "worker_exit_code": 1,
+  "scope": "Candidate only. Original untraced gate failed before cold repetition and workspace. Two existing independent traced diagnostic processes retain separate results and do not supersede the failure. Extra paint DC diagnostics were disabled in all three processes. No new CI rerun or binary execution was performed during this audit."
+}

@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "03053f794e3d765f24d8fbd29292f91517ab2574",
+  "run_id": 44323138525,
+  "architecture": "aarch64",
+  "artifact_id": 14435139244,
+  "artifact_zip_sha256": "b55288f05363dcaf092674b3e339cc8c59344a1ad2eeaa235290f87f0fad64e9",
+  "binary_sha256": "4cee5ec85b000876d98dd9620342284d3d66e6f2230c42766c4e9173d0f108ce",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "acceptance_credit": false,
+  "passed": false,
+  "status": "failed",
+  "failed_cold_start": 6,
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/paint-diagnostics-44323138525/windows-aarch64/summary.json",
+      "bytes": 11537,
+      "sha256": "6a7d2302a28b992ceca713b357711a38c3173334a9d5c02ecd9822d7c082f1c7",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 45431,
+      "sha256": "c13e68a0540bbf83e0bd2d5d76cd05509a4cb8f7ed920050a39e55b0b4e65c0b",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 1032
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.json",
+      "source_path": "artifacts/release-audit/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.native.cold-06.json",
+      "bytes": 44002,
+      "sha256": "9ec2f16a7dd93f40512aa8db10b88ae25dda13113d05ae0ba95596b73bf3c9d1",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2098
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.post-failure.json",
+      "source_path": "artifacts/release-audit/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.json",
+      "bytes": 1798,
+      "sha256": "8367fb6d78463f2751756610c878e7b37f7b9015f2b7c6eca0e9228bb8032414",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.resize-restored.png",
+      "source_path": "artifacts/release-audit/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.native.cold-06.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.post-failure.png",
+      "source_path": "artifacts/release-audit/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.post-repaint.png",
+      "source_path": "artifacts/release-audit/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "scope": "Compact original failed cold-start report, build identity, same-process snapshot and three original PNGs. Earlier successful cold reports and other PNGs remain in the verified original artifact and are indexed by the derived summary.",
+  "notes": [
+    "Raw JSON, original line endings and PNG bytes are preserved.",
+    "The original rapid pixel assertion fails with explicit paint DC diagnostics enabled; no ordinary acceptance credit is assigned.",
+    "Post-flush and post-repaint evidence does not accept the original failure.",
+    "NOCOPYBITS is present in both submitted CHANGING and reported CHANGED flags. The last paint has a full post-BitBlt clip and correct origin.",
+    "Thread-local callback sequence records do not establish another thread SetWindowPos completion or internal backing-surface/compositor/copy order.",
+    "No source or target RGB was sampled during the last BitBlt; the red source pixel is sampled only after the failure."
+  ]
+}

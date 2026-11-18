@@ -35,6 +35,7 @@ CREATE_SUSPENDED, EXTENDED_STARTUPINFO_PRESENT, CREATE_NO_WINDOW = 4, 0x80000, 0
 CREATION_FLAGS = CREATE_SUSPENDED | EXTENDED_STARTUPINFO_PRESENT | CREATE_NO_WINDOW
 KILL_ON_JOB_CLOSE, HANDLE_LIST = 0x2000, 0x20002
 WAIT_TIMEOUT, WAIT_FAILED = 258, 0xFFFFFFFF
+COLD_STARTS = 8
 
 
 class SecurityAttributes(C.Structure):
@@ -473,19 +474,148 @@ def run_isolated(api, command, desktop, stdout, stderr, timeout, checkpoint=lamb
     return report
 
 
-def combine(native, desktop, worker):
+def source_identity(binary):
+    source = os.environ.get("SOURCE_SHA", "")
+    if not re.fullmatch(r"[0-9a-f]{40}", source):
+        raise ValueError("cold-start evidence requires the immutable SOURCE_SHA")
+    return {"source_sha": source, "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest()}
+
+
+def complete_native_run(report, identity):
+    """Require the uninstrumented 31 checks and both ten-round resize gates."""
+    if not isinstance(report, dict):
+        return False
+    checks, rapid, cleanup = report.get("checks"), report.get("rapid_resize_repetitions", {}), report.get("cleanup", {})
+    burst = report.get("back_to_back_resize_repetitions", {})
+    if (not isinstance(checks, list) or len(checks) != 31 or not isinstance(rapid, dict)
+            or not isinstance(burst, dict) or not isinstance(cleanup, dict)):
+        return False
+    names = [check.get("name") for check in checks if isinstance(check, dict)]
+    iterations = rapid.get("iterations")
+    burst_iterations = burst.get("iterations")
+    return (report.get("passed") is True and report.get("status") == "passed"
+            and report.get("runtime_trace_enabled") is False and report.get("resize_path") == "rapid"
+            and len(names) == 31 and all(isinstance(name, str) and name for name in names)
+            and len(set(names)) == 31 and all(check.get("passed") is True for check in checks)
+            and report.get("visible_pixel_checks_completed", 0) > 0
+            and rapid.get("passed") is True and rapid.get("required") == rapid.get("completed") == 10
+            and isinstance(iterations, list) and len(iterations) == 10
+            and all(isinstance(item, dict) and item.get("number") == number and item.get("passed") is True
+                    for number, item in enumerate(iterations, 1))
+            and burst.get("passed") is True and burst.get("required") == burst.get("completed") == 10
+            and isinstance(burst_iterations, list) and len(burst_iterations) == 10
+            and all(isinstance(item, dict) and item.get("number") == number and item.get("passed") is True
+                    for number, item in enumerate(burst_iterations, 1))
+            and cleanup.get("process_exited") is True and cleanup.get("temporary_directory_removed") is True
+            and cleanup.get("returncode") == 0
+            and all(report.get(key, value) == value for key, value in identity.items() if key != "desktop")
+            and all(report.get("desktop", {}).get(key, {}).get("name") == identity["desktop"]
+                    for key in ("thread", "input")))
+
+
+def validate_cold_runs(aggregate, identity, directory):
+    """Reopen every raw report: a summary flag or missing round cannot pass."""
+    try:
+        if (not isinstance(aggregate, dict) or aggregate.get("passed") is not True
+                or aggregate.get("required") != COLD_STARTS or aggregate.get("completed") != COLD_STARTS
+                or not re.fullmatch(r"[0-9a-f]{40}", identity.get("source_sha", ""))
+                or not re.fullmatch(r"[0-9a-f]{64}", identity.get("binary_sha256", ""))
+                or any(aggregate.get(key) != value for key, value in identity.items())):
+            return False
+        runs = aggregate.get("runs")
+        if not isinstance(runs, list) or len(runs) != COLD_STARTS:
+            return False
+        seen, names = set(), None
+        for number, entry in enumerate(runs, 1):
+            name = entry["report"]
+            if (not isinstance(name, str) or Path(name).name != name or not name.endswith(".json")
+                    or name in seen or entry.get("number") != number or entry.get("passed") is not True
+                    or any(entry.get(key) != value for key, value in identity.items())):
+                return False
+            seen.add(name)
+            raw = (directory / name).read_bytes()
+            report = json.loads(raw)
+            if hashlib.sha256(raw).hexdigest() != entry.get("report_sha256") or not complete_native_run(report, identity):
+                return False
+            current = [check["name"] for check in report["checks"]]
+            if names is not None and current != names:
+                return False
+            names = current
+        return True
+    except (OSError, ValueError, TypeError, KeyError, AttributeError):
+        return False
+
+
+def run_cold_starts(args, identity, run_native):
+    """Keep the first raw result, then require seven fresh processes in order."""
+    first_raw = args.output.read_bytes()
+    original = json.loads(first_raw)
+    # Archive before the top-level report becomes an in-progress aggregate.
+    with args.output.with_suffix(".cold-01.json").open("xb") as stream:
+        stream.write(first_raw)
+    aggregate = {"required": COLD_STARTS, "completed": 0, "passed": False, "runs": [], **identity}
+    original.update({"cold_start_runs": aggregate, "passed": False, "status": "running"})
+    names = None
+    for number in range(1, COLD_STARTS + 1):
+        path = args.output.with_suffix(f".cold-{number:02d}.json")
+        entry = {"number": number, "report": path.name, "passed": False, **identity}
+        aggregate["runs"].append(entry)
+        write_json(args.output, original)
+        error, returned = None, True
+        try:
+            if source_identity(args.binary) != {key: identity[key] for key in ("source_sha", "binary_sha256")}:
+                raise ValueError("source or binary changed between cold starts")
+            if number != 1:
+                if path.exists():
+                    raise FileExistsError(f"cold-start report already exists: {path.name}")
+                try:
+                    returned = run_native(args.binary, path, args.arch)
+                except BaseException as failure:
+                    error = repr(failure)
+                    traceback.print_exc()
+            raw = path.read_bytes()
+            entry["report_sha256"] = hashlib.sha256(raw).hexdigest()
+            report = json.loads(raw)
+            entry["checks_completed"] = len(report.get("checks", []))
+            entry["rapid_resizes_completed"] = report.get("rapid_resize_repetitions", {}).get("completed", 0)
+            entry["back_to_back_resizes_completed"] = report.get("back_to_back_resize_repetitions", {}).get("completed", 0)
+            entry["cleanup"] = report.get("cleanup", {})
+            if error or returned is not True or not complete_native_run(report, identity):
+                raise ValueError(error or report.get("error") or "native checks, resize repetitions, or cleanup incomplete")
+            current = [check["name"] for check in report["checks"]]
+            if names is not None and current != names:
+                raise ValueError("cold-start native check set changed")
+            names = current
+            if source_identity(args.binary) != {key: identity[key] for key in ("source_sha", "binary_sha256")}:
+                raise ValueError("source or binary changed during a cold start")
+            entry["passed"] = True
+            aggregate["completed"] += 1
+        except BaseException as failure:
+            entry["error"] = repr(failure)
+            original.update({"passed": False, "status": "failed",
+                             "error": f"cold start {number}/{COLD_STARTS} failed: {failure}"})
+            write_json(args.output, original)
+            return original
+        write_json(args.output, original)
+    aggregate["passed"] = True
+    accepted = validate_cold_runs(aggregate, identity, args.output.parent)
+    original.update({"passed": accepted, "status": "passed" if accepted else "failed"})
+    if not accepted:
+        original["error"] = "cold-start raw evidence did not validate"
+    write_json(args.output, original)
+    return original
+
+
+def combine(native, desktop, worker, report_directory):
     """A desktop/cleanup success cannot replace the existing visible pixel gate."""
     from windows_workspace_native import validate_report
-    checks = native.get("checks")
-    native_ok = (native.get("passed") is True and native.get("status") == "passed"
-                 and isinstance(checks, list) and bool(checks)
-                 and all(check.get("passed") is True for check in checks)
-                 and native.get("visible_pixel_checks_completed", 0) > 0
-                 and native.get("cleanup", {}).get("process_exited") is True
-                 and native.get("cleanup", {}).get("temporary_directory_removed") is True
-                 and validate_report(native.get("workspace", {})))
+    identity = {key: desktop.get(key) for key in ("source_sha", "binary_sha256", "desktop")}
+    native_ok = (complete_native_run(native, identity)
+                 and validate_report(native.get("workspace", {}))
+                 and validate_cold_runs(native.get("cold_start_runs"), identity, report_directory))
     worker_ok = (worker.get("passed") is True and worker.get("pid") == desktop.get("worker_pid")
-                 and worker.get("desktop") == desktop.get("desktop"))
+                 and worker.get("desktop") == desktop.get("desktop")
+                 and all(worker.get(key) == desktop.get(key) for key in ("source_sha", "binary_sha256")))
     try:
         require_context(worker.get("context", {}), desktop["desktop"])
         if native_ok:
@@ -517,6 +647,7 @@ def worker(args, state_path):
         api = WindowsAPI()
         state["context"] = api.context()
         require_context(state["context"], args.worker_desktop)
+        state.update(source_identity(args.binary))
         state["passed"], state["status"] = True, "passed"
     except BaseException as error:
         state["error"] = str(error)
@@ -567,10 +698,25 @@ def worker(args, state_path):
                 if not attempt["cleanup_complete"]:
                     break
         return 1
-    # Preserve the original pixel/input checks in their original report. The second
-    # suite has its own JSON/PNG evidence and must also pass on this desktop.
+    # Every additional cold start has a distinct PTY/window and raw report. A
+    # failure stops here; extra cold runs never trigger the diagnostic retries.
+    try:
+        original = run_cold_starts(args, {key: state[key] for key in ("source_sha", "binary_sha256", "desktop")},
+                                   windows_native.run)
+    except BaseException as error:
+        traceback.print_exc()
+        try:
+            original = json.loads(args.output.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            original = {"checks": []}
+        original.update({"passed": False, "status": "failed", "error": f"cold-start evidence: {error}"})
+        write_json(args.output, original)
+        return 1
+    if original["passed"] is not True:
+        return 1
+    # Workspace evidence runs only after all eight independent native suites and
+    # their cleanup pass, while keeping the first suite's original checks.
     import windows_workspace_native
-    original = json.loads(args.output.read_text(encoding="utf-8"))
     workspace_path = args.output.with_suffix(".workspace.json")
     try:
         windows_workspace_native.run(args.binary, workspace_path, args.arch)
@@ -628,7 +774,7 @@ def main():
             if not isinstance(native, dict) or not isinstance(state, dict):
                 raise ValueError("native/worker reports must be JSON objects")
             report["worker_state"] = state
-            result = combine(native, report, state)
+            result = combine(native, report, state, args.output.parent)
         except Exception as error:
             result = {"passed": False, "status": "failed", "error": repr(error), "desktop_isolation": report}
         write_json(desktop_path, report)

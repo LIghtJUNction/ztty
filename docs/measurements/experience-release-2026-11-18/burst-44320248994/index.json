@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "65dcd2ce3e69a4cbadcb98c7d9e08f431962270f",
+  "production_policy_commit": "7098ee9bf53e44b7d4d8af7e9e5c9786a5967df7",
+  "run_id": 44320248994,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44320248994",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "passed": false,
+  "status": "failed",
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "back_to_back_protocol": {
+    "set_window_pos_flags": "0x16",
+    "between_two_size_requests": "no native query, screenshot, PTY acknowledgement or sleep",
+    "restored_pixel_tolerance_per_channel": 1,
+    "pixel_wait_seconds": 10
+  },
+  "x86_64": {
+    "completed": 1,
+    "attempted": 2,
+    "failed_cold_start": 2,
+    "failed_check": "resize_restores_visible_image",
+    "checks_completed_in_failed_run": 23,
+    "warm_and_burst_completed_in_failed_run": [
+      0,
+      0
+    ],
+    "actual": [
+      0,
+      0,
+      0
+    ],
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "completed": 4,
+    "attempted": 5,
+    "failed_cold_start": 5,
+    "failed_check": "resize_restores_visible_image",
+    "checks_completed_in_failed_run": 23,
+    "warm_and_burst_completed_in_failed_run": [
+      0,
+      0
+    ],
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "both_failure_snapshots": {
+    "cpu_and_source_rgb": [
+      255,
+      0,
+      0
+    ],
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_and_pty": [
+      20,
+      10
+    ],
+    "dispatch_resize_pending": false,
+    "dispatch_paint_pending": false,
+    "deferred_paints": 0,
+    "flush_did_not_restore_window": true,
+    "normal_repaint_restored_window": true
+  },
+  "workspace": "not_entered_on_either_architecture",
+  "cleanup": "all seven started application processes exited and all seven temporary directories were actually removed on their first attempt; outer Jobs empty and desktops restored",
+  "inference_limit": "This NOCOPYBITS policy candidate still failed the unchanged original pixel gate. No policy-branch count or final WINDOWPOS flags were captured; neither flag delivery/acceptance nor an internal saved-pixel copy order is established. Diagnostic repaint recovery does not accept the original failure.",
+  "delivery_scope": "Windows build-only candidate; no Release publication or device installation is claimed. The failed formal v0.3.0 tag and its evidence remain unchanged."
+}

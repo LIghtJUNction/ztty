@@ -2,6 +2,7 @@
 """Failure-path regressions for native release acceptance; ELF bytes are fixtures."""
 import contextlib
 import ctypes
+import errno
 import hashlib
 import json
 import os
@@ -18,6 +19,36 @@ import unittest
 from unittest import mock
 
 import linux_native
+import workspaces
+
+
+class ClosedIdentityTests(unittest.TestCase):
+    def test_already_closed_process_disappearing_during_read_is_gone(self):
+        for code in (errno.ENOENT, errno.ESRCH):
+            with self.subTest(errno=code):
+                read_start = mock.Mock(side_effect=OSError(code, os.strerror(code)))
+                self.assertTrue(workspaces.closed_identity_gone(41, 900, read_start))
+                read_start.assert_called_once_with(41)
+
+    def test_same_live_identity_still_requires_waiting(self):
+        read_start = mock.Mock(return_value=900)
+        self.assertFalse(workspaces.closed_identity_gone(41, 900, read_start))
+        read_start.assert_called_once_with(41)
+
+    def test_reused_pid_does_not_keep_old_identity_alive(self):
+        read_start = mock.Mock(return_value=901)
+        self.assertTrue(workspaces.closed_identity_gone(41, 900, read_start))
+        read_start.assert_called_once_with(41)
+
+    def test_permission_and_other_read_errors_remain_failures(self):
+        for code in (errno.EACCES, errno.EIO):
+            with self.subTest(errno=code):
+                failure = OSError(code, os.strerror(code))
+                read_start = mock.Mock(side_effect=failure)
+                with self.assertRaises(OSError) as raised:
+                    workspaces.closed_identity_gone(41, 900, read_start)
+                self.assertIs(raised.exception, failure)
+                read_start.assert_called_once_with(41)
 
 
 class ArchitectureTests(unittest.TestCase):

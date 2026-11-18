@@ -1,0 +1,315 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+  "run_id": 44345879314,
+  "job_id": 134948112991,
+  "architecture": "x86_64",
+  "artifact_id": 14444784247,
+  "artifact_zip_sha256": "420ef4e8aa2cbf216d545243ecde70d253cfbe13871edecc2f18250b283aff42",
+  "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "formal_release_eligible": false,
+  "required_cold_starts": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "completed_cold_starts": 6,
+  "attempted_cold_starts": 7,
+  "resize_control_diagnostic": {
+    "requested": false,
+    "outcome": "skipped"
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-1464-9c9e5f1f4e0546618e7691fa18480dfa",
+    "input_after_restore": "Default"
+  },
+  "worker_exit_code": 1,
+  "worker_elapsed_seconds": 20.528,
+  "status": "failed",
+  "native_gate_passed": false,
+  "workspace_entered": false,
+  "failed_cold_start": 7,
+  "failed_gate": "resize_restores_visible_image",
+  "failed_pid": 9292,
+  "failed_hwnd": 2425300,
+  "checks_completed_before_failure": 23,
+  "sample": [
+    175,
+    28
+  ],
+  "expected_rgb": [
+    255,
+    0,
+    0
+  ],
+  "actual_rgb": [
+    0,
+    0,
+    0
+  ],
+  "failure_difference_bbox": [
+    152,
+    0,
+    180,
+    190
+  ],
+  "failure_png_equals_after_flush": true,
+  "before_png_equals_after_repaint": true,
+  "dib_resize_changes": {
+    "count": 3,
+    "last_from": [
+      144,
+      190
+    ],
+    "last_to": [
+      180,
+      190
+    ]
+  },
+  "last_paint": {
+    "sequence": 19,
+    "surface": [
+      180,
+      190
+    ],
+    "region": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "blit": 1,
+    "start_event_sequence": 210,
+    "end_event_sequence": 211,
+    "default_message": 0,
+    "default_depth": 0,
+    "target_after_blit": null,
+    "target_after_end_paint": null
+  },
+  "snapshot_event_sequence": 212,
+  "source_after_failure": [
+    255,
+    0,
+    0
+  ],
+  "target_after_failure_flush": [
+    0,
+    0,
+    0
+  ],
+  "full_raw_report_identities": [
+    {
+      "number": 1,
+      "report": "ztty-windows-x86_64.native.cold-01.json",
+      "report_sha256": "2ba6d9265a073e88059440e278249bb58299bf7a1ab78770b1fdc1ca041c0f08",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "pid": 1992,
+      "checks": 31,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.00916979999999512,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 2,
+      "report": "ztty-windows-x86_64.native.cold-02.json",
+      "report_sha256": "1d0dc42cd67d5599304b9bb76f22b9330f5d795ead15478ec844991f088f3aa1",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "pid": 9872,
+      "checks": 31,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.010465600000003406,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 3,
+      "report": "ztty-windows-x86_64.native.cold-03.json",
+      "report_sha256": "f489a0f148ce2aef39869f66a774f53cb348b6910f36e830a9337746c3489ff5",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "pid": 1380,
+      "checks": 31,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.009498400000012452,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 4,
+      "report": "ztty-windows-x86_64.native.cold-04.json",
+      "report_sha256": "0c2365d0a761837ea62f9cc472a96c2af0b8d07aaa9f4b80342025e4653ace03",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "pid": 6068,
+      "checks": 31,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.010581799999982877,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 5,
+      "report": "ztty-windows-x86_64.native.cold-05.json",
+      "report_sha256": "f30d514da648f19a1623aafbde3c2f99033dba56f01df36ca18e590df3fafced",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "pid": 7780,
+      "checks": 31,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.012269399999979669,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 6,
+      "report": "ztty-windows-x86_64.native.cold-06.json",
+      "report_sha256": "bde66f38096dac38ef7e88b2d2a4e8fa7fa5f2d91ef1e533384055d9bec74425",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "pid": 2684,
+      "checks": 31,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.0090364000000136,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 7,
+      "report": "ztty-windows-x86_64.native.cold-07.json",
+      "report_sha256": "b8f59988aabed7ed7ad979c8fb9c430123fac1dd6bfb9ba535b7ae950d08c557",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "49ab613f548584819f608b11547d9a0b6375eff56de337ed45a930952e907380",
+      "pid": 9292,
+      "checks": 23,
+      "passed": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.005975599999999304,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    }
+  ],
+  "scope": "Ordinary-mode synchronous WM_SIZE candidate failed. Immediate paint probes are null and cannot be filled by prior diagnostic results. Failure-only snapshot, flush and repaint do not accept the original failure. NC harness intervention was not present at this source.",
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-x86_64/summary.json",
+      "bytes": 25195,
+      "sha256": "9569233c39f4a9d438027e5f1604450c4331eecc61c69bda020ada844e168fe8",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 53530,
+      "sha256": "44c4fc9a5b99403c531955723215783d7660def6b4b178720b9fa25544d85820",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 1220
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-07.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-x86_64/ztty-windows-x86_64.native.cold-07.json",
+      "bytes": 46781,
+      "sha256": "b8f59988aabed7ed7ad979c8fb9c430123fac1dd6bfb9ba535b7ae950d08c557",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2210
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-07.post-failure.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-x86_64/ztty-windows-x86_64.native.cold-07.post-failure.json",
+      "bytes": 2410,
+      "sha256": "7a82c3bb2283999a67fd0191912c1c093ad14898c6ab5bd013bb80a37c1915c7",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-07.resize-restored.png",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-x86_64/ztty-windows-x86_64.native.cold-07.resize-restored.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-07.post-failure.png",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-x86_64/ztty-windows-x86_64.native.cold-07.post-failure.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-07.post-repaint.png",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-x86_64/ztty-windows-x86_64.native.cold-07.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ]
+}

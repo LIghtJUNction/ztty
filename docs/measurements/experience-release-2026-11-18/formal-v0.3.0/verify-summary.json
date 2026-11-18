@@ -1,0 +1,92 @@
+{
+  "schema": 1,
+  "repo": "LIghtJUNction/ztty",
+  "run_id": 44309412482,
+  "job_id": 134819424395,
+  "job_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44309412482/job/134819424395",
+  "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "source_ref": "refs/tags/v0.3.0",
+  "source_binding": "Reusable Verify workflow ref and checked-out Git SHA are both recorded in the job log.",
+  "status": "passed",
+  "passed": true,
+  "job_conclusion": "success",
+  "command": "ZTTY_BARE_METAL=1 make check; cargo test --locked --workspace --doc; /usr/bin/python3 tests/gui_smoke.py",
+  "rust_regular_tests": 271,
+  "rust_regular_suites": 21,
+  "doctest_unique_cases": 6,
+  "doctest_executions": 12,
+  "doctest_runs": 2,
+  "doctest_note": "The same six cases run in cargo test --workspace and again in the explicit --doc command; counted as six unique cases, not twelve distinct tests.",
+  "session_core_custom_checks": 8,
+  "session_core_children_joined": true,
+  "installer_tests": 17,
+  "bash_pty_checks": 11,
+  "mcp_transport": "passed",
+  "mcp_sessions": "passed",
+  "mcp_sessions_exit_code_field": "The value 7 is an intentionally tested child exit code; the suite command completed successfully.",
+  "mcp_security": "passed",
+  "mcp_wait_checks": 13,
+  "mcp_sse_checks": 7,
+  "mcp_wait_sse_cleanup": "passed",
+  "mcp_test_binary_sha256": "4b9e2f354dc09cc32641b75bcd0238f14a2886074bfa66e091b992103ea38586",
+  "mcp_binary_matches_formal_linux_x86_64_package": true,
+  "gui_smoke_checks": 12,
+  "gui_smoke_failed": 0,
+  "gui_smoke_names": [
+    "legacy_keyboard",
+    "kitty_disambiguation",
+    "kitty_events_and_text",
+    "resize_signal",
+    "selection_clipboard",
+    "clipboard_bracketed_paste",
+    "large_paste_backpressure",
+    "sgr_mouse_drag",
+    "shift_selection_release",
+    "osc8_open",
+    "synchronized_output",
+    "appearance_and_cursor"
+  ],
+  "format_strict_clippy_release_build": "passed in the required make check command",
+  "no_std_dependency_and_symbol_audit": "passed",
+  "bare_metal_x86_64_unknown_none": "required and passed",
+  "native_darwin_spawn": "explicitly skipped on Linux; not counted",
+  "retained_warning": "zune-png v0.5.2 future Rust compatibility warning",
+  "log_source": "Decoded GitHub workflow-job log text, saved as UTF-8 preserving the returned BOM and line breaks.",
+  "job_log_bytes": 110996,
+  "job_log_sha256": "d0659cbb3f5c08326cea05311a129a3890ea90cbb306bf10ccaa7c193dcf448d",
+  "printed_json_files": {
+    "bash-integration.json": {
+      "bytes": 2120,
+      "sha256": "9190b719e894e3eb6d058c1e4feb660279439b5e94b9213b6b565b94f0eb3972"
+    },
+    "mcp-transport.json": {
+      "bytes": 165,
+      "sha256": "4da19e34008f0117ebf92a6fb944370a8388489224dee621e53960ade1a69c18"
+    },
+    "mcp-sessions.json": {
+      "bytes": 3462,
+      "sha256": "b7bf6461618c8d5ca2a621ad851fb860511dbce9a9ad696dfb2b121a8aeaec46"
+    },
+    "mcp-security.json": {
+      "bytes": 207,
+      "sha256": "9536b5a8589899f1b3e320e1b79c3ae0de20476a094dbd7e5a82caa25b1c799e"
+    },
+    "mcp-wait.json": {
+      "bytes": 5469,
+      "sha256": "5552ca5f847cf88e884378c6d351bc9948ffebf895b68c3826f4f6fc2fb3e54c"
+    },
+    "mcp-sse.json": {
+      "bytes": 2326,
+      "sha256": "192935496be11b787f312164e6e5b7769d3523df7241b79daf5ee3b75e8706f4"
+    },
+    "gui-smoke.json": {
+      "bytes": 2097,
+      "sha256": "9536fb34cc1563dd1da8c25ba79d1921a5df3fd44277d605c74702ee65f56fca"
+    }
+  },
+  "limits": [
+    "Verify did not upload a separate artifact; its printed JSON evidence was parsed from the preserved job log.",
+    "The GUI smoke JSON records its executable path but no independent binary hash; the wait/SSE reports include the hash that matches the formal Linux x86_64 package.",
+    "Publication and device installation are audited separately."
+  ]
+}
