@@ -8,19 +8,17 @@ not claim that a `v0.2.0` GitHub Release or AUR update has been published.
 
 ## Roadmap candidate acceptance gates
 
-The roadmap has executed four build-only candidates: fa2f201, 2dc6769,
-05782fc and 81c1c06. The fourth accepted both Linux architectures and Windows
-x86_64, including all 30 Windows functional checks and cleanup. Windows ARM64
-passed ten independent checks and cleanup but was blocked by runner-window
-occlusion; both macOS pixel helpers aborted with an initialization assertion.
-The [source-bound record](native-candidates-2026-11-18.md) preserves exact
-results, verified artifact hashes and durable download links. The next
-candidate initializes the macOS helper's WindowServer connection and retains
-real exit/signal evidence before attempting JSON decoding.
-The next Windows gate explicitly isolates its worker and children in an owned
-visible CI desktop and kill-on-close Job; all original pixel assertions remain.
-Desktop restoration and empty-Job evidence are mandatory.
-These are not accepted six-platform production releases.
+The fifth build-only candidate at `7a1d06b` accepts Linux x86_64/ARM64
+with all five GUI suites and Windows x64/ARM64 with all 30 functional checks,
+19 visible-pixel checks and full process/Job/desktop cleanup. The sixth
+candidate at `ef3c2fc` compiles both macOS helpers, then fails the helper's
+activation-policy guard after ten PTY/cwd/protocol checks per architecture.
+The [source-bound record](native-candidates-2026-11-18.md) preserves accepted,
+failed and blocked artifacts, verified hashes and exact download links.
+The next macOS correction verifies the observed policy and records any
+transition before testing WindowServer pixels. Native pixels, Wayland,
+physical input, native shared sessions and the full performance matrix
+remain incomplete; these candidates are not full production releases.
 
 The newer roadmap branch is not covered by run 44165748395. Its Release
 workflow now requires six native architecture jobs: Linux x86_64/ARM64,

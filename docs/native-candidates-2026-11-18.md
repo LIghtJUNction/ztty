@@ -351,12 +351,33 @@ artifacts were verified against GitHub byte counts and SHA-256;
 all build-manifest members and sidecars match. Failed Mac artifacts are
 explicitly named as helper-compilation failures. No Release was published.
 
+## Sixth macOS run: activation-policy state
+
+[Run 44220056623](https://github.com/LIghtJUNction/ztty/actions/runs/44220056623)
+compiles both native helpers at `ef3c2fc187a74aa6ce4eb7963b4d7d564f4dc969`.
+Each architecture passes ten PTY/cwd/protocol checks, then the helper exits 1
+at `appkit_initialization` with `cannot initialize AppKit with prohibited
+activation`. Permission checks and pixel readback have not run. Both reports
+retain an empty remaining-owned-process list. The two ZIPs, their build
+sidecars and all nine members per archive were independently verified; the
+[machine-readable record](measurements/native-sixth-macos-2026-11-18.json)
+includes the original stages and exact Drive locations.
+
+The guard previously required a successful `setActivationPolicy` call even
+when the process might already have the requested policy. Apple documents
+[prohibited as the default for an unbundled executable without Info.plist](https://developer.apple.com/documentation/appkit/nsapplication/activationpolicy-swift.enum/prohibited).
+The old helper did not retain the observed policy or setter result, so those
+individual values cannot be recovered from the sixth run. The correction
+reads the current policy, requests a change only when needed, records the
+before/after values and any setter return, then still requires the actual
+policy to be prohibited. The ten Python contracts pass. Actual AppKit and
+pixel acceptance still require the next native run.
+
 ## Remaining release gates
 
-The fifth run accepts both Windows and both Linux architectures. The corrected
-macOS helper is now queued in [run 44220056623](https://github.com/LIghtJUNction/ztty/actions/runs/44220056623),
-pinned to `ef3c2fc187a74aa6ce4eb7963b4d7d564f4dc969` in build-only mode.
-It still requires native compilation and pixel acceptance. Native Wayland, GPU/VRAM,
+The fifth run accepts both Windows and both Linux architectures. The macOS
+helper now compiles but its activation-policy correction still requires
+native execution and pixel acceptance. Native Wayland, GPU/VRAM,
 macOS pixels/IME, physical input matrices and macOS/Windows shared sessions
 remain incomplete.
 Apple Developer ID/notarization and Windows signing have not been supplied.

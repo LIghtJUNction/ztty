@@ -31,6 +31,8 @@
 
 ### Fixed
 
+- Make macOS helper activation-policy setup idempotent and retain before/after state before failure; the actual prohibited policy remains required. Native execution is pending.
+
 - Call the macOS helper activation-policy method correctly after both native compilers rejected property syntax; preserve the fifth-run failure evidence and require a native rerun.
 
 - Isolate the Windows CI pixel gate on its own visible desktop and owned Job, with explicit handle inheritance, secure-desktop refusal and verified restoration; verified with all 30 checks and desktop restoration on native Windows x64 and ARM64.
