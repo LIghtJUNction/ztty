@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "kind": "derived-device-candidate-index",
+  "source_sha": "19274145e37a591d800f638fe21c2717730b6431",
+  "candidate_version": "0.3.0",
+  "package": "ztty 0.3.0-1",
+  "formal_release": false,
+  "formal_version_0_3_1_published_by_this_evidence": false,
+  "binary_sha256": "57a27b7af8464643cd90889e4930c79e8b97691f2b5d231c28e05830cef7d85c",
+  "binary_path": "/usr/bin/ztty",
+  "user_entry_target": "/usr/bin/ztty",
+  "existing_processes_preserved": 5,
+  "custom_desktop_unchanged": true,
+  "custom_launcher_unchanged": true,
+  "input_gui_exit_code": 0,
+  "files": [
+    {
+      "path": "installed-readback.json",
+      "source_path": "artifacts/release-audit/device-candidate-19274145/installed-readback.json",
+      "bytes": 4679,
+      "sha256": "98e13bc4faf348bcf1ce92d06d22a298a9e47d71e5e0913f9fdd1b612528bcc5"
+    }
+  ],
+  "scope": "Root device readback of a locally verified Linux candidate installed through the package manager. This is separate from formalv0.3.0 failed tag and futureformal0.3.1. Old PIDs/start ticks are preserved while their former system executable inode is reported deleted. No formal six-platform acceptance or official Release download is claimed."
+}
