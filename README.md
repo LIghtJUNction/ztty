@@ -51,8 +51,9 @@ acceptance target; the platform table records what has actually been exercised.
 
 [中文介绍](README.zh-CN.md)
 
-Linux now also provides history search, a temporary command palette, configurable
-key/mouse bindings, live configuration reload and OSC 133 command navigation.
+Linux provides history search across soft-wrapped text, a temporary session
+switcher and command palette, configurable key/mouse bindings, live configuration
+reload and OSC 133 command navigation.
 The shell scripts support opt-in Bash, Zsh, Fish and Nushell integration.
 [Daily workflow and limits](docs/daily-workflow.md) · [Shell setup](shell/README.md)
 · [MCP permissions and command reads](docs/sessions.md).
@@ -104,6 +105,20 @@ The script installs the latest published release, verifies its archive, and
 installs to `~/.local/bin`. The Linux binary requires glibc, X11, Xft, and Xrender.
 The working tree may contain changes that have not yet reached that release.
 
+The installer in this source tree stages and checks the executable before
+replacing the installed file with an atomic rename. An upgrade retains one
+previous executable at `~/.local/bin/ztty.previous`, with its SHA256 in
+`ztty.previous.sha256`; reinstalling identical bytes keeps that rollback copy.
+If the previous installation was a symlink, the backup preserves the link.
+The desktop entry uses the absolute installed path, so an older `ztty` elsewhere
+in `PATH` does not take precedence when launching from the application menu.
+
+Set `ZTTY_INSTALL_DIR` to choose the binary directory and `ZTTY_DESKTOP_DIR` to
+choose the launcher directory. The latter defaults to
+`${XDG_DATA_HOME:-$HOME/.local/share}/applications`. Replacing the executable does
+not restart an existing shared broker; it keeps running its loaded version
+until it exits.
+
 ## Build and run
 
 The toolchain is Rust 1.100.0. On Linux, also install a C linker, X11/Xft/Xrender
@@ -123,9 +138,27 @@ cargo build --locked --release
 ./target/release/ztty --scrollback 4000 -e /bin/bash
 ```
 
-`make install` installs the executable and desktop entry under `~/.local`.
-Set `PREFIX` to choose another location. Linux and macOS use `SHELL`, with
-`/bin/sh` as the fallback; Windows uses `COMSPEC`, falling back to `cmd.exe`.
+Use the checkout's installer to install a local build without downloading:
+
+```sh
+sh install.sh --from-binary ./target/release/ztty
+```
+
+`--from-binary` checks a regular native executable and its staged copy, then
+uses the same replacement path as a release download. `make install` builds and
+installs through this path under `~/.local`; set `PREFIX` to choose another
+location, or `DESTDIR` to stage a package while retaining the final launcher
+path. [Installer options](install.sh) and [offline regression scenarios](tests/install_test.py)
+describe the file and rollback handling.
+
+To roll back later, when the default backup path contains a regular executable:
+
+```sh
+sh install.sh --from-binary "$HOME/.local/bin/ztty.previous"
+```
+
+Linux and macOS use `SHELL`, with `/bin/sh` as the fallback; Windows uses
+`COMSPEC`, falling back to `cmd.exe`.
 Use `-e` to select a different command and `--cwd PATH` for its initial
 directory. Relative commands use the selected cwd; relative config paths keep
 the launcher directory. [Startup directory behavior and native acceptance](docs/startup-directory.md)
@@ -210,8 +243,10 @@ Linux uses `$XDG_CONFIG_HOME/ztty/ztty.conf`, defaulting to
 `~/.config/ztty/ztty.conf`. macOS defaults to
 `~/Library/Application Support/ztty/ztty.conf` and accepts the same explicit
 `XDG_CONFIG_HOME` override. Windows uses `%APPDATA%\ztty\ztty.conf`.
-Choose another file with `ztty --config PATH`. Settings take effect on the next
-launch. Omitted keys use the built-in defaults and `--font` overrides the file.
+Choose another file with `ztty --config PATH`. Settings load at launch; Linux
+also watches the file for changes and supports explicit reload with
+Ctrl+Shift+R. Omitted keys use the built-in defaults and `--font` overrides the
+file.
 Use UTF-8, one `key = value` per line, and whole-line comments starting with `#`.
 
 ```ini
@@ -256,9 +291,50 @@ GDI surface. Appearance parity across the three backends has not been validated.
 | Paste primary selection | Middle mouse button |
 | Browse history | Mouse wheel or Shift + PageUp / PageDown |
 | Open an OSC 8 link | Ctrl + click |
+| Switch or attach a session | Ctrl + Shift + S (`sessions`) |
+| Search retained text | Ctrl + Shift + F |
+| Open the command palette | Ctrl + Shift + P |
+| Reload configuration | Ctrl + Shift + R |
+
+The session switcher filters by name, terminal title and session URI. Type words
+in any order, use Up/Down to choose, and press Enter to focus the selected view.
+Existing tabs and panes are selected within their own workspace; another window
+is raised in place. A session without a window is labeled **Attach**, and Enter
+explicitly opens its view. Attaching from an observing view, or to a session
+controlled by another operator, opens a read-only view. Switching preserves the
+session's PTY and input owner; taking control remains the separate
+`take-control` action. Esc closes the switcher, and Enter with no match leaves
+the query open for editing.
+
+The command palette also accepts multiple words in any order and shows the
+shortcuts active for that view, including custom bindings. ASCII matching is
+case-insensitive; other characters match literally. The named actions are shared
+with `ztty action NAME ACTION` and the `keybind` / `mousebind` settings. For example,
+`keybind = alt+f12 = sessions` adds another session-switcher shortcut, and
+`keybind = ctrl+shift+s = none` disables its default. Both overlays appear only
+when requested and keep their query keystrokes out of the child process.
+
+Search is case-sensitive, literal UTF-8 matching across retained text. Automatic
+wrapping at the window edge keeps a logical line together; an explicit line
+break ends it. Enter / Shift+Enter moves to the next / previous match, Ctrl+U
+clears the query, and Ctrl+Shift+C copies the selected match. Copying joins
+soft-wrapped rows without adding line breaks; ordinary selections preserve
+explicit line breaks. When output or a resize invalidates an active search hit,
+copying searches again before reading the selection. Queries are limited to
+1,024 UTF-8 bytes, and regular expressions and full history reflow remain outside
+the implemented search scope. The current column width bounds the searchable
+part of older rows. [Search and switcher regression scenarios](tests/session_switcher.py)
+exercise the keyboard and clipboard paths.
 
 When an application captures mouse events, hold Shift to use local selection,
 wheel scrolling, or primary-selection paste.
+
+Caps Lock, Num Lock and Scroll Lock change keyboard state without sending key
+bytes to a legacy shell. In normal keypad mode with Num Lock off, keypad zero
+still sends the standard Insert key; applications that explicitly request
+enhanced Kitty keyboard reporting can receive lock-key events.
+[Input compatibility](docs/input-compatibility.md)
+describes the protocol boundary.
 
 Links are opened only after an explicit click, using argv rather than a shell.
 Supported link schemes are HTTP, HTTPS, and mailto. Clipboard input is bounded;

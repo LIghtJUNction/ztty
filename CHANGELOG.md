@@ -4,6 +4,19 @@
 
 ### Added
 
+- Add the Linux `sessions` action and default `Ctrl+Shift+S` session switcher.
+  Filter names, titles and URIs; select with Up/Down and Enter. Focus existing
+  tabs, panes and windows in place, and explicitly attach sessions without a
+  window while preserving PTYs, input ownership and observing views.
+
+- Let the Linux command palette match multiple words across action names,
+  labels and shortcuts. Display effective custom/default bindings, and keep
+  empty-result queries open when Enter is pressed.
+
+- Add `install.sh --from-binary PATH` for local native builds and rollback from
+  a saved regular executable. Route `make install` through the installer, with
+  `PREFIX` and `DESTDIR` support and configurable binary/launcher directories.
+
 - Add opt-in `--http-response sse` for MCP POST responses, with prompt headers,
   five-second keepalive comments and a final JSON-RPC event. Preserve the default
   JSON mode, request cancellation, role/session isolation and bounded buffers;
@@ -45,6 +58,21 @@
 - Reproducible independent/shared 1/5/10/20 benchmark tooling, workload checks, retained raw measurements and SVG generation.
 
 ### Fixed
+
+- Join soft-wrapped rows during Linux history search and selection copying,
+  while preserving explicit line breaks. Track matches across physical rows,
+  copy complete matched cells beyond the viewport, and refresh stale active
+  search hits before copying after output or resize.
+
+- Keep Caps Lock, Num Lock and Scroll Lock silent in legacy keyboard mode.
+  Preserve Num-Lock-off keypad Insert and lock-key reports requested through
+  the enhanced Kitty keyboard protocol.
+
+- Stage, checksum and validate an installer candidate before atomically
+  replacing the executable. Retain one previous executable or original symlink
+  for rollback, preserve that backup on an identical reinstall, and write a
+  desktop launcher using the absolute installed path. Running processes keep
+  their loaded executable.
 
 - Match equivalent numeric MCP request IDs exactly for pending-request rejection
   and cancellation over stdio and HTTP. Preserve original response tokens,

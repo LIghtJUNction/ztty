@@ -15,6 +15,7 @@ do not yet implement these view actions or the shared runtime.
 | Ctrl+U or Ctrl+A in search/palette | Clear the query |
 | Esc | Close the temporary search/palette |
 | Ctrl+Shift+P | Open the command palette; type to filter, arrows to select, Enter to run |
+| Ctrl+Shift+S | Find a session by name, title or URI; focus its view or explicitly attach |
 | Ctrl+Shift+K / J | Previous / next retained shell command |
 | Ctrl+Shift+Y | Copy the selected command's output; otherwise copy the latest output |
 | Ctrl+Equal / Ctrl+Minus / Ctrl+0 | Increase, decrease or reset font size |
@@ -24,19 +25,37 @@ do not yet implement these view actions or the shared runtime.
 
 The palette appears only when requested. It uses the existing window and does
 not send its query or action keystrokes to the child. It exposes the same named
-actions as custom bindings and `ztty action NAME ACTION`. Workspace shortcuts
+actions as custom bindings and `ztty action NAME ACTION`. Filters accept several
+case-insensitive words in any order, and action rows show a currently effective
+shortcut, including custom overrides. Workspace shortcuts
 are listed in [workspaces](workspaces.md).
 
-Search is case-sensitive, literal UTF-8 matching within each retained physical
-line. It highlights complete wide/combining cells and all visible matches, and
-selects the current match for copying. Queries are limited to 1,024 bytes; one
-row is scanned at a time rather than copying the complete history. The highlight
-map uses one bit per visible cell, at most 16 KiB for a 512×256 grid.
+The session switcher labels existing views and detached sessions separately.
+Selecting an existing view focuses its actual window, tab and pane without
+changing its PTY or input owner. A detached session requires an explicit Attach
+entry. Observing views and sessions controlled by another actor remain read-only;
+switching does not take input ownership. The selected URI distinguishes sessions
+with the same display name. If a Focus target detaches while the list is open,
+the action reports that change rather than silently creating a new view.
 
-Search does not yet join soft-wrapped lines or provide regular expressions.
-Current column width bounds the searchable part of older rows. Match counts
-refresh when editing/navigating the query; ongoing output can shift retained
-positions between navigations. Full history reflow remains separate work.
+Search is case-sensitive, literal UTF-8 matching across rows joined by terminal
+autowrap. Explicit line breaks remain boundaries. It highlights complete wide
+and combining cells, including the visible portion of a match extending outside
+the viewport. Queries are limited to 1,024 bytes; the streaming matcher retains
+one query's positions, not a copy of the history. The highlight map uses one bit
+per visible cell, at most 16 KiB for a 512×256 grid.
+
+Copying a selection joins automatic line wraps while retaining explicit newlines.
+Wide-glyph wrap padding is omitted, meaningful spaces are retained, and UTF-8
+cells remain whole within the 4 MiB selection limit. An active search can copy
+its complete match even when it spans more than a viewport. Output or a resize
+invalidates saved match coordinates; copying refreshes the search first.
+
+Search does not provide regular expressions. Current column width bounds the
+searchable part of older rows; a clipped soft wrap stops being a logical link.
+Match counts refresh when editing, navigating or copying the query. Full history
+reflow remains separate work. Native macOS and Windows share the selection-copy
+rules, while their search and command palette interfaces remain unimplemented.
 
 ## Shell command regions
 
@@ -87,9 +106,15 @@ action. Each matched press and its release are withheld from application input,
 including buttons while an application has enabled mouse reports. There are at
 most 128 custom chords; unknown actions and malformed chords reject the config.
 
-The palette lists action descriptions; exact binding names are in
+The palette lists action descriptions and effective shortcuts; exact binding names are in
 [src/actions.rs](../src/actions.rs). Selection, copy and navigation remain
 available while observing; paste requires local input ownership.
+
+In ordinary shell mode, Caps Lock, Num Lock and Scroll Lock change keyboard state
+without sending private-use escape sequences. Programs that explicitly enable
+the enhanced keyboard protocol still receive negotiated lock-key events. With
+Num Lock enabled, keypad digits type numbers. With it disabled, keypad zero is
+the standard Insert key (`ESC [ 2 ~`), whose handling belongs to the application.
 
 ## Live configuration
 
@@ -119,6 +144,9 @@ cargo test --locked --workspace
 cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo build --release --locked
 python3 tests/daily_workflow.py --binary ./target/release/ztty
+python3 tests/session_switcher.py --binary ./target/release/ztty
+python3 tests/input_gui.py --binary ./target/release/ztty --source-root .
+python3 tests/install_test.py
 python3 tests/mcp_transport.py --binary ./target/release/ztty
 python3 tests/mcp_sessions.py --binary ./target/release/ztty
 python3 tests/mcp_security.py --binary ./target/release/ztty

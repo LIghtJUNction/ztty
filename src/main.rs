@@ -110,9 +110,17 @@ Multiple windows share one process, display connection and font cache.\n\
 Ctrl+Shift+T adds a tab; E/O splits right/down; PageUp/PageDown switches tabs.\n\
 Ctrl+Shift+Left/Right focuses panes; Up/Down swaps; Enter maximizes/restores.\n\
 Ctrl+Shift+D detaches; U moves a pane to a new window; G takes input control.\n\
-Ctrl+Shift+F searches; P opens actions; R reloads configuration.\n\
+Ctrl+Shift+S opens the session switcher (action: sessions).\n\
+Type name/title/URI words; Up/Down selects; Enter focuses or explicitly attaches.\n\
+Switching preserves the PTY and input owner; observing attaches stay read-only.\n\
+Ctrl+Shift+F searches across soft-wrapped text; Enter/Shift+Enter finds next/previous.\n\
+Copy joins soft-wrapped rows and preserves explicit line breaks.\n\
+Ctrl+Shift+P opens actions: filter with multiple words and see effective bindings.\n\
+Ctrl+U clears an overlay query; Esc closes it. Ctrl+Shift+R reloads configuration.\n\
 Ctrl+Shift+K/J browses shell commands; Y copies the selected command output.\n\
 Ctrl+Equal/Minus/0 adjusts or resets font size.\n\
+Lock keys stay silent in legacy mode.\n\
+With Num Lock off, keypad zero sends Insert in normal keypad mode.\n\
 attach without a name lists all local and MCP sessions.\n\
 MCP defaults to stdio; HTTP defaults to 127.0.0.1:8732/mcp.\n\
 Runs on X11 and XWayland. Use ztty mcp --help for transport options.\n";
