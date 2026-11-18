@@ -37,7 +37,9 @@ const WM_PAINT: u32 = 0x000f;
 const WM_CLOSE: u32 = 0x0010;
 const WM_DESTROY: u32 = 0x0002;
 const WM_SIZE: u32 = 0x0005;
+const WM_NCCALCSIZE: u32 = 0x0083;
 const WM_WINDOWPOSCHANGING: u32 = 0x0046;
+const WVR_VALIDRECTS: isize = 0x0400;
 const SWP_NOSIZE: u32 = 0x0001;
 const SWP_NOREDRAW: u32 = 0x0008;
 const SWP_NOCOPYBITS: u32 = 0x0100;
@@ -2711,6 +2713,19 @@ unsafe extern "system" fn window_proc(
     }
     let state = unsafe { &*pointer };
     let event_sequence = state.native_events.received(message);
+    if message == WM_NCCALCSIZE {
+        let result = unsafe { default_window_proc(state, hwnd, message, wparam, lparam) };
+        if wparam != 0
+            && let Some(params) = unsafe { (lparam as *mut ffi::NcCalcSizeParams).as_mut() }
+        {
+            // Keep default frame/client geometry, but preserve no old client
+            // pixels: the retained DIB supplies the resized frame.
+            params.rects[1] = ffi::Rect::default();
+            params.rects[2] = ffi::Rect::default();
+            return WVR_VALIDRECTS;
+        }
+        return result;
+    }
     if state.native_events.enabled
         && message == 0x0047
         && let Some(position) = unsafe { (lparam as *const ffi::WindowPos).as_ref() }
@@ -3140,6 +3155,16 @@ mod ffi {
         pub height: i32,
         pub flags: u32,
     }
+    #[repr(C)]
+    pub struct NcCalcSizeParams {
+        pub rects: [Rect; 3],
+        pub position: *mut WindowPos,
+    }
+    #[cfg(target_pointer_width = "64")]
+    const _: () = {
+        assert!(core::mem::size_of::<NcCalcSizeParams>() == 56);
+        assert!(core::mem::offset_of!(NcCalcSizeParams, position) == 48);
+    };
     #[repr(C)]
     pub struct WindowClass {
         pub size: u32,
