@@ -326,6 +326,33 @@ ARM64 第六个进程 PID 8544 的原始失败仍位于红色采样点 `(175,28)
 
 x64 的 8 个冷启动窗口进程、1 个工作区窗口进程及工作区 4 个 PTY 探针均退出；ARM64 的 6 个窗口进程也全部退出。两架构所有应用临时目录均首试实际删除，Job 清空、桌面和句柄恢复；x64 worker 在 14.480 秒以退出码 0 结束，ARM64 worker 在 19.514 秒以退出码 1 结束。证据目录保留 x64 原生汇总／工作区报告和 ARM64 原失败／快照，其他冷启动原始文件的源码、二进制与报告 SHA-256 仍由各架构索引和原 artifact 绑定。本次未发布或安装新正式版本。[x64 文件身份](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-x86_64/evidence-index.json) · [ARM64 文件身份](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/evidence-index.json)
 
+### 5.12. NCCALCSIZE 参数与独立 Win32 对照：提交记录正确，终端仍失败
+
+源码 `ab79d233da56e063539a5562a0b985293ffc4106` 的 [run 44333731432](https://github.com/LIghtJUNction/ztty/actions/runs/44333731432) 补充了 `WM_NCCALCSIZE` 三阶段参数记录，并运行独立的 Win32 保留 DIB 对照程序。两架构终端窗口仍然失败；各自 16 次对照通过只形成诊断结果。本轮终端记录为 `paint_diagnostics_enabled=true`、`runtime_trace_enabled=false`，含复制阶段主动查询，不计入普通模式验收，也没有把新增记录称为生产修复。[本轮总索引](measurements/experience-release-2026-11-18/nccalc-control-44333731432/index.json)
+
+| 架构 | 终端原始门禁 | 独立 Win32 对照 |
+| --- | --- | --- |
+| Windows x64 | 第 1 次冷启动完成 31＋10＋10；第 2 次完成 23 项后，红色点 `(175,28)` 读到黑色 `[0,0,0]`，原恢复检查失败 | 16 个独立进程均通过 before／shrunk／restored |
+| Windows ARM64 | 第 1–2 次各完成 31＋10＋10；第 3 次完成 23 项后，同一红色点读到灰色 `[20,20,20]`，原恢复检查失败 | 16 个独立进程均通过 before／shrunk／restored |
+
+两架构终端均在原来的像素检查停止，失败进程没有进入 warm／背靠背，其后冷启动与 workspace 也没有执行。x64 的 51 张终端 PNG、82 个有效几何／像素采样，以及 ARM64 的 96 张 PNG、157 个采样均已从原文件核对；两个架构的对照程序各有 48 张 PNG、144 个采样。缩小后落在客户区外、明确记录为 null 的点没有计入有效 PNG 采样数。原生 contract 29 项成功与后续真实像素失败分开保留。[x64 审计](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-x86_64/summary.json) · [ARM64 审计](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-aarch64/summary.json)
+
+这次能够直接确认，失败进程提交的空有效矩形与代码意图一致。两个快照中最后完成的 TRUE 回调都在默认处理后保留客户区 `[40,63,220,253]`，将 `rgrc[1]`、`rgrc[2]` 置为 `[0,0,0,0]`，并提交返回值 `0x400`；各自完整 `WINDOWPOS` 字段在 input、after_default、submitted 三阶段保持一致。下表列出的都是接收线程的应用参数，尚未观察 Windows 内部如何处理有效区、其他线程何时从 `SetWindowPos` 返回或 backing surface 的生命周期。[x64 原快照](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-x86_64/ztty-windows-x86_64.native.cold-02.post-failure.json) · [ARM64 原快照](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.native.cold-03.post-failure.json)
+
+| NCCALCSIZE 阶段 | `rgrc[0]` | `rgrc[1]` | `rgrc[2]` | 返回值 |
+| --- | --- | --- | --- | --- |
+| input | `[32,32,228,261]` | `[32,32,192,261]` | `[40,63,184,253]` | 尚未调用默认过程 |
+| after_default | `[40,63,220,253]` | `[32,32,192,261]` | `[40,63,184,253]` | `0` |
+| submitted | `[40,63,220,253]` | `[0,0,0,0]` | `[0,0,0,0]` | `0x400` |
+
+同一背景点在绘制后又变化的现象，本轮在两个架构都被记录到。`(178,95)` 的 CPU-before-copy、flush 后 target、随后 source 在 `EndPaint` 前均为预期背景 `[16,24,32]`，当时 clip 覆盖完整 180×190 客户区，origin 为 `[40,63]`；稍后的原失败图在该点分别为黑色和灰色。这只确定这个背景点后来发生了变化。红色验收点 `(175,28)` 没有在复制时采样，失败后读到的红色 CPU/source 仍不能倒推其复制时刻状态。两路原失败图均与显式 flush 后图逐字节相同，普通重画后的图则与原先正确图相同；诊断恢复没有改写原始失败。[x64 原失败图](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-x86_64/ztty-windows-x86_64.native.cold-02.resize-restored.png) · [ARM64 原失败图](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.native.cold-03.resize-restored.png) · [复制与恢复观测](measurements/experience-release-2026-11-18/nccalc-control-44333731432/index.json)
+
+独立对照的成功范围受创建和移动历史限制。它使用默认窗口边框与有效区策略，不主动追加 `NOCOPYBITS`；固定源码请求在 `(32,32)` 创建窗口，harness 随后仍请求放到 `(32,32)`。对照没有记录定位前的实际矩形，因此不能把这个源码请求写成已经测得“没有移动”。终端则使用 `CW_USEDEFAULT` 创建，再由 harness 移到目标位置；失败的 x64 进程实际记录从 `[78,78,274,307]` 移到 `[32,32,228,261]`，ARM64 从 `[52,52,248,281]` 移到同一目标矩形。对照说明简化程序在本轮条件下完成了 16 次指定循环；未匹配的定位历史、绘制管线和时序仍限制比较，不能据此排除依赖这些条件的系统路径。[固定版本 C 源码](https://github.com/LIghtJUNction/ztty/blob/ab79d233da56e063539a5562a0b985293ffc4106/tests/windows_resize_control.c) · [x64 对照摘要](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-x86_64/control-summary.json) · [ARM64 对照摘要](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-aarch64/control-summary.json)
+
+对照的源码身份按实际 artifact 校验。两个内层包的 C 文件均为 5,791 字节、149 个 CRLF 换行；仅把 CRLF 变为 LF 后，与固定提交 `ab79d233…` 中的 5,642 字节源码逐字节相等。本轮没有拿后续正在改动的工作区 C 文件替代旧实验。每份对照报告均由 source SHA、run ID、实际 EXE SHA 和原 C 文件 SHA 绑定，聚合报告保留 16 份原始报告的 SHA；精简目录额外保留各架构第一次对照的完整原始报告及恢复图。[x64 对照汇总](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-x86_64/ztty-windows-x86_64.resize-control.json) · [ARM64 对照汇总](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.resize-control.json) · [源码字节身份](measurements/experience-release-2026-11-18/nccalc-control-44333731432/index.json)
+
+本轮 5 个终端窗口进程及其临时目录全部清理，32 个独立对照进程全部退出，四个隔离 Job 清空并恢复原桌面。终端 worker 分别在 12.648 秒、14.682 秒以退出码 1 结束；对照 worker 分别在 1.096 秒、1.289 秒以退出码 0 结束。对照没有创建每进程临时目录，通用 cleanup 字段不能被解释为实际删除了 32 个目录。候选继续失败，本轮未发布或安装新正式版本。[x64 原始文件索引](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-x86_64/evidence-index.json) · [ARM64 原始文件索引](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-aarch64/evidence-index.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)

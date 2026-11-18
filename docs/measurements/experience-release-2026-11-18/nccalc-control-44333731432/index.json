@@ -1,0 +1,302 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "ab79d233da56e063539a5562a0b985293ffc4106",
+  "run_id": 44333731432,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44333731432",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "status": "failed",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "ordinary_acceptance_credit": false,
+  "production_fix_claimed": false,
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "x86_64": {
+    "completed_cold_starts": 1,
+    "failed_cold_start": 2,
+    "failed_pid": 2288,
+    "original_checks_completed_before_failure": 23,
+    "failed_gate_rgb": [
+      0,
+      0,
+      0
+    ],
+    "workspace_entered": false,
+    "native_pngs_verified": 51,
+    "native_geometry_samples_verified": 82,
+    "control_completed": 16,
+    "control_required": 16,
+    "control_pngs_verified": 48,
+    "control_geometry_samples_verified": 144,
+    "summary": "windows-x86_64/summary.json",
+    "control_summary": "windows-x86_64/control-summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "completed_cold_starts": 2,
+    "failed_cold_start": 3,
+    "failed_pid": 1608,
+    "original_checks_completed_before_failure": 23,
+    "failed_gate_rgb": [
+      20,
+      20,
+      20
+    ],
+    "workspace_entered": false,
+    "native_pngs_verified": 96,
+    "native_geometry_samples_verified": 157,
+    "control_completed": 16,
+    "control_required": 16,
+    "control_pngs_verified": 48,
+    "control_geometry_samples_verified": 144,
+    "summary": "windows-aarch64/summary.json",
+    "control_summary": "windows-aarch64/control-summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "both_nccalc_observations": {
+    "sequence": 192,
+    "wparam": 1,
+    "input_rects": [
+      [
+        32,
+        32,
+        228,
+        261
+      ],
+      [
+        32,
+        32,
+        192,
+        261
+      ],
+      [
+        40,
+        63,
+        184,
+        253
+      ]
+    ],
+    "default_return": 0,
+    "after_default_rects": [
+      [
+        40,
+        63,
+        220,
+        253
+      ],
+      [
+        32,
+        32,
+        192,
+        261
+      ],
+      [
+        40,
+        63,
+        184,
+        253
+      ]
+    ],
+    "submitted_return": 1024,
+    "submitted_rects": [
+      [
+        40,
+        63,
+        220,
+        253
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "lppos_unchanged_across_three_stages": true,
+    "lppos_flags": 6422,
+    "scope": "The last completed TRUE callback on each failing process preserved default client geometry and submitted empty source and destination valid rectangles. The record does not observe internal copying, another thread SetWindowPos return, or backing-surface lifecycle."
+  },
+  "both_copy_stage_observations": {
+    "sample": [
+      178,
+      95
+    ],
+    "expected_background": [
+      16,
+      24,
+      32
+    ],
+    "cpu_before_blit_rgb": [
+      16,
+      24,
+      32
+    ],
+    "flush_return": 1,
+    "target_after_flush_rgb": [
+      16,
+      24,
+      32
+    ],
+    "source_after_target_read_rgb": [
+      16,
+      24,
+      32
+    ],
+    "clip_type": 2,
+    "clip": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "origin": [
+      40,
+      63
+    ],
+    "paint_event_sequence": [
+      210,
+      211
+    ],
+    "snapshot_event_sequence": 212,
+    "later_failed_png_rgb": {
+      "x86_64": [
+        0,
+        0,
+        0
+      ],
+      "aarch64": [
+        20,
+        20,
+        20
+      ]
+    },
+    "later_change_at_same_background_point_observed": true,
+    "red_gate_point": [
+      175,
+      28
+    ],
+    "red_source_at_gate_measured_only_after_failure": true
+  },
+  "both_failure_recovery": {
+    "cpu_source_rgb_after_failure": [
+      255,
+      0,
+      0
+    ],
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_pty": [
+      20,
+      10
+    ],
+    "deferred_paints": 0,
+    "flush_preserved_failed_png_bytes": true,
+    "ordinary_repaint_restored_original_png_bytes": true,
+    "original_failure_remains_failed": true
+  },
+  "control_scope": {
+    "diagnostic_only": true,
+    "per_architecture_required": 16,
+    "per_architecture_completed": 16,
+    "per_process_checks": [
+      "before",
+      "shrunk",
+      "restored"
+    ],
+    "per_process_resize_flags": 22,
+    "resize_xy": [
+      0,
+      0
+    ],
+    "shrink_restore_outer_sizes": [
+      [
+        160,
+        229
+      ],
+      [
+        196,
+        229
+      ]
+    ],
+    "default_frame_and_valid_rectangle_policy": true,
+    "nocopybits_added": false,
+    "source_requests_creation_xy": [
+      32,
+      32
+    ],
+    "harness_requests_placement_xy": [
+      32,
+      32
+    ],
+    "actual_pre_placement_rectangle_recorded": false,
+    "terminal_creation_policy": "CW_USEDEFAULT",
+    "terminal_failed_before_placement": {
+      "x86_64": [
+        78,
+        78,
+        274,
+        307
+      ],
+      "aarch64": [
+        52,
+        52,
+        248,
+        281
+      ]
+    },
+    "terminal_placed_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "creation_move_history_matched": false,
+    "limit": "A passing independent standard Win32 control with different creation/positioning history does not exclude a system path conditional on that history, timing or other runtime differences."
+  },
+  "control_source_identity": {
+    "immutable_source_commit": "ab79d233da56e063539a5562a0b985293ffc4106",
+    "immutable_source_path": "tests/windows_resize_control.c",
+    "immutable_source_url": "https://github.com/LIghtJUNction/ztty/blob/ab79d233da56e063539a5562a0b985293ffc4106/tests/windows_resize_control.c",
+    "raw_artifact_bytes": 5791,
+    "raw_artifact_sha256": "d3518baa435734ef12279c75b02b4817eb8dfe7a424fbb9cbe36d1929b793d50",
+    "crlf_lines": 149,
+    "immutable_git_bytes": 5642,
+    "immutable_git_sha256": "8d8c4ae100e48627d92161506636a87508a303296bb516a127613d674663b388",
+    "lf_normalized_raw_equals_git_source": true,
+    "working_tree_source_used": false
+  },
+  "cleanup": {
+    "native_processes_exited": 5,
+    "native_temporary_directories_actually_removed": 5,
+    "control_processes_exited": 32,
+    "control_per_run_temporary_directories_created": false,
+    "all_four_owned_jobs_empty_and_desktops_restored": true
+  },
+  "worker_elapsed_seconds": {
+    "x86_64_native": 12.648,
+    "aarch64_native": 14.682,
+    "x86_64_control": 1.096,
+    "aarch64_control": 1.289
+  },
+  "worker_exit_codes": {
+    "x86_64_native": 1,
+    "aarch64_native": 1,
+    "x86_64_control": 0,
+    "aarch64_control": 0
+  },
+  "delivery_scope": "Explicit Windows-only diagnostic candidate. Native failure remains binding; no Release publication or device installation is claimed. The existing formal tag and all older failed evidence remain unchanged."
+}

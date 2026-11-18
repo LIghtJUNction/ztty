@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "ab79d233da56e063539a5562a0b985293ffc4106",
+  "run_id": 44333731432,
+  "architecture": "aarch64",
+  "job_id": 134904892465,
+  "artifact_id": 14440931602,
+  "artifact_zip_sha256": "5d493a4785e59c4ba167fd26175017c740fa5a61a29433ac85a858b94a111d10",
+  "binary_sha256": "b9e07e7d484cc381ae9cefd11bdd41baa588b4a0079d2732c49dfe3b10b48290",
+  "status": "failed",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "ordinary_acceptance_credit": false,
+  "required_cold_starts": 8,
+  "completed_cold_starts": 2,
+  "attempted_cold_starts": 3,
+  "failed_cold_start": 3,
+  "original_checks_completed_before_failure": 23,
+  "workspace_entered": false,
+  "control_diagnostic_only": true,
+  "control_completed": 16,
+  "control_required": 16,
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/summary.json",
+      "bytes": 21614,
+      "sha256": "53dd0e2faa6150c223880ace5660d2a6f5778d8640fffdd3f378c2af95e20bc2",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 38826,
+      "sha256": "19b62936840bfc09b560fac60409aa61887019cb4eb564039a244c22946363c8",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 896
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-03.json",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.native.cold-03.json",
+      "bytes": 46948,
+      "sha256": "bb2958add119bb4648a2dd4b04faef442e9ae4485dac1f99ef3cc90270211984",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2217
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-03.post-failure.json",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.native.cold-03.post-failure.json",
+      "bytes": 2538,
+      "sha256": "a46e3e08891447655e834b9664d13b0bdb956d9b17010d174097734ba0fbd5cc",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-03.resize-restored.png",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.native.cold-03.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-03.post-failure.png",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.native.cold-03.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-03.post-repaint.png",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.native.cold-03.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "control-summary.json",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/control-summary.json",
+      "bytes": 9126,
+      "sha256": "8ee27199a6734d6563c4ef971f5061f92e819d61193b10b3088321befa8c4023",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.resize-control.json",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.resize-control.json",
+      "bytes": 6226,
+      "sha256": "029491fc9487a2eaee406f57c710df82de73c7c9503a27f2f48064f3d24b251b",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 190
+    },
+    {
+      "path": "ztty-windows-aarch64.resize-control.cold-01.json",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.resize-control.cold-01.json",
+      "bytes": 9966,
+      "sha256": "5aba4685d8c7a0ec7c924f1f80077ec812818ddeb0dac3ef8ad7038fc9acc026",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 457
+    },
+    {
+      "path": "ztty-windows-aarch64.resize-control.cold-01.restored.png",
+      "source_path": "artifacts/release-audit/nccalc-control-44333731432/windows-aarch64/ztty-windows-aarch64.resize-control.cold-01.restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "scope": "Native failed cold report, original snapshot and three original PNGs, plus the diagnostic control aggregate, first raw control report and its restored PNG. All other cold/control reports and PNGs remain in the verified original artifact; raw report hashes and source/binary identities are preserved in the aggregates and summaries.",
+  "notes": [
+    "The terminal original failure remains failed. The independent control success cannot accept it.",
+    "All terminal cold runs had explicit paint diagnostics; no ordinary acceptance credit is assigned.",
+    "The NCCALCSIZE record captures submitted rectangles/return/WINDOWPOS, not an internal Window Manager operation.",
+    "Control C artifact bytes contain149 CRLF lines; normalizing only CRLF to LF matches immutable git ab79, not the changing working tree.",
+    "Control source requests creation at32,32 and the harness requests that same final coordinate, without recording the actual pre-placement rectangle. The terminal is created with CW_USEDEFAULT and its recorded earlier location differs.",
+    "Raw JSON original line endings and PNG bytes are preserved; summaries/indexes are derived."
+  ]
+}
