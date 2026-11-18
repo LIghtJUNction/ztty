@@ -1,0 +1,244 @@
+{
+  "passed": false,
+  "status": "failed",
+  "action": "capture",
+  "exit_code": 1,
+  "accessibility_selection_vector": "passed",
+  "appkit": {
+    "activation_policy": 2,
+    "activation_policy_before": 2,
+    "initialized": true,
+    "main_thread": true,
+    "transition_requested": false
+  },
+  "architecture": "x86_64",
+  "attempts": 83,
+  "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+  "error": "native window capture timed out after 10.0 seconds",
+  "image": {
+    "color_space": "kCGColorSpaceDeviceRGB",
+    "height": 208,
+    "requested_color_space": "kCGColorSpaceSRGB",
+    "requested_pixel_format": "32BGRA",
+    "width": 320
+  },
+  "last_error": "actual WindowServer pixels do not match the expected vector",
+  "os": "Version 15.7.9 (Build 24G830)",
+  "permissions": {
+    "accessibility": true,
+    "screen_capture": true
+  },
+  "phase": "saving_png",
+  "physical_display_latency": "not_measured",
+  "pixel_layout_vector": "passed",
+  "process_translated": false,
+  "samples": [
+    {
+      "actual": [
+        255,
+        0,
+        3
+      ],
+      "alpha": 255,
+      "client": [
+        16,
+        38
+      ],
+      "expected": [
+        255,
+        0,
+        0
+      ],
+      "passed": false
+    },
+    {
+      "actual": [
+        1,
+        255,
+        1
+      ],
+      "alpha": 255,
+      "client": [
+        32,
+        38
+      ],
+      "expected": [
+        0,
+        255,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "actual": [
+        0,
+        0,
+        255
+      ],
+      "alpha": 255,
+      "client": [
+        48,
+        46
+      ],
+      "expected": [
+        0,
+        0,
+        255
+      ],
+      "passed": true
+    }
+  ],
+  "screenshot": {
+    "height": 208,
+    "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_rgb_native_pixels.png",
+    "pid": 2944,
+    "width": 320,
+    "window_id": 27
+  },
+  "target": {
+    "pid": 2944,
+    "title": "ztty-native-ztty-macos-native-bh_zce0k",
+    "window_id": 0
+  },
+  "window": {
+    "client_pixel_rect": [
+      0,
+      28,
+      320,
+      180
+    ],
+    "client_points": [
+      0,
+      0,
+      320,
+      180
+    ],
+    "displays": [
+      {
+        "frame_points": [
+          0,
+          0,
+          1920,
+          1080
+        ],
+        "id": 25165824
+      }
+    ],
+    "filter_content_points": [
+      800,
+      216,
+      320,
+      208
+    ],
+    "frame_points": [
+      800,
+      216,
+      320,
+      208
+    ],
+    "inside_display": true,
+    "layer": 0,
+    "on_screen": true,
+    "pid": 2944,
+    "point_pixel_scale": 1,
+    "title": "ztty-native-ztty-macos-native-bh_zce0k",
+    "window_id": 27
+  },
+  "window_candidates": [
+    {
+      "frame_points": [
+        0,
+        0,
+        1920,
+        24
+      ],
+      "layer": 0,
+      "matches_target": false,
+      "on_screen": false,
+      "pid": 2944,
+      "title": "",
+      "window_id": 30
+    },
+    {
+      "frame_points": [
+        0,
+        580,
+        500,
+        500
+      ],
+      "layer": 0,
+      "matches_target": false,
+      "on_screen": false,
+      "pid": 2944,
+      "title": "",
+      "window_id": 33
+    },
+    {
+      "frame_points": [
+        0,
+        0,
+        1920,
+        24
+      ],
+      "layer": 0,
+      "matches_target": false,
+      "on_screen": false,
+      "pid": 2944,
+      "title": "",
+      "window_id": 32
+    },
+    {
+      "frame_points": [
+        0,
+        0,
+        1920,
+        24
+      ],
+      "layer": 0,
+      "matches_target": false,
+      "on_screen": false,
+      "pid": 2944,
+      "title": "",
+      "window_id": 31
+    },
+    {
+      "frame_points": [
+        0,
+        0,
+        1920,
+        24
+      ],
+      "layer": 0,
+      "matches_target": false,
+      "on_screen": false,
+      "pid": 2944,
+      "title": "",
+      "window_id": 29
+    },
+    {
+      "frame_points": [
+        800,
+        216,
+        320,
+        208
+      ],
+      "layer": 0,
+      "matches_target": true,
+      "on_screen": true,
+      "pid": 2944,
+      "title": "ztty-native-ztty-macos-native-bh_zce0k",
+      "window_id": 27
+    }
+  ],
+  "window_selection_vector": "passed",
+  "png": {
+    "file": "ztty-macos-x86_64.native.sixel_rgb_native_pixels.png",
+    "bytes": 6092,
+    "sha256": "9344706f49b85e105474048b93e39735176f7c08c8b58880365efd394802de1c",
+    "width": 320,
+    "height": 208
+  },
+  "stdout_bytes": 4259,
+  "stderr_tail": "hase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+  "name": "sixel_rgb_native_pixels"
+}

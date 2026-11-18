@@ -1,0 +1,37 @@
+{
+  "run_id": 44293476047,
+  "source_sha": "a045871a76ff51c1acd29881ff280869e093efbb",
+  "version": "0.3.0",
+  "build_only": true,
+  "candidate_platform": "macos",
+  "formal_release": false,
+  "platforms": {
+    "aarch64": {
+      "job_id": 134764495524,
+      "status": "accepted",
+      "checks_passed": 24,
+      "checks_total": 24,
+      "stages_passed": 13,
+      "stages_total": 13,
+      "spawn_checks_passed": 8,
+      "actual_png_count": 10,
+      "remaining_owned_processes": [],
+      "summary": "macos-aarch64-summary.json",
+      "artifact_verification": "macos-aarch64-artifact-verification.json"
+    },
+    "x86_64": {
+      "job_id": 134764495469,
+      "status": "failed",
+      "failure_stage": "darwin-threaded-spawn",
+      "native_status": "not_run",
+      "actual_png_count": 0,
+      "summary": "macos-x86_64-summary.json",
+      "artifact_verification": "macos-x86_64-artifact-verification.json"
+    }
+  },
+  "limits": [
+    "macOS candidate only; Linux/Windows/verify/publish not accepted by this run",
+    "Intel pixel color and AX restore have no evidence from this run",
+    "IME/keyboard and physical display latency are not measured by the native window gate"
+  ]
+}

@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "report_checkpoint": "0563554b95dc6321f6e45bdd53659b6c85f90850",
+  "copied_files_are_byte_identical": true,
+  "files": [
+    {
+      "path": "performance/core-throughput-build-inputs.json",
+      "source_path": "artifacts/experience-release/core-throughput-build-inputs.json",
+      "bytes": 2409,
+      "sha256": "e69819bc1801d5a450e73719e0c4098e1014c94f6d3a6e0d7451c8d8c6f5f4ff"
+    },
+    {
+      "path": "performance/core-throughput-072111be-114ca5bb.json",
+      "source_path": "artifacts/experience-release/core-throughput-072111be-114ca5bb.json",
+      "bytes": 13799,
+      "sha256": "390cc9e6e85fed456f32314b2ef1a9675e830df51ba061e2f150c09a4e55cdfc"
+    },
+    {
+      "path": "performance/core-throughput-rowindex-diagnosis.json",
+      "source_path": "artifacts/experience-release/core-throughput-rowindex-diagnosis.json",
+      "bytes": 21984,
+      "sha256": "e1d972558bbe0d42deff25713377f4f0326ebdf6ed3766b1638fb0fb6fcadad4"
+    },
+    {
+      "path": "performance/core-throughput-optimized-final.json",
+      "source_path": "artifacts/experience-release/core-throughput-optimized-final.json",
+      "bytes": 13473,
+      "sha256": "93696aa70300737d6d8f92a861f27d5f51c28349923b4c8c3363b26685c278e8"
+    },
+    {
+      "path": "performance/core-throughput-summary.json",
+      "source_path": "artifacts/experience-release/core-throughput-summary.json",
+      "bytes": 10438,
+      "sha256": "59cbce13a66d2cd9bd677c4327ce17589f0e1c0b3e05e13da6bd6911adbb92b0"
+    },
+    {
+      "path": "performance/core-rowindex-optimization.patch",
+      "source_path": "artifacts/experience-release/core-rowindex-optimization.patch",
+      "bytes": 1314,
+      "sha256": "c48f4888ab72a694d43e8b2f40e5fdde5aff61e71a9e10cbe01027f0130e0c49"
+    },
+    {
+      "path": "performance/core-inline-optimization.patch",
+      "source_path": "artifacts/experience-release/core-inline-optimization.patch",
+      "bytes": 1613,
+      "sha256": "6467c0dc21c2192467a27df9932cc8250df9e67d6fac847ab2b65b605186d9ac"
+    },
+    {
+      "path": "linux/local-workspace-tests.json",
+      "source_path": "artifacts/experience-release/local-workspace-tests.json",
+      "bytes": 2613,
+      "sha256": "99f8dbb7df179811d3bd8b76cc38909fb6ed430ed0dafbca7facf0d4ebfe46e7"
+    },
+    {
+      "path": "linux/local-workspace-tests.log",
+      "source_path": "artifacts/experience-release/local-workspace-tests.log",
+      "bytes": 26448,
+      "sha256": "9857b10e94162622694ba5b972bd419ea105adfd17b93106495ee030e0b76d28"
+    },
+    {
+      "path": "linux/candidate-builder.json",
+      "source_path": "artifacts/experience-release/device/candidate-builder.json",
+      "bytes": 280,
+      "sha256": "94be8757fab5ce6cec9c1028372b05b712ea8be07e9218523b122e6e9b4d29bd"
+    },
+    {
+      "path": "linux/linux-native.json",
+      "source_path": "artifacts/experience-release/device/linux-native.json",
+      "bytes": 22909,
+      "sha256": "c27d1c093c47dab1e4cbde8a02f801b18b4ec46f845c7bf454c6391f9fb6042f"
+    },
+    {
+      "path": "linux/regressions.json",
+      "source_path": "artifacts/experience-release/device/regressions.json",
+      "bytes": 1095,
+      "sha256": "750c90af9bc43670529a3812d4f84150076697596a4073ea2a92246bb5c30ced"
+    },
+    {
+      "path": "linux/session-switcher-recheck.json",
+      "source_path": "artifacts/experience-release/device/session-switcher-recheck.json",
+      "bytes": 10880,
+      "sha256": "3f7ed6f8fd1380fb79b3b8a061a8edaa1c1e705487bf3063929da92a997ecdc6"
+    },
+    {
+      "path": "linux/keypad-input.json",
+      "source_path": "artifacts/experience-release/device/keypad-input.json",
+      "bytes": 10828,
+      "sha256": "06d0b226b6666d04d5f9dff6340f9287bd050d1b9d94fbc5ef7bff56788baae2"
+    },
+    {
+      "path": "linux/mcp-wait.json",
+      "source_path": "artifacts/experience-release/device/mcp-wait.json",
+      "bytes": 5465,
+      "sha256": "3d683d33bbd05a8565de2d3eea34b6ffefc7e1949056300e8616c10a3b4675bb"
+    },
+    {
+      "path": "linux/mcp-sse.json",
+      "source_path": "artifacts/experience-release/device/mcp-sse.json",
+      "bytes": 2329,
+      "sha256": "40cd240391e15a1810a11efeca5a175589bcceb9dc1dbe6fca8fee3c3bd15604"
+    },
+    {
+      "path": "linux/bash-integration.json",
+      "source_path": "artifacts/experience-release/device/bash-integration.json",
+      "bytes": 2172,
+      "sha256": "6266eae5a74427d98d68c6acbb51eeba9c416d02c5694eeeacfc7933aeabea9e"
+    },
+    {
+      "path": "linux/workspaces.json",
+      "source_path": "artifacts/experience-release/device/linux-native/workspaces/report.json",
+      "bytes": 7749,
+      "sha256": "90866a4deb02b2f0445905f3eacee2622878f31ff7d0b3c7919b1881ae8320b0"
+    },
+    {
+      "path": "linux/daily_workflow.json",
+      "source_path": "artifacts/experience-release/device/linux-native/daily_workflow/report.json",
+      "bytes": 4912,
+      "sha256": "6fc4bcf674138d545b629978f1493fc4f48d0d96b4dfb1437fa84b0a21c535c3"
+    },
+    {
+      "path": "linux/sixel_gui.json",
+      "source_path": "artifacts/experience-release/device/linux-native/sixel_gui/report.json",
+      "bytes": 4792,
+      "sha256": "c345b0c1a18b5baae51b185be1c0bfb676f291ba05e5298ce508f030bf6c8aa0"
+    },
+    {
+      "path": "linux/input_gui.json",
+      "source_path": "artifacts/experience-release/device/linux-native/input_gui/report.json",
+      "bytes": 10925,
+      "sha256": "35166e6c0212ee218c49e80a2e0d09ca3831b6d364292a0ba65cc27eaeae783b"
+    },
+    {
+      "path": "linux/repaint_gui.json",
+      "source_path": "artifacts/experience-release/device/linux-native/repaint_gui/report.json",
+      "bytes": 7346,
+      "sha256": "b1c64ae832a8b3ac5dff94c9319f3f9bb661c6d359f23059c5ba3d910a8e28cf"
+    },
+    {
+      "path": "linux/screenshots/sessions.png",
+      "source_path": "artifacts/experience-release/device/session-switcher-recheck/sessions.png",
+      "bytes": 24325,
+      "sha256": "c0d7e65e86f7878c049d4ed5ddc41b1df034e54c74371960ebddeccd35668a6c"
+    },
+    {
+      "path": "linux/screenshots/command-palette.png",
+      "source_path": "artifacts/experience-release/device/session-switcher-recheck/command-palette.png",
+      "bytes": 14391,
+      "sha256": "af1c2931f066778d0762762dcb4b095e12ab31215a57580175561cba6f320b1b"
+    },
+    {
+      "path": "linux/screenshots/soft-wrap-search.png",
+      "source_path": "artifacts/experience-release/device/session-switcher-recheck/soft-wrap-search.png",
+      "bytes": 9299,
+      "sha256": "39779c6c6bf663af9f08ada187e5e498523606d9d904759a81d191233d08b8f9"
+    },
+    {
+      "path": "linux/screenshots/stale-focus-rejected.png",
+      "source_path": "artifacts/experience-release/device/session-switcher-recheck/stale-focus-rejected.png",
+      "bytes": 11275,
+      "sha256": "a601114dfbd4c2dccb56d7be0f6cdddbf2115353bdb4cbf49f0dcf071348df6f"
+    },
+    {
+      "path": "linux/screenshots/session-switcher-first-failure.png",
+      "source_path": "artifacts/experience-release/session-switcher-first/failure-2.png",
+      "bytes": 7782,
+      "sha256": "8976bae41e56fe3d062011b7d684ce03b5afb7534b853a7d420f4b403e5d1a36"
+    },
+    {
+      "path": "macos/run-44293476047/index.json",
+      "source_path": "artifacts/release-audit/current-macos/index.json",
+      "bytes": 1196,
+      "sha256": "836a334d223ffb5669037882759b9a5ed48c45a65cb9b9efc2ad0bb85e75b250"
+    },
+    {
+      "path": "macos/run-44293476047/ztty-macos-aarch64.build.json",
+      "source_path": "artifacts/release-audit/current-macos/ztty-macos-aarch64.build.json",
+      "bytes": 11983,
+      "sha256": "d117cb4e66b9af808ed2966a845170befe3843635271359e0d115b83c2161e2b"
+    },
+    {
+      "path": "macos/run-44293476047/ztty-macos-aarch64.spawn.json",
+      "source_path": "artifacts/release-audit/current-macos/ztty-macos-aarch64.spawn.json",
+      "bytes": 1788,
+      "sha256": "8d6c5d5e9bdf5ac76918698b8edc933e6704a348c27b01b37eaa020910836dff"
+    },
+    {
+      "path": "macos/run-44293476047/ztty-macos-aarch64.native.json",
+      "source_path": "artifacts/release-audit/current-macos/ztty-macos-aarch64.native.json",
+      "bytes": 66348,
+      "sha256": "33b1b7feef2936a544b7633d24d1f97bf9f2f5bf8df7148de21fc7a7bfcfa91d"
+    },
+    {
+      "path": "macos/run-44293476047/macos-aarch64-artifact-verification.json",
+      "source_path": "artifacts/release-audit/current-macos/macos-aarch64-artifact-verification.json",
+      "bytes": 14422,
+      "sha256": "e21a24d637ed0a2c3e493f41821f6da457a0dae89cca227fc7474bed2db5563f"
+    },
+    {
+      "path": "macos/run-44293476047/macos-x86_64-summary.json",
+      "source_path": "artifacts/release-audit/current-macos/macos-x86_64-summary.json",
+      "bytes": 1497,
+      "sha256": "67cc18e9355873c0ecf7d9d79f5b211c4ed54453ace9031ad30b3da42bae5aa7"
+    },
+    {
+      "path": "macos/run-44293476047/ztty-macos-x86_64.build.json",
+      "source_path": "artifacts/release-audit/current-macos/ztty-macos-x86_64.build.json",
+      "bytes": 1242,
+      "sha256": "34ae979e16ba38bd681951898bbd03ffe566009cced504e7198a2d29a6c064fb"
+    },
+    {
+      "path": "macos/run-44293476047/ztty-macos-x86_64.spawn.json",
+      "source_path": "artifacts/release-audit/current-macos/ztty-macos-x86_64.spawn.json",
+      "bytes": 1007,
+      "sha256": "7cc4f44dae9dce3ed6fe7d97e2a37bdb534ad181923056c84b8779b173de9525"
+    },
+    {
+      "path": "macos/run-44295578969/ztty-macos-aarch64.build.json",
+      "source_path": "artifacts/release-audit/macos-retry/ztty-macos-aarch64.build.json",
+      "bytes": 1239,
+      "sha256": "af4de5021481c01028e3d092e799c6201371c17dc21aca2aec972fb8702af39b"
+    },
+    {
+      "path": "macos/run-44295578969/ztty-macos-aarch64.spawn.json",
+      "source_path": "artifacts/release-audit/macos-retry/ztty-macos-aarch64.spawn.json",
+      "bytes": 970,
+      "sha256": "902cb49cfb614012700a9f1c49d0fc1662c48cab4a9f948b427acb186fa1ebee"
+    },
+    {
+      "path": "macos/run-44295578969/ztty-macos-aarch64.spawn.stderr.log",
+      "source_path": "artifacts/release-audit/macos-retry/ztty-macos-aarch64.spawn.stderr.log",
+      "bytes": 2356,
+      "sha256": "d947539c55f57bb765214a2c17c33a5c37ecce6caca1919751960ca8d6aab98a"
+    },
+    {
+      "path": "macos/run-44295578969/ztty-macos-x86_64.build.json",
+      "source_path": "artifacts/release-audit/macos-retry/ztty-macos-x86_64.build.json",
+      "bytes": 4475,
+      "sha256": "90b5a24dbb3bb94c0914066af1aba7c6f712e6d75df05b4d1a56e2bf37bae4c4"
+    },
+    {
+      "path": "macos/run-44295578969/ztty-macos-x86_64.spawn.json",
+      "source_path": "artifacts/release-audit/macos-retry/ztty-macos-x86_64.spawn.json",
+      "bytes": 1825,
+      "sha256": "405eeb639c88cd01189a02fac14368f8cd187b1243fa99887bc832d98fe56a05"
+    },
+    {
+      "path": "macos/run-44295578969/ztty-macos-x86_64.native.json",
+      "source_path": "artifacts/release-audit/macos-retry/ztty-macos-x86_64.native.json",
+      "bytes": 19776,
+      "sha256": "4e97bdf965dce9e3bf58cad6a6d0952aa079064acbb23a28004661f6aaf1a4af"
+    },
+    {
+      "path": "macos/run-44295578969/ztty-macos-x86_64.native.sixel_rgb_native_pixels.json",
+      "source_path": "artifacts/release-audit/macos-retry/ztty-macos-x86_64.native.sixel_rgb_native_pixels.json",
+      "bytes": 8542,
+      "sha256": "d636471fc39b9d493e6778b3eb620c4fed6e8bd1e49eff7a887cb93077e0501b"
+    },
+    {
+      "path": "summary.json",
+      "source_path": "derived from copied evidence and git show at report_checkpoint",
+      "bytes": 4376,
+      "sha256": "88a329ed2cf14f373feddd34a713629d92ef1593eddeb9ad4708f060a8d4e7c8"
+    }
+  ],
+  "notes": [
+    "Original failure statuses are retained. This manifest does not claim that every path referenced inside a source JSON has been copied.",
+    "summary.json is a derived index; all other entries are exact copies.",
+    "The performance executables are development-only std benchmark programs, separate from the no_std terminal runtime."
+  ]
+}

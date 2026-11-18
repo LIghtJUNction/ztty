@@ -1,0 +1,53 @@
+diff --git a/crates/zterm/src/screen.rs b/crates/zterm/src/screen.rs
+index a7b7def..392c0b8 100644
+--- a/crates/zterm/src/screen.rs
++++ b/crates/zterm/src/screen.rs
+@@ -179,17 +179,21 @@ impl Screen {
+     }
+ 
+     #[inline]
+-    pub fn index(&self, x: usize, y: usize) -> usize {
++    fn row_index(&self, y: usize) -> usize {
+         debug_assert!(y < self.rows);
+         // Both terms are below rows, so a single subtraction wraps the ring.
+         // Avoid a dynamic integer division for every cell or row lookup.
+         let row = self.row0 + y;
+-        let row = if row >= self.rows {
++        if row >= self.rows {
+             row - self.rows
+         } else {
+             row
+-        };
+-        row * self.cols + x
++        }
++    }
++
++    #[inline]
++    pub fn index(&self, x: usize, y: usize) -> usize {
++        self.row_index(y) * self.cols + x
+     }
+ 
+     pub fn row(&self, y: usize) -> &[Cell] {
+@@ -203,11 +207,11 @@ impl Screen {
+     }
+ 
+     pub fn row_wrap(&self, y: usize) -> usize {
+-        self.wrapped[self.index(0, y) / self.cols]
++        self.wrapped[self.row_index(y)]
+     }
+ 
+     pub fn set_row_wrap(&mut self, y: usize, columns: usize) {
+-        let row = self.index(0, y) / self.cols;
++        let row = self.row_index(y);
+         self.wrapped[row] = columns;
+     }
+ 
+@@ -251,7 +255,7 @@ impl Screen {
+ 
+     /// Prepare a nonempty interval that the caller will overwrite completely.
+     /// Only wide-character halves outside that interval need to be cleared.
+-    #[inline]
++    #[inline(always)]
+     pub fn overwrite_span(
+         &mut self,
+         y: usize,
