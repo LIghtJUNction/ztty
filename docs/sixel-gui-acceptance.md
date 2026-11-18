@@ -141,6 +141,16 @@ collision with its PID lock unchanged; an abstract-only listener also blocks
 allocation without a lock file. The first test additionally compares the native
 display's endpoint snapshot before and after cleanup.
 
+## Later source-bound candidate checks
+
+The preliminary snapshot above remains unchanged. Subsequent clean-source
+Linux x86_64 candidates `fa2f201` and `2dc6769` each passed the same ten
+Sixel GUI scenarios within the complete Linux release gate. Windows x86_64
+also passed six native Sixel color, transparency, deletion, cancellation and
+recovery groups. ARM64 failures and the remaining macOS pixel gap are recorded
+in the [native candidate history](native-candidates-2026-11-18.md). None of
+these Xvfb runs repairs or validates the unavailable current Hyprland endpoint.
+
 ## Acceptance boundaries
 
 Xvfb validates X11 drawing and software-visible pixels. It does not validate

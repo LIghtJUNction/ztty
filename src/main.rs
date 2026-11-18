@@ -60,13 +60,6 @@ use zterm::{Terminal, input};
 #[global_allocator]
 static ALLOCATOR: os::Allocator = os::Allocator;
 
-// Stable Rust's precompiled alloc contains unwind cleanup references even for
-// panic=abort consumers. Use the platform unwinder for those ABI references;
-// this application's Rust panic/personality boundaries always terminate.
-#[cfg(target_os = "linux")]
-#[link(name = "gcc_s")]
-unsafe extern "C" {}
-
 #[unsafe(no_mangle)]
 extern "C" fn rust_eh_personality(
     _: i32,
@@ -126,6 +119,7 @@ Runs on X11 and XWayland. Use ztty mcp --help for transport options.\n";
 #[cfg(not(target_os = "linux"))]
 const HELP: &str = "ztty — a small no_std Rust terminal\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\n\
+  --cwd PATH           Start the command in PATH\n\
   --config PATH        Load an appearance file\n\
   --font NAME          Fontconfig name (default: monospace:size=11)\n\
   --geometry COLSxROWS Initial character dimensions (default: 120x32)\n\
@@ -149,7 +143,6 @@ struct Config {
     observe: bool,
     #[cfg(target_os = "linux")]
     target: Option<(String, &'static str)>,
-    #[cfg(target_os = "linux")]
     cwd: Option<String>,
     #[cfg(target_os = "linux")]
     config_path: Option<CString>,
@@ -174,7 +167,6 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         observe: false,
         #[cfg(target_os = "linux")]
         target: None,
-        #[cfg(target_os = "linux")]
         cwd: None,
         #[cfg(target_os = "linux")]
         config_path: None,
@@ -222,7 +214,6 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
                     .map_err(|_| "session selector must be UTF-8")?;
                 cfg.target = Some((name.into(), mode));
             }
-            #[cfg(target_os = "linux")]
             b"--cwd" => {
                 i += 1;
                 cfg.cwd = Some(
@@ -483,6 +474,14 @@ fn launch(args: &[&CStr]) -> Result<i32, String> {
             }
             #[cfg(not(target_os = "linux"))]
             {
+                // Native single-PTY processes enter cwd before command lookup,
+                // PTY helpers or UI frameworks can start threads. Linux's
+                // shared broker applies cwd separately for each new session.
+                if let Some(path) = cfg.cwd.as_deref() {
+                    os::enter_startup_directory(path).map_err(|error| {
+                        alloc::format!("cannot enter command working directory (OS error {error})")
+                    })?;
+                }
                 platform::run(cfg).map_err(String::from)
             }
         } else {

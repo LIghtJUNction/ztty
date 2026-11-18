@@ -8,6 +8,13 @@ not claim that a `v0.2.0` GitHub Release or AUR update has been published.
 
 ## Roadmap candidate acceptance gates
 
+The roadmap has now executed two build-only candidates, at `fa2f201` and
+`2dc6769`. Both passed Linux/Windows x86_64 and the existing macOS protocol
+checks; both retained ARM64 failures. The
+[current source-bound record](native-candidates-2026-11-18.md) describes the
+exact failures, artifact hashes and subsequent corrections. These are not
+accepted six-platform production releases.
+
 The newer roadmap branch is not covered by run 44165748395. Its Release
 workflow now requires six native architecture jobs: Linux x86_64/ARM64,
 macOS Intel/Apple Silicon, and Windows x86_64/ARM64. A Windows ARM64 PE built
@@ -23,8 +30,14 @@ and the freshly built ELF. The gate runs workspace restore, daily workflow,
 Sixel pixel and extended-input suites on owned Xvfb displays; it records the
 binary, test and helper hashes and checks process cleanup. These are software
 X11 checks, not native Wayland, GPU or physical input-device acceptance.
-The gate's ten failure-path/packaging tests pass locally. The new complete
-native workflow and its resulting binaries still require execution.
+The gate's ten failure-path/packaging tests pass locally. Native Linux also
+runs four real libc working-directory regressions. The next candidate includes
+the corrected system-unwinder link order, native `--cwd`, five additional
+Windows cwd checks, and a macOS WindowServer pixel gate. That macOS gate retains
+the eight original PTY checks, runs ten evidence-contract tests, and reports
+missing Screen Recording/Accessibility as a blocker rather than a success.
+Its Swift helper requires macOS 14 only for testing; the production binary's
+minimum system requirements are unchanged.
 
 Linux evidence is retained in a separate `ztty-linux-ARCH.native.tar.gz`, with
 per-suite JSON reports, screenshots and logs. Packaging reads every archived

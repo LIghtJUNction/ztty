@@ -267,7 +267,11 @@ jobs:
           rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --target "$RUST_TARGET"
       - name: Build with the native Apple SDK
         id: build
-        run: cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty --target "$RUST_TARGET"
+        run: |
+          cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty --target "$RUST_TARGET"
+          MACOSX_DEPLOYMENT_TARGET=14.0 xcrun swiftc -O -swift-version 5 -parse-as-library \
+            -target "$HOST_ARCH-apple-macos14.0" tests/macos_window_probe.swift \
+            -o "$RUNNER_TEMP/ztty-macos-window-probe"
       - name: Run the native AppKit and Darwin PTY acceptance gate
         id: native
         shell: python {0}
@@ -279,15 +283,27 @@ jobs:
           report = {"passed": False, "source_sha": os.environ["SOURCE_SHA"], "status": "failed",
                     "pixel_readback": "not_performed", "ime_keyboard": "not_performed"}
           stdout = stderr = ""
+          contract_log = Path(f"dist/{stem}.native.contract.log")
+          report["contract_tests"] = {"passed": False, "log": contract_log.name}
           try:
+              with contract_log.open("w", encoding="utf-8") as stream:
+                  contract = subprocess.run([sys.executable, "tests/macos_native_test.py"],
+                      stdout=stream, stderr=subprocess.STDOUT, text=True, timeout=30)
+              report["contract_tests"].update({"passed": contract.returncode == 0,
+                                               "exit_code": contract.returncode})
+              assert contract.returncode == 0, f"macOS gate contract tests failed; see {contract_log}"
               version = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=30, check=True)
               assert version.stdout.strip() == "ztty " + os.environ["VERSION"], version.stdout
-              result = subprocess.run([sys.executable, "tests/macos_smoke.py", str(binary)], capture_output=True, text=True, timeout=60)
+              result = subprocess.run([
+                  sys.executable, "tests/macos_native.py", "--binary", str(binary),
+                  "--helper", str(Path(os.environ["RUNNER_TEMP"]) / "ztty-macos-window-probe"),
+                  "--evidence-prefix", f"dist/{stem}.native",
+              ], capture_output=True, text=True, timeout=240)
               stdout, stderr = result.stdout, result.stderr
               report.update(json.loads(stdout))
               report["exit_code"] = result.returncode
               report["passed"] = bool(report.get("passed")) and result.returncode == 0
-              report["status"] = "passed" if report["passed"] else "failed"
+              report["status"] = "passed" if report["passed"] else ("blocked" if report.get("status") == "blocked" else "failed")
           except Exception as error:
               report["error"] = repr(error)
               report["passed"] = False
@@ -340,6 +356,7 @@ jobs:
             dist/*.tar.gz*
             dist/*.json*
             dist/*.log
+            dist/*.png
           if-no-files-found: error
           retention-days: 14
 

@@ -20,6 +20,8 @@ unsafe extern "C" {
     fn read(fd: c_int, data: *mut c_void, size: usize) -> isize;
     pub fn getenv(name: *const c_char) -> *mut c_char;
     fn access(path: *const c_char, mode: c_int) -> c_int;
+    fn chdir(path: *const c_char) -> c_int;
+    fn getcwd(buffer: *mut c_char, size: usize) -> *mut c_char;
     fn _NSGetEnviron() -> *mut *mut *mut c_char;
     pub fn _exit(status: c_int) -> !;
     pub fn __error() -> *mut c_int;
@@ -138,6 +140,16 @@ fn environment() -> Vec<CString> {
     output
 }
 
+/// Called only at startup, before forkpty and Apple frameworks.
+pub fn enter_startup_directory(path: &str) -> Result<(), i32> {
+    let path = CString::new(path).map_err(|_| 22)?; // EINVAL
+    if unsafe { chdir(path.as_ptr()) } < 0 {
+        Err(errno())
+    } else {
+        Ok(())
+    }
+}
+
 fn resolve(program: &CStr, environment: &[CString]) -> Option<CString> {
     if program.to_bytes().contains(&b'/') {
         return Some(program.into());
@@ -173,10 +185,21 @@ pub fn child_setup(program: &CStr) -> Result<(CString, Vec<CString>), &'static s
             b"COLORTERM=",
             b"TERM_PROGRAM=",
             b"TERM_PROGRAM_VERSION=",
+            b"PWD=",
         ]
         .iter()
         .any(|prefix| entry.to_bytes().starts_with(prefix))
     });
+    // Darwin allocates the physical cwd when passed a null buffer. Copy it
+    // into the child environment and release it with the matching C allocator.
+    let cwd = unsafe { getcwd(core::ptr::null_mut(), 0) };
+    if cwd.is_null() {
+        return Err("cannot resolve the command working directory");
+    }
+    let mut pwd = b"PWD=".to_vec();
+    pwd.extend_from_slice(unsafe { CStr::from_ptr(cwd) }.to_bytes());
+    unsafe { free(cwd.cast()) };
+    env.push(CString::new(pwd).expect("getcwd contains no embedded NUL"));
     env.extend([
         c"TERM=xterm-256color".into(),
         c"COLORTERM=truecolor".into(),
