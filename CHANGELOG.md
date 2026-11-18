@@ -41,6 +41,11 @@
 
 ### Fixed
 
+- Match equivalent numeric MCP request IDs exactly for pending-request rejection
+  and cancellation over stdio and HTTP. Preserve original response tokens,
+  string/number separation and arbitrary-size integers without float rounding
+  or exponent expansion.
+
 - Repair Bash integration syntax, preserve complete PROMPT_COMMAND strings/arrays and avoid duplicate PS0 execution markers in nested shells. Check syntax and each source result independently.
 
 - Avoid clearing Unicode target cells immediately before overwriting them; preserve wide-cell boundary repair, insertion, metadata and wrapping, with five new core regressions.
