@@ -8,6 +8,11 @@
 从当前源码重新构建并实测：`make benchmark-terminals`。
 <!-- terminal-benchmark:end -->
 
+**2026-11-18 输出吞吐更新：** ztty 0.2.1 在上方十窗口对比中测得 **227.58 MiB/s**。
+独立的旧／新配对测试为 19.48 → 200.52 MiB/s，提升 **10.29 倍**，应用 PSS 基本持平。
+负载为 Xvfb 软件渲染下的 ASCII／颜色原地更新。
+[实测、实现与正确性证据](docs/benchmarks/throughput-2026-11-18.md)。
+
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。
 0.2 版本补齐了 macOS、Windows 后端，并加入静态 Kitty 图形协议。
 项目优先验证 Linux，目标是以更低的内存占用和更快的交互响应，
@@ -50,7 +55,7 @@ macOS 后端不要求 X11，Windows 后端不要求 WSL。上述原生检查在
 | --- | --- | --- | --- |
 | [`zvte`](https://github.com/LIghtJUNction/zvte) | 0.1.3 | 解析 ANSI/VT 字节流 | 只需要理解终端控制序列的程序 |
 | [`zinput`](crates/zinput) | 0.1.0 | 编码键盘、鼠标、焦点和粘贴事件 | 图形终端、远程终端、终端客户端 |
-| [`zterm`](crates/zterm) | 0.2.0 | 维护屏幕、历史、图片锚点、模式和协议回复 | 自定义终端界面、终端录制和回放 |
+| [`zterm`](crates/zterm) | 0.2.1 | 维护屏幕、历史、图片锚点、模式和协议回复 | 自定义终端界面、终端录制和回放 |
 | [`zpty`](crates/zpty) | 0.2.0 | 管理 Linux/macOS PTY 和 Windows ConPTY | 终端、进程控制、交互式测试工具 |
 | [`zgraphics`](crates/zgraphics) | 0.1.0 | 处理 Kitty 图形协议、图片解码、存储和放置 | 需要图片支持的终端或回放工具 |
 
@@ -72,6 +77,7 @@ macOS 使用 Apple 框架，Windows 使用 Win32 和 ConPTY。
 四个包均已在工作区之外验证单独及组合使用，依赖全部来自注册表，
 包括真实 PTY 会话与图像放置/删除。源码提交、包校验和与制品位置见
 [发布记录](docs/releasing.md)。
+当前源码中的 zterm 0.2.1 尚未在本轮发布到 crates.io。
 
 ```sh
 cargo add zinput@0.1.0 --no-default-features
@@ -243,6 +249,8 @@ cargo test --workspace --doc
 python3 tests/gui_smoke.py --binary ./target/release/ztty
 python3 tests/graphics_smoke.py --binary ./target/release/ztty
 python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
+python3 tests/repaint_gui.py --binary ./target/release/ztty
+python3 tests/test_throughput_benchmark.py
 python3 tests/mcp_transport.py --binary ./target/release/ztty
 python3 tests/mcp_sessions.py --binary ./target/release/ztty
 # 可选：真实 Fcitx 5、Pinyin 插件和独立 D-Bus 会话。

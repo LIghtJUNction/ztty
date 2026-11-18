@@ -10,65 +10,65 @@
 <text x="56" y="157" class="small muted">MiB resident · lower is better</text>
 <text x="56" y="200" class="label">ztty</text>
 <rect x="129" y="183" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="129" y="183" width="5.846" height="22" rx="4" fill="#1a73e8"/>
-<text x="520" y="200" text-anchor="end" class="value">15.36</text>
+<rect x="129" y="183" width="5.532" height="22" rx="4" fill="#1a73e8"/>
+<text x="520" y="200" text-anchor="end" class="value">14.91</text>
 <text x="56" y="249" class="label">Ghostty</text>
 <rect x="129" y="232" width="295" height="22" rx="4" fill="var(--track)"/>
 <rect x="129" y="232" width="295.000" height="22" rx="4" fill="#00897b"/>
-<text x="520" y="249" text-anchor="end" class="value">775.4</text>
+<text x="520" y="249" text-anchor="end" class="value">795.2</text>
 <text x="56" y="298" class="label">Kitty</text>
 <rect x="129" y="281" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="129" y="281" width="133.605" height="22" rx="4" fill="#8754c8"/>
-<text x="520" y="298" text-anchor="end" class="value">351.2</text>
+<rect x="129" y="281" width="131.100" height="22" rx="4" fill="#8754c8"/>
+<text x="520" y="298" text-anchor="end" class="value">353.4</text>
 <rect x="580" y="102" width="504" height="229" rx="12" fill="var(--panel)" stroke="var(--line)"/>
 <text x="600" y="134" class="h">App + full X server PSS</text>
 <text x="600" y="157" class="small muted">MiB resident · lower is better</text>
 <text x="600" y="200" class="label">ztty</text>
 <rect x="673" y="183" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="673" y="183" width="46.561" height="22" rx="4" fill="#1a73e8"/>
-<text x="1064" y="200" text-anchor="end" class="value">137.8</text>
+<rect x="673" y="183" width="44.755" height="22" rx="4" fill="#1a73e8"/>
+<text x="1064" y="200" text-anchor="end" class="value">137.4</text>
 <text x="600" y="249" class="label">Ghostty</text>
 <rect x="673" y="232" width="295" height="22" rx="4" fill="var(--track)"/>
 <rect x="673" y="232" width="295.000" height="22" rx="4" fill="#00897b"/>
-<text x="1064" y="249" text-anchor="end" class="value">873.1</text>
+<text x="1064" y="249" text-anchor="end" class="value">905.4</text>
 <text x="600" y="298" class="label">Kitty</text>
 <rect x="673" y="281" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="673" y="281" width="151.343" height="22" rx="4" fill="#8754c8"/>
-<text x="1064" y="298" text-anchor="end" class="value">447.9</text>
+<rect x="673" y="281" width="147.605" height="22" rx="4" fill="#8754c8"/>
+<text x="1064" y="298" text-anchor="end" class="value">453.0</text>
 <rect x="36" y="355" width="504" height="229" rx="12" fill="var(--panel)" stroke="var(--line)"/>
 <text x="56" y="387" class="h">PTY round-trip latency (p50)</text>
 <text x="56" y="410" class="small muted">µs · lower is better</text>
 <text x="56" y="453" class="label">ztty</text>
 <rect x="129" y="436" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="129" y="436" width="1.624" height="22" rx="4" fill="#1a73e8"/>
-<text x="520" y="453" text-anchor="end" class="value">63.52</text>
+<rect x="129" y="436" width="0.750" height="22" rx="4" fill="#1a73e8"/>
+<text x="520" y="453" text-anchor="end" class="value">17.24</text>
 <text x="56" y="502" class="label">Ghostty</text>
 <rect x="129" y="485" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="129" y="485" width="1.943" height="22" rx="4" fill="#00897b"/>
-<text x="520" y="502" text-anchor="end" class="value">75.99</text>
+<rect x="129" y="485" width="2.461" height="22" rx="4" fill="#00897b"/>
+<text x="520" y="502" text-anchor="end" class="value">56.58</text>
 <text x="56" y="551" class="label">Kitty</text>
 <rect x="129" y="534" width="295" height="22" rx="4" fill="var(--track)"/>
 <rect x="129" y="534" width="295.000" height="22" rx="4" fill="#8754c8"/>
-<text x="520" y="551" text-anchor="end" class="value">11537.7</text>
+<text x="520" y="551" text-anchor="end" class="value">6782.8</text>
 <rect x="580" y="355" width="504" height="229" rx="12" fill="var(--panel)" stroke="var(--line)"/>
 <text x="600" y="387" class="h">Output processing throughput</text>
 <text x="600" y="410" class="small muted">MiB/s · higher is better</text>
 <text x="600" y="453" class="label">ztty</text>
 <rect x="673" y="436" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="673" y="436" width="23.794" height="22" rx="4" fill="#1a73e8"/>
-<text x="1064" y="453" text-anchor="end" class="value">5.66</text>
+<rect x="673" y="436" width="295.000" height="22" rx="4" fill="#1a73e8"/>
+<text x="1064" y="453" text-anchor="end" class="value">227.6</text>
 <text x="600" y="502" class="label">Ghostty</text>
 <rect x="673" y="485" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="673" y="485" width="295.000" height="22" rx="4" fill="#00897b"/>
-<text x="1064" y="502" text-anchor="end" class="value">70.18</text>
+<rect x="673" y="485" width="150.849" height="22" rx="4" fill="#00897b"/>
+<text x="1064" y="502" text-anchor="end" class="value">116.4</text>
 <text x="600" y="551" class="label">Kitty</text>
 <rect x="673" y="534" width="295" height="22" rx="4" fill="var(--track)"/>
-<rect x="673" y="534" width="108.836" height="22" rx="4" fill="#8754c8"/>
-<text x="1064" y="551" text-anchor="end" class="value">25.89</text>
+<rect x="673" y="534" width="56.378" height="22" rx="4" fill="#8754c8"/>
+<text x="1064" y="551" text-anchor="end" class="value">43.49</text>
 <text x="36" y="625" class="small muted">App PSS counts all terminal processes. The second panel includes the full dedicated 7680×2160 Xvfb baseline.</text>
 <text x="36" y="650" class="small muted">PTY probes and private D-Bus are separate. PSS covers resident pages only; this is not total GPU/VRAM accounting.</text>
 <text x="36" y="675" class="small muted">One active window, nine idle; write → DSR reply. Logical completion, not frame rate. Memory: fixed frame + 1s settle.</text>
-<text x="36" y="700" class="small muted">Max sampled Swap (app + X server counters): ztty 0.04 MiB · Ghostty 93.45 MiB · Kitty 29.08 MiB</text>
-<text x="36" y="725" class="small muted">ztty 0.2.0 · Ghostty 1.4.0-arch1 · kitty 0.50.0 created by Kovid Goyal · 2026-11-17 UTC · 120×32 cells · monospace 11 pt</text>
+<text x="36" y="700" class="small muted">Max sampled Swap (app + X server counters): ztty 0.00 MiB · Ghostty 3.57 MiB · Kitty 2.00 MiB</text>
+<text x="36" y="725" class="small muted">ztty 0.2.1 · Ghostty 1.4.0-arch1 · kitty 0.50.0 created by Kovid Goyal · 2026-11-18 UTC · 120×32 cells · monospace 11 pt</text>
 <text x="36" y="750" class="small muted">Raw samples, versions, hashes and scope: docs/benchmarks/terminals-10-windows.json</text>
 </svg>
