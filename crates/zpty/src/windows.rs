@@ -539,6 +539,11 @@ impl Pty {
         }
         let mut startup: ffi::StartupInfoEx = unsafe { core::mem::zeroed() };
         startup.startup.cb = core::mem::size_of::<ffi::StartupInfoEx>() as u32;
+        // Explicit null stdio lets ConPTY supply its console handles instead of
+        // duplicating redirected host handles, even with inheritance disabled.
+        // Mirrors Microsoft's _LaunchAttachedClient:
+        // https://github.com/microsoft/terminal/blob/66cfdd5ecf159cde82f8cb27c2756062da7296a3/src/cascadia/TerminalConnection/ConptyConnection.cpp#L34-L36
+        startup.startup.flags = 0x00000100; // STARTF_USESTDHANDLES
         startup.attributes = list;
         let mut process: ffi::ProcessInformation = unsafe { core::mem::zeroed() };
         let success = unsafe {

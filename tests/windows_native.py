@@ -174,15 +174,41 @@ def capture_window(user, gdi, hwnd, expected_pid, path):
         user.ReleaseDC(hwnd, dc)
 
 
-def child(directory):
+def child(directory, stdio_only=False):
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel.GetStdHandle.restype = wintypes.HANDLE
     kernel.GetStdHandle.argtypes = [wintypes.DWORD]
     kernel.SetConsoleMode.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+    kernel.GetConsoleMode.argtypes = [wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD)]
+    kernel.GetConsoleMode.restype = wintypes.BOOL
+    kernel.GetFileType.argtypes = [wintypes.HANDLE]
+    kernel.GetFileType.restype = wintypes.DWORD
     kernel.ReadFile.argtypes = [wintypes.HANDLE, ctypes.c_void_p, wintypes.DWORD,
                                ctypes.POINTER(wintypes.DWORD), ctypes.c_void_p]
     stdin = kernel.GetStdHandle(-10 & 0xFFFFFFFF)
     stdout = kernel.GetStdHandle(-11 & 0xFFFFFFFF)
+    if stdio_only:
+        handles = {}
+        for name, identifier in (("stdin", -10), ("stdout", -11), ("stderr", -12)):
+            handle = kernel.GetStdHandle(identifier & 0xFFFFFFFF)
+            mode = wintypes.DWORD()
+            valid = bool(kernel.GetConsoleMode(handle, ctypes.byref(mode)))
+            error = 0 if valid else ctypes.get_last_error()
+            handles[name] = {"handle": int(handle or 0), "console": valid,
+                             "console_mode": mode.value if valid else None,
+                             "file_type": int(kernel.GetFileType(handle)), "error": error}
+        report = {"pid": os.getpid(), "parent_pid": os.getppid(), "handles": handles}
+        path = Path(directory) / "stdio.json"
+        path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        assert all(value["console"] and value["file_type"] == 2 for value in handles.values()), report
+        size = os.get_terminal_size(sys.stdout.fileno())
+        report["columns"], report["rows"] = size.columns, size.lines
+        path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        sys.stdout.buffer.write(b"ztty-conpty-stdout-only\n")
+        sys.stdout.buffer.flush()
+        sys.stderr.buffer.write(b"ztty-conpty-stderr-only\n")
+        sys.stderr.buffer.flush()
+        return
     if not kernel.SetConsoleMode(stdin, 0x200):
         raise ctypes.WinError(ctypes.get_last_error())
     if not kernel.SetConsoleMode(stdout, 0x1 | 0x4 | 0x8):
@@ -664,11 +690,32 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
             env=clean_environment, capture_output=True, timeout=15, check=False)
         assert relative.returncode == 0, (relative.returncode, relative.stderr)
         checks.append({"name": "relative_program_uses_requested_cwd", "passed": True})
+        stdio_directory = directory / "redirected host stdio"
+        stdio_directory.mkdir()
+        stdio_host = subprocess.run(
+            [str(binary.resolve()), "--config", "appearance.conf", "--geometry", "20x10",
+             "-e", sys.executable, str(Path(__file__).resolve()), "--stdio-child", str(stdio_directory)],
+            cwd=directory, env=clean_environment, stdin=subprocess.DEVNULL,
+            capture_output=True, timeout=15, check=False)
+        stdio_path = stdio_directory / "stdio.json"
+        stdio_evidence = json.loads(stdio_path.read_text(encoding="utf-8")) if stdio_path.exists() else {}
+        report["redirected_host_stdio"] = {"returncode": stdio_host.returncode,
+                                           "child": stdio_evidence,
+                                           "stdout_bytes": len(stdio_host.stdout),
+                                           "stderr": stdio_host.stderr.decode("utf-8", errors="replace")}
+        assert stdio_host.returncode == 0, report["redirected_host_stdio"]
+        handles = stdio_evidence.get("handles", {})
+        assert set(handles) == {"stdin", "stdout", "stderr"}, stdio_evidence
+        assert all(value["console"] and value["file_type"] == 2 for value in handles.values()), stdio_evidence
+        assert (stdio_evidence["columns"], stdio_evidence["rows"]) == (20, 10), stdio_evidence
+        assert not stdio_host.stdout and not stdio_host.stderr, report["redirected_host_stdio"]
+        checks.append({"name": "redirected_host_uses_conpty_standard_handles", "passed": True})
         command = [str(binary.resolve()), "--config", "appearance.conf",
                    "--cwd", str(working_directory), "--geometry", "20x10",
                    "-e", sys.executable, str(Path(__file__).resolve()), "--child", str(directory)]
-        runtime_path.parent.mkdir(parents=True, exist_ok=True)
-        runtime_stream = runtime_path.open("wb")
+        if trace_runtime:
+            runtime_path.parent.mkdir(parents=True, exist_ok=True)
+            runtime_stream = runtime_path.open("wb")
         environment = dict(os.environ, ZTTY_NATIVE_TRACE="1" if trace_runtime else "0",
                            ZTTY_NATIVE_GEOMETRY="1" if trace_runtime or staged_resize else "0")
         process = subprocess.Popen(command, cwd=directory, env=environment, stderr=runtime_stream)
@@ -988,10 +1035,13 @@ def main():
     parser.add_argument("--arch", choices=["x64", "arm64"],
                         help="require this native OS, Python and executable architecture")
     parser.add_argument("--child")
+    parser.add_argument("--stdio-child")
     args = parser.parse_args()
     if sys.platform != "win32":
         parser.error("this acceptance gate must run on native Windows")
-    if args.child:
+    if args.stdio_child:
+        child(args.stdio_child, stdio_only=True)
+    elif args.child:
         child(args.child)
     else:
         return 0 if run(args.binary, args.output, args.arch) else 1
