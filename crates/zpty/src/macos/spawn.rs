@@ -17,6 +17,9 @@ const O_NONBLOCK: i32 = 0x0004;
 const O_NOCTTY: i32 = 0x0002_0000;
 const O_CLOEXEC: i32 = 0x0100_0000;
 const F_DUPFD_CLOEXEC: i32 = 67;
+const AT_FDCWD: i32 = -2;
+const AT_EACCESS: i32 = 0x0010;
+const X_OK: i32 = 1;
 const TIOCPTYGNAME: u64 = 0x4080_7453;
 const TIOCSCTTY: u64 = 0x2000_7461;
 const TIOCSWINSZ: u64 = 0x8008_7467;
@@ -210,11 +213,24 @@ impl Pty {
     /// the target exec. No helper remains after success: it becomes the target
     /// program with the same child PID, session and process group.
     ///
-    /// Spawn, controlling-terminal and target-exec failures return their real
-    /// OS error after cleanup/reaping. A fixed ready frame must precede the EOF
-    /// used for exec handoff. The handshake allows five seconds after
-    /// `posix_spawn` returns; kernel process creation and kill/reap completion
-    /// are not hard-real-time bounded. A missing or invalid handshake fails.
+    /// The helper path is checked for execute access using the effective IDs
+    /// before allocating a PTY or creating a child. This is not an atomic
+    /// check-and-exec guarantee: the path or its permissions can change after
+    /// the check, and executable format or script-interpreter errors can still
+    /// be returned by `posix_spawn`. Its original OS error is preserved.
+    ///
+    /// When `posix_spawn` itself fails, Darwin has not handed the caller a
+    /// child PID. Its kernel disposes of any internally created failed process;
+    /// it can remain visible to process-wide child queries during that disposal.
+    /// This API does not guess its PID or reap unrelated host children.
+    /// After a successful spawn hands over a PID, controlling-terminal,
+    /// handshake and target-exec failures clean up and reap that owned child
+    /// before returning the original error.
+    ///
+    /// A fixed ready frame must precede the EOF used for exec handoff. The
+    /// handshake allows five seconds after `posix_spawn` returns; kernel process
+    /// creation and kill/reap completion are not hard-real-time bounded.
+    /// A missing or invalid handshake fails.
     ///
     /// Concurrent calls to this API cannot inherit each other's private fds:
     /// `POSIX_SPAWN_CLOEXEC_DEFAULT` allows only the explicit file actions.
@@ -237,6 +253,9 @@ impl Pty {
         {
             return Err(error(EINVAL));
         }
+        // Reject known unusable helpers before Darwin creates an internal
+        // failed-spawn process without returning its PID to the caller.
+        syscall(unsafe { ffi::faccessat(AT_FDCWD, helper.as_ptr(), X_OK, AT_EACCESS) })?;
         let master = Descriptor::new(unsafe {
             ffi::posix_openpt(O_RDWR | O_NOCTTY | O_CLOEXEC | O_NONBLOCK)
         })?

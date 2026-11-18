@@ -606,8 +606,10 @@ mod darwin {
         let denied = directory.0.join("not-executable");
         fs::write(&denied, b"not executable\n").unwrap();
         fs::set_permissions(&denied, fs::Permissions::from_mode(0o600)).unwrap();
-        expect_error(&helper, &c_path(&denied), &[], 13);
-        checks.push("real exec/helper errors preserve ENOENT/EACCES, close descriptors and reap");
+        let denied = c_path(&denied);
+        expect_error(&helper, &denied, &[], 13);
+        expect_error(&denied, c"/bin/sh", &[], 13);
+        checks.push("missing/non-executable helper and target errors preserve ENOENT/EACCES without descriptors or owned children");
 
         for mode in ["exit", "crash", "partial"] {
             let environment = CString::new(format!("ZPTY_TEST_BROKEN_HELPER={mode}")).unwrap();
