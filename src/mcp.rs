@@ -11,7 +11,7 @@ use crate::os;
 mod http;
 
 pub(super) const VERSIONS: [&str; 3] = ["2025-11-25", "2025-06-18", "2025-03-26"];
-const HELP: &str = "Usage: ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n                [--read-only] [--token TOKEN] [--observer-token TOKEN]\n                [--allow-host AUTHORITY]\n\nDefaults: stdio; HTTP host 127.0.0.1, port 8732, endpoint /mcp.\nUse --port 0 to choose a free port. ZTTY_MCP_TOKEN supplies an operator token;\nZTTY_MCP_OBSERVER_TOKEN supplies an observer token. --read-only limits all\nclients to session and command reads, including operator-token holders.\nNon-loopback HTTP requires a token. --allow-host explicitly permits another\nHTTP Host authority (name:port), for example behind a trusted local proxy.\nHTTP authentication is required whenever either token is configured.\nMCP protocol versions: 2025-11-25, 2025-06-18, 2025-03-26.\nMCP sessions create persistent PTYs; use ztty attach to list and view them.\n";
+const HELP: &str = "Usage: ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n                [--read-only] [--token TOKEN] [--observer-token TOKEN]\n                [--allow-host AUTHORITY] [--http-response json|sse]\n\nDefaults: stdio; HTTP host 127.0.0.1, port 8732, endpoint /mcp.\nHTTP replies default to JSON. --http-response sse streams each POST request\nwith keepalive comments and one final response; GET subscriptions are not provided.\nUse --port 0 to choose a free port. ZTTY_MCP_TOKEN supplies an operator token;\nZTTY_MCP_OBSERVER_TOKEN supplies an observer token. --read-only limits all\nclients to session and command reads, including operator-token holders.\nNon-loopback HTTP requires a token. --allow-host explicitly permits another\nHTTP Host authority (name:port), for example behind a trusted local proxy.\nHTTP authentication is required whenever either token is configured.\nMCP protocol versions: 2025-11-25, 2025-06-18, 2025-03-26.\nMCP sessions create persistent PTYs; use ztty attach to list and view them.\n";
 const MAX_PENDING: usize = 32;
 const MAX_WAITING: usize = 24;
 const MAX_BUFFERED: usize = 4 * 1024 * 1024;
@@ -47,6 +47,7 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
         .map_err(|_| "ZTTY_MCP_OBSERVER_TOKEN must be UTF-8")?;
     let mut read_only = false;
     let mut allowed_hosts = Vec::new();
+    let mut sse = false;
     let mut http_option = false;
     let mut index = 0;
     while index < args.len() {
@@ -62,7 +63,7 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
             "--http" => transport = "http",
             "--read-only" => read_only = true,
             "--transport" | "--host" | "--port" | "--token" | "--observer-token"
-            | "--allow-host" => {
+            | "--allow-host" | "--http-response" => {
                 index += 1;
                 let value = args
                     .get(index)
@@ -85,6 +86,14 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
                     }
                     "--observer-token" => {
                         observer_token = Some(value.into());
+                        http_option = true;
+                    }
+                    "--http-response" => {
+                        sse = match value {
+                            "json" => false,
+                            "sse" => true,
+                            _ => return Err("--http-response must be json or sse".into()),
+                        };
                         http_option = true;
                     }
                     "--allow-host" => {
@@ -117,7 +126,7 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
     }
     match transport {
         "stdio" if http_option => Err(
-            "--host, --port, --token, --observer-token and --allow-host require --transport http"
+            "--host, --port, --token, --observer-token, --allow-host and --http-response require --transport http"
                 .into(),
         ),
         "stdio" => stdio(read_only),
@@ -128,6 +137,7 @@ pub fn run(args: &[&CStr]) -> Result<i32, String> {
             observer_token.as_deref(),
             read_only,
             &allowed_hosts,
+            sse,
         ),
         _ => Err("--transport must be stdio or http".into()),
     }
