@@ -77,6 +77,42 @@ def rect_values(rect):
     return [rect.left, rect.top, rect.right, rect.bottom]
 
 
+def configure_nc_rendering_diagnostic(user, hwnd, process, report):
+    """Opt-in control for this owned HWND; never part of release acceptance."""
+    if os.environ.get("ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS") != "1":
+        return
+    record = report["nc_rendering_diagnostic"] = {
+        "diagnostic_only": True, "requested_policy": 1, "attribute": 2,
+        "hwnd": int(hwnd), "pid": process.pid}
+
+    def require_owned():
+        owner = wintypes.DWORD()
+        user.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
+        assert process.poll() is None and owner.value == process.pid and user.IsWindow(hwnd), \
+            "NC diagnostic window ownership changed"
+
+    require_owned()
+    dwm = ctypes.WinDLL("dwmapi", use_last_error=True)
+    dwm.DwmGetWindowAttribute.argtypes = [wintypes.HWND, wintypes.DWORD,
+                                        ctypes.c_void_p, wintypes.DWORD]
+    dwm.DwmGetWindowAttribute.restype = ctypes.c_int32
+    dwm.DwmSetWindowAttribute.argtypes = [wintypes.HWND, wintypes.DWORD,
+                                        ctypes.c_void_p, wintypes.DWORD]
+    dwm.DwmSetWindowAttribute.restype = ctypes.c_int32
+    before, after, policy = wintypes.BOOL(), wintypes.BOOL(), ctypes.c_int32(1)
+    before_status = dwm.DwmGetWindowAttribute(hwnd, 1, ctypes.byref(before), ctypes.sizeof(before))
+    record.update(before_hresult=before_status, before_enabled=bool(before.value))
+    assert before_status == 0 and before.value, "NC control requires initially enabled rendering"
+    require_owned()
+    set_status = dwm.DwmSetWindowAttribute(hwnd, 2, ctypes.byref(policy), ctypes.sizeof(policy))
+    record["set_hresult"] = set_status
+    assert set_status == 0, "disabling owned-window NC rendering failed"
+    after_status = dwm.DwmGetWindowAttribute(hwnd, 1, ctypes.byref(after), ctypes.sizeof(after))
+    record.update(after_hresult=after_status, after_enabled=bool(after.value))
+    require_owned()
+    assert after_status == 0 and not after.value, "NC rendering remained enabled"
+
+
 class BitmapInfoHeader(ctypes.Structure):
     _fields_ = [("size", ctypes.c_uint32), ("width", ctypes.c_int32),
                 ("height", ctypes.c_int32), ("planes", ctypes.c_uint16),
@@ -516,6 +552,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
               "transport": "real ConPTY", "renderer": "Win32 retained DIB",
               "runtime_trace_enabled": trace_runtime,
               "paint_diagnostics_enabled": os.environ.get("ZTTY_NATIVE_PAINT_DIAGNOSTICS") == "1",
+              "nc_rendering_diagnostics_enabled": os.environ.get("ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS") == "1",
               "resize_path": "staged" if staged_resize else "rapid",
               "rapid_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
               "back_to_back_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
@@ -800,6 +837,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                                        "actual": startup_state["cwd"],
                                        "relative_config": "appearance.conf"}
         checks.append({"name": "unicode_cwd_and_relative_config", "passed": True})
+        configure_nc_rendering_diagnostic(user, hwnd, process, report)
         rect = wintypes.RECT()
         assert user.GetClientRect(hwnd, ctypes.byref(rect))
         cw, ch = rect.right // 20, rect.bottom // 10
