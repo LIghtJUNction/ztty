@@ -257,6 +257,108 @@ fn integer_number(token: &str) -> bool {
             >= zeroes_needed
 }
 
+/// Compare validated MCP IDs without changing their original response tokens.
+/// Numeric spelling is not identity: 7, 7.0 and 7e0 name the same request.
+pub(super) fn request_id_eq(left: &Value, right: &Value) -> bool {
+    match (left, right) {
+        (Value::String(left), Value::String(right)) => left == right,
+        (Value::Number(left), Value::Number(right)) => {
+            if left == right {
+                return true;
+            }
+            let left = NumericId::new(left);
+            let right = NumericId::new(right);
+            left.negative == right.negative
+                && left
+                    .digits
+                    .iter()
+                    .filter(|byte| **byte != b'.')
+                    .eq(right.digits.iter().filter(|byte| **byte != b'.'))
+                && equal_id_exponents(left.exponent, left.shift, right.exponent, right.shift)
+        }
+        _ => false,
+    }
+}
+
+/// A nonzero ID is its significant digits times 10^(exponent + shift).
+/// Borrow the digits and exponent; even enormous exponents are never expanded.
+struct NumericId<'a> {
+    negative: bool,
+    digits: &'a [u8],
+    exponent: &'a str,
+    shift: i64,
+}
+
+impl<'a> NumericId<'a> {
+    fn new(token: &'a str) -> Self {
+        let negative = token.starts_with('-');
+        let token = token.strip_prefix('-').unwrap_or(token);
+        let (mantissa, exponent) = token.split_once(['e', 'E']).unwrap_or((token, "0"));
+        let bytes = mantissa.as_bytes();
+        let Some(first) = bytes.iter().position(|byte| matches!(byte, b'1'..=b'9')) else {
+            return Self {
+                negative: false,
+                digits: &[],
+                exponent: "0",
+                shift: 0,
+            };
+        };
+        let last = bytes
+            .iter()
+            .rposition(|byte| matches!(byte, b'1'..=b'9'))
+            .unwrap();
+        let fraction = mantissa
+            .split_once('.')
+            .map_or(0, |(_, digits)| digits.len());
+        let trailing = bytes[last + 1..]
+            .iter()
+            .filter(|byte| **byte != b'.')
+            .count();
+        Self {
+            negative,
+            digits: &bytes[first..=last],
+            exponent,
+            shift: trailing as i64 - fraction as i64,
+        }
+    }
+}
+
+fn equal_id_exponents(left: &str, left_shift: i64, right: &str, right_shift: i64) -> bool {
+    if let (Ok(left), Ok(right)) = (left.parse::<i64>(), right.parse::<i64>()) {
+        return left as i128 + left_shift as i128 == right as i128 + right_shift as i128;
+    }
+    // A validated nonzero integer cannot have an exponent below -MAX_MESSAGE.
+    // An overflowing exponent is therefore positive; a negative peer cannot
+    // bridge that gap with a shift bounded by the original message length.
+    if left.starts_with('-') || right.starts_with('-') {
+        return false;
+    }
+    let shift = left_shift - right_shift;
+    let (base, expected, mut carry) = if shift >= 0 {
+        (left, right, shift as u64)
+    } else {
+        (right, left, (-shift) as u64)
+    };
+    let mut expected = expected.trim_start_matches('+').bytes().rev();
+    // Add only the small decimal-point adjustment, one exponent digit at a
+    // time. This also handles a carry through arbitrarily many nines, in O(n)
+    // time and constant extra space, without floating-point rounding.
+    for digit in base.trim_start_matches('+').bytes().rev() {
+        carry += (digit - b'0') as u64;
+        if expected.next().unwrap_or(b'0') - b'0' != (carry % 10) as u8 {
+            return false;
+        }
+        carry /= 10;
+    }
+    while carry != 0 {
+        if expected.next().unwrap_or(b'0') - b'0' != (carry % 10) as u8 {
+            return false;
+        }
+        carry /= 10;
+    }
+    expected.all(|digit| digit == b'0')
+}
+
 fn observable_tool(name: &str) -> bool {
     matches!(
         name,
@@ -813,9 +915,9 @@ fn stdio(read_only: bool) -> Result<i32, String> {
                         match json::parse(&input) {
                             Ok(message) => {
                                 let duplicate = message_kind(&message) == Ok(MessageKind::Request)
-                                    && message
-                                        .get("id")
-                                        .is_some_and(|id| calls.iter().any(|call| &call.id == id));
+                                    && message.get("id").is_some_and(|id| {
+                                        calls.iter().any(|call| request_id_eq(&call.id, id))
+                                    });
                                 if duplicate {
                                     output.push(error(
                                         message.get("id").unwrap().clone(),
@@ -829,7 +931,7 @@ fn stdio(read_only: bool) -> Result<i32, String> {
                                     }
                                     match next.action {
                                         Some(Action::Cancel(id)) => {
-                                            calls.retain(|call| call.id != id)
+                                            calls.retain(|call| !request_id_eq(&call.id, &id))
                                         }
                                         Some(Action::Tool { id, request }) => {
                                             let waiting = request
@@ -953,6 +1055,81 @@ mod tests {
         ] {
             assert!(!integer_number(number), "{number}");
         }
+    }
+
+    #[test]
+    fn numeric_request_ids_match_by_exact_value() {
+        for aliases in [
+            &["7", "7.0", "7e0", "70e-1", "0.7e1", "0.0700E+0002"][..],
+            &["-7", "-7.00", "-70e-1"],
+            &["0", "-0", "0.00", "-0e-999999999999999999999"],
+            &["123", "1.2300e2", "12300e-2"],
+            &["9007199254740993", "90071992547409930e-1"],
+            &["1e9223372036854775808", "10e9223372036854775807"],
+            &[
+                "1e1000000000000000000000000",
+                "10e999999999999999999999999",
+                "100.00e+0999999999999999999999998",
+                "0.1e1000000000000000000000001",
+            ],
+        ] {
+            for left in aliases {
+                assert!(integer_number(left), "{left}");
+                for right in aliases {
+                    assert!(
+                        request_id_eq(
+                            &json::parse(left.as_bytes()).unwrap(),
+                            &json::parse(right.as_bytes()).unwrap(),
+                        ),
+                        "{left} != {right}",
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn distinct_request_ids_do_not_collide() {
+        for (left, right) in [
+            ("7", "-7"),
+            ("0", "1"),
+            ("0", "-1"),
+            ("7", r#""7""#),
+            (r#""7e0""#, r#""7""#),
+            ("9007199254740993", "9007199254740992"),
+            ("9007199254740993123456789", "9007199254740993123456788"),
+            ("1e9223372036854775808", "1e9223372036854775807"),
+            ("1e9223372036854775808", "1e-0"),
+            ("1e1000000000000000000000000", "1e999999999999999999999999"),
+            (
+                "10e1000000000000000000000000",
+                "1e1000000000000000000000000",
+            ),
+            ("null", "null"),
+            ("true", "true"),
+        ] {
+            let left_id = json::parse(left.as_bytes()).unwrap();
+            let right_id = json::parse(right.as_bytes()).unwrap();
+            assert!(!request_id_eq(&left_id, &right_id), "{left} == {right}");
+            assert!(!request_id_eq(&right_id, &left_id), "{right} == {left}");
+        }
+        assert!(request_id_eq(&"".into(), &"".into()));
+        assert!(request_id_eq(
+            &json::parse(br#""a\u0062""#).unwrap(),
+            &"ab".into(),
+        ));
+    }
+
+    #[test]
+    fn request_id_exponent_carries_stay_bounded_by_input_size() {
+        let length = json::MAX_MESSAGE / 2;
+        let left = Value::Number(format!("1e1{}", "0".repeat(length)));
+        let right = Value::Number(format!("10e{}", "9".repeat(length)));
+        let different = Value::Number(format!("1e{}", "9".repeat(length)));
+        assert!(request_id_eq(&left, &right));
+        assert!(request_id_eq(&right, &left));
+        assert!(!request_id_eq(&left, &different));
+        assert!(!request_id_eq(&different, &left));
     }
 
     #[test]

@@ -7,6 +7,7 @@ use core::ffi::{CStr, c_char, c_int, c_void};
 
 use super::{
     Action, MessageKind, PendingCall, RpcSession, VERSIONS, dispatch, error, message_kind,
+    request_id_eq,
 };
 use crate::json::{self, Value};
 use crate::os;
@@ -443,10 +444,9 @@ pub(super) fn run(
                                 }) => {
                                     for client in &mut clients {
                                         if client.session.as_deref() == Some(&session)
-                                            && client
-                                                .pending
-                                                .as_ref()
-                                                .is_some_and(|pending| pending.id == request_id)
+                                            && client.pending.as_ref().is_some_and(|pending| {
+                                                request_id_eq(&pending.id, &request_id)
+                                            })
                                         {
                                             client.pending = None;
                                             client.closed = true;
@@ -1062,7 +1062,7 @@ fn respond(
                 && client
                     .pending
                     .as_ref()
-                    .is_some_and(|pending| &pending.id == id)
+                    .is_some_and(|pending| request_id_eq(&pending.id, id))
         })
     {
         return (
