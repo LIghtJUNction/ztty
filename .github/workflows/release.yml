@@ -9,6 +9,12 @@ on:
         type: boolean
         required: true
         default: true
+      candidate_platform:
+        description: 'Build-only validation scope; publishing always requires all native platforms'
+        type: choice
+        required: true
+        default: all
+        options: [all, linux, macos, windows]
 
 permissions:
   contents: read
@@ -32,6 +38,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
       source_sha: ${{ steps.version.outputs.source_sha }}
       build_only: ${{ steps.version.outputs.build_only }}
+      candidate_platform: ${{ steps.version.outputs.candidate_platform }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -41,7 +48,16 @@ jobs:
         id: version
         env:
           BUILD_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.build_only || false }}
+          CANDIDATE_PLATFORM: ${{ inputs.candidate_platform || 'all' }}
         run: |
+          case "$CANDIDATE_PLATFORM" in
+            all|linux|macos|windows) ;;
+            *) echo "Unknown native candidate platform" >&2; exit 1 ;;
+          esac
+          if [[ "$BUILD_ONLY" != true && "$CANDIDATE_PLATFORM" != all ]]; then
+            echo "Publishing requires all native platforms; scoped builds require build_only=true." >&2
+            exit 1
+          fi
           version=$(bash tools/release-source.sh "$RUNNER_TEMP/ztty-release")
           source_sha=$(git rev-parse HEAD)
           if [[ "$GITHUB_REF" == refs/tags/* ]]; then
@@ -50,9 +66,12 @@ jobs:
             echo "Publishing requires the matching release tag v$version; branch builds require build_only=true." >&2
             exit 1
           fi
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
-          echo "build_only=$BUILD_ONLY" >> "$GITHUB_OUTPUT"
+          {
+            echo "version=$version"
+            echo "source_sha=$source_sha"
+            echo "build_only=$BUILD_ONLY"
+            echo "candidate_platform=$CANDIDATE_PLATFORM"
+          } >> "$GITHUB_OUTPUT"
 
   # Retain the existing publication gate. Candidate artifact builds use the
   # already completed local Linux gates and do not invoke routine Verify.
@@ -63,6 +82,7 @@ jobs:
 
   linux:
     needs: version
+    if: ${{ needs.version.outputs.build_only != 'true' || needs.version.outputs.candidate_platform == 'all' || needs.version.outputs.candidate_platform == 'linux' }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -81,6 +101,7 @@ jobs:
       VERSION: ${{ needs.version.outputs.version }}
       SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
       BUILD_ONLY: ${{ needs.version.outputs.build_only }}
+      CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
       ARTIFACT_STEM: ztty-linux-${{ matrix.arch }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -107,7 +128,8 @@ jobs:
                       "runner": os.environ["RUNNER_LABEL"], "runner_image": os.environ.get("ImageVersion"),
                       "platform": platform.platform(), "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
                       "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
-                      "build_only": os.environ["BUILD_ONLY"] == "true", "passed": False, "status": "initialized"}
+                      "build_only": os.environ["BUILD_ONLY"] == "true",
+                      "candidate_platform": os.environ["CANDIDATE_PLATFORM"], "passed": False, "status": "initialized"}
           if "LLVM_MINGW_SHA256" in os.environ:
               metadata["llvm_mingw"] = {"version": os.environ["LLVM_MINGW_VERSION"], "sha256": os.environ["LLVM_MINGW_SHA256"]}
           (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
@@ -199,6 +221,7 @@ jobs:
 
   macos:
     needs: version
+    if: ${{ needs.version.outputs.build_only != 'true' || needs.version.outputs.candidate_platform == 'all' || needs.version.outputs.candidate_platform == 'macos' }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -223,6 +246,7 @@ jobs:
       VERSION: ${{ needs.version.outputs.version }}
       SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
       BUILD_ONLY: ${{ needs.version.outputs.build_only }}
+      CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
       ARTIFACT_STEM: ztty-macos-${{ matrix.arch }}
       MACOSX_DEPLOYMENT_TARGET: '11.0'
     steps:
@@ -250,7 +274,8 @@ jobs:
                       "runner": os.environ["RUNNER_LABEL"], "runner_image": os.environ.get("ImageVersion"),
                       "platform": platform.platform(), "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
                       "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
-                      "build_only": os.environ["BUILD_ONLY"] == "true", "passed": False, "status": "initialized"}
+                      "build_only": os.environ["BUILD_ONLY"] == "true",
+                      "candidate_platform": os.environ["CANDIDATE_PLATFORM"], "passed": False, "status": "initialized"}
           if "LLVM_MINGW_SHA256" in os.environ:
               metadata["llvm_mingw"] = {"version": os.environ["LLVM_MINGW_VERSION"], "sha256": os.environ["LLVM_MINGW_SHA256"]}
           (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
@@ -362,6 +387,7 @@ jobs:
 
   windows:
     needs: version
+    if: ${{ needs.version.outputs.build_only != 'true' || needs.version.outputs.candidate_platform == 'all' || needs.version.outputs.candidate_platform == 'windows' }}
     strategy:
       fail-fast: false
       matrix:
@@ -389,6 +415,7 @@ jobs:
       VERSION: ${{ needs.version.outputs.version }}
       SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
       BUILD_ONLY: ${{ needs.version.outputs.build_only }}
+      CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
       ARTIFACT_STEM: ztty-windows-${{ matrix.arch }}
       # SHA-256 digests from the official 20261104 release assets API.
       # https://github.com/mstorsjo/llvm-mingw/releases/tag/20261104
@@ -419,7 +446,8 @@ jobs:
                       "runner": os.environ["RUNNER_LABEL"], "runner_image": os.environ.get("ImageVersion"),
                       "platform": platform.platform(), "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
                       "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
-                      "build_only": os.environ["BUILD_ONLY"] == "true", "passed": False, "status": "initialized"}
+                      "build_only": os.environ["BUILD_ONLY"] == "true",
+                      "candidate_platform": os.environ["CANDIDATE_PLATFORM"], "passed": False, "status": "initialized"}
           if "LLVM_MINGW_SHA256" in os.environ:
               metadata["llvm_mingw"] = {"version": os.environ["LLVM_MINGW_VERSION"], "sha256": os.environ["LLVM_MINGW_SHA256"]}
           metadata["rust_host"] = os.environ["RUST_HOST"]
@@ -573,7 +601,7 @@ jobs:
 
   publish:
     needs: [version, verify, linux, macos, windows]
-    if: ${{ needs.version.outputs.build_only == 'false' && startsWith(github.ref, 'refs/tags/') && needs.verify.result == 'success' }}
+    if: ${{ needs.version.outputs.build_only == 'false' && needs.version.outputs.candidate_platform == 'all' && startsWith(github.ref, 'refs/tags/') && needs.verify.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
@@ -622,6 +650,7 @@ jobs:
           for stem, path in records.items():
               report = json.loads(path.read_text(encoding="utf-8"))
               assert report["source_sha"] == os.environ["SOURCE_SHA"] and report["version"] == os.environ["VERSION"], stem
+              assert report["candidate_platform"] == "all", stem
               assert report["passed"] and all(value == "success" for value in report["outcomes"].values()), stem
               native = json.loads((folder / f"{stem}.native.json").read_text(encoding="utf-8"))
               assert native["passed"] and native["source_sha"] == os.environ["SOURCE_SHA"], stem
@@ -657,6 +686,7 @@ jobs:
           for path in records.values():
               report = json.loads(path.read_text(encoding="utf-8"))
               assert report["source_sha"] == os.environ["SOURCE_SHA"] and report["version"] == os.environ["VERSION"], path.name
+              assert report["candidate_platform"] == "all", path.name
               assert report["passed"], path.name
               for name, details in report["files"].items():
                   assert Path(name).name == name

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Allow build-only native candidates to select Linux, macOS or Windows while keeping both architectures, pinned provenance and mandatory all-platform publication gates.
+
 - Export the common action, JSON, pane-layout and workspace-state modules from the no_std library; Linux and regression tests consume the same implementations.
 
 - Export a shared no_std session library and route Windows/macOS PTY reads, bounded writes and resize commits through it; Windows x64/ARM64 now pass the native 30-check gate; macOS acceptance is pending.

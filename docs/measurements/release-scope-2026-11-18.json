@@ -1,0 +1,21 @@
+{
+  "scope": "build-only candidates may select one native platform; publishing requires all",
+  "tests": {
+    "unit_tests": 6,
+    "input_vectors": 14,
+    "contracts": {
+      "exit": 0,
+      "sha256": "798f543063a70b7c67412f024b49ec4fc8a2083fe44bcd881d57452967173911"
+    },
+    "actionlint": {
+      "exit": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "initial_actionlint_issue": "SC2129: individual GITHUB_OUTPUT redirects; replaced by one grouped redirect",
+  "native_scoped_dispatch": "pending actual candidate",
+  "source_sha256": {
+    ".github/workflows/release.yml": "a2a589fd99b9f2995af5f99ae36f36001d399d1d6f75d9972ce40cda88053eca",
+    "tests/release_scope_test.py": "c034a6fcdbeceb835cf9a24f0cb4de6b8b3f007572f1ead0bd2f54f53f39d63a"
+  }
+}
