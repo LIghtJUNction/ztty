@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "baseline_source": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
-  "core_candidate_source": "91ae4e8961e5f97d4366e162ab638695b1b1144b",
-  "mcp_candidate_source": "0971198a1e6e7a7526b5d3d6774cd6281bd16f25",
+  "core_candidate_source": "d0dac9d3640f6bc5d8ab116f8f46c8590cc5c31e",
+  "mcp_candidate_source": "c0a6aba9579dd4849a0aad04c9c8ce9578cbe10f",
   "record_kind": "observed_result_summary",
   "baseline_run": {
     "command": [
@@ -88,7 +88,8 @@
         "exit_code": 0
       }
     ],
-    "local_logs": "artifacts/core-validation in the alternate-screen-state worktree"
+    "local_logs": "artifacts/core-validation in the alternate-screen-state worktree",
+    "verified_commit": "d0dac9d3640f6bc5d8ab116f8f46c8590cc5c31e"
   },
   "static_review": {
     "core": "completed",
@@ -133,5 +134,6 @@
         "expected": "──q     "
       }
     ]
-  }
+  },
+  "integration_evidence": "merged-main-verification-2026-11-18.json"
 }

@@ -1,0 +1,82 @@
+{
+  "source_sha": "c497fba0cb8bcfe53bacb9f4142a5eb73902f263",
+  "checks": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.87
+    },
+    {
+      "name": "workspace-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "-j",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 66.318
+    },
+    {
+      "name": "workspace-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "-j",
+        "4",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 17.297
+    }
+  ],
+  "cargo_tests_passed": 280,
+  "doctests_passed": 6,
+  "session_core_pty_checks_passed": 8,
+  "log_sha256": {
+    "format.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "workspace-tests.log": "adef80dd54500d8e765a7cae7c99ecb270da0ea001bcf43c008219973613bc1c",
+    "workspace-clippy.log": "7a1287888aeafdacca3e568ca966e0465ba9774da461fc22e0fbfa75b1552271"
+  },
+  "schema_version": 1,
+  "record_kind": "observed_result_summary",
+  "validated_prs": [
+    {
+      "number": 5,
+      "head": "d0dac9d3640f6bc5d8ab116f8f46c8590cc5c31e",
+      "ancestor_verified": true
+    },
+    {
+      "number": 6,
+      "head": "c0a6aba9579dd4849a0aad04c9c8ce9578cbe10f",
+      "ancestor_verified": true
+    },
+    {
+      "number": 7,
+      "head": "34bf5a6af74a5b14b2046c3082ce16e04509935c",
+      "ancestor_verified": true
+    }
+  ],
+  "host": "light",
+  "local_worktree": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/verified-main-state-20261118",
+  "mcp_runtime_evidence": "session-mutation-identity-2026-11-18.json",
+  "limits": [
+    "Integration checks ran on Linux at the exact source_sha.",
+    "MCP real-PTY runtime suites and release binary are separately bound to the PR6 candidate and recorded in its evidence file.",
+    "No native Windows/macOS acceptance or formal release is claimed for this integration check."
+  ]
+}
