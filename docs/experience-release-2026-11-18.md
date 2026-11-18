@@ -372,6 +372,23 @@ x64 的 8 个冷启动窗口进程、1 个工作区窗口进程及工作区 4 �
 
 9 个终端进程及其临时目录、32 个对照进程全部清理，四个隔离 Job 清空并恢复桌面。x64／ARM64 终端 worker 分别用时 17.331／16.278 秒、退出码均为 1；对照 worker 分别用时 0.836／1.250 秒、退出码均为 0。这些时间只记录本次运行，不作为性能比较。两个终端门禁仍然失败，本轮未取得正式发布或设备安装资格。[x64 文件身份与清理](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-x86_64/evidence-index.json) · [ARM64 文件身份与清理](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-aarch64/evidence-index.json)
 
+### 5.14. 先准备离屏画面再获取窗口 DC：x64 全过，ARM64 仍失败
+
+源码 `31bdb1cdfc8dc8b176f16410376fb007d8ff0a90` 的 [run 44337030390](https://github.com/LIghtJUNction/ztty/actions/runs/44337030390) 将 `BeginPaint` 移到离屏整帧准备之后，使窗口绘图上下文的使用范围集中在画面提交阶段。x64 完成了全部指定门禁，ARM64 在第二次冷启动仍出现原来的恢复像素错误，候选整体失败。本轮两路均为 `paint_diagnostics_enabled=false`、`runtime_trace_enabled=false`，独立 control 未请求并被跳过；固定 8 次冷启动、原 31 项、每进程 warm 10 轮／背靠背 10 轮和 workspace 19 项要求保持不变。[本轮生产改动](https://github.com/LIghtJUNction/ztty/commit/31bdb1cdfc8dc8b176f16410376fb007d8ff0a90) · [结果索引](measurements/experience-release-2026-11-18/short-paint-44337030390/index.json)
+
+| 架构 | 冷启动与工作区结果 | 本轮结论 |
+| --- | --- | --- |
+| Windows x64 | 8 个独立进程各完成 31＋10＋10，随后 workspace 19 项全部通过；没有失败快照或诊断重试 | 该架构候选通过 |
+| Windows ARM64 | 第 1 个进程完成 31＋10＋10；第 2 个进程完成 23 项后，原 `resize_restores_visible_image` 失败；其 warm／背靠背、其后冷启动和 workspace 未进入 | 候选整体失败 |
+
+x64 的原始图像与工作区证据完整保留。367 张 PNG 的文件身份、尺寸以及 600 个有效原生缩放点完成独立核对，88 条客户区外的 null 记录单列；正常记录的直接 ScreenDC RGB 数量为 0。Workspace 的 34 条 live GetPixel 精确匹配，其中 19 条有对应阶段 PNG；其余 15 条没有冒充图像复核。8 份冷启动原始报告的 source／binary／raw SHA 绑定与工作区原始报告均核验通过。[x64 审计摘要](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-x86_64/summary.json) · [原生汇总](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.native.json) · [workspace 原始报告](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.native.workspace.json)
+
+ARM64 失败进程 PID 9672 在红色采样点 `(175,28)` 得到 `[20,20,20]`，预期仍为 `[255,0,0]`。该架构 51 张 PNG 与 82 个实际采样点已核对，原失败图相对正确图的差异仍只覆盖 `[152,0,180,190]` 区域。失败后的同进程快照中，surface／client／bitmap 为 180×190、grid／PTY 为 20×10，CPU 与 source 红色正确，target 在显式 flush 后仍灰。原失败图与 flush 后图逐字节相同，普通重画后的图与缩放前正确图逐字节相同；原失败没有被恢复画面替换。[ARM64 原始报告](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-aarch64/ztty-windows-aarch64.native.cold-02.json) · [原失败图](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-aarch64/ztty-windows-aarch64.native.cold-02.resize-restored.png) · [flush 后图](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-failure.png) · [普通重画后图](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-repaint.png)
+
+这次快照的 `last_paint.sequence=20`，记录的区域覆盖完整客户区，`BitBlt` 返回 1，paint 事件序号为 213–214，随后快照为 215；pending／dirty 标记未置位，`deferred_paints=0`。这些字段描述已记录的应用状态，仍未定位目标图像变错的过程。因为主动绘制查询关闭，`target_after_blit=null`，不能从失败后正确的 source 倒推复制时刻的 target，也不能沿用前两轮诊断的即时像素记录。可以确定的范围是：这项缩短 DC 使用时间的改动仍不足以使两架构同时通过，x64 的通过不能覆盖 ARM64 的失败。[原始同进程快照](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-failure.json) · [验收与推断边界](measurements/experience-release-2026-11-18/short-paint-44337030390/index.json)
+
+x64 的 9 个应用窗口进程、4 个工作区 PTY 探针以及 ARM64 的 2 个应用窗口进程全部退出，应用临时目录均实际删除，两个 Job 清空并恢复桌面。x64 worker 用时 13.893 秒、退出码 0；ARM64 worker 用时 12.907 秒、退出码 1。时间仅用于定位本次执行。证据目录保留 x64 汇总／工作区与 ARM64 原失败／快照及代表图，前轮对照结果不作为本轮通过依据；本轮未发布或安装新正式版本。[x64 文件身份与清理](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-x86_64/evidence-index.json) · [ARM64 文件身份与清理](measurements/experience-release-2026-11-18/short-paint-44337030390/windows-aarch64/evidence-index.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
