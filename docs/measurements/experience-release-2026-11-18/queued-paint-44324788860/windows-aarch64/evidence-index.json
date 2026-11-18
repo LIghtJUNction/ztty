@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "f10e0daaae4ad611d79f21ca1d3788725b1043f5",
+  "run_id": 44324788860,
+  "architecture": "aarch64",
+  "artifact_id": 14436337782,
+  "artifact_zip_sha256": "dd38ee1a527d6668aeb39320f3216501b9d392fd2736f21aa03b591db29c96cd",
+  "binary_sha256": "0c90d18225700112cfe04f7b2f05c14fddf09991d9f534126ce2cde53e0505bf",
+  "paint_diagnostics_enabled": false,
+  "original_runtime_trace_enabled": false,
+  "accepted": false,
+  "status": "failed",
+  "original_attempted_cold_starts": 1,
+  "completed_cold_starts": 0,
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/queued-paint-44324788860/windows-aarch64/summary.json",
+      "bytes": 8243,
+      "sha256": "d7b1faf68d394a49ee465362885ceb790fc19c2bf966ff6a880e8fcadae51084",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/queued-paint-44324788860/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 15778,
+      "sha256": "05d927dcfd50d5d022ada06b1ede304ab08cc86bb8ab6e621625b46a48793488",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 348
+    },
+    {
+      "path": "ztty-windows-aarch64.native.json",
+      "source_path": "artifacts/release-audit/queued-paint-44324788860/windows-aarch64/ztty-windows-aarch64.native.json",
+      "bytes": 47263,
+      "sha256": "b11411b881946bd7a44754c494d582a9b6924cb522673afa320fc0d1e69b56ba",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2205
+    },
+    {
+      "path": "ztty-windows-aarch64.native.post-failure.json",
+      "source_path": "artifacts/release-audit/queued-paint-44324788860/windows-aarch64/ztty-windows-aarch64.native.post-failure.json",
+      "bytes": 1733,
+      "sha256": "16b1d8706b73daaeb976b282376a9bc6a5a7d334e9369ea4a3cff08a9dae3e10",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.resize-restored.png",
+      "source_path": "artifacts/release-audit/queued-paint-44324788860/windows-aarch64/ztty-windows-aarch64.native.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.post-failure.png",
+      "source_path": "artifacts/release-audit/queued-paint-44324788860/windows-aarch64/ztty-windows-aarch64.native.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.post-repaint.png",
+      "source_path": "artifacts/release-audit/queued-paint-44324788860/windows-aarch64/ztty-windows-aarch64.native.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "diagnostic_reports_not_copied": [
+    {
+      "report": "ztty-windows-aarch64.native.resize-rapid-diagnostic.json",
+      "report_sha256": "3e500a64def4bce8546607515fca53a6fa41943b166afb67e0da6f2b37eaa552",
+      "scope": "independent diagnostic only",
+      "passed": true,
+      "base_checks": 31,
+      "runtime_trace_enabled": true,
+      "paint_diagnostics_enabled": false,
+      "resize_path": "rapid",
+      "window_pid": 10052,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "error": null,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.027055700000005345,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "report": "ztty-windows-aarch64.native.resize-staged-diagnostic.json",
+      "report_sha256": "d8de0e330162dff2d77780c961c7272267e590db81a372347a73007d1d15e101",
+      "scope": "independent diagnostic only",
+      "passed": false,
+      "base_checks": 31,
+      "runtime_trace_enabled": true,
+      "paint_diagnostics_enabled": false,
+      "resize_path": "staged",
+      "window_pid": 1564,
+      "warm_completed": 0,
+      "back_to_back_completed": 0,
+      "error": "resize_restores_visible_image: expected [255, 0, 0], last RGB [20, 20, 20]; timeout: resize_restores_visible_image; last error: None",
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.008096000000023196,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "first_failed_warm_iteration": 1,
+      "base_staged_geometry_and_query_ack_verified": true,
+      "warm_first_iteration_has_no_staged_ack": true
+    }
+  ],
+  "scope": "Compact original first-process failed report, build identity, same-process snapshot and three original PNGs. Both independently traced diagnostic reports remain in the verified original artifact, are hash-bound by build.files, and are indexed here.",
+  "notes": [
+    "Raw JSON, line endings and PNG bytes are preserved.",
+    "The original gate failed at resize_restores_visible_image after 23 successful checks. No full cold start completed; workspace never entered.",
+    "Both independent diagnostic processes have runtime_trace_enabled=true and cannot supersede the original failure. All three processes have paint_diagnostics_enabled=false.",
+    "The failed original last_paint.target_after_blit is null because extra paint DC queries are disabled; the previous diagnostic candidate clip/origin samples must not be transferred to this source.",
+    "The source red pixel was sampled after failure, not during the last BitBlt. Thread-local callback order does not establish cross-thread SetWindowPos completion or internal backing/copy order.",
+    "Diagnostic JSON lacks embedded source/binary SHA fields; its identity is bound by the verified source-bound build.files hashes and package binary.",
+    "The staged diagnostic passed the base 31 with 16/20-column child geometry and query ACK. Its subsequent warm iteration 1 used rapid stages without those ACK fields and failed the restored pixel; no warm repetition completed."
+  ]
+}
