@@ -77,6 +77,15 @@ remain pending. Verification entries below describe separate source checkpoints.
 
 ### Fixed
 
+- Preserve Windows pane history and selection for keyboard events that encode
+  no terminal input, including the Shift release after Shift+PageUp and silent
+  modifiers used to switch focus. Actual encoded input still returns to live
+  output and clears the selection.
+
+- Give Windows ConPTY children their own console standard handles when ztty's
+  stdin, stdout or stderr is redirected, keeping the child's input/output
+  inside its terminal instead of inheriting the host's redirected streams.
+
 - Join soft-wrapped rows during Linux history search and selection copying,
   while preserving explicit line breaks. Track matches across physical rows,
   copy complete matched cells beyond the viewport, and refresh stale active
@@ -161,12 +170,35 @@ remain pending. Verification entries below describe separate source checkpoints.
 
 ### Verification
 
+- Accept Windows source `3418b82` in
+  [run 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420):
+  native x64 and ARM64 each passed all 31 base checks and 19 workspace groups,
+  with owned-process and desktop cleanup. The original rapid resize path ran
+  without runtime tracing or added resize acknowledgements. Both architectures
+  preserved blue history and selection through silent modifiers/focus changes,
+  and actual Enter input returned to live output. This is a build-only candidate;
+  final-tag acceptance, publication and installation remain pending.
+
+- Record the intervening Windows candidates separately:
+  [source `8a2f4be`, run 44303751871](https://github.com/LIghtJUNction/ztty/actions/runs/44303751871)
+  failed after 7 checks when redirected host streams exposed invalid child
+  console handles. After the `e334cf7` stdio fix,
+  [run 44305368950](https://github.com/LIghtJUNction/ztty/actions/runs/44305368950)
+  passed all 31 base checks on both architectures but failed pane history
+  after 5 workspace groups. Neither failed run is promoted by later acceptance.
+
 - Preserve the failed Windows-only retry at source `dc43870` in
   [run 44300272576](https://github.com/LIghtJUNction/ztty/actions/runs/44300272576).
   Both native architectures completed 22 of 30 base checks and 12 visible-pixel
   checks before failing `resize_restores_visible_image`. Workspace checks were
   not reached. Application, Job and desktop cleanup passed on both runners;
-  native acceptance remains open.
+  that source did not pass native acceptance.
+
+- Record `ZTTY_BARE_METAL=1 make check` at Linux source `8a2f4be`: 271 ordinary
+  Rust tests, 6 doctests and 8 separate SessionCore PTY checks passed, together
+  with strict workspace Clippy, release build, installer, shell, MCP and no_std
+  gates. [Fixed-source result and full log](docs/experience-release-2026-11-18.md)
+  retain Darwin skips and the dependency's future-compatibility warning.
 
 - Extend the Linux daily-workflow harness to 18 groups with real mouse return,
   new-output anchoring, search/palette coexistence and read-only control checks.
@@ -214,6 +246,6 @@ remain pending. Verification entries below describe separate source checkpoints.
   Each release still requires those gates against its own tagged source.
 - Twenty-seven real X11/PTY vectors cover legacy keyboard bytes, four wheel directions, extra buttons, press ownership, focus transitions, X10 mode and custom bindings. Button 11 uses explicitly recorded synthetic X11 events because the virtual pointer exposes ten buttons.
 - Six layout tests and an isolated real X11/PTY acceptance script cover geometry, actual keyboard routing, hidden output, detach/reattach and ownership.
-- Native Windows workspace acceptance remains open; macOS workspace UI and
+- Windows workspace acceptance passed at `3418b82`; macOS workspace UI and
   multi-view GUI observation remain pending.
 - Native macOS/Windows search, command palette and shared MCP runtime are not yet implemented.
