@@ -59,9 +59,9 @@ the verified scope and the remaining native runtime work.
 
 | Platform | Native implementation | Current acceptance status |
 | --- | --- | --- |
-| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 81c1c06 passed four GUI suites and cwd regressions on x86_64 and ARM64 under guarded Xvfb |
-| macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Both architectures passed 12 protocol/startup checks; the first pixel probe aborted with a helper initialization assertion |
-| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | x86_64 passed all 30 functional checks and cleanup; ARM64 passed 10 independent checks and cleanup but remains blocked by runner-window occlusion |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 7a1d06b passed five GUI suites on ARM64; x86_64 passed four suites and cwd regressions at 81c1c06; the latest x86_64 job is pending |
+| macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Both architectures previously passed 12 protocol/startup checks; the latest pixel helper stopped at Swift compilation, with a method-call correction awaiting native rerun |
+| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | Source 7a1d06b passed all 30 functional checks, 19 visible-pixel checks and full process/desktop cleanup on native x64 and ARM64 |
 
 The macOS and Windows backends use their native APIs. macOS does not require
 X11, and Windows does not require WSL. Cross-target compilation does not establish
