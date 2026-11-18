@@ -1,0 +1,202 @@
+{
+  "schema": 1,
+  "timestamp_utc": "2026-11-18T05:14:42.757485+00:00",
+  "ok": true,
+  "independent_checks": 3286,
+  "scope": "Independent standard-library recomputation; no benchmark modules imported, binaries executed, GUI or performance runs. Source JSON unchanged.",
+  "inputs": {
+    "ab": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/docs/benchmarks/throughput-ab-2026-11-18.json",
+      "sha256": "68e0d08fa8f153fb5eead9e29ec578039461f062573f7b3b218e8dc29f33a1dc",
+      "runs": 12
+    },
+    "comparison": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/docs/benchmarks/terminals-10-windows.json",
+      "sha256": "9442c9018a13073abab27c398c6bd618cef0e3d002fa1989283d2ce0985afe30",
+      "runs": 9
+    }
+  },
+  "throughput_samples_recomputed": 468,
+  "direct_cpr_checks": 156,
+  "ztty_full_text_screen_checks": 96,
+  "expected_screen_sha256": "870e33e20b7680bd41f56ed49834ffbdedfeaf06276b47a2c032aad7c9535d8c",
+  "paired_summary": [
+    {
+      "windows": 1,
+      "before_mib_per_second": 17.524004351174554,
+      "after_mib_per_second": 194.1789657898843,
+      "ratio_of_medians": 11.080741701417654,
+      "paired_ratios": [
+        9.242127672488452,
+        11.080741701417654,
+        19.393600930169402
+      ]
+    },
+    {
+      "windows": 10,
+      "before_mib_per_second": 19.482310921782556,
+      "after_mib_per_second": 200.518388702798,
+      "ratio_of_medians": 10.29233079729801,
+      "paired_ratios": [
+        6.0833433860762645,
+        10.29233079729801,
+        12.818931986241388
+      ]
+    }
+  ],
+  "three_terminal_summary": [
+    {
+      "app": "ztty",
+      "median_output_mib_per_second": 227.57705457743253,
+      "median_pss_bytes": 15636480,
+      "median_app_plus_xserver_pss_bytes": 144029696,
+      "median_private_bytes": 12840960,
+      "max_sampled_application_swap_bytes": 0,
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "application_pss_mib": 14.912109375,
+      "full_xvfb_pss_mib": 137.357421875,
+      "max_paired_swap_mib": 0.0,
+      "run_throughputs": [
+        227.57705457743253,
+        196.8791035168921,
+        242.1968142540901
+      ]
+    },
+    {
+      "app": "ghostty",
+      "median_output_mib_per_second": 116.37224457735249,
+      "median_pss_bytes": 833828864,
+      "median_app_plus_xserver_pss_bytes": 949355520,
+      "median_private_bytes": 817750016,
+      "max_sampled_application_swap_bytes": 3743744,
+      "max_sampled_app_plus_xserver_swap_bytes": 3743744,
+      "application_pss_mib": 795.201171875,
+      "full_xvfb_pss_mib": 905.3759765625,
+      "max_paired_swap_mib": 3.5703125,
+      "run_throughputs": [
+        116.37224457735249,
+        126.3234261546894,
+        80.82518858875258
+      ]
+    },
+    {
+      "app": "kitty",
+      "median_output_mib_per_second": 43.492501229525935,
+      "median_pss_bytes": 370557952,
+      "median_app_plus_xserver_pss_bytes": 475016192,
+      "median_private_bytes": 343617536,
+      "max_sampled_application_swap_bytes": 2101248,
+      "max_sampled_app_plus_xserver_swap_bytes": 2101248,
+      "application_pss_mib": 353.3916015625,
+      "full_xvfb_pss_mib": 453.0107421875,
+      "max_paired_swap_mib": 2.00390625,
+      "run_throughputs": [
+        43.492501229525935,
+        43.74856783802464,
+        41.260813690061696
+      ]
+    }
+  ],
+  "host_context": {
+    "ab": {
+      "load_average_ranges": {
+        "1m": [
+          5.5849609375,
+          7.26220703125
+        ],
+        "5m": [
+          4.623046875,
+          5.1220703125
+        ],
+        "15m": [
+          4.59716796875,
+          4.76513671875
+        ]
+      },
+      "MemAvailable_bytes_range": [
+        2575073280,
+        3111886848
+      ],
+      "MemAvailable_GiB_range": [
+        2.398223876953125,
+        2.8981704711914062
+      ],
+      "swap_used_bytes_range": [
+        20346212352,
+        21241683968
+      ],
+      "swap_used_GiB_range": [
+        18.94888687133789,
+        19.782859802246094
+      ],
+      "swap_io_counter_pages_range": {
+        "pswpin": [
+          553715729,
+          554190267
+        ],
+        "pswpout": [
+          682628683,
+          683287793
+        ]
+      }
+    },
+    "comparison": {
+      "load_average_ranges": {
+        "1m": [
+          6.20361328125,
+          9.099609375
+        ],
+        "5m": [
+          5.2001953125,
+          6.69677734375
+        ],
+        "15m": [
+          4.82568359375,
+          5.44189453125
+        ]
+      },
+      "MemAvailable_bytes_range": null,
+      "swap_used_bytes_range": null,
+      "limitation": "Three-terminal collector records load and process Swap, not host MemAvailable/SwapFree at run boundaries."
+    }
+  },
+  "binary_checks": [
+    {
+      "report": "ab",
+      "variant": "before",
+      "recorded_sha256": "32e2bba63d939e419cb51b81b6b0ac54fcea8062fbc521cdbf443808321de3c9",
+      "current_sha256": "32e2bba63d939e419cb51b81b6b0ac54fcea8062fbc521cdbf443808321de3c9"
+    },
+    {
+      "report": "ab",
+      "variant": "after",
+      "recorded_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b",
+      "current_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b"
+    },
+    {
+      "report": "comparison",
+      "variant": "ztty",
+      "recorded_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b",
+      "current_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b"
+    },
+    {
+      "report": "comparison",
+      "variant": "ghostty",
+      "recorded_sha256": "da05c34806b7e74dd4f4b0067b9abf08ea11eecd2e1eabd348b8da791cb36437",
+      "current_sha256": "da05c34806b7e74dd4f4b0067b9abf08ea11eecd2e1eabd348b8da791cb36437"
+    },
+    {
+      "report": "comparison",
+      "variant": "kitty",
+      "recorded_sha256": "e3aec26698a05b4c024a672e92365649a8fdeff8e884e432f345b14d54e20dd7",
+      "current_sha256": "e3aec26698a05b4c024a672e92365649a8fdeff8e884e432f345b14d54e20dd7"
+    }
+  ],
+  "historical_5_66_used_for_speedup": false,
+  "speedup_basis": "Only matched before/after runs from the same 12-case AB report. Historical 5.66 MiB/s is not an input.",
+  "limitations": [
+    "Three-terminal JSON binds metadata and launch argv but has no per-run post-execution SHA fields. Current binaries match metadata.",
+    "CPR and broker checks cover logical terminal completion and final text, not physical presentation or glyph rendering."
+  ],
+  "issues": []
+}

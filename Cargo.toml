@@ -12,7 +12,7 @@ repository = "https://github.com/LIghtJUNction/ztty"
 
 [package]
 name = "ztty"
-version = "0.2.0"
+version = "0.2.1"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -35,7 +35,7 @@ path = "tests/session_core.rs"
 harness = false
 
 [dependencies]
-zterm = { path = "crates/zterm", version = "0.2.0", default-features = false }
+zterm = { path = "crates/zterm", version = "0.2.1", default-features = false }
 zpty = { path = "crates/zpty", version = "0.2.0", default-features = false }
 
 [profile.dev]
