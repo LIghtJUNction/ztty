@@ -1,0 +1,194 @@
+{
+  "diagnostic_only": true,
+  "passed": true,
+  "status": "passed",
+  "required": 16,
+  "completed": 16,
+  "runs": [
+    {
+      "number": 1,
+      "report": "ztty-windows-aarch64.resize-control.cold-01.json",
+      "passed": true,
+      "report_sha256": "3f603bf55245c6c1704d77e450267242dd89244db027f83270a46d78caad8935"
+    },
+    {
+      "number": 2,
+      "report": "ztty-windows-aarch64.resize-control.cold-02.json",
+      "passed": true,
+      "report_sha256": "006da29ae876ff2a1747474779f73c62323fadba00853a781186cb3254cef2dd"
+    },
+    {
+      "number": 3,
+      "report": "ztty-windows-aarch64.resize-control.cold-03.json",
+      "passed": true,
+      "report_sha256": "f657878cff26b37b9fca05128bfdd2c34db6b9d5ac42ead907a820de2b9feb63"
+    },
+    {
+      "number": 4,
+      "report": "ztty-windows-aarch64.resize-control.cold-04.json",
+      "passed": true,
+      "report_sha256": "40cabcd455d34e68191304471bd7bd98eb4af917f1d1ca72c1629a56471f7b53"
+    },
+    {
+      "number": 5,
+      "report": "ztty-windows-aarch64.resize-control.cold-05.json",
+      "passed": true,
+      "report_sha256": "7b08a8919eca9ea456f25513f34e62ac1093475f937d06fbfdf3ba2c7aad0495"
+    },
+    {
+      "number": 6,
+      "report": "ztty-windows-aarch64.resize-control.cold-06.json",
+      "passed": true,
+      "report_sha256": "530cbd3416bfd1cd033b69b11673b3f55c7e5fafe7e0966bda68ea85cddcda96"
+    },
+    {
+      "number": 7,
+      "report": "ztty-windows-aarch64.resize-control.cold-07.json",
+      "passed": true,
+      "report_sha256": "2eb0daee2674a8752fcb9907e6795457a525023ed214b11c24b7d97ca00c699a"
+    },
+    {
+      "number": 8,
+      "report": "ztty-windows-aarch64.resize-control.cold-08.json",
+      "passed": true,
+      "report_sha256": "d0ca7dbe3efe91c98f0ed396d3c6e65ba804331c3485516807a2590e7aaced8f"
+    },
+    {
+      "number": 9,
+      "report": "ztty-windows-aarch64.resize-control.cold-09.json",
+      "passed": true,
+      "report_sha256": "e6533f1aa8a9d4a13181b10876e5259248bc8cc7ee1c774834725eb3029e70e6"
+    },
+    {
+      "number": 10,
+      "report": "ztty-windows-aarch64.resize-control.cold-10.json",
+      "passed": true,
+      "report_sha256": "ed3e2b34411425ddd220ba4bc6dd552b2342251f0f2f68e8f61c2fdd286bb6ae"
+    },
+    {
+      "number": 11,
+      "report": "ztty-windows-aarch64.resize-control.cold-11.json",
+      "passed": true,
+      "report_sha256": "c02abd5a83acf16dfb32cd1cd3c0a792242fa07f9fa8f2d2625ab106b0ff8845"
+    },
+    {
+      "number": 12,
+      "report": "ztty-windows-aarch64.resize-control.cold-12.json",
+      "passed": true,
+      "report_sha256": "68b2fde16973dce16569dea97e12be64c9d71a089e66172fe1ee1bc1977b557f"
+    },
+    {
+      "number": 13,
+      "report": "ztty-windows-aarch64.resize-control.cold-13.json",
+      "passed": true,
+      "report_sha256": "cabb42258ad7d2b02f330a2001e28ff97602893e24083884420a428248d6c7ac"
+    },
+    {
+      "number": 14,
+      "report": "ztty-windows-aarch64.resize-control.cold-14.json",
+      "passed": true,
+      "report_sha256": "713a6395f69a819c630367e2a0b1d4eebdbb030cb1b8cdaa873978f044e7bcac"
+    },
+    {
+      "number": 15,
+      "report": "ztty-windows-aarch64.resize-control.cold-15.json",
+      "passed": true,
+      "report_sha256": "76e1be60d737ebbeda221d0dc41c7c3f0140c2059ae6e490969d789eb5168e60"
+    },
+    {
+      "number": 16,
+      "report": "ztty-windows-aarch64.resize-control.cold-16.json",
+      "passed": true,
+      "report_sha256": "27079851dc5094d1542995b8ad228bce180044d0f418634e0401776e275c6d97"
+    }
+  ],
+  "desktop": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682",
+  "python_process": {
+    "process_machine": 0,
+    "native_machine": 43620,
+    "emulated": false
+  },
+  "binary_machine": 43620,
+  "source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+  "binary_sha256": "ac9c78852a23161260d52dfa31e057c68906dd5c106df13f602c3b30e1747bf1",
+  "run_id": "44341581701",
+  "c_source_sha256": "50a2a1aeb3b436b75b35e7992f93ed9d4e004bed2496f9cfd6fe04a4dc898de9",
+  "desktop_isolation": {
+    "passed": true,
+    "status": "passed",
+    "desktop": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682",
+    "creation_flags": 134742020,
+    "inherited_handles": [
+      "NUL stdin",
+      "stdout log",
+      "stderr log"
+    ],
+    "kill_on_job_close": true,
+    "worker_resumed": true,
+    "observed_job_pids": [
+      724,
+      1968,
+      2540,
+      3872,
+      5380,
+      7388,
+      8236,
+      8932,
+      9244,
+      9376,
+      10212,
+      10880
+    ],
+    "cleanup": {
+      "errors": [],
+      "job_empty": true,
+      "worker_exited": true,
+      "input_restored": true,
+      "thread_restored": true,
+      "owned_desktop_closed": true,
+      "handles_closed": true,
+      "job_pids_after": [],
+      "input_before_restore": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682",
+      "input_after_restore": "Default"
+    },
+    "before": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "Default",
+      "input": "Default"
+    },
+    "created_desktop": true,
+    "worker_pid": 9244,
+    "worker_tid": 3304,
+    "created_suspended": true,
+    "worker_assigned": true,
+    "assigned_job_pids": [
+      9244
+    ],
+    "last_input_desktop": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682",
+    "switched_to_owned": true,
+    "worker_exit_code": 0,
+    "after": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "Default",
+      "input": "Default"
+    },
+    "elapsed_seconds": 1.267
+  },
+  "worker_state": {
+    "passed": true,
+    "pid": 9244,
+    "desktop": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682",
+    "context": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682",
+      "input": "ztty-control-8180-d27b81353e9c4f13b6609847f867a682"
+    },
+    "source_sha": "ee4fb3fc804c5cf292b83f23adae0cbab85a224f",
+    "binary_sha256": "ac9c78852a23161260d52dfa31e057c68906dd5c106df13f602c3b30e1747bf1",
+    "run_id": "44341581701",
+    "c_source_sha256": "50a2a1aeb3b436b75b35e7992f93ed9d4e004bed2496f9cfd6fe04a4dc898de9"
+  }
+}
