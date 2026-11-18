@@ -1787,6 +1787,317 @@ impl Window {
         }
         None
     }
+
+    pub fn native_ui_geometry(&self) -> ztty::native_ui::Geometry {
+        ztty::native_ui::Geometry {
+            width: self.width,
+            height: self.height,
+            cell_width: self.cw,
+            cell_height: self.ch,
+            padding: self.padding,
+        }
+    }
+
+    fn native_ui_fill(&mut self, rect: crate::layout::Rect, rgb: u32) {
+        if rect.width <= 0 || rect.height <= 0 {
+            return;
+        }
+        let color = self.color(rgb);
+        unsafe {
+            XftDrawRect(
+                self.draw,
+                &color,
+                rect.x,
+                rect.y,
+                rect.width as u32,
+                rect.height as u32,
+            );
+        }
+    }
+
+    fn native_ui_text(&mut self, text: &str, rect: crate::layout::Rect, rgb: u32) {
+        let color = self.color(rgb);
+        let right = rect.x + rect.width;
+        let rows = (rect.height / self.ch).max(0) as usize;
+        let draw = self.draw;
+        for (row, line) in text.split('\n').take(rows.min(32)).enumerate() {
+            let mut x = rect.x;
+            let baseline = rect.y + row as i32 * self.ch + unsafe { (*self.font).ascent } + 1;
+            // One Xft draw per font run, with bounded stack storage. Fallback
+            // fonts share the terminal's existing glyph/font cache.
+            let mut run = [0u8; 4096];
+            let mut used = 0usize;
+            let mut run_font = core::ptr::null_mut();
+            let mut run_x = x;
+            let flush = |font, x, bytes: &[u8]| {
+                if !bytes.is_empty() {
+                    unsafe {
+                        XftDrawStringUtf8(
+                            draw,
+                            &color,
+                            font,
+                            x,
+                            baseline,
+                            bytes.as_ptr(),
+                            bytes.len() as i32,
+                        );
+                    }
+                }
+            };
+            for ch in line.chars().filter(|ch| !ch.is_control()).take(4096) {
+                let font = self.glyph_font(ch);
+                let mut bytes = [0; 4];
+                let text = ch.encode_utf8(&mut bytes);
+                let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
+                unsafe {
+                    XftTextExtentsUtf8(
+                        self.display,
+                        font,
+                        text.as_ptr(),
+                        text.len() as i32,
+                        &mut metrics,
+                    );
+                }
+                if x + i32::from(metrics.x_off).max(1) > right {
+                    break;
+                }
+                if run_font != font || used + text.len() > run.len() {
+                    flush(run_font, run_x, &run[..used]);
+                    used = 0;
+                    run_font = font;
+                    run_x = x;
+                }
+                run[used..used + text.len()].copy_from_slice(text.as_bytes());
+                used += text.len();
+                x += i32::from(metrics.x_off);
+            }
+            flush(run_font, run_x, &run[..used]);
+        }
+    }
+
+    /// Use the same generation-keyed XRender upload as Kitty/Sixel placements.
+    /// Scene references reuse that upload; scaling allocates no second bitmap.
+    fn native_ui_image(
+        &mut self,
+        terminal: &Terminal,
+        image_id: u32,
+        generation: Option<u64>,
+        rect: crate::layout::Rect,
+    ) -> bool {
+        let Some(image) = terminal.graphics().image(image_id) else {
+            return false;
+        };
+        if generation.is_some_and(|generation| generation != image.generation)
+            || image.width == 0
+            || image.height == 0
+            || rect.width <= 0
+            || rect.height <= 0
+        {
+            return false;
+        }
+        let Some(picture) = self.image_picture(image_id, image) else {
+            return false;
+        };
+        let (width, height) = if i64::from(rect.width) * i64::from(image.height)
+            <= i64::from(rect.height) * i64::from(image.width)
+        {
+            (
+                rect.width,
+                (i64::from(rect.width) * i64::from(image.height) / i64::from(image.width)).max(1)
+                    as i32,
+            )
+        } else {
+            (
+                (i64::from(rect.height) * i64::from(image.width) / i64::from(image.height)).max(1)
+                    as i32,
+                rect.height,
+            )
+        };
+        let fixed = |source: u32, destination: i32| {
+            ((u64::from(source) << 16) / destination as u64).min(i32::MAX as u64) as i32
+        };
+        let transform = Transform {
+            matrix: [
+                [fixed(image.width, width), 0, 0],
+                [0, fixed(image.height, height), 0],
+                [0, 0, 1 << 16],
+            ],
+        };
+        unsafe {
+            XRenderSetPictureTransform(self.display, picture, &transform);
+            XRenderComposite(
+                self.display,
+                3,
+                picture,
+                0,
+                XftDrawPicture(self.draw),
+                0,
+                0,
+                0,
+                0,
+                rect.x,
+                rect.y,
+                width as u32,
+                height as u32,
+            );
+        }
+        true
+    }
+
+    pub fn native_ui(
+        &mut self,
+        terminal: &Terminal,
+        view: &ztty::native_ui::View,
+        interactive: bool,
+    ) {
+        use crate::layout::Rect;
+        use zterm::ui::{Kind, TextStyle};
+        if self.suspended {
+            return;
+        }
+        let Some(layout) = &view.layout else {
+            return;
+        };
+        let Some(scene) = terminal.ui_scene() else {
+            return;
+        };
+        if layout.stamp.change != terminal.ui_revision() {
+            return;
+        }
+        let panel = layout.panel;
+        self.native_ui_fill(panel, 0x354457);
+        self.native_ui_fill(
+            Rect {
+                x: panel.x + 1,
+                y: panel.y + 1,
+                width: panel.width - 2,
+                height: panel.height - 2,
+            },
+            0x121a24,
+        );
+        let header = if interactive {
+            if view.focused_node().is_some() {
+                "ztty UI  ·  Tab selects  ·  Enter activates  ·  Esc returns"
+            } else {
+                "ztty UI  ·  Click a button to focus"
+            }
+        } else {
+            "ztty UI  ·  Read-only preview"
+        };
+        self.native_ui_text(
+            header,
+            Rect {
+                x: panel.x + 16,
+                y: panel.y + 10,
+                width: panel.width - 32,
+                height: self.ch,
+            },
+            0x94a3b8,
+        );
+        for item in &layout.items {
+            let Some(node) = scene.nodes.get(item.index) else {
+                continue;
+            };
+            let rect = item.rect;
+            match &node.kind {
+                Kind::Text { text, style } => {
+                    let color = match style {
+                        TextStyle::Heading => 0xe8eef8,
+                        TextStyle::Muted => 0x94a3b8,
+                        TextStyle::Code => 0x8ab4f8,
+                        TextStyle::Body => 0xcdd6e4,
+                    };
+                    self.native_ui_text(text, rect, color);
+                }
+                Kind::Progress { value, label } => {
+                    self.native_ui_text(
+                        label,
+                        Rect {
+                            height: self.ch.min(rect.height),
+                            ..rect
+                        },
+                        0xcdd6e4,
+                    );
+                    if rect.height >= self.ch + 10 {
+                        let bar = Rect {
+                            y: rect.y + self.ch + 6,
+                            height: 4,
+                            ..rect
+                        };
+                        self.native_ui_fill(bar, 0x314155);
+                        self.native_ui_fill(
+                            Rect {
+                                width: (i64::from(bar.width) * i64::from(*value) / 10000) as i32,
+                                ..bar
+                            },
+                            0x8ab4f8,
+                        );
+                    }
+                }
+                Kind::Button { label, enabled, .. } => {
+                    if rect.height < self.ch + 16 {
+                        continue;
+                    }
+                    let active = interactive && *enabled;
+                    self.native_ui_fill(
+                        rect,
+                        if view.focused_node() == Some(node.id) {
+                            0x8ab4f8
+                        } else {
+                            0x40536b
+                        },
+                    );
+                    self.native_ui_fill(
+                        Rect {
+                            x: rect.x + 1,
+                            y: rect.y + 1,
+                            width: rect.width - 2,
+                            height: rect.height - 2,
+                        },
+                        if active { 0x23354a } else { 0x202731 },
+                    );
+                    self.native_ui_text(
+                        label,
+                        Rect {
+                            x: rect.x + 12,
+                            y: rect.y + 8,
+                            width: rect.width - 24,
+                            height: self.ch,
+                        },
+                        if active { 0xdce9fb } else { 0x7c8999 },
+                    );
+                }
+                Kind::Image {
+                    image_id,
+                    generation,
+                    alt,
+                    cols,
+                    rows,
+                } => {
+                    let image_rect = Rect {
+                        width: rect.width.min(i32::from(*cols).saturating_mul(self.cw)),
+                        height: rect.height.min(i32::from(*rows).saturating_mul(self.ch)),
+                        ..rect
+                    };
+                    if !self.native_ui_image(terminal, *image_id, *generation, image_rect) {
+                        self.native_ui_fill(image_rect, 0x202b3a);
+                        self.native_ui_text(
+                            alt,
+                            Rect {
+                                x: image_rect.x + 8,
+                                y: image_rect.y + 8,
+                                width: image_rect.width - 16,
+                                height: image_rect.height - 16,
+                            },
+                            0x94a3b8,
+                        );
+                    }
+                }
+                Kind::Column { .. } | Kind::Row { .. } => {}
+            }
+        }
+        self.present();
+    }
     pub fn graphics_changed(&self, terminal: &Terminal) -> bool {
         self.graphics_revision != terminal.graphics().revision()
             || self.graphics_alternate != terminal.modes().alternate_screen
@@ -1989,6 +2300,7 @@ impl Window {
         selection: Option<Selection>,
         force: bool,
         cursor: Option<DrawnCursor>,
+        defer_present: bool,
     ) {
         // A scene change can remove pixels outside the new placement. Rebuild
         // the visible frame on structural changes; ordinary text still damages
@@ -2002,9 +2314,20 @@ impl Window {
         if self.graphics_changed(terminal) {
             for index in (0..self.images.len()).rev() {
                 let upload = &self.images[index];
-                if !terminal.graphics_draws(offset).any(|draw| {
+                let placed = terminal.graphics_draws(offset).any(|draw| {
                     draw.image_id == upload.image_id && draw.image.generation == upload.generation
-                }) {
+                });
+                let referenced = terminal.ui_scene().is_some_and(|scene| {
+                    scene.nodes.iter().any(|node| {
+                        matches!(&node.kind, zterm::ui::Kind::Image { image_id, generation, .. }
+                            if *image_id == upload.image_id
+                                && generation.is_none_or(|expected| expected == upload.generation))
+                    }) && terminal
+                        .graphics()
+                        .image(upload.image_id)
+                        .is_some_and(|image| image.generation == upload.generation)
+                });
+                if !placed && !referenced {
                     self.discard_upload(index);
                 }
             }
@@ -2033,7 +2356,9 @@ impl Window {
                         .flatten()
                         .any(|((_, y), _)| y == row)))
             {
-                if let Some(start) = damaged_start.take() {
+                if let Some(start) = damaged_start.take()
+                    && !defer_present
+                {
                     self.publish_rows(start, row);
                 }
                 continue;
@@ -2188,10 +2513,12 @@ impl Window {
         }
         // Submit adjacent damaged rows together. A forced frame is published
         // once below, including padding, without redundant per-row copies.
-        if let Some(start) = damaged_start {
+        if let Some(start) = damaged_start
+            && !defer_present
+        {
             self.publish_rows(start, rows);
         }
-        if force {
+        if force && !defer_present {
             unsafe {
                 XCopyArea(
                     self.display,
@@ -2207,7 +2534,7 @@ impl Window {
                 );
             }
         }
-        if changed {
+        if changed && !defer_present {
             unsafe {
                 XFlush(self.display);
             }

@@ -101,6 +101,7 @@ struct Ui {
     history: usize,
     new_output: bool,
     scroll_prompt: Option<crate::layout::Rect>,
+    native_ui: ztty::native_ui::View,
     force: bool,
     repaint: Repaint,
     open: bool,
@@ -136,6 +137,7 @@ impl Ui {
             history: 0,
             new_output: false,
             scroll_prompt: None,
+            native_ui: ztty::native_ui::View::default(),
             force: true,
             repaint: Repaint::default(),
             open: true,
@@ -164,6 +166,7 @@ impl Ui {
         self.force = true;
     }
     fn reset_input(&mut self) {
+        self.native_ui.blur();
         self.held.fill(0);
         self.intercepted.fill(false);
         self.local_buttons.fill(false);
@@ -272,6 +275,62 @@ impl Ui {
         });
         self.find(terminal, false, true);
     }
+    fn native_action(&mut self, core: &mut SessionCore, action: Option<zterm::ui::Action>) {
+        if let Some(action) = action {
+            let bytes = ztty::native_ui::action_bytes(action);
+            self.repaint.input_sent();
+            queue_input(&mut core.input, &bytes);
+        }
+    }
+
+    fn native_pointer(
+        &mut self,
+        event: &x11::Event,
+        core: &mut SessionCore,
+        allow_input: bool,
+    ) -> bool {
+        let geometry_current = self
+            .native_ui
+            .layout
+            .as_ref()
+            .is_none_or(|layout| layout.geometry == self.window.native_ui_geometry());
+        if !geometry_current {
+            self.native_ui.blur();
+            self.force = true;
+        }
+        let interactive = geometry_current
+            && allow_input
+            && !core.eof()
+            && self.history == 0
+            && self.search.is_none()
+            && self.palette.is_none()
+            && core.terminal.ui_scene().is_some_and(|scene| scene.events);
+        match unsafe { event.kind } {
+            x11::BUTTON_PRESS | x11::BUTTON_RELEASE => {
+                let e = unsafe { event.button };
+                let focused = self.native_ui.focused_node();
+                let (handled, action) = self.native_ui.pointer(
+                    &mut core.terminal,
+                    e.x,
+                    e.y,
+                    e.button,
+                    e.kind == x11::BUTTON_PRESS,
+                    interactive,
+                );
+                if handled || focused != self.native_ui.focused_node() {
+                    self.force = true;
+                }
+                self.native_action(core, action);
+                handled
+            }
+            x11::MOTION_NOTIFY => {
+                let e = unsafe { event.motion };
+                self.native_ui.blocks_motion(e.x, e.y)
+            }
+            _ => false,
+        }
+    }
+
     // The view borrows shared session state; window ownership stays separate
     // from the PTY and its input queue.
     fn event(
@@ -395,6 +454,27 @@ impl Ui {
                     }
                     self.force = true;
                     return Ok(());
+                }
+                if press {
+                    let geometry_current =
+                        self.native_ui.layout.as_ref().is_none_or(|layout| {
+                            layout.geometry == self.window.native_ui_geometry()
+                        });
+                    let interactive =
+                        geometry_current && allow_input && !core.eof() && self.history == 0;
+                    let (handled, action) = self.native_ui.key(
+                        &mut core.terminal,
+                        symbol,
+                        mods.0 & 1 != 0,
+                        repeated,
+                        interactive,
+                    );
+                    if handled {
+                        self.intercepted[code] = true;
+                        self.force = true;
+                        self.native_action(core, action);
+                        return Ok(());
+                    }
                 }
                 let lookup = if press {
                     self.window.lookup(&mut e, text_buffer)
@@ -600,6 +680,7 @@ impl Ui {
                 if e.serial < self.window.configure_serial.get() {
                     return Ok(());
                 }
+                self.native_ui.invalidate();
                 let (cols, rows) = self.window.resize(e.width, e.height);
                 self.scroll_prompt = None;
                 if allow_input
@@ -675,6 +756,7 @@ impl Ui {
         terminal: &mut Terminal,
         appearance: &Appearance,
         observing: bool,
+        alive: bool,
     ) -> Option<u64> {
         if self
             .message
@@ -738,6 +820,16 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
+        let native_interactive =
+            alive && !observing && terminal.ui_scene().is_some_and(|scene| scene.events);
+        if self.native_ui.refresh(
+            terminal,
+            self.window.native_ui_geometry(),
+            self.history == 0 && self.search.is_none() && self.palette.is_none(),
+            native_interactive,
+        ) {
+            self.force = true;
+        }
         let plan = self.repaint.plan(
             now,
             self.force
@@ -761,8 +853,16 @@ impl Ui {
                     search::highlights(terminal, &search.query, self.history),
                 );
             }
+            self.window.render(
+                terminal,
+                self.history,
+                self.selection,
+                self.force,
+                cursor,
+                self.native_ui.layout.is_some(),
+            );
             self.window
-                .render(terminal, self.history, self.selection, self.force, cursor);
+                .native_ui(terminal, &self.native_ui, native_interactive);
             let mut overlay_rows = 0;
             if let Some(search) = &self.search {
                 self.window.overlay(&format!(
@@ -1389,6 +1489,7 @@ impl Pool {
         drop(directory);
         let mut terminal = Terminal::with_theme(cols, rows, history, appearance.theme);
         if let Some(ui) = &ui {
+            terminal.set_ui_host_enabled(true);
             terminal.set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
         }
         let session = Session {
@@ -1652,6 +1753,7 @@ impl Pool {
 
     fn detach(&mut self, index: usize) -> Value {
         let session = &mut self.sessions[index];
+        session.core.terminal.set_ui_host_enabled(false);
         session.persistent = true;
         let id = session.id;
         if let Some(ui) = session.ui.take() {
@@ -1943,6 +2045,7 @@ impl Pool {
         ui.read_only = read_only;
         session.appearance = appearance;
         session.ui = Some(ui);
+        session.core.terminal.set_ui_host_enabled(true);
         Ok(())
     }
 
@@ -2222,6 +2325,7 @@ impl Pool {
                 }
                 Ok(())
             })?;
+            ui.native_ui.invalidate();
             session
                 .core
                 .terminal
@@ -2659,6 +2763,22 @@ impl Pool {
                         }
                         continue;
                     }
+                    let native_handled = {
+                        let session = &mut self.sessions[index];
+                        let ui = session.ui.as_mut().unwrap();
+                        let allow_input = !ui.read_only && session.core.owns("local");
+                        ui.native_pointer(&event, &mut session.core, allow_input)
+                    };
+                    if native_handled {
+                        if kind == x11::BUTTON_PRESS {
+                            let session_id = self.sessions[index].id;
+                            if let Some(workspace) = self.workspace(session_id) {
+                                self.workspaces[workspace].layout.focus(session_id);
+                            }
+                            self.sessions[index].ui.as_ref().unwrap().window.raise();
+                        }
+                        continue;
+                    }
                     if kind == x11::KEY_RELEASE {
                         let code = (unsafe { event.key.keycode } as usize).min(255);
                         if self.shortcuts[code] {
@@ -2675,6 +2795,17 @@ impl Pool {
                             .then(|| window.key_symbol(&mut e, true));
                         if let Some(action) =
                             actions::key_action_with_shifted(bindings, symbol, shifted, e.state)
+                            && (self.sessions[index]
+                                .ui
+                                .as_ref()
+                                .unwrap()
+                                .native_ui
+                                .focused_node()
+                                .is_none()
+                                || matches!(
+                                    action,
+                                    "font-increase" | "font-decrease" | "font-reset"
+                                ))
                         {
                             self.shortcuts[(e.keycode as usize).min(255)] = true;
                             if let Err(error) = self.action(index, action) {
@@ -2779,6 +2910,7 @@ impl Pool {
         for session in &mut self.sessions {
             session.pump(buffer);
             let local_owner = session.core.owns("local");
+            let alive = !session.core.eof();
             if let Some(ui) = &mut session.ui
                 && ui.open
                 && ui.visible
@@ -2787,6 +2919,7 @@ impl Pool {
                     &mut session.core.terminal,
                     &session.appearance,
                     ui.read_only || !local_owner,
+                    alive,
                 )
             {
                 deadline = Some(deadline.map_or(next, |old: u64| old.min(next)));
