@@ -1,0 +1,43 @@
+{
+  "timestamp_utc": "2026-11-17T23:11:30.386722+00:00",
+  "old_source_commit": "19fb5966ca4164ebc679abc2d8dacd4c26927b39",
+  "old_watcher_sha256": "4fe12b27a19f859d822b6a661f2ac7c50e932ca868233260201632d519f2657b",
+  "old_test_sha256": "61b6af5b75bcf5ee1def6413c1e45440eeb8a7baf73de56f2438992ab970a613",
+  "new_watcher_sha256": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+  "new_test_sha256": "c4e5f5179e79826888ea45eb86d89652b552314a81d6455afec8d9e4096e38dc",
+  "old_result": {
+    "passed": 1,
+    "failed": 2,
+    "cargo_exit": 101,
+    "log": "artifacts/config-watch-old-regression.log"
+  },
+  "old_test_difference": "The final test adds diagnostic traces and rustfmt only; the three regression assertions are unchanged.",
+  "tests_use_real_libc_inotify": true,
+  "trigger": "The test interposer observes a real failed direct-parent add-watch, creates missing directories immediately before the real ancestor add-watch, and writes the config only after watch/reconnect returns.",
+  "new_regression": {
+    "exit_code": 0,
+    "command": [
+      "cargo",
+      "test",
+      "--test",
+      "config_watch",
+      "--",
+      "--nocapture"
+    ],
+    "log": "artifacts/config-watch-new-regression.log"
+  },
+  "clippy": {
+    "exit_code": 0,
+    "command": [
+      "cargo",
+      "clippy",
+      "--test",
+      "config_watch",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "log": "artifacts/config-watch-clippy.log"
+  },
+  "source_unchanged_during_checks": true
+}

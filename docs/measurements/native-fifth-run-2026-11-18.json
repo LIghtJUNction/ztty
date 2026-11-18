@@ -1,0 +1,325 @@
+{
+  "run_id": 44217268331,
+  "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44217268331",
+  "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+  "build_only": true,
+  "release_published": false,
+  "verification": "ZIP byte count and SHA-256 against GitHub API; all build-manifest member sizes and hashes, source/run/build_only and sidecars checked. Linux native archive members checked against evidence_files. Windows reports and actual ARM64 Sixel PNG reviewed.",
+  "artifacts": [
+    {
+      "id": 14388723267,
+      "name": "ztty-windows-x86_64",
+      "bytes": 819189,
+      "sha256": "33e85cc85e573a2cf9d76c867bdf0c569f511ada9c5776def2afba573505066d",
+      "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+      "manifest_sha256": "118643d46f621f4882220f43fee95bdd6a3c7f6111f26f007371c52b07c996ca",
+      "verified_members": 17,
+      "build_passed": true,
+      "build_status": "accepted",
+      "native_passed": true,
+      "native_status": "passed",
+      "checks": 30,
+      "pixel_checks": 19,
+      "architecture": "x64",
+      "native_cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "desktop_cleanup": {
+        "errors": [],
+        "job_empty": true,
+        "worker_exited": true,
+        "input_restored": true,
+        "thread_restored": true,
+        "owned_desktop_closed": true,
+        "handles_closed": true,
+        "job_pids_after": [],
+        "input_before_restore": "ztty-native-4964-d6d293b83a6247b0a6d78ec21db0f3a1",
+        "input_after_restore": "Default"
+      },
+      "desktop_before": {
+        "station": "WinSta0",
+        "visible": true,
+        "thread": "Default",
+        "input": "Default"
+      },
+      "desktop_after": {
+        "station": "WinSta0",
+        "visible": true,
+        "thread": "Default",
+        "input": "Default"
+      },
+      "screenshots": {
+        "ztty-windows-x86_64.native.sixel.png": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174",
+        "ztty-windows-x86_64.native.resize-restored.png": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+        "ztty-windows-x86_64.native.resize-before.png": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+        "ztty-windows-x86_64.native.resize-shrunk.png": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+        "ztty-windows-x86_64.native.png": "da34c509b66ca1a4a3af2666de9c2ac8c195396aa064f518eee5ec9c7f6f05cd"
+      },
+      "drive_url": "https://drive.google.com/file/d/10lcivXhpiMtadLgCTzicUjLYh37eOh-A/view?usp=drivesdk"
+    },
+    {
+      "id": 14388693319,
+      "name": "ztty-macos-x86_64",
+      "bytes": 1095,
+      "sha256": "59b09d2ef8a8beafd6cf71de821c0acedd64a0fae9624b4a211a2541f9e9d500",
+      "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+      "manifest_sha256": "31c6150222ebe850aae0b702f110751bdecae28ff05ca11c61775b1c6aba8a31",
+      "verified_members": 1,
+      "build_passed": false,
+      "build_status": "failed",
+      "native_passed": false,
+      "native_status": "not_run",
+      "failure_stage": "Swift helper compilation before native gate",
+      "pixel_readback": "not_performed",
+      "drive_url": "https://drive.google.com/file/d/1Dh2xmKvTVRzGH2mIqSk7L841-ilNkeK_/view?usp=drivesdk"
+    },
+    {
+      "id": 14388532771,
+      "name": "ztty-linux-aarch64",
+      "bytes": 611711,
+      "sha256": "ed9418f73ed3dd64c01fbf8fa72a3730efb4f20b95111501c8201832f52c55d4",
+      "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+      "manifest_sha256": "93fd967cbc645b8d82f2b1fa1b4f8e8f4f454139e9c2a630ff4f32fc5e3b7ea9",
+      "verified_members": 6,
+      "build_passed": true,
+      "build_status": "accepted",
+      "native_passed": true,
+      "native_status": "passed",
+      "suites": [
+        {
+          "name": "workspaces",
+          "passed": true,
+          "checks_completed": 10,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "daily_workflow",
+          "passed": true,
+          "checks_completed": 15,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "sixel_gui",
+          "passed": true,
+          "checks_completed": 10,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "input_gui",
+          "passed": true,
+          "checks_completed": 8,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "repaint_gui",
+          "passed": true,
+          "checks_completed": 7,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        }
+      ],
+      "evidence_files": 30,
+      "drive_url": "https://drive.google.com/file/d/18CTPuoJtpcgqHwg3Hz1fvvoVrlfmrXAd/view?usp=drivesdk"
+    },
+    {
+      "id": 14388168287,
+      "name": "ztty-macos-aarch64",
+      "bytes": 1099,
+      "sha256": "e878589634ac051ede2115f0f55d08a83524cdf2befdc94379b9412bfc7c68f6",
+      "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+      "manifest_sha256": "17b9e54cc575973f0b7753970d10952391b20ee9321c298b98a27d7e176d8e67",
+      "verified_members": 1,
+      "build_passed": false,
+      "build_status": "failed",
+      "native_passed": false,
+      "native_status": "not_run",
+      "failure_stage": "Swift helper compilation before native gate",
+      "pixel_readback": "not_performed",
+      "drive_url": "https://drive.google.com/file/d/1cYsWuafbkRWBbTgO-_hhM7in5DfY9AIb/view?usp=drivesdk"
+    },
+    {
+      "id": 14387884039,
+      "name": "ztty-windows-aarch64",
+      "bytes": 753907,
+      "sha256": "c1a150c132ac6d3bd0e36668261119268628d221b447d06678f9b0503aedc1b2",
+      "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+      "manifest_sha256": "7ee35f5c8dd6875e370aab263ebeec8678258b24f34fdc90d59502b55a9fdcb4",
+      "verified_members": 17,
+      "build_passed": true,
+      "build_status": "accepted",
+      "native_passed": true,
+      "native_status": "passed",
+      "checks": 30,
+      "pixel_checks": 19,
+      "architecture": "arm64",
+      "native_cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "desktop_cleanup": {
+        "errors": [],
+        "job_empty": true,
+        "worker_exited": true,
+        "input_restored": true,
+        "thread_restored": true,
+        "owned_desktop_closed": true,
+        "handles_closed": true,
+        "job_pids_after": [],
+        "input_before_restore": "ztty-native-11240-e629b2d4e9324d87bda70edee7c29ab9",
+        "input_after_restore": "Default"
+      },
+      "desktop_before": {
+        "station": "WinSta0",
+        "visible": true,
+        "thread": "Default",
+        "input": "Default"
+      },
+      "desktop_after": {
+        "station": "WinSta0",
+        "visible": true,
+        "thread": "Default",
+        "input": "Default"
+      },
+      "screenshots": {
+        "ztty-windows-aarch64.native.resize-shrunk.png": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012",
+        "ztty-windows-aarch64.native.sixel.png": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174",
+        "ztty-windows-aarch64.native.resize-restored.png": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+        "ztty-windows-aarch64.native.png": "da34c509b66ca1a4a3af2666de9c2ac8c195396aa064f518eee5ec9c7f6f05cd",
+        "ztty-windows-aarch64.native.resize-before.png": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+      },
+      "drive_url": "https://drive.google.com/file/d/1_xVjlfo7L0xE6XbepBVbLfNc3SOhC9qI/view?usp=drivesdk"
+    },
+    {
+      "id": 14389343696,
+      "name": "ztty-linux-x86_64",
+      "bytes": 631070,
+      "sha256": "c3f70d18550800e0831c8deaf7a5c365470d186917f826d843b5d8e9fe995453",
+      "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+      "manifest_sha256": "962c6b5508cc8362dbcb3d7e58a6d21a5a290eb337429ebf319bf2fd403ff388",
+      "verified_members": 6,
+      "build_passed": true,
+      "build_status": "accepted",
+      "native_passed": true,
+      "native_status": "passed",
+      "suites": [
+        {
+          "name": "workspaces",
+          "passed": true,
+          "checks_completed": 10,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "daily_workflow",
+          "passed": true,
+          "checks_completed": 15,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "sixel_gui",
+          "passed": true,
+          "checks_completed": 10,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "input_gui",
+          "passed": true,
+          "checks_completed": 8,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "repaint_gui",
+          "passed": true,
+          "checks_completed": 7,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        }
+      ],
+      "evidence_files": 30,
+      "drive_url": "https://drive.google.com/file/d/1qT02MblJYkjptemGuPUMnjvfu8ENM8rE/view?usp=drivesdk"
+    }
+  ],
+  "macos_failures": [
+    {
+      "job_id": 134510212933,
+      "stage": "Swift helper compilation",
+      "observed_lines": [
+        "2026-11-18T01:39:38.9884720Z tests/macos_window_probe.swift:184:27: error: function produces expected type 'NSApplication.ActivationPolicy'; did you mean to call it with '()'?",
+        "2026-11-18T01:39:39.0455470Z     |                           `- error: function produces expected type 'NSApplication.ActivationPolicy'; did you mean to call it with '()'?",
+        "2026-11-18T01:39:39.0642950Z tests/macos_window_probe.swift:184:48: error: type 'AnyHashable' has no member 'prohibited'",
+        "2026-11-18T01:39:39.0662160Z     |                                                `- error: type 'AnyHashable' has no member 'prohibited'",
+        "2026-11-18T01:39:39.0691940Z tests/macos_window_probe.swift:189:46: error: method 'activationPolicy' was used as a property; add () to call it",
+        "2026-11-18T01:39:39.0706850Z     |                                              `- error: method 'activationPolicy' was used as a property; add () to call it"
+      ]
+    },
+    {
+      "job_id": 134510213052,
+      "stage": "Swift helper compilation",
+      "observed_lines": [
+        "2026-11-18T01:38:48.9906860Z tests/macos_window_probe.swift:184:27: error: function produces expected type 'NSApplication.ActivationPolicy'; did you mean to call it with '()'?",
+        "2026-11-18T01:38:48.9911830Z     |                           `- error: function produces expected type 'NSApplication.ActivationPolicy'; did you mean to call it with '()'?",
+        "2026-11-18T01:38:48.9917600Z tests/macos_window_probe.swift:184:48: error: type 'AnyHashable' has no member 'prohibited'",
+        "2026-11-18T01:38:48.9924200Z     |                                                `- error: type 'AnyHashable' has no member 'prohibited'",
+        "2026-11-18T01:38:48.9929610Z tests/macos_window_probe.swift:189:46: error: method 'activationPolicy' was used as a property; add () to call it",
+        "2026-11-18T01:38:48.9935030Z     |                                              `- error: method 'activationPolicy' was used as a property; add () to call it"
+      ]
+    }
+  ],
+  "macos_correction": {
+    "file": "tests/macos_window_probe.swift",
+    "change": "Call NSApplication.activationPolicy() as a method at both access sites.",
+    "official_reference": "https://developer.apple.com/documentation/appkit/nsapplication/activationpolicy%28%29",
+    "local_contract_tests": 10,
+    "local_contract_exit": 0,
+    "native_swift_compilation": "not_executed_locally; requires subsequent native candidate",
+    "pixels": "not accepted by this correction alone"
+  },
+  "status": "completed; four native platform/architecture jobs accepted, two macOS helper compilation failures",
+  "macos_rerun": {
+    "run_id": 44220056623,
+    "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44220056623",
+    "source_sha": "ef3c2fc187a74aa6ce4eb7963b4d7d564f4dc969",
+    "build_only": true,
+    "status": "requested; acceptance pending"
+  }
+}

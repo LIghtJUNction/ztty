@@ -1,0 +1,537 @@
+{
+  "run_id": 44306719420,
+  "source_sha": "3418b82dcfa1b9323379e36aec0f3926371b0eb6",
+  "architecture": "aarch64",
+  "job_id": 134810151465,
+  "artifact_id": 14428208385,
+  "artifact_zip_sha256": "53635e8c8a6d1d1af3ce2863af9c14cfb487e631d22da4d2969cf8bf48a0e8df",
+  "binary_sha256": "f048c1066b00c80048445bd8633b422d985dc6b108f35abe2be3a90931881bc1",
+  "build": {
+    "passed": true,
+    "status": "accepted",
+    "build_only": true,
+    "candidate_platform": "windows",
+    "outcomes": {
+      "toolchain": "success",
+      "build": "success",
+      "native": "success",
+      "package": "success"
+    }
+  },
+  "complete_native": {
+    "passed": true,
+    "status": "passed",
+    "exit_code": 0
+  },
+  "base_rapid": {
+    "checks_completed": 31,
+    "all_checks_passed": true,
+    "runtime_trace_enabled": false,
+    "resize_path": "rapid",
+    "visible_pixel_checks_completed": 19,
+    "restored_red": [
+      255,
+      0,
+      0
+    ],
+    "before_restored_png_identical": true,
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 0
+    }
+  },
+  "redirected_host_stdio": {
+    "returncode": 0,
+    "child": {
+      "pid": 7352,
+      "parent_pid": 3260,
+      "handles": {
+        "stdin": {
+          "handle": 116,
+          "console": true,
+          "console_mode": 503,
+          "file_type": 2,
+          "error": 0
+        },
+        "stdout": {
+          "handle": 120,
+          "console": true,
+          "console_mode": 7,
+          "file_type": 2,
+          "error": 0
+        },
+        "stderr": {
+          "handle": 124,
+          "console": true,
+          "console_mode": 7,
+          "file_type": 2,
+          "error": 0
+        }
+      },
+      "columns": 20,
+      "rows": 10
+    },
+    "stdout_bytes": 0,
+    "stderr": ""
+  },
+  "diagnostic_retries": {
+    "rapid_trace": {
+      "executed": false,
+      "reason": "Original base rapid passed"
+    },
+    "staged_trace": {
+      "executed": false,
+      "reason": "Original base rapid passed"
+    }
+  },
+  "workspace": {
+    "passed": true,
+    "validator_passed": true,
+    "required_checks": 19,
+    "checks_completed": 19,
+    "completed_names": [
+      "native_architecture_and_initial_pty",
+      "split_right_distinct_pty",
+      "split_viewport_pixels",
+      "pane_keyboard_focus_isolation",
+      "inactive_pane_mouse_tracking",
+      "pane_history_isolation",
+      "pane_selection_isolation",
+      "split_down_distinct_pty",
+      "three_pane_pixels_and_shared_window",
+      "maximize_restore_keeps_pty_identity",
+      "grow_shrink_updates_child_geometry",
+      "swap_keeps_session_identity",
+      "window_resize_coordinates_all_ptys",
+      "new_tab_distinct_pty",
+      "hidden_tab_output_and_response",
+      "tab_switch_restores_pane_images",
+      "natural_exit_keeps_siblings",
+      "close_keeps_other_tab",
+      "last_pane_closes_window"
+    ],
+    "visible_pixel_checks_completed": 12,
+    "reported_pixel_samples_checked": 34,
+    "max_channel_error": 0,
+    "key_checks": {
+      "split_viewport_pixels": {
+        "name": "split_viewport_pixels",
+        "passed": true,
+        "pixels": [
+          {
+            "client": [
+              16,
+              16
+            ],
+            "screen": [
+              32,
+              55
+            ],
+            "rgb": [
+              255,
+              0,
+              0
+            ],
+            "expected": [
+              255,
+              0,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              317,
+              16
+            ],
+            "screen": [
+              333,
+              55
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "expected": [
+              0,
+              255,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              275,
+              53
+            ],
+            "screen": [
+              291,
+              92
+            ],
+            "rgb": [
+              255,
+              255,
+              255
+            ],
+            "expected": [
+              255,
+              255,
+              255
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              283,
+              53
+            ],
+            "screen": [
+              299,
+              92
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              299,
+              53
+            ],
+            "screen": [
+              315,
+              92
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              303,
+              53
+            ],
+            "screen": [
+              319,
+              92
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          }
+        ],
+        "synchronized_layout": {
+          "focus": {
+            "elapsed_seconds": 0.0516198999999915,
+            "pixels": [
+              {
+                "client": [
+                  16,
+                  16
+                ],
+                "screen": [
+                  32,
+                  55
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ],
+                "expected": [
+                  255,
+                  0,
+                  0
+                ],
+                "window_from_point": 393400,
+                "pid_at_point": 8580,
+                "owned": true,
+                "visible": true
+              }
+            ]
+          },
+          "resize": {
+            "elapsed_seconds": 0.051977599999986523,
+            "pixels": [
+              {
+                "client": [
+                  16,
+                  16
+                ],
+                "screen": [
+                  32,
+                  55
+                ],
+                "rgb": [
+                  255,
+                  0,
+                  0
+                ],
+                "expected": [
+                  255,
+                  0,
+                  0
+                ],
+                "window_from_point": 393400,
+                "pid_at_point": 8580,
+                "owned": true,
+                "visible": true
+              }
+            ]
+          }
+        }
+      },
+      "pane_history_isolation": {
+        "name": "pane_history_isolation",
+        "passed": true,
+        "pixels": [
+          {
+            "client": [
+              59,
+              15
+            ],
+            "screen": [
+              75,
+              54
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "expected": [
+              0,
+              0,
+              255
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              317,
+              16
+            ],
+            "screen": [
+              333,
+              55
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "expected": [
+              0,
+              255,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          }
+        ],
+        "silent_modifiers": [
+          "shift",
+          "control"
+        ],
+        "actual_input": "0d",
+        "live_pixels": [
+          {
+            "client": [
+              16,
+              16
+            ],
+            "screen": [
+              32,
+              55
+            ],
+            "rgb": [
+              255,
+              0,
+              0
+            ],
+            "expected": [
+              255,
+              0,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              317,
+              16
+            ],
+            "screen": [
+              333,
+              55
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "expected": [
+              0,
+              255,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          }
+        ]
+      },
+      "pane_selection_isolation": {
+        "name": "pane_selection_isolation",
+        "passed": true,
+        "pixels": [
+          {
+            "client": [
+              351,
+              91
+            ],
+            "screen": [
+              367,
+              130
+            ],
+            "rgb": [
+              34,
+              68,
+              102
+            ],
+            "expected": [
+              34,
+              68,
+              102
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              50,
+              91
+            ],
+            "screen": [
+              66,
+              130
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 393400,
+            "pid_at_point": 8580,
+            "owned": true,
+            "visible": true
+          }
+        ]
+      }
+    },
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 0,
+      "all_probe_processes_exited": true
+    },
+    "probe_processes": {
+      "a": {
+        "pid": 9528,
+        "exited": true
+      },
+      "b": {
+        "pid": 4564,
+        "exited": true
+      },
+      "c": {
+        "pid": 8768,
+        "exited": true
+      },
+      "d": {
+        "pid": 10956,
+        "exited": true
+      }
+    }
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-2768-6ed589e0e1874ae6b4f271d9a33c365b",
+    "input_after_restore": "Default"
+  },
+  "desktop_worker_exit_code": 0,
+  "pngs": 12,
+  "contract_tests": {
+    "passed": true,
+    "log": "ztty-windows-aarch64.native.contract.log",
+    "exit_code": 0
+  },
+  "consecutive_untraced_rapid_passes_per_architecture": 2
+}

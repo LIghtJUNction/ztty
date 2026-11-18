@@ -1,0 +1,36 @@
+{
+  "base_sha": "c96e8f6da4954936e56abbd97a392606c34bfaeb",
+  "imported_commit": "2e893b46fd2e9c577751c43453f6a11739be1266",
+  "source_sha256": {
+    "Cargo.toml": "76bd07ca7cf0ef0f626632b00b5f0150d6d45aaaac80fba93ffad68cf54224cd",
+    "src/main.rs": "97de185cc0aa982cad1cfffafd93709e719ebf706db7a08a01eed48114cce809",
+    "src/session.rs": "2aa1a99d0933005b77230ce6e357e3ea665e746c18ceb074012de945a4980ccf",
+    "src/input_queue.rs": "e34883d0376d2439454e93920fcb813657fbf69007c5937dfae8dd6c4929c44d",
+    "src/session_core.rs": "7eed11c01eb96780f739ce08877e825c7aee15137c4ed20f6801f9778bcd5d58",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/output_tail.rs": "44f8dd3ff249c1fbc89152dce6e4eb815a4bba5cfcde5a2743a112ea72b4b3ba",
+    "tests/session_core.rs": "559c35b41572980721897831dabb8d014e5854dedec24e8cd0f18905f0261c0b",
+    "tests/daily_workflow.py": "9193f495c1d1d46b57d096fdae03309d46611ccb4e1e429e0ff13228b225d152",
+    "tests/workspaces.py": "4b08e0c060a5a0dd5a0fd608bd9e2e9dd96d01eab5daa443f9ac649b5091b60a"
+  },
+  "binary_sha256": "f7d36d03ab249a86f4f53831a9dfb7f942029b787764d8f01390c6ccae7e0544",
+  "binary_bytes": 678424,
+  "ordinary_rust_tests_passed": 200,
+  "single_thread_real_pty_checks_passed": 8,
+  "checks": {
+    "full_gate": "CARGO_BUILD_JOBS=1 sh tools/check.sh",
+    "bare_metal": "cargo check --locked -p zinput -p zgraphics -p zterm --target x86_64-unknown-none"
+  },
+  "bare_metal_warning": "existing zune-png SIMD future incompatibility warning remains; no_std portable libraries pass",
+  "gui": {
+    "daily_workflow": 15,
+    "workspaces": 10
+  },
+  "evidence_sha256": {
+    "check.log": "e855f7b9a841472b20f2442265a2e6df4e46a0d3ee74875da5230e9255eb1349",
+    "bare-metal.log": "18ac5eaa72b2d670d7b07072d2f35350fbd99484bbe32431b1379eee3aab9ed7",
+    "daily15.json": "e823050f8dd360c08a81c51a0dd4dbfced6739621b6d9c620219d5a333bf12e7",
+    "workspaces.json": "2b2d708707a033338dcf94c6b856c942abc06af10fa1931b557aa028bd54ec2f",
+    "workspaces.png": "69e1aa7878e1ce4a706061de88af53396ef811b47e006d01e7b3cdbc42b2c194"
+  }
+}

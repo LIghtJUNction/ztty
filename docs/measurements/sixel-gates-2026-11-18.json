@@ -1,0 +1,44 @@
+{
+  "timestamp_utc": "2026-11-17T21:49:36.808446+00:00",
+  "commands": [
+    {
+      "command": "cargo test --locked -p zgraphics -p zterm -j 1",
+      "exit_code": 0,
+      "zgraphics_tests": 31,
+      "zterm_tests": 67,
+      "doctests": 4
+    },
+    {
+      "command": "cargo clippy --locked -p zgraphics -p zterm --all-targets -j 1 -- -D warnings",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo check --locked -p zgraphics -p zterm --target x86_64-unknown-none -j 1",
+      "exit_code": 0
+    },
+    {
+      "command": "cargo build --locked -p zterm --example sixel_probe -j 1",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 tests/sixel_reference.py",
+      "exit_code": 0,
+      "fixture_comparisons": 30,
+      "libsixel_comparisons": 25,
+      "reference_discrepancies": 1
+    }
+  ],
+  "source_sha256": {
+    "crates/zgraphics/src/lib.rs": "6de28c07f898b929c5fc292ca6c9b86e332d5763afb4ea2746d0e2fd8d7acdae",
+    "crates/zgraphics/src/sixel.rs": "94d893643d8147b3e98f5ad8b4d4c5e23366d106c6ff0077117a18bdd073c41f",
+    "crates/zgraphics/src/sixel_tests.rs": "dea926c857f5a2b6fa38567fdcf27512bba1a079c0aa5c9ecc8800febf61f196",
+    "crates/zterm/src/terminal.rs": "b121079c166bec586ee565af776b9179a0436f5fdaff7d1353e509ed327696bd",
+    "crates/zterm/src/sixel_tests.rs": "ae7537fa8984acb852fb679c434348e0b6456b606960ce6b792ed9cc271356e9"
+  },
+  "limitations": [
+    "No native macOS or Windows execution in this gate.",
+    "GUI image presentation remains a separate acceptance gate.",
+    "zune-png 0.5.2 emits a pre-existing future-incompatibility warning during the bare-metal check.",
+    "VT340 framebuffer text/image overpainting is not emulated; see docs/protocols.md."
+  ]
+}

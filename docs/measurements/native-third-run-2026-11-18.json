@@ -1,0 +1,96 @@
+{
+  "run_id": 44206278093,
+  "source_sha": "05782fc23b23306d61932ad39777407802886548",
+  "build_only": true,
+  "production_release": false,
+  "artifacts": [
+    {
+      "id": 14384425989,
+      "name": "ztty-windows-aarch64",
+      "bytes": 747006,
+      "zip_sha256": "c93197ffcb1badddda79fb07cfe309b5d04f10b4948fd48dbddd075c9a0b8dec"
+    },
+    {
+      "id": 14384301394,
+      "name": "ztty-linux-aarch64",
+      "bytes": 580172,
+      "zip_sha256": "8e2e8f820726f19e7519ebdffa1fb5ec802735a380cc8645cd15beb75fef4845"
+    },
+    {
+      "id": 14384126865,
+      "name": "ztty-macos-x86_64",
+      "bytes": 10952,
+      "zip_sha256": "546d00bfb2017be157d14d712f7d192c168ac1069d9b9c5efce2376f2e82375d"
+    },
+    {
+      "id": 14383752166,
+      "name": "ztty-linux-x86_64",
+      "bytes": 594818,
+      "zip_sha256": "6c224b66fa80631f0848750a9c01bc61b3e2976b9094c14f4729788dfd0a7e2d"
+    },
+    {
+      "id": 14383398590,
+      "name": "ztty-macos-aarch64",
+      "bytes": 10971,
+      "zip_sha256": "bb64291c275e18da0122ee019d6cf3f85f4dfdbe25100562edf61d3553356a40"
+    },
+    {
+      "id": 14383244437,
+      "name": "ztty-windows-x86_64",
+      "bytes": 813511,
+      "zip_sha256": "778280b5cf2b3fc16afe9e8decbe5ba0980d7cd868321e821c8777e6c3928b0b"
+    }
+  ],
+  "verified_build_manifests": {
+    "ztty-linux-aarch64": "a13d8af05133e6a72928e17c0b18c4ea7fd67a642ad11752b8ef474ebec89b05",
+    "ztty-windows-aarch64": "a56d2e2365f3894a80968adc4df4b612b1c96e5eb36e962d908e9d2595d1e9e2",
+    "ztty-windows-x86_64": "40e8859e1f3552c178a46d1de02e9f68089118a5fbc4d944c44a41bfae642d4d",
+    "ztty-macos-aarch64": "bc3cf04998653f7ea742e83a55d87395c06283ad81bb1125e48f2ddec29d7cee",
+    "ztty-macos-x86_64": "b5144034b453d1d57b28481475d8d44ac0331eb14ce58e789b1349cc75a89b8e"
+  },
+  "results": {
+    "linux-x86_64": {
+      "accepted": true,
+      "working_directory": 4,
+      "workspaces": 10,
+      "daily": 14,
+      "sixel": 10,
+      "input_vectors": 27
+    },
+    "linux-aarch64": {
+      "accepted": true,
+      "working_directory": 4,
+      "workspaces": 10,
+      "daily": 14,
+      "sixel": 10,
+      "input_vectors": 27
+    },
+    "windows-x86_64": {
+      "accepted": false,
+      "functional_checks_passed": 30,
+      "failure": "temporary directory removed before owned process shutdown"
+    },
+    "windows-aarch64": {
+      "accepted": false,
+      "functional_checks_passed": 7,
+      "failure": "all nine positions covered by another full-screen topmost CoreWindow; cwd cleanup masked initial error"
+    },
+    "macos-x86_64": {
+      "accepted": false,
+      "checks_passed": 12,
+      "png_count": 0,
+      "failure": "six same-PID SCWindows rejected before screenshot"
+    },
+    "macos-aarch64": {
+      "accepted": false,
+      "checks_passed": 12,
+      "png_count": 0,
+      "failure": "six same-PID SCWindows rejected before screenshot"
+    }
+  },
+  "visual_review": [
+    "Linux ARM64 workspace PNG: intact black background, text, pane separation and padding",
+    "Linux ARM64 Sixel PNG: intact image mosaic and text",
+    "Windows x86_64 Sixel PNG: expected red, green and blue patches"
+  ]
+}

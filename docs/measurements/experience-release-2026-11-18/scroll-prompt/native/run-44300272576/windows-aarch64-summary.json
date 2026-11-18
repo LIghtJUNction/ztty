@@ -1,0 +1,161 @@
+{
+  "run_id": 44300272576,
+  "source_sha": "dc43870ef2c8e3c54894d0124e47a23445a3c624",
+  "job_id": 134788016516,
+  "job_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44300272576/job/134788016516",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "formal_release": false,
+  "status": "failed",
+  "passed": false,
+  "artifact_id": 14424334713,
+  "artifact_sha256": "90514020e43ab55947ddf0f88c3230850d62457d7c75e027d0ee5c495ddbc7d3",
+  "artifact_sha256_verified": true,
+  "retained_build_file_hashes_verified": 15,
+  "manifest_and_build_sidecar_hashes_verified": true,
+  "binary_sha256_matches_manifest": true,
+  "binary_sha256": "9114c99a2cd3a512febfc68ed5a86f4235f5d09a38fba0c3bcd7f01550d4ffe0",
+  "architecture": "arm64",
+  "native_process": {
+    "process_machine": 0,
+    "native_machine": 43620,
+    "emulated": false
+  },
+  "build_outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "native": "failure",
+    "package": "success"
+  },
+  "contract_tests": {
+    "passed": true,
+    "log": "ztty-windows-aarch64.native.contract.log",
+    "exit_code": 0
+  },
+  "base_native": {
+    "passed": false,
+    "completed_checks": 22,
+    "required_checks": 30,
+    "visible_pixel_checks_completed": 12,
+    "failed_check": "resize_restores_visible_image",
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "client_sample": [
+      175,
+      28
+    ],
+    "owned_pid": 1816,
+    "owned_hwnd": 459392,
+    "visible": true,
+    "minimized": false,
+    "foreground_pid": 1816,
+    "pixel_samples": [
+      {
+        "client": [
+          175,
+          28
+        ],
+        "screen": [
+          215,
+          91
+        ],
+        "point_visible": true,
+        "window_from_point": 459392,
+        "root_window": 459392,
+        "window_from_point_pid": 1816,
+        "hit_window": {
+          "hwnd": 459392,
+          "pid": 1816,
+          "rect": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "class": "ztty.NativeWindow",
+          "process_image": {
+            "name": "ztty.exe"
+          },
+          "topmost": true,
+          "visible": true,
+          "root": 459392
+        },
+        "owned_window_at_point": true,
+        "rgb": [
+          20,
+          20,
+          20
+        ]
+      }
+    ],
+    "error": "resize_restores_visible_image: expected [255, 0, 0], last RGB [20, 20, 20]; timeout: resize_restores_visible_image; last error: None",
+    "resize_client_widths": [
+      180,
+      144,
+      180
+    ]
+  },
+  "workspace": {
+    "status": "not_run",
+    "entered": false,
+    "completed_checks": 0,
+    "required_checks": 19,
+    "reason": "Original native gate failed before workspace dispatch; no workspace JSON or PNG was produced."
+  },
+  "application_cleanup": {
+    "process_exited": true,
+    "temporary_directory_removed": true,
+    "returncode": 0
+  },
+  "desktop": {
+    "passed": false,
+    "worker_pid": 8300,
+    "worker_exit_code": 1,
+    "observed_job_pids": [
+      696,
+      1500,
+      1816,
+      5896,
+      6464,
+      8300
+    ],
+    "cleanup_all_passed": true,
+    "cleanup": {
+      "errors": [],
+      "job_empty": true,
+      "worker_exited": true,
+      "input_restored": true,
+      "thread_restored": true,
+      "owned_desktop_closed": true,
+      "handles_closed": true,
+      "job_pids_after": [],
+      "input_before_restore": "ztty-native-1464-01bd221d2b744ca0bdc5fe7076f4a4a3",
+      "input_after_restore": "Default"
+    },
+    "after": {
+      "station": "WinSta0",
+      "visible": true,
+      "thread": "Default",
+      "input": "Default"
+    }
+  },
+  "pngs": {
+    "count": 4,
+    "independent_pixel_read": "matches native report for before/shrunk/restored samples",
+    "analysis": "windows-aarch64-png-analysis.json",
+    "observation": "Restored PNG contains correct configured background at x=0..151, then a full-height platform-colored strip at x=152..178 and a gray border at x=179; this affects ordinary background as well as the red image."
+  },
+  "limits": [
+    "Both architectures failed current-source native acceptance.",
+    "No workspace or previous-run checks are counted as current-source success.",
+    "Observed strip is evidence for further DC/resize/presentation diagnosis; it does not establish the production root cause."
+  ]
+}

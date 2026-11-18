@@ -1,0 +1,304 @@
+{
+  "ok": true,
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/repaint-integrated-ztty",
+  "binary_sha256": "e8b64de484350ddd3c879ceac5b82cb5a1f06b7f2ff15e906bb136e15ce897db",
+  "source_root": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree",
+  "source_sha256": {
+    "src/session.rs": "917548323adf009e3ae5f1f8b2959c538f8631539fdd05b2dfd693fcec33d1db",
+    "src/x11.rs": "587410686c51358e759310b69061113c62ed7eb953c01c5195cf5a0e96853825",
+    "src/main.rs": "afd9e43ffa373dd5779e3ae8fc565598dfbe6b3d839917784f659a558c9dd6f5",
+    "src/actions.rs": "8650d63e1fa4543a1ee7d6a1fb0e340c5bcfb6d7fc48ecb828f2125dc853e075",
+    "crates/zinput/src/lib.rs": "17e8083ea6ebf28ab2f53e46f010ae20a8ce08e11a0233ec88a09bb46db1b265",
+    "crates/zterm/src/lib.rs": "29dc98d13fbbcee89ad0463436a46a5710ce0d4981337529643780ea397c9a4c",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+  },
+  "source_commit": "a790749907362f975702683e72724672eec06811",
+  "source_changes": [
+    "M  CHANGELOG.md",
+    "M  README.md",
+    "M  README.zh-CN.md",
+    "M  crates/zterm/src/terminal.rs",
+    "M  crates/zterm/src/tests.rs",
+    "A  docs/benchmarks/repaint-ab-2026-11-18-collector.py",
+    "A  docs/benchmarks/repaint-ab-2026-11-18.json",
+    "AM docs/benchmarks/repaint-ab-2026-11-18.md",
+    "A  docs/benchmarks/repaint-ab-2026-11-18.png",
+    "A  docs/benchmarks/repaint-gui-2026-11-18.json",
+    "A  docs/benchmarks/repaint-linux-native-2026-11-18.json",
+    "A  docs/benchmarks/repaint-x11-diagnostic-2026-11-18.json",
+    "M  src/main.rs",
+    "A  src/repaint.rs",
+    "M  src/session.rs",
+    " M tests/linux_native.py",
+    " M tests/linux_native_test.py",
+    "A  tests/repaint_gui.py",
+    "A  tests/repaint_schedule.rs"
+  ],
+  "checks": [
+    "real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings",
+    "vertical and horizontal wheel input has distinct SGR press codes and no release reports",
+    "extra button press/release reports retain button identity; report records physical XTEST versus synthetic XSendEvent coverage",
+    "held extra-button state survives motion and clears on release, including X11 buttons lacking core state-mask bits",
+    "press ownership remains stable when Shift changes before a primary or extra-button release",
+    "focus loss clears held extra-button state before focus returns, motion, and release",
+    "mode 9 filters input correctly, follows SGR selection, and its reset cannot cancel active mode 1000",
+    "custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled"
+  ],
+  "vectors": [
+    {
+      "name": "legacy Ctrl+I",
+      "injection": "XTEST",
+      "expected_hex": "09",
+      "actual_hex": "09",
+      "ok": true
+    },
+    {
+      "name": "legacy Ctrl+Shift+I remains distinct",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3130353b3675",
+      "actual_hex": "1b5b3130353b3675",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+unshifted tilde on private keyboard mapping",
+      "injection": "XTEST",
+      "expected_hex": "1e",
+      "actual_hex": "1e",
+      "ok": true
+    },
+    {
+      "name": "wheel button 4: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36343b383b364d",
+      "actual_hex": "1b5b3c36343b383b364d",
+      "ok": true
+    },
+    {
+      "name": "wheel button 5: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36353b383b364d",
+      "actual_hex": "1b5b3c36353b383b364d",
+      "ok": true
+    },
+    {
+      "name": "wheel button 6: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36363b383b364d",
+      "actual_hex": "1b5b3c36363b383b364d",
+      "ok": true
+    },
+    {
+      "name": "wheel button 7: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36373b383b364d",
+      "actual_hex": "1b5b3c36373b383b364d",
+      "ok": true
+    },
+    {
+      "name": "extra button 8: SGR press/release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132383b383b364d1b5b3c3132383b383b366d",
+      "actual_hex": "1b5b3c3132383b383b364d1b5b3c3132383b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 9: SGR press/release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132393b383b364d1b5b3c3132393b383b366d",
+      "actual_hex": "1b5b3c3132393b383b364d1b5b3c3132393b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 10: SGR press/release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3133303b383b364d1b5b3c3133303b383b366d",
+      "actual_hex": "1b5b3c3133303b383b364d1b5b3c3133303b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 11: SGR press/release",
+      "injection": "XSendEvent (outside virtual pointer button count)",
+      "expected_hex": "1b5b3c3133313b383b364d1b5b3c3133313b383b366d",
+      "actual_hex": "1b5b3c3133313b383b364d1b5b3c3133313b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 8: drag in mode 1002",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132383b383b364d1b5b3c3136303b31303b374d1b5b3c3132383b31303b376d",
+      "actual_hex": "1b5b3c3132383b383b364d1b5b3c3136303b31303b374d1b5b3c3132383b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "extra button 9: drag in mode 1002",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132393b383b364d1b5b3c3136313b31303b374d1b5b3c3132393b31303b376d",
+      "actual_hex": "1b5b3c3132393b383b364d1b5b3c3136313b31303b374d1b5b3c3132393b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "extra button 10: drag in mode 1002",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3133303b383b364d1b5b3c3136323b31303b374d1b5b3c3133303b31303b376d",
+      "actual_hex": "1b5b3c3133303b383b364d1b5b3c3136323b31303b374d1b5b3c3133303b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "extra button 11: drag in mode 1002",
+      "injection": "XSendEvent (outside virtual pointer button count)",
+      "expected_hex": "1b5b3c3133313b383b364d1b5b3c3136333b31303b374d1b5b3c3133313b31303b376d",
+      "actual_hex": "1b5b3c3133313b383b364d1b5b3c3136333b31303b374d1b5b3c3133313b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "button 1: remote release survives Shift change",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c303b383b364d1b5b3c343b383b366d",
+      "actual_hex": "1b5b3c303b383b364d1b5b3c343b383b366d",
+      "ok": true
+    },
+    {
+      "name": "button 1: local Shift press cannot leak a remote release",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "button 8: remote release survives Shift change",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132383b383b364d1b5b3c3133323b383b366d",
+      "actual_hex": "1b5b3c3132383b383b364d1b5b3c3133323b383b366d",
+      "ok": true
+    },
+    {
+      "name": "button 8: local Shift press cannot leak a remote release",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "focus loss clears extra-button drag and unmatched release",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "X10 primary press ignores modifiers and release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b4d202826",
+      "actual_hex": "1b5b4d202826",
+      "ok": true
+    },
+    {
+      "name": "X10 suppresses wheel extra-button and motion",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "X10 tracking is independent from SGR encoding",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c303b383b364d",
+      "actual_hex": "1b5b3c303b383b364d",
+      "ok": true
+    },
+    {
+      "name": "reset X10 does not cancel subsequently enabled normal tracking",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c303b383b364d1b5b3c303b383b366d",
+      "actual_hex": "1b5b3c303b383b364d1b5b3c303b383b366d",
+      "ok": true
+    },
+    {
+      "name": "custom key binding and search input never leak to PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "custom mouse binding and palette input never leak to PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "custom extra-button binding and palette input never leak to PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    }
+  ],
+  "button_injection": {
+    "4": "XTEST",
+    "5": "XTEST",
+    "6": "XTEST",
+    "7": "XTEST",
+    "8": "XTEST",
+    "9": "XTEST",
+    "10": "XTEST",
+    "11": "XSendEvent (outside virtual pointer button count)",
+    "1": "XTEST",
+    "3": "XTEST"
+  },
+  "test_sha256": "e0d2c65a759838c5f5fcb8b36ad18bf8aa7c140010b9be5c30218112c3f9e318",
+  "xvfb": {
+    "display": ":21885",
+    "pid": 3934796,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X21885",
+        "inode": 76258874,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X21885",
+        "inode": 76258873,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "pointer_mapping": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "tilde_keycode": 255,
+  "grid": {
+    "cols": 100,
+    "rows": 28,
+    "cell_width": 9,
+    "cell_height": 24
+  },
+  "focus_acknowledgments": {
+    "focus_out_hex": "1b5b3c3132383b383b364d1b5b4f",
+    "focus_in_hex": "1b5b3c3132383b383b364d1b5b4f1b5b49"
+  },
+  "screenshot": {
+    "path": "artifacts/repaint-integrated/input_gui/screenshot.png",
+    "sha256": "177e18ff9a42043c5e84385ed633b3ae1c42376f161a984ab1ff4f2d91980fb5"
+  },
+  "cleanup": {
+    "owned_processes_remaining": []
+  },
+  "stderr": ""
+}

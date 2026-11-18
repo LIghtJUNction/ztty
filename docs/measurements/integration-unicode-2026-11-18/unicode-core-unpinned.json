@@ -1,0 +1,294 @@
+{
+  "schema": 1,
+  "scope": "parser and screen model; no PTY, renderer or display",
+  "timestamp_utc": "2026-11-18T07:14:09.591382+00:00",
+  "baseline_source": "b9771a39a5653c488719679d737844180ad45067",
+  "change": "State::put_char reuses overwrite_span",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "-p",
+    "zterm",
+    "--example",
+    "benchmark"
+  ],
+  "binary_sha256": {
+    "before": "4ed7d32e069ee4daf8bb9bd5c779fe2f284558d696f5b3e42dc2fada7a3141cd",
+    "after": "9a7ee4c7b91fe6eb05919f8ecd68f1b2aec4befa276e53c97a6c32a2b4173372"
+  },
+  "runs": [
+    {
+      "variant": "before",
+      "duration_seconds": 2.95,
+      "host_load": [
+        8.8173828125,
+        8.2958984375,
+        9.61279296875
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 159.94,
+        "ascii_full_history_mib_s": 124.82,
+        "sgr_mib_s": 126.27,
+        "unicode_mib_s": 92.18,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 39,
+          "p95": 41,
+          "p99": 43,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2854,
+          "p95": 3465,
+          "p99": 3978,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "after",
+      "duration_seconds": 2.676,
+      "host_load": [
+        8.8173828125,
+        8.2958984375,
+        9.61279296875
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 228.008,
+        "ascii_full_history_mib_s": 138.761,
+        "sgr_mib_s": 157.094,
+        "unicode_mib_s": 119.861,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 45,
+          "p95": 48,
+          "p99": 50,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3548,
+          "p95": 4081,
+          "p99": 4270,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "after",
+      "duration_seconds": 2.828,
+      "host_load": [
+        8.67138671875,
+        8.27392578125,
+        9.5986328125
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 193.075,
+        "ascii_full_history_mib_s": 119.301,
+        "sgr_mib_s": 143.126,
+        "unicode_mib_s": 125.943,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 47,
+          "p95": 51,
+          "p99": 59,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3863,
+          "p95": 4994,
+          "p99": 5875,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "before",
+      "duration_seconds": 3.107,
+      "host_load": [
+        8.537109375,
+        8.25244140625,
+        9.58447265625
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 253.645,
+        "ascii_full_history_mib_s": 139.335,
+        "sgr_mib_s": 132.84,
+        "unicode_mib_s": 74.104,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 44,
+          "p95": 51,
+          "p99": 85,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3823,
+          "p95": 4749,
+          "p99": 5180,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "before",
+      "duration_seconds": 2.905,
+      "host_load": [
+        8.537109375,
+        8.25244140625,
+        9.58447265625
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 231.413,
+        "ascii_full_history_mib_s": 136.166,
+        "sgr_mib_s": 151.037,
+        "unicode_mib_s": 82.717,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 44,
+          "p95": 46,
+          "p99": 48,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3435,
+          "p95": 3793,
+          "p99": 4074,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "after",
+      "duration_seconds": 2.578,
+      "host_load": [
+        8.33349609375,
+        8.21484375,
+        9.56494140625
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 216.042,
+        "ascii_full_history_mib_s": 149.187,
+        "sgr_mib_s": 143.888,
+        "unicode_mib_s": 130.635,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 44,
+          "p95": 53,
+          "p99": 70,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3554,
+          "p95": 4882,
+          "p99": 5251,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "ascii_mib_s": {
+      "before": {
+        "median": 231.413,
+        "min": 159.94,
+        "max": 253.645
+      },
+      "after": {
+        "median": 216.042,
+        "min": 193.075,
+        "max": 228.008
+      },
+      "ratio": 0.9335776296059426
+    },
+    "ascii_full_history_mib_s": {
+      "before": {
+        "median": 136.166,
+        "min": 124.82,
+        "max": 139.335
+      },
+      "after": {
+        "median": 138.761,
+        "min": 119.301,
+        "max": 149.187
+      },
+      "ratio": 1.019057620845145
+    },
+    "sgr_mib_s": {
+      "before": {
+        "median": 132.84,
+        "min": 126.27,
+        "max": 151.037
+      },
+      "after": {
+        "median": 143.888,
+        "min": 143.126,
+        "max": 157.094
+      },
+      "ratio": 1.0831677205660946
+    },
+    "unicode_mib_s": {
+      "before": {
+        "median": 82.717,
+        "min": 74.104,
+        "max": 92.18
+      },
+      "after": {
+        "median": 125.943,
+        "min": 119.861,
+        "max": 130.635
+      },
+      "ratio": 1.5225769793391926
+    }
+  },
+  "after_source": "3c5b8e28a0c9baccd0dca1f24e1d3c3d558c449d"
+}

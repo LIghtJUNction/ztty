@@ -1,0 +1,77 @@
+{
+  "ok": true,
+  "checks": [
+    "OSC 133 metadata, exit codes, bounded command output and command CLI agree with the real PTY",
+    "real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input",
+    "command navigation copies the selected first and second command regions through the real clipboard",
+    "filtered command palette executes a font action, font reset restores the grid and both preserve the running PTY",
+    "custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release",
+    "command navigation skips regions invalidated by live-screen width changes and retains intact historical output",
+    "atomic config saves update pixels/font without restarting; explicit truecolor survives theme change; malformed reload retains the previous valid state",
+    "config watching recovers after the containing directory is renamed or deleted and recreated",
+    "observing an already attached workspace pane preserves the other pane's actual X input focus",
+    "closing an observer by action or WM_DELETE preserves the agent-owned PTY and permits reattachment",
+    "observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY",
+    "same-owner local acquire leaves observation mode and restores real GUI input without replacing the PTY",
+    "attach --observe on an already attached local-owned view preserves the same live PTY when the observing window closes",
+    "a fresh --observe window owns and reaps only its newly created child when closed",
+    "launch waiter exits and session/PTY resources are released"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+  "binary_sha256": "ef2e86087c4dd326df911281dd516bc074328eebd10987632144adee3cf3d6f8",
+  "source_sha256": {
+    "src/session.rs": "abf8dce4abcb7f671a417304a8839af0b5773e2dc7355d69dc0a8e360826dd60",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/output_tail.rs": "fa9c12ac62f76e9cfc266651e63948d1901e4aa85808da44d0d4bf888e996e08",
+    "src/session_core.rs": "7eed11c01eb96780f739ce08877e825c7aee15137c4ed20f6801f9778bcd5d58",
+    "src/input_queue.rs": "e34883d0376d2439454e93920fcb813657fbf69007c5937dfae8dd6c4929c44d",
+    "src/search.rs": "6262c89f7260ea534f23e258e27fc0362e24bc43b6269f6978a02d216f1b2ee6",
+    "src/actions.rs": "8650d63e1fa4543a1ee7d6a1fb0e340c5bcfb6d7fc48ecb828f2125dc853e075",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "src/x11.rs": "4e6788b5dc4ac92f06b6d63301284e1ff3f68b85cdc1d5f1ded74f0ef4f5ce3e",
+    "src/appearance.rs": "0e8135892dbb42d3053a01c287f8e180cb4599f21699cc6febb7676e79f1c2bf",
+    "src/main.rs": "f17bfa6e455e23709a0068a02e49a20db95aa2b1bd1b057d91ebde5b608888b6",
+    "tests/daily_workflow.py": "9193f495c1d1d46b57d096fdae03309d46611ccb4e1e429e0ff13228b225d152"
+  },
+  "screenshots": {
+    "history-search": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow/history-search.png",
+      "sha256": "1b62aaab087a3e6c9a380e2ff2cc545c39c599f0ba52b0b2f9c5324b9fb557ec"
+    },
+    "command-palette": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow/command-palette.png",
+      "sha256": "c73cc7a45d293c62668804cb76a23c67925858a373fe2d037fc1c9f6230f51ad"
+    },
+    "invalid-config-diagnostic": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow/invalid-config-diagnostic.png",
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "reloaded-terminal": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow/reloaded-terminal.png",
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    }
+  },
+  "display_ownership": {
+    "display": ":27730",
+    "pid": 2984110,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X27730",
+        "inode": 94393306,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X27730",
+        "inode": 94393305,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "stderr": ""
+}

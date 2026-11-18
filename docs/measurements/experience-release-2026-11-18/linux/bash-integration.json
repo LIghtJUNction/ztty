@@ -1,0 +1,41 @@
+{
+  "schema": "ztty.bash-integration.v1",
+  "ok": true,
+  "platform": "Linux",
+  "source_path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/shell/ztty.bash",
+  "source_sha256": "b67a54158f43329ae4d7b5f1f90946415a67aa75d557b1c5a148bf533815514f",
+  "test_sha256": "87c7619a3fde7411ef2e334c8f9b57bdac27aca59326744a93ded67e7c7a2590",
+  "bash_version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+  "checks": [
+    "production script passes bash -n before any PTY is started",
+    "array: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "array: both existing prompt hooks run once; nonzero hook/command statuses match the original Bash behavior",
+    "array: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "nested: exported PS0 receives one execution marker; re-source is idempotent; parent hooks/status survive child exit",
+    "string: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "string: both existing prompt hooks run once; nonzero hook/command statuses match the original Bash behavior",
+    "string: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "unset: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "unset: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "noninteractive sourcing is inert and emits no terminal controls"
+  ],
+  "syntax": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "transcripts": {
+    "array.pty": {
+      "bytes": 2376,
+      "sha256": "6ec717ebf3d2ab9ce3646b8eaf428339ec72f6c0fe9fb1b7ba3394b99cba3ae4"
+    },
+    "string.pty": {
+      "bytes": 1239,
+      "sha256": "0c84e435671082b38614c36aac3ae0df71f10678cccc666f8be0a9e3a9220946"
+    },
+    "unset.pty": {
+      "bytes": 872,
+      "sha256": "340130584550493c9464e9cf27ff2f89ca9d30802132e629bb43f498ffffa341"
+    }
+  }
+}

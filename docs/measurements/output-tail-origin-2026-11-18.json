@@ -1,0 +1,69 @@
+{
+  "before_commit": "23eeeea9ec078bf95dad065829d735c4f706944a",
+  "before_binary_sha256": "847cef584c828c3d66408632dfa40289dfd997b8848bbdb0ec1610436394f9ea",
+  "before_command": [
+    "python3",
+    "tests/mcp_sessions.py",
+    "--binary",
+    "/home/lightjunction/Documents/GITHUB/ztty/artifacts/session-control-worktree/target/release/ztty"
+  ],
+  "before_started": 1794961528.757356,
+  "test_sha256": "ab9268b6f1a3903187fde0c636a8a40abc5fd2c13685bf48d9959957753b68d0",
+  "before_exit_code": 1,
+  "before_finished": 1794961529.243485,
+  "check_command": [
+    "sh",
+    "tools/check.sh"
+  ],
+  "environment_changes": {
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "wrapper_preserved": true,
+  "check_started": 1794961836.8796964,
+  "sources": {
+    "src/main.rs": "69066f191fa1b2110624b0ce8f21787aeb59b42531dfeae14197819ce86c7c82",
+    "src/session.rs": "915a2ab976569b1769b8ec0663920d962afc183c352645b6662bae961c7d8d14",
+    "src/output_tail.rs": "44f8dd3ff249c1fbc89152dce6e4eb815a4bba5cfcde5a2743a112ea72b4b3ba",
+    "tests/output_tail.rs": "626981d53d2932a1f95ccb3889b997e823c833c39cb33fd5103207580385b2e4",
+    "tests/mcp_sessions.py": "ab9268b6f1a3903187fde0c636a8a40abc5fd2c13685bf48d9959957753b68d0",
+    "tests/daily_workflow.py": "b2d15e53d132311e61f5d146d70b13c0bc35a8c5b6815251abedba53b4c8be62"
+  },
+  "check_exit_code": 0,
+  "check_finished": 1794961849.110789,
+  "after_binary_sha256": "5ef524d7d7fb803fc6bcedff4d83e9dfa5e789eb396137578e9e0892a0557636",
+  "rust_passed_total": 200,
+  "daily_command": [
+    "python3",
+    "tests/daily_workflow.py",
+    "--binary",
+    "target/release/ztty",
+    "--output",
+    "artifacts/output-tail-validation/daily15.json",
+    "--screenshots",
+    "artifacts/output-tail-validation/screenshots"
+  ],
+  "daily_started": 1794962000.9457867,
+  "daily_exit_code": 0,
+  "daily_finished": 1794962002.2211957,
+  "daily_checks": 15,
+  "same_as_visually_reviewed_session_control_screenshots": {
+    "history-search.png": true,
+    "reloaded-terminal.png": true
+  },
+  "final_diff_check_exit_code": 0,
+  "remaining_processes_using_test_binary": [],
+  "owned_xvfb_pid_still_exists": false,
+  "failed_case_child_pid_still_exists": false,
+  "failed_case_broker_pid_still_exists": false,
+  "commit": "e6df870e316008585bcb6b7d6671db281ab24e1d",
+  "branch": "agent/session-control-20261118",
+  "committed_paths": [
+    "src/main.rs",
+    "src/session.rs",
+    "src/output_tail.rs",
+    "tests/output_tail.rs",
+    "tests/mcp_sessions.py",
+    "tests/daily_workflow.py"
+  ],
+  "final_git_status": ""
+}

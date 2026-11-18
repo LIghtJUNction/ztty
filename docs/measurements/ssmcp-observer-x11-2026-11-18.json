@@ -1,0 +1,231 @@
+{
+  "ok": true,
+  "platform": "Linux X11 / owned Xvfb / actual authenticated ssmcp relay",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/observer-watch-candidate-ztty",
+  "binary_sha256": "a339a7d258ad313379b5cfea40d8b125aa8c810ecaebd40005b489413a1b6d4d",
+  "ssmcp_binary": "/home/lightjunction/.cargo/bin/ssmcp",
+  "ssmcp_sha256": "e7e3d84b6afc869c5e340fbf9cf0c8c4092e60f6ce68c85379b4b64e8cc0c048",
+  "source_commit": "19fb5966ca4164ebc679abc2d8dacd4c26927b39",
+  "source_changes": [
+    " M src/config_watch.rs",
+    " M src/main.rs",
+    " M src/platform/linux.rs",
+    " M src/session.rs",
+    " M tests/daily_workflow.py",
+    "?? docs/ssmcp-observer.md",
+    "?? tests/config_watch.rs",
+    "?? tests/ssmcp_observer.py",
+    "?? tools/ztty-observer"
+  ],
+  "source_sha256": {
+    "src/main.rs": "9e8a0575a1c5c639baffe1c3d2bb2287d1c5059582ecc74600e73728055d41f8",
+    "src/platform/linux.rs": "c9207ce4443f68ca6a645967bbb295faa4fb88834a4dc4ef0fff59c1a7f56693",
+    "src/session.rs": "9d760ba54e921b07cbd00270d332147368c4f89e598bd3d5f3ca6cf2ef46076a",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "tools/ztty-observer": "615b54ebf0e1275ed6f1600f538cb2edbd66c4553e04ba897b12a70d386175ff",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+  },
+  "test_sha256": "370abf802ea5edddaf93106f2b45f6b7291787b775d0e3d42587a1722a764d0d",
+  "checks": [
+    "existing authenticated account reused without provisioning or reading credentials",
+    "actual ssmcp PTY output reached a fresh read-only ztty window without stealing X11 focus",
+    "ztty runs the installed ssmcp __tty-view for the exact native exec slot",
+    "XTEST keyboard, paste shortcut and mouse events neither queued PTY input nor requested clipboard data",
+    "resizing the read-only observation window leaves its viewer PTY dimensions unchanged",
+    "sequential native exec reuses the same ssmcp slot, viewer process and ztty window without focus theft",
+    "two commands executed exactly once each with real PTY stdout/stderr; the observer did not rerun either command",
+    "both real native exec jobs completed with exit 0 and their exact combined PTY streams were retained",
+    "the next command after WM_DELETE_WINDOW obtains a visible read-only observer without stealing focus",
+    "explicit ztty close retires the private observer session after commands finish"
+  ],
+  "receipts": {
+    "first_start": {
+      "job_id": "01c5a997f9a93eb4c65631f6778a0b06-1",
+      "output_mode": "pty",
+      "tty_slot": 1
+    },
+    "first_done": {
+      "job_id": "01c5a997f9a93eb4c65631f6778a0b06-1",
+      "exit_code": 0,
+      "running": false,
+      "stdout": "\u001b]2;ssmcp observer acceptance\u0007\u001b[?1000h\u001b[?1006h\u001b[32mSSMCP_OBSERVER_FIRST\u001b[0m\r\nActual command PID: 2232093\r\nstderr marker first\r\nSSMCP_OBSERVER_FIRST_DONE\r\n",
+      "stderr": ""
+    },
+    "second_start": {
+      "job_id": "01c5a997f9a93eb4c65631f6778a0b06-2",
+      "output_mode": "pty",
+      "tty_slot": 1
+    },
+    "second_done": {
+      "job_id": "01c5a997f9a93eb4c65631f6778a0b06-2",
+      "exit_code": 0,
+      "running": false,
+      "stdout": "\u001b]2;ssmcp observer acceptance\u0007\u001b[?1000h\u001b[?1006h\u001b[32mSSMCP_OBSERVER_SECOND\u001b[0m\r\nActual command PID: 2233916\r\nstderr marker second\r\nSSMCP_OBSERVER_SECOND_DONE\r\n",
+      "stderr": ""
+    },
+    "third_start": {
+      "job_id": "01c5a997f9a93eb4c65631f6778a0b06-3",
+      "output_mode": "pty",
+      "tty_slot": 1
+    },
+    "third_done": {
+      "job_id": "01c5a997f9a93eb4c65631f6778a0b06-3",
+      "exit_code": 0,
+      "running": false,
+      "stdout": "\u001b]2;ssmcp observer acceptance\u0007\u001b[?1000h\u001b[?1006h\u001b[32mSSMCP_OBSERVER_THIRD\u001b[0m\r\nActual command PID: 2237104\r\nstderr marker third\r\nSSMCP_OBSERVER_THIRD_DONE\r\n",
+      "stderr": ""
+    }
+  },
+  "scope": "two sequential jobs plus a third after closing the observer; no ssmcp model or agent tool calls",
+  "xvfb": {
+    "display": ":8692",
+    "pid": 2226360,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X8692",
+        "inode": 69633281,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X8692",
+        "inode": 69633280,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "client_name": "ztty-observer-acceptance-5247033f6e4c",
+  "client_pid": 2226367,
+  "first_session": {
+    "id": 1,
+    "created_at": 1794956655767,
+    "uri": "ztty://local/session-1",
+    "name": "session-1",
+    "origin": "local",
+    "pid": 2226811,
+    "broker_pid": 2226801,
+    "cols": 120,
+    "rows": 32,
+    "attached": true,
+    "read_only": true,
+    "attachment": 1,
+    "running": true,
+    "exit_code": null,
+    "title": "ssmcp observer acceptance",
+    "input_owner": "local",
+    "workspace": null,
+    "visible": true,
+    "window_id": 2097154
+  },
+  "viewer_slot": 1,
+  "second_session": {
+    "id": 1,
+    "created_at": 1794956655767,
+    "uri": "ztty://local/session-1",
+    "name": "session-1",
+    "origin": "local",
+    "pid": 2226811,
+    "broker_pid": 2226801,
+    "cols": 120,
+    "rows": 32,
+    "attached": true,
+    "read_only": true,
+    "attachment": 1,
+    "running": true,
+    "exit_code": null,
+    "title": "ssmcp observer acceptance",
+    "input_owner": "local",
+    "workspace": null,
+    "visible": true,
+    "window_id": 2097154
+  },
+  "executions": [
+    {
+      "phase": "first",
+      "pid": 2232093,
+      "stdout_isatty": true,
+      "stderr_isatty": true
+    },
+    {
+      "phase": "second",
+      "pid": 2233916,
+      "stdout_isatty": true,
+      "stderr_isatty": true
+    },
+    {
+      "phase": "third",
+      "pid": 2237104,
+      "stdout_isatty": true,
+      "stderr_isatty": true
+    }
+  ],
+  "screenshot": {
+    "path": "artifacts/ssmcp-observer-run-03.png",
+    "sha256": "3ecf8b8007f82402c258fbf214995752195813d39a7040ddff3a7b85b4420e24",
+    "width": 1104,
+    "height": 792
+  },
+  "closed_window_sessions": [],
+  "next_command_after_close": {
+    "visible": true,
+    "session": {
+      "id": 1,
+      "created_at": 1794956702249,
+      "uri": "ztty://local/session-1",
+      "name": "session-1",
+      "origin": "local",
+      "pid": 2237025,
+      "broker_pid": 2237019,
+      "cols": 120,
+      "rows": 32,
+      "attached": true,
+      "read_only": true,
+      "attachment": 1,
+      "running": true,
+      "exit_code": null,
+      "title": "ssmcp observer acceptance",
+      "input_owner": "local",
+      "workspace": null,
+      "visible": true,
+      "window_id": 2097154
+    },
+    "sessions": [
+      {
+        "id": 1,
+        "created_at": 1794956702249,
+        "uri": "ztty://local/session-1",
+        "name": "session-1",
+        "origin": "local",
+        "pid": 2237025,
+        "broker_pid": 2237019,
+        "cols": 120,
+        "rows": 32,
+        "attached": true,
+        "read_only": true,
+        "attachment": 1,
+        "running": true,
+        "exit_code": null,
+        "title": "ssmcp observer acceptance",
+        "input_owner": "local",
+        "workspace": null,
+        "visible": true,
+        "window_id": 2097154
+      }
+    ],
+    "new_session_incarnation": true
+  },
+  "reopened_screenshot": {
+    "path": "artifacts/ssmcp-observer-run-03-reopened.png",
+    "sha256": "cad76d0d9671fae2e6703d99e315afac1db68e4256bb57ab1db3fb6338cdbfef",
+    "width": 1104,
+    "height": 792
+  },
+  "cleanup": {
+    "owned_processes_remaining": [],
+    "account_logs_published": false
+  }
+}

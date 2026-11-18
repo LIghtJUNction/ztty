@@ -1,0 +1,4 @@
+#!/bin/sh
+# Adapter for tools accepting TERMINAL -e COMMAND, including ssmcp --tty.
+# ZTTY_BIN may select an installed or explicitly built ztty executable.
+exec "${ZTTY_BIN:-ztty}" --observe "$@"

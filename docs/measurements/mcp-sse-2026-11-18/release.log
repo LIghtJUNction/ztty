@@ -1,0 +1,12 @@
+   Compiling simd-adler32 v0.3.10
+   Compiling zune-inflate v0.2.54
+   Compiling zune-core v0.5.3
+   Compiling zune-png v0.5.2
+   Compiling zgraphics v0.1.0 ($ZTTY_WORKTREE/crates/zgraphics)
+   Compiling unicode-width v0.2.3
+   Compiling ztty v0.2.1 ($ZTTY_WORKTREE)
+   Compiling zvte v0.1.3
+   Compiling zinput v0.1.0 ($ZTTY_WORKTREE/crates/zinput)
+   Compiling zterm v0.2.1 ($ZTTY_WORKTREE/crates/zterm)
+   Compiling zpty v0.2.0 ($ZTTY_WORKTREE/crates/zpty)
+    Finished `release` profile [optimized] target(s) in 17.93s

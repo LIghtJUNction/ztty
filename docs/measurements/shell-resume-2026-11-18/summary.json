@@ -1,0 +1,350 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "timezone": "Asia/Taipei",
+  "source": "f2a49ec23a54ed3334d825087e1cd97fd00816af",
+  "previous_checkpoint": "7bd5188d0c6386d20de90361a5155545a6acdc9b",
+  "implementation_commits": [
+    "4b8613689c4e8d774d148630523237cb18778e26",
+    "23ccc6718c274576e15f47a5aec817a2cdf41a02",
+    "f2a49ec23a54ed3334d825087e1cd97fd00816af"
+  ],
+  "binary": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+    "sha256": "a6e1254283d888954698c8e92a61eded6703417e6854d6a16421290a98ccdb6e",
+    "size": 682224,
+    "source": "f2a49ec23a54ed3334d825087e1cd97fd00816af"
+  },
+  "rust": {
+    "regular_passed": 225,
+    "doctests_passed": 6,
+    "failed": 0
+  },
+  "bash": {
+    "passed": true,
+    "checks": 11,
+    "version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+    "source_sha256": "b67a54158f43329ae4d7b5f1f90946415a67aa75d557b1c5a148bf533815514f",
+    "old_script_rejected": true
+  },
+  "shells": [
+    {
+      "shell": "bash",
+      "version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+      "checks": 9,
+      "status": "passed"
+    },
+    {
+      "shell": "zsh",
+      "version": "zsh 5.9.2 (x86_64-pc-linux-gnu)",
+      "checks": 7,
+      "status": "passed"
+    },
+    {
+      "shell": "fish",
+      "version": "fish，版本 4.9.3",
+      "checks": 7,
+      "status": "passed"
+    },
+    {
+      "shell": "nu",
+      "version": "0.117.0",
+      "checks": 7,
+      "status": "passed"
+    }
+  ],
+  "gui": {
+    "passed": true,
+    "checks": 17,
+    "new_cwd_checks": 7,
+    "screenshot": "workspace-cwd.png"
+  },
+  "mcp": {
+    "passed": true,
+    "suites": 3,
+    "guarded_output_resume": {
+      "status": "passed",
+      "old_identity": {
+        "uri": "ztty://mcp/stdio/resume-reuse",
+        "id": 8,
+        "created_at": 1794989144776,
+        "broker_pid": 3417043
+      },
+      "replacement_identity": {
+        "uri": "ztty://mcp/stdio/resume-reuse",
+        "id": 9,
+        "created_at": 1794989144813,
+        "broker_pid": 3417043
+      },
+      "resumed_stdio": "LD",
+      "independent_observer": "D",
+      "resumed_http": "LD",
+      "mismatched_identity_fields_rejected": [
+        "uri",
+        "id",
+        "created_at",
+        "broker_pid"
+      ],
+      "malformed_guards_rejected": 11,
+      "rename_preserved_identity": true,
+      "stale_guard_error": "session identity changed; start a new read",
+      "legacy_unguarded_output": "LACEMENT"
+    },
+    "descendant_output_eof": {
+      "status": "passed",
+      "after_direct_child_exit": {
+        "output": "PREFIX",
+        "running": false,
+        "exit_code": 7,
+        "has_more": false,
+        "output_eof": false
+      },
+      "later_descendant_output": "SUFFIX",
+      "final_cursor": 12,
+      "final_output_eof": true
+    }
+  },
+  "gates": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.897,
+      "log": "fmt.log"
+    },
+    {
+      "name": "rust-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 15.544,
+      "log": "rust-tests.log"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 25.209,
+      "log": "clippy.log"
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 25.478,
+      "log": "release.log"
+    },
+    {
+      "name": "shell-probe",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "-p",
+        "zterm",
+        "--example",
+        "shell_probe"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.084,
+      "log": "shell-probe.log"
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.311,
+      "log": "no-std.log"
+    },
+    {
+      "name": "bare-metal",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "zterm",
+        "-p",
+        "zinput",
+        "-p",
+        "zgraphics",
+        "--target",
+        "x86_64-unknown-none"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.871,
+      "log": "bare-metal.log"
+    },
+    {
+      "name": "windows-typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--target",
+        "x86_64-pc-windows-gnu"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 5.335,
+      "log": "windows-typecheck.log"
+    },
+    {
+      "name": "macos-intel-typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--target",
+        "x86_64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 5.899,
+      "log": "macos-intel-typecheck.log"
+    },
+    {
+      "name": "macos-arm-typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--target",
+        "aarch64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 9.063,
+      "log": "macos-arm-typecheck.log"
+    },
+    {
+      "name": "check-script-syntax",
+      "command": [
+        "sh",
+        "-n",
+        "tools/check.sh"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.004,
+      "log": "check-script-syntax.log"
+    }
+  ],
+  "acceptance": [
+    {
+      "name": "bash",
+      "command": [
+        "python3",
+        "tests/bash_integration.py",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/bash.json"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.458,
+      "log": "bash.log"
+    },
+    {
+      "name": "shells",
+      "command": [
+        "python3",
+        "tests/shell_integration.py",
+        "--probe",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/debug/examples/shell_probe",
+        "--artifacts",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/shells",
+        "--report",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/shells.json"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.681,
+      "log": "shells.log"
+    },
+    {
+      "name": "workspaces",
+      "command": [
+        "python3",
+        "tests/workspaces.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/workspaces.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/workspaces.png"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.894,
+      "log": "workspaces.log"
+    }
+  ],
+  "mcp_gates": [
+    {
+      "name": "sessions",
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.972,
+      "log": "mcp-sessions.log"
+    },
+    {
+      "name": "transport",
+      "command": [
+        "python3",
+        "tests/mcp_transport.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.255,
+      "log": "mcp-transport.log"
+    },
+    {
+      "name": "security",
+      "command": [
+        "python3",
+        "tests/mcp_security.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.352,
+      "log": "mcp-security.log"
+    }
+  ],
+  "scope": {
+    "platform": "Linux X11 with owned Xvfb and real PTYs",
+    "old_bash": "Bash before 5.1 was not run",
+    "native": "Windows GNU and Darwin Intel/ARM typechecks; no new native runtime acceptance",
+    "subscription": "Request/response polling; asynchronous subscriptions remain separate",
+    "performance": "No throughput or RSS comparison measured in this iteration"
+  },
+  "visual_review": "Viewed the actual cwd split screenshot: both panes render legibly on black, and the new child displays the inherited Unicode/reserved-character directory."
+}

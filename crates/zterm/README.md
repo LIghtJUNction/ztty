@@ -60,6 +60,79 @@ while shrinking are retained within the configured scrollback limits.
 modes into the independent `zinput::Modes` value. The input crate is re-exported
 as `zterm::input`; it is also usable without this terminal model.
 
+## Runtime themes
+
+`Terminal::set_theme` applies configured default colors and the 16 ANSI palette
+entries to retained cells in place. It updates the live screen, scrollback,
+alternate screens, and saved SGR styles, then marks every screen row dirty.
+`Terminal::theme()` returns the current configuration. Applying an identical
+theme does no work; changing one does not allocate or restart the child process.
+
+```rust
+use zterm::Terminal;
+
+let mut terminal = Terminal::new(80, 24, 2_000);
+terminal.feed(b"normal \x1b[31mred\x1b[0m");
+let mut theme = terminal.theme();
+theme.foreground = 0xe8eaed;
+theme.background = 0x000000;
+theme.palette[1] = 0xff6666;
+terminal.set_theme(theme);
+assert_eq!(terminal.cell(0, 0).fg, 0xe8eaed);
+assert_eq!(terminal.cell(7, 0).fg, 0xff6666);
+assert!(terminal.row_dirty(0));
+```
+
+SGR default colors and ANSI palette references follow the new configuration.
+Explicit truecolor and indexed colors 16 through 255 keep their values, even
+when their RGB values happen to equal an old default or palette entry. Color
+provenance occupies existing cell padding and flag bits; `Cell` remains 28 bytes
+and `fg`/`bg` remain resolved RGB values for renderers. The frontend still owns
+window padding, cursor colors, and redraw scheduling. OSC 4/10/11 queries report
+the current colors with their original terminator; OSC color writes remain
+unsupported. The SGR defaults and OSC query format follow the
+[xterm control-sequence reference](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html).
+
+## Shell command metadata
+
+OSC 133 A/B/C/D marks expose prompt, input, output, and completion boundaries
+through `commands()`. Records have stable session-local IDs, absolute history
+coordinates, and optional exit codes. `command_input(id, max_bytes)` and
+`command_output(id, max_bytes)` extract current rendered text from retained
+primary-screen cells; `command_scroll_offset(id)` locates a retained prompt.
+The result reports completion and truncation explicitly.
+
+```rust
+use zterm::Terminal;
+
+let mut terminal = Terminal::new(80, 24, 2_000);
+// These marks normally arrive from the configured shell through the PTY.
+terminal.feed(b"\x1b]133;A\x07$ \x1b]133;B\x07printf hello\r\n\x1b]133;C\x07hello\r\n\x1b]133;D;0\x07");
+let command = terminal.commands().next_back().unwrap();
+assert_eq!(command.exit_status, Some(0));
+let output = terminal.command_output(command.id, 4_096).unwrap();
+assert_eq!(output.text, "hello\n");
+assert!(output.complete && !output.truncated);
+assert_eq!(terminal.command_scroll_offset(command.id), Some(0));
+```
+
+Use `commands().rev()` to locate recent executed commands and copy their IDs
+before mutating the terminal. A missing command ID or output boundary returns
+`None`. A returned `CommandText` may be incomplete while the process is running,
+or truncated by the requested byte limit, history eviction, or destructive
+screen edits. Check both fields before labeling a copied result complete.
+`command_scroll_offset` returns a viewport offset that can be passed to
+`view_cell`; it returns `None` for unavailable prompts or an active alternate
+screen. Offsets should be queried again after more terminal output arrives.
+
+Metadata is allocated on the first marker and retains at most 128 records.
+Reads return at most 64 KiB of UTF-8 without duplicating the whole history.
+Scrolling keeps retained anchors stable. History eviction, width changes,
+and destructive screen operations can make a range unavailable; a reset clears
+records without reusing IDs. These are untrusted display markers, not proof
+of command identity or authorization. See the
+[shell setup and acceptance guide](../../shell/README.md).
+
 ## Static graphics
 
 Call `set_cell_size(width, height)` whenever physical text-cell metrics change.
@@ -119,6 +192,8 @@ Additional bounds are explicit:
 | Window title | 256 UTF-8 bytes |
 | Working-directory value | 2,048 UTF-8 bytes |
 | Kitty keyboard stack | 32 entries per screen |
+| Shell command records | 128, allocated lazily |
+| Command-text read | 65,536 UTF-8 bytes |
 | Graphics APC staging | At most a 512-byte header plus 4,096 encoded payload bytes; larger bodies stream through it |
 | Decoded graphics | 16 MiB per image; 32 MiB per screen, counting vector capacity |
 | Pending graphics transfer | 16 MiB per screen; one transfer at a time |
@@ -201,3 +276,13 @@ measurements.
 ## License
 
 MIT. See [LICENSE](LICENSE).
+
+## Sixel parsing
+
+`Terminal::feed` decodes bounded Sixel images from DCS streams and exposes them
+through `graphics_draws`, alongside Kitty images. DECSDM 80, private/shared
+palette mode 1070 and cursor-right mode 8452 are queryable with DECRQM. Sixel
+input commits only at ST; cancellation drops the partial decoder without moving
+the cursor or publishing pixels. The [graphics protocol scope](../../docs/protocols.md#sixel)
+distinguishes tested decoding/cursor behavior from framebuffer and native-GUI
+compatibility limits.

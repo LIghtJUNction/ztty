@@ -1,0 +1,141 @@
+{
+  "timestamp_utc": "2026-11-17T21:49:36.773684+00:00",
+  "platform": "Linux-7.3.4-arch1-1-x86_64-with-glibc2.44",
+  "reference_decoder": "sixel2png 1.10.5",
+  "probe_sha256": "61a29797726649dc19ef69dd3eb7f10f6546fcb14eed77624d5664207f0a622a",
+  "source_sha256": {
+    "crates/zgraphics/src/sixel.rs": "94d893643d8147b3e98f5ad8b4d4c5e23366d106c6ff0077117a18bdd073c41f",
+    "crates/zgraphics/src/lib.rs": "6de28c07f898b929c5fc292ca6c9b86e332d5763afb4ea2746d0e2fd8d7acdae",
+    "crates/zterm/src/terminal.rs": "b121079c166bec586ee565af776b9179a0436f5fdaff7d1353e509ed327696bd",
+    "crates/zterm/examples/sixel_probe.rs": "ce3a3f532388dc4302dca510dad2dff3e8e234a07a47746ddf004d2a10ca4b98",
+    "tests/sixel_reference.py": "104537d07f055d64a9512ee1a06571aa617069b4739244c836faa445e1539fa0"
+  },
+  "fixtures": [
+    {
+      "fixture": "rgb_raster_repeat",
+      "width": 37,
+      "height": 19,
+      "stream_sha256": "57a50b26f3cb8521f1b640daee52287af41c36e83c03d20a39f9a684bf5c22c7",
+      "rgba_sha256": "8030b8b79209d810f9aa6ba6f5de2b065b9dea79674f87ebea6f485e245a500a",
+      "chunk_sizes": [
+        1,
+        2,
+        7,
+        256,
+        65536
+      ],
+      "zterm_matches_fixture": true,
+      "zterm_matches_libsixel": true
+    },
+    {
+      "fixture": "hls_dec_hues",
+      "width": 29,
+      "height": 17,
+      "stream_sha256": "4c3683d5bbf17d92fd514b4530c8bb519ed85d0818308f29a9159e2fe86334c0",
+      "rgba_sha256": "7cb91034b8d82124920efa67948bd7738bf230c17ede242f1b14068100281fd3",
+      "chunk_sizes": [
+        1,
+        2,
+        7,
+        256,
+        65536
+      ],
+      "zterm_matches_fixture": true,
+      "zterm_matches_libsixel": true
+    },
+    {
+      "fixture": "palette_redefinition",
+      "width": 19,
+      "height": 13,
+      "stream_sha256": "8c5a607f957d3395f463efad9bde328d2299e9f37a7f8d446a41f1b309aa1467",
+      "rgba_sha256": "28fd487a114fd9400d90b20036156747300bee8cd543fe570a7e05bbb0f2127c",
+      "chunk_sizes": [
+        1,
+        2,
+        7,
+        256,
+        65536
+      ],
+      "zterm_matches_fixture": true,
+      "zterm_matches_libsixel": true
+    },
+    {
+      "fixture": "embedded_controls",
+      "width": 41,
+      "height": 25,
+      "stream_sha256": "f0f4a0cf795b852920f6400b90f515cd22c6e92241dbf7d8e8600134faff361c",
+      "rgba_sha256": "8ab3d09b8956e59732bebb2107d1e70ab9acc29e43b5971df80a7bdbd38196b3",
+      "chunk_sizes": [
+        1,
+        2,
+        7,
+        256,
+        65536
+      ],
+      "zterm_matches_fixture": true,
+      "zterm_matches_libsixel": true
+    },
+    {
+      "fixture": "vt340_palette",
+      "width": 67,
+      "height": 23,
+      "stream_sha256": "9da3bf029fce559968b4882aa033251fc882fcbd166c972bd28588e966199247",
+      "rgba_sha256": "094ec1d65139f7cc5a3e3775ade319febda76731e4aa0b22dd2e3b50b881a5db",
+      "chunk_sizes": [
+        1,
+        2,
+        7,
+        256,
+        65536
+      ],
+      "zterm_matches_fixture": true,
+      "zterm_matches_libsixel": true
+    },
+    {
+      "fixture": "hls_white_endpoint",
+      "width": 11,
+      "height": 7,
+      "stream_sha256": "e3e39b47d7d5846372c6c2c65bb10ef76cd8116bd7b6f3192c326e1b5c9ed8f0",
+      "rgba_sha256": "24ae50ba2ab855a4b185179127b8c1c5d9de0a07edb44a2005f2b82dfb2f3296",
+      "chunk_sizes": [
+        1,
+        2,
+        7,
+        256,
+        65536
+      ],
+      "zterm_matches_fixture": true,
+      "zterm_matches_libsixel": false
+    }
+  ],
+  "fixture_comparisons_passed": 30,
+  "reference_comparisons_passed": 25,
+  "reference_discrepancies": [
+    {
+      "fixture": "hls_white_endpoint",
+      "reference_decoder": "sixel2png 1.10.5",
+      "input_hls": [
+        120,
+        100,
+        100
+      ],
+      "expected_rgba": [
+        255,
+        255,
+        255,
+        255
+      ],
+      "reference_rgba": [
+        1,
+        255,
+        254,
+        255
+      ],
+      "zterm_matches_expected": true
+    }
+  ],
+  "limitations": [
+    "Pixel comparison is separate from native GUI presentation.",
+    "The independent fixtures cover opaque RGB/HLS/palette data; transparency, cursor modes, cancellation and quotas are covered by Rust tests."
+  ]
+}

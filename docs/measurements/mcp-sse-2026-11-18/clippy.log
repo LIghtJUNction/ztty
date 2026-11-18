@@ -1,0 +1,12 @@
+    Checking simd-adler32 v0.3.10
+    Checking zune-inflate v0.2.54
+    Checking zune-core v0.5.3
+    Checking zune-png v0.5.2
+   Compiling ztty v0.2.1 ($ZTTY_WORKTREE)
+    Checking zgraphics v0.1.0 ($ZTTY_WORKTREE/crates/zgraphics)
+    Checking zinput v0.1.0 ($ZTTY_WORKTREE/crates/zinput)
+    Checking zvte v0.1.3
+    Checking unicode-width v0.2.3
+    Checking zpty v0.2.0 ($ZTTY_WORKTREE/crates/zpty)
+    Checking zterm v0.2.1 ($ZTTY_WORKTREE/crates/zterm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 16.43s

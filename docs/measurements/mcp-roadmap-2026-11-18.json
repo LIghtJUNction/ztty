@@ -1,0 +1,41 @@
+{
+  "binary_sha256": "c17e617f76ac080eab51e82853eff58f972921cecccbd27f7599cc74db8f5ce5",
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "tests/mcp_transport.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"stdio\": \"passed\",\n  \"tool_count\": 9,\n  \"http\": \"passed\",\n  \"concurrent_requests\": 16,\n  \"chunked\": \"passed\",\n  \"authentication\": \"passed\",\n  \"ipv6\": \"passed\"\n}\n",
+      "stderr": "",
+      "test_sha256": "3d8e2dd6fcdb8d03959b1e3e75f7c9e28d89ba627121651e48f3de4ce6ddf605"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"stdio_pty\": \"passed\",\n  \"unicode_cursor_pages\": \"passed\",\n  \"cwd_environment_resize\": \"passed\",\n  \"split_pty_utf8\": \"passed\",\n  \"creator_cwd_argv_env_isolation\": \"passed\",\n  \"http_stdio_shared_broker\": \"passed\",\n  \"namespaces_and_ambiguity\": \"passed\",\n  \"exit_code\": 7,\n  \"exclusive_input_owner_and_explicit_takeover\": \"passed\",\n  \"bounded_command_reads_across_observers\": \"passed\",\n  \"transport_exit_persistence\": \"passed\",\n  \"attach_default_list\": \"passed\",\n  \"close_releases_sessions\": \"passed\"\n}\n",
+      "stderr": "",
+      "test_sha256": "a3a1962393563e9950de16872d7b70f3870a503f85076e0d9a510587143ea4c8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/mcp_security.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"stdio_observer\": \"passed\",\n  \"http_observer\": \"passed\",\n  \"role_session_binding\": \"passed\",\n  \"host_origin_allowlist\": \"passed\",\n  \"strict_jsonrpc\": \"passed\",\n  \"hostile_framing_and_limits\": \"passed\"\n}\n",
+      "stderr": "",
+      "test_sha256": "f9bf0e3f545497429b5a2e5bcc210f905e0884fd41f0279bf1b1462f511a6d82"
+    }
+  ]
+}

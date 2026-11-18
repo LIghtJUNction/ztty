@@ -1,0 +1,43 @@
+{
+  "run_id": 44293476047,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44293476047",
+  "job_id": 134764495469,
+  "source_sha": "a045871a76ff51c1acd29881ff280869e093efbb",
+  "version": "0.3.0",
+  "status": "failed",
+  "build_only": true,
+  "candidate_platform": "macos",
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "spawn": "failure",
+    "native": "skipped",
+    "package": "skipped"
+  },
+  "failure": {
+    "suite": "darwin-threaded-spawn",
+    "test_compilation_seconds": 2.46,
+    "panic_thread": "<unnamed>",
+    "panic_file": "crates/zpty/tests/darwin_spawn.rs",
+    "panic_line": 306,
+    "panic_message": "child did not exit",
+    "inner_child_exit_deadline_ms": 2000,
+    "outer_timeout_seconds": 120,
+    "stdout_bytes": 0,
+    "native_window_evidence": "not_run",
+    "cleanup_acceptance": "not_reached"
+  },
+  "inference": {
+    "location": "unnamed thread plus probe() exit panic points to the nine concurrent simple probes",
+    "hypothesis": "simple probe consumed READY but did not drain final DONE/output before waiting for exit; failure cleanup then used an unbounded wait with master open",
+    "status": "requires native rerun; no production-code failure classification made"
+  },
+  "evidence_files": [
+    "ztty-macos-x86_64.spawn.stderr.log",
+    "ztty-macos-x86_64.spawn.stdout.log",
+    "ztty-macos-x86_64.spawn.json",
+    "ztty-macos-x86_64.native.json",
+    "ztty-macos-x86_64.build.json",
+    "macos-x86_64-job.log"
+  ]
+}

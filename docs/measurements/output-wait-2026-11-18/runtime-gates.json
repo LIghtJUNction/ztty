@@ -1,0 +1,61 @@
+[
+  {
+    "name": "mcp-wait",
+    "command": [
+      "python3",
+      "tests/mcp_wait.py",
+      "--binary",
+      "./target/release/ztty",
+      "--output",
+      "artifacts/output-wait-integrated-20261118/mcp-wait.json"
+    ],
+    "exit_code": 0,
+    "seconds": 14.88
+  },
+  {
+    "name": "mcp-transport",
+    "command": [
+      "python3",
+      "tests/mcp_transport.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit_code": 0,
+    "seconds": 0.145
+  },
+  {
+    "name": "mcp-sessions",
+    "command": [
+      "python3",
+      "tests/mcp_sessions.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit_code": 0,
+    "seconds": 0.753
+  },
+  {
+    "name": "mcp-security",
+    "command": [
+      "python3",
+      "tests/mcp_security.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit_code": 0,
+    "seconds": 0.145
+  },
+  {
+    "name": "shared-gui",
+    "command": [
+      "python3",
+      "tests/shared_gui_smoke.py",
+      "--binary",
+      "./target/release/ztty",
+      "--output",
+      "artifacts/output-wait-integrated-20261118/shared-gui.json"
+    ],
+    "exit_code": 0,
+    "seconds": 0.804
+  }
+]

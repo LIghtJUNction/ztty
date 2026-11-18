@@ -1,0 +1,41 @@
+{
+  "source_sha": "bfd2732e238b3864e95e721e873f6c9498507bec",
+  "source_ref": "refs/heads/feat/experience-release-20261118",
+  "version": "0.3.0",
+  "architecture": "aarch64",
+  "runner": "macos-15",
+  "runner_image": "20261104.0514.1",
+  "platform": "macOS-15.8.2-arm64-arm-64bit-Mach-O",
+  "rust_toolchain": "1.100.0",
+  "run_id": "44295578969",
+  "run_attempt": "1",
+  "build_only": true,
+  "candidate_platform": "macos",
+  "passed": false,
+  "status": "failed",
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "spawn": "failure",
+    "native": "skipped",
+    "package": "skipped"
+  },
+  "files": {
+    "ztty-macos-aarch64.native.json": {
+      "bytes": 142,
+      "sha256": "886e1d5d43a36aebb191d69eaf40171aca7a38852be08a08af0a5bad6783e2e5"
+    },
+    "ztty-macos-aarch64.spawn.json": {
+      "bytes": 970,
+      "sha256": "902cb49cfb614012700a9f1c49d0fc1662c48cab4a9f948b427acb186fa1ebee"
+    },
+    "ztty-macos-aarch64.spawn.stderr.log": {
+      "bytes": 2356,
+      "sha256": "d947539c55f57bb765214a2c17c33a5c37ecce6caca1919751960ca8d6aab98a"
+    },
+    "ztty-macos-aarch64.spawn.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

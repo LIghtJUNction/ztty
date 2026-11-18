@@ -1,0 +1,51 @@
+{
+  "source": "aef55d95747c38aad34d161043ad1b9c72127b44",
+  "exit_code": 0,
+  "seconds": 3.299621820449829,
+  "ok": true,
+  "checks": 18,
+  "error": null,
+  "screenshots": {
+    "history-search": {
+      "path": "artifacts/experience-release/device/scroll-prompt/history-search.png",
+      "sha256": "d0e6f2a6b3ba498b1818f16ea6cad866aaa515c1fbe3d4a254296415c3963e6e"
+    },
+    "command-palette": {
+      "path": "artifacts/experience-release/device/scroll-prompt/command-palette.png",
+      "sha256": "9f522d38efe05f2cb97ba172c4e2a6414067af04968ca68033912e4381c79c4a"
+    },
+    "invalid-config-diagnostic": {
+      "path": "artifacts/experience-release/device/scroll-prompt/invalid-config-diagnostic.png",
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "reloaded-terminal": {
+      "path": "artifacts/experience-release/device/scroll-prompt/reloaded-terminal.png",
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    },
+    "scrollback-return": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-return.png",
+      "sha256": "a3a7e4256af9286b3411e709237b3b898123271150e5e7a3f9141f8ba54a18ba"
+    },
+    "scrollback-new-output": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-new-output.png",
+      "sha256": "3da127495566c4156eb256a197f476d1f8d7d3e8faf560ee3386b011f1910ef4"
+    },
+    "scrollback-live": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-live.png",
+      "sha256": "3a52e9be32b0ff603f951d005bd2fafaf09ea736826cb8d1f2bb8ac1ee1075e1"
+    },
+    "scrollback-search": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-search.png",
+      "sha256": "d0e6f2a6b3ba498b1818f16ea6cad866aaa515c1fbe3d4a254296415c3963e6e"
+    },
+    "scrollback-palette": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-palette.png",
+      "sha256": "fc721217e55bc1f6ae4c172431289a5ca45be5b9a84b6f88dc0785ce76dac1e6"
+    },
+    "scrollback-observer": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-observer.png",
+      "sha256": "57591461828b234be1b6ee4201e03570bcc1b969a848e2730621aea0f3b15ec3"
+    }
+  },
+  "binary_sha256": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada"
+}

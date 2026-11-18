@@ -1,0 +1,16 @@
+{
+  "source_sha": "f2a49ec23a54ed3334d825087e1cd97fd00816af",
+  "checkpoint_sha": "bd92d3b49a3431c442700901d0e01f7744fe2c61",
+  "binary_provenance": "Matched the executable SHA-256 against docs/measurements/shell-resume-2026-11-18/binary.json at checkpoint_sha.",
+  "binary_sha256": "a6e1254283d888954698c8e92a61eded6703417e6854d6a16421290a98ccdb6e",
+  "expected_failure": true,
+  "observed": {
+    "output": "",
+    "next_cursor": 0,
+    "has_more": true,
+    "running": true,
+    "output_eof": false,
+    "truncated": false
+  },
+  "remaining_sessions": []
+}

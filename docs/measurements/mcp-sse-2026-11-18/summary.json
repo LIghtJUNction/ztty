@@ -1,0 +1,147 @@
+{
+  "recorded_at": "2026-11-18T18:41:51.661294+08:00",
+  "base_commit": "1bd658cf868bcd88074519f3ee561629c2cdf872",
+  "source_commit": "c0fee849446da748082db18f40e7c18d684faf29",
+  "acceptance_commit": "dfb05e8b3dd9b6e8fc4d05bfc95ec7daa9583d76",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "target": "x86_64-unknown-linux-gnu",
+  "binary": {
+    "bytes": 715168,
+    "sha256": "40862015daca2d3d3a08729f3b61e225feb210a6c177d9a3dabd362cb276496f",
+    "baseline_bytes": 711168,
+    "baseline_sha256": "8f54bd24c88d6459197136092c07f11eb926b77ccf26e2d09fafb3f12195194a",
+    "delta_bytes": 4000
+  },
+  "tests": {
+    "rust_protocol_json_output_tail": 50,
+    "new_rust_sse": 5,
+    "sse_groups": 7,
+    "existing_wait_groups": 13,
+    "sse_cleanup": "passed",
+    "existing_wait_cleanup": "passed"
+  },
+  "cpu_tick_seconds": 0.01,
+  "log_paths": "absolute worktree paths replaced by $ZTTY_WORKTREE or $ZTTY_BASELINE; trailing blank lines removed",
+  "scope": "Linux MCP POST SSE; JSON default preserved; no GET subscriptions or event replay; native broker parity and formal release remain open",
+  "gates": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.351
+    },
+    {
+      "name": "protocol",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--test",
+        "mcp_protocol",
+        "--test",
+        "json",
+        "--test",
+        "output_tail"
+      ],
+      "exit_code": 0,
+      "seconds": 4.892
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 16.488
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release"
+      ],
+      "exit_code": 0,
+      "seconds": 17.959
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.265
+    },
+    {
+      "name": "mcp-transport",
+      "command": [
+        "python3",
+        "tests/mcp_transport.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.215
+    },
+    {
+      "name": "mcp-sessions",
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.866
+    },
+    {
+      "name": "mcp-security",
+      "command": [
+        "python3",
+        "tests/mcp_security.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.215
+    },
+    {
+      "name": "mcp-wait",
+      "command": [
+        "python3",
+        "tests/mcp_wait.py",
+        "--binary",
+        "./target/release/ztty",
+        "--output",
+        "artifacts/mcp-sse-checks/mcp-wait.json"
+      ],
+      "exit_code": 0,
+      "seconds": 15.397
+    },
+    {
+      "name": "check-script",
+      "command": [
+        "sh",
+        "-n",
+        "tools/check.sh"
+      ],
+      "exit_code": 0,
+      "seconds": 0.004
+    }
+  ]
+}

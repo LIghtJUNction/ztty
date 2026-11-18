@@ -1,0 +1,523 @@
+#!/usr/bin/env python3
+"""Verify real X11 keyboard/mouse input against a running ztty binary.
+
+Uses an owned Xvfb, private broker socket and raw PTY. XTEST drives every button
+supported by the virtual pointer; higher buttons use explicitly labelled
+XSendEvent coverage. A separate control socket changes PTY output modes, and
+real cursor-position replies provide a barrier before each input assertion.
+"""
+
+import argparse
+import ctypes
+import hashlib
+import json
+import os
+from pathlib import Path
+import signal
+import socket
+import subprocess
+import sys
+import tempfile
+import time
+
+
+CHILD = r'''import json,os,re,select,socket,sys,time,tty
+tty.setraw(0)
+record=open(sys.argv[1],"w+b",buffering=0)
+control=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+control.bind(sys.argv[2]);control.listen(1)
+os.write(1,b"\x1b]2;Input protocol verification\x07\x1b[?25l\r\n  Input protocol verification\r\n\r\n  Real X11 events -> raw PTY bytes\r\n  READY\r\n")
+while True:
+    ready,_,_=select.select([0,control],[],[])
+    if 0 in ready:
+        data=os.read(0,65536)
+        if not data: break
+        record.write(data)
+    if control not in ready: continue
+    connection,_=control.accept()
+    with connection:
+        connection.settimeout(8)
+        request=bytearray()
+        while b"\n" not in request:
+            part=connection.recv(8192)
+            if not part: break
+            request.extend(part)
+            if len(request)>65536: raise RuntimeError("oversized test control request")
+        command=json.loads(request)
+        os.write(1,command.get("output","").encode()+b"\x1b[6n")
+        data=bytearray();reply=None;deadline=time.monotonic()+8
+        while time.monotonic()<deadline:
+            if not select.select([0],[],[],max(0,deadline-time.monotonic()))[0]: break
+            block=os.read(0,65536)
+            if not block: raise EOFError("PTY input closed")
+            data.extend(block)
+            reply=re.search(rb"\x1b\[[0-9]+;[0-9]+R",data)
+            if reply:
+                record.write(data[:reply.start()]+data[reply.end():])
+                if command.get("clear"):
+                    record.seek(0);record.truncate()
+                connection.sendall(json.dumps({"ok":True,"dsr":bytes(reply.group()).hex()}).encode()+b"\n")
+                break
+        else: raise TimeoutError("cursor-position barrier")
+        if not reply: raise TimeoutError("cursor-position barrier")
+'''
+
+RESET = "\x1b[?9l\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l\x1b[?1004l\x1b[=0u"
+CONFIG = """font = monospace:size=11
+background = #000000
+background-opacity = 100
+background-blur = false
+cursor-blink = false
+window-padding = 0
+keybind = ctrl+shift+x = search
+mousebind = ctrl+button3 = palette
+mousebind = ctrl+button8 = palette
+"""
+
+
+def main():
+    from Xlib import X, XK, display, protocol
+    from Xlib.ext import xtest
+    from PIL import Image
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", type=Path, required=True)
+    parser.add_argument("--source-root", type=Path, required=True,
+                        help="source tree used to build the supplied binary; recorded for evidence")
+    parser.add_argument("--output", type=Path, default=Path("artifacts/input-gui.json"))
+    parser.add_argument("--screenshot", type=Path, default=Path("artifacts/input-gui.png"))
+    args = parser.parse_args()
+    binary = args.binary.resolve(strict=True)
+    source = args.source_root.resolve(strict=True)
+    sys.path.insert(0, str(source / "tools"))
+    from isolated_xvfb import start_xvfb
+    with binary.open("rb") as file:
+        binary_sha = hashlib.file_digest(file, "sha256").hexdigest()
+    report = {
+        "ok": False, "platform": "Linux X11 / private Xvfb", "binary": str(binary),
+        "binary_sha256": binary_sha, "source_root": str(source), "source_sha256": {},
+        "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=source, text=True, timeout=5).strip(),
+        "source_changes": subprocess.check_output(["git", "status", "--short"], cwd=source, text=True, timeout=5).splitlines(),
+        "checks": [], "vectors": [], "button_injection": {},
+    }
+    for name in ("src/session.rs", "src/x11.rs", "src/main.rs", "src/actions.rs", "crates/zinput/src/lib.rs", "crates/zterm/src/lib.rs", "tools/isolated_xvfb.py"):
+        path = source / name
+        if path.is_file():
+            report["source_sha256"][name] = hashlib.sha256(path.read_bytes()).hexdigest()
+    report["test_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    if ctypes.CDLL(None).prctl(36, 1, 0, 0, 0) != 0:
+        raise OSError("PR_SET_CHILD_SUBREAPER failed")
+    xvfb = connection = launcher = None
+    owned_pids = {}
+
+    def wait(predicate, label, seconds=12):
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            try:
+                result = predicate()
+                if result:
+                    return result
+            except (FileNotFoundError, ConnectionRefusedError):
+                pass
+            time.sleep(0.02)
+        raise TimeoutError(label)
+
+    def birth(pid):
+        return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[19]
+
+    def descendants():
+        # PR_SET_CHILD_SUBREAPER also covers a broker that detached before
+        # startup failed. Walk only this test's process family, never names.
+        result = {}
+        pending = [os.getpid()]
+        while pending:
+            parent = pending.pop()
+            try:
+                children = Path(f"/proc/{parent}/task/{parent}/children").read_text().split()
+            except FileNotFoundError:
+                continue
+            for child in children:
+                pid = int(child)
+                try:
+                    stat = Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()
+                except FileNotFoundError:
+                    continue
+                if int(stat[1]) == parent and pid not in result:
+                    result[pid] = stat[19]
+                    pending.append(pid)
+        return result
+
+    with tempfile.TemporaryDirectory(prefix="ztty-input-gui-") as temporary:
+        root = Path(temporary)
+        log = (root / "stderr.log").open("wb")
+        try:
+            xvfb = start_xvfb(screen="1400x900x24", stderr=log)
+            report["xvfb"] = xvfb.evidence
+            connection = display.Display(xvfb.display)
+            assert connection.has_extension("XTEST"), "XTEST extension is required"
+            pointer_mapping = list(connection.get_pointer_mapping())
+            report["pointer_mapping"] = pointer_mapping
+            # A non-US layout can have tilde as an unshifted key. Configure an
+            # otherwise unused key in the private display before ztty connects.
+            tilde_code = connection.display.info.max_keycode
+            connection.change_keyboard_mapping(tilde_code, [(XK.string_to_keysym("asciitilde"),)])
+            connection.sync()
+            assert connection.get_keyboard_mapping(tilde_code, 1)[0][0] == ord("~")
+            report["tilde_keycode"] = tilde_code
+            env = dict(os.environ, DISPLAY=xvfb.display, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
+                       XDG_RUNTIME_DIR=temporary, XDG_CONFIG_HOME=str(root / "xdg-config"),
+                       ZTTY_SOCKET="@ztty-input-gui-" + root.name)
+            env.pop("WAYLAND_DISPLAY", None)
+            config = root / "config"
+            config.write_text(CONFIG)
+            input_path = root / "input.bin"
+            control_path = root / "control.sock"
+
+            def rpc(request):
+                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as channel:
+                    channel.settimeout(5)
+                    channel.connect("\0" + env["ZTTY_SOCKET"][1:])
+                    channel.sendall(json.dumps(request).encode() + b"\n")
+                    data = bytearray()
+                    while b"\n" not in data:
+                        part = channel.recv(8192)
+                        if not part:
+                            raise EOFError("broker disconnected")
+                        data.extend(part)
+                        if len(data) > 1048576:
+                            raise RuntimeError("oversized broker response")
+                response = json.loads(data.split(b"\n", 1)[0])
+                assert response["ok"], response
+                return response["result"]
+
+            def info():
+                return rpc({"op": "info", "session": "input-probe"})
+
+            def control(output="", clear=False):
+                with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as channel:
+                    channel.settimeout(10)
+                    channel.connect(str(control_path))
+                    channel.sendall(json.dumps({"output": output, "clear": clear}).encode() + b"\n")
+                    data = bytearray()
+                    while b"\n" not in data:
+                        part = channel.recv(8192)
+                        if not part:
+                            raise EOFError("PTY control disconnected before barrier")
+                        data.extend(part)
+                    response = json.loads(data)
+                    assert response["ok"], response
+                    return response
+
+            launcher = subprocess.Popen(
+                [str(binary), "--name", "input-probe", "--config", str(config), "--geometry", "100x28",
+                 "-e", "/usr/bin/python3", "-c", CHILD, str(input_path), str(control_path)],
+                env=env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True,
+            )
+            wait(lambda: launcher.poll() is None and rpc({"op": "list"})["sessions"], "input session startup")
+            session = info()
+            for pid in (session["pid"], session["broker_pid"]):
+                owned_pids[pid] = birth(pid)
+            wait(lambda: control_path.exists() and "READY" in rpc({"op": "read", "session": "input-probe"})["screen"], "raw PTY ready")
+            view = connection.create_resource_object("window", session["window_id"])
+            view.set_input_focus(X.RevertToParent, X.CurrentTime)
+            connection.sync()
+            geometry = view.get_geometry()
+            cols, rows = session["cols"], session["rows"]
+            assert geometry.width % cols == 0 and geometry.height % rows == 0
+            cell_width, cell_height = geometry.width // cols, geometry.height // rows
+            report["grid"] = {"cols": cols, "rows": rows, "cell_width": cell_width, "cell_height": cell_height}
+
+            def codes(keys):
+                values = [key if isinstance(key, int) else connection.keysym_to_keycode(XK.string_to_keysym(key)) for key in keys]
+                assert all(values), keys
+                return values
+
+            def key(*keys):
+                values = codes(keys)
+                for value in values:
+                    xtest.fake_input(connection, X.KeyPress, value)
+                for value in reversed(values):
+                    xtest.fake_input(connection, X.KeyRelease, value)
+                connection.sync()
+
+            def type_text(text):
+                for character in text:
+                    key("space" if character == " " else character)
+
+            def move(col=7, row=5):
+                view.warp_pointer(col * cell_width + cell_width // 2, row * cell_height + cell_height // 2)
+                connection.sync()
+
+            def mouse_event(button, pressed, col=7, row=5, state=0):
+                if button <= len(pointer_mapping):
+                    report["button_injection"][str(button)] = "XTEST"
+                    xtest.fake_input(connection, X.ButtonPress if pressed else X.ButtonRelease, button)
+                else:
+                    report["button_injection"][str(button)] = "XSendEvent (outside virtual pointer button count)"
+                    x = col * cell_width + cell_width // 2
+                    y = row * cell_height + cell_height // 2
+                    event = (protocol.event.ButtonPress if pressed else protocol.event.ButtonRelease)(
+                        time=X.CurrentTime, root=connection.screen().root, window=view, child=X.NONE,
+                        root_x=x, root_y=y, event_x=x, event_y=y, state=state, same_screen=1, detail=button,
+                    )
+                    view.send_event(event, event_mask=X.ButtonPressMask if pressed else X.ButtonReleaseMask)
+
+            def click(button, modifiers=()):
+                for code in codes(modifiers):
+                    xtest.fake_input(connection, X.KeyPress, code)
+                mouse_event(button, True)
+                mouse_event(button, False)
+                for code in reversed(codes(modifiers)):
+                    xtest.fake_input(connection, X.KeyRelease, code)
+                connection.sync()
+
+            def assert_input(label, expected, injection="XTEST"):
+                # XSync waits for the X server, not for the application to
+                # consume its event queue. Allow the real PTY input to arrive
+                # before taking the final output/reply barrier and sample.
+                deadline = time.monotonic() + 2
+                quiet_since = time.monotonic()
+                previous = input_path.read_bytes()
+                while time.monotonic() < deadline:
+                    actual = input_path.read_bytes()
+                    if actual != previous:
+                        quiet_since = time.monotonic()
+                        previous = actual
+                    if actual == expected and time.monotonic() - quiet_since >= 0.12:
+                        break
+                    time.sleep(0.01)
+                control()
+                actual = input_path.read_bytes()
+                vector = {"name": label, "injection": injection, "expected_hex": expected.hex(), "actual_hex": actual.hex(), "ok": actual == expected}
+                report["vectors"].append(vector)
+                assert actual == expected, vector
+
+            def begin(output=""):
+                control(output, clear=True)
+
+            begin(RESET)
+            key("Control_L", "i")
+            assert_input("legacy Ctrl+I", b"\t")
+            begin()
+            key("Control_L", "Shift_L", "i")
+            assert_input("legacy Ctrl+Shift+I remains distinct", b"\x1b[105;6u")
+            begin()
+            key("Control_L", tilde_code)
+            assert_input("Ctrl+unshifted tilde on private keyboard mapping", b"\x1e")
+            report["checks"].append("real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings")
+
+            # Read the real X server modifier state. This display is private,
+            # so toggling locks cannot change the user's physical keyboard.
+            def num_lock(enabled):
+                if bool(connection.screen().root.query_pointer().mask & X.Mod2Mask) != enabled:
+                    key("Num_Lock")
+                wait(lambda: bool(connection.screen().root.query_pointer().mask & X.Mod2Mask) == enabled,
+                     "private X server Num Lock state", 2)
+
+            begin(RESET)
+            num_lock(True)
+            assert_input("Num Lock toggles without writing CSI-u into a legacy shell", b"")
+            begin()
+            for digit in range(10):
+                key(f"KP_{digit}")
+            key("KP_Decimal")
+            assert_input("Num Lock on: keypad digits and decimal are text", b"0123456789.")
+            begin()
+            num_lock(False)
+            assert_input("Num Lock off emits no legacy input", b"")
+            begin()
+            key("KP_0")
+            assert_input("Num Lock off: keypad zero retains the standard Insert key", b"\x1b[2~")
+            begin(RESET + "\x1b[=1u")
+            num_lock(True)
+            assert_input("explicit Kitty opt-in still reports Num Lock and its state", b"\x1b[57360;129u")
+            begin(RESET)
+            num_lock(False)
+            assert_input("return to legacy mode stops reporting lock keys", b"")
+            report["checks"].append("Num Lock stays silent in legacy mode; real keypad digits, Insert semantics and explicit enhanced lock reporting are verified")
+
+            begin(RESET + "\x1b[?1000h\x1b[?1006h")
+            move()
+            for button, code in [(4, 64), (5, 65), (6, 66), (7, 67)]:
+                begin()
+                click(button)
+                assert_input(f"wheel button {button}: press without release", f"\x1b[<{code};8;6M".encode(), report["button_injection"][str(button)])
+            report["checks"].append("vertical and horizontal wheel input has distinct SGR press codes and no release reports")
+
+            for button, code in [(8, 128), (9, 129), (10, 130), (11, 131)]:
+                begin()
+                click(button)
+                expected = f"\x1b[<{code};8;6M\x1b[<{code};8;6m".encode()
+                assert_input(f"extra button {button}: SGR press/release", expected, report["button_injection"][str(button)])
+            report["checks"].append("extra button press/release reports retain button identity; report records physical XTEST versus synthetic XSendEvent coverage")
+
+            begin(RESET + "\x1b[?1002h\x1b[?1006h")
+            for button, code in [(8, 128), (9, 129), (10, 130), (11, 131)]:
+                move()
+                begin()
+                mouse_event(button, True)
+                connection.sync()
+                # A native XTEST motion is also used for a synthetic high
+                # button: it checks the frontend's independently held state.
+                move(9, 6)
+                mouse_event(button, False, 9, 6)
+                connection.sync()
+                expected = f"\x1b[<{code};8;6M\x1b[<{code + 32};10;7M\x1b[<{code};10;7m".encode()
+                assert_input(f"extra button {button}: drag in mode 1002", expected, report["button_injection"][str(button)])
+            report["checks"].append("held extra-button state survives motion and clears on release, including X11 buttons lacking core state-mask bits")
+
+            begin(RESET + "\x1b[?1000h\x1b[?1006h")
+            move()
+            for button, code in [(1, 0), (8, 128)]:
+                begin()
+                mouse_event(button, True)
+                xtest.fake_input(connection, X.KeyPress, codes(("Shift_L",))[0])
+                mouse_event(button, False)
+                xtest.fake_input(connection, X.KeyRelease, codes(("Shift_L",))[0])
+                connection.sync()
+                assert_input(f"button {button}: remote release survives Shift change",
+                             f"\x1b[<{code};8;6M\x1b[<{code + 4};8;6m".encode())
+                begin()
+                xtest.fake_input(connection, X.KeyPress, codes(("Shift_L",))[0])
+                mouse_event(button, True)
+                xtest.fake_input(connection, X.KeyRelease, codes(("Shift_L",))[0])
+                mouse_event(button, False)
+                connection.sync()
+                assert_input(f"button {button}: local Shift press cannot leak a remote release", b"")
+            report["checks"].append("press ownership remains stable when Shift changes before a primary or extra-button release")
+
+            begin(RESET + "\x1b[?1002h\x1b[?1006h\x1b[?1004h")
+            move()
+            begin()
+            mouse_event(8, True)
+            connection.sync()
+            wait(lambda: input_path.read_bytes() == b"\x1b[<128;8;6M", "remote press before focus loss", 2)
+            connection.screen().root.set_input_focus(X.RevertToParent, X.CurrentTime)
+            connection.sync()
+            assert connection.get_input_focus().focus.id == connection.screen().root.id
+            # Focus reports arrive through the real PTY only after the
+            # frontend handles each transition, even under scheduling load.
+            focus_out = b"\x1b[<128;8;6M\x1b[O"
+            wait(lambda: input_path.read_bytes() == focus_out, "PTY focus-out acknowledgment", 2)
+            view.set_input_focus(X.RevertToParent, X.CurrentTime)
+            connection.sync()
+            focus_in = focus_out + b"\x1b[I"
+            wait(lambda: input_path.read_bytes() == focus_in, "PTY focus-in acknowledgment", 2)
+            report["focus_acknowledgments"] = {"focus_out_hex": focus_out.hex(), "focus_in_hex": focus_in.hex()}
+            begin()
+            move(9, 6)
+            mouse_event(8, False, 9, 6)
+            connection.sync()
+            assert_input("focus loss clears extra-button drag and unmatched release", b"")
+            report["checks"].append("focus loss clears held extra-button state before focus returns, motion, and release")
+
+            begin(RESET + "\x1b[?9h")
+            move()
+            begin()
+            click(1, ("Control_L", "Alt_L"))
+            assert_input("X10 primary press ignores modifiers and release", bytes([27, 91, 77, 32, 40, 38]))
+            begin()
+            click(4)
+            click(8)
+            move(9, 6)
+            assert_input("X10 suppresses wheel extra-button and motion", b"")
+            begin("\x1b[?1006h")
+            move()
+            begin()
+            click(1)
+            assert_input("X10 tracking is independent from SGR encoding", b"\x1b[<0;8;6M")
+            begin("\x1b[?1000h\x1b[?9l")
+            click(1)
+            assert_input("reset X10 does not cancel subsequently enabled normal tracking", b"\x1b[<0;8;6M\x1b[<0;8;6m")
+            report["checks"].append("mode 9 filters input correctly, follows SGR selection, and its reset cannot cancel active mode 1000")
+
+            begin()
+            key("Control_L", "Shift_L", "x")
+            type_text("query")
+            key("Escape")
+            assert_input("custom key binding and search input never leak to PTY", b"")
+            begin()
+            click(3, ("Control_L",))
+            type_text("unmatched")
+            key("Escape")
+            assert_input("custom mouse binding and palette input never leak to PTY", b"")
+            begin()
+            click(8, ("Control_L",))
+            type_text("unmatched")
+            key("Escape")
+            assert_input("custom extra-button binding and palette input never leak to PTY", b"")
+            report["checks"].append("custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled")
+
+            assert info()["pid"] == session["pid"] and info()["running"]
+            control(RESET + "\r\n  Keyboard, wheel, extra-button and mode tests passed.\r\n  Coverage details are recorded in input-gui.json.\r\n")
+            connection.sync()
+            time.sleep(0.1)
+            pixels = view.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
+            screenshot = Image.frombytes("RGB", (geometry.width, geometry.height), pixels.data, "raw", "BGRX")
+            args.screenshot.parent.mkdir(parents=True, exist_ok=True)
+            screenshot.save(args.screenshot)
+            report["screenshot"] = {"path": str(args.screenshot), "sha256": hashlib.sha256(args.screenshot.read_bytes()).hexdigest()}
+            rpc({"op": "close", "session": "input-probe"})
+            wait(lambda: not rpc({"op": "list"})["sessions"], "input session cleanup")
+            launcher.wait(timeout=5)
+            report["ok"] = True
+        except Exception as error:
+            import traceback
+            report["error"] = str(error)
+            report["traceback"] = traceback.format_exc()
+            if "input_path" in locals() and input_path.exists():
+                report["last_input_hex_suffix"] = input_path.read_bytes().hex()[-16384:]
+            if "rpc" in locals():
+                try:
+                    report["last_terminal"] = rpc({"op": "read", "session": "input-probe", "max_bytes": 8192})
+                except Exception as detail:
+                    report["last_terminal_error"] = str(detail)
+            raise
+        finally:
+            if connection is not None:
+                connection.close()
+            for pid, token in owned_pids.items():
+                try:
+                    if birth(pid) == token:
+                        os.kill(pid, signal.SIGTERM)
+                except (FileNotFoundError, ProcessLookupError):
+                    pass
+            if launcher is not None:
+                if launcher.poll() is None:
+                    os.killpg(launcher.pid, signal.SIGTERM)
+                try:
+                    launcher.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    os.killpg(launcher.pid, signal.SIGKILL)
+                    launcher.wait(timeout=3)
+            if xvfb is not None:
+                xvfb.close()
+            deadline = time.monotonic() + 2
+            while time.monotonic() < deadline:
+                for pid, token in descendants().items():
+                    try:
+                        if birth(pid) == token:
+                            os.kill(pid, signal.SIGKILL)
+                    except (FileNotFoundError, ProcessLookupError):
+                        pass
+                try:
+                    pid, _ = os.waitpid(-1, os.WNOHANG)
+                except ChildProcessError:
+                    break
+                if pid == 0:
+                    time.sleep(0.02)
+            remaining = descendants()
+            report["cleanup"] = {"owned_processes_remaining": list(remaining)}
+            if remaining:
+                report["ok"] = False
+            log.close()
+            report["stderr"] = (root / "stderr.log").read_text(errors="replace")[-12000:]
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+    if not report["ok"]:
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()

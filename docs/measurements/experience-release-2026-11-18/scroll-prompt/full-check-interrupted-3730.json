@@ -1,0 +1,6 @@
+{
+  "source": "3730b28a16f48b15809581213bccab284f6f4f22",
+  "status": "interrupted",
+  "exit_code": null,
+  "reason": "Client disconnected before completion; no surviving owned check runner or final report observed."
+}

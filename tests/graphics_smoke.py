@@ -9,6 +9,7 @@ import base64
 import contextlib
 import io
 import json
+import re
 from pathlib import Path
 import struct
 import sys
@@ -68,10 +69,13 @@ def capability_and_size(gui):
     gui.wait(lambda: b"\x1b[4;" in gui.input(), "graphics and geometry replies")
     data = gui.input()
     assert data.index(b"\x1b_Gi=71;OK\x1b\\") < data.index(b"\x1b[?"), data
+    primary_da = re.findall(rb"\x1b\[\?([0-9]+(?:;[0-9]+)*)c", data)
+    capabilities = [[int(number) for number in packet.split(b";")] for packet in primary_da]
+    assert capabilities == [[62, 4]], data
     assert f"\x1b[6;{gui.ch};{gui.cw}t".encode() in data, data
     assert f"\x1b[4;{gui.ch*gui.snapshot()['rows']};{gui.cw*gui.snapshot()['cols']}t".encode() in data, data
     assert pixel(gui, 0, 0) == BG
-    return {"cell_pixels": [gui.cw, gui.ch], "query_did_not_place": True}
+    return {"primary_da": [62, 4], "cell_pixels": [gui.cw, gui.ch], "query_did_not_place": True}
 
 
 def rgb_rgba_png(gui):

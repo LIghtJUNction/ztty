@@ -1,0 +1,74 @@
+[
+  {
+    "name": "output-tail",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--test",
+      "output_tail",
+      "--lib"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 17.287530258000004
+  },
+  {
+    "name": "fmt",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.3373225480000315
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--locked",
+      "-p",
+      "ztty",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 3.8189910289999602
+  },
+  {
+    "name": "release",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--release"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 8.759033607999982
+  },
+  {
+    "name": "no-std",
+    "command": [
+      "python3",
+      "tools/check_no_std.py"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.11327634299999545
+  },
+  {
+    "name": "mcp-sessions",
+    "command": [
+      "python3",
+      "tests/mcp_sessions.py",
+      "--binary",
+      "<checkout>/target/release/ztty"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 1.6636879790000307
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "command": "CARGO_BUILD_JOBS=1 ZTTY_BARE_METAL=1 sh tools/check.sh",
+  "exit_code": 0,
+  "elapsed_seconds": 4.735,
+  "check_script_sha256": "44a92f029a4d75ccad2c21c44ff4bd17163766c804824d16eb103da44ff3c267",
+  "binary_sha256": "a339a7d258ad313379b5cfea40d8b125aa8c810ecaebd40005b489413a1b6d4d",
+  "git_head": "19fb5966ca4164ebc679abc2d8dacd4c26927b39",
+  "git_status": " M README.md\n M README.zh-CN.md\n M src/config_watch.rs\n M src/main.rs\n M src/platform/linux.rs\n M src/session.rs\n M tests/daily_workflow.py\n M tools/check.sh\n?? docs/ssmcp-observer.md\n?? tests/config_watch.rs\n?? tests/ssmcp_observer.py\n?? tools/ztty-observer\n"
+}

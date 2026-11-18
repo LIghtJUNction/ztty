@@ -1,0 +1,33 @@
+{
+  "binary_sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+  "selected_checks": [
+    "stdio_numeric_request_ids"
+  ],
+  "checks": {
+    "stdio_numeric_request_ids": {
+      "status": "failed",
+      "error": "('response timed out', 1, {})",
+      "elapsed_ms": 5131.272
+    }
+  },
+  "cleanup": "passed"
+}
+Traceback (most recent call last):
+  File "<checkout>/tests/mcp_wait.py", line 951, in <module>
+    main(os.path.abspath(arguments.binary), arguments.output, checks=arguments.checks)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<checkout>/tests/mcp_wait.py", line 917, in main
+    details = test(harness)
+  File "<checkout>/tests/mcp_wait.py", line 708, in stdio_numeric_request_ids
+    return numeric_request_ids(h, "stdio")
+  File "<checkout>/tests/mcp_wait.py", line 651, in numeric_request_ids
+    response = receive(duplicate)
+  File "<checkout>/tests/mcp_wait.py", line 572, in receive
+    response, wire = client.receive(
+                     ~~~~~~~~~~~~~~^
+        numeric_key(identifier) if numeric else identifier, with_wire=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<checkout>/tests/mcp_wait.py", line 130, in receive
+    assert remaining > 0, ("response timed out", identifier, self.responses)
+           ^^^^^^^^^^^^^
+AssertionError: ('response timed out', 1, {})

@@ -1,0 +1,29 @@
+{
+  "passed": false,
+  "status": "failed",
+  "source_sha": "bfd2732e238b3864e95e721e873f6c9498507bec",
+  "suite": "darwin-threaded-spawn",
+  "command": [
+    "cargo",
+    "+1.100.0",
+    "test",
+    "--locked",
+    "-p",
+    "zpty",
+    "--test",
+    "darwin_spawn",
+    "--target",
+    "aarch64-apple-darwin"
+  ],
+  "timeout_seconds": 120,
+  "host_machine": "arm64",
+  "architecture": "aarch64",
+  "exit_code": 101,
+  "error": "AssertionError('missing or ambiguous native spawn result (a skip cannot pass)')",
+  "source_files_sha256": {
+    "crates/zpty/src/macos/spawn.rs": "c657c065eacc65a0e9ca937701f598d4d4eedfd61f81602c8dea799c26729077",
+    "crates/zpty/src/macos.rs": "720d71f9f8f00f9bb41012ac3f6c01c3b866150c13df17e1ec0111d4c511c321",
+    "crates/zpty/tests/darwin_spawn.rs": "ebb1516e4274aff1d6dede6d756e4e354c2091dcc270c5803bf0ace04e487401",
+    "crates/zpty/tests/darwin_spawn_abi.c": "823ccff2f8c1c60151c357412e7b009513aa3247e65ff32522903d3c2e351466"
+  }
+}

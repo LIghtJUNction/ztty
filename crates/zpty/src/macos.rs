@@ -1,5 +1,9 @@
 //! Owned Darwin pseudo-terminals without the Rust standard library.
 //!
+//! [`Pty::spawn_with_helper`] uses Darwin's posix_spawn and a fresh executable
+//! helper entry for multithreaded hosts. The legacy unsafe constructor below
+//! retains its process-wide fork contract.
+//!
 //! [`Pty::spawn`] accepts an already resolved executable path and a complete
 //! environment. It performs no PATH lookup, environment mutation, logging,
 //! terminal emulation, or UI work. The child side calls only `close`, `execve`,
@@ -7,6 +11,9 @@
 //!
 //! This library uses `alloc` to prepare argument pointers before the fork and
 //! links the host C runtime and Darwin libSystem. Read [`Pty::spawn`]'s safety contract.
+mod spawn;
+pub use spawn::{current_executable, run_spawn_helper};
+
 use alloc::vec::Vec;
 use core::ffi::{CStr, c_char, c_int, c_long, c_void};
 use core::fmt;
@@ -351,6 +358,12 @@ fn milliseconds() -> Result<u64, Error> {
 mod ffi {
     use super::*;
     #[repr(C)]
+    pub struct PollFd {
+        pub fd: c_int,
+        pub events: i16,
+        pub revents: i16,
+    }
+    #[repr(C)]
     pub struct TimeSpec {
         pub seconds: c_long,
         pub nanoseconds: c_long,
@@ -362,6 +375,8 @@ mod ffi {
         pub fn close(fd: c_int) -> c_int;
         pub fn poll(fds: *mut c_void, count: u32, timeout: c_int) -> c_int;
         pub fn fcntl(fd: c_int, command: c_int, ...) -> c_int;
+        pub fn faccessat(directory: c_int, path: *const c_char, mode: c_int, flags: c_int)
+        -> c_int;
         pub fn ioctl(fd: c_int, request: u64, ...) -> c_int;
         pub fn execve(
             file: *const c_char,
@@ -373,6 +388,59 @@ mod ffi {
         pub fn _exit(status: c_int) -> !;
         pub fn __error() -> *mut c_int;
         pub fn clock_gettime(clock: c_int, time: *mut TimeSpec) -> c_int;
+        pub fn pipe(descriptors: *mut c_int) -> c_int;
+        pub fn posix_openpt(flags: c_int) -> c_int;
+        pub fn grantpt(fd: c_int) -> c_int;
+        pub fn unlockpt(fd: c_int) -> c_int;
+        pub fn getpid() -> c_int;
+        pub fn getsid(pid: c_int) -> c_int;
+        pub fn getpgrp() -> c_int;
+        pub fn tcgetpgrp(fd: c_int) -> c_int;
+        pub fn _NSGetEnviron() -> *mut *mut *mut c_char;
+        pub fn sigemptyset(set: *mut u32) -> c_int;
+        pub fn sigfillset(set: *mut u32) -> c_int;
+        pub fn sigdelset(set: *mut u32, signal: c_int) -> c_int;
+        pub fn posix_spawn(
+            pid: *mut c_int,
+            path: *const c_char,
+            actions: *const *mut c_void,
+            attributes: *const *mut c_void,
+            argv: *const *const c_char,
+            environment: *const *const c_char,
+        ) -> c_int;
+        pub fn posix_spawn_file_actions_init(actions: *mut *mut c_void) -> c_int;
+        pub fn posix_spawn_file_actions_destroy(actions: *mut *mut c_void) -> c_int;
+        pub fn posix_spawn_file_actions_addopen(
+            actions: *mut *mut c_void,
+            fd: c_int,
+            path: *const c_char,
+            flags: c_int,
+            mode: u16,
+        ) -> c_int;
+        pub fn posix_spawn_file_actions_adddup2(
+            actions: *mut *mut c_void,
+            source: c_int,
+            destination: c_int,
+        ) -> c_int;
+        pub fn posix_spawn_file_actions_addinherit_np(
+            actions: *mut *mut c_void,
+            fd: c_int,
+        ) -> c_int;
+        pub fn posix_spawnattr_init(attributes: *mut *mut c_void) -> c_int;
+        pub fn posix_spawnattr_destroy(attributes: *mut *mut c_void) -> c_int;
+        pub fn posix_spawnattr_setflags(attributes: *mut *mut c_void, flags: i16) -> c_int;
+        pub fn posix_spawnattr_setsigmask(
+            attributes: *mut *mut c_void,
+            signals: *const u32,
+        ) -> c_int;
+        pub fn posix_spawnattr_setsigdefault(
+            attributes: *mut *mut c_void,
+            signals: *const u32,
+        ) -> c_int;
+    }
+    #[link(name = "proc")]
+    unsafe extern "C" {
+        pub fn proc_pidpath(pid: c_int, buffer: *mut c_void, size: u32) -> c_int;
     }
     #[link(name = "System")]
     unsafe extern "C" {

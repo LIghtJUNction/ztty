@@ -1,0 +1,27 @@
+{
+  "recorded_at_utc": "2026-11-17T22:18:24.724567+00:00",
+  "status": "display_listener_ownership_not_verified",
+  "scope": "Historical collection evidence; no raw run, process counter, source manifest or binary hash is modified by this qualification.",
+  "matrix": "docs/benchmarks/roadmap-idle-matrix-smoke-2026-11-18.json",
+  "matrix_file_sha256": "85bb308e64a2b39f0a8bf1f2a8de2021898903833055109c3e653de7995c7ba7",
+  "source_runs_sha256": "25fea161ded74200306217b329963da4f2cd66854cbbc5d5859d7ff9b33cefcf",
+  "smaps": "docs/benchmarks/roadmap-idle-smaps-2026-11-18.json",
+  "smaps_file_sha256": "225e08354a73de445e16e37209875b06c924823cc5449b1a9aa162ec156a3c65",
+  "observed_smaps_display": ":0",
+  "matrix_display_number_recorded": false,
+  "application_process_ownership": {
+    "status": "recorded_and_verified_at_collection",
+    "matrix_process_records": 696,
+    "identity_fields": [
+      "pid",
+      "start_ticks",
+      "exe"
+    ],
+    "gui_owner_pids_recorded": true,
+    "remaining_owned_pids_empty": true
+  },
+  "display_isolation": "Collectors used Xvfb -displayfd without proving that the selected X11 listener was owned by the spawned Xvfb process. The smaps report records :0. A subsequent isolation investigation showed that display-number allocation alone can conflict with an existing native Xwayland endpoint; these historical reports cannot retrospectively prove which listener accepted their clients.",
+  "server_attribution": "Recorded Xvfb RSS/PSS and per-window graphical counters remain raw observations, but attribution to the server rendering these application windows and cross-terminal server-cost comparability are not proven.",
+  "interpretation": "Application PID/start-time memory samples remain historical observations on this busy host. Claims of an isolated display, fair graphical-resource attribution or a verified total system-memory comparison are provisional until guarded reruns.",
+  "required_rerun_guard": "tools/isolated_xvfb.py checks display leases, pathname and abstract UNIX endpoints, the spawned PID lock and its listener ownership before clients connect."
+}

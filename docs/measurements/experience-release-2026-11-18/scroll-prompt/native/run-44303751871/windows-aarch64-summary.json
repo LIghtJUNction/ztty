@@ -1,0 +1,79 @@
+{
+  "run_id": 44303751871,
+  "source_sha": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+  "architecture": "aarch64",
+  "build": {
+    "passed": false,
+    "status": "failed",
+    "build_only": true,
+    "candidate_platform": "windows",
+    "outcomes": {
+      "toolchain": "success",
+      "build": "success",
+      "native": "failure",
+      "package": "success"
+    }
+  },
+  "native": {
+    "passed": false,
+    "status": "failed",
+    "error": "timeout: Unicode command arguments and ConPTY child; last error: None",
+    "checks_completed": 7,
+    "checks_all_passed": true,
+    "runtime_trace_enabled": false,
+    "resize_path": "rapid",
+    "failed_phase": "ConPTY child initialization before ready marker",
+    "runtime_exception": "child() SetConsoleMode(stdin, 0x200): WinError 6, The handle is invalid.",
+    "screenshot_error": "AssertionError('refusing to capture a window owned by another process')",
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 1
+    }
+  },
+  "execution_variants": {
+    "original_rapid": {
+      "executed": true,
+      "passed": false,
+      "checks_completed": 7,
+      "runtime_trace_enabled": false
+    },
+    "rapid_trace": {
+      "executed": false,
+      "reason": "Original failed before resize; diagnostic trigger not met"
+    },
+    "staged_trace": {
+      "executed": false,
+      "reason": "Original failed before resize; diagnostic trigger not met"
+    }
+  },
+  "workspace": {
+    "entered": false,
+    "checks_completed": 0
+  },
+  "pixels": {
+    "PNG_count": 0,
+    "three_layer_comparison_available": false,
+    "reason": "Child exited before ready; no resize stage or valid owned window at failure capture"
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-5656-36017377552b47c4a6952f1db89dcec5",
+    "input_after_restore": "Default"
+  },
+  "worker_exit_code": 1,
+  "contract_tests": {
+    "passed": true,
+    "log": "ztty-windows-aarch64.native.contract.log",
+    "exit_code": 0
+  },
+  "binary_sha256": "0f655ddb0ffcfcfcaead1b95bf023583a92cc251a74f8f06e5e0e107232cb180",
+  "artifact_zip_sha256": "f9d13e51165187bc439052d24dc5d6d4f7302fb6618fd4dd64a7b885537e818b"
+}

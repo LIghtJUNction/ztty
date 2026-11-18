@@ -1,0 +1,17 @@
+{
+  "before": {
+    "path": "<before-checkout>/target/release/ztty",
+    "size": 708456,
+    "sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+    "source_commit": "c2fdb7caf8d4a6f548a29c9decf33bc4ccddd80c",
+    "documented_at": "b0a158f59392f58e7a263ccec3192e911b4a7110"
+  },
+  "after": {
+    "path": "<checkout>/target/release/ztty",
+    "size": 711168,
+    "sha256": "8f54bd24c88d6459197136092c07f11eb926b77ccf26e2d09fafb3f12195194a",
+    "source_commit": "7b8aac8b8513ef94213e7f5e7890d9ca0021eb4f"
+  },
+  "test_commit": "5afe3c0065c10370c2616c7a0401425a38c61e7e",
+  "size_delta_bytes": 2712
+}

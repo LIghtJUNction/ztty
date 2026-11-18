@@ -1,0 +1,15 @@
+test_contradictory_status (__main__.GateContract.test_contradictory_status) ... ok
+test_false_never_passes (__main__.GateContract.test_false_never_passes) ... ok
+test_forged_permission_success_rejected (__main__.GateContract.test_forged_permission_success_rejected) ... ok
+test_good_status (__main__.GateContract.test_good_status) ... ok
+test_malformed_helper_json_preserves_evidence (__main__.GateContract.test_malformed_helper_json_preserves_evidence) ... ok
+test_missing_png_signature_rejected (__main__.GateContract.test_missing_png_signature_rejected) ... ok
+test_nonzero_never_passes (__main__.GateContract.test_nonzero_never_passes) ... ok
+test_permission_block_preserves_evidence (__main__.GateContract.test_permission_block_preserves_evidence) ... ok
+test_png_dimensions_and_hash (__main__.GateContract.test_png_dimensions_and_hash) ... ok
+test_unicode_atomic_control_record (__main__.GateContract.test_unicode_atomic_control_record) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.172s
+
+OK

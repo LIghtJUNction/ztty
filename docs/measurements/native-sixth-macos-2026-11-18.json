@@ -1,0 +1,98 @@
+{
+  "run_id": 44220056623,
+  "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44220056623",
+  "source_sha": "ef3c2fc187a74aa6ce4eb7963b4d7d564f4dc969",
+  "build_only": true,
+  "scope": "macOS Intel and Apple Silicon job artifacts only",
+  "artifacts": [
+    {
+      "name": "ztty-macos-x86_64",
+      "artifact_id": 14390407121,
+      "zip_sha256": "sha256:5e990b6ddcfec599cdcc3884d69fbc55e2ae6d007942b55a5c50a65579ad84b9",
+      "manifest_sha256": "dd62c0a8665d73f25dbc40c961a3990caa25692ef350dfbfc5bc30c0cde55057",
+      "verified_members": 9,
+      "drive_url": "https://drive.google.com/file/d/1SWJfMzTWDfkKBG7a4ANJcSNMtX5mbqce/view?usp=drivesdk",
+      "passed": false,
+      "status": "failed",
+      "checks": {
+        "native_pty_and_pixel_geometry": true,
+        "cursor_reply": true,
+        "kitty_capability_query": true,
+        "chunked_rgba": true,
+        "png": true,
+        "alternate_screen_image_isolation": true,
+        "malformed_image_text_recovery": true,
+        "image_deletion": true,
+        "unicode_cwd_reaches_native_pty_child": true,
+        "relative_config_resolves_before_cwd": true,
+        "permissions": false
+      },
+      "stages": [
+        {
+          "passed": false,
+          "status": "failed",
+          "action": "preflight",
+          "exit_code": 1,
+          "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+          "error": "cannot initialize AppKit with prohibited activation",
+          "phase": "appkit_initialization",
+          "physical_display_latency": "not_measured",
+          "stdout_bytes": 297,
+          "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\n",
+          "name": "permissions"
+        }
+      ],
+      "pixel_readback": "not_performed",
+      "remaining_owned_processes": [],
+      "exit_code": 1
+    },
+    {
+      "name": "ztty-macos-aarch64",
+      "artifact_id": 14389414879,
+      "zip_sha256": "sha256:9858942c020cc47b00f1de4bb5f4ca147f7f46fc36ac12dd105e03797313889a",
+      "manifest_sha256": "09a7d7b18f52f2ecef2e4dec5b5b1d81d488df899abf181d796119316c046c7e",
+      "verified_members": 9,
+      "drive_url": "https://drive.google.com/file/d/1BqjcynK51jQ_SLwE-BUdoM3OXef6PbLJ/view?usp=drivesdk",
+      "passed": false,
+      "status": "failed",
+      "checks": {
+        "native_pty_and_pixel_geometry": true,
+        "cursor_reply": true,
+        "kitty_capability_query": true,
+        "chunked_rgba": true,
+        "png": true,
+        "alternate_screen_image_isolation": true,
+        "malformed_image_text_recovery": true,
+        "image_deletion": true,
+        "unicode_cwd_reaches_native_pty_child": true,
+        "relative_config_resolves_before_cwd": true,
+        "permissions": false
+      },
+      "stages": [
+        {
+          "passed": false,
+          "status": "failed",
+          "action": "preflight",
+          "exit_code": 1,
+          "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+          "error": "cannot initialize AppKit with prohibited activation",
+          "phase": "appkit_initialization",
+          "physical_display_latency": "not_measured",
+          "stdout_bytes": 297,
+          "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\n",
+          "name": "permissions"
+        }
+      ],
+      "pixel_readback": "not_performed",
+      "remaining_owned_processes": [],
+      "exit_code": 1
+    }
+  ],
+  "correction": {
+    "observed": "Both helpers compiled, then exited with cannot initialize AppKit with prohibited activation, before permission and pixel checks.",
+    "previous_state_evidence": "The prior helper did not record the actual policy or setActivationPolicy return value; their individual values remain unknown.",
+    "change": "Read the current policy first, request a transition only when needed, record previous/current policy and any transition return before enforcing prohibited.",
+    "official_reference": "https://developer.apple.com/documentation/appkit/nsapplication/activationpolicy-swift.enum/prohibited",
+    "native_validation": "pending subsequent candidate; ten local Python contracts pass"
+  }
+}

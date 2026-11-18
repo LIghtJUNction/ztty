@@ -1,0 +1,227 @@
+{
+  "binary_sha256": "c6e6a8105c30e9b16be7def46a558eb3aee6154c9539c0f74b3a6501698e3ae6",
+  "selected_checks": [
+    "stdio_concurrency",
+    "timeouts_and_bounds",
+    "fragmented_utf8",
+    "retained_output_is_immediate",
+    "eof_waits",
+    "replacement_identity",
+    "stdio_cancellation_and_limits",
+    "stdio_numeric_request_ids",
+    "http_concurrency_and_observers",
+    "http_cancellation_and_disconnect",
+    "http_numeric_request_ids",
+    "http_long_wait",
+    "completed_input_preserves_ordinary_requests"
+  ],
+  "checks": {
+    "stdio_concurrency": {
+      "status": "passed",
+      "elapsed_ms": 223.347,
+      "ping_and_list_ms": 0.183,
+      "output": "stdio-ready"
+    },
+    "timeouts_and_bounds": {
+      "status": "passed",
+      "elapsed_ms": 193.075,
+      "timeout_ms": 140.547,
+      "zero_wait_ms": 0.172,
+      "invalid_values": 5
+    },
+    "fragmented_utf8": {
+      "status": "passed",
+      "elapsed_ms": 213.4,
+      "output": "😀",
+      "cursor": 4,
+      "requested_max_bytes": 1
+    },
+    "retained_output_is_immediate": {
+      "status": "passed",
+      "elapsed_ms": 76.439,
+      "expired_cursor_ms": 0.56,
+      "first_cursor": 45056,
+      "bounded_bytes": 7
+    },
+    "eof_waits": {
+      "status": "passed",
+      "elapsed_ms": 298.549,
+      "silent_eof": "passed",
+      "direct_child_exit_code": 7,
+      "descendant_output": "LATE"
+    },
+    "replacement_identity": {
+      "status": "passed",
+      "elapsed_ms": 275.99,
+      "old_id": 7,
+      "new_id": 8,
+      "old_wait_rejected": true
+    },
+    "stdio_cancellation_and_limits": {
+      "status": "passed",
+      "elapsed_ms": 808.589,
+      "wait_limit": 24,
+      "management_responsive": true,
+      "quota_reused_after_cancel": true,
+      "stdin_eof_ms": 1.149
+    },
+    "stdio_numeric_request_ids": {
+      "status": "passed",
+      "elapsed_ms": 583.183,
+      "wait_limit": 24,
+      "numeric_aliases_rejected": [
+        "1",
+        "1.0",
+        "0.0",
+        "10e9223372036854775807"
+      ],
+      "negative_zero_cancelled_by_zero": true,
+      "string_and_number_ids_distinct": true,
+      "adjacent_large_integer_ids_distinct": [
+        "9007199254740992",
+        "9007199254740993"
+      ],
+      "huge_exponent_cancelled_by_alias": true,
+      "fresh_id_used_released_wait_slot": true,
+      "echoed_ids": [
+        {
+          "type": "number",
+          "token": "1"
+        },
+        {
+          "type": "number",
+          "token": "1.0"
+        },
+        {
+          "type": "number",
+          "token": "1e0"
+        },
+        {
+          "type": "number",
+          "token": "7.0"
+        },
+        {
+          "type": "string",
+          "token": "7"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740992"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740993"
+        },
+        {
+          "type": "number",
+          "token": "0.0"
+        },
+        {
+          "type": "number",
+          "token": "10e9223372036854775807"
+        },
+        {
+          "type": "number",
+          "token": "2e9223372036854775808"
+        }
+      ]
+    },
+    "http_concurrency_and_observers": {
+      "status": "passed",
+      "elapsed_ms": 374.82,
+      "ping_ms": 0.513,
+      "independent_cursors": [
+        14,
+        14
+      ]
+    },
+    "http_cancellation_and_disconnect": {
+      "status": "passed",
+      "elapsed_ms": 810.375,
+      "wait_limit": 32,
+      "ping_at_limit_ms": 0.543,
+      "duplicate_id_rejected": true,
+      "cross_session_cancel_ignored": true,
+      "disconnect_releases_capacity": true,
+      "delete_retains_terminal": true
+    },
+    "http_numeric_request_ids": {
+      "status": "passed",
+      "elapsed_ms": 481.311,
+      "wait_limit": 32,
+      "numeric_aliases_rejected": [
+        "1",
+        "1.0",
+        "0.0",
+        "10e9223372036854775807"
+      ],
+      "negative_zero_cancelled_by_zero": true,
+      "string_and_number_ids_distinct": true,
+      "adjacent_large_integer_ids_distinct": [
+        "9007199254740992",
+        "9007199254740993"
+      ],
+      "huge_exponent_cancelled_by_alias": true,
+      "fresh_id_used_released_wait_slot": true,
+      "echoed_ids": [
+        {
+          "type": "number",
+          "token": "1"
+        },
+        {
+          "type": "number",
+          "token": "1.0"
+        },
+        {
+          "type": "number",
+          "token": "1e0"
+        },
+        {
+          "type": "number",
+          "token": "7.0"
+        },
+        {
+          "type": "string",
+          "token": "7"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740992"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740993"
+        },
+        {
+          "type": "number",
+          "token": "0.0"
+        },
+        {
+          "type": "number",
+          "token": "10e9223372036854775807"
+        },
+        {
+          "type": "number",
+          "token": "2e9223372036854775808"
+        }
+      ]
+    },
+    "http_long_wait": {
+      "status": "passed",
+      "elapsed_ms": 11005.2,
+      "requested_ms": 11000
+    },
+    "completed_input_preserves_ordinary_requests": {
+      "status": "passed",
+      "elapsed_ms": 135.927,
+      "single_stdio_write_messages": 4,
+      "stdio_response_ids": [
+        1,
+        "eof-list",
+        "eof-read"
+      ],
+      "http_half_closed_ordinary_requests": 2
+    }
+  },
+  "cleanup": "passed"
+}

@@ -1,0 +1,15 @@
+{
+  "binary_sha256": "8f54bd24c88d6459197136092c07f11eb926b77ccf26e2d09fafb3f12195194a",
+  "selected_checks": [
+    "sse_lifecycle"
+  ],
+  "checks": {
+    "sse_lifecycle": {
+      "status": "failed",
+      "error_type": "AssertionError",
+      "error": "HTTP startup failed: ztty: unknown MCP argument: --http-response; run ztty mcp --help\n",
+      "elapsed_ms": 1.52
+    }
+  },
+  "cleanup": "passed"
+}

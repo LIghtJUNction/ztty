@@ -1,0 +1,90 @@
+{
+  "binary_sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+  "checks": {
+    "stdio_concurrency": {
+      "status": "passed",
+      "elapsed_ms": 223.819,
+      "ping_and_list_ms": 0.312,
+      "output": "stdio-ready"
+    },
+    "timeouts_and_bounds": {
+      "status": "passed",
+      "elapsed_ms": 192.495,
+      "timeout_ms": 140.627,
+      "zero_wait_ms": 0.144,
+      "invalid_values": 5
+    },
+    "fragmented_utf8": {
+      "status": "passed",
+      "elapsed_ms": 192.256,
+      "output": "😀",
+      "cursor": 4,
+      "requested_max_bytes": 1
+    },
+    "retained_output_is_immediate": {
+      "status": "passed",
+      "elapsed_ms": 62.91,
+      "expired_cursor_ms": 0.181,
+      "first_cursor": 45056,
+      "bounded_bytes": 7
+    },
+    "eof_waits": {
+      "status": "passed",
+      "elapsed_ms": 247.832,
+      "silent_eof": "passed",
+      "direct_child_exit_code": 7,
+      "descendant_output": "LATE"
+    },
+    "replacement_identity": {
+      "status": "passed",
+      "elapsed_ms": 243.963,
+      "old_id": 7,
+      "new_id": 8,
+      "old_wait_rejected": true
+    },
+    "stdio_cancellation_and_limits": {
+      "status": "passed",
+      "elapsed_ms": 816.876,
+      "wait_limit": 24,
+      "management_responsive": true,
+      "quota_reused_after_cancel": true,
+      "stdin_eof_ms": 3.58
+    },
+    "http_concurrency_and_observers": {
+      "status": "passed",
+      "elapsed_ms": 736.464,
+      "ping_ms": 2.648,
+      "independent_cursors": [
+        14,
+        14
+      ]
+    },
+    "http_cancellation_and_disconnect": {
+      "status": "passed",
+      "elapsed_ms": 946.546,
+      "wait_limit": 32,
+      "ping_at_limit_ms": 0.329,
+      "duplicate_id_rejected": true,
+      "cross_session_cancel_ignored": true,
+      "disconnect_releases_capacity": true,
+      "delete_retains_terminal": true
+    },
+    "http_long_wait": {
+      "status": "passed",
+      "elapsed_ms": 11001.947,
+      "requested_ms": 11000
+    },
+    "completed_input_preserves_ordinary_requests": {
+      "status": "passed",
+      "elapsed_ms": 45.748,
+      "single_stdio_write_messages": 4,
+      "stdio_response_ids": [
+        1,
+        "eof-list",
+        "eof-read"
+      ],
+      "http_half_closed_ordinary_requests": 2
+    }
+  },
+  "cleanup": "passed"
+}

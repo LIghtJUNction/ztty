@@ -8,6 +8,25 @@ native GPU rendering, display frame rate, or keyboard-to-photon latency.
 
 ![Ten-window terminal comparison](terminals-10-windows.svg)
 
+The figure links to the complete ztty 0.2.1 collection at source
+`dfe949c7`, measured with host load1 6.20–9.10. Its original JSON and SVG
+are preserved together. The [throughput report](throughput-2026-11-18.md)
+records those binaries, samples, and measurement conditions; these results
+describe that source rather than the subsequently integrated feature branch.
+
+The separate [guarded roadmap comparison](guarded-idle-1-10-2026-11-18.md)
+records 18 successful one- and ten-window cases at source `fa2f2017`.
+The project READMEs retain that dated chart and its source identity.
+The [earlier verification record](verification-2026-11-18.md) describes the
+previous busy-host baseline and its own workload checks.
+
+The [roadmap idle matrix](roadmap-idle-verification-2026-11-18.md) records a
+separate 24-case validation run at 1, 5, 10 and 20 windows in both process modes,
+using the newer immutable roadmap binary. It is smoke evidence from a busy host,
+not a replacement for the baseline or a controlled performance ranking.
+Its per-process [smaps attribution](roadmap-idle-smaps-2026-11-18.json) explains
+why the measured single-window RSS still exceeds 10 MiB.
+
 ## Reproduce
 
 From the repository root:
@@ -55,6 +74,79 @@ python3 tools/benchmark_terminals.py --render-only
 
 Missing runtimes or incomplete data cause a clear error. Missing values are
 never rendered as zero-length performance or memory bars.
+
+## Window counts, process modes and loaded histories
+
+The default command retains the ten-window, shared-instance comparison. To run
+the requested 1, 5, 10 and 20-window comparison in both process modes:
+
+```sh
+python3 tools/benchmark_terminals.py --matrix
+```
+
+This runs 72 fresh-process cases: four counts, two modes, three applications and
+three repetitions. `--counts 1,5,10,20 --modes shared,independent` is the explicit
+equivalent. Each case verifies the number of distinct GUI owner processes:
+one in shared mode, and one per window in independent mode. ztty uses one
+private broker socket per window for the independent case; Kitty omits
+`--single-instance`; Ghostty sets `gtk-single-instance=false` in its file and command line and gives each window a distinct application class.
+The selected mode and actual owner/process counts are saved in each raw run.
+
+The same command can exercise memory after different terminal workloads:
+
+```sh
+python3 tools/benchmark_terminals.py --matrix \
+  --workloads idle,history,images,hidden
+```
+
+| Workload | Preparation before memory and CPU sampling |
+| --- | --- |
+| `idle` | The fixed UTF-8/color page, with no scrolling. |
+| `history` | 100,000 numbered 117-column rows, streamed in bounded batches: 11.9 MB of input. The terminals retain their configured 2,000-line or 10,000,000-byte history limits. |
+| `images` | One deterministic 256 × 256 raw RGBA image per window, transmitted in Kitty protocol chunks. A successful image reply is required. |
+| `hidden` | All OS windows except one are unmapped after initialization. Their PTYs remain active; the performance probe does not raise hidden windows. This does not exercise a terminal's tab UI. |
+
+History inputs are identical, but the history capacity units and retained
+representations differ. The benchmark records that distinction instead of
+claiming equal retained rows. Image measurements include retained decoded
+pixels and renderer resources; they do not capture the peak during decoding.
+
+Each run also records application RSS, idle CPU as a percentage of one CPU core,
+thread counts, X-server deltas and available XRes pixmap allocations. CPU samples
+use Linux process start times and become unavailable when the process set changes.
+Missing optional kernel memory counters remain `null`; missing required RSS,
+PSS or private-memory fields fail the run. Duplicate process IDs fail accounting.
+
+`launch_to_dsr_ready_seconds` measures launch through the initialized PTY's DSR
+reply, including the selected workload preparation. The raw report explicitly
+marks native GPU memory, first presented frame and input-to-display latency
+unavailable in this Xvfb harness. These metrics require a native display backend
+and a presentation fence or an external latency measurement.
+
+The command also regenerates `terminals-10-windows-scaling.svg` from every selected
+matrix cell. Each panel distinguishes workload and process mode; its points show
+measured PSS versus window count. Panel scales are independent. The README
+overview continues to show only the ten-window shared idle subset. Incomplete
+matrix cells, failed runs, duplicate repetitions and non-finite values cannot be
+published as a completed comparison.
+
+Comparison mode checks available memory and one-minute host load before each case. It defers the run below 2 GiB or 10% available RAM, or above half the available logical CPUs in load average. These are reproducibility guards, not proof of an otherwise idle host. Every case records available RAM, swap use, load and Linux pressure-stall counters. Existing builds and user processes are left running. For functional validation on a busy host, use `--purpose smoke --no-readme`; those results are labeled validation data and cannot update the README comparison.
+
+Small validation runs can select applications and write separate artifacts:
+
+```sh
+python3 tools/benchmark_terminals.py \
+  --apps ztty,ghostty,kitty --counts 2 --modes shared,independent \
+  --workloads idle,images,hidden --repetitions 1 --purpose smoke --no-readme \
+  --json artifacts/benchmark-smoke.json --svg artifacts/benchmark-smoke.svg
+python3 tests/test_benchmark_terminals.py
+```
+
+Custom output paths require `--no-readme` so partial or experimental data does not
+replace the README's evidence links. The complete raw JSON includes executable
+hashes, harness/dependency source hashes, startup commands, configurations and
+measured process identities. The rendering command accepts both the original
+ten-window JSON schema and the matrix schema.
 
 ## Paired ztty throughput comparison
 
@@ -128,7 +220,7 @@ Kitty receives `--config NONE` plus the listed settings as `-o` overrides,
 so neither system nor personal configuration files affect this run. Any
 surviving Kitty helper processes are included in application memory.
 
-The histories are empty when memory is sampled. The output workload updates
+In the default idle workload, histories are empty when memory is sampled. The output workload updates
 the visible screen in place and does not scroll. The different history capacity
 units therefore remain explicit; this comparison does not claim equal memory
 cost after filling all applications' history limits.
@@ -182,6 +274,13 @@ from the **same run** before taking the range or maximum; maxima from different
 runs are never added together. These are near-consecutive process samples,
 not an atomic system-wide snapshot. Swap counters remain separate from PSS
 and are not presented as a deduplicated physical-memory total.
+
+The same paired calculation is performed separately for every selected window
+count, process mode, workload and application. Missing optional server or Swap
+counters produce null derived values; incomplete snapshots cannot silently
+shrink a range or maximum. The overview refuses to draw its full-server PSS
+panel when that required metric is unavailable. The scaling figure retains
+application-only PSS and explicitly states whether sampled Swap is available.
 
 The figure includes the largest sampled paired Swap counter for each terminal.
 The committed run was collected on the 24-logical-CPU development machine

@@ -1,0 +1,7 @@
+{
+  "source_sha": "cfc7ae80e785e4d3de11ffa5e1fba3f63d158222",
+  "builder": "Linux cloud workspace Rust 1.100.0",
+  "runner": "light Linux x86_64 development device",
+  "binary_sha256": "c6e6a8105c30e9b16be7def46a558eb3aee6154c9539c0f74b3a6501698e3ae6",
+  "binary_bytes": 728232
+}

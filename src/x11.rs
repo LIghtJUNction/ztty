@@ -438,10 +438,28 @@ unsafe extern "C" {
     fn XDestroyWindow(display: *mut Display, window: Xid) -> c_int;
     fn XSelectInput(display: *mut Display, window: Xid, mask: c_long) -> c_int;
     fn XMapWindow(display: *mut Display, window: Xid) -> c_int;
+    fn XUnmapWindow(display: *mut Display, window: Xid) -> c_int;
+    fn XReparentWindow(
+        display: *mut Display,
+        window: Xid,
+        parent: Xid,
+        x: c_int,
+        y: c_int,
+    ) -> c_int;
+    fn XMoveResizeWindow(
+        display: *mut Display,
+        window: Xid,
+        x: c_int,
+        y: c_int,
+        width: c_uint,
+        height: c_uint,
+    ) -> c_int;
     fn XMapRaised(display: *mut Display, window: Xid) -> c_int;
     fn XResizeWindow(display: *mut Display, window: Xid, width: c_uint, height: c_uint) -> c_int;
     fn XSetInputFocus(display: *mut Display, window: Xid, revert_to: c_int, time: c_ulong)
     -> c_int;
+    fn XGetInputFocus(display: *mut Display, window: *mut Xid, revert_to: *mut c_int) -> c_int;
+    fn XNextRequest(display: *mut Display) -> c_ulong;
     fn XFreeColormap(display: *mut Display, colormap: Xid) -> c_int;
     fn XStoreName(display: *mut Display, window: Xid, title: *const c_char) -> c_int;
     fn XSetClassHint(display: *mut Display, window: Xid, hint: *mut ClassHint) -> c_int;
@@ -640,33 +658,7 @@ impl Selection {
         (a.min(b)..=a.max(b)).contains(&at)
     }
     pub fn text(&self, terminal: &Terminal, offset: usize) -> String {
-        let cols = terminal.cols();
-        let a = self.start.1 * cols + self.start.0;
-        let b = self.end.1 * cols + self.end.0;
-        let mut text = String::new();
-        let mut line = String::new();
-        for at in a.min(b)..=a.max(b) {
-            let cell = terminal.view_cell(at % cols, at / cols, offset);
-            if cell.width != 0 {
-                line.push(if cell.ch == '\0' { ' ' } else { cell.ch });
-                for c in cell.combining {
-                    if c != '\0' {
-                        line.push(c);
-                    }
-                }
-            }
-            if at % cols == cols - 1 || at == a.max(b) {
-                text.push_str(line.trim_end_matches(' '));
-                if at != a.max(b) {
-                    text.push('\n');
-                }
-                line.clear();
-            }
-            if text.len() + line.len() > 4 * 1024 * 1024 {
-                break;
-            }
-        }
-        text
+        ztty::selection::text(terminal, self.start, self.end, offset)
     }
 }
 
@@ -705,6 +697,147 @@ unsafe fn alpha_visual(display: *mut Display, screen: c_int) -> Option<*mut c_vo
 }
 
 type DrawnCursor = ((usize, usize), CursorShape);
+
+/// Focus events can remain queued after reparenting or an explicit focus
+/// change. Consult the current server owner before acting on such an event.
+pub fn input_focus(display: *mut Display) -> Xid {
+    let mut window = 0;
+    let mut revert = 0;
+    unsafe {
+        XGetInputFocus(display, &mut window, &mut revert);
+    }
+    window
+}
+
+/// A workspace adds one native parent, without a duplicate terminal backing
+/// pixmap, font set or terminal model. Children retain their PTYs when moved.
+pub struct Container {
+    connection: Rc<Connection>,
+    pub id: Xid,
+    pub width: i32,
+    pub height: i32,
+    pub wm_delete: Atom,
+    pub configure_serial: c_ulong,
+}
+
+impl Container {
+    pub fn new(window: &Window) -> Self {
+        let connection = window.fonts.connection.clone();
+        let display = connection.display;
+        unsafe {
+            let screen = connection.screen;
+            let mut attrs: WindowAttributes = core::mem::zeroed();
+            attrs.background_pixel = 0;
+            let id = XCreateWindow(
+                display,
+                XRootWindow(display, screen),
+                0,
+                0,
+                window.width as u32,
+                window.height as u32,
+                0,
+                XDefaultDepth(display, screen),
+                1,
+                XDefaultVisual(display, screen),
+                1 << 1,
+                &mut attrs,
+            );
+            XSelectInput(display, id, 131072 | 2097152 | 32768);
+            let mut wm_delete = XInternAtom(display, c"WM_DELETE_WINDOW".as_ptr(), 0);
+            XSetWMProtocols(display, id, &mut wm_delete, 1);
+            let mut hint = ClassHint {
+                name: c"ztty".as_ptr().cast_mut(),
+                class: c"Ztty".as_ptr().cast_mut(),
+            };
+            XSetClassHint(display, id, &mut hint);
+            let pid = crate::os::getpid() as c_ulong;
+            let pid_atom = XInternAtom(display, c"_NET_WM_PID".as_ptr(), 0);
+            XChangeProperty(
+                display,
+                id,
+                pid_atom,
+                6,
+                32,
+                0,
+                (&pid as *const c_ulong).cast(),
+                1,
+            );
+            XMapWindow(display, id);
+            XFlush(display);
+            Self {
+                connection,
+                id,
+                width: window.width,
+                height: window.height,
+                wm_delete,
+                configure_serial: 0,
+            }
+        }
+    }
+
+    pub fn display(&self) -> *mut Display {
+        self.connection.display
+    }
+
+    pub fn resize(&mut self, width: i32, height: i32) {
+        self.width = width.max(1);
+        self.height = height.max(1);
+        unsafe {
+            self.configure_serial = XNextRequest(self.display());
+            XResizeWindow(
+                self.display(),
+                self.id,
+                self.width as u32,
+                self.height as u32,
+            );
+            XFlush(self.display());
+        }
+    }
+
+    pub fn title(&self, text: &str) {
+        if self.id == 0 {
+            return;
+        }
+        let Ok(title) = CString::new(text) else {
+            return;
+        };
+        unsafe {
+            let display = self.display();
+            XStoreName(display, self.id, title.as_ptr());
+            let name = XInternAtom(display, c"_NET_WM_NAME".as_ptr(), 0);
+            let utf8 = XInternAtom(display, c"UTF8_STRING".as_ptr(), 0);
+            XChangeProperty(
+                display,
+                self.id,
+                name,
+                utf8,
+                8,
+                0,
+                text.as_ptr(),
+                text.len() as i32,
+            );
+        }
+    }
+
+    pub fn raise(&self) {
+        if self.id != 0 {
+            unsafe {
+                XMapRaised(self.display(), self.id);
+                XFlush(self.display());
+            }
+        }
+    }
+}
+
+impl Drop for Container {
+    fn drop(&mut self) {
+        if self.id != 0 {
+            unsafe {
+                XDestroyWindow(self.display(), self.id);
+            }
+        }
+    }
+}
 
 /// Shared X11 connection for a single-threaded host of terminal windows.
 ///
@@ -855,10 +988,12 @@ pub struct Window {
     pub width: i32,
     pub height: i32,
     pub wm_delete: Atom,
+    pub configure_serial: core::cell::Cell<c_ulong>,
     depth: u32,
     visual: *mut c_void,
     colormap: c_ulong,
     owns_colormap: bool,
+    requested_opacity: u8,
     pixmap: Xid,
     gc: *mut c_void,
     draw: *mut XftDraw,
@@ -890,6 +1025,9 @@ pub struct Window {
     graphics_revision: u64,
     graphics_alternate: bool,
     pub focused: bool,
+    suspended: bool,
+    search_cols: usize,
+    search_bits: Vec<u64>,
 }
 
 impl Window {
@@ -898,6 +1036,16 @@ impl Window {
         rows: usize,
         appearance: &Appearance,
         connection: &Rc<Connection>,
+    ) -> Result<Self, &'static str> {
+        Self::new_view(cols, rows, appearance, connection, true)
+    }
+
+    pub fn new_view(
+        cols: usize,
+        rows: usize,
+        appearance: &Appearance,
+        connection: &Rc<Connection>,
+        activate: bool,
     ) -> Result<Self, &'static str> {
         let padding = appearance.padding;
         let background = appearance.theme.background;
@@ -969,6 +1117,22 @@ impl Window {
                 (&pid as *const c_ulong).cast(),
                 1,
             );
+            if !activate {
+                // EWMH user-time zero requests an initial map without activation.
+                // Explicit clicks may still focus the view for copy/search.
+                let user_time = XInternAtom(display, c"_NET_WM_USER_TIME".as_ptr(), 0);
+                let zero: c_ulong = 0;
+                XChangeProperty(
+                    display,
+                    id,
+                    user_time,
+                    6,
+                    32,
+                    0,
+                    (&zero as *const c_ulong).cast(),
+                    1,
+                );
+            }
             let pixmap = XCreatePixmap(display, id, width as u32, height as u32, depth);
             let gc = XCreateGC(display, id, 0, core::ptr::null_mut());
             let draw = XftDrawCreate(display, pixmap, visual, colormap);
@@ -1010,10 +1174,12 @@ impl Window {
                 width,
                 height,
                 wm_delete,
+                configure_serial: core::cell::Cell::new(0),
                 depth,
                 visual,
                 colormap,
                 owns_colormap: alpha.is_some(),
+                requested_opacity: appearance.opacity,
                 pixmap,
                 gc,
                 draw,
@@ -1059,7 +1225,10 @@ impl Window {
                 image_clock: 0,
                 graphics_revision: 0,
                 graphics_alternate: false,
-                focused: true,
+                focused: activate,
+                suspended: false,
+                search_cols: 0,
+                search_bits: Vec::new(),
             };
             out.title("ztty");
             out.fill_background(background, true, 0, 0, width as u32, height as u32);
@@ -1105,7 +1274,72 @@ impl Window {
             (((y - self.padding).max(0) / self.ch) as usize).min(rows.saturating_sub(1)),
         )
     }
+
+    pub fn reconfigure(
+        &mut self,
+        appearance: &Appearance,
+        before: impl FnOnce(usize, usize, i32, i32) -> Result<(), String>,
+    ) -> Result<(usize, usize), String> {
+        if !self.owns_colormap && appearance.opacity < 100 && self.requested_opacity == 100 {
+            return Err(
+                "this opaque window needs detach/attach to enable a transparency visual".into(),
+            );
+        }
+        let fonts = self.fonts.connection.fonts(&appearance.font)?;
+        let font = fonts.font;
+        let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
+        unsafe {
+            XftTextExtentsUtf8(self.display, font, b"M".as_ptr(), 1, &mut metrics);
+        }
+        let cw = i32::from(metrics.x_off).max(1);
+        let ch = unsafe { (*font).ascent + (*font).descent + 3 }.max(1);
+        if cw > 512 || ch > 1024 {
+            return Err("font cell size exceeds the supported limit".into());
+        }
+        let cols = (((self.width - appearance.padding * 2) / cw).max(1) as usize).min(512);
+        let rows = (((self.height - appearance.padding * 2) / ch).max(1) as usize).min(256);
+        // Font validation and the host's fallible PTY update happen before any
+        // live window state changes, so rejected reloads retain the old view.
+        before(cols, rows, cw, ch)?;
+        self.fonts = fonts;
+        self.font = font;
+        self.cw = cw;
+        self.ch = ch;
+        self.requested_opacity = appearance.opacity;
+        self.padding = appearance.padding;
+        self.background = appearance.theme.background;
+        self.cursor_color = appearance.cursor_color;
+        self.selection_colors = (
+            appearance.selection_foreground,
+            appearance.selection_background,
+        );
+        if self.owns_colormap {
+            let opacity = u32::from(appearance.opacity);
+            let component =
+                |shift: u32| (((self.background >> shift) & 255) * 257 * opacity / 100) as u16;
+            self.background_fill = Some(RenderColor {
+                red: component(16),
+                green: component(8),
+                blue: component(0),
+                alpha: (65535 * opacity / 100) as u16,
+            });
+            unsafe {
+                let blur = XInternAtom(self.display, c"_KDE_NET_WM_BLUR_BEHIND_REGION".as_ptr(), 0);
+                if appearance.blur {
+                    XChangeProperty(self.display, self.id, blur, 6, 32, 0, core::ptr::null(), 0);
+                } else {
+                    XDeleteProperty(self.display, self.id, blur);
+                }
+            }
+        }
+        self.last_cursor = None;
+        self.graphics_revision = 0;
+        Ok((cols, rows))
+    }
     pub fn present(&self) {
+        if self.suspended || self.id == 0 {
+            return;
+        }
         unsafe {
             XCopyArea(
                 self.display,
@@ -1137,6 +1371,7 @@ impl Window {
             .saturating_add((self.padding * 2) as usize)
             .clamp(1, u16::MAX as usize);
         unsafe {
+            self.configure_serial.set(XNextRequest(self.display));
             XResizeWindow(self.display, self.id, width as c_uint, height as c_uint);
             XFlush(self.display);
         }
@@ -1146,7 +1381,64 @@ impl Window {
         if self.width != width.max(1) || self.height != height.max(1) {
             self.width = width.max(1);
             self.height = height.max(1);
-            unsafe {
+            if !self.suspended {
+                unsafe {
+                    let pixmap = XCreatePixmap(
+                        self.display,
+                        self.id,
+                        self.width as u32,
+                        self.height as u32,
+                        self.depth,
+                    );
+                    XftDrawChange(self.draw, pixmap);
+                    XFreePixmap(self.display, self.pixmap);
+                    self.pixmap = pixmap;
+                }
+            }
+        }
+        (
+            (((self.width - self.padding * 2) / self.cw).max(1) as usize).min(512),
+            (((self.height - self.padding * 2) / self.ch).max(1) as usize).min(256),
+        )
+    }
+
+    pub fn parent(&mut self, parent: Option<Xid>) {
+        if self.id == 0 {
+            return;
+        }
+        unsafe {
+            let root = XRootWindow(self.display, self.fonts.connection.screen);
+            XUnmapWindow(self.display, self.id);
+            self.configure_serial.set(XNextRequest(self.display));
+            XReparentWindow(self.display, self.id, parent.unwrap_or(root), 0, 0);
+            if !self.suspended {
+                XMapWindow(self.display, self.id);
+            }
+            XFlush(self.display);
+        }
+    }
+
+    pub fn place(&mut self, rect: crate::layout::Rect) -> (usize, usize) {
+        unsafe {
+            self.configure_serial.set(XNextRequest(self.display));
+            XMoveResizeWindow(
+                self.display,
+                self.id,
+                rect.x,
+                rect.y,
+                rect.width.max(1) as u32,
+                rect.height.max(1) as u32,
+            );
+        }
+        self.resize(rect.width, rect.height)
+    }
+
+    pub fn visible(&mut self, visible: bool) {
+        if self.id == 0 || visible != self.suspended {
+            return;
+        }
+        unsafe {
+            if visible {
                 let pixmap = XCreatePixmap(
                     self.display,
                     self.id,
@@ -1157,12 +1449,24 @@ impl Window {
                 XftDrawChange(self.draw, pixmap);
                 XFreePixmap(self.display, self.pixmap);
                 self.pixmap = pixmap;
+                self.last_cursor = None;
+                XMapWindow(self.display, self.id);
+            } else {
+                XUnmapWindow(self.display, self.id);
+                // Hidden tabs keep canonical pixels but release all rebuildable
+                // server uploads and their full-size retained surface.
+                while !self.images.is_empty() {
+                    self.discard_upload(self.images.len() - 1);
+                }
+                let pixmap = XCreatePixmap(self.display, self.id, 1, 1, self.depth);
+                XftDrawChange(self.draw, pixmap);
+                XFreePixmap(self.display, self.pixmap);
+                self.pixmap = pixmap;
+                self.focus(false);
             }
+            self.suspended = !visible;
+            XFlush(self.display);
         }
-        (
-            (((self.width - self.padding * 2) / self.cw).max(1) as usize).min(512),
-            (((self.height - self.padding * 2) / self.ch).max(1) as usize).min(256),
-        )
     }
     /// Resolve the current keyboard group, preserving AltGr/layout selection.
     pub fn key_symbol(&self, event: &mut KeyEvent, shifted: bool) -> c_ulong {
@@ -1312,6 +1616,176 @@ impl Window {
     }
     pub fn cursor_changed(&self, cursor: Option<DrawnCursor>) -> bool {
         cursor != self.last_cursor
+    }
+
+    pub fn search_matches(&mut self, cols: usize, bits: Vec<u64>) {
+        self.search_cols = cols;
+        self.search_bits = bits;
+    }
+
+    fn search_match(&self, col: usize, row: usize) -> bool {
+        let bit = row.saturating_mul(self.search_cols).saturating_add(col);
+        self.search_bits
+            .get(bit / 64)
+            .is_some_and(|word| word & (1 << (bit % 64)) != 0)
+    }
+
+    /// Temporary search/command UI belongs to the view, never to PTY output.
+    pub fn overlay(&mut self, text: &str) {
+        if self.suspended {
+            return;
+        }
+        let y = (self.height - self.padding - self.ch).max(0);
+        self.fill_background(
+            self.background,
+            false,
+            0,
+            y,
+            self.width as u32,
+            (self.height - y) as u32,
+        );
+        self.overlay_line(text, y);
+        self.present();
+    }
+
+    pub fn overlay_lines(&mut self, lines: &[String]) {
+        if self.suspended {
+            return;
+        }
+        let count = lines
+            .len()
+            .min(((self.height - self.padding).max(self.ch) / self.ch) as usize);
+        let y = (self.height - self.padding - self.ch * count as i32).max(0);
+        self.fill_background(
+            self.background,
+            false,
+            0,
+            y,
+            self.width as u32,
+            (self.height - y) as u32,
+        );
+        for (row, line) in lines.iter().take(count).enumerate() {
+            self.overlay_line(line, y + row as i32 * self.ch);
+        }
+        self.present();
+    }
+
+    fn overlay_line(&mut self, text: &str, y: i32) {
+        self.overlay_text(text, self.padding, y, self.width - self.padding);
+    }
+
+    fn overlay_text(&mut self, text: &str, mut x: i32, y: i32, right: i32) {
+        let color = self.color(0xcdd6e4);
+        let baseline = y + unsafe { (*self.font).ascent } + 1;
+        for ch in text.chars().take(1024) {
+            let font = self.glyph_font(ch);
+            let mut bytes = [0; 4];
+            let text = ch.encode_utf8(&mut bytes);
+            let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
+            unsafe {
+                XftTextExtentsUtf8(
+                    self.display,
+                    font,
+                    text.as_ptr(),
+                    text.len() as i32,
+                    &mut metrics,
+                );
+            }
+            if x + i32::from(metrics.x_off).max(1) > right {
+                break;
+            }
+            unsafe {
+                XftDrawStringUtf8(
+                    self.draw,
+                    &color,
+                    font,
+                    x,
+                    baseline,
+                    text.as_ptr(),
+                    text.len() as i32,
+                );
+            }
+            x += i32::from(metrics.x_off);
+        }
+    }
+
+    fn overlay_width(&mut self, text: &str) -> i32 {
+        let mut width: i32 = 0;
+        for ch in text.chars() {
+            let font = self.glyph_font(ch);
+            let mut bytes = [0; 4];
+            let text = ch.encode_utf8(&mut bytes);
+            let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
+            unsafe {
+                XftTextExtentsUtf8(
+                    self.display,
+                    font,
+                    text.as_ptr(),
+                    text.len() as i32,
+                    &mut metrics,
+                );
+            }
+            width = width.saturating_add(i32::from(metrics.x_off).max(1));
+        }
+        width
+    }
+
+    /// A small view-local affordance; no terminal rows are reserved for it.
+    pub fn scroll_prompt(
+        &mut self,
+        new_output: bool,
+        overlay_rows: usize,
+    ) -> Option<crate::layout::Rect> {
+        use ztty::scroll_prompt::{INSET_X, INSET_Y, place};
+        if self.suspended {
+            return None;
+        }
+        let labels = if new_output {
+            ["New output · Back to live ↓", "New · Live ↓", "↓"]
+        } else {
+            ["Back to live ↓", "Live ↓", "↓"]
+        };
+        for text in labels {
+            let width = self.overlay_width(text);
+            let Some(rect) = place(
+                self.width,
+                self.height,
+                self.padding,
+                self.ch,
+                width,
+                overlay_rows,
+            ) else {
+                continue;
+            };
+            let border = self.color(if new_output { 0x89b4fa } else { 0x64748b });
+            unsafe {
+                XftDrawRect(
+                    self.draw,
+                    &border,
+                    rect.x,
+                    rect.y,
+                    rect.width as u32,
+                    rect.height as u32,
+                );
+            }
+            self.fill_background(
+                self.background,
+                false,
+                rect.x + 1,
+                rect.y + 1,
+                (rect.width - 2) as u32,
+                (rect.height - 2) as u32,
+            );
+            self.overlay_text(
+                text,
+                rect.x + INSET_X,
+                rect.y + INSET_Y,
+                rect.x + rect.width - INSET_X,
+            );
+            self.present();
+            return Some(rect);
+        }
+        None
     }
     pub fn graphics_changed(&self, terminal: &Terminal) -> bool {
         self.graphics_revision != terminal.graphics().revision()
@@ -1572,13 +2046,17 @@ impl Window {
             let mut col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
-                let selected = selection.is_some_and(|s| s.contains(col, row, cols));
+                let selected = selection.is_some_and(|s| s.contains(col, row, cols))
+                    || self.search_match(col, row);
                 let (_, rgb, translucent) = self.cell_colors(cell, selected);
                 let mut end = col + 1;
                 while end < cols {
                     let next = terminal.view_cell(end, row, offset);
-                    let (_, next_rgb, next_translucent) = self
-                        .cell_colors(next, selection.is_some_and(|s| s.contains(end, row, cols)));
+                    let (_, next_rgb, next_translucent) = self.cell_colors(
+                        next,
+                        selection.is_some_and(|s| s.contains(end, row, cols))
+                            || self.search_match(end, row),
+                    );
                     if (next_rgb, next_translucent) != (rgb, translucent) {
                         break;
                     }
@@ -1603,7 +2081,8 @@ impl Window {
             {
                 for col in 0..cols {
                     let cell = terminal.view_cell(col, row, offset);
-                    let selected = selection.is_some_and(|s| s.contains(col, row, cols));
+                    let selected = selection.is_some_and(|s| s.contains(col, row, cols))
+                        || self.search_match(col, row);
                     let (_, rgb, translucent) = self.cell_colors(cell, selected);
                     if !translucent {
                         self.fill_background(
@@ -1625,8 +2104,11 @@ impl Window {
                     col += 1;
                     continue;
                 }
-                let (fg, _, _) =
-                    self.cell_colors(cell, selection.is_some_and(|s| s.contains(col, row, cols)));
+                let (fg, _, _) = self.cell_colors(
+                    cell,
+                    selection.is_some_and(|s| s.contains(col, row, cols))
+                        || self.search_match(col, row),
+                );
                 let color = self.color(fg);
                 let x = self.padding + col as i32 * self.cw;
                 let baseline = y + unsafe { (*self.font).ascent } + 1;
@@ -1655,7 +2137,8 @@ impl Window {
                             || self
                                 .cell_colors(
                                     next,
-                                    selection.is_some_and(|s| s.contains(col + cells, row, cols)),
+                                    selection.is_some_and(|s| s.contains(col + cells, row, cols))
+                                        || self.search_match(col + cells, row),
                                 )
                                 .0
                                 != fg
@@ -1818,6 +2301,17 @@ impl Window {
             XFlush(self.display);
         }
     }
+    pub fn cancel_paste(&mut self) {
+        self.receiving = false;
+        self.incoming.clear();
+        self.paste_selection = 0;
+        if self.id != 0 {
+            unsafe {
+                XDeleteProperty(self.display, self.id, self.transfer);
+            }
+        }
+    }
+
     pub fn paste(&mut self, primary: bool) {
         self.receiving = false;
         self.incoming.clear();

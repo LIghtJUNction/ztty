@@ -1,0 +1,45 @@
+{
+  "source_sha": "6566943a188813fc1c7fcabaac009e63025951d4",
+  "production_source_commit": "6566943a188813fc1c7fcabaac009e63025951d4",
+  "command": "CARGO_BUILD_JOBS=1 ZTTY_BARE_METAL=1 sh tools/check.sh",
+  "exit": 0,
+  "seconds": 11.194379329681396,
+  "ordinary_rust_tests": 208,
+  "single_thread_real_pty_checks": 8,
+  "native_darwin": "pending; Linux SKIP must not count as runtime acceptance",
+  "log_sha256": "2797d029e153e243f7cda6e442e89e317678b3c3a92374a64106fe08440964e2",
+  "binary_sha256": "851d304858101b46c90388774a0aae40f304b052c48adcca6d37040823a612a9",
+  "ordinary_test_breakdown": {
+    "unit_and_integration": 202,
+    "doctests": 6
+  },
+  "source_sha256": {
+    "crates/zpty/src/macos/spawn.rs": "c657c065eacc65a0e9ca937701f598d4d4eedfd61f81602c8dea799c26729077",
+    "crates/zpty/src/macos.rs": "720d71f9f8f00f9bb41012ac3f6c01c3b866150c13df17e1ec0111d4c511c321",
+    "crates/zpty/tests/darwin_spawn.rs": "2361ac066af6d0478d78b0ce1dd462ee9ad8fe3d8c1d70f1cb0c2c76a5c9a4c8",
+    "crates/zpty/tests/darwin_spawn_abi.c": "823ccff2f8c1c60151c357412e7b009513aa3247e65ff32522903d3c2e351466",
+    "src/main.rs": "f17bfa6e455e23709a0068a02e49a20db95aa2b1bd1b057d91ebde5b608888b6",
+    "src/platform/macos.rs": "de97879962670edd5de2ca82894b5af7a5d452e9845fb2bd86aca474882c413c",
+    ".github/workflows/release.yml": "ff1325d82bf6e0d4891e6d021c5cca64d3acc2cc716c2b5554210229f3c8d81f",
+    "tests/darwin_spawn_gate_test.py": "151f1cc00836214cc012749342db41050bae25b0b767f17fb2b2aae1730db520"
+  },
+  "gate_contracts": {
+    "darwin_spawn": {
+      "tests": 6,
+      "vectors": 16,
+      "exit": 0
+    },
+    "release_scope": {
+      "tests": 6,
+      "vectors": 14,
+      "exit": 0
+    },
+    "actionlint": "passed"
+  },
+  "original_review_archive": {
+    "bytes": 31994,
+    "sha256": "7d82d77292349fb78549c4cb78704bb0061097882834bfa48c93ada9624e6261",
+    "url": "https://drive.google.com/file/d/10QSHeEYrKgWOThy3geCMBvyPBrcJPrCb/view?usp=drivesdk"
+  },
+  "native_macos": "pending actual Intel and Apple Silicon SDK/PTY/AppKit acceptance"
+}

@@ -1,0 +1,107 @@
+{
+  "source_sha": "81c1c068c42868d4e1fdfb1e97e9046c4094f361",
+  "run_id": 44209439093,
+  "build_only": true,
+  "artifacts": [
+    {
+      "id": 14386050076,
+      "name": "ztty-macos-aarch64",
+      "sha256": "967f6d8bdd3756887831b60703c97d675e2b67e62399853a62e3f4a372418b28",
+      "size": 9786,
+      "build_manifest_sha256": "7f3e26af8c29e83be668866148f6f64bd40f4d2050c73c34afe850004f07fbd5",
+      "verified_members": 18,
+      "build_status": "failed",
+      "native_status": "failed",
+      "native_passed": false,
+      "cleanup": null,
+      "native_error": "JSONDecodeError('Expecting value: line 1 column 1 (char 0)')",
+      "passed_checks": 12,
+      "drive_url": "https://drive.google.com/file/d/1exqO4wdZBYsY11MIwbKeXjYeyRW7L-WP/view?usp=drivesdk"
+    },
+    {
+      "id": 14385917845,
+      "name": "ztty-linux-x86_64",
+      "sha256": "d3741e27b98514d2e2169b8d9dbf4250019df38c3508c6b7f230d6df62ff4a09",
+      "size": 595060,
+      "build_manifest_sha256": "c05f9f96de77a22e2c221fc489159f05f9bee4cbe51cdb4b4381ff36daea0a06",
+      "verified_members": 6,
+      "build_status": "accepted",
+      "native_status": "passed",
+      "native_passed": true,
+      "cleanup": null,
+      "native_error": null,
+      "passed_checks": null,
+      "drive_url": "https://drive.google.com/file/d/1xE2Kpnq30pyUcts9EAMKoU6r8Nv7qxOK/view?usp=drivesdk",
+      "accepted_scope": "four native GUI suites and four cwd regressions"
+    },
+    {
+      "id": 14384822932,
+      "name": "ztty-macos-x86_64",
+      "sha256": "8ea08519824d09f4389da5c8e7dc4ec161f2de744b8337f02c3de8c776953da8",
+      "size": 9769,
+      "build_manifest_sha256": "6b3c44bd3ef7853ea3ff651a6bb1ec536340f362da20db9c89e6f08aa3131da8",
+      "verified_members": 18,
+      "build_status": "failed",
+      "native_status": "failed",
+      "native_passed": false,
+      "cleanup": null,
+      "native_error": "JSONDecodeError('Expecting value: line 1 column 1 (char 0)')",
+      "passed_checks": 12,
+      "drive_url": "https://drive.google.com/file/d/1IcXAdql--0ZzTA4SMPIZlAU4XTPkdrr2/view?usp=drivesdk"
+    },
+    {
+      "id": 14384768753,
+      "name": "ztty-linux-aarch64",
+      "sha256": "acd723046f9ffe2df0e7a409e139f209d299034acbed0087866b33cf512a8a70",
+      "size": 580434,
+      "build_manifest_sha256": "fbcda554c60123847aa037adecee1c777ce788c8674ea3dcdae7d03b01313295",
+      "verified_members": 6,
+      "build_status": "accepted",
+      "native_status": "passed",
+      "native_passed": true,
+      "cleanup": null,
+      "native_error": null,
+      "passed_checks": null,
+      "drive_url": "https://drive.google.com/file/d/1Dj6eebHvZfI3l0zY94pQRg09NTThSmFf/view?usp=drivesdk",
+      "accepted_scope": "four native GUI suites and four cwd regressions"
+    },
+    {
+      "id": 14384493750,
+      "name": "ztty-windows-aarch64",
+      "sha256": "609c3715b9710e9c639715acc841cb6c0c935c9c96f9a7f3409b7c8b6c5dd1b7",
+      "size": 746909,
+      "build_manifest_sha256": "38387ff0b4efeaac71b40a872bab0248d51153cd19514ea0026d4f5e337f3124",
+      "verified_members": 9,
+      "build_status": "failed",
+      "native_status": "blocked",
+      "native_passed": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "native_error": "runner desktop has no verified visible location for the owned test window",
+      "passed_checks": 10,
+      "drive_url": "https://drive.google.com/file/d/1cDC0VPNawSsEXwylE-yneHRJ8K1RdHDO/view?usp=drivesdk"
+    },
+    {
+      "id": 14384004857,
+      "name": "ztty-windows-x86_64",
+      "sha256": "1f4be23e2032bcdd2cb5fb556260b0815b850776c50fdd739f845560d00edd98",
+      "size": 812517,
+      "build_manifest_sha256": "8d8a5577ce92669d04ab0cdbf37c0a0bda538f58908bfd901bcc5b1eda920f5c",
+      "verified_members": 13,
+      "build_status": "accepted",
+      "native_status": "passed",
+      "native_passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "native_error": null,
+      "passed_checks": 30,
+      "drive_url": "https://drive.google.com/file/d/1-dOuYb2LwgzaK-NKLcya_ywd8o4kmo2g/view?usp=drivesdk"
+    }
+  ]
+}
