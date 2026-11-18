@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "baseline_source": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "core_candidate_source": "91ae4e8961e5f97d4366e162ab638695b1b1144b",
+  "mcp_candidate_source": "0971198a1e6e7a7526b5d3d6774cd6281bd16f25",
+  "record_kind": "observed_result_summary",
+  "baseline_run": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "zterm",
+      "alternate_1047",
+      "--",
+      "--nocapture"
+    ],
+    "exit_code": 101,
+    "passed": 1,
+    "failed": 2,
+    "filtered_out": 88,
+    "tests": [
+      {
+        "name": "alternate_1047_preserves_retained_content_on_entry",
+        "status": "failed",
+        "observed": "!       ",
+        "expected": "ALT!    "
+      },
+      {
+        "name": "alternate_1047_clears_text_and_images_on_exit",
+        "status": "failed",
+        "observed": "ALT     ",
+        "expected": "        "
+      },
+      {
+        "name": "alternate_1047_reset_on_primary_preserves_both_screens",
+        "status": "passed"
+      }
+    ]
+  },
+  "post_fix_execution": {
+    "status": "pending",
+    "reason": "Development-machine execution channel repeatedly timed out after reconnect. No successful post-fix execution result has been observed."
+  },
+  "static_review": {
+    "core": "completed",
+    "mcp": "completed",
+    "mcp_python_ast": "passed for both modified test files"
+  },
+  "specifications": [
+    "https://invisible-island.net/xterm/ctlseqs/ctlseqs.html",
+    "https://www.zx.net.nz/computers/dec/vt220/doc/vt220-rm/chapter4.html"
+  ]
+}
