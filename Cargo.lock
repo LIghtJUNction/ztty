@@ -16,7 +16,7 @@ checksum = "ca718471876992059f251e33aafc334346ada08042b7661dd1fe313a9bced557"
 
 [[package]]
 name = "zgraphics"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "zune-core",
  "zune-inflate",
@@ -25,15 +25,15 @@ dependencies = [
 
 [[package]]
 name = "zinput"
-version = "0.1.0"
+version = "0.1.1"
 
 [[package]]
 name = "zpty"
-version = "0.2.0"
+version = "0.2.1"
 
 [[package]]
 name = "zterm"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "unicode-width",
  "zgraphics",
