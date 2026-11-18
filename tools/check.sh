@@ -7,6 +7,7 @@ cargo clippy --locked --workspace --all-targets -- -D warnings
 cargo build --locked --release
 python3 tools/check_no_std.py
 if [ "$(uname -s)" = Linux ]; then
+    python3 tests/install_test.py
     python3 tests/bash_integration.py --output artifacts/bash-integration/report.json
     python3 tests/mcp_transport.py --binary ./target/release/ztty
     python3 tests/mcp_sessions.py --binary ./target/release/ztty

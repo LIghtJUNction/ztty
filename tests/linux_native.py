@@ -34,7 +34,7 @@ import time
 
 ELF_MACHINES = {"x86_64": 62, "aarch64": 183}
 RUN_MARKER = "ZTTY_LINUX_NATIVE_RUN"
-CASES = ("workspaces", "daily_workflow", "sixel_gui", "input_gui", "repaint_gui")
+CASES = ("workspaces", "daily_workflow", "session_switcher", "sixel_gui", "input_gui", "repaint_gui")
 HARNESS_FILES = tuple(f"tests/{name}.py" for name in CASES)
 
 
@@ -253,7 +253,7 @@ def png_info(path):
 def case_command(name, root, binary, directory):
     command = [sys.executable, str(root / "tests" / f"{name}.py"),
                "--binary", str(binary), "--output", str(directory / "report.json")]
-    if name in ("daily_workflow", "repaint_gui"):
+    if name in ("daily_workflow", "repaint_gui", "session_switcher"):
         command.extend(["--screenshots", str(directory / "screenshots")])
     else:
         command.extend(["--screenshot", str(directory / "screenshot.png")])

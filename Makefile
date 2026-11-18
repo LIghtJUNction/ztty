@@ -1,4 +1,6 @@
 PREFIX ?= $(HOME)/.local
+BINARY ?= target/release/ztty
+export PREFIX DESTDIR BINARY
 
 .PHONY: build check bench benchmark-terminals install uninstall
 
@@ -15,8 +17,9 @@ benchmark-terminals: build
 	python3 tools/benchmark_terminals.py
 
 install: build
-	install -Dm755 target/release/ztty $(DESTDIR)$(PREFIX)/bin/ztty
-	install -Dm644 assets/ztty.desktop $(DESTDIR)$(PREFIX)/share/applications/ztty.desktop
+	ZTTY_INSTALL_DIR="$$PREFIX/bin" ZTTY_DESKTOP_DIR="$$PREFIX/share/applications" \
+		sh install.sh --from-binary "$$BINARY"
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/ztty $(DESTDIR)$(PREFIX)/share/applications/ztty.desktop
+	rm -f -- "$$DESTDIR$$PREFIX/bin/ztty" "$$DESTDIR$$PREFIX/bin/ztty.previous" \
+		"$$DESTDIR$$PREFIX/bin/ztty.previous.sha256" "$$DESTDIR$$PREFIX/share/applications/ztty.desktop"
