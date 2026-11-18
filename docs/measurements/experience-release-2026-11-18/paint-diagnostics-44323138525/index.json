@@ -1,0 +1,135 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "03053f794e3d765f24d8fbd29292f91517ab2574",
+  "run_id": 44323138525,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44323138525",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "acceptance_credit": false,
+  "passed": false,
+  "status": "failed",
+  "additional_per_paint_queries": [
+    "GetClipBox",
+    "GetDCOrgEx"
+  ],
+  "additional_query_location": "after BitBlt and before EndPaint",
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "back_to_back_protocol": {
+    "set_window_pos_flags": "0x16",
+    "between_two_size_requests": "no native query, screenshot, PTY acknowledgement or sleep",
+    "restored_pixel_tolerance_per_channel": 1,
+    "pixel_wait_seconds": 10
+  },
+  "x86_64": {
+    "completed": 2,
+    "attempted": 3,
+    "failed_cold_start": 3,
+    "failed_check": "resize_restores_visible_image",
+    "checks_completed_in_failed_run": 23,
+    "warm_and_burst_completed_in_failed_run": [
+      0,
+      0
+    ],
+    "actual": [
+      0,
+      0,
+      0
+    ],
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "completed": 5,
+    "attempted": 6,
+    "failed_cold_start": 6,
+    "failed_check": "resize_restores_visible_image",
+    "checks_completed_in_failed_run": 23,
+    "warm_and_burst_completed_in_failed_run": [
+      0,
+      0
+    ],
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "both_failure_snapshots": {
+    "source_rgb_sampled_only_after_failure": [
+      255,
+      0,
+      0
+    ],
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_and_pty": [
+      20,
+      10
+    ],
+    "dispatch_resize_pending": false,
+    "dispatch_paint_pending": false,
+    "deferred_paints": 0,
+    "last_paint_sequence": 19,
+    "last_paint_region": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "bitblt_return": 1,
+    "post_bitblt_target_clip_type": 2,
+    "post_bitblt_target_clip": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "post_bitblt_target_origin": [
+      40,
+      63
+    ],
+    "changing_flags_in": "0x16",
+    "changing_flags_submitted": "0x116",
+    "changed_flags_reported": "0x1116",
+    "latest_recorded_default_exit_sequence": 205,
+    "last_paint_start_event_sequence": 210,
+    "last_paint_end_event_sequence": 211,
+    "last_paint_default_message": 0,
+    "last_paint_default_depth": 0,
+    "snapshot_event_sequence": 212,
+    "flush_did_not_restore_window": true,
+    "normal_repaint_restored_window": true
+  },
+  "workspace": "not_entered_on_either_architecture",
+  "cleanup": "All nine started application processes exited; all nine temporary directories were actually removed on their first attempt; outer Jobs were empty and desktops were restored.",
+  "worker_elapsed_seconds": {
+    "x86_64": 14.208,
+    "aarch64": 20.105
+  },
+  "observed_exclusions": [
+    "NOCOPYBITS absent from the recorded restore CHANGING/CHANGED flags",
+    "a post-BitBlt target clip limited to the shrunk client or incorrect target origin at the measured instant",
+    "a last paint inside the recorded default-procedure context",
+    "a WM_PAINT rejected by the mutable guard in these two failed processes",
+    "a persistently shrunk surface/grid/PTY at the failure snapshot"
+  ],
+  "inference_limits": [
+    "Records retain latest phases for six message types, not a complete event trace.",
+    "Receiver-thread callback order does not prove another thread SetWindowPos return or internal backing-surface/compositor/copy completion.",
+    "The last BitBlt did not sample source or target RGB; the source red pixel is observed only after failure.",
+    "Extra paint DC queries can change GDI timing, so neither successful cold starts nor diagnostic recovery count as ordinary acceptance."
+  ],
+  "delivery_scope": "Windows build-only diagnostic candidate; no Release publication or device installation is claimed. The failed formal v0.3.0 tag and its evidence remain unchanged."
+}
