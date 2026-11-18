@@ -38,6 +38,8 @@ mod darwin {
         fn ioctl(fd: i32, request: u64, ...) -> i32;
         fn waitpid(pid: i32, status: *mut i32, options: i32) -> i32;
         fn kill(pid: i32, signal: i32) -> i32;
+        fn proc_listchildpids(pid: i32, buffer: *mut std::ffi::c_void, bytes: i32) -> i32;
+        fn proc_pidpath(pid: i32, buffer: *mut std::ffi::c_void, bytes: u32) -> i32;
         fn __error() -> *mut i32;
         fn write(fd: i32, bytes: *const std::ffi::c_void, length: usize) -> isize;
     }
@@ -196,16 +198,51 @@ mod darwin {
             .collect()
     }
 
-    fn no_children() {
+    fn child_diagnostics(context: &str) {
+        let mut children = [0_i32; 32];
+        let count = unsafe {
+            proc_listchildpids(
+                getpid(),
+                children.as_mut_ptr().cast(),
+                std::mem::size_of_val(&children) as i32,
+            )
+        };
+        diagnostic(format_args!(
+            "darwin_spawn: {context}: owned child inventory count={count}, capacity={}",
+            children.len()
+        ));
+        let count = usize::try_from(count).unwrap_or(0).min(children.len());
+        for &pid in &children[..count] {
+            if pid <= 0 {
+                continue;
+            }
+            let mut path = [0_u8; 4096];
+            let length = unsafe { proc_pidpath(pid, path.as_mut_ptr().cast(), path.len() as u32) };
+            let path = if length > 0 {
+                CStr::from_bytes_until_nul(&path).ok()
+            } else {
+                None
+            };
+            diagnostic(format_args!(
+                "darwin_spawn: {context}: owned child pid={pid}, executable={path:?}, path_result={length}"
+            ));
+        }
+    }
+
+    fn no_children(context: &str) {
         // This dedicated test executable has no foreign children. All its
         // compiler, std::process and PTY children have already been joined.
         let mut status = 0;
+        let result = unsafe { waitpid(-1, &mut status, 1) };
+        let errno = if result < 0 { unsafe { *__error() } } else { 0 };
+        if result != -1 || errno != 10 {
+            child_diagnostics(context);
+        }
         assert_eq!(
-            unsafe { waitpid(-1, &mut status, 1) },
-            -1,
-            "unreaped owned child"
+            result, -1,
+            "{context}: unreaped owned child, returned_pid={result}, status={status}, errno={errno}"
         );
-        assert_eq!(unsafe { *__error() }, 10, "expected ECHILD");
+        assert_eq!(errno, 10, "{context}: expected ECHILD");
     }
 
     fn collect_until(pty: &Pty, marker: &[u8], out: &mut Vec<u8>) {
@@ -422,6 +459,10 @@ mod darwin {
     }
 
     fn expect_error(helper: &CStr, program: &CStr, environment: &[&CStr], errno: i32) {
+        let context = format!(
+            "spawn-error helper={helper:?}, program={program:?}, environment={environment:?}, expected_errno={errno}"
+        );
+        diagnostic(format_args!("darwin_spawn: phase=before {context}"));
         let before = open_fds();
         let failure = match Pty::spawn_with_helper(
             helper,
@@ -436,10 +477,13 @@ mod darwin {
             }
             Err(error) => error,
         };
+        diagnostic(format_args!(
+            "darwin_spawn: phase=returned {context}, actual={failure:?}"
+        ));
         assert_eq!(failure.operation, zpty::Operation::Spawn);
         assert_eq!(failure.errno, errno);
         assert_eq!(open_fds(), before, "failed spawn leaked descriptors");
-        no_children();
+        no_children(&context);
     }
 
     fn closed_stdio(arguments: &[CString]) {
@@ -551,6 +595,7 @@ mod darwin {
                 handle.join().unwrap();
             }
         });
+        no_children("after nine concurrent probes");
         drop(sentinel);
         checks
             .push("nine concurrent PTY spawns drain READY/DONE through EOF, exit, and exclude peer handshakes and a non-CLOEXEC sentinel");
@@ -633,7 +678,7 @@ mod darwin {
             "owned child cleanup failed"
         );
         assert_eq!(open_fds(), baseline, "suite leaked descriptors");
-        no_children();
+        no_children("suite complete");
         let encoded = checks
             .iter()
             .map(|check| format!("{check:?}"))
