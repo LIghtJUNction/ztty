@@ -15,8 +15,24 @@ import tomllib
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-VERSIONS = {"zinput": "0.1.0", "zgraphics": "0.1.0", "zpty": "0.2.0", "zterm": "0.2.0"}
-PACKAGES = tuple(VERSIONS)
+PACKAGES = ("zinput", "zgraphics", "zpty", "zterm")
+
+
+def release_versions():
+    workspace = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["package"]
+    versions = {}
+    for package in PACKAGES:
+        manifest = tomllib.loads((ROOT / "crates" / package / "Cargo.toml").read_text())
+        version = manifest["package"]["version"]
+        if version == {"workspace": True}:
+            version = workspace["version"]
+        if not isinstance(version, str) or not version:
+            raise ValueError(f"invalid release version for {package}")
+        versions[package] = version
+    return versions
+
+
+VERSIONS = release_versions()
 CRATES_IO_SOURCES = {
     "registry+https://github.com/rust-lang/crates.io-index",
     "registry+https://index.crates.io/",
