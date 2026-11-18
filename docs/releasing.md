@@ -1,13 +1,50 @@
 # Releasing ztty and its reusable libraries
 
-Report date: **2026-11-18, Asia/Taipei**. The source tree prepares application
-**0.3.0**; final-tag verification, publication and device installation remain
-pending. The earlier verified 0.2.0 application candidate used
+Report date: **2026-11-18, Asia/Taipei**. Tag **v0.3.0** is fixed at
+`9b5497dac5402603ba0f633152fa4b07e6c11c9e`. Its formal release attempt failed the
+Windows ARM rapid-resize gate. Publish was skipped; no 0.3.0 Release was created
+or installed. The earlier verified 0.2.0 application candidate used
 [`7535aa2`](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92).
 The libraries below are published on crates.io. Their source commits and the
 earlier application candidate artifacts remain recorded independently of the
 0.3.0 release preparation. The [experience candidate report](experience-release-2026-11-18.md)
 pins the Linux runtime, revised GUI harness and native retry evidence separately.
+
+## Formal v0.3.0 attempt
+
+[Run 44309412482](https://github.com/LIghtJUNction/ztty/actions/runs/44309412482)
+ran from `refs/tags/v0.3.0` with `build_only=false`, `candidate_platform=all`
+and attempt 1. The annotated tag object `9317806ac9b098c772f1a05514d222942268d2d5`
+resolves to source `9b5497dac5402603ba0f633152fa4b07e6c11c9e`.
+[Read-back status](measurements/experience-release-2026-11-18/formal-v0.3.0/github-status.json).
+
+| Formal gate | Result at the tagged source |
+| --- | --- |
+| Verify | Passed: 271 ordinary Rust tests, 6 distinct doctests, 8 separate SessionCore checks, 17 installer checks, 11 Bash checks, MCP suites and 12 GUI smoke groups; strict Clippy, release build and no_std checks passed |
+| Linux x86_64 and ARM64 | Each passed six GUI suites / 67 groups / 27 PNG captures, with clean source before/after, packaged-binary identity and owned-resource cleanup verified |
+| macOS Intel and Apple Silicon | Each passed 8 spawn checks and 24 native checks across 13 stages / 10 PNG captures; owned processes cleaned up; ad-hoc signing verified, not notarized |
+| Windows x64 | Passed 31 base checks and 19 workspace groups on the original untraced rapid path; owned-process, Job and desktop cleanup passed |
+| Windows ARM64 | Failed `resize_restores_visible_image` after 23 of 31 base checks; workspace checks were not reached; cleanup passed |
+| Publish | Skipped because the required native gate failed |
+
+The ARM gate restored a 180×190 client area, but its sample at `(175, 28)`
+remained `[20,20,20]` after the 10-second pixel wait instead of the required
+red `[255,0,0]`. Its original run used `runtime_trace_enabled=false` and
+`resize_path=rapid`. Two separate processes subsequently passed all 31 base
+checks with tracing enabled, one rapid and one staged. Those runs are diagnostic
+only: they leave the original formal result failed and do not establish the
+cause of the untraced failure.
+[Original failure, screenshot and diagnostic records](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64-summary.json).
+
+At **2026-11-18 21:11:00 Asia/Taipei (13:11:00 UTC)**, the GitHub Release-by-tag API returned **404**.
+There were no official 0.3.0 Release assets to read back or install, and this
+iteration did not perform device installation. The existing `v0.3.0` tag remains
+fixed. After a verified repair, publication must use a new version tag and pass
+its own complete gates. Candidate successes below remain historical evidence;
+they cannot override this failed formal attempt.
+[Compact platform evidence and publication status](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json).
+
+## Development-machine experience checks
 
 The latest Linux view change adds a temporary **Back to live ↓** control while
 browsing history, with a new-output indicator and preserved observing ownership.
@@ -343,8 +380,8 @@ python3 tools/verify_registry.py
 
 The [Release workflow](../.github/workflows/release.yml) supports two operations.
 `workflow_dispatch` with `build_only=true` generates candidate artifacts from a
-branch and leaves release publishing and AUR untouched. This is the operation
-used for the current native verification. The source SHA is pinned before any
+branch and leaves release publishing and AUR untouched. The earlier candidates
+used this operation; the failed `v0.3.0` attempt above used a tag push. The source SHA is pinned before any
 platform job starts; failed or incomplete probes cannot produce an accepted
 build report.
 

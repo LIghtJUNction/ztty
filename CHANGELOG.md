@@ -2,8 +2,10 @@
 
 ## 0.3.0 — 2026-11-18
 
-Release preparation: final-tag acceptance, publication and device installation
-remain pending. Verification entries below describe separate source checkpoints.
+Unreleased: tag `v0.3.0` is fixed at `9b5497d`. Its formal release attempt failed
+the Windows ARM rapid-resize gate; publication was skipped and no device
+installation was performed. A repaired release will use a new tag. Verification
+entries below retain their separate source checkpoints.
 
 ### Added
 
@@ -170,14 +172,29 @@ remain pending. Verification entries below describe separate source checkpoints.
 
 ### Verification
 
+- Record the failed formal `v0.3.0` attempt at source `9b5497d` in
+  [run 44309412482](https://github.com/LIghtJUNction/ztty/actions/runs/44309412482).
+  Verify passed 271 ordinary Rust tests, 6 distinct doctests, 8 separate
+  SessionCore checks and 12 GUI smoke groups. Each Linux architecture passed
+  six GUI suites / 67 groups / 27 PNG captures; each Mac architecture passed
+  8 spawn and 24 native checks. Windows x64 passed 31 base and 19 workspace
+  groups. Windows ARM completed 23 base checks, then failed
+  `resize_restores_visible_image`: the 10-second wait ended at RGB `[20,20,20]`
+  instead of `[255,0,0]`. Workspace checks were not reached and cleanup passed.
+  Two fresh traced rapid/staged diagnostic processes each passed 31 checks,
+  without changing the original failure or establishing its cause. Publish was
+  skipped and the by-tag Release API returned 404. The tag remains unchanged;
+  no Release assets were published or installed.
+  [Formal evidence](docs/experience-release-2026-11-18.md#54-正式-v030-门禁失败).
+
 - Accept Windows source `3418b82` in
   [run 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420):
   native x64 and ARM64 each passed all 31 base checks and 19 workspace groups,
   with owned-process and desktop cleanup. The original rapid resize path ran
   without runtime tracing or added resize acknowledgements. Both architectures
   preserved blue history and selection through silent modifiers/focus changes,
-  and actual Enter input returned to live output. This is a build-only candidate;
-  final-tag acceptance, publication and installation remain pending.
+  and actual Enter input returned to live output. This is an earlier build-only
+  candidate; its acceptance does not override the later formal ARM failure.
 
 - Record the intervening Windows candidates separately:
   [source `8a2f4be`, run 44303751871](https://github.com/LIghtJUNction/ztty/actions/runs/44303751871)
