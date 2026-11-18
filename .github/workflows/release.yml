@@ -767,24 +767,37 @@ jobs:
                   artifact = folder / name
                   assert artifact.is_file() and artifact.stat().st_size == details["bytes"], name
                   assert hashlib.sha256(artifact.read_bytes()).hexdigest() == details["sha256"], name
+      - name: Check release evidence packaging contracts
+        run: python3 -m unittest discover -s tests -p 'release_assets_test.py'
       - name: Publish or verify GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           out="$RUNNER_TEMP/ztty-release"
           cp install.sh "$out/bin/"
-          assets=("$out/ztty-$VERSION.tar.gz" "$out/SHA256SUMS" "$out/bin/"*)
+          evidence="$out/ztty-$VERSION-native-evidence.zip"
+          python3 tools/release_assets.py prepare --folder "$out/bin" --archive "$evidence" \
+            --asset-list "$out/upload-assets.bin" --version "$VERSION" --source-sha "$SOURCE_SHA"
+          mapfile -d '' -t native_assets < "$out/upload-assets.bin"
+          assets=("$out/ztty-$VERSION.tar.gz" "$out/SHA256SUMS" "${native_assets[@]}")
           (cd "$out/bin" && for checksum in *.sha256; do sha256sum -c "$checksum"; done)
-          if gh release view "v$VERSION" >/dev/null 2>&1; then
-            readback=$(mktemp -d)
-            patterns=()
-            for asset in "${assets[@]}"; do patterns+=(--pattern "${asset##*/}"); done
-            gh release download "v$VERSION" --dir "$readback" "${patterns[@]}"
-            cmp "$out/SHA256SUMS" "$readback/SHA256SUMS"
-            (cd "$readback" && sha256sum --check SHA256SUMS
-             for checksum in *.sha256; do sha256sum --check "$checksum"; done)
-            cmp install.sh "$readback/install.sh"
-            python3 - "$readback" <<'PYREADBACK'
+          if ! gh release view "v$VERSION" >/dev/null 2>&1; then
+            gh release create "v$VERSION" --verify-tag --generate-notes --draft \
+              --notes "Raw native evidence, including empty logs, is retained in ztty-$VERSION-native-evidence.zip." \
+              "${assets[@]}"
+          fi
+          readback=$(mktemp -d)
+          patterns=()
+          for asset in "${assets[@]}"; do patterns+=(--pattern "${asset##*/}"); done
+          gh release download "v$VERSION" --dir "$readback" "${patterns[@]}"
+          python3 tools/release_assets.py verify --folder "$readback" \
+            --archive "$readback/ztty-$VERSION-native-evidence.zip" --expected-archive "$evidence" \
+            --version "$VERSION" --source-sha "$SOURCE_SHA"
+          cmp "$out/SHA256SUMS" "$readback/SHA256SUMS"
+          (cd "$readback" && sha256sum --check SHA256SUMS
+           for checksum in *.sha256; do sha256sum --check "$checksum"; done)
+          cmp install.sh "$readback/install.sh"
+          python3 - "$readback" <<'PYREADBACK'
           import hashlib, json, os, sys
           from pathlib import Path
           folder = Path(sys.argv[1])
@@ -801,8 +814,8 @@ jobs:
                   payload = (folder / name).read_bytes()
                   assert len(payload) == details["bytes"] and hashlib.sha256(payload).hexdigest() == details["sha256"], name
           PYREADBACK
-          else
-            gh release create "v$VERSION" --verify-tag --generate-notes "${assets[@]}"
+          if [[ "$(gh release view "v$VERSION" --json isDraft --jq .isDraft)" == true ]]; then
+            gh release edit "v$VERSION" --draft=false --latest
           fi
       - name: Update AUR
         env:
