@@ -1,8 +1,9 @@
 # ztty
 
-**0.3.1 正在准备发布。** 当前源码版本仍需通过新 tag 的 Verify 和六个原生架构门禁。
-下载请以 [官方 Releases](https://github.com/LIghtJUNction/ztty/releases) 中实际存在的资产为准。
-[当前准备状态与历史记录](docs/releasing.md#031-preparation)区分候选验证、正式发布和设备安装。
+**ztty 0.3.1** 为 Linux 和 Windows 加入常用字号缩放与标签切换快捷键，
+修复 Windows 窗口缩放显示，并加强终端状态和 MCP 会话身份校验。
+下载入口为 [官方 Releases](https://github.com/LIghtJUNction/ztty/releases)。
+[发布门禁与源码记录](docs/releasing.md#031-release-gate)分别记录候选验证、正式发布和设备安装。
 
 <!-- terminal-benchmark:start -->
 [![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
@@ -73,7 +74,8 @@ macOS 后端不要求 X11，Windows 后端不要求 WSL。上述原生检查在
 旧 `v0.3.0` tag 固定在 `9b5497d`，当时 Windows ARM 快速缩放失败，正式发布被跳过，
 Release-by-tag API 返回 404。设备后来确实安装了源码 `19274145` 的本地候选
 `ztty 0.3.0-1`，它与失败的 tag 不同源，也不是官方 Release 下载。
-新 `0.3.1` 的正式 Verify、六平台验收与正式安装仍待完成。
+完整 `0.3.1` 候选源码 `90ec70fe` 已在[运行 44365691692](https://github.com/LIghtJUNction/ztty/actions/runs/44365691692)
+通过六个原生架构任务；正式 tag 验证、实际发布资产和设备安装各有独立记录。
 [发布记录](docs/releasing.md)保留这些不同阶段；[协议说明](docs/protocols.md#acceptance-coverage)
 记录能力范围。Hyprland 图片属于历史验收，Xvfb 检查也不代表物理显示延迟或完整输入法矩阵。
 
