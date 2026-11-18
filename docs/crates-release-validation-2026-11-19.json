@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-19T00:30:40+08:00",
+  "source_commit": "74a599445fa358bbe7d1fdb71e923a97fe398467",
+  "published_count": 4,
+  "publications": [
+    {
+      "name": "zinput",
+      "version": "0.1.1",
+      "created_at": "2026-11-18T15:58:46.688087Z",
+      "url": "https://crates.io/crates/zinput/0.1.1",
+      "source_commit": "74a599445fa358bbe7d1fdb71e923a97fe398467",
+      "sha256": "c88addbab550c221a40f764002674a6e1e9b0ccc832139048f87f241f87c00f9",
+      "official_download_matches": true,
+      "local_archive_matches": true,
+      "yanked": false
+    },
+    {
+      "name": "zgraphics",
+      "version": "0.1.1",
+      "created_at": "2026-11-18T16:01:48.973787Z",
+      "url": "https://crates.io/crates/zgraphics/0.1.1",
+      "source_commit": "74a599445fa358bbe7d1fdb71e923a97fe398467",
+      "sha256": "5d47cac5269b7873f7c7a1c1e24bf56636f1be29830ddd17f96ed2e847533ebc",
+      "official_download_matches": true,
+      "local_archive_matches": true,
+      "yanked": false
+    },
+    {
+      "name": "zpty",
+      "version": "0.2.1",
+      "created_at": "2026-11-18T16:02:05.410654Z",
+      "url": "https://crates.io/crates/zpty/0.2.1",
+      "source_commit": "74a599445fa358bbe7d1fdb71e923a97fe398467",
+      "sha256": "e04083399cd7e57fa3cd362d4574108ef9761041b3acb5fe5cb8960325f7bca4",
+      "official_download_matches": true,
+      "local_archive_matches": true,
+      "yanked": false
+    },
+    {
+      "name": "zterm",
+      "version": "0.3.0",
+      "created_at": "2026-11-18T16:03:51.641799Z",
+      "url": "https://crates.io/crates/zterm/0.3.0",
+      "source_commit": "74a599445fa358bbe7d1fdb71e923a97fe398467",
+      "sha256": "d82f8016bb0bed5200c9fb5142bce46dc0445db258537f073fea14a3ccb29798",
+      "official_download_matches": true,
+      "local_archive_matches": true,
+      "yanked": false
+    }
+  ],
+  "consumer_verification": {
+    "status": "passed",
+    "verifier_commit": "10f6d13625d1a32d99c102e2d059e2fc0dff815c",
+    "cargo_timeout_seconds": 1800,
+    "report": "registry-published-consumers.json",
+    "report_sha256": "a52a192ae8a37762eb72c2f72825883edf51636ae0235c0688aae5e81d63d96b",
+    "exit_code": 0,
+    "duration_seconds": 283.92,
+    "individual_checks_passed": 4,
+    "combined_check_passed": true,
+    "no_std_library_checks_passed": 5,
+    "runtime_consumers_passed": 5,
+    "cargo_commands_passed": 15,
+    "registry_versions": {
+      "zinput": "0.1.1",
+      "zgraphics": "0.1.1",
+      "zpty": "0.2.1",
+      "zterm": "0.3.0"
+    },
+    "all_registry_source_commits": "74a599445fa358bbe7d1fdb71e923a97fe398467",
+    "all_registry_checksums_match_uploads": true,
+    "prior_attempts_preserved": true,
+    "verifier_merge": "bf57806efa9547faf674c596a0179de64afffeb2",
+    "scope": "Actual crates.io dependencies pinned to exact versions; no path or git substitutions. Consumer libraries compile with no_std; executable harnesses use std. zpty opens and exercises a real PTY on Linux."
+  }
+}
