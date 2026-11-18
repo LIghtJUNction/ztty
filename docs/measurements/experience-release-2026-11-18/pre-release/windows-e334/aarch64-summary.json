@@ -1,0 +1,222 @@
+{
+  "run_id": 44305368950,
+  "source_sha": "e334cf7ed6bb757f092ebabdcae5291c0d54b03a",
+  "architecture": "aarch64",
+  "job_id": 134805525694,
+  "artifact_id": 14428206571,
+  "artifact_zip_sha256": "2d8a66998e42ec191b3ccb8591165d15b32f04aa82190c56006ac4df9bb81bd9",
+  "binary_sha256": "28f695deea42f8dc2fb886db96d3911aa6a927b64b68a1547b6ea92cb8f7b94e",
+  "build": {
+    "passed": false,
+    "status": "failed",
+    "build_only": true,
+    "candidate_platform": "windows",
+    "outcomes": {
+      "toolchain": "success",
+      "build": "success",
+      "native": "failure",
+      "package": "success"
+    }
+  },
+  "complete_native": {
+    "passed": false,
+    "status": "failed",
+    "error": "AssertionError('timeout: pane A history; last error: None')"
+  },
+  "base_rapid": {
+    "checks_completed": 31,
+    "all_checks_passed": true,
+    "runtime_trace_enabled": false,
+    "resize_path": "rapid",
+    "visible_pixel_checks_completed": 19,
+    "restored_red": [
+      255,
+      0,
+      0
+    ],
+    "before_restored_png_identical": true,
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 0
+    }
+  },
+  "redirected_host_stdio": {
+    "returncode": 0,
+    "child": {
+      "pid": 9804,
+      "parent_pid": 2728,
+      "handles": {
+        "stdin": {
+          "handle": 104,
+          "console": true,
+          "console_mode": 503,
+          "file_type": 2,
+          "error": 0
+        },
+        "stdout": {
+          "handle": 112,
+          "console": true,
+          "console_mode": 7,
+          "file_type": 2,
+          "error": 0
+        },
+        "stderr": {
+          "handle": 116,
+          "console": true,
+          "console_mode": 7,
+          "file_type": 2,
+          "error": 0
+        }
+      },
+      "columns": 20,
+      "rows": 10
+    },
+    "stdout_bytes": 0,
+    "stderr": ""
+  },
+  "diagnostic_retries": {
+    "rapid_trace": {
+      "executed": false,
+      "reason": "Original base rapid passed"
+    },
+    "staged_trace": {
+      "executed": false,
+      "reason": "Original base rapid passed"
+    }
+  },
+  "workspace": {
+    "entered": true,
+    "required_checks": 19,
+    "checks_completed": 5,
+    "completed_names": [
+      "native_architecture_and_initial_pty",
+      "split_right_distinct_pty",
+      "split_viewport_pixels",
+      "pane_keyboard_focus_isolation",
+      "inactive_pane_mouse_tracking"
+    ],
+    "active_check": "pane A history",
+    "failed_pixels": {
+      "name": "pane A history",
+      "samples": [
+        {
+          "client": [
+            59,
+            15
+          ],
+          "screen": [
+            75,
+            54
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 459396,
+          "pid_at_point": 9740,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 459396,
+          "pid_at_point": 9740,
+          "owned": true,
+          "visible": true
+        }
+      ],
+      "window": {
+        "client": [
+          0,
+          0,
+          600,
+          404
+        ],
+        "outer": [
+          8,
+          8,
+          624,
+          451
+        ],
+        "monitor": [
+          0,
+          0,
+          1024,
+          768
+        ],
+        "work": [
+          0,
+          0,
+          1024,
+          720
+        ],
+        "dpi": 96,
+        "hwnd": 459396,
+        "pid": 9740,
+        "foreground": 459396,
+        "visible": true,
+        "minimized": false
+      }
+    },
+    "visible_pixel_checks_completed": 1,
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 0,
+      "all_probe_processes_exited": true
+    },
+    "probe_processes": {
+      "a": {
+        "pid": 8956,
+        "exited": true
+      },
+      "b": {
+        "pid": 3580,
+        "exited": true
+      }
+    }
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-10472-e3de99368cad45d795acfe5b96d96706",
+    "input_after_restore": "Default"
+  },
+  "desktop_worker_exit_code": 1,
+  "pngs": 9,
+  "contract_tests": {
+    "passed": true,
+    "log": "ztty-windows-aarch64.native.contract.log",
+    "exit_code": 0
+  }
+}

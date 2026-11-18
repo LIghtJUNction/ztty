@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "linux": {
+    "test_checkout_source_sha": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+    "runtime_build_source_sha": "3730b28a16f48b15809581213bccab284f6f4f22",
+    "runtime_source_origin": "Recorded device build and earlier scroll-prompt source binding; this wrapper source field identifies the test checkout, not a new build.",
+    "binary_sha256": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada",
+    "binary_sha256_after": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada",
+    "architecture": "x86_64",
+    "source_before": {
+      "commit": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+      "tracked_changes": []
+    },
+    "source_after": {
+      "commit": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+      "tracked_changes": []
+    },
+    "passed": true,
+    "cases": [
+      {
+        "name": "workspaces",
+        "passed": true,
+        "checks": 17,
+        "pngs": 2,
+        "remaining_owned_pids": []
+      },
+      {
+        "name": "daily_workflow",
+        "passed": true,
+        "checks": 18,
+        "pngs": 10,
+        "remaining_owned_pids": []
+      },
+      {
+        "name": "session_switcher",
+        "passed": true,
+        "checks": 6,
+        "pngs": 7,
+        "remaining_owned_pids": []
+      },
+      {
+        "name": "sixel_gui",
+        "passed": true,
+        "checks": 10,
+        "pngs": 1,
+        "remaining_owned_pids": []
+      },
+      {
+        "name": "input_gui",
+        "passed": true,
+        "checks": 9,
+        "pngs": 1,
+        "remaining_owned_pids": []
+      },
+      {
+        "name": "repaint_gui",
+        "passed": true,
+        "checks": 7,
+        "pngs": 6,
+        "remaining_owned_pids": []
+      }
+    ],
+    "total_groups": 67,
+    "total_pngs_recorded": 27,
+    "copied_evidence": [
+      "linux/native.json",
+      "linux/native.log"
+    ],
+    "all_27_pngs_copied_in_this_appendix": false
+  },
+  "windows": {
+    "x86_64": {
+      "source_sha": "3418b82dcfa1b9323379e36aec0f3926371b0eb6",
+      "run_id": 44306719420,
+      "job_id": 134810151560,
+      "build_status": "accepted",
+      "binary_sha256": "4ab87f9b7dcc208ddb332a70680054345a52723d40af258dd742920677331dc2",
+      "base_checks": 31,
+      "base_pixel_checks": 19,
+      "workspace_checks": 19,
+      "workspace_pixel_groups": 12,
+      "pngs": 12,
+      "runtime_trace_enabled": false,
+      "resize_path": "rapid",
+      "full_cleanup_passed": true
+    },
+    "aarch64": {
+      "source_sha": "3418b82dcfa1b9323379e36aec0f3926371b0eb6",
+      "run_id": 44306719420,
+      "job_id": 134810151465,
+      "build_status": "accepted",
+      "binary_sha256": "f048c1066b00c80048445bd8633b422d985dc6b108f35abe2be3a90931881bc1",
+      "base_checks": 31,
+      "base_pixel_checks": 19,
+      "workspace_checks": 19,
+      "workspace_pixel_groups": 12,
+      "pngs": 12,
+      "runtime_trace_enabled": false,
+      "resize_path": "rapid",
+      "full_cleanup_passed": true
+    }
+  },
+  "windows_previous_workspace_failure": {
+    "x86_64": {
+      "source_sha": "e334cf7ed6bb757f092ebabdcae5291c0d54b03a",
+      "run_id": 44305368950
+    },
+    "aarch64": {
+      "source_sha": "e334cf7ed6bb757f092ebabdcae5291c0d54b03a",
+      "run_id": 44305368950
+    }
+  },
+  "acceptance_scope": "Build-only source-bound candidates and a Linux development-machine run. These records do not establish acceptance of a final tag.",
+  "rapid_resize_limit": "e334 and 3418 each passed the original untraced rapid path on both native architectures. The earlier dc43870 black-strip mechanism has not been independently reproduced and closed; candidate passes are not a causal proof for that historical failure.",
+  "release_status": "pending",
+  "device_installation_status": "pending",
+  "copied_files_are_byte_identical": true,
+  "copied_files_with_crlf": [
+    "docs/measurements/experience-release-2026-11-18/pre-release/windows-3418/x86_64.native.json",
+    "docs/measurements/experience-release-2026-11-18/pre-release/windows-3418/aarch64.native.json"
+  ],
+  "notes": [
+    "Original JSON, logs and newline bytes are preserved. Paths inside raw reports are source-machine paths; actual copied scope is listed by the manifest.",
+    "The Linux wrapper records test checkout 8a2f4be while the executable remains the 3730b28 candidate with SHA-256 2a50377... .",
+    "No new tests, builds, runtime edits or Git operations were performed for this report update."
+  ]
+}

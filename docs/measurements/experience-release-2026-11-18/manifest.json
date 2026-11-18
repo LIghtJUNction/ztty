@@ -398,13 +398,80 @@
       "source_path": "artifacts/experience-release/back-to-live-gates/full-check-interrupted-3730.log",
       "bytes": 803,
       "sha256": "5a3f4c9dada4d683b6685e51bd26d1b69f8a7f81f6dd90a28449bc6ff1233ea0"
+    },
+    {
+      "path": "pre-release/linux/native.json",
+      "source_path": "artifacts/experience-release/device/linux-final-local/native.json",
+      "bytes": 26289,
+      "sha256": "1c4062a45df794c862be14e1707ebf1dc687de0214c0baaf42b9858a0f516302"
+    },
+    {
+      "path": "pre-release/linux/native.log",
+      "source_path": "artifacts/experience-release/device/linux-final-local/native.log",
+      "bytes": 689,
+      "sha256": "e2629f70c46249b3241688422cf3b46e949c5d74451c29bbf4f7e1d9c0272765"
+    },
+    {
+      "path": "pre-release/windows-3418/x86_64-summary.json",
+      "source_path": "artifacts/release-audit/windows-history-retry-44306719420/windows-x86_64-summary.json",
+      "bytes": 11921,
+      "sha256": "544aad3c572c1f0277b9e1b0722abc4b5bc7cee2d5e22d5c6defca82ef388839"
+    },
+    {
+      "path": "pre-release/windows-3418/x86_64.native.json",
+      "source_path": "artifacts/release-audit/windows-history-retry-44306719420/ztty-windows-x86_64/ztty-windows-x86_64.native.json",
+      "bytes": 60036,
+      "sha256": "24b9cb7c80c9be82bd407cad0440b02ccb6b97e8ec2d0fb031af5fa85539813d"
+    },
+    {
+      "path": "pre-release/windows-3418/x86_64.native.workspace.json",
+      "source_path": "artifacts/release-audit/windows-history-retry-44306719420/ztty-windows-x86_64/ztty-windows-x86_64.native.workspace.json",
+      "bytes": 26047,
+      "sha256": "94adb2594bffc0d379fcd69430b4587e298b8e2b9c8e6e612b857fcbd9d0c60e"
+    },
+    {
+      "path": "pre-release/windows-e334/x86_64-summary.json",
+      "source_path": "artifacts/release-audit/windows-stdio-retry-44305368950/windows-x86_64-summary.json",
+      "bytes": 4815,
+      "sha256": "f7d92ec9ffadef64fe45e0715f3e49fd0c479d1e118c6f6bd8531d600cd43b62"
+    },
+    {
+      "path": "pre-release/windows-3418/aarch64-summary.json",
+      "source_path": "artifacts/release-audit/windows-history-retry-44306719420/windows-aarch64-summary.json",
+      "bytes": 11925,
+      "sha256": "d17d420bf354540fbadfca1992fb8787638c1f270077daa1a773b2c4e98fa619"
+    },
+    {
+      "path": "pre-release/windows-3418/aarch64.native.json",
+      "source_path": "artifacts/release-audit/windows-history-retry-44306719420/ztty-windows-aarch64/ztty-windows-aarch64.native.json",
+      "bytes": 60080,
+      "sha256": "4a3c772c548484eb7784660b1f0082592a0264cd752d84824a98fe9a8bf58c85"
+    },
+    {
+      "path": "pre-release/windows-3418/aarch64.native.workspace.json",
+      "source_path": "artifacts/release-audit/windows-history-retry-44306719420/ztty-windows-aarch64/ztty-windows-aarch64.native.workspace.json",
+      "bytes": 26058,
+      "sha256": "32c45616e96cbdd4d5266ba9af4433f68de672023f147e3e74b905435f774c53"
+    },
+    {
+      "path": "pre-release/windows-e334/aarch64-summary.json",
+      "source_path": "artifacts/release-audit/windows-stdio-retry-44305368950/windows-aarch64-summary.json",
+      "bytes": 4818,
+      "sha256": "7840db41de6dbf291d8ed3a1a8e883c7e57878f777e015b4982d13e69db17ac4"
+    },
+    {
+      "path": "pre-release/index.json",
+      "source_path": "derived from the copied Linux wrapper, Windows source-bound audit/native records and preserved runtime binding",
+      "bytes": 4436,
+      "sha256": "389fd3da6ffe5ca5add04d0f336df1a18d036411cf870ce2024110372df58b57"
     }
   ],
   "notes": [
     "Original failure statuses are retained. This manifest does not claim that every path referenced inside a source JSON has been copied.",
     "summary.json, scroll-prompt/source-binding.json and scroll-prompt/pixel-review.json are derived indexes or analyses; all other entries are byte-identical copies from the recorded source paths.",
     "The performance executables are development-only std benchmark programs, separate from the no_std terminal runtime.",
-    "The six added PNGs are original scrollback captures. No image was modified, and the source tar archive and four older screenshots were not duplicated."
+    "The six added PNGs are original scrollback captures. No image was modified, and the source tar archive and four older screenshots were not duplicated.",
+    "pre-release/index.json is an additional derived index; all other pre-release entries preserve the source bytes, including CRLF in native JSON records."
   ],
   "appended_checkpoints": [
     {
@@ -429,6 +496,14 @@
       "summary": "scroll-prompt/full-check-8a.json",
       "log": "scroll-prompt/full-check-8a.log",
       "interrupted_attempt": "scroll-prompt/full-check-interrupted-3730.json"
+    },
+    {
+      "name": "pre-release-platform-follow-up",
+      "index": "pre-release/index.json",
+      "linux_test_checkout_source_sha": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+      "linux_runtime_source_sha": "3730b28a16f48b15809581213bccab284f6f4f22",
+      "windows_accepted_source_sha": "3418b82dcfa1b9323379e36aec0f3926371b0eb6",
+      "windows_run_id": 44306719420
     }
   ]
 }
