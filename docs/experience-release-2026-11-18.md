@@ -307,6 +307,25 @@ x64 的画面表现不同，不能套用 ARM64 的同点变灰结论。它的背
 
 本轮四个应用进程均退出、临时目录均实际删除，外层 Job 清空且桌面恢复。ARM64 第二个目录首次删除遇到 `winerror=32`，在原有两秒期限内第二次删除成功，总耗时约 0.0567 秒，原像素失败保持不变；其余目录均首试删除。x64 和 ARM64 worker 分别在 12.381 秒、13.393 秒以退出码 1 结束。本轮没有取得发布或设备安装资格，后续生产策略的结果须按其自身源码和验收记录另行判断。[本轮清理与交付范围](measurements/experience-release-2026-11-18/copy-pixels-44326997082/index.json)
 
+### 5.11. 空有效矩形策略候选：x64 完成门禁，ARM64 第六次冷启动仍失败
+
+源码 `07851a38374f5794e1f0013de0821d0be76ae32b` 的 [Windows 候选 run 44330414544](https://github.com/LIghtJUNction/ztty/actions/runs/44330414544) 在 x64 完成全部指定门禁，但 ARM64 再次出现原来的缩放恢复错误，整个候选仍失败。本轮生产改动在 `WM_NCCALCSIZE` 的默认处理后保留客户区矩形，把有效源、目标矩形置空并返回 `WVR_VALIDRECTS`；已有 `NOCOPYBITS` 请求和消息队列绘制策略继续保留。测试没有增加逐帧查询：全部原生记录均为 `paint_diagnostics_enabled=false`、`runtime_trace_enabled=false`，原 31 项、每进程 warm 10 轮、背靠背 10 轮和固定 8 次冷启动要求保持不变。[本轮源码](https://github.com/LIghtJUNction/ztty/blob/07851a38374f5794e1f0013de0821d0be76ae32b/src/platform/windows.rs) · [同源结果索引](measurements/experience-release-2026-11-18/preserve-none-44330414544/index.json)
+
+| 架构 | 冷启动与原始门禁 | 工作区 | 本轮结果 |
+| --- | --- | --- | --- |
+| Windows x64 | 8 个独立进程各完成原 31 项、warm 10 轮和背靠背 10 轮；无失败快照或独立诊断重试 | 19 项全部进入并通过 | 该架构候选通过 |
+| Windows ARM64 | 第 1–5 个进程各完成 31＋10＋10；第 6 个进程完成 23 项后，原 `resize_restores_visible_image` 失败；该进程的 warm／背靠背及第 7–8 次冷启动均未进入 | 未进入 | 候选失败 |
+
+x64 的成功记录覆盖了本轮要求的冷启动、快速缩放和多工作区路径。独立审计核对了 367 张 PNG 的文件身份与尺寸，并从图像重新读取 600 个原生缩放采样点，均与预期和原始 ClientDC 记录一致。工作区的 34 条 live GetPixel 记录也全部精确匹配，其中 19 条具有对应阶段 PNG，可再从图像核对；其余 15 条保留实时采样证据，没有把它们计入 PNG 复核数。正常缩放记录的 `screen_rgb` 均为 null，不能称为直接 ScreenDC 采样。分屏、焦点、历史、选区、静默修饰键、尺寸更新、标签页和子进程退出的 19 项结果由独立工作区原始报告保留。[x64 审计摘要](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-x86_64/summary.json) · [原生汇总](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.json) · [工作区原始报告](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.workspace.json)
+
+ARM64 第六个进程 PID 8544 的原始失败仍位于红色采样点 `(175,28)`：预期 `[255,0,0]`，实际 `[20,20,20]`。原失败 PNG 相对正确画面的差异覆盖 `x=152…179`、整个 190 像素高度；第 28 行的 `x=152…178` 是平台灰色，最右一列是边框色。该架构 231 张 PNG 与 382 条几何／像素采样记录已核对，后一个数量包含两个失败后的诊断采样，不是通过的测试项数。[ARM64 审计摘要](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/summary.json) · [第六次原始报告](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.json) · [原失败图](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.resize-restored.png)
+
+失败后的同进程快照显示，surface、client 和 bitmap 均为 180×190，grid／PTY 均为 20×10，CPU 与 source 的红色像素正确；resize／paint pending、full redraw 和 dirty 标记均未置位，`deferred_paints=0`。显式 flush 后 target 仍是灰色，PNG 与原失败图逐字节相同；随后普通重画恢复，PNG 与缩放前正确图逐字节相同。这个顺序说明失败没有被单独 flush 消除，普通重画能够恢复当前画面；原始失败结果保持不变。因为额外绘制查询关闭，`last_paint.target_after_blit=null`，这里的红色 source 只是在失败后测得，不能据此倒推最后一次 `BitBlt` 当时的像素。[失败后快照](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.json) · [flush 后图](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.png) · [普通重画后图](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-repaint.png)
+
+本轮能够支持的结论是：空有效矩形策略仍未消除所观察到的故障，x64 的全部通过不能替代 ARM64 的失败。此源码没有记录 `WM_NCCALCSIZE` 输入、默认处理后及最终提交的矩形，因而既不能据此认定某个内部复制或 backing 行为已发生，也不能认定系统忽略了指定标志。固定次数的结果不用于估计总体失败率，更不构成六平台正式发布通过。[本轮观察与推断边界](measurements/experience-release-2026-11-18/preserve-none-44330414544/index.json)
+
+x64 的 8 个冷启动窗口进程、1 个工作区窗口进程及工作区 4 个 PTY 探针均退出；ARM64 的 6 个窗口进程也全部退出。两架构所有应用临时目录均首试实际删除，Job 清空、桌面和句柄恢复；x64 worker 在 14.480 秒以退出码 0 结束，ARM64 worker 在 19.514 秒以退出码 1 结束。证据目录保留 x64 原生汇总／工作区报告和 ARM64 原失败／快照，其他冷启动原始文件的源码、二进制与报告 SHA-256 仍由各架构索引和原 artifact 绑定。本次未发布或安装新正式版本。[x64 文件身份](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-x86_64/evidence-index.json) · [ARM64 文件身份](measurements/experience-release-2026-11-18/preserve-none-44330414544/windows-aarch64/evidence-index.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)

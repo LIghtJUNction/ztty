@@ -1134,6 +1134,108 @@
       "source_path": "artifacts/release-audit/copy-pixels-44326997082/windows-x86_64/ztty-windows-x86_64.native.cold-02.resize-restored.png",
       "bytes": 642,
       "sha256": "3109187c34b845670893a40f7f58e3208f36458d155bdda34dbde90585656f8f"
+    },
+    {
+      "path": "preserve-none-44330414544/index.json",
+      "source_path": "derived: preserve-none-44330414544/index.json",
+      "bytes": 4956,
+      "sha256": "ed82493341c5051de471fff6524526ee4d8dbea56e7823786be6f36219936a39"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/evidence-index.json",
+      "source_path": "derived: preserve-none-44330414544/windows-aarch64/evidence-index.json",
+      "bytes": 4594,
+      "sha256": "d1acfc99386899456dda3ac246d7e7088ce505cfdebbb780530690a8f9996759"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/summary.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/summary.json",
+      "bytes": 11366,
+      "sha256": "3b4e2191bc08a543a0987e0008ffc096e357406b72c1ee3ecd65330d4dc0fe92"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 45432,
+      "sha256": "1e8967180906aebf84c2c8eded477334deb93a21aac2db35c62c3da334637ffb"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.json",
+      "bytes": 43833,
+      "sha256": "00181c5ba658fdf05bf5a9ab5fbc9c3aee60fd5c56cc0f70b985704e312b1bf5"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.json",
+      "bytes": 1734,
+      "sha256": "20fe1c8f177882c02aa388e526ec9dca59954f2f8c90c429011f4f3790c16751"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-repaint.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.resize-restored.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/evidence-index.json",
+      "source_path": "derived: preserve-none-44330414544/windows-x86_64/evidence-index.json",
+      "bytes": 4561,
+      "sha256": "dfa5d65a00e7ba91b8f3672723243fe1a9c8feca17e8c1e277fdcaa93a4c0d69"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/summary.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-x86_64/summary.json",
+      "bytes": 11385,
+      "sha256": "86cf9a2cc983f986bbda2b82575ccc88d7a8d8d338c1faa19580447c2fee1cf3"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 69969,
+      "sha256": "bb39bed95921426107a1f478e0d23cc304bd3521997fc10dd26e43b09a02de2b"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.json",
+      "bytes": 255913,
+      "sha256": "dfe12e57ad5f2b3b67b70a602caa122f052db03b7482d21bc8f8105873eeef59"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.workspace.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.workspace.json",
+      "bytes": 26226,
+      "sha256": "7720a60332c32285c21d075caea5889e0681eba57928bfb0c133aa51d5a79a81"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.workspace.resized.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.workspace.resized.png",
+      "bytes": 1820,
+      "sha256": "a93302c74648a45f0a53b926dac70ee4556af4b056111f9a0295d95941f4b290"
+    },
+    {
+      "path": "preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.workspace.three-panes.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-x86_64/ztty-windows-x86_64.native.workspace.three-panes.png",
+      "bytes": 2241,
+      "sha256": "ccf7dec33d1f03a0d35abe33556cae7e4fd39bd1e00d9e3c2137324d5e00a357"
     }
   ],
   "notes": [
@@ -1148,7 +1250,8 @@
     "burst-44320248994 preserves the failed NOCOPYBITS-policy candidate. Both architectures first failed the original pixel gate, after earlier cold runs passed original31/warm10/back-to-back10. Indexes and summaries are derived; raw build/failed-cold/snapshot JSON and three PNGs per architecture are byte-identical copies. No evidence establishes that Windows ignored a flag, and no diagnostic recovery accepts the candidate.",
     "paint-diagnostics-44323138525 preserves the failed 03053 diagnostic candidate with paint_diagnostics_enabled=true; no ordinary acceptance credit is assigned. Both architectures first failed the unchanged original pixel gate. NOCOPYBITS delivery and the full post-BitBlt clip/correct origin were recorded; another thread SetWindowPos completion, internal backing-surface/copy order and source/target RGB during that BitBlt remain unobserved. Indexes and summaries are derived; raw build/failed-cold/snapshot JSON and three PNGs per architecture are byte-identical copies.",
     "queued-paint-44324788860 preserves source f10e0da after removing unconditional UpdateWindow. Both original untraced first-process gates failed after 23 checks with paint_diagnostics_enabled=false; no full cold start completed and workspace did not enter. Separate traced diagnostics cannot accept the failure. The ARM staged diagnostic passed its ACK-based 31 checks but failed the later rapid warm iteration 1. The null immediate target record is not replaced with older diagnostic source evidence. Raw build/original/snapshot JSON and three PNGs per architecture are byte-identical copies; summaries and indexes are derived.",
-    "copy-pixels-44326997082 preserves the failed 7e163 diagnostic candidate with paint_diagnostics_enabled=true. Both architectures passed cold1 31+10+10 and failed cold2 after 23 checks. Only ARM shows [178,95] correct in the before-EndPaint target record and gray later; x64 keeps that background point correct while the distinct red gate point fails. Neither has a copy-time measurement of red at [175,28]. Raw build/failed-cold/snapshot JSON and three PNGs per architecture are byte-identical copies; summaries and indexes are derived. No root-cause or ordinary acceptance claim is made."
+    "copy-pixels-44326997082 preserves the failed 7e163 diagnostic candidate with paint_diagnostics_enabled=true. Both architectures passed cold1 31+10+10 and failed cold2 after 23 checks. Only ARM shows [178,95] correct in the before-EndPaint target record and gray later; x64 keeps that background point correct while the distinct red gate point fails. Neither has a copy-time measurement of red at [175,28]. Raw build/failed-cold/snapshot JSON and three PNGs per architecture are byte-identical copies; summaries and indexes are derived. No root-cause or ordinary acceptance claim is made.",
+    "preserve-none-44330414544 preserves normal-mode source 07851a3 with paint diagnostics and runtime trace disabled. x64 passed all eight original31/warm10/back-to-back10 cold runs and workspace19; ARM passed cold1 through cold5 then failed the original restore gate after 23 checks in cold6, without cold7/cold8/workspace. x64 aggregate/workspace and ARM failed-cold/snapshot reports, build records and three PNGs per architecture are raw byte-identical copies; summaries/indexes are derived. The same-source x64 success does not accept ARM or establish an eliminated failure. Post-failure source pixels are not copy-time evidence."
   ],
   "appended_checkpoints": [
     {
@@ -1296,6 +1399,28 @@
       "generic_target_changed_later_architectures": [
         "aarch64"
       ]
+    },
+    {
+      "name": "empty-valid-rectangle-candidate",
+      "source_sha": "07851a38374f5794e1f0013de0821d0be76ae32b",
+      "run_id": 44330414544,
+      "index": "preserve-none-44330414544/index.json",
+      "status": "failed",
+      "paint_diagnostics_enabled": false,
+      "runtime_trace_enabled": false,
+      "required_cold_starts": 8,
+      "per_cold_required_original_warm_burst": [
+        31,
+        10,
+        10
+      ],
+      "x64_completed_cold_starts": 8,
+      "x64_workspace_checks": 19,
+      "arm_completed_cold_starts": 5,
+      "arm_failed_cold_start": 6,
+      "arm_original_checks_completed_before_failure": 23,
+      "arm_workspace_entered": false,
+      "formal_release_eligible": false
     }
   ]
 }
