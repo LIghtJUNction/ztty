@@ -532,6 +532,40 @@ def worker(args, state_path):
         # windows_native.run writes its checks, original error, PNGs and cleanup
         # from finally. Preserve that evidence instead of replacing its report.
         traceback.print_exc()
+        try:
+            original = json.loads(args.output.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return 1
+        cleanup = original.get("cleanup", {})
+        if (original.get("passed") is False
+                and original.get("failed_pixel", {}).get("name") == "resize_restores_visible_image"
+                and cleanup.get("process_exited") is True
+                and cleanup.get("temporary_directory_removed") is True):
+            # GDI instrumentation can change batching. Retry only for evidence
+            # after cleanup; its result can never accept the original failure.
+            original["diagnostic_retries"] = []
+            for mode, staged in (("rapid", False), ("staged", True)):
+                diagnostic = args.output.with_suffix(f".resize-{mode}-diagnostic.json")
+                attempt = {"report": diagnostic.name, "mode": mode,
+                           "purpose": "diagnostic only; original gate remains failed"}
+                original["diagnostic_retries"].append(attempt)
+                try:
+                    windows_native.run(args.binary, diagnostic, args.arch,
+                                       trace_runtime=True, staged_resize=staged)
+                except BaseException:
+                    traceback.print_exc()
+                try:
+                    evidence = json.loads(diagnostic.read_text(encoding="utf-8"))
+                    cleanup = evidence.get("cleanup", {})
+                    attempt["passed"] = evidence.get("passed") is True
+                    attempt["cleanup_complete"] = (cleanup.get("process_exited") is True and
+                                                   cleanup.get("temporary_directory_removed") is True)
+                except (OSError, ValueError) as error:
+                    attempt["error"] = repr(error)
+                    attempt["cleanup_complete"] = False
+                write_json(args.output, original)
+                if not attempt["cleanup_complete"]:
+                    break
         return 1
     # Preserve the original thirty checks in their original report. The second
     # suite has its own JSON/PNG evidence and must also pass on this desktop.

@@ -168,6 +168,46 @@ class WorkspaceContract(unittest.TestCase):
             self.assertEqual(len(calls), 2)
             self.assertFalse(path.with_suffix(".json.tmp").exists())
 
+    def test_resize_diagnostic_success_cannot_accept_original_failure(self):
+        name = "ztty-native-1-" + "b" * 32
+        api = types.SimpleNamespace(context=lambda: {
+            "station": "WinSta0", "visible": True, "thread": name, "input": name})
+        for cleaned in (True, False):
+            with self.subTest(cleaned=cleaned), tempfile.TemporaryDirectory() as temporary:
+                output = Path(temporary) / "native.json"
+                state = Path(temporary) / "worker.json"
+                original = {"passed": False, "status": "failed", "error": "pixel stayed black",
+                            "checks": [{"name": "prior", "passed": True}],
+                            "failed_pixel": {"name": "resize_restores_visible_image", "actual": [0, 0, 0]},
+                            "cleanup": {"process_exited": True, "temporary_directory_removed": True}}
+                calls = []
+                def legacy(binary, report, arch, trace_runtime=False, staged_resize=False):
+                    calls.append((report, trace_runtime, staged_resize))
+                    evidence = {"passed": True, "cleanup": {
+                        "process_exited": cleaned, "temporary_directory_removed": cleaned}}
+                    desktop.write_json(report, evidence if trace_runtime else original)
+                    if not trace_runtime:
+                        raise AssertionError(original["error"])
+                    return True
+                args = types.SimpleNamespace(worker_desktop=name, binary=Path("ztty.exe"), output=output, arch="x64")
+                with patch.object(desktop, "WindowsAPI", return_value=api), \
+                        patch.dict("sys.modules", {"windows_native": types.SimpleNamespace(run=legacy)}), \
+                        patch.object(desktop.traceback, "print_exc"):
+                    self.assertEqual(desktop.worker(args, state), 1)
+                result = json.loads(output.read_text(encoding="utf-8"))
+                self.assertFalse(result["passed"])
+                self.assertEqual(result["error"], original["error"])
+                self.assertEqual(result["checks"], original["checks"])
+                self.assertEqual(result["failed_pixel"], original["failed_pixel"])
+                rapid = output.with_suffix(".resize-rapid-diagnostic.json")
+                staged = output.with_suffix(".resize-staged-diagnostic.json")
+                expected = [(output, False, False), (rapid, True, False)]
+                if cleaned:
+                    expected.append((staged, True, True))
+                self.assertEqual(calls, expected)
+                self.assertEqual(len(result["diagnostic_retries"]), 2 if cleaned else 1)
+                self.assertTrue(json.loads(rapid.read_text(encoding="utf-8"))["passed"])
+
 
 if __name__ == "__main__":
     unittest.main()

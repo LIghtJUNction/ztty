@@ -3,7 +3,11 @@
 
 use crate::{Config, appearance::Appearance, os};
 use alloc::{boxed::Box, ffi::CString, format, string::String, sync::Arc, vec, vec::Vec};
-use core::{cell::UnsafeCell, ffi::c_void, ptr};
+use core::{
+    cell::{Cell, UnsafeCell},
+    ffi::c_void,
+    ptr,
+};
 use zterm::{
     CursorShape, Terminal,
     input::{self, Key, KeyEvent, ModifierKey, Modifiers, MouseEvent},
@@ -39,6 +43,26 @@ const WM_CHAR: u32 = 0x0102;
 const WM_SYSKEYDOWN: u32 = 0x0104;
 const WM_SYSKEYUP: u32 = 0x0105;
 const WM_SYSCHAR: u32 = 0x0106;
+
+struct NativeTrace {
+    remaining: Cell<u16>,
+}
+impl NativeTrace {
+    fn new(enabled: bool) -> Self {
+        Self {
+            remaining: Cell::new(if enabled { 64 } else { 0 }),
+        }
+    }
+    fn enabled(&self) -> bool {
+        self.remaining.get() != 0
+    }
+    fn record(&self, message: core::fmt::Arguments<'_>) {
+        if self.enabled() {
+            self.remaining.set(self.remaining.get() - 1);
+            os::print(2, format!("{message}\n").as_bytes());
+        }
+    }
+}
 
 fn wide(text: &str) -> Vec<u16> {
     text.encode_utf16().chain([0]).collect()
@@ -479,9 +503,139 @@ struct App {
     cancelled_mouse_buttons: u8,
     title: String,
     focused: bool,
+    native_trace: NativeTrace,
 }
 
 impl App {
+    fn trace_frame(&self, event: &str, target: Handle, paint: &ffi::Rect, blit: i32) {
+        if !self.native_trace.enabled() {
+            return;
+        }
+        let mut client = ffi::Rect::default();
+        let mut source_clip = ffi::Rect::default();
+        let mut target_clip = ffi::Rect::default();
+        let mut bitmap: ffi::Bitmap = unsafe { core::mem::zeroed() };
+        let (selected, bitmap_read, source_clip_type, target_clip_type) = unsafe {
+            ffi::GdiFlush();
+            ffi::GetClientRect(self.hwnd, &mut client);
+            let selected = ffi::GetCurrentObject(self.surface.dc, 7);
+            (
+                selected,
+                ffi::GetObjectW(
+                    selected,
+                    core::mem::size_of::<ffi::Bitmap>() as i32,
+                    (&mut bitmap as *mut ffi::Bitmap).cast(),
+                ),
+                ffi::GetClipBox(self.surface.dc, &mut source_clip),
+                if target.is_null() {
+                    0
+                } else {
+                    ffi::GetClipBox(target, &mut target_clip)
+                },
+            )
+        };
+        let x = client.right - self.fonts.width / 2 - 1;
+        let y = self.fonts.height * 3 / 2;
+        let rgb = |value: Option<u32>| {
+            value.map_or_else(
+                || String::from("null"),
+                |value| {
+                    format!(
+                        "[{},{},{}]",
+                        value >> 16 & 255,
+                        value >> 8 & 255,
+                        value & 255
+                    )
+                },
+            )
+        };
+        let cpu = if x >= 0
+            && x < self.surface.width
+            && y >= 0
+            && y < self.surface.height
+            && !self.surface.pixels.is_null()
+        {
+            Some(unsafe {
+                *self
+                    .surface
+                    .pixels
+                    .add((y * self.surface.width + x) as usize)
+            })
+        } else {
+            None
+        };
+        let dc_pixel = |dc: Handle| {
+            if dc.is_null() {
+                return None;
+            }
+            let value = unsafe { ffi::GetPixel(dc, x, y) };
+            (value != u32::MAX).then(|| colorref(value))
+        };
+        let pane = self.panes.get(self.active).map_or_else(
+            || String::from("null"),
+            |pane| {
+                format!(
+                    concat!(
+                        "{{\"rect\":[{},{},{},{}],\"grid\":[{},{}],",
+                        "\"pty\":[{},{}],\"images\":{},\"placements\":{},\"grid_ready\":{}}}"
+                    ),
+                    pane.rect.x,
+                    pane.rect.y,
+                    pane.rect.width,
+                    pane.rect.height,
+                    pane.core.terminal.cols(),
+                    pane.core.terminal.rows(),
+                    pane.pty_size.cols,
+                    pane.pty_size.rows,
+                    pane.core.terminal.graphics().image_count(),
+                    pane.core.terminal.graphics().placement_count(),
+                    pane.grid_ready()
+                )
+            },
+        );
+        self.native_trace.record(format_args!(
+            concat!(
+                "{{\"event\":\"{}\",\"ms\":{},\"client\":[{},{}],\"surface\":[{},{}],",
+                "\"bitmap_read\":{},\"bitmap\":[{},{}],\"bitmap_matches\":{},",
+                "\"source_clip_type\":{},\"source_clip\":[{},{},{},{}],",
+                "\"paint\":[{},{},{},{}],\"target_clip_type\":{},\"target_clip\":[{},{},{},{}],",
+                "\"blit\":{},\"sample\":[{},{}],\"cpu_rgb\":{},\"source_rgb\":{},",
+                "\"target_rgb\":{},\"pane\":{}}}"
+            ),
+            event,
+            os::milliseconds(),
+            client.right,
+            client.bottom,
+            self.surface.width,
+            self.surface.height,
+            bitmap_read,
+            bitmap.width,
+            bitmap.height,
+            selected == self.surface.bitmap,
+            source_clip_type,
+            source_clip.left,
+            source_clip.top,
+            source_clip.right,
+            source_clip.bottom,
+            paint.left,
+            paint.top,
+            paint.right,
+            paint.bottom,
+            target_clip_type,
+            target_clip.left,
+            target_clip.top,
+            target_clip.right,
+            target_clip.bottom,
+            blit,
+            x,
+            y,
+            rgb(cpu),
+            rgb(dc_pixel(self.surface.dc)),
+            rgb(dc_pixel(target)),
+            pane
+        ));
+    }
+
     fn enqueue(&mut self, index: usize, bytes: &[u8]) {
         if !self.panes[index].core.input.push(bytes) {
             os::print(2, b"ztty: input queue full; paste was rejected\n");
@@ -602,6 +756,7 @@ impl App {
         }
         let width = client.right.max(1);
         let height = client.bottom.max(1);
+        self.trace_frame("arrange-start", NULL, &ffi::Rect::default(), 0);
         let changed = self.surface.width != width || self.surface.height != height;
         let placements = layout.placements(width, height);
         let geometry_changed = changed
@@ -723,6 +878,7 @@ impl App {
         unsafe {
             ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
         }
+        self.trace_frame("arrange-commit", NULL, &ffi::Rect::default(), 0);
         Ok(())
     }
 
@@ -1443,9 +1599,10 @@ impl App {
             }
         }
         self.full_redraw = false;
+        let mut blit = 0;
         if !self.surface.bitmap.is_null() {
             unsafe {
-                ffi::BitBlt(
+                blit = ffi::BitBlt(
                     dc,
                     0,
                     0,
@@ -1458,6 +1615,7 @@ impl App {
                 );
             }
         }
+        self.trace_frame("paint", dc, &paint.paint, blit);
         unsafe {
             ffi::EndPaint(self.hwnd, &paint);
         }
@@ -2025,6 +2183,7 @@ fn virtual_key(vk: u32, flags: isize) -> Key {
 struct WindowState {
     app: UnsafeCell<App>,
     dispatch: session_dispatch::Dispatch,
+    native_trace: NativeTrace,
 }
 impl WindowState {
     fn with<R>(&self, operation: impl FnOnce(&mut App) -> R) -> Option<R> {
@@ -2056,6 +2215,16 @@ unsafe extern "system" fn window_proc(
         // Sent WM_SIZE can arrive while another callback owns App. Retain it
         // without borrowing App; the outer loop reads the latest client size.
         state.dispatch.resize_event(wparam == 1);
+        if state.native_trace.enabled() {
+            let mut client = ffi::Rect::default();
+            unsafe {
+                ffi::GetClientRect(hwnd, &mut client);
+            }
+            state.native_trace.record(format_args!(
+                "{{\"event\":\"wm-size\",\"ms\":{},\"kind\":{},\"message_size\":[{},{}],\"client\":[{},{}]}}",
+                os::milliseconds(), wparam, lparam as u16, (lparam >> 16) as u16,
+                client.right, client.bottom));
+        }
         return 0;
     }
     let handled = state.with(|app| {
@@ -2147,6 +2316,8 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
     unsafe {
         ffi::SetProcessDpiAwarenessContext(-4isize as Handle);
     }
+    let native_trace =
+        os::environment_value("ZTTY_NATIVE_TRACE").is_some_and(|value| value == [u16::from(b'1')]);
     let program = os::resolve(&cfg.command[0])?;
     let arguments: Vec<Vec<u16>> = cfg
         .command
@@ -2219,8 +2390,10 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             cancelled_mouse_buttons: 0,
             title: String::new(),
             focused: false,
+            native_trace: NativeTrace::new(native_trace),
         }),
         dispatch: session_dispatch::Dispatch::default(),
+        native_trace: NativeTrace::new(native_trace),
     });
     let class_name = wide("ztty.NativeWindow");
     let instance = unsafe { ffi::GetModuleHandleW(ptr::null()) };
@@ -2415,6 +2588,16 @@ mod ffi {
         pub palette: [u32; 1],
     }
     #[repr(C)]
+    pub struct Bitmap {
+        pub kind: i32,
+        pub width: i32,
+        pub height: i32,
+        pub width_bytes: i32,
+        pub planes: u16,
+        pub bits_per_pixel: u16,
+        pub bits: *mut c_void,
+    }
+    #[repr(C)]
     pub struct TextMetric {
         pub height: i32,
         pub ascent: i32,
@@ -2561,6 +2744,10 @@ mod ffi {
             operation: u32,
         ) -> i32;
         pub fn GdiFlush() -> i32;
+        pub fn GetCurrentObject(dc: Handle, kind: u32) -> Handle;
+        pub fn GetObjectW(object: Handle, bytes: i32, result: *mut c_void) -> i32;
+        pub fn GetPixel(dc: Handle, x: i32, y: i32) -> u32;
+        pub fn GetClipBox(dc: Handle, rect: *mut Rect) -> i32;
         pub fn SaveDC(dc: Handle) -> i32;
         pub fn RestoreDC(dc: Handle, saved: i32) -> i32;
         pub fn IntersectClipRect(dc: Handle, left: i32, top: i32, right: i32, bottom: i32) -> i32;
