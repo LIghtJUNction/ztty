@@ -1,0 +1,6 @@
+    Checking zgraphics v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/crates/zgraphics)
+    Checking zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/crates/zinput)
+    Checking zterm v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/crates/zterm)
+    Checking zpty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/crates/zpty)
+    Checking ztty v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.26s
