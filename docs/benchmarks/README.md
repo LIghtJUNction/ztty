@@ -56,6 +56,36 @@ python3 tools/benchmark_terminals.py --render-only
 Missing runtimes or incomplete data cause a clear error. Missing values are
 never rendered as zero-length performance or memory bars.
 
+## Paired ztty throughput comparison
+
+The [0.2.1 optimization report](throughput-2026-11-18.md) compares retained old
+and new binaries on the same machine. Its [raw A/B record](throughput-ab-2026-11-18.json)
+contains one- and ten-window runs, three rounds each, in AB/BA/AB order.
+Each pair uses the same payload, timer, terminal configuration, and collector.
+It records process memory, host load, available memory, Swap, and swap-I/O
+counters before and after each run.
+
+To reproduce with two already-built binaries:
+
+```sh
+python3 tools/benchmark_throughput.py \
+  --before /path/to/old-ztty --after /path/to/new-ztty \
+  --before-source OLD_COMMIT --after-source NEW_COMMIT \
+  --counts 1,10 --rounds 3 --json artifacts/throughput-ab-new.json
+```
+
+Replace the source placeholders with the actual revisions. The output path
+must not already exist. A single-round run is marked as exploration.
+The collector checks binary and helper-script identities, all window samples,
+raw-rate calculations, terminal-state integrity, and process cleanup before
+accepting a comparison. It does not update the three-terminal SVG; run
+`make benchmark-terminals` for that complete comparison.
+
+The [independent recomputation record](throughput-evidence-2026-11-18/verification.json)
+and [runtime validation evidence](throughput-evidence-2026-11-18/runtime-checks.json)
+bind the committed results to the tested binary. Old README measurements
+from different host conditions are not used as the denominator of the A/B gain.
+
 ## Controlled setup
 
 Each run starts fresh terminal processes on a private Xvfb display at 96 DPI.
@@ -199,6 +229,22 @@ the median of the three rates. The run value is the median across ten windows;
 the figure uses the median of three run values. The units are MiB/s, where one
 MiB is 1,048,576 bytes. The measure describes terminal processing under this
 workload; a terminal may batch or skip intermediate physical frames.
+
+### Completion and screen-integrity checks
+
+The timed payload and its original HOME/DSR completion barrier are unchanged.
+After the timed bursts, the probe replays the same payload **outside the timer**
+and asks for the cursor position directly, without a HOME reset. The reply must
+be row 32, column 120. ztty additionally verifies all 32 final text rows through
+the private session broker, then restores the fixed idle frame. The JSON retains
+the expected and observed text hashes as well as the direct cursor reply.
+
+This validates logical processing and final text; separate real X11 tests check
+visible pixels, a quiet final frame, interaction during another window's output,
+and synchronized-output boundaries. See the
+[repaint acceptance record](throughput-evidence-2026-11-18/repaint-gui.json).
+A failure during measurement, integrity checking, or teardown marks the run
+unsuccessful, so incomplete results cannot replace the published comparison.
 
 ## Repetitions, environment, and limits
 

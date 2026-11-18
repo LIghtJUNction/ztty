@@ -5,3 +5,6 @@ core
 
 __pycache__/
 *.py[cod]
+
+# Isolated targets for concurrent performance work.
+/target-*/

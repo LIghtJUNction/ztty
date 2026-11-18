@@ -1,0 +1,13 @@
+{
+  "stdio_pty": "passed",
+  "unicode_cursor_pages": "passed",
+  "cwd_environment_resize": "passed",
+  "split_pty_utf8": "passed",
+  "creator_cwd_argv_env_isolation": "passed",
+  "http_stdio_shared_broker": "passed",
+  "namespaces_and_ambiguity": "passed",
+  "exit_code": 7,
+  "transport_exit_persistence": "passed",
+  "attach_default_list": "passed",
+  "close_releases_sessions": "passed"
+}

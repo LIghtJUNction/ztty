@@ -1,0 +1,64 @@
+{
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/target-render/release/ztty",
+  "sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b",
+  "size_bytes": 443456,
+  "version": "ztty 0.2.1",
+  "source": "dfe949c7ea58a372f69f0de9b4baa0cb2ab93379",
+  "build_checks": [
+    {
+      "name": "tests",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--workspace"
+      ],
+      "rc": 0,
+      "seconds": 7.437952790991403
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "rc": 0,
+      "seconds": 2.3690382029890316
+    },
+    {
+      "name": "nostd",
+      "command": [
+        "cargo",
+        "check",
+        "--offline",
+        "--locked",
+        "-p",
+        "zterm",
+        "--target",
+        "x86_64-unknown-none"
+      ],
+      "rc": 0,
+      "seconds": 0.4486227110028267
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "--release"
+      ],
+      "rc": 0,
+      "seconds": 7.234194201009814
+    }
+  ]
+}
