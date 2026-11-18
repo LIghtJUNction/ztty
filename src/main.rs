@@ -4,17 +4,11 @@
 
 extern crate alloc;
 
-#[cfg(target_os = "linux")]
-mod actions;
 mod appearance;
 #[cfg(target_os = "linux")]
 mod broker;
 #[cfg(target_os = "linux")]
 mod config_watch;
-#[cfg(target_os = "linux")]
-mod json;
-#[cfg(target_os = "linux")]
-mod layout;
 #[cfg(target_os = "linux")]
 mod mcp;
 #[cfg(target_os = "linux")]
@@ -43,8 +37,6 @@ mod session;
 #[cfg(target_os = "linux")]
 mod working_directory;
 #[cfg(target_os = "linux")]
-mod workspace_state;
-#[cfg(target_os = "linux")]
 mod x11;
 #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 compile_error!("ztty supports Linux, macOS, and Windows");
@@ -61,7 +53,7 @@ use input_queue::InputQueue;
 #[cfg(target_os = "linux")]
 use zterm::{Terminal, input};
 #[cfg(target_os = "linux")]
-use ztty::{input_queue, session_control, session_core};
+use ztty::{actions, input_queue, json, layout, session_control, session_core, workspace_state};
 
 #[global_allocator]
 static ALLOCATOR: os::Allocator = os::Allocator;

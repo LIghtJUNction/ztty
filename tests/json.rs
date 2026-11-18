@@ -1,7 +1,6 @@
 extern crate alloc;
-#[path = "../src/json.rs"]
-mod json;
 use json::{Value, object, parse, stringify};
+use ztty::json;
 
 #[test]
 fn unicode_roundtrip_preserves_request_identifiers() {

@@ -6,7 +6,11 @@
 
 extern crate alloc;
 
+pub mod actions;
 pub mod input_queue;
+pub mod json;
+pub mod layout;
 pub mod output_tail;
 pub mod session_control;
 pub mod session_core;
+pub mod workspace_state;

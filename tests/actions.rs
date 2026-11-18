@@ -1,6 +1,5 @@
 extern crate alloc;
-#[path = "../src/actions.rs"]
-mod actions;
+use ztty::actions;
 
 #[test]
 fn custom_bindings_override_defaults_and_can_disable_them() {
