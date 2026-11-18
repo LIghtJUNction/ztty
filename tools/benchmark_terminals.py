@@ -601,6 +601,7 @@ def measure(app, binary, repetition, settle):
                 for channel in connections:
                     send_json(channel, {"op": "quit"})
             except Exception as error:
+                result["ok"] = False
                 result["error"] = repr(error)
                 result["traceback"] = traceback.format_exc()
             finally:

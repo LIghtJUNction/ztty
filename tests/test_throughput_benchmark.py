@@ -131,7 +131,7 @@ class PairedCollectorTests(unittest.TestCase):
                 paired.summarize(report)
 
     def test_incomplete_or_changed_executables_cannot_be_published(self):
-        for change in ({"ok": False}, {"remaining_owned_pids": [999]},
+        for change in ({"ok": False}, {"error": "quit failed"}, {"remaining_owned_pids": [999]},
                        {"binary_sha256_after": "changed"}, {"binary_sha256_before": "wrong"}):
             report = fixture_report()
             report["runs"][0].update(change)

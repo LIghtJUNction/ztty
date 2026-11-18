@@ -93,7 +93,7 @@ def summarize(report):
         if identity in observed or identity not in expected:
             raise ValueError("duplicate or unexpected before/after case")
         observed.add(identity)
-        if run["ok"] is not True or run.get("remaining_owned_pids") != []:
+        if run["ok"] is not True or run.get("error") or run.get("remaining_owned_pids") != []:
             raise ValueError("failed measurement or missing successful process cleanup")
         windows = run.get("windows_observed", [])
         owners = run.get("gui_owner_pids", [])
