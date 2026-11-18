@@ -226,6 +226,10 @@ returned `next_cursor` to the next call. `cursor` in the response
 is an alias for that next offset. `max_bytes` accepts 1–65,536.
 A text page may extend by up to three bytes to finish a UTF-8 character.
 An incomplete trailing character is held until more PTY output arrives.
+Already available bytes beyond the requested page are checked before deciding
+to wait: a malformed prefix followed by ASCII or another character advances
+the cursor, even with a one-byte page. Only a genuinely incomplete suffix waits
+for more output; EOF releases that suffix using replacement characters.
 
 MCP sessions retain a rolling 256 KiB of raw output, separate from screen
 history. When a cursor precedes the retained range, `truncated` is true

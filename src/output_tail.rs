@@ -78,14 +78,9 @@ impl OutputTail {
             .take(max + 3)
             .copied()
             .collect();
-        if bytes.len() > max {
-            let mut end = max;
-            while end < bytes.len() && bytes[end] & 0xc0 == 0x80 {
-                end += 1;
-            }
-            bytes.truncate(end);
-        }
         if !eof {
+            // Validate the lookahead before cutting a page: in E2 | 58, the
+            // already available 58 proves E2 is malformed, not a pending suffix.
             // An earlier malformed sequence does not make a later incomplete
             // suffix safe to consume. Skip complete errors and keep scanning;
             // every byte is visited at most once.
@@ -99,6 +94,13 @@ impl OutputTail {
                     break;
                 }
             }
+        }
+        if bytes.len() > max {
+            let mut end = max;
+            while end < bytes.len() && bytes[end] & 0xc0 == 0x80 {
+                end += 1;
+            }
+            bytes.truncate(end);
         }
         let next = start + bytes.len() as u64;
         Ok(OutputChunk {

@@ -179,6 +179,95 @@ os.write(1,b"\x9a\x80END")
             "output": partial["output"] + suffix}
 
 
+def invalid_utf8_page_boundaries(operator, http, sid, directory, sessions):
+    """A page boundary must not turn known-invalid bytes into an endless wait."""
+    release = pathlib.Path(directory) / "invalid-page-release"
+    payload = b"\xe2X\xf0\x9fX" + "中文🚀".encode() + b"\xe2\xc2\xa2END"
+    final_suffix = b"\xf0\x9f"
+    child = r'''import os,pathlib,sys,time
+payload=bytes.fromhex(sys.argv[2])
+assert os.write(1,payload)==len(payload)
+while not pathlib.Path(sys.argv[1]).exists(): time.sleep(.01)
+os.write(1,bytes.fromhex(sys.argv[3]))
+'''
+    created = operator.tool("session_create", {
+        "name": "invalid-page-boundaries", "history": 0,
+        "command": ["python3", "-c", child, str(release), payload.hex(), final_suffix.hex()],
+    })
+    uri = created["uri"]
+    sessions.append(uri)
+    identity = session_identity(created)
+
+    def snapshot(expected, eof):
+        # Confirm the broker has all bytes before asserting immediate progress.
+        # The child remains alive behind the release gate throughout open reads.
+        deadline = time.monotonic() + 6
+        value = None
+        while time.monotonic() < deadline:
+            value = operator.tool("session_read", {
+                "session": uri, "max_bytes": 65536, "expected_session": identity,
+            })
+            if (value["next_cursor"] == len(expected) and value["output_eof"] is eof
+                    and (not eof or value["exit_code"] is not None)):
+                break
+            time.sleep(.01)
+        assert value is not None and value["next_cursor"] == len(expected), value
+        assert value["output"] == expected.decode("utf-8", "replace"), value
+        assert not value["truncated"] and not value["has_more"], value
+        assert value["output_eof"] is eof and value["running"] is not eof, value
+        if eof:
+            assert value["exit_code"] == 0, value
+
+    def pages(read, transport, start, maximum, source, eof):
+        cursor = start
+        cursors = [cursor]
+        output = ""
+        while cursor < len(source):
+            value = read("session_read", {
+                "session": uri, "cursor": cursor, "max_bytes": maximum,
+                "expected_session": identity,
+            })
+            next_cursor = value["next_cursor"]
+            assert cursor < next_cursor <= min(len(source), cursor + maximum + 3), value
+            assert value["output"] == source[cursor:next_cursor].decode("utf-8", "replace"), value
+            assert value["output_eof"] is eof and value["running"] is not eof, value
+            assert not value["truncated"] and value["has_more"] is (next_cursor < len(source)), value
+            output += value["output"]
+            cursor = next_cursor
+            cursors.append(cursor)
+        assert output == source[start:].decode("utf-8", "replace"), (transport, output)
+        return {"transport": transport, "max_bytes": maximum, "cursors": cursors,
+                "output": output, "output_eof": eof}
+
+    def read_http(name, arguments):
+        return http_tool(http, sid, name, arguments)
+
+    try:
+        snapshot(payload, False)
+        # Separate clients resume at different byte offsets; one reader reaching
+        # the end must not advance the other's cursor. Both malformed prefixes
+        # lie at a page boundary while complete Chinese/emoji bytes stay intact.
+        open_reads = [
+            pages(operator.tool, "stdio", 0, 1, payload, False),
+            pages(read_http, "http", 2, 2, payload, False),
+        ]
+        release.touch()
+        complete = payload + final_suffix
+        snapshot(complete, True)
+        closed_reads = [
+            pages(operator.tool, "stdio", 0, 2, complete, True),
+            pages(read_http, "http", 2, 1, complete, True),
+        ]
+        operator.tool("session_close", {"session": uri})
+        sessions.remove(uri)
+        return {"status": "passed", "payload_hex": payload.hex(),
+                "eof_suffix_hex": final_suffix.hex(), "open_reads": open_reads,
+                "closed_reads": closed_reads}
+    finally:
+        # The enclosing suite closes tracked sessions on every failure path.
+        release.touch(exist_ok=True)
+
+
 def session_identity(value):
     return {key: value[key] for key in ("uri", "id", "created_at", "broker_pid")}
 
@@ -513,6 +602,8 @@ def main(binary):
             report["bounded_command_reads_across_observers"]="passed"
             report["guarded_output_resume"] = guarded_output_resume(
                 binary, stdio, http, sid, sessions)
+            report["invalid_utf8_page_boundaries"] = invalid_utf8_page_boundaries(
+                stdio, http, sid, directory, sessions)
             report["descendant_output_eof"] = descendant_output_eof(
                 stdio, directory, sessions)
 
