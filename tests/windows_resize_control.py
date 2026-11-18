@@ -88,6 +88,7 @@ class ControlWindow(Window):
 def run_one(args, output, number, expected_identity):
     report = {"diagnostic_only": True, "number": number, "passed": False, "status": "running",
               "checks": [], "resize_stages": {}, "architecture": args.arch,
+              "nc_rendering_diagnostics_enabled": os.environ.get("ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS") == "1",
               "resize_flags": 0x16, "resize_xy": [0, 0], "pixel_timeout_seconds": 10,
               "expected_outer_before": [32, 32, 228, 261], **expected_identity}
     process = window = None
@@ -106,6 +107,7 @@ def run_one(args, output, number, expected_identity):
                 window = ControlWindow(process, report)
                 report["hwnd"] = int(window.hwnd)
                 window.require_owned()
+                native.configure_nc_rendering_diagnostic(window.user, window.hwnd, process, report)
                 before = window.geometry()
                 placement = report["window_placement"] = {
                     "before": before, "requested_position": [32, 32],

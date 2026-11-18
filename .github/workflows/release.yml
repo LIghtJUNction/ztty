@@ -20,6 +20,11 @@ on:
         type: boolean
         required: true
         default: false
+      windows_nc_rendering_diagnostics:
+        description: 'Build-only owned-window nonclient rendering isolation; cannot be used for publication'
+        type: boolean
+        required: true
+        default: false
 
 permissions:
   contents: read
@@ -55,6 +60,7 @@ jobs:
           BUILD_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.build_only || false }}
           CANDIDATE_PLATFORM: ${{ inputs.candidate_platform || 'all' }}
           WINDOWS_PAINT_DIAGNOSTICS: ${{ inputs.windows_paint_diagnostics && 'true' || 'false' }}
+          WINDOWS_NC_RENDERING_DIAGNOSTICS: ${{ inputs.windows_nc_rendering_diagnostics && 'true' || 'false' }}
         run: |
           case "$CANDIDATE_PLATFORM" in
             all|linux|macos|windows) ;;
@@ -66,6 +72,10 @@ jobs:
           fi
           if [[ "$WINDOWS_PAINT_DIAGNOSTICS" == true && "$BUILD_ONLY" != true ]]; then
             echo "Paint diagnostics change GDI query timing and cannot be used for publication." >&2
+            exit 1
+          fi
+          if [[ "$WINDOWS_NC_RENDERING_DIAGNOSTICS" == true && "$BUILD_ONLY" != true ]]; then
+            echo "Nonclient rendering isolation changes window policy and cannot be used for publication." >&2
             exit 1
           fi
           version=$(bash tools/release-source.sh "$RUNNER_TEMP/ztty-release")
@@ -475,6 +485,7 @@ jobs:
       CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
       ARTIFACT_STEM: ztty-windows-${{ matrix.arch }}
       ZTTY_NATIVE_PAINT_DIAGNOSTICS: ${{ inputs.windows_paint_diagnostics && '1' || '0' }}
+      ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS: ${{ inputs.windows_nc_rendering_diagnostics && '1' || '0' }}
       # SHA-256 digests from the official 20261104 release assets API.
       # https://github.com/mstorsjo/llvm-mingw/releases/tag/20261104
       LLVM_MINGW_VERSION: '20261104'
@@ -512,6 +523,7 @@ jobs:
           metadata["rust_target"] = os.environ["RUST_TARGET"]
           metadata["windows_architecture"] = os.environ["WINDOWS_ARCH"]
           metadata["paint_diagnostics_enabled"] = os.environ["ZTTY_NATIVE_PAINT_DIAGNOSTICS"] == "1"
+          metadata["nc_rendering_diagnostics_enabled"] = os.environ["ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS"] == "1"
           (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
           (out / f"{stem}.native.json").write_text(json.dumps({"source_sha": source, "passed": False,
               "status": "not_run", "pixel_readback": "not_performed"}, indent=2) + "\n", encoding="utf-8")
@@ -624,7 +636,7 @@ jobs:
           raise SystemExit(0 if report["passed"] else 1)
       - name: Run an independent Win32 resize control diagnostic
         id: resize_control
-        if: ${{ always() && needs.version.outputs.build_only == 'true' && inputs.windows_paint_diagnostics && steps.package.outcome == 'success' }}
+        if: ${{ always() && needs.version.outputs.build_only == 'true' && (inputs.windows_paint_diagnostics || inputs.windows_nc_rendering_diagnostics) && steps.package.outcome == 'success' }}
         shell: python {0}
         run: |
           import hashlib, json, os, subprocess, sys, zipfile
@@ -668,7 +680,8 @@ jobs:
           path = out / f"{stem}.build.json"
           report = json.loads(path.read_text(encoding="utf-8"))
           report["outcomes"] = {key: os.environ[f"OUTCOME_{key.upper()}"] for key in ("toolchain", "build", "native", "package")}
-          report["resize_control_diagnostic"] = {"requested": os.environ["ZTTY_NATIVE_PAINT_DIAGNOSTICS"] == "1",
+          report["resize_control_diagnostic"] = {"requested": (os.environ["ZTTY_NATIVE_PAINT_DIAGNOSTICS"] == "1"
+                                                    or os.environ["ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS"] == "1"),
                                                 "outcome": os.environ["OUTCOME_RESIZE_CONTROL"]}
           report["passed"] = all(value == "success" for value in report["outcomes"].values())
           report["status"] = "accepted" if report["passed"] else "failed"
