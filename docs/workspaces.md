@@ -35,8 +35,11 @@ The launch commands wait for their view to close; use separate shells or append 
 Font zoom, Ctrl+Tab / Ctrl+Shift+Tab, and Ctrl+Alt+Shift+Equal / Minus also work
 in the native Windows workspace. Zoom preserves the current window and PTYs;
 Windows updates the font metrics for all panes. Ctrl+Shift+Equal/Minus and
-Ctrl+Shift+0 are additional zoom/reset bindings; Ctrl+keypad Add/Subtract/0
-also works, with Num Lock required for keypad 0. The shared-session commands and
+Ctrl+0 provide additional zoom/reset bindings; Linux also accepts Ctrl+Shift+0.
+On Windows, [Ctrl+Shift+0 can be reserved by the system](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size)
+when multiple keyboard layouts are active; use Ctrl+0, or the shifted alias only
+when delivered. Ctrl+keypad Add/Subtract/0 also works, with Num Lock required for
+keypad 0. The shared-session commands and
 lifecycle below use the Linux broker. macOS does not yet have workspace UI or
 these font-size shortcuts.
 

@@ -352,6 +352,9 @@ Font zoom, tab cycling and split resizing also use these shortcuts in the native
 Windows frontend. Zoom keeps the window and running PTYs; Windows applies the
 new font to every pane in that workspace. Reset restores the latest successfully
 loaded configuration font on Linux and the startup configuration font on Windows.
+Use Ctrl+0 on Windows: the system can reserve Ctrl+Shift+0 when multiple keyboard
+layouts are active, so that alias works only if delivered to ztty.
+[Microsoft documents this system shortcut](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size).
 The macOS frontend does not yet implement these zoom or workspace shortcuts;
 its copy/paste shortcuts are Command+C/V or Ctrl+Shift+C/V.
 
