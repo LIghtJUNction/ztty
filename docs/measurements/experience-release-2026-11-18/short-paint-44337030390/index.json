@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "31bdb1cdfc8dc8b176f16410376fb007d8ff0a90",
+  "run_id": 44337030390,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44337030390",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "status": "failed",
+  "formal_release_eligible": false,
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "resize_control_diagnostic": {
+    "requested": false,
+    "outcome": "skipped"
+  },
+  "production_change": {
+    "path": "src/platform/windows.rs",
+    "previous_source": "ce176ffb96f6e000e71af88f8f8ce5395e085967",
+    "current_source": "31bdb1cdfc8dc8b176f16410376fb007d8ff0a90",
+    "previous_file_sha256": "6da18d9c60dff983c966578ff19a85b46149929a4ffae1116f0fa5ac7970f176",
+    "current_file_sha256": "fc91aa8f63f93b02814b1cbf7ca55da7e5aacc3aeba1cd9b953e1e4489263895",
+    "description": "Move BeginPaint after retained-frame preparation; keep the window target DC lifetime to presentation and existing opt-in diagnostics.",
+    "sufficient_fix_proven": false
+  },
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "x86_64": {
+    "native_gate_passed": true,
+    "completed_cold_starts": 8,
+    "attempted_cold_starts": 8,
+    "each_original_warm_back_to_back": [
+      31,
+      10,
+      10
+    ],
+    "workspace_checks_passed": 19,
+    "pngs_verified": 367,
+    "native_png_samples_exact": 600,
+    "normal_direct_screen_dc_samples": 0,
+    "off_client_null_samples_verified_separately": 88,
+    "workspace_live_query_samples_exact": 34,
+    "workspace_png_samples_exact": 19,
+    "workspace_live_samples_without_matching_stage_png": 15,
+    "failure_snapshots_or_diagnostic_retries": 0,
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "native_gate_passed": false,
+    "completed_cold_starts": 1,
+    "attempted_cold_starts": 2,
+    "cold1_original_warm_back_to_back": [
+      31,
+      10,
+      10
+    ],
+    "failed_cold_start": 2,
+    "failed_pid": 9672,
+    "original_checks_completed_before_failure": 23,
+    "failed_gate": "resize_restores_visible_image",
+    "failed_sample": [
+      175,
+      28
+    ],
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "failed_cold_warm_back_to_back_entered": false,
+    "later_cold_and_workspace_entered": false,
+    "pngs_verified": 51,
+    "geometry_samples_verified": 82,
+    "failure_difference_bbox": [
+      152,
+      0,
+      180,
+      190
+    ],
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "arm_failure_only_snapshot": {
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_pty": [
+      20,
+      10
+    ],
+    "cpu_source_after_failure": [
+      255,
+      0,
+      0
+    ],
+    "target_after_flush": [
+      20,
+      20,
+      20
+    ],
+    "app_and_dispatch_resize_pending": false,
+    "dispatch_paint_pending": false,
+    "full_redraw_and_pane_dirty": false,
+    "deferred_paints": 0,
+    "last_paint_sequence": 20,
+    "last_paint_surface": [
+      180,
+      190
+    ],
+    "last_paint_region": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "last_paint_blit_return": 1,
+    "last_paint_event_sequence": [
+      213,
+      214
+    ],
+    "snapshot_event_sequence": 215,
+    "target_after_blit": null,
+    "failed_png_identical_after_flush": true,
+    "before_png_identical_after_repaint": true
+  },
+  "cleanup": {
+    "x64_application_window_processes_exited": 9,
+    "x64_workspace_pty_probe_processes_exited": 4,
+    "arm_application_window_processes_exited": 2,
+    "all_application_temporary_directories_actually_removed": true,
+    "both_jobs_empty_and_desktops_restored": true
+  },
+  "worker_elapsed_seconds": {
+    "x86_64": 13.893,
+    "aarch64": 12.907
+  },
+  "worker_exit_codes": {
+    "x86_64": 0,
+    "aarch64": 1
+  },
+  "inference_limits": [
+    "The normal-mode candidate passed x64 but failed ARM; moving retained-frame preparation before BeginPaint did not establish a sufficient overall fix.",
+    "The last BitBlt return and failure-only source pixels do not prove target pixels at copy time; immediate target_after_blit is null in this mode.",
+    "Explicit flush and repaint are failure-only diagnostics and cannot accept the original failure.",
+    "No independent control ran in this candidate; earlier control results are not inherited as a gate.",
+    "These source-bound tests do not constitute the formal same-source six-platform release."
+  ],
+  "delivery_scope": "Overall failed Windows build-only candidate. No new formal Release publication or device installation; all preceding source-bound evidence and the failed v0.3.0 tag remain unchanged."
+}
