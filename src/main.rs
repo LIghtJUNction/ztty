@@ -484,6 +484,8 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
         .iter()
         .map(|&ptr| unsafe { CStr::from_ptr(ptr) })
         .collect();
+    #[cfg(target_os = "macos")]
+    zpty::run_spawn_helper(&args);
     #[cfg(windows)]
     let owned_args = os::arguments();
     #[cfg(windows)]
