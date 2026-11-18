@@ -331,6 +331,10 @@ GDI surface. Appearance parity across the three backends has not been validated.
 | Copy selection | Ctrl + Shift + C |
 | Paste clipboard | Ctrl + Shift + V |
 | Paste primary selection | Middle mouse button |
+| Increase / decrease font size | Ctrl + Plus / Minus; Ctrl + Equal and Ctrl + Shift + Minus also work |
+| Reset font size to configuration | Ctrl + 0 or Ctrl + Shift + 0 |
+| Keypad zoom / reset | Ctrl + keypad Add / Subtract / 0 (Num Lock on for keypad 0) |
+| Next / previous tab | Ctrl + Tab / Ctrl + Shift + Tab |
 | Browse history | Mouse wheel or Shift + PageUp / PageDown |
 | Return to newest output | Click **Back to live ↓** while browsing history |
 | Open an OSC 8 link | Ctrl + click |
@@ -338,6 +342,18 @@ GDI surface. Appearance parity across the three backends has not been validated.
 | Search retained text | Ctrl + Shift + F |
 | Open the command palette | Ctrl + Shift + P |
 | Reload configuration | Ctrl + Shift + R |
+
+On Linux, Plus follows the active keyboard layout, including Ctrl + Shift + Equal
+on common layouts and a different shifted key on others. Split resizing uses
+Ctrl + Alt + Shift + Equal / Minus.
+Custom bindings take priority over these defaults, including bindings to `none`.
+
+Font zoom, tab cycling and split resizing also use these shortcuts in the native
+Windows frontend. Zoom keeps the window and running PTYs; Windows applies the
+new font to every pane in that workspace. Reset restores the latest successfully
+loaded configuration font on Linux and the startup configuration font on Windows.
+The macOS frontend does not yet implement these zoom or workspace shortcuts;
+its copy/paste shortcuts are Command+C/V or Ctrl+Shift+C/V.
 
 The return control appears only while the view is above the newest output.
 If more output arrives, it changes to **New output · Back to live ↓** with a

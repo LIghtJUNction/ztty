@@ -154,6 +154,23 @@ Shift+PageUp/PageDown 或滚轮浏览历史，历史中的 **Back to live ↓** 
 Ctrl+点击打开链接。
 应用捕获鼠标时，按住 Shift 可使用本地选择、滚轮历史和中键粘贴。
 
+Linux 和 Windows 的字体、标签页与分屏快捷键如下；macOS 尚未实现这组窗口操作，
+其复制、粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
+
+| 操作 | 快捷键 |
+| --- | --- |
+| 放大字体 | Ctrl+Plus 或 Ctrl+Equal；也可使用 Ctrl+Shift+Equal |
+| 缩小字体 | Ctrl+Minus 或 Ctrl+Shift+Minus |
+| 恢复配置中的字体 | Ctrl+0 或 Ctrl+Shift+0 |
+| 小键盘放大、缩小、恢复 | Ctrl+小键盘 Add / Subtract / 0；小键盘 0 需开启 Num Lock |
+| 下一个、上一个标签页 | Ctrl+Tab / Ctrl+Shift+Tab |
+| 增大、缩小当前分屏 | Ctrl+Alt+Shift+Equal / Minus |
+
+字体缩放保留窗口和正在运行的 PTY；Windows 会协调同一工作区的所有窗格。
+恢复字体时，Linux 使用最近成功加载的配置，Windows 使用启动时的配置。
+Linux 按当前键盘布局识别加号，包括通过 Shift 产生加号的按键。
+自定义绑定优先于默认绑定；Num Lock 关闭时，小键盘 0 仍按 Insert 处理。
+
 Linux/macOS 默认使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用
 `COMSPEC`，缺省为 `cmd.exe`。用 `-e` 指定其他命令、`--cwd PATH` 指定初始目录；
 相对命令使用目标目录，相对配置路径仍使用启动器原目录。

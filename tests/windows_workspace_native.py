@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import struct
 import subprocess
 import sys
@@ -32,7 +33,9 @@ REQUIRED_CHECKS = (
     "pane_selection_isolation", "split_down_distinct_pty", "three_pane_pixels_and_shared_window",
     "maximize_restore_keeps_pty_identity", "grow_shrink_updates_child_geometry", "swap_keeps_session_identity",
     "window_resize_coordinates_all_ptys", "new_tab_distinct_pty", "hidden_tab_output_and_response",
-    "tab_switch_restores_pane_images", "natural_exit_keeps_siblings", "close_keeps_other_tab",
+    "tab_switch_restores_pane_images", "font_increase_coordinates_all_ptys",
+    "font_decrease_and_keypad_zoom", "font_reset_restores_configured_metrics",
+    "natural_exit_keeps_siblings", "close_keeps_other_tab",
     "last_pane_closes_window",
 )
 
@@ -64,6 +67,23 @@ def split_rect(rect, vertical, ratio=500):
     if vertical:
         return (x, y, first, height), (x + first + gap, y, available - first, height)
     return (x, y, width, first), (x, y + first + gap, width, available - first)
+
+
+def cell_reply(data):
+    """Read a CSI 16t reply without inferring font metrics from rounded grids."""
+    replies = re.findall(rb"\x1b\[6;([0-9]+);([0-9]+)t", data)
+    if len(replies) != 1:
+        raise AssertionError("expected exactly one cell-size reply")
+    height, width = map(int, replies[0])
+    if not (0 < width <= 4096 and 0 < height <= 4096):
+        raise AssertionError("invalid reported cell dimensions")
+    return width, height
+
+
+def without_probe_replies(data):
+    """Keep possible leaked keys while removing only this probe's query replies."""
+    data = re.sub(rb"\x1b\[6;[0-9]+;[0-9]+t", b"", data)
+    return re.sub(rb"\x1b_Gi=[0-9]+;OK\x1b\\", b"", data)
 
 
 def validate_report(report):
@@ -361,8 +381,8 @@ class Window:
         if count != len(array):
             raise native.DesktopBlocked(f"SendInput accepted {count}/{len(array)} owned-window events")
 
-    def chord(self, vk, control=True, shift=True):
-        modifiers = ([0x11] if control else []) + ([0x10] if shift else [])
+    def chord(self, vk, control=True, shift=True, alt=False):
+        modifiers = ([0x11] if control else []) + ([0x12] if alt else []) + ([0x10] if shift else [])
         self.inputs([(key, 0, 0) for key in modifiers + [vk]]
                     + [(key, 0, 2) for key in [vk] + list(reversed(modifiers))])
 
@@ -428,6 +448,11 @@ class Probe:
         native.wait_for(lambda: [self.state()["cols"], self.state()["rows"]] == expected,
                         f"pane {self.name} real ConPTY size {expected}")
         return self.state()
+
+    def cell_pixels(self):
+        start = len(self.input())
+        self.send(b"\x1b[16t")
+        return cell_reply(self.input()[start:])
 
     def render(self):
         color = COLORS[self.name]
@@ -537,7 +562,7 @@ def run(binary, output, expected_arch=None):
                 focus("b", 0x27)
                 held_rect = left
             else:
-                window.chord(0xBB)
+                window.chord(0xBB, alt=True)
                 held_rect, grown_right = split_rect(whole, True, 550)
                 a.wait_grid(held_rect, cell)
                 b.wait_grid(grown_right, cell)
@@ -551,7 +576,7 @@ def run(binary, output, expected_arch=None):
             if kind == "focus":
                 focus("a", 0x25)
             else:
-                window.chord(0xBD)
+                window.chord(0xBD, alt=True)
                 a.wait_grid(left, cell)
                 b.wait_grid(right, cell)
         a.render()
@@ -673,11 +698,11 @@ def run(binary, output, expected_arch=None):
         assert all(probe.state()["pid"] == probe.pid for probe in probes.values())
         check("maximize_restore_keeps_pty_identity", pixels=pixels)
 
-        window.chord(0xBB)
+        window.chord(0xBB, alt=True)
         grown_top, grown_bottom = split_rect(right, False, 450)
         b.wait_grid(grown_top, cell)
         c.wait_grid(grown_bottom, cell)
-        window.chord(0xBD)
+        window.chord(0xBD, alt=True)
         b.wait_grid(top, cell)
         c.wait_grid(bottom, cell)
         check("grow_shrink_updates_child_geometry", restored={name: probe.state() for name, probe in probes.items()})
@@ -723,7 +748,100 @@ def run(binary, output, expected_arch=None):
         focus("d", 0x22)
         window.expect("next tab image restored", [image_sample(whole, "d")])
         focus("a", 0x21)
-        check("tab_switch_restores_pane_images", pixels=pixels)
+        window.chord(0x09, shift=False)
+        native.wait_for(lambda: window.title().endswith("ztty workspace d"), "Ctrl+Tab selects next tab")
+        next_tab_pixels = window.expect("Ctrl+Tab preserves image", [image_sample(whole, "d")])
+        window.chord(0x09)
+        native.wait_for(lambda: window.title().endswith("ztty workspace a"), "Ctrl+Shift+Tab selects previous tab")
+        previous_tab_pixels = window.expect("Ctrl+Shift+Tab preserves panes",
+            [image_sample(left, "a"), image_sample(top, "b"), image_sample(bottom, "c")])
+        assert all(probe.state()["pid"] == probe.pid for probe in probes.values())
+        check("tab_switch_restores_pane_images", pixels=pixels,
+              control_tab_pixels=next_tab_pixels, control_shift_tab_pixels=previous_tab_pixels)
+
+        # Font shortcuts share one HWND/font set, including the hidden tab.
+        # Query real cell metrics separately from the rounded ConPTY grid.
+        font_window = window.geometry()
+        font_pids = {name: probe.pid for name, probe in probes.items()}
+        font_input_starts = {name: len(probe.input()) for name, probe in probes.items()}
+        assert all(probe.cell_pixels() == cell for probe in probes.values())
+        visible_panes = (("a", left), ("b", top), ("c", bottom))
+
+        def font_trial(label, vk, accepted, shift=True):
+            hidden_before = [d.state()["cols"], d.state()["rows"]]
+            window.chord(vk, shift=shift)
+            def ready():
+                current = a.cell_pixels()
+                return current if accepted(current) else None
+            measured = native.wait_for(ready, "font metrics " + label)
+            states = {}
+            for name, probe in probes.items():
+                assert probe.cell_pixels() == measured, f"font metrics differ in pane {name}"
+                assert probe.state()["pid"] == font_pids[name], "font action replaced a PTY"
+                states[name] = probe.state()
+            for name, rect in visible_panes:
+                states[name] = probes[name].wait_grid(rect, measured)
+            assert [states["d"]["cols"], states["d"]["rows"]] == hidden_before, \
+                "hidden tab grid changed before being shown"
+            geometry = window.geometry()
+            for field in ("hwnd", "pid", "client", "outer", "dpi"):
+                assert geometry[field] == font_window[field], f"font action changed window {field}"
+            assert window.title().endswith("ztty workspace a"), "font action changed pane focus"
+            samples = []
+            for name, rect in visible_panes:
+                probe = probes[name]
+                probe.render()
+                red, green, blue = COLORS[name]
+                probe.send(f"\x1b[4;4H\x1b[48;2;{red};{green};{blue}m \x1b[0m".encode("ascii"))
+                x, y = rect[0] + PADDING, rect[1] + PADDING
+                samples.extend((image_sample(rect, name),
+                    (x + 3 * measured[0] + measured[0] // 2, y + 3 * measured[1] + measured[1] // 2, COLORS[name]),
+                    (x + 4 * measured[0] + 1, y + 3 * measured[1] + measured[1] // 2, BLACK)))
+            pixels = window.expect("font-sized cells " + label, samples)
+            return {"shortcut_vk": vk, "control": True, "shift": shift,
+                    "cell_pixels": list(measured), "panes": states, "window": geometry, "pixels": pixels}
+
+        increase = font_trial("increase", 0xBB,
+            lambda value: value != cell and all(new >= old for new, old in zip(value, cell)))
+        enlarged = tuple(increase["cell_pixels"])
+        window.capture(output, "font-increased")
+        focus("d", 0x22)
+        revealed = d.wait_grid(whole, enlarged)
+        assert d.cell_pixels() == enlarged
+        d.render()
+        window.expect("zoomed hidden tab becomes visible", [image_sample(whole, "d")])
+        focus("a", 0x21)
+        for name, rect in visible_panes:
+            probes[name].wait_grid(rect, enlarged)
+        check("font_increase_coordinates_all_ptys", original_cell=list(cell), enlarged_cell=list(enlarged),
+              trial=increase, revealed_hidden_tab=revealed, pixels=increase["pixels"])
+
+        decreased = font_trial("decrease", 0xBD, lambda value: value == cell)
+        smaller = font_trial("control-minus", 0xBD,
+            lambda value: value != cell and all(new <= old for new, old in zip(value, cell)), shift=False)
+        reduced = tuple(smaller["cell_pixels"])
+        keypad_add = font_trial("keypad-add", 0x6B, lambda value: value == cell, shift=False)
+        keypad_subtract = font_trial("keypad-subtract", 0x6D, lambda value: value == reduced, shift=False)
+        check("font_decrease_and_keypad_zoom", original_cell=list(cell), smaller_cell=list(reduced),
+              trials=[decreased, smaller, keypad_add, keypad_subtract], pixels=keypad_subtract["pixels"])
+
+        # The configured size is 12, deliberately different from the default 11.
+        reset = font_trial("configured-reset", 0x30, lambda value: value == cell)
+        raised_again = font_trial("keypad-increase-before-reset", 0x6B, lambda value: value == enlarged, shift=False)
+        # Inject the logical VK_NUMPAD0, not a hardware scan code. This tests
+        # that dispatch branch without changing or claiming NumLock state.
+        keypad_reset = font_trial("logical-keypad-configured-reset", 0x60, lambda value: value == cell, shift=False)
+        tails = {name: probe.input()[font_input_starts[name]:] for name, probe in probes.items()}
+        assert all(not without_probe_replies(tail) for tail in tails.values()), \
+            "a font shortcut leaked into a PTY"
+        final_gdi = window.user.GetGuiResources(int(process._handle), 0)
+        assert 0 < final_gdi <= initial_gdi + 2, (initial_gdi, final_gdi)
+        window.capture(output, "font-reset")
+        check("font_reset_restores_configured_metrics", configured_size=12, original_cell=list(cell),
+              trials=[reset, raised_again, keypad_reset], input_kind="virtual-key", numlock_changed=False,
+              physical_numlock_state_verified=False,
+              shortcut_input_bytes={name: without_probe_replies(tail).hex() for name, tail in tails.items()},
+              gdi_objects=final_gdi, pixels=keypad_reset["pixels"])
 
         a.exit()
         native.wait_for(lambda: window.kernel.WaitForSingleObject(a.handle, 0) == 0, "initial PTY child exits")

@@ -197,6 +197,9 @@ impl Binding {
             0xff57 => "end",
             0x3d => "equal",
             0x2d => "minus",
+            0xffab => "kp-add",
+            0xffad => "kp-subtract",
+            0xffb0 => "kp-0",
             _ => "",
         };
         if !key.is_empty() {
@@ -242,6 +245,7 @@ pub fn canonical(symbol: u64) -> u64 {
         0x41..=0x5a => symbol + 32,
         0x2b => 0x3d,
         0x5f => 0x2d,
+        0xfe20 => 0xff09, // ISO_Left_Tab is Shift+Tab.
         _ => symbol,
     }
 }
@@ -298,6 +302,9 @@ pub fn parse(value: &str, mouse: bool) -> Result<Binding, &'static str> {
                 "end" => 0xff57,
                 "plus" | "equal" => 0x3d,
                 "minus" => 0x2d,
+                "kp-add" => 0xffab,
+                "kp-subtract" => 0xffad,
+                "kp-0" => 0xffb0,
                 _ if part.len() == 1 && part.as_bytes()[0].is_ascii_graphic() => {
                     canonical(u64::from(part.as_bytes()[0]))
                 }
@@ -345,24 +352,27 @@ pub fn lookup(bindings: &[Binding], symbol: u64, state: u32) -> Option<&'static 
         .map(|b| b.action)
 }
 
-/// Prefer an explicitly bound shifted symbol, then retain physical-key
-/// bindings and defaults. The frontend supplies its active layout's symbol.
+/// Custom shifted and base-key bindings take precedence over defaults.
+/// Default symbols follow the active layout, including Shift-generated plus.
 pub fn key_action_with_shifted(
     bindings: &[Binding],
     symbol: u64,
     shifted: Option<u64>,
     state: u32,
 ) -> Option<&'static str> {
+    let shifted = shifted.filter(|_| state & 1 != 0);
     shifted
-        .filter(|_| state & 1 != 0)
         .and_then(|symbol| lookup(bindings, symbol, state))
-        .or_else(|| key_action(bindings, symbol, state))
+        .or_else(|| lookup(bindings, symbol, state))
+        .or_else(|| shifted.and_then(|symbol| default_key_action(symbol, state)))
+        .or_else(|| default_key_action(symbol, state))
 }
 
 pub fn key_action(bindings: &[Binding], symbol: u64, state: u32) -> Option<&'static str> {
-    if let Some(action) = lookup(bindings, symbol, state) {
-        return Some(action);
-    }
+    lookup(bindings, symbol, state).or_else(|| default_key_action(symbol, state))
+}
+
+fn default_key_action(symbol: u64, state: u32) -> Option<&'static str> {
     let symbol = canonical(symbol);
     let state = state & (1 | 4 | 8 | 64);
     DEFAULT_KEYS
@@ -379,6 +389,15 @@ const DEFAULT_KEYS: &[(u64, u32, &str)] = &[
     (0x3d, 4, "font-increase"),
     (0x2d, 4, "font-decrease"),
     (0x30, 4, "font-reset"),
+    // Plus needs Shift on many layouts. Keep zoom separate from split resizing.
+    (0x3d, 5, "font-increase"),
+    (0x2d, 5, "font-decrease"),
+    (0x30, 5, "font-reset"),
+    (0xffab, 4, "font-increase"),
+    (0xffad, 4, "font-decrease"),
+    (0xffb0, 4, "font-reset"),
+    (0xff09, 4, "next-tab"),
+    (0xff09, 5, "previous-tab"),
     (0x74, 5, "new-tab"),
     (0x65, 5, "split-right"),
     (0x6f, 5, "split-down"),
@@ -403,8 +422,8 @@ const DEFAULT_KEYS: &[(u64, u32, &str)] = &[
     (0xff52, 5, "swap-previous"),
     (0xff54, 5, "swap-next"),
     (0xff0d, 5, "maximize"),
-    (0x3d, 5, "grow"),
-    (0x2d, 5, "shrink"),
+    (0x3d, 13, "grow"),
+    (0x2d, 13, "shrink"),
 ];
 
 /// A currently effective custom shortcut, falling back to an active default.

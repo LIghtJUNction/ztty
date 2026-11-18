@@ -3,7 +3,9 @@
 The Linux shared runtime keeps the PTY and terminal model independent of its
 window. Search, command actions and configuration changes operate on that live
 session; they do not restart its child. The native macOS and Windows frontends
-do not yet implement these view actions or the shared runtime.
+do not implement the Linux search, session switcher, command palette or shared
+runtime. Windows implements font zoom and tab/split shortcuts in its native
+workspace; macOS does not yet implement font zoom or workspace UI.
 
 ## Keyboard and command palette
 
@@ -18,10 +20,24 @@ do not yet implement these view actions or the shared runtime.
 | Ctrl+Shift+S | Find a session by name, title or URI; focus its view or explicitly attach |
 | Ctrl+Shift+K / J | Previous / next retained shell command |
 | Ctrl+Shift+Y | Copy the selected command's output; otherwise copy the latest output |
-| Ctrl+Equal / Ctrl+Minus / Ctrl+0 | Increase, decrease or reset font size |
+| Ctrl+Plus or Ctrl+Equal / Ctrl+Minus | Increase / decrease font size |
+| Ctrl+Shift+Minus | Decrease font size while Shift is held |
+| Ctrl+0 or Ctrl+Shift+0 | Reset to the configured font size |
+| Ctrl+keypad Add / Subtract / 0 | Increase / decrease / reset; keypad 0 needs Num Lock on |
+| Ctrl+Tab / Ctrl+Shift+Tab | Next / previous workspace tab |
 | Ctrl+Shift+R | Reload the session's configuration file |
 | Ctrl+Shift+C / V | Copy selection / paste clipboard |
 | Shift+PageUp / PageDown | Scroll history |
+
+Plus follows the active keyboard layout, including Ctrl+Shift+Equal on common
+keyboards and a different shifted key on other layouts. Zoom changes the font
+and PTY grid within the existing pixel-sized window. Ctrl+0 restores the latest
+successfully loaded configuration font. With Num Lock off, keypad 0 keeps its
+Insert behavior. Split resizing uses Ctrl+Alt+Shift+Equal / Minus.
+
+Custom bindings are checked before these defaults. For example,
+`keybind = ctrl+shift+plus = none` disables that shifted zoom chord, while
+`keybind = ctrl+kp-add = font-decrease` changes only Ctrl+keypad Add.
 
 The palette appears only when requested. It uses the existing window and does
 not send its query or action keystrokes to the child. It exposes the same named
@@ -119,8 +135,10 @@ mousebind = ctrl+button3 = palette
 
 Modifiers are `ctrl`, `shift`, `alt`, `super`. Keys include ASCII characters,
 `f1`–`f35`, `enter`, `escape`, `tab`, `backspace`, `space`, arrows, `home`, `end`,
-`pageup`, `pagedown`, `equal`/`plus`, and `minus`. Mouse buttons are `button1`–
-`button11`. Caps Lock and Num Lock do not change binding matching. Custom bindings
+`pageup`, `pagedown`, `equal`/`plus`, `minus`, `kp-add`, `kp-subtract`, and `kp-0`.
+Mouse buttons are `button1`–`button11`. Binding comparisons ignore the Caps Lock
+and Num Lock modifier bits, but the active layout still resolves the key itself:
+keypad 0 is `kp-0` with Num Lock on and Insert with it off. Custom bindings
 replace defaults for the exact chord. `none` consumes a chord without running an
 action. Each matched press and its release are withheld from application input,
 including buttons while an application has enabled mouse reports. There are at
