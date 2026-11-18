@@ -64,6 +64,11 @@ struct PaintRecord {
 }
 
 struct PaintTarget {
+    sample: [i32; 2],
+    cpu_before_blit: Option<u32>,
+    flush_after_blit: i32,
+    target_after_flush: Option<u32>,
+    source_after_target_read: Option<u32>,
     clip_type: i32,
     clip: [i32; 4],
     origin_ok: bool,
@@ -704,8 +709,8 @@ struct App {
 }
 
 impl App {
-    /// A failure-only read of our own DIB through the kernel, before any GDI
-    /// query can flush its batch. The value may precede queued GDI work.
+    /// An explicit diagnostic read of our DIB through the kernel, without asking
+    /// GDI to flush its batch. The value may precede queued GDI work.
     fn diagnostic_cpu_pixel(&self, x: i32, y: i32) -> Option<u32> {
         if self.surface.pixels.is_null()
             || x < 0
@@ -761,7 +766,11 @@ impl App {
         };
         let cpu = self.diagnostic_cpu_pixel(x, y);
         let target = self.last_paint.target.as_ref().map_or_else(|| String::from("null"), |target| {
-            format!(concat!("{{\"clip_type\":{},\"clip\":[{},{},{},{}],\"origin_ok\":{},\"origin\":[{},{}]}}"),
+            format!(concat!("{{\"sample\":[{},{}],\"cpu_before_blit_rgb\":{},\"gdi_flush_after_blit_return\":{},",
+                "\"target_after_flush_rgb\":{},\"source_after_target_read_rgb\":{},",
+                "\"clip_type\":{},\"clip\":[{},{},{},{}],\"origin_ok\":{},\"origin\":[{},{}]}}"),
+                target.sample[0], target.sample[1], rgb(target.cpu_before_blit), target.flush_after_blit,
+                rgb(target.target_after_flush), rgb(target.source_after_target_read),
                 target.clip_type, target.clip[0], target.clip[1], target.clip[2], target.clip[3],
                 target.origin_ok, target.origin[0], target.origin[1])
         });
@@ -2017,6 +2026,17 @@ impl App {
             }
         }
         self.full_redraw = false;
+        let diagnostic_sample = (events.paint_diagnostics
+            && !dc.is_null()
+            && self.surface.width > 0
+            && self.surface.height > 0)
+            .then(|| {
+                [
+                    self.surface.width.saturating_sub(2).max(0),
+                    self.surface.height / 2,
+                ]
+            });
+        let cpu_before_blit = diagnostic_sample.and_then(|[x, y]| self.diagnostic_cpu_pixel(x, y));
         let mut blit = 0;
         if !self.surface.bitmap.is_null() {
             unsafe {
@@ -2033,14 +2053,23 @@ impl App {
                 );
             }
         }
-        // These queries can change GDI batching. They are explicitly opt-in
-        // diagnostics, after the blit, and never an acceptance-path flush.
-        let target = if events.paint_diagnostics && !dc.is_null() {
+        // Opt-in only: flush immediately after BitBlt, then sample target before
+        // source or clip queries can hide a failed batch. Never an acceptance flush.
+        let target = if let Some([x, y]) = diagnostic_sample {
+            let flush_after_blit = unsafe { ffi::GdiFlush() };
+            let target_pixel = unsafe { ffi::GetPixel(dc, x, y) };
+            let source_pixel = unsafe { ffi::GetPixel(self.surface.dc, x, y) };
             let mut clip = ffi::Rect::default();
             let mut origin = ffi::Point::default();
             let clip_type = unsafe { ffi::GetClipBox(dc, &mut clip) };
             let origin_ok = unsafe { ffi::GetDCOrgEx(dc, &mut origin) } != 0;
             Some(PaintTarget {
+                sample: [x, y],
+                cpu_before_blit,
+                flush_after_blit,
+                target_after_flush: (target_pixel != u32::MAX).then(|| colorref(target_pixel)),
+                source_after_target_read: (source_pixel != u32::MAX)
+                    .then(|| colorref(source_pixel)),
                 clip_type,
                 clip: [clip.left, clip.top, clip.right, clip.bottom],
                 origin_ok,
