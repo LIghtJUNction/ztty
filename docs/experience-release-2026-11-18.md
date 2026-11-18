@@ -250,6 +250,25 @@ ARM 第七次在主进程退出码为 0 后真实遇到 `winerror=32` 的临时�
 
 本轮七个已启动应用进程及其临时目录都完成清理，目录均在第一次尝试中实际删除，外层 Job 清空且桌面恢复；两个 worker 分别在 12.749 秒和 17.944 秒以退出码 1 结束。本轮使用 `build_only=true`、`candidate_platform=windows`，没有取得发布或设备安装资格；正式 `v0.3.0` tag 和此前失败记录保持不变。[本轮范围与清理结果](measurements/experience-release-2026-11-18/burst-44320248994/index.json)
 
+### 5.8 绘制诊断补齐了标志与裁剪证据，候选仍失败
+
+源码 `03053f794e3d765f24d8fbd29292f91517ab2574` 的 [Windows 诊断运行 44323138525](https://github.com/LIghtJUNction/ztty/actions/runs/44323138525)在双架构再次失败。本轮显式设置 `windows_paint_diagnostics=true`，构建、每份原始报告和同进程快照均记录 `paint_diagnostics_enabled=true`；它在 `BitBlt` 后、`EndPaint` 前增加 `GetClipBox` 和 `GetDCOrgEx` 两次查询，用于记录目标绘制区域及原点。`runtime_trace_enabled=false` 只表示另一路逐帧 trace 关闭，不表示本轮没有额外查询。查询可能改变 GDI 时序，因此本轮所有成功冷启动和诊断恢复都不计入普通发布验收。[固定诊断源码](https://github.com/LIghtJUNction/ztty/blob/03053f794e3d765f24d8fbd29292f91517ab2574/src/platform/windows.rs) · [诊断范围与结果](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/index.json)
+
+本轮保持原 31 项、warm 10 轮、背靠背 10 轮和八次冷启动要求，两侧最先失败的仍是原 `resize_restores_visible_image` 像素断言。此前完整通过的冷启动仅说明对应进程执行了所有检查；任一失败仍停止后续冷启动和工作区验收，不能以较早成功覆盖失败。[x64 原始失败报告](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-x86_64/ztty-windows-x86_64.native.cold-03.json) · [ARM64 原始失败报告](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.native.cold-06.json)
+
+| 架构 | 完整执行的冷启动 | 原检查失败与停止范围 | 图像校验 |
+| --- | --- | --- | --- |
+| Windows x64 | 前两次各通过 `31+10+10` | 第三次通过 23 项后失败，恢复点实际 `[0,0,0]`；该次 warm／背靠背为 0，第四至八次及工作区未执行 | 96 张 PNG、155 个缩放采样点；154 点精确符合预期，唯一失败为原恢复红色点。[摘要](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-x86_64/summary.json) |
+| Windows ARM64 | 前五次各通过 `31+10+10` | 第六次通过 23 项后失败，恢复点实际 `[20,20,20]`；该次 warm／背靠背为 0，第七至八次及工作区未执行 | 231 张 PNG、380 个缩放采样点；379 点精确符合预期，唯一失败为原恢复红色点。[摘要](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-aarch64/summary.json) |
+
+新增记录证明，这两个失败现场的恢复请求确实携带了 `SWP_NOCOPYBITS`。`WM_WINDOWPOSCHANGING` 收到的 flags 为 `0x16`，提交值为 `0x116`，随后 `WM_WINDOWPOSCHANGED` 报告 `0x1116`，其中 `0x100` 仍然存在。两侧最后一次 paint 均记录 `BitBlt` 返回 1，紧随其后的目标 clip type 为 2、范围为 `[0,0,180,190]`，DC 原点为 `[40,63]`，与恢复后的客户端区域及屏幕位置一致。这些记录排除了该次恢复请求未携带标志、或最后一次查询仍得到缩小后的目标裁剪区域这两种解释；它们没有观察系统内部如何处理旧像素。[x64 快照](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.json) · [ARM64 快照](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.json)
+
+消息记录进一步缩小了可见时序范围。两侧最近一次已记录的默认过程退出序号均为 205，最后一次 paint 的开始／结束序号为 210／211，快照序号为 212；该次 paint 的 `default_message=0`、`default_depth=0`。失败进程的 `deferred_paints=0`，没有记录到因 App 可变借用守卫而拒绝的 `WM_PAINT`。这些数据支持“最后一次 paint 位于已记录的默认过程嵌套范围之外”，但记录只保留六类消息的最近阶段，不是完整事件轨迹，也不能证明另一线程的 `SetWindowPos` 已经返回，或系统 backing surface、合成和内部复制已经结束。[两侧时序及结论边界](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/index.json)
+
+失败后的快照仍显示应用画布正确、窗口画面错误。x64 PID 为 `6564`，ARM64 PID 为 `2724`；两侧 client、surface 和 selected bitmap 均为 `180×190`，终端与 PTY 均为 `20×10`，尺寸、补画及脏标记均为 false。CPU／source DIB 在 `(175,28)` 的红色是在原检查已经失败后采得，不能倒推最后一次 `BitBlt` 当时的源或目标像素。此后显式 GdiFlush 仍未恢复窗口；经正常消息泵补画后才显示红色。每侧原失败帧与 flush 后帧字节相同，补画帧与缩放前正确帧字节相同，原失败结论始终保留。[x64 三阶段文件身份](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-x86_64/evidence-index.json) · [ARM64 三阶段文件身份](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/windows-aarch64/evidence-index.json)
+
+本轮九个已启动应用进程均退出，九个临时目录均在首试中实际删除，外层 Job 清空且桌面恢复；x64 和 ARM64 worker 分别在 14.208 秒、20.105 秒以退出码 1 结束。归档绑定了源码、原始 artifact 和二进制哈希，并逐字保留两架构的构建记录、原始失败报告、快照和三个阶段的 PNG。本轮仍是 `build_only=true` 的诊断候选，没有取得发布或设备安装资格，也没有证明内部呈现故障的最终根因。[本轮清理、身份与交付范围](measurements/experience-release-2026-11-18/paint-diagnostics-44323138525/index.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
