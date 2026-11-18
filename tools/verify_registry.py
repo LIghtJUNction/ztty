@@ -7,6 +7,7 @@ Each consumer library is no_std; its executable is a std-based test harness.
 import argparse
 import datetime
 import json
+import math
 import pathlib
 import re
 import subprocess
@@ -16,6 +17,7 @@ import tomllib
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PACKAGES = ("zinput", "zgraphics", "zpty", "zterm")
+DEFAULT_CARGO_TIMEOUT = 90
 
 
 def release_versions():
@@ -133,14 +135,14 @@ def safe_log(value):
     return value[-20000:]
 
 
-def cargo(arguments, cwd, result, stage):
+def cargo(arguments, cwd, result, stage, timeout):
     command = ["cargo", "--config", "net.retry=1", "--config", "http.timeout=20"] + arguments
-    record = {"stage": stage, "command": command}
+    record = {"stage": stage, "command": command, "timeout_seconds": timeout}
     result["commands"].append(record)
     try:
-        completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True, timeout=90)
+        completed = subprocess.run(command, cwd=cwd, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired as error:
-        record.update(ok=False, error="cargo command exceeded 90 seconds", stderr=safe_log(error.stderr))
+        record.update(ok=False, error=f"cargo command exceeded {timeout:g} seconds", stderr=safe_log(error.stderr))
         raise RuntimeError(record["error"]) from None
     record.update(ok=completed.returncode == 0, exit_code=completed.returncode,
                   stderr=safe_log(completed.stderr))
@@ -151,7 +153,7 @@ def cargo(arguments, cwd, result, stage):
     return completed.stdout
 
 
-def check(selected, directory):
+def check(selected, directory, cargo_timeout=DEFAULT_CARGO_TIMEOUT):
     name = "ztty-registry-check-" + "-".join(selected)
     result = {"selected": selected, "ok": False, "packages": [], "commands": [],
               "consumer_library_no_std": True, "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies"}
@@ -161,7 +163,8 @@ def check(selected, directory):
         (directory / "src/lib.rs").write_text(library(selected), encoding="utf-8")
         (directory / "src/main.rs").write_text(executable(selected, name), encoding="utf-8")
         manifest_path = str(directory / "Cargo.toml")
-        metadata = json.loads(cargo(["metadata", "--format-version", "1", "--manifest-path", manifest_path], directory, result, "metadata"))
+        metadata = json.loads(cargo(["metadata", "--format-version", "1", "--manifest-path", manifest_path],
+                                    directory, result, "metadata", cargo_timeout))
         lock = tomllib.loads((directory / "Cargo.lock").read_text())
         checksums = {(p["name"], p["version"]): p.get("checksum") for p in lock.get("package", [])}
         found = set()
@@ -191,8 +194,10 @@ def check(selected, directory):
                     raise AssertionError(f"{package['name']} library is missing its no_std crate attribute")
         if found != set(selected):
             raise AssertionError(f"missing packages in Cargo resolution: {sorted(set(selected) - found)}")
-        cargo(["check", "--lib", "--locked", "--manifest-path", manifest_path], directory, result, "no_std_library_check")
-        cargo(["run", "--locked", "--manifest-path", manifest_path], directory, result, "consumer_run")
+        cargo(["check", "--lib", "--locked", "--manifest-path", manifest_path],
+              directory, result, "no_std_library_check", cargo_timeout)
+        cargo(["run", "--locked", "--manifest-path", manifest_path],
+              directory, result, "consumer_run", cargo_timeout)
         result["ok"] = True
     except Exception as error:
         result["error"] = safe_log(repr(error))
@@ -204,10 +209,15 @@ def main():
     parser.add_argument("--packages", nargs="+", choices=PACKAGES, default=list(PACKAGES),
                         help="crates to verify; default: zinput zgraphics zpty zterm")
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "artifacts/registry-consumer.json")
+    parser.add_argument("--cargo-timeout", type=float, default=DEFAULT_CARGO_TIMEOUT, metavar="SECONDS",
+                        help="maximum seconds per Cargo command, including compiler-lock wait (default: %(default)s)")
     args = parser.parse_args()
+    if not math.isfinite(args.cargo_timeout) or args.cargo_timeout <= 0:
+        parser.error("--cargo-timeout must be a positive finite number")
     selected = list(dict.fromkeys(args.packages))
     result = {"schema": 3, "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
               "requested_packages": selected, "versions": VERSIONS, "ok": False,
+              "cargo_timeout_seconds": args.cargo_timeout,
               "packages": [], "individual_checks": [], "combined_check": None,
               "scope": "actual crates.io consumers; library code is no_std, executable harness uses std; zpty runs a real PTY"}
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -219,14 +229,14 @@ def main():
         with tempfile.TemporaryDirectory(prefix="ztty-registry-") as temporary:
             root = pathlib.Path(temporary)
             for package in selected:
-                checked = check([package], root / package)
+                checked = check([package], root / package, args.cargo_timeout)
                 result["individual_checks"].append(checked)
                 result["packages"].extend(p for p in checked["packages"] if p["selected"])
                 save()
                 print(json.dumps({"package": package, "ok": checked["ok"], "packages": checked["packages"],
                                   "error": checked.get("error")}, ensure_ascii=False), flush=True)
             if len(selected) > 1 and all(item["ok"] for item in result["individual_checks"]):
-                result["combined_check"] = check(selected, root / "combined")
+                result["combined_check"] = check(selected, root / "combined", args.cargo_timeout)
             result["ok"] = all(item["ok"] for item in result["individual_checks"]) and (
                 result["combined_check"] is None or result["combined_check"]["ok"])
     except Exception as error:
