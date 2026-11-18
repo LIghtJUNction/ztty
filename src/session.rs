@@ -859,14 +859,8 @@ impl Ui {
                     search::highlights(terminal, &search.query, self.history),
                 );
             }
-            self.window.render(
-                terminal,
-                self.history,
-                self.selection,
-                self.force,
-                cursor,
-                self.native_ui.layout.is_some(),
-            );
+            self.window
+                .render(terminal, self.history, self.selection, self.force, cursor);
             self.window
                 .native_ui(terminal, &self.native_ui, native_interactive);
             let mut overlay_rows = 0;
@@ -937,6 +931,7 @@ impl Ui {
             } else {
                 None
             };
+            self.window.finish_frame();
             self.force = false;
             self.repaint.painted(os::milliseconds());
         }

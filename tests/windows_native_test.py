@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """Contract checks for resource disposal, separate from native pixel acceptance."""
+import hashlib
+import json
 import subprocess
 import sys
 import tempfile
@@ -298,6 +300,89 @@ class CleanupContract(unittest.TestCase):
             self.assertFalse(report["cleanup"]["temporary_directory_removed"])
             self.assertEqual(report["cleanup"]["directory_removal"]["attempts"], 1)
             self.assertEqual(clock.sleeps, [])
+
+
+class ProbeFailureEvidenceContract(unittest.TestCase):
+    def test_successful_child_operation_has_no_diagnostic_file(self):
+        with tempfile.TemporaryDirectory() as directory:
+            operation = mock.Mock(return_value=17)
+            self.assertEqual(native.child_failure_guard(directory, "main", operation), 17)
+            operation.assert_called_once_with()
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
+    def test_main_and_reader_errors_are_bounded_and_reraise_the_original(self):
+        with tempfile.TemporaryDirectory() as directory:
+            for phase in ("main", "reader"):
+                error = PermissionError(13, "\x00\U0001f980" * 20000)
+                error.winerror = 32
+                with self.subTest(phase=phase), self.assertRaises(PermissionError) as raised:
+                    native.child_failure_guard(directory, phase, mock.Mock(side_effect=error))
+                self.assertIs(raised.exception, error)
+                raw = (Path(directory) / f"child-{phase}-error.json").read_bytes()
+                self.assertLessEqual(len(raw), native.CHILD_ERROR_LIMIT)
+                record = json.loads(raw)
+                self.assertEqual(record["phase"], phase)
+                self.assertEqual(record["type"], "PermissionError")
+                self.assertEqual((record["errno"], record["winerror"]), (13, 32))
+                self.assertTrue(record["truncated"])
+                self.assertGreater(record["pid"], 0)
+                self.assertGreater(record["parent_pid"], 0)
+                self.assertIn("PermissionError", record["traceback"])
+
+    def test_sidecar_write_failure_does_not_replace_the_original_exception(self):
+        with tempfile.TemporaryDirectory() as directory:
+            original = RuntimeError("original probe failure")
+            with (mock.patch.object(Path, "write_bytes", side_effect=OSError("diagnostic disk failure")),
+                  self.assertRaises(RuntimeError) as raised):
+                native.child_failure_guard(directory, "main", mock.Mock(side_effect=original))
+            self.assertIs(raised.exception, original)
+            self.assertEqual(list(Path(directory).iterdir()), [])
+
+    def test_sidecars_survive_fixture_cleanup_and_oversize_is_rejected(self):
+        with tempfile.TemporaryDirectory() as outer:
+            output = Path(outer) / "native.json"
+            directory = tempfile.TemporaryDirectory(dir=outer)
+            fixture = Path(directory.name)
+            raw = b'{"phase":"reader","type":"OSError","message":"probe read failed"}\n'
+            (fixture / "child-reader-error.json").write_bytes(raw)
+            (fixture / "keyboard.bin").write_bytes(b"unrelated fixture bytes")
+            report = {"passed": False, "error": "original PTY write timeout"}
+            native.archive_child_failures(fixture, output, report)
+            native.cleanup_owned(None, lambda: None, directory, report)
+            self.assertFalse(fixture.exists())
+            self.assertEqual(report["error"], "original PTY write timeout")
+            self.assertFalse(report["passed"])
+            self.assertEqual(report["child_errors"], [{"phase": "reader",
+                "path": str(Path(outer) / "native.child-reader-error.json"),
+                "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}])
+            self.assertEqual((Path(outer) / "native.child-reader-error.json").read_bytes(), raw)
+            self.assertFalse((Path(outer) / "keyboard.bin").exists())
+            with tempfile.TemporaryDirectory(dir=outer) as oversized:
+                (Path(oversized) / "child-main-error.json").write_bytes(b"x" * (native.CHILD_ERROR_LIMIT + 1))
+                report = {"passed": True}
+                native.archive_child_failures(oversized, output, report)
+                self.assertFalse(report["passed"])
+                self.assertNotIn("child_errors", report)
+                self.assertIn("fixed bound", report["child_error_capture_errors"][0]["error"])
+                self.assertFalse((Path(outer) / "native.child-main-error.json").exists())
+
+    def test_write_failure_snapshot_observes_once_without_modifying_fixture(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = Path(directory)
+            payload = b"\x1b_Gbroken-fixture\x1b\\"
+            (fixture / "command-9.bin").write_bytes(payload)
+            process = mock.Mock(pid=912)
+            process.poll.return_value = 1
+            report = {"passed": False, "error": "original write error"}
+            native.record_output_write_failure(report, process, fixture, 9, payload, 913)
+            process.poll.assert_called_once_with()
+            self.assertEqual(report["output_write_failure"], {"sequence": 9,
+                "payload_bytes": len(payload), "payload_sha256": hashlib.sha256(payload).hexdigest(),
+                "child_pid": 913, "ztty_pid": 912, "command_exists": True,
+                "staging_exists": False, "done_exists": False, "ztty_returncode": 1})
+            self.assertEqual(report["error"], "original write error")
+            self.assertEqual((fixture / "command-9.bin").read_bytes(), payload)
+            self.assertEqual([path.name for path in fixture.iterdir()], ["command-9.bin"])
 
 
 if __name__ == "__main__":

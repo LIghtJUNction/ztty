@@ -2,11 +2,11 @@
 
 ## 0.3.1 — 2026-11-19 (Asia/Taipei)
 
-Release preparation: the new tag's Verify job and all six native architecture
-gates have not run yet. Official publication and installation remain pending.
-The failed `v0.3.0` tag stays fixed; this version carries its previously
-unreleased application features together with the following corrections.
-[Preparation status](docs/releasing.md#031-preparation).
+Version 0.3.1 uses a new immutable tag. Publication requires its own Verify job
+and all six native architecture gates. The failed `v0.3.0` tag stays fixed;
+this version carries its previously unreleased application features together
+with the following corrections.
+[Source-bound acceptance and publication record](docs/releasing.md#031-release-gate).
 
 ### Added
 
@@ -67,9 +67,10 @@ unreleased application features together with the following corrections.
   NC-policy diagnostics were disabled; every final NC readback reported disabled
   rendering, and owned-resource cleanup passed. This is a build-only Windows
   candidate, not the new version's complete tagged release gate.
-- That candidate predates the additional zoom and tab-shortcut changes. Their
-  keyboard checks require a new source-bound run; the earlier 19 workspace
-  groups are not evidence for the added font actions.
+- Complete candidate `90ec70fe` passed all six native architecture jobs in
+  [run 44365691692](https://github.com/LIghtJUNction/ztty/actions/runs/44365691692),
+  including the additional zoom and tab-shortcut changes. This build-only
+  acceptance is separate from the final tag's Verify and publication gates.
 - Unified candidate `735ca927` in
   [run 44355360532](https://github.com/LIghtJUNction/ztty/actions/runs/44355360532)
   failed the Windows Ctrl+Shift+0 reset check. This is consistent with the
@@ -78,9 +79,9 @@ unreleased application features together with the following corrections.
   metrics, all PTY identities, grid sizes and pixels to match.
 - The four reusable libraries are published independently:
   `zinput 0.1.1`, `zgraphics 0.1.1`, `zpty 0.2.1`, and `zterm 0.3.0`.
-  [Registry checks](docs/releasing.md#published-packages) do not imply that the
-  `ztty 0.3.1` application is already published.
-- The device already has a separately built Linux candidate from `19274145`,
+  Their [registry checks](docs/releasing.md#published-packages) are recorded
+  separately from application publication.
+- The earlier device installation used a separately built Linux candidate from `19274145`,
   installed as `ztty 0.3.0-1`. Its launcher files and five existing processes
   were preserved; the installed binary passed 36 input vectors in 10 GUI groups.
   That local installation does not make the failed formal
