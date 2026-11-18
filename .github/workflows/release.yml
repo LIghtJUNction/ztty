@@ -793,6 +793,7 @@ jobs:
           python3 tools/release_assets.py verify --folder "$readback" \
             --archive "$readback/ztty-$VERSION-native-evidence.zip" --expected-archive "$evidence" \
             --version "$VERSION" --source-sha "$SOURCE_SHA"
+          cmp "$evidence.sha256" "$readback/${evidence##*/}.sha256"
           cmp "$out/SHA256SUMS" "$readback/SHA256SUMS"
           (cd "$readback" && sha256sum --check SHA256SUMS
            for checksum in *.sha256; do sha256sum --check "$checksum"; done)
