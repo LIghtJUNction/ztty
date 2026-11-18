@@ -426,6 +426,11 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
     user.ReleaseDC.argtypes = [wintypes.HWND, wintypes.HDC]
     user.SendMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
     user.SendMessageW.restype = wintypes.LPARAM
+    user.SendMessageTimeoutW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM,
+        wintypes.LPARAM, wintypes.UINT, wintypes.UINT, ctypes.POINTER(ctypes.c_size_t)]
+    user.SendMessageTimeoutW.restype = ctypes.c_ssize_t
+    user.InvalidateRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT), wintypes.BOOL]
+    user.InvalidateRect.restype = wintypes.BOOL
     user.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
     user.SetForegroundWindow.argtypes = [wintypes.HWND]
     gdi.GetPixel.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
@@ -469,6 +474,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
               "transport": "real ConPTY", "renderer": "Win32 retained DIB",
               "runtime_trace_enabled": trace_runtime,
               "resize_path": "staged" if staged_resize else "rapid",
+              "rapid_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
               "checks": checks, "passed": False, "status": "running"}
     def window_pid(window):
         pid = wintypes.DWORD()
@@ -717,7 +723,8 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
             runtime_path.parent.mkdir(parents=True, exist_ok=True)
             runtime_stream = runtime_path.open("wb")
         environment = dict(os.environ, ZTTY_NATIVE_TRACE="1" if trace_runtime else "0",
-                           ZTTY_NATIVE_GEOMETRY="1" if trace_runtime or staged_resize else "0")
+                           ZTTY_NATIVE_GEOMETRY="1" if trace_runtime or staged_resize else "0",
+                           ZTTY_NATIVE_SNAPSHOT=str(directory / "failure-state.json"))
         process = subprocess.Popen(command, cwd=directory, env=environment, stderr=runtime_stream)
         report["ztty_process"] = process_architecture(process.pid)
         assert report["ztty_process"] == interpreter, "ztty must run natively on the test machine"
@@ -753,14 +760,16 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         assert cw > 0 and ch > 0
         report["client_pixels"] = [rect.right, rect.bottom]
         report["cell_pixels"] = [cw, ch]
-        def record_resize(stage):
-            state = report.setdefault("resize_stages", {}).setdefault(stage, {})
+        def record_resize(stage, stages=None, prefix="resize"):
+            if stages is None:
+                stages = report.setdefault("resize_stages", {})
+            state = stages.setdefault(stage, {})
             state["monotonic_seconds"] = time.monotonic()
             try:
                 state.update(window_geometry([(19.5 * cw, 1.5 * ch), (15.5 * cw, 1.5 * ch)]))
                 state["screenshot"] = capture_window(
                     user, gdi, hwnd, process.pid,
-                    output.with_name(output.stem + f".resize-{stage}.png"))
+                    output.with_name(output.stem + f".{prefix}-{stage}.png"))
             except Exception as error:
                 state["diagnostic_error"] = repr(error)
 
@@ -814,6 +823,52 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         def pixel(col, row):
             return pixel_at(col * cw, row * ch)
 
+        def post_failure_snapshot():
+            # This path is reached only after the original pixel assertion
+            # failed. Preserve its image before any message can flush/repaint.
+            diagnostic = report["post_failure_snapshot"] = {"original_gate_remains_failed": True}
+            try:
+                x, y = report["failed_pixel"]["client_sample"]
+                assert 0 <= x <= 65535 and 0 <= y <= 65535
+                assert process.poll() is None and window_pid(hwnd) == process.pid, "snapshot window ownership changed"
+                report["screenshot"] = capture_window(user, gdi, hwnd, process.pid, output.with_suffix(".png"))
+                diagnostic["before"] = window_geometry([(x, y)], diagnostics=True)
+                result = ctypes.c_size_t()
+                ctypes.set_last_error(0)
+                delivered = user.SendMessageTimeoutW(hwnd, 0x85A1, 0x5A545459, x | (y << 16),
+                                                      0x0003, 2000, ctypes.byref(result))
+                diagnostic["message"] = {"delivered": bool(delivered), "result": result.value,
+                                         "last_error": ctypes.get_last_error(), "timeout_ms": 2000}
+                assert delivered and result.value == 1, "failure snapshot was unavailable, busy or timed out"
+                source = directory / "failure-state.json"
+                assert source.stat().st_size <= 8192, "failure snapshot exceeded its bound"
+                raw = source.read_bytes()
+                state = json.loads(raw)
+                assert (state["schema"] == 1 and state["pid"] == process.pid
+                        and state["hwnd"] == int(hwnd) and state["sample"] == [x, y]), state
+                saved = output.with_name(output.stem + ".post-failure.json")
+                saved.write_bytes(raw)
+                diagnostic["record"] = {"path": str(saved), "bytes": len(raw),
+                                         "sha256": hashlib.sha256(raw).hexdigest()}
+                diagnostic["state"] = state
+                diagnostic["after_flush"] = window_geometry([(x, y)], diagnostics=True)
+                diagnostic["after_flush_screenshot"] = capture_window(user, gdi, hwnd, process.pid,
+                    output.with_name(output.stem + ".post-failure.png"))
+                # A separate bounded repaint distinguishes a missing update
+                # from a flush effect. It cannot change the failed assertion.
+                assert process.poll() is None and window_pid(hwnd) == process.pid, "repaint window ownership changed"
+                assert user.InvalidateRect(hwnd, None, False)
+                update = wintypes.RECT()
+                def repaint_processed():
+                    assert process.poll() is None and window_pid(hwnd) == process.pid, "repaint window ownership changed"
+                    return not user.GetUpdateRect(hwnd, ctypes.byref(update), False)
+                wait_for(repaint_processed, "diagnostic repaint update region", timeout=2)
+                diagnostic["after_repaint"] = window_geometry([(x, y)], diagnostics=True)
+                diagnostic["after_repaint_screenshot"] = capture_window(user, gdi, hwnd, process.pid,
+                    output.with_name(output.stem + ".post-repaint.png"))
+            except Exception as error:
+                diagnostic["error"] = repr(error)
+
         def expect_pixels(name, samples):
             actual = []
             report["active_check"] = name
@@ -831,7 +886,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
             checks.append({"name": name, "passed": True, "pixels": [
                 {"x": x, "y": y, "rgb": rgb} for (x, y, _), rgb in zip(samples, actual)]})
 
-        def expect(name, col, row, expected):
+        def expect(name, col, row, expected, record=True):
             actual = None
 
             def matches():
@@ -850,7 +905,9 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                     failure["diagnostic_error"] = repr(diagnostic_error)
                 report["failed_pixel"] = failure
                 raise AssertionError(f"{name}: expected {expected}, last RGB {actual}; {error}") from error
-            checks.append({"name": name, "passed": True, "pixel": actual})
+            if record:
+                checks.append({"name": name, "passed": True, "pixel": actual})
+            return actual
 
         rgba = bytes([255, 0, 0, 255, 0, 255, 0, 128,
                       0, 0, 255, 255, 255, 255, 255, 0])
@@ -983,6 +1040,38 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                  and keyboard_marker in (directory / "keyboard.bin").read_bytes(),
                  "keyboard input after malformed and incomplete images")
         checks.append({"name": "keyboard_recovers_after_malformed_graphics", "passed": True})
+        # Preserve the original 31 checks, then independently require ten
+        # repetitions of their rapid resize path. Later Sixel/recovery vectors
+        # removed the earlier edge image, so recreate that exact fixture first.
+        repetitions = report["rapid_resize_repetitions"]
+        send(b"\x1b[0m\x1b[2J\x1b[?25l\x1b[2;20H"
+             + kitty("a=T,f=32,s=2,v=2,i=42,c=4,r=2,C=1,q=2", rgba))
+        expect("rapid_resize_fixture", 19.5, 1.5, [255, 0, 0], record=False)
+        for number in range(1, repetitions["required"] + 1):
+            iteration = {"number": number, "passed": False, "resize_stages": {}}
+            repetitions["iterations"].append(iteration)
+            prefix = f"rapid-{number:02d}"
+            record_resize("before", iteration["resize_stages"], prefix)
+            assert user.SetWindowPos(hwnd, None, 0, 0, old_width - 4 * cw, old_height, 0x16)
+            try:
+                wait_for(lambda: resized(16), "native client resize")
+                iteration["shrunk_pixel"] = expect("resize_clips_without_ghosts", 15.5, 1.5,
+                                                      [16, 24, 32], record=False)
+            finally:
+                record_resize("shrunk", iteration["resize_stages"], prefix)
+            assert user.SetWindowPos(hwnd, None, 0, 0, old_width, old_height, 0x16)
+            try:
+                wait_for(lambda: resized(20), "native client restore to original geometry")
+                iteration["restored_pixel"] = expect("resize_restores_visible_image", 19.5, 1.5,
+                                                        [255, 0, 0], record=False)
+            finally:
+                record_resize("restored", iteration["resize_stages"], prefix)
+            assert all("screenshot" in iteration["resize_stages"].get(stage, {})
+                       for stage in ("before", "shrunk", "restored")), "rapid resize evidence capture failed"
+            iteration["passed"] = True
+            repetitions["completed"] += 1
+        assert repetitions["completed"] == repetitions["required"] == 10
+        repetitions["passed"] = True
         assert all("screenshot" in report.get("resize_stages", {}).get(stage, {})
                    for stage in ("before", "shrunk", "restored")), "resize evidence capture failed"
         assert process.poll() is None, "ztty exited unexpectedly"
@@ -991,12 +1080,15 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         report["passed"] = False
         report["status"] = "blocked" if isinstance(error, DesktopBlocked) else "failed"
         report["error"] = str(error)
+        if report.get("failed_pixel", {}).get("name") == "resize_restores_visible_image":
+            post_failure_snapshot()
         raise
     finally:
         output.parent.mkdir(parents=True, exist_ok=True)
         if hwnd and process:
             try:
-                report["screenshot"] = capture_window(user, gdi, hwnd, process.pid, output.with_suffix(".png"))
+                if "screenshot" not in report:
+                    report["screenshot"] = capture_window(user, gdi, hwnd, process.pid, output.with_suffix(".png"))
                 visible_checks = sum("pixel" in check or "pixels" in check for check in checks)
                 report["visible_pixel_checks_completed"] = visible_checks
                 report["pixel_readback"] = (
