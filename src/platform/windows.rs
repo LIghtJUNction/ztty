@@ -50,6 +50,7 @@ const WM_SYSKEYDOWN: u32 = 0x0104;
 const WM_SYSKEYUP: u32 = 0x0105;
 const WM_SYSCHAR: u32 = 0x0106;
 const WM_NATIVE_SNAPSHOT: u32 = 0x85a1;
+const WM_NATIVE_PAINT_SAMPLE: u32 = 0x85a2;
 const NATIVE_SNAPSHOT_MAGIC: usize = 0x5a545459;
 
 #[derive(Default)]
@@ -63,6 +64,7 @@ struct PaintRecord {
     default_message: u32,
     default_depth: u32,
     target: Option<PaintTarget>,
+    target_after_end: Option<PaintAfterEnd>,
 }
 
 struct PaintTarget {
@@ -75,6 +77,15 @@ struct PaintTarget {
     clip: [i32; 4],
     origin_ok: bool,
     origin: [i32; 2],
+}
+
+struct PaintAfterEnd {
+    sample: [i32; 2],
+    sample_end_event_sequence: u64,
+    end_paint_return: i32,
+    client_dc_ok: bool,
+    target_rgb: Option<u32>,
+    release_dc_return: Option<i32>,
 }
 
 const POSITION_MESSAGES: [u32; 6] = [
@@ -212,6 +223,7 @@ struct NativeEventRecord {
 struct NativeEvents {
     enabled: bool,
     paint_diagnostics: bool,
+    paint_sample: Cell<Option<[i32; 2]>>,
     sequence: Cell<u64>,
     record: Cell<NativeEventRecord>,
 }
@@ -220,6 +232,7 @@ impl NativeEvents {
         Self {
             enabled,
             paint_diagnostics,
+            paint_sample: Cell::new(None),
             sequence: Cell::new(0),
             record: Cell::new(NativeEventRecord::default()),
         }
@@ -853,6 +866,26 @@ impl App {
                 target.clip_type, target.clip[0], target.clip[1], target.clip[2], target.clip[3],
                 target.origin_ok, target.origin[0], target.origin[1])
         });
+        let target_after_end = self.last_paint.target_after_end.as_ref().map_or_else(
+            || String::from("null"),
+            |target| {
+                format!(
+                    concat!(
+                        "{{\"sample\":[{},{}],\"sample_end_event_sequence\":{},\"end_paint_return\":{},\"client_dc_ok\":{},",
+                        "\"target_rgb\":{},\"release_dc_return\":{}}}"
+                    ),
+                    target.sample[0],
+                    target.sample[1],
+                    target.sample_end_event_sequence,
+                    target.end_paint_return,
+                    target.client_dc_ok,
+                    rgb(target.target_rgb),
+                    target
+                        .release_dc_return
+                        .map_or_else(|| String::from("null"), |value| format!("{value}"))
+                )
+            },
+        );
         let pane = self.panes.get(self.active).map_or_else(|| String::from("null"), |pane| {
             format!(concat!("{{\"rect\":[{},{},{},{}],\"grid\":[{},{}],\"pty\":[{},{}],\"images\":{},\"placements\":{},",
                             "\"dirty\":{},\"terminal_dirty\":{},\"grid_ready\":{},\"synchronized_output\":{}}}"),
@@ -867,7 +900,8 @@ impl App {
                 "\"dispatch_paint_pending\":{},\"deferred_paints\":{},",
                 "\"app_resize_pending\":{},\"full_redraw\":{},\"pane\":{},\"last_paint\":{{\"sequence\":{},",
                 "\"surface\":[{},{}],\"region\":[{},{},{},{}],\"blit\":{},",
-                "\"start_event_sequence\":{},\"end_event_sequence\":{},\"default_message\":{},\"default_depth\":{},\"target_after_blit\":{}}},",
+                "\"start_event_sequence\":{},\"end_event_sequence\":{},\"default_message\":{},\"default_depth\":{},\"target_after_blit\":{},",
+                "\"target_after_end_paint\":{}}},",
                 "\"events\":{}}}"
             ),
             self.surface.width,
@@ -896,6 +930,7 @@ impl App {
             self.last_paint.default_message,
             self.last_paint.default_depth,
             target,
+            target_after_end,
             events.json()
         );
         // All App/CPU fields above are captured before these native queries.
@@ -2112,10 +2147,12 @@ impl App {
             && self.surface.width > 0
             && self.surface.height > 0)
             .then(|| {
-                [
+                // Keep an explicitly configured point unchanged across resize,
+                // including when it falls outside the temporarily smaller DIB.
+                events.paint_sample.get().unwrap_or([
                     self.surface.width.saturating_sub(2).max(0),
                     self.surface.height / 2,
-                ]
+                ])
             });
         let cpu_before_blit = diagnostic_sample.and_then(|[x, y]| self.diagnostic_cpu_pixel(x, y));
         let mut blit = 0;
@@ -2159,6 +2196,29 @@ impl App {
         } else {
             None
         };
+        self.trace_frame("paint", dc, &paint.paint, blit);
+        let end_paint_return = unsafe { ffi::EndPaint(self.hwnd, &paint) };
+        let end_event_sequence = events.next();
+        // Opt-in only: compare the same pixel through a fresh client DC after
+        // EndPaint. Keep both samples local until the complete paint is recorded.
+        let target_after_end = diagnostic_sample.map(|sample| {
+            let client_dc = unsafe { ffi::GetDC(self.hwnd) };
+            let (target_rgb, release_dc_return) = if client_dc.is_null() {
+                (None, None)
+            } else {
+                let pixel = unsafe { ffi::GetPixel(client_dc, sample[0], sample[1]) };
+                let released = unsafe { ffi::ReleaseDC(self.hwnd, client_dc) };
+                ((pixel != u32::MAX).then(|| colorref(pixel)), Some(released))
+            };
+            PaintAfterEnd {
+                sample,
+                sample_end_event_sequence: events.next(),
+                end_paint_return,
+                client_dc_ok: !client_dc.is_null(),
+                target_rgb,
+                release_dc_return,
+            }
+        });
         if self.native_snapshot_path.is_some() {
             self.last_paint = PaintRecord {
                 sequence: self.last_paint.sequence.saturating_add(1),
@@ -2171,19 +2231,12 @@ impl App {
                 ],
                 blit,
                 start_event_sequence,
-                end_event_sequence: 0,
+                end_event_sequence,
                 default_message,
                 default_depth,
                 target,
+                target_after_end,
             };
-        }
-        self.trace_frame("paint", dc, &paint.paint, blit);
-        unsafe {
-            ffi::EndPaint(self.hwnd, &paint);
-        }
-        let end_event_sequence = events.next();
-        if self.native_snapshot_path.is_some() {
-            self.last_paint.end_event_sequence = end_event_sequence;
         }
     }
     fn ime_position(&self) {
@@ -2872,6 +2925,19 @@ unsafe extern "system" fn window_proc(
             });
         }
         return unsafe { default_window_proc(state, hwnd, message, wparam, lparam) };
+    }
+    if message == WM_NATIVE_PAINT_SAMPLE {
+        if state.native_events.enabled
+            && state.native_events.paint_diagnostics
+            && wparam == NATIVE_SNAPSHOT_MAGIC
+        {
+            state
+                .native_events
+                .paint_sample
+                .set(Some([lparam as u16 as i32, (lparam >> 16) as u16 as i32]));
+            return 1;
+        }
+        return 0;
     }
     if message == WM_NATIVE_SNAPSHOT && wparam == NATIVE_SNAPSHOT_MAGIC {
         let resize_pending = state.dispatch.resize_pending();
