@@ -1,0 +1,323 @@
+{
+  "schema": 1,
+  "passed": true,
+  "status": "passed",
+  "cases": [
+    {
+      "name": "workspaces",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/tests/workspaces.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/workspaces/report.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/workspaces/screenshot.png"
+      ],
+      "timeout_seconds": 180.0,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/workspaces/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/workspaces/stderr.log",
+      "harness_pid": 3370591,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.138,
+      "checks_completed": 10,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/workspaces/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "69e1aa7878e1ce4a706061de88af53396ef811b47e006d01e7b3cdbc42b2c194"
+        }
+      }
+    },
+    {
+      "name": "daily_workflow",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/tests/daily_workflow.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/daily_workflow/report.json",
+        "--screenshots",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/daily_workflow/screenshots"
+      ],
+      "timeout_seconds": 180.0,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/daily_workflow/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/daily_workflow/stderr.log",
+      "harness_pid": 3370759,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.063,
+      "checks_completed": 14,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/daily_workflow/report.json",
+      "screenshots": {
+        "screenshots/command-palette.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "c73cc7a45d293c62668804cb76a23c67925858a373fe2d037fc1c9f6230f51ad"
+        },
+        "screenshots/history-search.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "1b62aaab087a3e6c9a380e2ff2cc545c39c599f0ba52b0b2f9c5324b9fb557ec"
+        },
+        "screenshots/invalid-config-diagnostic.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+        },
+        "screenshots/reloaded-terminal.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+        }
+      }
+    },
+    {
+      "name": "sixel_gui",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/tests/sixel_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/sixel_gui/report.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/sixel_gui/screenshot.png",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree"
+      ],
+      "timeout_seconds": 180.0,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/sixel_gui/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/sixel_gui/stderr.log",
+      "harness_pid": 3370918,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 0.745,
+      "checks_completed": 10,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/sixel_gui/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 948,
+          "height": 848,
+          "sha256": "aa64fca868aeca8b1f23b9fe34b39d61addefd77cb3ee7c710c1e5c535435d75"
+        }
+      }
+    },
+    {
+      "name": "input_gui",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/tests/input_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/input_gui/report.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/input_gui/screenshot.png",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree"
+      ],
+      "timeout_seconds": 180.0,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/input_gui/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/input_gui/stderr.log",
+      "harness_pid": 3371021,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 3.856,
+      "checks_completed": 8,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/input_gui/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 900,
+          "height": 672,
+          "sha256": "177e18ff9a42043c5e84385ed633b3ae1c42376f161a984ab1ff4f2d91980fb5"
+        }
+      }
+    }
+  ],
+  "timestamp_utc": "2026-11-18T00:42:08.384368+00:00",
+  "source_sha": "60c672aa6ee6dc79ba44182f1dd6079feced9a5c",
+  "architecture": "x86_64",
+  "host_machine": "x86_64",
+  "platform": "Linux-7.3.4-arch1-1-x86_64-with-glibc2.44",
+  "python": "3.14.10 (main, Nov  4 2026, 18:21:50) [GCC 16.2.1 20260810]",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+  "evidence_dir": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native",
+  "scope": "Native Linux ELF and real PTY/X11 GUI acceptance under guarded private Xvfb",
+  "pixel_readback": "Actual XGetImage captures from owned X11 windows in private Xvfb",
+  "ime_keyboard": "synthetic XTEST input; no hardware IME acceptance",
+  "limitations": [
+    "No native Wayland or hardware GPU/scanout acceptance.",
+    "No physical input-to-display latency measurement."
+  ],
+  "wrapper_sha256": "89f71e082a3f417acde543901b0d69c5d0fd21aa7382569579accb001d9fdb46",
+  "elf": {
+    "class_bits": 64,
+    "byte_order": "little",
+    "machine": 62,
+    "architecture": "x86_64",
+    "type": 3
+  },
+  "binary_sha256": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a",
+  "source_before": {
+    "commit": "60c672aa6ee6dc79ba44182f1dd6079feced9a5c",
+    "tracked_changes": []
+  },
+  "source_files_sha256": {
+    "tests/workspaces.py": "4b08e0c060a5a0dd5a0fd608bd9e2e9dd96d01eab5daa443f9ac649b5091b60a",
+    "tests/daily_workflow.py": "128c3fa959f8e03a4d05c2e581460029fbd7597403281933f1ea0b16871556a6",
+    "tests/sixel_gui.py": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+    "tests/input_gui.py": "e0d2c65a759838c5f5fcb8b36ad18bf8aa7c140010b9be5c30218112c3f9e318",
+    "tests/ioctl_resize_fault.c": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tests/linux_native.py": "89f71e082a3f417acde543901b0d69c5d0fd21aa7382569579accb001d9fdb46"
+  },
+  "dependencies": {
+    "python-xlib": "0.33",
+    "Pillow": "13.0.0"
+  },
+  "programs": {
+    "Xvfb": "/usr/bin/Xvfb",
+    "cc": "/usr/bin/cc",
+    "fc-match": "/usr/bin/fc-match"
+  },
+  "version_check": {
+    "command": [
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+      "--version"
+    ],
+    "timeout_seconds": 30,
+    "timed_out": false,
+    "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/version/stdout.log",
+    "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-linux-native/version/stderr.log",
+    "harness_pid": 3370567,
+    "exit_code": 0,
+    "cleanup": {
+      "leftover_owned_pids": [],
+      "remaining_owned_pids": [],
+      "removed_owned_leases": []
+    },
+    "duration_seconds": 0.121,
+    "stdout_text": "ztty 0.2.0\n",
+    "passed": true
+  },
+  "source_after": {
+    "commit": "60c672aa6ee6dc79ba44182f1dd6079feced9a5c",
+    "tracked_changes": []
+  },
+  "binary_sha256_after": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a",
+  "evidence_files": {
+    "daily_workflow/report.json": {
+      "bytes": 4301,
+      "sha256": "2e683551660650ab78243c614b323dd4645263694f3057b94fc24b899549332f"
+    },
+    "daily_workflow/screenshots/command-palette.png": {
+      "bytes": 64392,
+      "sha256": "c73cc7a45d293c62668804cb76a23c67925858a373fe2d037fc1c9f6230f51ad"
+    },
+    "daily_workflow/screenshots/history-search.png": {
+      "bytes": 69872,
+      "sha256": "1b62aaab087a3e6c9a380e2ff2cc545c39c599f0ba52b0b2f9c5324b9fb557ec"
+    },
+    "daily_workflow/screenshots/invalid-config-diagnostic.png": {
+      "bytes": 75223,
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "daily_workflow/screenshots/reloaded-terminal.png": {
+      "bytes": 57242,
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    },
+    "daily_workflow/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "daily_workflow/stdout.log": {
+      "bytes": 4301,
+      "sha256": "2e683551660650ab78243c614b323dd4645263694f3057b94fc24b899549332f"
+    },
+    "input_gui/report.json": {
+      "bytes": 9557,
+      "sha256": "9d5aed54ecfe1f9e00e3e66e57320638a0405613ddc234144785bd7a92decd31"
+    },
+    "input_gui/screenshot.png": {
+      "bytes": 15126,
+      "sha256": "177e18ff9a42043c5e84385ed633b3ae1c42376f161a984ab1ff4f2d91980fb5"
+    },
+    "input_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "input_gui/stdout.log": {
+      "bytes": 9557,
+      "sha256": "9d5aed54ecfe1f9e00e3e66e57320638a0405613ddc234144785bd7a92decd31"
+    },
+    "sixel_gui/report.json": {
+      "bytes": 4732,
+      "sha256": "28d5dcc7f2fca2f2e072f3a8f4adfcc031ef7b1bcaf6905225de5afe9083db15"
+    },
+    "sixel_gui/screenshot.png": {
+      "bytes": 10929,
+      "sha256": "aa64fca868aeca8b1f23b9fe34b39d61addefd77cb3ee7c710c1e5c535435d75"
+    },
+    "sixel_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sixel_gui/stdout.log": {
+      "bytes": 341,
+      "sha256": "e33716f7c625dc422dd55b05f90ab5a207b685c9b8ee90300cd72e4608632479"
+    },
+    "version/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "version/stdout.log": {
+      "bytes": 11,
+      "sha256": "bc8d7fdbd80941d43fc4cfc2c205b87e973bcc12f3f410b8c49085779c99becc"
+    },
+    "workspaces/report.json": {
+      "bytes": 4774,
+      "sha256": "b9b8aaa4728fd8f94ee82dddd0cda6a83d5a1ac93961f16df72bb8d26e27b291"
+    },
+    "workspaces/screenshot.png": {
+      "bytes": 9825,
+      "sha256": "69e1aa7878e1ce4a706061de88af53396ef811b47e006d01e7b3cdbc42b2c194"
+    },
+    "workspaces/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspaces/stdout.log": {
+      "bytes": 4774,
+      "sha256": "b9b8aaa4728fd8f94ee82dddd0cda6a83d5a1ac93961f16df72bb8d26e27b291"
+    }
+  }
+}

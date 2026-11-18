@@ -1,0 +1,526 @@
+{
+  "purpose": "one uninstrumented control plus one instrumented owned-broker diagnostic, not a formal comparative benchmark",
+  "source_commit": "2dc6769b795e407d8fbecc2a305f1045868863a5",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+  "binary_sha256": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+  "driver_sha256": "2be6883b37d5aaa4d60bc17831d189552ba457a42d5c36623f1a6a2080b09da1",
+  "library_sha256": "cbaa3375caa79ddf33d285ec94b5892b089f2406394c58c67f33cfe073cd731c",
+  "compile": {
+    "command": [
+      "cc",
+      "-shared",
+      "-fPIC",
+      "-O2",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I/usr/include/freetype2",
+      "-I/usr/include/libpng16",
+      "-DWITH_GZFILEOP",
+      "-o",
+      "artifacts/x11-diagnostic-2dc6769/x11_elapsed.so",
+      "artifacts/x11-diagnostic-2dc6769/x11_elapsed.c",
+      "-ldl"
+    ],
+    "exit_code": 0,
+    "source_sha256": "85127e841939df6c94c0710cc855855bf3763e7bb107f9c6f3577a12e27a2fe8",
+    "compiler": "cc (GCC) 16.2.1 20260810\nCopyright \u00a9 2026 Free Software Foundation, Inc.\n\u672c\u7a0b\u5e8f\u662f\u81ea\u7531\u8f6f\u4ef6\uff1b\u8bf7\u53c2\u770b\u6e90\u4ee3\u7801\u7684\u7248\u6743\u58f0\u660e\u3002\u672c\u8f6f\u4ef6\u6ca1\u6709\u4efb\u4f55\u62c5\u4fdd\uff1b\n\u5305\u62ec\u6ca1\u6709\u9002\u9500\u6027\u548c\u67d0\u4e00\u4e13\u7528\u76ee\u7684\u4e0b\u7684\u9002\u7528\u6027\u62c5\u4fdd\u3002\n",
+    "library_sha256": "cbaa3375caa79ddf33d285ec94b5892b089f2406394c58c67f33cfe073cd731c"
+  },
+  "helpers_sha256": {
+    "tools/benchmark_terminals.py": "e880a34baa65371639ab8ed2b56c77583fab513ed93776cb905789fc4695ca7b",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "source_sha256_at_commit": {
+    "src/session.rs": "059af2698cd8015d7d74f6c64d4c44565909ddb92a391a1c250aeacdc1e6457a",
+    "src/x11.rs": "587410686c51358e759310b69061113c62ed7eb953c01c5195cf5a0e96853825",
+    "crates/zterm/src/terminal.rs": "a6add38c9f57d37c316458640120b10d7b2ed8334136552d631d55c8a3d55f28"
+  },
+  "limitations": [
+    "One sequential pair cannot isolate instrumentation cost from scheduling, CPU frequency or host noise.",
+    "The observed functions measure inclusive wall time; nested times are not additive and are not sampled CPU percentages.",
+    "Single 120x32 window on 1600x1000x24 guarded Xvfb at 96 DPI; real GPU/physical display latency not measured.",
+    "The loader library is injected only into the newly created instrumented command environment; only the validated broker PID records."
+  ],
+  "runs": [
+    {
+      "name": "control",
+      "instrumented": false,
+      "started_utc": "2026-11-18T00:05:03.948614+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2914430976,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22534909952,
+        "swap_used_bytes": 18390872064,
+        "load_average": [
+          5.48974609375,
+          5.09033203125,
+          5.65234375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.00 total=1181391896\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.08 total=2164543079\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1924694751",
+          "io": "some avg10=0.16 avg60=0.37 avg300=0.43 total=4567110111\nfull avg10=0.14 avg60=0.33 avg300=0.35 total=3546164533"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-x11-diag-omxv_1hg"
+      },
+      "display_ownership": {
+        "display": ":11948",
+        "pid": 2938984,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X11948",
+            "inode": 72353634,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X11948",
+            "inode": 72353633,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": null,
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": null
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "--config",
+        "/tmp/ztty-x11-diag-omxv_1hg/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-x11-diag-omxv_1hg/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 2939008,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 2939007,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5234959,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "exe_sha256": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5"
+      },
+      "owned_processes": {
+        "2939005": 5234959,
+        "2939008": 5234964,
+        "2939007": 5234959
+      },
+      "broker_before": {
+        "pid": 2939007,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5234959
+      },
+      "enabled_utc": "2026-11-18T00:05:04.446133+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 3375412448,
+        "burst_elapsed_ns": [
+          31933318,
+          37006617,
+          39640241,
+          44051800,
+          39814299,
+          40120549,
+          36606804,
+          36526672,
+          40542714,
+          43919176,
+          45289936,
+          56517431,
+          55770512,
+          52370132,
+          54727591,
+          61363105,
+          62997781,
+          66621775,
+          71488874,
+          58712705,
+          64889357,
+          87991426,
+          88020020,
+          53976737,
+          49194385,
+          43967161,
+          44385367,
+          41515349,
+          40300434,
+          38408996,
+          41844287,
+          57682897,
+          57971451,
+          68033830,
+          76252842,
+          63354624,
+          58649286,
+          59648623,
+          57364170,
+          54203350,
+          58800635,
+          56366549,
+          75724422,
+          71394641,
+          61326009,
+          43583633,
+          42858714,
+          46332752,
+          44396450,
+          49656994,
+          53702575,
+          61859701,
+          66431391,
+          47819617,
+          53771053,
+          50909960,
+          52810011,
+          50705183,
+          45780227,
+          45680050,
+          42271206,
+          45027069,
+          42178762,
+          42208387
+        ],
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "enabled_elapsed_ns": 3425748359,
+      "disabled_utc": "2026-11-18T00:05:07.871900+00:00",
+      "broker_after": {
+        "pid": 2939007,
+        "state": "S",
+        "user_ticks": 70,
+        "system_ticks": 34,
+        "threads": 1,
+        "start_ticks": 5234959
+      },
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "8696b968e4277cd2a2b6d36d8bd5bbb8db2d6773d7160544786dcb6e6f553c7e",
+        "png_sha256": "693775b54c78ca7d28a85fd6fe280c1959c79e38ea6b91f2fa84a74540a77949"
+      },
+      "binary_sha256_after": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:05:07.936792+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2784837632,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22520311808,
+        "swap_used_bytes": 18405470208,
+        "load_average": [
+          5.61083984375,
+          5.1220703125,
+          5.65966796875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.00 total=1181406191\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.08 total=2164556595\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1924708035",
+          "io": "some avg10=0.28 avg60=0.38 avg300=0.43 total=4567144296\nfull avg10=0.28 avg60=0.34 avg300=0.35 total=3546195903"
+        }
+      },
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "512d795204df150a51680945a0aa14cdc97523d5f2ea2a6bcc5ecd95c4536231",
+        "counter-state-final.bin": "45f981fd952660f37f7f97f664b752e5bf379525fe1bfae45acdd989c313eb9d",
+        "final-frame.png": "693775b54c78ca7d28a85fd6fe280c1959c79e38ea6b91f2fa84a74540a77949"
+      }
+    },
+    {
+      "name": "instrumented",
+      "instrumented": true,
+      "started_utc": "2026-11-18T00:05:07.937811+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2792468480,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22520311808,
+        "swap_used_bytes": 18405470208,
+        "load_average": [
+          5.61083984375,
+          5.1220703125,
+          5.65966796875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.00 total=1181406191\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.08 total=2164556595\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1924708035",
+          "io": "some avg10=0.28 avg60=0.38 avg300=0.43 total=4567144296\nfull avg10=0.28 avg60=0.34 avg300=0.35 total=3546195903"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-x11-diag-ov23e0qg"
+      },
+      "display_ownership": {
+        "display": ":24684",
+        "pid": 2939442,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X24684",
+            "inode": 72374758,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X24684",
+            "inode": 72374757,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/x11-diagnostic-2dc6769/x11_elapsed.so",
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": "/tmp/ztty-x11-diag-ov23e0qg/counter-state.bin"
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "--config",
+        "/tmp/ztty-x11-diag-ov23e0qg/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-x11-diag-ov23e0qg/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 2939468,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 2939463,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5235338,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "exe_sha256": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5"
+      },
+      "owned_processes": {
+        "2939461": 5235338,
+        "2939468": 5235340,
+        "2939463": 5235338
+      },
+      "broker_before": {
+        "pid": 2939463,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5235338
+      },
+      "enabled_utc": "2026-11-18T00:05:08.195454+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 3879183265,
+        "burst_elapsed_ns": [
+          33822971,
+          36878091,
+          38588442,
+          38792868,
+          46638111,
+          48491558,
+          50067117,
+          50708184,
+          66563980,
+          58985038,
+          67367263,
+          68207408,
+          68766765,
+          72537150,
+          120783466,
+          257402805,
+          220865954,
+          104850674,
+          74914636,
+          60579481,
+          53686035,
+          54159003,
+          64114219,
+          49070440,
+          41374144,
+          40811237,
+          48955523,
+          66272559,
+          60099421,
+          60412564,
+          57992973,
+          61990181,
+          55649650,
+          52345639,
+          51347883,
+          54689851,
+          63637813,
+          63889156,
+          57308147,
+          51883360,
+          51531983,
+          49673177,
+          50834380,
+          45931751,
+          58075196,
+          54236182,
+          48900673,
+          43896033,
+          41366496,
+          45794601,
+          46740002,
+          44024190,
+          43977145,
+          45630295,
+          48644490,
+          53491304,
+          53573416,
+          55954810,
+          52753751,
+          51944615,
+          47351256,
+          46996379,
+          56198759,
+          45970329
+        ],
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "enabled_elapsed_ns": 3929628886,
+      "disabled_utc": "2026-11-18T00:05:12.125106+00:00",
+      "broker_after": {
+        "pid": 2939463,
+        "state": "S",
+        "user_ticks": 94,
+        "system_ticks": 45,
+        "threads": 1,
+        "start_ticks": 5235338
+      },
+      "counters": {
+        "magic": "0x5a54545958444941",
+        "target_pid": 2939463,
+        "enabled_at_read": 0,
+        "observed_pid": 2939463,
+        "observed_tid": 2939463,
+        "multiple_tids": 0,
+        "outer_calls": 355274,
+        "outer_elapsed_ns": 3069921818,
+        "clock_failures": 0,
+        "functions": {
+          "XftDrawStringUtf8": {
+            "calls": 235501,
+            "elapsed_ns": 192356211,
+            "max_elapsed_ns": 190780,
+            "nested_calls": 0
+          },
+          "XCopyArea": {
+            "calls": 116127,
+            "elapsed_ns": 5235910,
+            "max_elapsed_ns": 6921,
+            "nested_calls": 0
+          },
+          "XFlush": {
+            "calls": 3646,
+            "elapsed_ns": 2872329697,
+            "max_elapsed_ns": 12970818,
+            "nested_calls": 0
+          }
+        },
+        "limitation": "Function elapsed values are inclusive wall time, not CPU samples. Nested function times cannot be added. Outer elapsed excludes nested double counting within each thread; multiple threads could overlap."
+      },
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "8696b968e4277cd2a2b6d36d8bd5bbb8db2d6773d7160544786dcb6e6f553c7e",
+        "png_sha256": "693775b54c78ca7d28a85fd6fe280c1959c79e38ea6b91f2fa84a74540a77949"
+      },
+      "binary_sha256_after": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:05:12.172809+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2592620544,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22371782656,
+        "swap_used_bytes": 18553999360,
+        "load_average": [
+          6.76318359375,
+          5.369140625,
+          5.73681640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.00 total=1181432116\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.18 avg60=0.04 avg300=0.08 total=2164606636\nfull avg10=0.18 avg60=0.04 avg300=0.08 total=1924757682",
+          "io": "some avg10=0.37 avg60=0.39 avg300=0.43 total=4567173235\nfull avg10=0.18 avg60=0.32 avg300=0.35 total=3546219802"
+        }
+      },
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "070665a41b234640131be4244f3060aa6389311e125f952c08765967ca7445f5",
+        "counter-state-final.bin": "9191f991f611b88d56587660d7db369bde82cdb51c583355b4614b49907fa445",
+        "final-frame.png": "693775b54c78ca7d28a85fd6fe280c1959c79e38ea6b91f2fa84a74540a77949"
+      }
+    }
+  ],
+  "ok": true,
+  "diagnostic_to_control_elapsed_ratio": 1.1492471882357649,
+  "final_frame_pixels_equal": true,
+  "binary_sha256_after": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5"
+}

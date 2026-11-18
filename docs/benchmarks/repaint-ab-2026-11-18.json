@@ -1,0 +1,1462 @@
+{
+  "purpose": "three before/after pairs for the bounded repaint change only; not a Kitty/Ghostty comparison",
+  "started_utc": "2026-11-18T00:50:15.161140+00:00",
+  "command": [
+    "/usr/bin/python3",
+    "artifacts/repaint_ab.py"
+  ],
+  "variants": {
+    "before": {
+      "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+      "sha256": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+      "source_commit": "2dc6769b795e407d8fbecc2a305f1045868863a5",
+      "bytes": 677088
+    },
+    "after": {
+      "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+      "sha256": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a",
+      "source_commit": "60c672aa6ee6dc79ba44182f1dd6079feced9a5c",
+      "bytes": 677328
+    }
+  },
+  "repetitions": 3,
+  "bursts_per_run": 64,
+  "run_order": [
+    "before",
+    "after",
+    "after",
+    "before",
+    "before",
+    "after"
+  ],
+  "driver_sha256": "aa2284ade3565ca55ba1258159a3a6174fc388e30da9c3f1e2a8882053f8b6a8",
+  "helpers_sha256": {
+    "tools/benchmark_terminals.py": "e880a34baa65371639ab8ed2b56c77583fab513ed93776cb905789fc4695ca7b",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "source_files_sha256_at_commit": {
+    "before": {
+      "src/main.rs": "6af9fbf389b6e4aa29f41b09fe91aef2b1dccc77590719972cd3b93df621f5ff",
+      "src/session.rs": "059af2698cd8015d7d74f6c64d4c44565909ddb92a391a1c250aeacdc1e6457a",
+      "src/repaint.rs": null,
+      "crates/zterm/src/terminal.rs": "a6add38c9f57d37c316458640120b10d7b2ed8334136552d631d55c8a3d55f28"
+    },
+    "after": {
+      "src/main.rs": "5bf10d7d53f99ed88d96679de8ed6a9bd058f3801c0ee5b86094f5846f5cb090",
+      "src/session.rs": "2da5a360dc5337f4e40f38182ba99f78a4829e9d2b05b71ed57619d9eacb5384",
+      "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+      "crates/zterm/src/terminal.rs": "5e71d256da42d333a97299336d4ae0119f4df7088ea12bcffe7b54e8b1f966a8"
+    }
+  },
+  "measurement": {
+    "window_count": 1,
+    "sharing": "shared broker plus waiting launcher",
+    "grid": [
+      120,
+      32
+    ],
+    "screen": "1600x1000x24",
+    "dpi": 96,
+    "font": "monospace:size=11",
+    "scrollback": 2000,
+    "padding": 16,
+    "timed": "64 unchanged original CUP+SGR payloads, each followed by DSR completion",
+    "fresh_pixels": "untimed unique blue final marker on row 1; XGetImage verifies visibility before further PTY requests; final whole-window pixels compared",
+    "no_instrumentation": true,
+    "pressure_gate": "unchanged tools/benchmark_terminals.py comparison_pressure_reasons at each run start; end flags also invalidate comparison"
+  },
+  "limitations": [
+    "DSR completion is a logical PTY fence, not display presentation.",
+    "Marker observations and final screenshots use private Xvfb, not a physical GPU/display.",
+    "Only one visible idle-history session and this in-place ASCII/color workload are measured; history view force, Unicode/images, 5/10/20 sessions and native Wayland are outside this AB.",
+    "Three short pairs do not establish a universal speedup or a hardware input-to-display latency bound."
+  ],
+  "runs": [
+    {
+      "name": "01-before",
+      "instrumented": false,
+      "started_utc": "2026-11-18T00:50:15.221065+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2931417088,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22291337216,
+        "swap_used_bytes": 18634444800,
+        "load_average": [
+          3.18310546875,
+          4.01953125,
+          4.8720703125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.02 avg300=0.11 total=1196325842\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.11 total=2175118264\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1933793117",
+          "io": "some avg10=0.01 avg60=0.11 avg300=0.55 total=4603321807\nfull avg10=0.00 avg60=0.06 avg300=0.35 total=3574667236"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-repaint-ab-podgcxm8"
+      },
+      "display_ownership": {
+        "display": ":1369",
+        "pid": 3460177,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X1369",
+            "inode": 74368709,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X1369",
+            "inode": 74368708,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": null,
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": null
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "--config",
+        "/tmp/ztty-repaint-ab-podgcxm8/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-repaint-ab-podgcxm8/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 16\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 3460198,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 3460197,
+        "state": "S",
+        "user_ticks": 3,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5506086,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "exe_sha256": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5"
+      },
+      "owned_processes": {
+        "3460195": 5506085,
+        "3460198": 5506092,
+        "3460197": 5506086
+      },
+      "broker_before": {
+        "pid": 3460197,
+        "state": "S",
+        "user_ticks": 3,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5506086
+      },
+      "phase_started_utc": "2026-11-18T00:50:15.754645+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 3102464611,
+        "burst_elapsed_ns": [
+          40947011,
+          51592763,
+          62920512,
+          50776329,
+          35575147,
+          52963096,
+          57523065,
+          41719757,
+          48771936,
+          43344050,
+          37656235,
+          37868937,
+          60649816,
+          58314519,
+          64001905,
+          52496129,
+          49665631,
+          54569964,
+          50873364,
+          53500416,
+          61816737,
+          61383336,
+          63409981,
+          68394112,
+          48340922,
+          49557722,
+          49868192,
+          42607781,
+          49488347,
+          53592265,
+          45435120,
+          38551252,
+          37530941,
+          39709903,
+          37700896,
+          36221319,
+          37855208,
+          39873305,
+          46709348,
+          53616966,
+          50369008,
+          44098909,
+          46311176,
+          46225407,
+          43982023,
+          41108726,
+          41078793,
+          42435080,
+          38085923,
+          44804148,
+          45721508,
+          46095770,
+          47696732,
+          44730367,
+          48785748,
+          56351270,
+          59396779,
+          51253342,
+          48710253,
+          56239857,
+          49623450,
+          47819721,
+          48842761,
+          45148554
+        ],
+        "untimed_final_marker_sha256": "76e5abae1bf180523243053fd7003fa1a5e7717e0fd38562758920274df8c2cc",
+        "untimed_final_marker_bytes": 48,
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "phase_elapsed_ns": 3102696748,
+      "phase_ended_utc": "2026-11-18T00:50:18.857357+00:00",
+      "broker_after": {
+        "pid": 3460197,
+        "state": "R",
+        "user_ticks": 67,
+        "system_ticks": 33,
+        "threads": 1,
+        "start_ticks": 5506086
+      },
+      "fresh_final_marker_visible_ms": 0.17078100063372403,
+      "final_marker_verified_before_drain": true,
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "59db17fc924b6bb823912861b8d38dd969175a41b815cb832caa3188caf2f94e",
+        "png_sha256": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "binary_sha256_after": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:50:18.928746+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 3126480896,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22310715392,
+        "swap_used_bytes": 18615066624,
+        "load_average": [
+          3.16796875,
+          4.00244140625,
+          4.86181640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.02 avg300=0.11 total=1196342318\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.10 total=2175130919\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1933804842",
+          "io": "some avg10=0.15 avg60=0.13 avg300=0.55 total=4603347051\nfull avg10=0.14 avg60=0.08 avg300=0.35 total=3574690137"
+        }
+      },
+      "pressure_flags_after": [],
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "0a4610b53eda7d4bd6b5d795143f28407bc56a82ffb7f523f892c07ba5de880a",
+        "final-frame.png": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "variant": "before"
+    },
+    {
+      "name": "02-after",
+      "instrumented": false,
+      "started_utc": "2026-11-18T00:50:18.930190+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 3132452864,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22310715392,
+        "swap_used_bytes": 18615066624,
+        "load_average": [
+          3.16796875,
+          4.00244140625,
+          4.86181640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.02 avg300=0.11 total=1196342319\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.10 total=2175130919\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1933804842",
+          "io": "some avg10=0.15 avg60=0.13 avg300=0.55 total=4603347051\nfull avg10=0.14 avg60=0.08 avg300=0.35 total=3574690137"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-repaint-ab-_r7qtjf6"
+      },
+      "display_ownership": {
+        "display": ":15275",
+        "pid": 3460666,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X15275",
+            "inode": 74386672,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X15275",
+            "inode": 74386671,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": null,
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": null
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "--config",
+        "/tmp/ztty-repaint-ab-_r7qtjf6/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-repaint-ab-_r7qtjf6/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 16\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 3460722,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 3460711,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5506438,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "exe_sha256": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a"
+      },
+      "owned_processes": {
+        "3460708": 5506438,
+        "3460722": 5506441,
+        "3460711": 5506438
+      },
+      "broker_before": {
+        "pid": 3460711,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5506438
+      },
+      "phase_started_utc": "2026-11-18T00:50:19.220032+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 482258620,
+        "burst_elapsed_ns": [
+          20362264,
+          18682029,
+          13234727,
+          13453542,
+          8883730,
+          11034618,
+          9454499,
+          10138904,
+          10831482,
+          10597542,
+          8304105,
+          10996890,
+          8722750,
+          11738764,
+          7508979,
+          7122351,
+          6306826,
+          9566613,
+          11173285,
+          8924943,
+          8185667,
+          9026531,
+          12176391,
+          8655219,
+          8006740,
+          8189538,
+          5829817,
+          5533620,
+          5105105,
+          6407819,
+          5037809,
+          5104185,
+          4799203,
+          5722525,
+          4462353,
+          5343642,
+          5174617,
+          5612630,
+          6534014,
+          5996934,
+          4917820,
+          5530999,
+          6056828,
+          7067217,
+          7489370,
+          6733112,
+          8145378,
+          7213153,
+          4877905,
+          5649115,
+          5094180,
+          4775814,
+          6682745,
+          4482112,
+          4890585,
+          5165670,
+          4750848,
+          4816501,
+          4754779,
+          5229977,
+          4907407,
+          4574864,
+          4882306,
+          5475113
+        ],
+        "untimed_final_marker_sha256": "76e5abae1bf180523243053fd7003fa1a5e7717e0fd38562758920274df8c2cc",
+        "untimed_final_marker_bytes": 48,
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "phase_elapsed_ns": 482667942,
+      "phase_ended_utc": "2026-11-18T00:50:19.702745+00:00",
+      "broker_after": {
+        "pid": 3460711,
+        "state": "S",
+        "user_ticks": 28,
+        "system_ticks": 14,
+        "threads": 1,
+        "start_ticks": 5506438
+      },
+      "fresh_final_marker_visible_ms": 8.397912999498658,
+      "final_marker_verified_before_drain": true,
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "59db17fc924b6bb823912861b8d38dd969175a41b815cb832caa3188caf2f94e",
+        "png_sha256": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "binary_sha256_after": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:50:19.767352+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2559995904,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22302023680,
+        "swap_used_bytes": 18623758336,
+        "load_average": [
+          3.16796875,
+          4.00244140625,
+          4.86181640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.36 avg60=0.08 avg300=0.12 total=1196394638\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.10 total=2175137187\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1933811097",
+          "io": "some avg10=0.12 avg60=0.13 avg300=0.55 total=4603347716\nfull avg10=0.12 avg60=0.08 avg300=0.35 total=3574690426"
+        }
+      },
+      "pressure_flags_after": [],
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "101959d52c7b04800f8f4624b1a62b9021a83f43e1393b44b26e5fd435361929",
+        "final-frame.png": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "variant": "after"
+    },
+    {
+      "name": "03-after",
+      "instrumented": false,
+      "started_utc": "2026-11-18T00:50:19.769472+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2571608064,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22301794304,
+        "swap_used_bytes": 18623987712,
+        "load_average": [
+          3.16796875,
+          4.00244140625,
+          4.86181640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.36 avg60=0.08 avg300=0.12 total=1196394781\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.10 total=2175137525\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1933811435",
+          "io": "some avg10=0.12 avg60=0.13 avg300=0.55 total=4603347760\nfull avg10=0.12 avg60=0.08 avg300=0.35 total=3574690454"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-repaint-ab-7ifwf6_o"
+      },
+      "display_ownership": {
+        "display": ":1056",
+        "pid": 3461404,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X1056",
+            "inode": 74390603,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X1056",
+            "inode": 74390602,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": null,
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": null
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "--config",
+        "/tmp/ztty-repaint-ab-7ifwf6_o/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-repaint-ab-7ifwf6_o/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 16\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 3461426,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 3461425,
+        "state": "S",
+        "user_ticks": 3,
+        "system_ticks": 0,
+        "threads": 1,
+        "start_ticks": 5506523,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "exe_sha256": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a"
+      },
+      "owned_processes": {
+        "3461423": 5506523,
+        "3461426": 5506526,
+        "3461425": 5506523
+      },
+      "broker_before": {
+        "pid": 3461425,
+        "state": "S",
+        "user_ticks": 3,
+        "system_ticks": 0,
+        "threads": 1,
+        "start_ticks": 5506523
+      },
+      "phase_started_utc": "2026-11-18T00:50:20.055116+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 489777364,
+        "burst_elapsed_ns": [
+          9525112,
+          8255551,
+          7654866,
+          6089632,
+          6472760,
+          5991059,
+          6369533,
+          11077841,
+          7208475,
+          7669952,
+          6518113,
+          5172965,
+          6852202,
+          6722222,
+          8817198,
+          6671734,
+          5949048,
+          8779344,
+          5785293,
+          6169348,
+          6965136,
+          5365504,
+          5552929,
+          5715204,
+          10325368,
+          5536167,
+          5894903,
+          5563329,
+          10065820,
+          12904003,
+          8611619,
+          8214990,
+          8589814,
+          8689231,
+          11667324,
+          8496589,
+          11730611,
+          8844281,
+          11856872,
+          12800843,
+          6030980,
+          6620517,
+          7035174,
+          7217899,
+          9200565,
+          10757827,
+          11706979,
+          6623628,
+          7511646,
+          7514477,
+          10158960,
+          6701152,
+          6429162,
+          7692623,
+          6118316,
+          6075699,
+          6334007,
+          6209300,
+          6029713,
+          5920101,
+          5971152,
+          6056974,
+          6263546,
+          6267857
+        ],
+        "untimed_final_marker_sha256": "76e5abae1bf180523243053fd7003fa1a5e7717e0fd38562758920274df8c2cc",
+        "untimed_final_marker_bytes": 48,
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "phase_elapsed_ns": 490204109,
+      "phase_ended_utc": "2026-11-18T00:50:20.545348+00:00",
+      "broker_after": {
+        "pid": 3461425,
+        "state": "S",
+        "user_ticks": 33,
+        "system_ticks": 13,
+        "threads": 1,
+        "start_ticks": 5506523
+      },
+      "fresh_final_marker_visible_ms": 2.398629003437236,
+      "final_marker_verified_before_drain": true,
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "59db17fc924b6bb823912861b8d38dd969175a41b815cb832caa3188caf2f94e",
+        "png_sha256": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "binary_sha256_after": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:50:20.603335+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2487296000,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22220107776,
+        "swap_used_bytes": 18705674240,
+        "load_average": [
+          3.16796875,
+          4.00244140625,
+          4.86181640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.36 avg60=0.08 avg300=0.12 total=1196415852\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.10 total=2175185257\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1933857283",
+          "io": "some avg10=0.12 avg60=0.13 avg300=0.55 total=4603351901\nfull avg10=0.12 avg60=0.08 avg300=0.35 total=3574692676"
+        }
+      },
+      "pressure_flags_after": [],
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "36226d9060eff52ad2b242b2aeaf64ca3a0ad5bcd0b0cc2ef226f7ef2845ff36",
+        "final-frame.png": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "variant": "after"
+    },
+    {
+      "name": "04-before",
+      "instrumented": false,
+      "started_utc": "2026-11-18T00:50:20.605703+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2502238208,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22219870208,
+        "swap_used_bytes": 18705911808,
+        "load_average": [
+          3.16796875,
+          4.00244140625,
+          4.86181640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.36 avg60=0.08 avg300=0.12 total=1196415869\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.01 avg300=0.10 total=2175185546\nfull avg10=0.00 avg60=0.01 avg300=0.08 total=1933857571",
+          "io": "some avg10=0.12 avg60=0.13 avg300=0.55 total=4603352069\nfull avg10=0.12 avg60=0.08 avg300=0.35 total=3574692834"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-repaint-ab-7o5wlhv7"
+      },
+      "display_ownership": {
+        "display": ":13471",
+        "pid": 3461549,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X13471",
+            "inode": 74366668,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X13471",
+            "inode": 74366667,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": null,
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": null
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "--config",
+        "/tmp/ztty-repaint-ab-7o5wlhv7/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-repaint-ab-7o5wlhv7/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 16\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 3461621,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 3461614,
+        "state": "S",
+        "user_ticks": 4,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5506608,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "exe_sha256": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5"
+      },
+      "owned_processes": {
+        "3461608": 5506608,
+        "3461621": 5506611,
+        "3461614": 5506608
+      },
+      "broker_before": {
+        "pid": 3461614,
+        "state": "S",
+        "user_ticks": 4,
+        "system_ticks": 1,
+        "threads": 1,
+        "start_ticks": 5506608
+      },
+      "phase_started_utc": "2026-11-18T00:50:21.036993+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 3418207436,
+        "burst_elapsed_ns": [
+          63650198,
+          69191130,
+          66384828,
+          53665036,
+          53090705,
+          56374765,
+          66199384,
+          61425104,
+          63618694,
+          65844458,
+          58659739,
+          50983066,
+          58641483,
+          55051828,
+          47731926,
+          57417947,
+          54509981,
+          50145503,
+          48674288,
+          69658825,
+          49932424,
+          52004182,
+          41873446,
+          49238007,
+          45373488,
+          42310079,
+          46032414,
+          49213134,
+          46261078,
+          54968562,
+          61903050,
+          70732503,
+          56267830,
+          46065439,
+          44394042,
+          50190714,
+          52267206,
+          47251923,
+          64211200,
+          59723353,
+          59126378,
+          56493239,
+          54054055,
+          61916829,
+          59801128,
+          48729399,
+          52039607,
+          57562021,
+          50461555,
+          44978820,
+          54392185,
+          57874517,
+          54275023,
+          55850511,
+          56155917,
+          49774418,
+          51550531,
+          38746170,
+          36603899,
+          38314090,
+          39962590,
+          41423434,
+          49067546,
+          47746355
+        ],
+        "untimed_final_marker_sha256": "76e5abae1bf180523243053fd7003fa1a5e7717e0fd38562758920274df8c2cc",
+        "untimed_final_marker_bytes": 48,
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "phase_elapsed_ns": 3418516085,
+      "phase_ended_utc": "2026-11-18T00:50:24.455530+00:00",
+      "broker_after": {
+        "pid": 3461614,
+        "state": "S",
+        "user_ticks": 80,
+        "system_ticks": 38,
+        "threads": 1,
+        "start_ticks": 5506608
+      },
+      "fresh_final_marker_visible_ms": 0.08810700091999024,
+      "final_marker_verified_before_drain": true,
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "59db17fc924b6bb823912861b8d38dd969175a41b815cb832caa3188caf2f94e",
+        "png_sha256": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "binary_sha256_after": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:50:24.509430+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2752012288,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22099918848,
+        "swap_used_bytes": 18825863168,
+        "load_average": [
+          4.11572265625,
+          4.18505859375,
+          4.91650390625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.53 avg60=0.14 avg300=0.13 total=1196450486\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.74 avg60=0.17 avg300=0.14 total=2175261396\nfull avg10=0.74 avg60=0.17 avg300=0.11 total=1933932814",
+          "io": "some avg10=0.08 avg60=0.12 avg300=0.54 total=4603362042\nfull avg10=0.08 avg60=0.08 avg300=0.35 total=3574700822"
+        }
+      },
+      "pressure_flags_after": [],
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "492e91b915dfb09c76b54364e61af4be669a02782bed2b4e36d11d3b1adcc418",
+        "final-frame.png": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "variant": "before"
+    },
+    {
+      "name": "05-before",
+      "instrumented": false,
+      "started_utc": "2026-11-18T00:50:24.511501+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2771599360,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22099918848,
+        "swap_used_bytes": 18825863168,
+        "load_average": [
+          4.11572265625,
+          4.18505859375,
+          4.91650390625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.53 avg60=0.14 avg300=0.13 total=1196450490\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.74 avg60=0.17 avg300=0.14 total=2175261396\nfull avg10=0.74 avg60=0.17 avg300=0.11 total=1933932814",
+          "io": "some avg10=0.08 avg60=0.12 avg300=0.54 total=4603362117\nfull avg10=0.08 avg60=0.08 avg300=0.35 total=3574700897"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-repaint-ab-iwx20yce"
+      },
+      "display_ownership": {
+        "display": ":10247",
+        "pid": 3462289,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X10247",
+            "inode": 74403848,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X10247",
+            "inode": 74403847,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": null,
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": null
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "--config",
+        "/tmp/ztty-repaint-ab-iwx20yce/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-repaint-ab-iwx20yce/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 16\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 3462298,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 3462297,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 0,
+        "threads": 1,
+        "start_ticks": 5506995,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/arm-candidate-ztty",
+        "exe_sha256": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5"
+      },
+      "owned_processes": {
+        "3462295": 5506994,
+        "3462298": 5506996,
+        "3462297": 5506995
+      },
+      "broker_before": {
+        "pid": 3462297,
+        "state": "S",
+        "user_ticks": 2,
+        "system_ticks": 0,
+        "threads": 1,
+        "start_ticks": 5506995
+      },
+      "phase_started_utc": "2026-11-18T00:50:24.745822+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 3396713645,
+        "burst_elapsed_ns": [
+          29819262,
+          35814649,
+          35905259,
+          42233948,
+          52460418,
+          53741718,
+          53555328,
+          49052532,
+          46399984,
+          47246696,
+          41394769,
+          43089019,
+          51912763,
+          56590683,
+          58509993,
+          67127294,
+          68538522,
+          63426268,
+          51575380,
+          52147216,
+          64847739,
+          52313171,
+          53934310,
+          61834475,
+          60549408,
+          73967576,
+          62286236,
+          68328494,
+          126257115,
+          150822361,
+          80917484,
+          66300411,
+          51234718,
+          49096062,
+          44894075,
+          50284439,
+          48325997,
+          51267098,
+          59184038,
+          58721139,
+          66936110,
+          61084369,
+          43957588,
+          39264038,
+          39341592,
+          44044884,
+          44272684,
+          42377473,
+          37897920,
+          37794048,
+          38169089,
+          41574045,
+          50840561,
+          63864423,
+          49772214,
+          37020392,
+          37213659,
+          36961637,
+          40573118,
+          40324193,
+          40032027,
+          41433061,
+          40395229,
+          45511465
+        ],
+        "untimed_final_marker_sha256": "76e5abae1bf180523243053fd7003fa1a5e7717e0fd38562758920274df8c2cc",
+        "untimed_final_marker_bytes": 48,
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "phase_elapsed_ns": 3397077854,
+      "phase_ended_utc": "2026-11-18T00:50:28.142913+00:00",
+      "broker_after": {
+        "pid": 3462297,
+        "state": "S",
+        "user_ticks": 76,
+        "system_ticks": 34,
+        "threads": 1,
+        "start_ticks": 5506995
+      },
+      "fresh_final_marker_visible_ms": 0.1139189989771694,
+      "final_marker_verified_before_drain": true,
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "59db17fc924b6bb823912861b8d38dd969175a41b815cb832caa3188caf2f94e",
+        "png_sha256": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "binary_sha256_after": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:50:28.191673+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2732756992,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22108303360,
+        "swap_used_bytes": 18817478656,
+        "load_average": [
+          4.0263671875,
+          4.1650390625,
+          4.90576171875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.36 avg60=0.13 avg300=0.13 total=1196463500\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.49 avg60=0.16 avg300=0.13 total=2175261460\nfull avg10=0.49 avg60=0.16 avg300=0.11 total=1933932877",
+          "io": "some avg10=0.05 avg60=0.11 avg300=0.53 total=4603375513\nfull avg10=0.05 avg60=0.07 avg300=0.34 total=3574712298"
+        }
+      },
+      "pressure_flags_after": [],
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "14fe449853881aa8f6c0277c8d9ac60fb4ec5b9de573f6578783002f5fde5850",
+        "final-frame.png": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "variant": "before"
+    },
+    {
+      "name": "06-after",
+      "instrumented": false,
+      "started_utc": "2026-11-18T00:50:28.192539+00:00",
+      "host_at_start": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2732756992,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22108303360,
+        "swap_used_bytes": 18817478656,
+        "load_average": [
+          4.0263671875,
+          4.1650390625,
+          4.90576171875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.36 avg60=0.13 avg300=0.13 total=1196463500\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.49 avg60=0.16 avg300=0.13 total=2175261460\nfull avg10=0.49 avg60=0.16 avg300=0.11 total=1933932877",
+          "io": "some avg10=0.05 avg60=0.11 avg300=0.53 total=4603375513\nfull avg10=0.05 avg60=0.07 avg300=0.34 total=3574712298"
+        }
+      },
+      "ok": true,
+      "ownership_marker": {
+        "ZTTY_TERMINAL_BENCHMARK": "ztty-repaint-ab-s2vwgwzv"
+      },
+      "display_ownership": {
+        "display": ":6980",
+        "pid": 3462784,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X6980",
+            "inode": 74366972,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X6980",
+            "inode": 74366971,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "instrumentation_environment": {
+        "LD_PRELOAD": null,
+        "ZTTY_X11_DIAGNOSTIC_CONTROL": null
+      },
+      "terminal_command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "--config",
+        "/tmp/ztty-repaint-ab-s2vwgwzv/ztty.conf",
+        "--font",
+        "monospace:size=11",
+        "--geometry",
+        "120x32",
+        "--scrollback",
+        "2000",
+        "-e",
+        "/tmp/ztty-repaint-ab-s2vwgwzv/probe"
+      ],
+      "terminal_config": "background-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 16\n",
+      "child_ready": {
+        "ready": true,
+        "pid": 3462793,
+        "cols": 120,
+        "rows": 32,
+        "payload_bytes": 1050937,
+        "payload_sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+      },
+      "broker": {
+        "pid": 3462792,
+        "state": "S",
+        "user_ticks": 1,
+        "system_ticks": 0,
+        "threads": 1,
+        "start_ticks": 5507362,
+        "exe": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/repaint-worktree/artifacts/repaint-final-ztty",
+        "exe_sha256": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a"
+      },
+      "owned_processes": {
+        "3462790": 5507362,
+        "3462793": 5507366,
+        "3462792": 5507362
+      },
+      "broker_before": {
+        "pid": 3462792,
+        "state": "S",
+        "user_ticks": 1,
+        "system_ticks": 0,
+        "threads": 1,
+        "start_ticks": 5507362
+      },
+      "phase_started_utc": "2026-11-18T00:50:28.411556+00:00",
+      "workload": {
+        "bursts": 64,
+        "bytes": 67259968,
+        "elapsed_ns": 230259755,
+        "burst_elapsed_ns": [
+          4736224,
+          3521160,
+          3474083,
+          3533931,
+          3624840,
+          3559991,
+          3679537,
+          3556647,
+          4288898,
+          3606276,
+          3701893,
+          3498570,
+          3502015,
+          3389023,
+          3345165,
+          3598387,
+          3417950,
+          4343455,
+          3337383,
+          3539518,
+          3372588,
+          3401986,
+          3478011,
+          3375139,
+          4307944,
+          3610974,
+          3695453,
+          3628760,
+          3818202,
+          3630845,
+          3869520,
+          3807282,
+          3740996,
+          3859182,
+          3877381,
+          3545638,
+          3583907,
+          3631500,
+          3515414,
+          3723718,
+          3523725,
+          3677316,
+          3548964,
+          3643600,
+          3527210,
+          3520619,
+          3553123,
+          3439438,
+          3574439,
+          3446232,
+          3518124,
+          3436058,
+          3470496,
+          3446206,
+          3435574,
+          3525540,
+          3427541,
+          3485878,
+          3364667,
+          3395484,
+          3369648,
+          3365224,
+          3455487,
+          3338254
+        ],
+        "untimed_final_marker_sha256": "76e5abae1bf180523243053fd7003fa1a5e7717e0fd38562758920274df8c2cc",
+        "untimed_final_marker_bytes": 48,
+        "scope": "PTY write and DSR completion, not frame presentation"
+      },
+      "phase_elapsed_ns": 230438849,
+      "phase_ended_utc": "2026-11-18T00:50:28.642008+00:00",
+      "broker_after": {
+        "pid": 3462792,
+        "state": "S",
+        "user_ticks": 16,
+        "system_ticks": 8,
+        "threads": 1,
+        "start_ticks": 5507362
+      },
+      "fresh_final_marker_visible_ms": 2.731396998569835,
+      "final_marker_verified_before_drain": true,
+      "final_frame": {
+        "width": 1112,
+        "height": 768,
+        "rgb_sha256": "59db17fc924b6bb823912861b8d38dd969175a41b815cb832caa3188caf2f94e",
+        "png_sha256": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "binary_sha256_after": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a",
+      "display_cleanup": {
+        "xvfb_exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "remaining_known_owned_pids": [],
+      "ended_utc": "2026-11-18T00:50:28.684194+00:00",
+      "host_at_end": {
+        "MemTotal_bytes": 16476708864,
+        "MemAvailable_bytes": 2980696064,
+        "SwapTotal_bytes": 40925782016,
+        "SwapFree_bytes": 22108438528,
+        "swap_used_bytes": 18817343488,
+        "load_average": [
+          4.0263671875,
+          4.1650390625,
+          4.90576171875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.36 avg60=0.13 avg300=0.13 total=1196466224\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.49 avg60=0.16 avg300=0.13 total=2175262221\nfull avg10=0.49 avg60=0.16 avg300=0.11 total=1933933637",
+          "io": "some avg10=0.05 avg60=0.11 avg300=0.53 total=4603377444\nfull avg10=0.05 avg60=0.07 avg300=0.34 total=3574714195"
+        }
+      },
+      "pressure_flags_after": [],
+      "artifact_sha256": {
+        "xvfb.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "terminal.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "broker-maps.txt": "2e7894d3f80e7f29fd0f89b6595c325020ada0239916ac671114932f6a5f59f6",
+        "final-frame.png": "c2c778c9b2a237f67082cc1ca47f5dee50fa3e475c2e9692b82d4b0bb74fe039"
+      },
+      "variant": "after"
+    }
+  ],
+  "ok": true,
+  "summary": {
+    "before": {
+      "runs": 3,
+      "mib_per_second": [
+        20.675208921474546,
+        18.765421702717944,
+        18.88416590498498
+      ],
+      "median_mib_per_second": 18.88416590498498,
+      "max_observed_final_marker_ms": 0.17078100063372403
+    },
+    "after": {
+      "runs": 3,
+      "mib_per_second": [
+        133.00768787483,
+        130.96584023410736,
+        278.5727970739231
+      ],
+      "median_mib_per_second": 133.00768787483,
+      "max_observed_final_marker_ms": 8.397912999498658
+    },
+    "throughput_ratio": 7.043344595893381
+  },
+  "final_frame_pixels_equal": true,
+  "all_fresh_markers_verified_before_drain": true,
+  "ended_utc": "2026-11-18T00:50:28.685791+00:00",
+  "source_commit_after": "60c672aa6ee6dc79ba44182f1dd6079feced9a5c",
+  "source_status_after": "",
+  "binary_sha256_after": {
+    "before": "f73d7b66b8b081244e4b4ad9a302271e4d3778d456bff8e615cc03ae8ebcabf5",
+    "after": "786fec62515d50129be2216ce587b6fbda297368298922acad741f4a597f1c7a"
+  },
+  "raw_runs_sha256": "4337986b380ae05f24ed3f60f6beebc5c1d2f3eb32a184a000d7d0cf72269c75"
+}

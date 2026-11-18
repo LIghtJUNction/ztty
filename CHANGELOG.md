@@ -35,6 +35,7 @@
 - Native acceptance now disposes owned Windows processes before their cwd, preserves original failures, and uniquely selects the titled macOS terminal before pinning WindowID; actual third-run Linux ARM64 acceptance and remaining failures are retained.
 - Linux links the real system unwinder after Rust archives so GNU ld --as-needed cannot discard it before debug alloc cleanup references.
 - Windows native gates search for a visible location for their own window and record covering-window identities, while retaining the pixel ownership checks and original assertions.
+- Linux continuous PTY output now coalesces ordinary redraws behind a fixed 8 ms scheduling budget, preserves prompt parsing and four-read session fairness, commits quiet final damage, and prioritizes interaction and synchronized-output release without adding idle polling.
 - Linux sessions save cwd with portable O_PATH/CLOEXEC flags, fixing ARM64 startup and supporting search-only original directories; save and enter failures retain their own errno.
 - Windows native pixel gates verify on-screen ownership and clipping, record resize-stage PNGs and report the actual final RGB without relaxing color or timeout requirements.
 - Custom benchmark charts now link their actual raw-data path; renderer-only updates preserve collection identity and historical evidence.
@@ -56,10 +57,12 @@
 
 ### Verification
 
+- The integrated shared-core/repaint candidate passes 208 regular Rust tests, eight real PTY checks and five Xvfb suites; native Linux candidates now also require the repaint pixel/fairness/idle checks.
+
 - Shared core passes eight single-threaded real-PTY checks, the integrated Rust/Clippy/MCP/no_std gates, daily GUI 15 and workspace GUI 10.
 
 - Fourth source-pinned native run accepts Linux x86_64/ARM64 and Windows x86_64 (30 checks plus cleanup); preserves Windows ARM64 occlusion and both macOS helper initialization failures with all artifact hashes.
-
+- Bounded repaint passes 70 zterm and 6 scheduling tests, 7 real X11/PTY regressions and the four existing Linux suites (42 checks). Three fixed-binary A/B pairs measured median logical throughput 18.88 → 133.01 MiB/s with identical final pixels; scope, variation and the pending per-hold snapshot behavior are recorded in [the report](docs/benchmarks/repaint-ab-2026-11-18.md).
 - Final local gates pass 170 Rust unit/integration/documentation tests, strict Clippy, MCP transport/session/security tests and bare-metal checks; the zune-png bare-metal SIMD future-compatibility warning is retained in the evidence.
 - Real ssmcp relay integration passes three native commands and ten checks, including window reuse and reopening; daily Linux GUI coverage now has fourteen checks.
 - Windows native gates now exercise six Sixel pixel/recovery groups and save owned-window PNG evidence; execution on x64 and ARM64 is still required.

@@ -6,7 +6,9 @@ use crate::{
     json::{self, Value},
     key, key_modifiers,
     layout::{Axis, Layout},
-    modifiers, os, paste, queue_input, search, session_control,
+    modifiers, os, paste, queue_input,
+    repaint::{Plan, Repaint},
+    search, session_control,
     session_core::{ReadStep, SessionCore},
     working_directory::WorkingDirectory,
     workspace_state,
@@ -67,6 +69,7 @@ struct Ui {
     selection: Option<Selection>,
     history: usize,
     force: bool,
+    repaint: Repaint,
     open: bool,
     title: String,
     held: [u64; 256],
@@ -99,6 +102,7 @@ impl Ui {
             selection: None,
             history: 0,
             force: true,
+            repaint: Repaint::default(),
             open: true,
             title: String::new(),
             held: [0; 256],
@@ -135,6 +139,7 @@ impl Ui {
         }
     }
     fn cancel_input(&mut self) {
+        self.repaint.cancel_input();
         self.window.cancel_paste();
         self.reset_input();
     }
@@ -364,6 +369,7 @@ impl Ui {
                         self.selection = None;
                         self.force = true;
                     }
+                    self.repaint.input_sent();
                     queue_input(&mut core.input, encoded);
                 }
             }
@@ -458,6 +464,9 @@ impl Ui {
                     if pressed && !(4..=7).contains(&e.button) && !encoded.is_empty() {
                         self.reported_buttons |= mask;
                     }
+                    if !encoded.is_empty() {
+                        self.repaint.input_sent();
+                    }
                     queue_input(&mut core.input, encoded);
                 }
             }
@@ -485,6 +494,9 @@ impl Ui {
                     &core.terminal.modes().input(),
                     encoded,
                 );
+                if !encoded.is_empty() {
+                    self.repaint.input_sent();
+                }
                 queue_input(&mut core.input, encoded);
             }
             x11::CONFIGURE_NOTIFY => {
@@ -514,10 +526,12 @@ impl Ui {
                     self.reset_input();
                 }
                 if allow_input {
-                    queue_input(
-                        &mut core.input,
-                        &input::encode_focus(focused, &core.terminal.modes().input()),
-                    );
+                    let encoded_focus =
+                        input::encode_focus(focused, &core.terminal.modes().input());
+                    if !encoded_focus.is_empty() {
+                        self.repaint.input_sent();
+                    }
+                    queue_input(&mut core.input, &encoded_focus);
                 }
             }
             x11::EXPOSE => {
@@ -540,6 +554,7 @@ impl Ui {
                 if let Some(data) = self.window.selection_notify(unsafe { event.selection })
                     && allow_input
                 {
+                    self.repaint.input_sent();
                     paste(data, &core.terminal, &mut core.input);
                 }
             }
@@ -547,6 +562,7 @@ impl Ui {
                 if let Some(data) = self.window.property(unsafe { event.property })
                     && allow_input
                 {
+                    self.repaint.input_sent();
                     paste(data, &core.terminal, &mut core.input);
                 }
             }
@@ -619,12 +635,21 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
-        if !synchronized
-            && (self.force
+        let plan = self.repaint.plan(
+            now,
+            self.force
                 || terminal.dirty()
+                || terminal.sync_commit_pending()
                 || self.window.cursor_changed(cursor)
-                || self.window.graphics_changed(terminal))
-        {
+                || self.window.graphics_changed(terminal),
+            self.force || terminal.sync_commit_pending(),
+            synchronized,
+        );
+        let repaint_deadline = match plan {
+            Plan::WaitUntil(deadline) => Some(deadline),
+            Plan::Idle | Plan::Render => None,
+        };
+        if plan == Plan::Render {
             if let Some(search) = &self.search
                 && (self.force || terminal.dirty())
             {
@@ -665,12 +690,19 @@ impl Ui {
                 self.window.overlay(&format!("ztty: {message}"));
             }
             self.force = false;
+            self.repaint.painted(os::milliseconds());
         }
 
-        let deadline = match (self.sync_since.map(|s| s + 150), self.blink_deadline) {
-            (Some(a), Some(b)) => Some(a.min(b)),
-            (a, b) => a.or(b),
-        };
+        // A synchronized frame only uses its existing 150 ms safety deadline;
+        // returning an expired ordinary deadline here would busy-poll.
+        let deadline = [
+            self.sync_since.map(|s| s + 150),
+            self.blink_deadline,
+            repaint_deadline,
+        ]
+        .into_iter()
+        .flatten()
+        .min();
         self.message
             .as_ref()
             .map(|(_, until)| deadline.map_or(*until, |d| d.min(*until)))
@@ -766,14 +798,17 @@ impl Session {
                     history_after,
                     ..
                 }) => {
-                    if let Some(ui) = &mut self.ui
-                        && ui.history != 0
-                    {
-                        ui.history = ui
-                            .history
-                            .saturating_add(history_after.saturating_sub(history_before))
-                            .min(history_after);
-                        ui.force = true;
+                    if let Some(ui) = &mut self.ui {
+                        // Input priority survives a force/expose paint of the old
+                        // screen and is consumed only after subsequent PTY output.
+                        ui.repaint.output_received();
+                        if ui.history != 0 {
+                            ui.history = ui
+                                .history
+                                .saturating_add(history_after.saturating_sub(history_before))
+                                .min(history_after);
+                            ui.force = true;
+                        }
                     }
                 }
                 Ok(ReadStep::Pending | ReadStep::Eof) | Err(_) => break,
@@ -2061,6 +2096,11 @@ impl Pool {
                 }
                 if !session.core.input.push(data.as_bytes()) {
                     return Err("session input queue is full".into());
+                }
+                if !data.is_empty()
+                    && let Some(ui) = &mut session.ui
+                {
+                    ui.repaint.input_sent();
                 }
                 let _ = session.core.flush_input();
                 Ok(Reply::Value(json::object([
