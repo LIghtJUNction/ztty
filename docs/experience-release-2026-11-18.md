@@ -233,6 +233,23 @@ x64 第八次的原失败进程为 PID `8576`、HWND `2294132`。超时后的快
 
 ARM 第七次在主进程退出码为 0 后真实遇到 `winerror=32` 的临时文件占用，第二次删除在 0.055527 秒后成功，首次异常仍保存在报告中。所有已启动进程、临时目录、Job 和桌面均完成清理；像素失败保持 `passed=false`。这验证了测试脚本能等待本次短暂锁释放，不构成对生产子进程生命周期的额外修复声明。[ARM 清理与原失败报告](measurements/experience-release-2026-11-18/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.json) · [x64 审计](measurements/experience-release-2026-11-18/presentation-44317542062/windows-x86_64/summary.json) · [ARM 审计](measurements/experience-release-2026-11-18/presentation-44317542062/windows-aarch64/summary.json)
 
+### 5.7 NOCOPYBITS 与背靠背缩放候选仍在原检查失败
+
+源码 `65dcd2ce3e69a4cbadcb98c7d9e08f431962270f` 的 [Windows 候选运行 44320248994](https://github.com/LIghtJUNction/ztty/actions/runs/44320248994)在 x64 和 ARM64 都失败。该候选包含生产策略 `7098ee9`：仅在真实外框尺寸变化、且请求未指定 `NOSIZE` 或 `NOREDRAW` 时设置 `SWP_NOCOPYBITS`，请求 Windows 不保留旧客户端像素。两侧首先失败的仍是原来的 `resize_restores_visible_image` 像素断言，因此本次结果不是新增验证字段导致的契约拒绝。[生产策略源码](https://github.com/LIghtJUNction/ztty/blob/7098ee9bf53e44b7d4d8af7e9e5c9786a5967df7/src/platform/windows.rs) · [本轮证据索引](measurements/experience-release-2026-11-18/burst-44320248994/index.json)
+
+新增背靠背检查用于覆盖缩小后尚未采样就立即恢复的请求顺序。原 31 项和额外 10 轮快速缩放保持不变；每次冷启动随后再要求 10 轮连续的缩小／恢复调用。测试发出的两次 `SetWindowPos` 都使用 `0x16`，中间不查询窗口、不截图、不做 PTY 往返或等待，恢复后仍按原来的红色像素、每通道误差不超过 1 和 10 秒时限判断。八次冷启动中的每份报告都必须同时满足 `31+10+10`，任何失败停止剩余冷启动和工作区检查，180 秒总期限不变。[固定源码中的验收路径](https://github.com/LIghtJUNction/ztty/blob/65dcd2ce3e69a4cbadcb98c7d9e08f431962270f/tests/windows_native.py) · [逐份报告约束](https://github.com/LIghtJUNction/ztty/blob/65dcd2ce3e69a4cbadcb98c7d9e08f431962270f/tests/windows_desktop.py)
+
+| 架构 | 已完成的完整冷启动 | 首个失败及停止范围 | 直接证据 |
+| --- | --- | --- | --- |
+| Windows x64 | 第一次通过原 31 项、warm 10 轮和背靠背 10 轮 | 第二次在原缩放恢复处失败，此前通过 23 项；实际 `[0,0,0]`，期望 `[255,0,0]`；该次 warm／背靠背均未开始，第三至八次及工作区未执行 | [审计摘要](measurements/experience-release-2026-11-18/burst-44320248994/windows-x86_64/summary.json) · [第二次原始报告](measurements/experience-release-2026-11-18/burst-44320248994/windows-x86_64/ztty-windows-x86_64.native.cold-02.json) |
+| Windows ARM64 | 前四次各通过原 31 项、warm 10 轮和背靠背 10 轮 | 第五次在同一原检查失败，此前通过 23 项；实际 `[20,20,20]`，期望 `[255,0,0]`；该次 warm／背靠背均未开始，第六至八次及工作区未执行 | [审计摘要](measurements/experience-release-2026-11-18/burst-44320248994/windows-aarch64/summary.json) · [第五次原始报告](measurements/experience-release-2026-11-18/burst-44320248994/windows-aarch64/ztty-windows-aarch64.native.cold-05.json) |
+
+两个失败进程的内部画布仍正确，窗口采样却没有显示对应像素。x64 的 PID 为 `8384`，ARM64 为 `7744`；快照中的 client、surface 和 selected bitmap 都是 `180×190`，终端与 PTY 都是 `20×10`，CPU 与 source DIB 在 `(175,28)` 都为红色。两侧 `deferred_paints=0`，补画和尺寸 pending 标记均为 false；显式 GdiFlush 后 target DC 与 ScreenDC 仍分别为黑色或灰色，经正常消息泵补画后才恢复红色。原失败帧与 flush 后帧字节相同，补画后的帧与缩放前正确帧字节相同，诊断恢复没有改变原失败结论。[x64 同进程快照](measurements/experience-release-2026-11-18/burst-44320248994/windows-x86_64/ztty-windows-x86_64.native.cold-02.post-failure.json) · [ARM64 同进程快照](measurements/experience-release-2026-11-18/burst-44320248994/windows-aarch64/ztty-windows-aarch64.native.cold-05.post-failure.json)
+
+本轮证据只能说明当前 NOCOPYBITS 策略候选没有消除该故障。快照没有记录该策略分支的命中次数、最终 `WINDOWPOS` flags 或 Windows 内部的像素保存／回贴顺序，因此不能据此认定 Windows 忽略了标志，也不能把旧像素回贴写成已经证实的根因。x64 的 51 张 PNG、80 个缩放采样点和 ARM64 的 186 张 PNG、305 个缩放采样点均已独立校验；每侧唯一不符预期的采样点都是该次原检查的恢复红色点。精简归档保留了两架构的构建记录、原始失败报告、快照和三个阶段的 PNG，其余原始文件仍由已核验的 artifact 与逐份哈希索引绑定。[x64 文件身份](measurements/experience-release-2026-11-18/burst-44320248994/windows-x86_64/evidence-index.json) · [ARM64 文件身份](measurements/experience-release-2026-11-18/burst-44320248994/windows-aarch64/evidence-index.json)
+
+本轮七个已启动应用进程及其临时目录都完成清理，目录均在第一次尝试中实际删除，外层 Job 清空且桌面恢复；两个 worker 分别在 12.749 秒和 17.944 秒以退出码 1 结束。本轮使用 `build_only=true`、`candidate_platform=windows`，没有取得发布或设备安装资格；正式 `v0.3.0` tag 和此前失败记录保持不变。[本轮范围与清理结果](measurements/experience-release-2026-11-18/burst-44320248994/index.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
