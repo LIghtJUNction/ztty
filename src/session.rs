@@ -554,7 +554,9 @@ impl Ui {
                 if let Some(data) = self.window.selection_notify(unsafe { event.selection })
                     && allow_input
                 {
-                    self.repaint.input_sent();
+                    if !data.is_empty() {
+                        self.repaint.input_sent();
+                    }
                     paste(data, &core.terminal, &mut core.input);
                 }
             }
@@ -562,7 +564,9 @@ impl Ui {
                 if let Some(data) = self.window.property(unsafe { event.property })
                     && allow_input
                 {
-                    self.repaint.input_sent();
+                    if !data.is_empty() {
+                        self.repaint.input_sent();
+                    }
                     paste(data, &core.terminal, &mut core.input);
                 }
             }

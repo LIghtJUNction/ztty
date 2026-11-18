@@ -8,6 +8,7 @@ from pathlib import Path
 import re
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 import xml.etree.ElementTree as ET
@@ -50,6 +51,17 @@ def report(counts=(10,), modes=("shared",), workloads=("idle",), repetitions=3):
 
 
 class AccountingTests(unittest.TestCase):
+    def test_paired_window_default_and_explicit_matrix_count_are_distinct(self):
+        # The paired collector changes WINDOWS between cases; matrix callers
+        # supply count explicitly. A captured default would open ten windows
+        # for the paired one-window case.
+        with patch.dict(sys.modules, {"Xlib": SimpleNamespace(X=None, display=None)}), \
+                patch.object(bench, "WINDOWS", 1), \
+                patch.object(bench, "host_pressure", return_value={}), \
+                patch.object(bench, "comparison_pressure_reasons", return_value=["busy fixture"]):
+            self.assertEqual(bench.measure("ztty", Path("/fixture"), 1, 0)["windows"], 1)
+            self.assertEqual(bench.measure("ztty", Path("/fixture"), 1, 0, count=2)["windows"], 2)
+
     def test_shared_pages_are_counted_once_per_process(self):
         samples = [memory(7), memory(8)]
         self.assertEqual(bench.totals(samples)["Pss_bytes"], 2048)
@@ -167,6 +179,14 @@ class PublicationTests(unittest.TestCase):
         data["runs"][0]["ok"] = False
         with self.assertRaises(ValueError):
             bench.scaling_svg_document(data)
+
+    def test_recorded_failure_or_teardown_error_prevents_publication(self):
+        for failure in ({"error": "measurement failed"}, {"cleanup_error": "teardown failed"},
+                        {"remaining_owned_pids": [999]}):
+            data = report()
+            data["runs"][0].update(failure)
+            with self.subTest(failure=failure), self.assertRaises(ValueError):
+                bench.validate_report(data)
 
     def test_nonfinite_measurements_are_not_published(self):
         for value in (float("nan"), float("inf"), None, 0):

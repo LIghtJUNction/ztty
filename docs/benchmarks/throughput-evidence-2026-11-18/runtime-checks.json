@@ -1,0 +1,64 @@
+{
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/target-render/release/ztty",
+  "binary_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b",
+  "source_commit": "dfe949c7ea58a372f69f0de9b4baa0cb2ab93379",
+  "checks": [
+    {
+      "name": "graphics",
+      "command": [
+        "python3",
+        "tests/graphics_smoke.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/target-render/release/ztty",
+        "--artifacts",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/artifacts/throughput-gates/graphics-final"
+      ],
+      "exit_code": 0,
+      "seconds": 1.944752037001308,
+      "binary_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b"
+    },
+    {
+      "name": "shared-gui",
+      "command": [
+        "python3",
+        "tests/shared_gui_smoke.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/target-render/release/ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/artifacts/throughput-gates/shared-gui-final.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6986411820107605,
+      "binary_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b"
+    },
+    {
+      "name": "mcp-sessions",
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/target-render/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.44010390700714197,
+      "binary_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b"
+    },
+    {
+      "name": "python-tests",
+      "command": [
+        "python3",
+        "tests/test_throughput_benchmark.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.33189349999884143,
+      "binary_sha256": "5e1f6d111b7840ccbb2526bc253d7b75ab0a3f1d68f20685a8e74988f384607b"
+    }
+  ],
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "c9cf8a81c922c6ffab55f247c1b143a513f3d952a25e0d889c8d181d2e9d41f7",
+    "src/x11.rs": "cc5e49f5c63c3ffcdd722627135bb2fc8628ce37a600140f9ec4dc4fc3bc5e26",
+    "crates/zterm/src/terminal.rs": "baa9b1d0cf2fe7ede063e7e074f01161410fb0700b0f0df08ac93733a273d378",
+    "crates/zterm/src/screen.rs": "6d200b8924820af4260320c81622b65ad700c4c0a0101a4410c80a2094d1d643"
+  }
+}

@@ -8,10 +8,17 @@ native GPU rendering, display frame rate, or keyboard-to-photon latency.
 
 ![Ten-window terminal comparison](terminals-10-windows.svg)
 
-The checked-in ten-window baseline was recorded with host load1
-31.02–36.57; its timings describe that busy host. The
-[verification record](verification-2026-11-18.md) separates preserved measurements,
-successful workload checks and outstanding performance acceptance.
+The figure links to the complete ztty 0.2.1 collection at source
+`dfe949c7`, measured with host load1 6.20–9.10. Its original JSON and SVG
+are preserved together. The [throughput report](throughput-2026-11-18.md)
+records those binaries, samples, and measurement conditions; these results
+describe that source rather than the subsequently integrated feature branch.
+
+The separate [guarded roadmap comparison](guarded-idle-1-10-2026-11-18.md)
+records 18 successful one- and ten-window cases at source `fa2f2017`.
+The project READMEs retain that dated chart and its source identity.
+The [earlier verification record](verification-2026-11-18.md) describes the
+previous busy-host baseline and its own workload checks.
 
 The [roadmap idle matrix](roadmap-idle-verification-2026-11-18.md) records a
 separate 24-case validation run at 1, 5, 10 and 20 windows in both process modes,
@@ -140,6 +147,36 @@ replace the README's evidence links. The complete raw JSON includes executable
 hashes, harness/dependency source hashes, startup commands, configurations and
 measured process identities. The rendering command accepts both the original
 ten-window JSON schema and the matrix schema.
+
+## Paired ztty throughput comparison
+
+The [0.2.1 optimization report](throughput-2026-11-18.md) compares retained old
+and new binaries on the same machine. Its [raw A/B record](throughput-ab-2026-11-18.json)
+contains one- and ten-window runs, three rounds each, in AB/BA/AB order.
+Each pair uses the same payload, timer, terminal configuration, and collector.
+It records process memory, host load, available memory, Swap, and swap-I/O
+counters before and after each run.
+
+To reproduce with two already-built binaries:
+
+```sh
+python3 tools/benchmark_throughput.py \
+  --before /path/to/old-ztty --after /path/to/new-ztty \
+  --before-source OLD_COMMIT --after-source NEW_COMMIT \
+  --counts 1,10 --rounds 3 --json artifacts/throughput-ab-new.json
+```
+
+Replace the source placeholders with the actual revisions. The output path
+must not already exist. A single-round run is marked as exploration.
+The collector checks binary and helper-script identities, all window samples,
+raw-rate calculations, terminal-state integrity, and process cleanup before
+accepting a comparison. It does not update the three-terminal SVG; run
+`make benchmark-terminals` for that complete comparison.
+
+The [independent recomputation record](throughput-evidence-2026-11-18/verification.json)
+and [runtime validation evidence](throughput-evidence-2026-11-18/runtime-checks.json)
+bind the committed results to the tested binary. Old README measurements
+from different host conditions are not used as the denominator of the A/B gain.
 
 ## Controlled setup
 
@@ -291,6 +328,22 @@ the median of the three rates. The run value is the median across ten windows;
 the figure uses the median of three run values. The units are MiB/s, where one
 MiB is 1,048,576 bytes. The measure describes terminal processing under this
 workload; a terminal may batch or skip intermediate physical frames.
+
+### Completion and screen-integrity checks
+
+The timed payload and its original HOME/DSR completion barrier are unchanged.
+After the timed bursts, the probe replays the same payload **outside the timer**
+and asks for the cursor position directly, without a HOME reset. The reply must
+be row 32, column 120. ztty additionally verifies all 32 final text rows through
+the private session broker, then restores the fixed idle frame. The JSON retains
+the expected and observed text hashes as well as the direct cursor reply.
+
+This validates logical processing and final text; separate real X11 tests check
+visible pixels, a quiet final frame, interaction during another window's output,
+and synchronized-output boundaries. See the
+[repaint acceptance record](throughput-evidence-2026-11-18/repaint-gui.json).
+A failure during measurement, integrity checking, or teardown marks the run
+unsuccessful, so incomplete results cannot replace the published comparison.
 
 ## Repetitions, environment, and limits
 
