@@ -1,0 +1,167 @@
+{
+  "validated_at_utc": "2026-11-18T09:40:17.335714+00:00",
+  "source_commit": "c2fdb7caf8d4a6f548a29c9decf33bc4ccddd80c",
+  "source_tree": "e9dba20b23f049584185e218c30017520bd32027",
+  "integrates_production_head": "4df37df0bea7992ab41d9762740a51669cfa8ab4",
+  "platform": "Linux x86_64",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "binary_sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+  "rust_standard_tests": 230,
+  "session_core_checks": 8,
+  "doctests": 6,
+  "mcp_wait_groups": 11,
+  "existing_mcp_suites": 3,
+  "shared_gui_checks": 9,
+  "build_gates": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.926
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.165,
+      "binary_sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+      "ran_after_release": true
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release"
+      ],
+      "exit_code": 0,
+      "seconds": 9.539
+    },
+    {
+      "name": "rust-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace"
+      ],
+      "exit_code": 0,
+      "seconds": 4.297
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 5.923
+    },
+    {
+      "name": "bare-metal",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "zterm",
+        "-p",
+        "zinput",
+        "-p",
+        "zgraphics",
+        "--target",
+        "x86_64-unknown-none"
+      ],
+      "exit_code": 0,
+      "seconds": 0.996
+    }
+  ],
+  "runtime_gates": [
+    {
+      "name": "mcp-wait",
+      "command": [
+        "python3",
+        "tests/mcp_wait.py",
+        "--binary",
+        "./target/release/ztty",
+        "--output",
+        "artifacts/output-wait-integrated-20261118/mcp-wait.json"
+      ],
+      "exit_code": 0,
+      "seconds": 14.88
+    },
+    {
+      "name": "mcp-transport",
+      "command": [
+        "python3",
+        "tests/mcp_transport.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.145
+    },
+    {
+      "name": "mcp-sessions",
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.753
+    },
+    {
+      "name": "mcp-security",
+      "command": [
+        "python3",
+        "tests/mcp_security.py",
+        "--binary",
+        "./target/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.145
+    },
+    {
+      "name": "shared-gui",
+      "command": [
+        "python3",
+        "tests/shared_gui_smoke.py",
+        "--binary",
+        "./target/release/ztty",
+        "--output",
+        "artifacts/output-wait-integrated-20261118/shared-gui.json"
+      ],
+      "exit_code": 0,
+      "seconds": 0.804
+    }
+  ],
+  "cleanup": {
+    "mcp_wait": "passed",
+    "remaining_gui_owned_pids": []
+  },
+  "release_status": "development candidate; no formal release",
+  "remaining_scope": [
+    "SSE and unsolicited output subscription",
+    "native macOS and Windows broker/MCP runtime acceptance",
+    "long-duration resource and performance measurements"
+  ],
+  "upstream_warning": "zune-png 0.5.2 future Rust compatibility warning in bare-metal check"
+}
