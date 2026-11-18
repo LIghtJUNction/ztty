@@ -161,6 +161,8 @@ jobs:
       - name: Install native Linux build and GUI acceptance dependencies
         id: toolchain
         run: |
+          export RUSTUP_HOME="$RUNNER_TEMP/ztty-release-rustup"
+          printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
           sudo apt-get update
           sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev libxtst6 \
             xvfb fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
