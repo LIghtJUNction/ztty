@@ -1,0 +1,56 @@
+[
+  {
+    "name": "format",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit_code": 0,
+    "seconds": 0.351
+  },
+  {
+    "name": "protocol",
+    "command": [
+      "cargo",
+      "test",
+      "--locked",
+      "--test",
+      "mcp_protocol",
+      "--test",
+      "json",
+      "--test",
+      "output_tail"
+    ],
+    "exit_code": 0,
+    "seconds": 4.892
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--locked",
+      "--workspace",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 16.488
+  },
+  {
+    "name": "release",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--release"
+    ],
+    "exit_code": 0,
+    "seconds": 17.959
+  }
+]

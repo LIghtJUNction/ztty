@@ -1,0 +1,67 @@
+[
+  {
+    "name": "no-std",
+    "command": [
+      "python3",
+      "tools/check_no_std.py"
+    ],
+    "exit_code": 0,
+    "seconds": 0.265
+  },
+  {
+    "name": "mcp-transport",
+    "command": [
+      "python3",
+      "tests/mcp_transport.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit_code": 0,
+    "seconds": 0.215
+  },
+  {
+    "name": "mcp-sessions",
+    "command": [
+      "python3",
+      "tests/mcp_sessions.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit_code": 0,
+    "seconds": 0.866
+  },
+  {
+    "name": "mcp-security",
+    "command": [
+      "python3",
+      "tests/mcp_security.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit_code": 0,
+    "seconds": 0.215
+  },
+  {
+    "name": "mcp-wait",
+    "command": [
+      "python3",
+      "tests/mcp_wait.py",
+      "--binary",
+      "./target/release/ztty",
+      "--output",
+      "artifacts/mcp-sse-checks/mcp-wait.json"
+    ],
+    "exit_code": 0,
+    "seconds": 15.397
+  },
+  {
+    "name": "check-script",
+    "command": [
+      "sh",
+      "-n",
+      "tools/check.sh"
+    ],
+    "exit_code": 0,
+    "seconds": 0.004
+  }
+]
