@@ -567,7 +567,7 @@ def worker(args, state_path):
                 if not attempt["cleanup_complete"]:
                     break
         return 1
-    # Preserve the original thirty checks in their original report. The second
+    # Preserve the original pixel/input checks in their original report. The second
     # suite has its own JSON/PNG evidence and must also pass on this desktop.
     import windows_workspace_native
     original = json.loads(args.output.read_text(encoding="utf-8"))
