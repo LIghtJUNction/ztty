@@ -17,8 +17,8 @@ pub struct Appearance {
     pub cursor_blink_interval: u64,
     pub selection_foreground: u32,
     pub selection_background: u32,
-    #[cfg(target_os = "linux")]
-    pub bindings: alloc::vec::Vec<crate::actions::Binding>,
+    #[cfg(any(target_os = "linux", target_os = "windows"))]
+    pub bindings: alloc::vec::Vec<ztty::actions::Binding>,
 }
 
 impl Default for Appearance {
@@ -43,7 +43,7 @@ impl Default for Appearance {
             cursor_blink_interval: 500,
             selection_foreground: 0xf0f4fa,
             selection_background: 0x394969,
-            #[cfg(target_os = "linux")]
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
             bindings: alloc::vec::Vec::new(),
         }
     }
@@ -193,12 +193,14 @@ impl Appearance {
         let color = || rgb(value);
         match key {
             "font" => self.set_font(value)?,
-            #[cfg(target_os = "linux")]
+            #[cfg(any(target_os = "linux", target_os = "windows"))]
             "keybind" | "mousebind" => {
-                crate::actions::set(
-                    &mut self.bindings,
-                    crate::actions::parse(value, key == "mousebind")?,
-                )?;
+                let binding = ztty::actions::parse(value, key == "mousebind")?;
+                #[cfg(target_os = "windows")]
+                if key == "mousebind" || !crate::platform::action_supported(binding.action) {
+                    return Err("this binding action is not supported by the Windows frontend");
+                }
+                ztty::actions::set(&mut self.bindings, binding)?;
             }
             "foreground" => self.theme.foreground = color()?,
             "background" => self.theme.background = color()?,
