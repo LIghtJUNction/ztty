@@ -120,6 +120,7 @@ python3 tests/mcp_sessions.py --binary ./target/release/ztty
 python3 tests/mcp_security.py --binary ./target/release/ztty
 cargo build --locked -p zterm --example shell_probe
 python3 tests/shell_integration.py
+python3 tests/bash_integration.py
 ```
 
 The daily workflow test uses private Xvfb, XTEST key/button events, a real raw

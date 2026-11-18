@@ -148,7 +148,7 @@ versions. It supports `2025-11-25`, `2025-06-18` and
 | --- | --- | --- |
 | `session_create` | Optional `name`, `command`, `cwd`, `cols`, `rows`, `history` | URI, child/broker PIDs, dimensions and state |
 | `session_list` | None | All local and MCP sessions |
-| `session_read` | `session`; optional `cursor`, `max_bytes` | Output page, screen snapshot, next cursor and state |
+| `session_read` | `session`; optional `cursor`, `max_bytes`, `expected_session` | Output page, screen snapshot, next cursor, `output_eof` and state |
 | `session_commands` | `session` | At most 128 OSC 133 records, exit status and availability |
 | `session_command_read` | `session`, `command_id`; optional `part`, `max_bytes` | Rendered command input/output, `complete` and `truncated` |
 | `session_write` | `session`, `data` | Queued input and session state |
@@ -239,6 +239,52 @@ their retained state. Each HTTP server allows 64 transport sessions and 64
 concurrent connections, with a 1 MiB message limit, a 4 MiB aggregate incoming
 and queued-response buffer limit and a ten-second request deadline.
 
+### Guarded resume and output termination
+
+A canonical URI can be reused after its old session is closed. A byte offset
+alone cannot distinguish that replacement from the previous output stream.
+When resuming or reconnecting, send `expected_session` with exactly the four
+identity fields from the original create/list/read response:
+
+```json
+{
+  "session": "ztty://mcp/stdio/checks",
+  "cursor": 4096,
+  "expected_session": {
+    "uri": "ztty://mcp/stdio/checks",
+    "id": 7,
+    "created_at": 1794988800000,
+    "broker_pid": 12345
+  }
+}
+```
+
+These numbers are illustrative; copy the actual returned values. The guard is
+checked before output or screen data is read. A different URI, session ID,
+creation time or broker process returns a tool error. Renaming the display name
+preserves the original URI and identity, so a guarded read can continue.
+Missing, unknown, duplicate or incorrectly typed identity fields are rejected.
+The identifiers prevent accidental stream confusion; transport authentication
+and input ownership still determine authority.
+
+Existing calls without `expected_session` remain supported and have no instance
+guard. A reconnecting client should retain both its original identity and its
+own `next_cursor`; independent observers do not consume each other's position.
+After an identity mismatch, explicitly start a new read at zero only if the new
+session is the intended one. Do not silently replace the saved identity.
+
+`output_eof` means this endpoint's PTY reader has terminated, either at EOF or
+after an unrecoverable read error, so no more bytes will be appended. A direct
+child can already have exited while a descendant still holds the PTY and writes
+later. Therefore `running: false` and an `exit_code` do not prove that output has
+finished. Use `output_eof && !has_more` to identify a drained retained stream,
+and still check `truncated` for expired bytes. This condition does not guarantee
+a successful child exit or lossless transport.
+
+The current transport remains bounded request/response polling. Waiting or SSE
+subscriptions need an asynchronous broker connection integrated with the event
+loop; a blocking wait inside one MCP call would stall unrelated requests.
+
 ## Verify
 
 ```sh
@@ -250,8 +296,9 @@ python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
 ```
 
 The MCP tests cover transport lifecycle, IPv6, concurrent requests, real PTYs,
-UTF-8 cursor boundaries, creator environment isolation, namespaced addressing,
-exit status and persistence. The GUI test covers shared-window behavior on
+UTF-8 cursor boundaries, guarded reconnection across transports, same-name session
+replacement, independent observers, delayed descendant output, creator environment
+isolation, namespaced addressing, exit status and persistence. The GUI test covers shared-window behavior on
 a private Xvfb display. These shared-session tests exercise Linux X11/XWayland;
 native macOS and Windows frontends have their own acceptance records.
 

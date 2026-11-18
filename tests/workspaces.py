@@ -20,10 +20,11 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from isolated_xvfb import start_xvfb
 
-CHILD = r'''import os,sys,tty
+CHILD = r'''import os,sys,tty,urllib.parse
 tty.setraw(0)
+os.chdir(sys.argv[3])
 out=open(sys.argv[1],"wb",buffering=0)
-os.write(1,("\x1b]2;"+sys.argv[2]+"\x07\x1b]7;file://localhost"+sys.argv[3]+"\x07\r\n  "+sys.argv[2]+"\r\n\r\n  One shared broker · independent PTY\r\n  中文  /  Rust  /  no_std\r\n").encode())
+os.write(1,("\x1b]2;"+sys.argv[2]+"\x07\x1b]7;file://localhost"+urllib.parse.quote(sys.argv[3],safe="/")+"\x07\r\n  "+sys.argv[2]+"\r\n\r\n  One shared broker · independent PTY\r\n  中文  /  Rust  /  no_std\r\n").encode())
 while True:
  data=os.read(0,4096)
  if not data: break
@@ -132,14 +133,14 @@ def main():
             def info(name):
                 return rpc({"op": "info", "session": name})
 
-            def start(name, extra=()):
-                launch_env = env
+            def start(name, extra=(), directory=temporary, shell=None):
+                launch_env = env if shell is None else dict(env, SHELL=shell)
                 if broker_pid is None:
-                    launch_env = dict(env, LD_PRELOAD=str(fault_library),
+                    launch_env = dict(launch_env, LD_PRELOAD=str(fault_library),
                                       ZTTY_TEST_RESIZE_FAILURE_MARKER=str(fault_marker),
                                       ZTTY_TEST_RESIZE_FAILURE_LOG=str(fault_log))
                 process = subprocess.Popen([str(binary), "--name", name, "--config", str(config), "--geometry", "100x26", *extra,
-                                            "-e", "/usr/bin/python3", "-c", CHILD, str(root / (name + ".input")), name, temporary],
+                                            "-e", "/usr/bin/python3", "-c", CHILD, str(root / (name + ".input")), name, directory],
                                            env=launch_env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True)
                 owned.append(process)
                 wait(lambda: process.poll() is None and any(s["name"] == name for s in rpc({"op": "list"})["sessions"]), name + " startup")
@@ -409,6 +410,96 @@ def main():
                                            "replacement_created_at": replacement["created_at"],
                                            "rejected_restore": stale_error}
             report["checks"].append("a stale layout cannot adopt a new PTY that reuses the closed session's origin/name; rejection preserves the replacement view and process")
+
+            # A real shortcut must start a child in the local OSC 7 directory.
+            # Verify the child's cwd and PWD, not just terminal metadata.
+            from urllib.parse import quote
+            fallback = root / "launch-directory"
+            desired = root / "shell directory 中文 #?%+"
+            records = root / "cwd-records"
+            for directory in (fallback, desired, records):
+                directory.mkdir()
+            probe = root / "cwd-shell"
+            probe.write_text(
+                "#!/usr/bin/python3\n"
+                "import json,os,pathlib,tty\n"
+                "tty.setraw(0)\n"
+                f"records=pathlib.Path({str(records)!r})\n"
+                "value={'pid':os.getpid(),'cwd':os.getcwd(),'pwd':os.environ.get('PWD')}\n"
+                "temporary=records/(str(os.getpid())+'.tmp')\n"
+                "temporary.write_text(json.dumps(value,ensure_ascii=False))\n"
+                "temporary.replace(records/(str(os.getpid())+'.json'))\n"
+                "os.write(1,('CWD probe\\r\\n'+value['cwd']+'\\r\\n').encode())\n"
+                "while os.read(0,4096): pass\n")
+            probe.chmod(0o755)
+            parent = start("cwd-parent", ["--cwd", str(fallback)],
+                           directory=str(desired), shell=str(probe))
+            report["cwd_inheritance"] = []
+
+            def inherited_child(shortcut, expected, label):
+                existing = {s["id"] for s in rpc({"op": "list"})["sessions"]}
+                before_input = input_bytes("cwd-parent")
+                key("cwd-parent", ["Control_L", "Shift_L", shortcut])
+                created = wait(
+                    lambda: [s for s in rpc({"op": "list"})["sessions"]
+                    if s["id"] not in existing], label + " child")
+                assert len(created) == 1, created
+                child = created[0]
+                record = records / (str(child["pid"]) + ".json")
+                wait(record.exists, label + " actual child cwd")
+                actual = json.loads(record.read_text())
+                assert actual["cwd"] == str(expected), (label, actual, expected)
+                assert actual["pwd"] == str(expected), (label, actual, expected)
+                assert actual["pid"] == child["pid"] and child["broker_pid"] == broker_pid
+                assert input_bytes("cwd-parent") == before_input, label
+                wait(lambda: "CWD probe" in rpc({"op": "read", "session": child["uri"]})["screen"],
+                     label + " real PTY output")
+                report["cwd_inheritance"].append({"case": label, "child_id": child["id"],
+                                                  "uri": child["uri"], **actual})
+                if shortcut == "e":
+                    view = info(child["uri"])
+                    surface = connection.create_resource_object("window", view["workspace"])
+
+                    def cwd_pixels():
+                        connection.sync()
+                        geometry = surface.get_geometry()
+                        raw = surface.get_image(0, 0, geometry.width, geometry.height,
+                                                X.ZPixmap, 0xFFFFFFFF)
+                        picture = Image.frombytes("RGB", (geometry.width, geometry.height),
+                                                  raw.data, "raw", "BGRX")
+                        child_geometry = connection.create_resource_object(
+                            "window", view["window_id"]).get_geometry()
+                        pane = picture.crop((child_geometry.x, child_geometry.y,
+                                             child_geometry.x + child_geometry.width,
+                                             child_geometry.y + child_geometry.height))
+                        return picture if sum(pane.convert("L").histogram()[128:]) >= 100 else None
+
+                    picture = wait(cwd_pixels, "cwd probe pixels in actual split")
+                    screenshot_path = args.screenshot.with_name("workspace-cwd.png")
+                    screenshot_path.parent.mkdir(parents=True, exist_ok=True)
+                    picture.save(screenshot_path)
+                    report["cwd_screenshot"] = str(screenshot_path)
+                child_started = start_ticks(child["pid"])
+                rpc({"op": "close", "session": child["uri"]})
+                wait(lambda: not Path(f"/proc/{child['pid']}").exists()
+                     or start_ticks(child["pid"]) != child_started, label + " child reaped")
+                wait(lambda: info("cwd-parent")["visible"], label + " parent restored")
+                report["checks"].append(label + ": actual child cwd/PWD and shortcut isolation")
+
+            for shortcut, label in [("t", "new tab"), ("e", "right split"),
+                                    ("o", "lower split"), ("n", "new window")]:
+                inherited_child(shortcut, desired, label + " inherits encoded local OSC 7")
+
+            for suffix, uri in [
+                ("remote", "file://remote-host.invalid" + quote(str(desired), safe="/")),
+                ("bad-escape", "file://localhost" + quote(str(desired), safe="/") + "%ZZ"),
+                ("nul", "file://localhost" + quote(str(desired), safe="/") + "%00"),
+            ]:
+                title = "cwd-guard-" + suffix
+                rpc({"op": "write", "session": "cwd-parent",
+                     "data": "\x1b]7;" + uri + "\x07\x1b]2;" + title + "\x07"})
+                wait(lambda: info("cwd-parent")["title"] == title, title + " parsed")
+                inherited_child("t", fallback, suffix + " OSC 7 uses initial launch directory")
 
             # Any local user can explicitly reclaim their own desktop session;
             # transport observers never get this action through MCP dispatch.

@@ -2,7 +2,7 @@
 #![allow(dead_code)]
 extern crate alloc;
 
-use ztty::json;
+use ztty::{json, session_identity};
 #[path = "../src/mcp.rs"]
 mod mcp;
 #[path = "../src/os.rs"]

@@ -17,7 +17,7 @@ const TOOLS: &str = r#"[
 {"name":"session_list","description":"List terminal sessions, canonical ztty:// URIs, process state and attached windows.","inputSchema":{"type":"object","properties":{},"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_commands","description":"List up to 128 retained OSC 133 shell command boundaries, exit codes and availability. Requires shell integration; records refer to the retained terminal history.","inputSchema":{"type":"object","properties":{"session":{"type":"string"}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_command_read","description":"Read one shell command input or output from retained terminal cells, bounded to 65536 UTF-8 bytes. This is rendered text, not immutable raw stdout. Check complete and truncated.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"command_id":{"type":"integer","minimum":1},"part":{"type":"string","enum":["input","output"]},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session","command_id"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
-{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish a UTF-8 character. Reuse next_cursor; truncated reports expired output.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
+{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. Reuse next_cursor and send expected_session from prior uri/id/created_at/broker_pid fields to reject a replaced session. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish UTF-8. truncated reports expired output. Only output_eof together with has_more=false means the output stream is drained; running=false alone does not.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536},"expected_session":{"type":"object","description":"Optional identity guard copied from a previous create/list/read response; rejects a new PTY that reused the URI. Public identifiers, not credentials.","properties":{"uri":{"type":"string","minLength":1,"maxLength":2048},"id":{"type":"integer","minimum":1},"created_at":{"type":"integer","minimum":1},"broker_pid":{"type":"integer","minimum":1,"maximum":4294967295}},"required":["uri","id","created_at","broker_pid"],"additionalProperties":false}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_write","description":"Send up to 65536 UTF-8 bytes or terminal control bytes to a session. Include a newline to submit a shell command; use \\u0003 to interrupt.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"data":{"type":"string","maxLength":65536}},"required":["session","data"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":true}},
 {"name":"session_resize","description":"Resize a session PTY and screen; attached windows use the new terminal dimensions.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256}},"required":["session","cols","rows"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":false}},
 {"name":"session_control","description":"Acquire or release exclusive input control. takeover=true explicitly replaces another operator; observers cannot acquire control.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"action":{"type":"string","enum":["acquire","release"]},"takeover":{"type":"boolean"}},"required":["session","action"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}},
@@ -409,7 +409,10 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
             &["name", "command", "cwd", "cols", "rows", "history"],
         ),
         "session_list" => ("list", &[]),
-        "session_read" => ("read", &["session", "cursor", "max_bytes"]),
+        "session_read" => (
+            "read",
+            &["session", "cursor", "max_bytes", "expected_session"],
+        ),
         "session_commands" => ("commands", &["session"]),
         "session_command_read" => (
             "command-read",
@@ -426,6 +429,9 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         .any(|(key, _)| !allowed.contains(&key.as_str()))
     {
         return Err("Unknown tool argument");
+    }
+    if let Some(expected) = arguments.get("expected_session") {
+        crate::session_identity::ExpectedSession::parse(expected)?;
     }
     let mut request = object([("op", operation.into())]);
     for (key, value) in fields {
@@ -849,5 +855,101 @@ mod tests {
             Some("trusted-test-actor")
         );
         assert_eq!(request.get("max_bytes").unwrap().as_u64(), Some(32));
+    }
+
+    #[test]
+    fn guarded_reads_preserve_identity_and_observer_permissions() {
+        let expected = object([
+            ("uri", "ztty://mcp/stdio/work".into()),
+            ("id", 7u64.into()),
+            ("created_at", 123456u64.into()),
+            ("broker_pid", 42u32.into()),
+        ]);
+        let arguments = object([
+            ("session", "work".into()),
+            ("cursor", 13u64.into()),
+            ("expected_session", expected.clone()),
+        ]);
+        let message = object([
+            ("jsonrpc", "2.0".into()),
+            ("id", 1i32.into()),
+            ("method", "tools/call".into()),
+            (
+                "params",
+                object([("name", "session_read".into()), ("arguments", arguments)]),
+            ),
+        ]);
+        let mut observer = ready(true);
+        let response = dispatch(&message, &mut observer, "mcp/stdio").unwrap();
+        let request = response
+            .get("result")
+            .unwrap()
+            .get("structuredContent")
+            .unwrap();
+        assert_eq!(request.get("expected_session"), Some(&expected));
+        assert_eq!(request.get("cursor").and_then(Value::as_u64), Some(13));
+        assert_eq!(
+            request.get("_actor").and_then(Value::as_str),
+            Some("trusted-test-actor")
+        );
+        assert!(
+            tool_request(
+                "session_read",
+                &object([("session", "work".into())]),
+                "mcp/stdio"
+            )
+            .is_ok()
+        );
+        assert!(
+            tool_request(
+                "session_write",
+                &object([
+                    ("session", "work".into()),
+                    ("data", "x".into()),
+                    ("expected_session", expected),
+                ]),
+                "mcp/stdio"
+            )
+            .is_err()
+        );
+    }
+
+    #[test]
+    fn malformed_read_guards_fail_before_broker_dispatch() {
+        for expected in [
+            "null",
+            "[]",
+            "{}",
+            r#"{"uri":"ztty://local/work","id":1,"created_at":1}"#,
+            r#"{"uri":"ztty://local/work","id":1,"created_at":1,"broker_pid":"42"}"#,
+            r#"{"uri":"ztty://local/work","id":1,"created_at":1,"broker_pid":42,"extra":true}"#,
+        ] {
+            let mut observer = ready(true);
+            let message = object([
+                ("jsonrpc", "2.0".into()),
+                ("id", 1i32.into()),
+                ("method", "tools/call".into()),
+                (
+                    "params",
+                    object([
+                        ("name", "session_read".into()),
+                        (
+                            "arguments",
+                            object([
+                                ("session", "work".into()),
+                                (
+                                    "expected_session",
+                                    json::parse(expected.as_bytes()).unwrap(),
+                                ),
+                            ]),
+                        ),
+                    ]),
+                ),
+            ]);
+            assert_eq!(
+                code(&dispatch(&message, &mut observer, "mcp/stdio").unwrap()),
+                Some(-32602)
+            );
+        }
     }
 }

@@ -53,7 +53,10 @@ use input_queue::InputQueue;
 #[cfg(target_os = "linux")]
 use zterm::{Terminal, input};
 #[cfg(target_os = "linux")]
-use ztty::{actions, input_queue, json, layout, session_control, session_core, workspace_state};
+use ztty::{
+    actions, input_queue, json, layout, session_control, session_core, session_identity,
+    workspace_state,
+};
 
 #[global_allocator]
 static ALLOCATOR: os::Allocator = os::Allocator;
