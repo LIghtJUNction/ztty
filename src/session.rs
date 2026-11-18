@@ -7,6 +7,7 @@ use crate::{
     key, key_modifiers,
     layout::{Axis, Layout},
     modifiers, os, paste, search,
+    session_control::{self, SessionControl},
     working_directory::WorkingDirectory,
     workspace_state,
     x11::{self, Connection, Selection, Window},
@@ -690,7 +691,7 @@ struct Session {
     eof: bool,
     output: VecDeque<u8>,
     output_end: u64,
-    input_owner: Option<String>,
+    control: SessionControl,
     launch_env: Vec<CString>,
     initial_cwd: CString,
     config_path: Option<CString>,
@@ -737,10 +738,7 @@ impl Session {
             ("title", Value::from(self.terminal.title())),
             (
                 "input_owner",
-                self.input_owner
-                    .as_ref()
-                    .map(|s| Value::from(s.clone()))
-                    .unwrap_or(Value::Null),
+                self.control.owner().map(Value::from).unwrap_or(Value::Null),
             ),
             (
                 "workspace",
@@ -949,12 +947,7 @@ fn actor(request: &Value) -> Result<&str, String> {
         None => Ok("local"),
         Some(value) => value
             .as_str()
-            .filter(|s| {
-                !s.is_empty()
-                    && s.len() <= 128
-                    && s.bytes()
-                        .all(|b| b.is_ascii_alphanumeric() || b"._:-".contains(&b))
-            })
+            .filter(|s| session_control::valid_actor(s))
             .ok_or_else(|| String::from("invalid control identity")),
     }
 }
@@ -1258,7 +1251,7 @@ impl Pool {
             eof: false,
             output: VecDeque::new(),
             output_end: 0,
-            input_owner: Some(input_owner),
+            control: SessionControl::new(input_owner),
             launch_env: env,
             initial_cwd: cwd,
             config_path,
@@ -1378,7 +1371,7 @@ impl Pool {
             let placement = placements.iter().find(|(id, _)| *id == session.id);
             if let Some((_, rect)) = placement {
                 let (cols, rows) = ui.window.place(*rect);
-                if session.input_owner.as_deref() == Some("local")
+                if session.control.owns("local")
                     && !ui.read_only
                     && (cols != session.terminal.cols() || rows != session.terminal.rows())
                 {
@@ -1714,7 +1707,7 @@ impl Pool {
             }
             "paste" | "paste-primary" => {
                 let session = &mut self.sessions[index];
-                if session.input_owner.as_deref() != Some("local")
+                if !session.control.owns("local")
                     || session.ui.as_ref().is_some_and(|ui| ui.read_only)
                 {
                     return Err("observing views cannot paste; take input control first".into());
@@ -1867,7 +1860,7 @@ impl Pool {
     ) -> Result<Value, String> {
         let session = &mut self.sessions[index];
         if let Some(ui) = &mut session.ui {
-            let allow_resize = session.input_owner.as_deref() == Some("local") && !ui.read_only;
+            let allow_resize = session.control.owns("local") && !ui.read_only;
             let (cols, rows) = ui.window.reconfigure(&appearance, |cols, rows, cw, ch| {
                 if allow_resize && !session.eof {
                     session
@@ -1916,24 +1909,14 @@ impl Pool {
             .ok_or("control action is required")?;
         match action {
             "acquire" => {
-                if session
-                    .input_owner
-                    .as_deref()
-                    .is_some_and(|owner| owner != actor)
-                    && request.get("takeover").and_then(Value::as_bool) != Some(true)
-                {
-                    return Err(
-                        "session already has an input owner; explicit takeover is required".into(),
-                    );
-                }
-                if session.input_owner.as_deref() != Some(actor) {
+                let takeover = request.get("takeover").and_then(Value::as_bool) == Some(true);
+                if session.control.acquire(actor, takeover)? {
                     session.queue.bytes.clear();
                     session.queue.offset = 0;
                     if let Some(ui) = &mut session.ui {
                         ui.cancel_input();
                     }
                 }
-                session.input_owner = Some(actor.into());
                 if actor == "local"
                     && let Some(ui) = &mut session.ui
                 {
@@ -1941,10 +1924,7 @@ impl Pool {
                 }
             }
             "release" => {
-                if session.input_owner.as_deref() != Some(actor) {
-                    return Err("only the input owner can release control".into());
-                }
-                session.input_owner = None;
+                session.control.release(actor)?;
                 session.queue.bytes.clear();
                 session.queue.offset = 0;
                 if let Some(ui) = &mut session.ui {
@@ -2015,7 +1995,7 @@ impl Pool {
         }
         let index = self.selector(request)?;
         if matches!(op, "write" | "resize" | "close" | "rename")
-            && self.sessions[index].input_owner.as_deref() != Some(actor(request)?)
+            && !self.sessions[index].control.owns(actor(request)?)
         {
             return Err(
                 "input control is required; acquire or explicitly take over this session".into(),
@@ -2186,8 +2166,7 @@ impl Pool {
                         ui.owns_child = false;
                         ui.cancel_input();
                     }
-                    let observing =
-                        read_only || self.sessions[index].input_owner.as_deref() != Some("local");
+                    let observing = read_only || !self.sessions[index].control.owns("local");
                     if let Some(workspace) = self.workspace(self.sessions[index].id)
                         && !observing
                     {
@@ -2208,7 +2187,7 @@ impl Pool {
                 if let Some(value) = request.get("_appearance") {
                     session.appearance = Appearance::from_json(value).map_err(String::from)?;
                 }
-                let observing = read_only || session.input_owner.as_deref() != Some("local");
+                let observing = read_only || !session.control.owns("local");
                 let window = Window::new_view(
                     session.terminal.cols(),
                     session.terminal.rows(),
@@ -2409,8 +2388,7 @@ impl Pool {
                     }
                     let session = &mut self.sessions[index];
                     let ui = session.ui.as_mut().unwrap();
-                    let allow_input =
-                        !ui.read_only && session.input_owner.as_deref() == Some("local");
+                    let allow_input = !ui.read_only && session.control.owns("local");
                     if ui
                         .event(
                             &mut event,
@@ -2465,7 +2443,7 @@ impl Pool {
                 && let Some(next) = ui.paint(
                     &mut session.terminal,
                     &session.appearance,
-                    ui.read_only || session.input_owner.as_deref() != Some("local"),
+                    ui.read_only || !session.control.owns("local"),
                 )
             {
                 deadline = Some(deadline.map_or(next, |old: u64| old.min(next)));
@@ -2478,9 +2456,9 @@ impl Pool {
         for i in (0..self.sessions.len()).rev() {
             let closed = self.sessions[i].ui.as_ref().is_some_and(|ui| !ui.open);
             let ended = self.sessions[i].eof && self.sessions[i].status().is_some();
-            let observing = self.sessions[i].input_owner.as_deref() != Some("local")
+            let observing = !self.sessions[i].control.owns("local")
                 || self.sessions[i].ui.as_ref().is_some_and(|ui| ui.read_only);
-            let owns_child = self.sessions[i].input_owner.as_deref() == Some("local")
+            let owns_child = self.sessions[i].control.owns("local")
                 && self.sessions[i].ui.as_ref().is_some_and(|ui| ui.owns_child);
             if closed && observing && !ended && !owns_child {
                 // An attached observer cannot terminate another actor's live PTY.
@@ -2502,7 +2480,7 @@ impl Pool {
                 } else {
                     session.terminal.title()
                 };
-                let observer = session.input_owner.as_deref() != Some("local")
+                let observer = !session.control.owns("local")
                     || session.ui.as_ref().is_some_and(|ui| ui.read_only);
                 let title = format!(
                     "ztty · {}/{} · {}{}",
