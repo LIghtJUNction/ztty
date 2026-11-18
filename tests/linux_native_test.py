@@ -93,7 +93,7 @@ class EvidenceArchiveTests(unittest.TestCase):
             evidence = out / (stem + ".native")
             files = {}
             for case in linux_native.CASES:
-                png = "screenshots/frame.png" if case in ("daily_workflow", "repaint_gui") else "screenshot.png"
+                png = "screenshots/frame.png" if case in ("daily_workflow", "repaint_gui", "session_switcher") else "screenshot.png"
                 for name, payload in (("report.json", b'{"ok":true}\n'),
                                       ("stdout.log", b"accepted\n"), ("stderr.log", b""),
                                       (png, b"\x89PNG\r\n\x1a\nsynthetic packaging fixture")):
@@ -114,7 +114,7 @@ class EvidenceArchiveTests(unittest.TestCase):
                 for name, payload in files.items():
                     self.assertEqual(archive.extractfile(name).read(), payload)
             source, version = "1" * 40, "0.0.0-fixture"
-            metadata = {"source_sha": source, "version": version}
+            metadata = {"source_sha": source, "version": version, "candidate_platform": "all"}
             (out / (stem + ".build.json")).write_text(json.dumps(metadata))
             (out / (stem + ".native.json")).write_text(json.dumps({"source_sha": source, "passed": True}))
             environment = {"ARTIFACT_STEM": stem, "SOURCE_SHA": source, "VERSION": version,
