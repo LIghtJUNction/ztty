@@ -2,6 +2,7 @@
 """Portable failure contracts; native desktop/pixel evidence comes from the CI gate."""
 import copy
 import ctypes
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -11,7 +12,7 @@ import unittest
 from unittest.mock import patch
 
 import windows_desktop as desktop
-from windows_workspace_test import complete_report
+from windows_workspace_test import complete_report, complete_native_report, complete_cold_runs
 
 
 class FakeAPI:
@@ -226,27 +227,68 @@ class DesktopContract(unittest.TestCase):
 
     def test_native_pixels_worker_identity_and_cleanup_must_all_pass(self):
         name = "ztty-native-1-" + "a" * 32
-        controller = {"passed": True, "status": "passed", "desktop": name, "worker_pid": 100}
+        identity = {"source_sha": "1" * 40, "binary_sha256": "2" * 64, "desktop": name}
+        controller = {"passed": True, "status": "passed", "worker_pid": 100, **identity}
         worker = {"passed": True, "pid": 100, "desktop": name,
+                  "source_sha": identity["source_sha"], "binary_sha256": identity["binary_sha256"],
                   "context": {"station": "WinSta0", "visible": True, "thread": name, "input": name}}
-        native = {"passed": True, "status": "passed", "checks": [{"passed": True}],
-                  "visible_pixel_checks_completed": 20,
-                  "cleanup": {"process_exited": True, "temporary_directory_removed": True},
-                  "desktop": {"thread": {"name": name}, "input": {"name": name}}}
+        native = complete_native_report(name)
         native["workspace"] = complete_report() | {"desktop": native["desktop"]}
-        self.assertTrue(desktop.combine(copy.deepcopy(native), controller, worker)["passed"])
-        for changed in (native | {"passed": False}, native | {"checks": []},
-                        native | {"visible_pixel_checks_completed": 0},
-                        native | {"cleanup": {"process_exited": False}},
-                        native | {"workspace": {}},
-                        native | {"desktop": {"thread": {"name": "Default"}}}):
-            self.assertFalse(desktop.combine(copy.deepcopy(changed), controller, worker)["passed"])
-        self.assertFalse(desktop.combine(copy.deepcopy(native), controller | {"passed": False}, worker)["passed"])
-        self.assertFalse(desktop.combine(copy.deepcopy(native), controller, worker | {"pid": 99})["passed"])
-        failed = native | {"passed": False, "status": "blocked", "error": "original visible pixel failure"}
-        result = desktop.combine(failed, controller | {"passed": False, "status": "failed"}, worker)
-        self.assertEqual(result["error"], "original visible pixel failure")
-        self.assertEqual(result["status"], "blocked")
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            native["cold_start_runs"] = complete_cold_runs(directory, identity)
+            def combine(value=native, desktop_state=controller, worker_state=worker):
+                return desktop.combine(copy.deepcopy(value), desktop_state, worker_state, directory)
+            self.assertTrue(combine()["passed"])
+            for changed in (native | {"passed": False}, native | {"checks": []},
+                            native | {"visible_pixel_checks_completed": 0},
+                            native | {"cleanup": {"process_exited": False}},
+                            native | {"workspace": {}}, native | {"cold_start_runs": {}},
+                            native | {"desktop": {"thread": {"name": "Default"}}}):
+                self.assertFalse(combine(changed)["passed"])
+            self.assertFalse(combine(desktop_state=controller | {"passed": False})["passed"])
+            for changed in (worker | {"pid": 99}, worker | {"source_sha": "3" * 40},
+                            worker | {"binary_sha256": "4" * 64}):
+                self.assertFalse(combine(worker_state=changed)["passed"])
+            failed = native | {"passed": False, "status": "blocked", "error": "original visible pixel failure"}
+            result = combine(failed, controller | {"passed": False, "status": "failed"})
+            self.assertEqual(result["error"], "original visible pixel failure")
+            self.assertEqual(result["status"], "blocked")
+
+    def test_cold_summary_cannot_accept_missing_changed_or_incomplete_raw_evidence(self):
+        identity = {"source_sha": "1" * 40, "binary_sha256": "2" * 64, "desktop": "ztty-native-1-" + "a" * 32}
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            aggregate = complete_cold_runs(directory, identity)
+            self.assertTrue(desktop.validate_cold_runs(aggregate, identity, directory))
+            for changed in (aggregate | {"required": None}, aggregate | {"completed": 7},
+                            aggregate | {"runs": aggregate["runs"][:-1]},
+                            aggregate | {"source_sha": "3" * 40}):
+                self.assertFalse(desktop.validate_cold_runs(changed, identity, directory))
+            for key, value in (("source_sha", "3" * 40), ("binary_sha256", "4" * 64),
+                               ("report_sha256", "5" * 64), ("passed", False),
+                               ("report", aggregate["runs"][0]["report"])):
+                changed = copy.deepcopy(aggregate)
+                changed["runs"][1][key] = value
+                self.assertFalse(desktop.validate_cold_runs(changed, identity, directory))
+            path = directory / aggregate["runs"][-1]["report"]
+            raw = path.read_bytes()
+            path.write_bytes(raw + b" ")
+            self.assertFalse(desktop.validate_cold_runs(aggregate, identity, directory))
+            # Even a matching digest cannot accept a truncated warm gate,
+            # traced run, wrong desktop, or unfinished process cleanup.
+            for field, value in (("rapid_resize_repetitions", {"passed": True, "required": 10, "completed": 9}),
+                                 ("runtime_trace_enabled", True), ("checks", []),
+                                 ("desktop", {"thread": {"name": "Default"}}),
+                                 ("cleanup", {"process_exited": False, "temporary_directory_removed": True})):
+                report = json.loads(raw)
+                report[field] = value
+                desktop.write_json(path, report)
+                changed = copy.deepcopy(aggregate)
+                changed["runs"][-1]["report_sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+                self.assertFalse(desktop.validate_cold_runs(changed, identity, directory))
+            path.unlink()
+            self.assertFalse(desktop.validate_cold_runs(aggregate, identity, directory))
 
     def test_worker_failure_preserves_original_native_checks_and_error(self):
         name = "ztty-native-1-" + "a" * 32
@@ -260,7 +302,9 @@ class DesktopContract(unittest.TestCase):
                 raise RuntimeError("original pixel rejection")
             args = types.SimpleNamespace(worker_desktop=name, binary=Path("ztty.exe"), output=output, arch="arm64")
             module = types.SimpleNamespace(run=fail_native)
-            with patch.object(desktop, "WindowsAPI", return_value=api), patch.dict("sys.modules", {"windows_native": module}), patch.object(desktop.traceback, "print_exc"):
+            with patch.object(desktop, "WindowsAPI", return_value=api), \
+                    patch.object(desktop, "source_identity", return_value={"source_sha": "1" * 40, "binary_sha256": "2" * 64}), \
+                    patch.dict("sys.modules", {"windows_native": module}), patch.object(desktop.traceback, "print_exc"):
                 self.assertEqual(desktop.worker(args, state_path), 1)
             self.assertEqual(json.loads(output.read_text()), original)
             self.assertTrue(json.loads(state_path.read_text())["passed"])
