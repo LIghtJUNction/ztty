@@ -25,6 +25,7 @@ import sys
 import tempfile
 import threading
 import time
+import traceback
 import zlib
 
 
@@ -217,6 +218,80 @@ def capture_window(user, gdi, hwnd, expected_pid, path, include_frame=False):
         user.ReleaseDC(hwnd, dc)
 
 
+CHILD_ERROR_LIMIT = 65536
+
+
+def child_failure_guard(directory, phase, operation):
+    """Keep probe exceptions outside the PTY, then preserve their original exit path."""
+    try:
+        return operation()
+    except BaseException as error:
+        try:
+            assert phase in ("main", "reader")
+            message = str(error)
+            stack = "".join(traceback.format_tb(error.__traceback__, limit=-32))
+            error_type = type(error).__name__[:256]
+            record = {"phase": phase, "pid": os.getpid(), "parent_pid": os.getppid(),
+                      "type": error_type, "message": message[:2048],
+                      "errno": getattr(error, "errno", None), "winerror": getattr(error, "winerror", None),
+                      "traceback": stack[-16384:] + error_type + ": " + message[:2048],
+                      "truncated": len(message) > 2048 or len(stack) > 16384}
+            raw = json.dumps(record, ensure_ascii=False, indent=2).encode("utf-8", errors="replace")
+            while len(raw) > CHILD_ERROR_LIMIT:
+                record["message"] = record["message"][:len(record["message"]) // 2]
+                record["traceback"] = record["traceback"][-len(record["traceback"]) // 2:]
+                record["truncated"] = True
+                raw = json.dumps(record, ensure_ascii=False, indent=2).encode("utf-8", errors="replace")
+            path = Path(directory) / f"child-{phase}-error.json"
+            pending = path.with_suffix(".tmp")
+            pending.write_bytes(raw)
+            pending.replace(path)
+        except BaseException:
+            # A failed diagnostic write must not replace or hide the probe error.
+            pass
+        raise
+
+
+def record_output_write_failure(report, process, directory, sequence, data, child_pid):
+    """Read only this failed fixture's state; never retry its output or acknowledgement."""
+    record = {"sequence": sequence, "payload_bytes": len(data),
+              "payload_sha256": hashlib.sha256(data).hexdigest(), "child_pid": child_pid,
+              "ztty_pid": process.pid}
+    for name, read in (
+            ("command_exists", lambda: (directory / f"command-{sequence}.bin").exists()),
+            ("staging_exists", lambda: (directory / f"command-{sequence}.tmp").exists()),
+            ("done_exists", lambda: (directory / f"done-{sequence}").exists()),
+            ("ztty_returncode", process.poll)):
+        try:
+            record[name] = read()
+        except Exception as error:
+            record[name] = {"error": repr(error)[:2048]}
+    report["output_write_failure"] = record
+
+
+def archive_child_failures(directory, output, report):
+    """Preserve bounded probe errors before the owned fixture directory is removed."""
+    for phase in ("main", "reader"):
+        path = Path(directory) / f"child-{phase}-error.json"
+        try:
+            if not path.exists():
+                continue
+            report["passed"] = False
+            report.setdefault("error", "the native Python probe raised an exception")
+            with path.open("rb") as stream:
+                raw = stream.read(CHILD_ERROR_LIMIT + 1)
+            if len(raw) > CHILD_ERROR_LIMIT:
+                raise ValueError("probe exception sidecar exceeds its fixed bound")
+            target = output.with_name(output.stem + f".child-{phase}-error.json")
+            target.write_bytes(raw)
+            report.setdefault("child_errors", []).append({"phase": phase, "path": str(target),
+                "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()})
+        except Exception as error:
+            report["passed"] = False
+            report.setdefault("child_error_capture_errors", []).append({"phase": phase,
+                "error": repr(error)[:2048]})
+
+
 def child(directory, stdio_only=False):
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel.GetStdHandle.restype = wintypes.HANDLE
@@ -274,7 +349,8 @@ def child(directory, stdio_only=False):
                 del received[:-65536]
             (directory / "keyboard.bin").write_bytes(received)
 
-    threading.Thread(target=read_input, daemon=True).start()
+    threading.Thread(target=child_failure_guard,
+                     args=(directory, "reader", read_input), daemon=True).start()
     sys.stdout.buffer.write(b"\x1b]2;ztty native acceptance\x07\x1b[?25l\x1b[2J\x1b[H")
     sys.stdout.buffer.flush()
     (directory / "ready").write_text("ready", encoding="utf-8")
@@ -887,9 +963,16 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
             nonlocal sequence
             path = directory / f"command-{sequence}.bin"
             stage = path.with_suffix(".tmp")
-            stage.write_bytes(data)
-            stage.replace(path)
-            wait_for(lambda: (directory / f"done-{sequence}").exists(), "PTY output write")
+            try:
+                stage.write_bytes(data)
+                stage.replace(path)
+                wait_for(lambda: (directory / f"done-{sequence}").exists(), "PTY output write")
+            except BaseException:
+                try:
+                    record_output_write_failure(report, process, directory, sequence, data, startup_state["pid"])
+                except BaseException:
+                    pass  # Keep the original write/wait error even if inspection fails.
+                raise
             sequence += 1
 
         def resize_ack(stage, columns, query_id):
@@ -1258,6 +1341,8 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                                                     for path in paths[-64:]]
             except (OSError, ValueError) as error:
                 report["child_geometry_error"] = repr(error)
+        if temporary_directory:
+            archive_child_failures(directory, output, report)
         cleanup_owned(process, request_close, temporary_directory, report)
         if runtime_stream:
             runtime_stream.close()
@@ -1284,7 +1369,7 @@ def main():
     if args.stdio_child:
         child(args.stdio_child, stdio_only=True)
     elif args.child:
-        child(args.child)
+        child_failure_guard(args.child, "main", lambda: child(args.child))
     else:
         return 0 if run(args.binary, args.output, args.arch) else 1
 
