@@ -4,6 +4,8 @@
 
 ### Added
 
+- Native macOS and Windows startup `--cwd`, with Unicode paths, command lookup in the selected directory and preserved relative config semantics; Darwin child PWD follows the physical directory.
+- macOS WindowServer capture and owned-window resize/minimize acceptance, retaining existing PTY checks and recording Screen Recording/Accessibility blockers explicitly.
 - Three-run guarded 1/10-window benchmark evidence and README charts, including measured RSS/PSS/Swap, source hashes, the unmet 10 MiB RSS target and the PTY throughput gap.
 - Linux standalone `--observe` command windows and the `ztty-observer` external-terminal adapter; `close NAME` follows existing input ownership authorization.
 - Linux x86_64/ARM64 release gates now require four real X11/PTY suites with source, executable and display ownership evidence; Windows ARM64 must execute natively.
@@ -22,6 +24,8 @@
 
 ### Fixed
 
+- Linux links the real system unwinder after Rust archives so GNU ld --as-needed cannot discard it before debug alloc cleanup references.
+- Windows native gates search for a visible location for their own window and record covering-window identities, while retaining the pixel ownership checks and original assertions.
 - Linux sessions save cwd with portable O_PATH/CLOEXEC flags, fixing ARM64 startup and supporting search-only original directories; save and enter failures retain their own errno.
 - Windows native pixel gates verify on-screen ownership and clipping, record resize-stage PNGs and report the actual final RGB without relaxing color or timeout requirements.
 - Custom benchmark charts now link their actual raw-data path; renderer-only updates preserve collection identity and historical evidence.

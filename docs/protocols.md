@@ -150,6 +150,14 @@ presentation and macOS/Windows acceptance must be recorded separately.
 
 ## Acceptance coverage
 
+Newer roadmap candidates are tracked separately in the
+[native acceptance record](native-candidates-2026-11-18.md). At `2dc6769`,
+Linux x86_64 passed four guarded GUI suites and Windows x86_64 passed 25 checks,
+including six Sixel groups. The two ARM64 gates still failed; macOS only
+completed its eight protocol checks. Historical tables and their immutable
+source reports below retain their original scope. The new macOS capture gate
+and native startup-directory additions require their own subsequent execution.
+
 The [GUI suite](../tests/gui_smoke.py) has passed 12 checks under an isolated Xvfb/X11 server,
 as recorded in [the GUI result](measurements/gui-graphics-2026-11-18.json):
 legacy keyboard input; Kitty disambiguation; all five Kitty flags with modifier,

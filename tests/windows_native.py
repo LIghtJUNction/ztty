@@ -188,6 +188,8 @@ def child(directory):
     if not kernel.SetConsoleMode(stdout, 0x1 | 0x4 | 0x8):
         raise ctypes.WinError(ctypes.get_last_error())
     directory = Path(directory)
+    (directory / "startup.json").write_text(
+        json.dumps({"cwd": os.getcwd(), "parent_pid": os.getppid()}), encoding="utf-8")
     received = bytearray()
 
     def read_input():
@@ -308,6 +310,10 @@ def run(binary, output, expected_arch=None):
     user.IsIconic.restype = wintypes.BOOL
     user.GetDpiForWindow.argtypes = [wintypes.HWND]
     user.GetDpiForWindow.restype = wintypes.UINT
+    user.GetClassNameW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
+    user.GetClassNameW.restype = ctypes.c_int
+    user.GetWindowLongPtrW.argtypes = [wintypes.HWND, ctypes.c_int]
+    user.GetWindowLongPtrW.restype = ctypes.c_ssize_t
     gdi.GetClipBox.argtypes = [wintypes.HDC, ctypes.POINTER(wintypes.RECT)]
     gdi.GetClipBox.restype = ctypes.c_int
     gdi.PtVisible.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
@@ -324,6 +330,19 @@ def run(binary, output, expected_arch=None):
         if window:
             user.GetWindowThreadProcessId(window, ctypes.byref(pid))
         return pid.value
+
+    def window_identity(window):
+        if not window:
+            return {"hwnd": 0, "pid": 0}
+        rect = wintypes.RECT()
+        bounds = rect_values(rect) if user.GetWindowRect(window, ctypes.byref(rect)) else None
+        name = ctypes.create_unicode_buffer(256)
+        count = user.GetClassNameW(window, name, len(name))
+        style = int(user.GetWindowLongPtrW(window, -20))  # GWL_EXSTYLE
+        return {"hwnd": int(window), "pid": window_pid(window), "rect": bounds,
+                "class": name.value if count else None,
+                "topmost": bool(style & 8), "visible": bool(user.IsWindowVisible(window)),
+                "root": int(user.GetAncestor(window, 2) or 0)}
 
     def screen_point(x, y):
         point = NativePoint(int(x), int(y))
@@ -357,6 +376,7 @@ def run(binary, output, expected_arch=None):
                                "point_visible": bool(gdi.PtVisible(dc, int(x), int(y))),
                                "window_from_point": int(hit or 0), "root_window": int(root_window or 0),
                                "window_from_point_pid": window_pid(hit),
+                               "hit_window": window_identity(hit),
                                "owned_window_at_point": root_window == hwnd and window_pid(hit) == process.pid,
                                "rgb": None if color == 0xFFFFFFFF else
                                [color & 255, (color >> 8) & 255, (color >> 16) & 255]})
@@ -367,6 +387,8 @@ def run(binary, output, expected_arch=None):
                 "dpi": int(user.GetDpiForWindow(hwnd)), "visible": bool(user.IsWindowVisible(hwnd)),
                 "minimized": bool(user.IsIconic(hwnd)), "window_pid": window_pid(hwnd),
                 "foreground_pid": window_pid(user.GetForegroundWindow()),
+                "foreground_window": window_identity(user.GetForegroundWindow()),
+                "owned_window": window_identity(hwnd),
                 "monitor": {"rect": rect_values(info.monitor), "work": rect_values(info.work),
                             "primary": bool(info.flags & 1)},
                 "clip_type": clip_type, "clip_box": rect_values(clip), "samples": points}
@@ -380,22 +402,47 @@ def run(binary, output, expected_arch=None):
         width, height = outer[2] - outer[0], outer[3] - outer[1]
         if width > right - left or height > bottom - top:
             raise AssertionError("test window does not fit the monitor work area")
-        x = left + min(32, (right - left - width) // 2)
-        y = top + min(32, (bottom - top - height) // 2)
-        # Move only this new test window, without resizing or activating another
-        # process. Topmost placement keeps GetPixel away from unrelated windows.
-        if not user.SetWindowPos(hwnd, ctypes.c_void_p(-1), x, y, 0, 0, 0x0011):
-            raise OSError("cannot place the owned test window inside its monitor")
+        client = before["client"]
+        cw, ch = client[2], client[3]
+        points = [(1, 1), (cw - 2, 1), (1, ch - 2), (cw - 2, ch - 2), (cw // 2, ch // 2)]
+        xs = [left + min(32, (right - left - width) // 2),
+              left + (right - left - width) // 2, right - width]
+        ys = [top + min(32, (bottom - top - height) // 2),
+              top + (bottom - top - height) // 2, bottom - height]
+        positions = list(dict.fromkeys((x, y) for y in ys for x in xs))
+        placement = {"before": before, "requested_topmost": True, "attempts": []}
+        report["window_placement"] = placement
 
-        def visible_inside_work_area():
-            state = window_geometry()
+        def unobstructed():
+            state = window_geometry(points)
             bounds = state["client_screen"]
-            return (state["visible"] and not state["minimized"] and
-                    left <= bounds[0] < bounds[2] <= right and top <= bounds[1] < bounds[3] <= bottom)
+            if (state["visible"] and not state["minimized"] and
+                    left <= bounds[0] < bounds[2] <= right and top <= bounds[1] < bounds[3] <= bottom and
+                    all(point["owned_window_at_point"] and point["point_visible"] for point in state["samples"])):
+                return state
+            return None
 
-        wait_for(visible_inside_work_area, "owned native window visible inside monitor work area")
-        report["window_placement"] = {"before": before, "placed": window_geometry(),
-                                      "requested_topmost": True, "position": [x, y]}
+        # Keep the test window inside its own work area and in front of other
+        # topmost windows. If a runner overlay cannot be covered, try another
+        # location for our window; never move, hide or close the other window.
+        deadline = time.monotonic() + 10
+        for x, y in positions:
+            if time.monotonic() >= deadline:
+                break
+            if not user.SetWindowPos(hwnd, ctypes.c_void_p(-1), x, y, 0, 0, 0x0001):
+                raise OSError("cannot place the owned test window inside its monitor")
+            user.SetForegroundWindow(hwnd)
+            try:
+                placed = wait_for(unobstructed, "owned window has five visible client points",
+                                  timeout=min(0.5, max(0, deadline - time.monotonic())))
+                placement.update({"placed": placed, "position": [x, y]})
+                placement["attempts"].append({"position": [x, y], "visible": True})
+                return
+            except AssertionError as error:
+                placement["attempts"].append({"position": [x, y], "visible": False,
+                                               "diagnostic": window_geometry(points),
+                                               "error": str(error)})
+        raise AssertionError("runner desktop has no verified visible location for the owned test window")
 
     try:
         interpreter = process_architecture()
@@ -423,9 +470,36 @@ def run(binary, output, expected_arch=None):
             config.write_text("font = Consolas:size=12\nwindow-padding = 0\n"
                               "background = #101820\ncursor-blink = false\n"
                               "background-opacity = 100\n", encoding="utf-8")
-            command = [str(binary.resolve()), "--config", str(config), "--geometry", "20x10",
+            working_directory = directory / "工作 目录 🦀"
+            working_directory.mkdir()
+            marker = directory / "invalid-cwd-started"
+            child_code = f"from pathlib import Path; Path({str(marker)!r}).write_text('unexpected')"
+            for kind, invalid in (("missing", directory / "missing cwd"),
+                                  ("regular_file", config), ("empty", "")):
+                rejected = subprocess.run(
+                    [str(binary.resolve()), "--config", "appearance.conf", "--cwd", str(invalid),
+                     "-e", sys.executable, "-c", child_code],
+                    cwd=directory, env=clean_environment, capture_output=True, timeout=10, check=False)
+                assert rejected.returncode == 1, (kind, rejected.returncode, rejected.stderr)
+                assert b"cannot enter command working directory (OS error " in rejected.stderr
+                assert not marker.exists(), "invalid cwd must not launch a child"
+                checks.append({"name": f"invalid_cwd_{kind}_rejected", "passed": True,
+                               "exit_code": rejected.returncode,
+                               "stderr": rejected.stderr.decode("utf-8", errors="replace").strip()})
+            # A copied native --version executable proves relative program
+            # resolution occurs inside the requested directory.
+            relative_program = working_directory / "relative-probe.exe"
+            relative_program.write_bytes(binary.read_bytes())
+            relative = subprocess.run(
+                [str(binary.resolve()), "--cwd", str(working_directory),
+                 "-e", ".\\relative-probe.exe", "--version"],
+                env=clean_environment, capture_output=True, timeout=15, check=False)
+            assert relative.returncode == 0, (relative.returncode, relative.stderr)
+            checks.append({"name": "relative_program_uses_requested_cwd", "passed": True})
+            command = [str(binary.resolve()), "--config", "appearance.conf",
+                       "--cwd", str(working_directory), "--geometry", "20x10",
                        "-e", sys.executable, str(Path(__file__).resolve()), "--child", str(directory)]
-            process = subprocess.Popen(command)
+            process = subprocess.Popen(command, cwd=directory)
             report["ztty_process"] = process_architecture(process.pid)
             assert report["ztty_process"] == interpreter, "ztty must run natively on the test machine"
             checks.append({"name": "native_ztty_process_architecture", "passed": True})
@@ -449,6 +523,13 @@ def run(binary, output, expected_arch=None):
             user.SetForegroundWindow(hwnd)
             wait_for(lambda: (directory / "ready").exists(), "Unicode command arguments and ConPTY child")
             checks.append({"name": "unicode_arguments_and_native_child", "passed": True})
+            startup_state = json.loads((directory / "startup.json").read_text(encoding="utf-8"))
+            assert Path(startup_state["cwd"]).samefile(working_directory), startup_state
+            assert Path.cwd() != working_directory, "the harness cwd must remain unchanged"
+            report["startup_directory"] = {"requested": str(working_directory),
+                                           "actual": startup_state["cwd"],
+                                           "relative_config": "appearance.conf"}
+            checks.append({"name": "unicode_cwd_and_relative_config", "passed": True})
             rect = wintypes.RECT()
             assert user.GetClientRect(hwnd, ctypes.byref(rect))
             cw, ch = rect.right // 20, rect.bottom // 10

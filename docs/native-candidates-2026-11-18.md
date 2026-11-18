@@ -90,10 +90,76 @@ passed. They do not validate Windows execution. Both Windows architectures,
 especially ARM64, must run these unchanged assertions in the next native
 candidate before that candidate can be accepted.
 
+## Second native run and remaining corrections
+
+[Run 44201206779](https://github.com/LIghtJUNction/ztty/actions/runs/44201206779)
+used `2dc6769b795e407d8fbecc2a305f1045868863a5`. Linux x86_64's four
+GUI suites, Windows x86_64's 25 checks and both macOS eight-check protocol
+gates passed again. Both ARM64 gates still failed.
+
+Linux ARM64's **release build passed**, but the newly added cwd regression
+command first built the debug ztty executable and exposed unresolved
+`_Unwind_Resume` imports from precompiled `liballoc`. GNU ld's
+`--as-needed` encountered `-lgcc_s` before the Rust archives. The GUI tests
+did not run in this second ARM64 job, so the cwd correction was not yet
+validated there. A new Linux-only build-script argument places the real
+system unwinder after the Rust archives. A separate x86_64 GNU bfd debug build,
+four cwd tests, actual ELF imports and the matching system export passed;
+[the retained record](measurements/linux-gcc-link-order-2026-11-18.json) does
+not substitute that result for ARM64 execution.
+
+Windows ARM64 now retained enough metadata to identify the second failure.
+Its 180×190 client area was inside a 1024×720 monitor work area at 96 DPI.
+The sample at client (13, 47) read red from ztty's DC, and PtVisible was true,
+but WindowFromPoint and the foreground window belonged to PID 5984 rather
+than the tested PID 6964. The ownership guard correctly rejected this as
+unverified visible output. The original image assertions were not relaxed.
+The next harness records window class/root/rect/topmost identities and tries
+visible positions for **its own window only**; it never moves, hides or
+closes the covering window.
+
+The following downloaded ZIPs and every file in their build manifests were
+verified before analysis:
+
+| Failure artifact | ID | ZIP SHA256 |
+| --- | ---: | --- |
+| Linux ARM64 | 14381332202 | `bc8ff8785fe0752923699ef355103ccc152988ae09418470262b2bbd22c002e0` |
+| Windows ARM64 | 14380429063 | `4f21370797aea2fd4fbb852970aa094e2e849b86e84ef3c4e54ff03a847c1e66` |
+
+Their durable copies are in the
+[delivery folder](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa)
+as `failed-linux-arm64-44201206779.zip` and
+`failed-windows-arm64-44201206779.zip`. Earlier failed-run ZIPs are retained
+separately. These filenames deliberately distinguish failure evidence from
+accepted installation packages.
+
+## Native startup and macOS pixel additions
+
+The next source candidate adds native `--cwd` with Unicode paths and resolves
+relative commands after the directory switch while loading a relative config
+before it. Darwin rewrites the child PWD from the physical cwd. The
+[startup-directory guide](startup-directory.md) describes the native single-PTY
+boundary.
+
+Windows keeps the existing 25 checks and adds five cwd checks. The macOS gate
+retains all eight protocol checks and adds owned WindowServer captures through
+ScreenCaptureKit, Sixel, resize/minimize recovery and cwd validation. Permission
+preflight reports missing Screen Recording or Accessibility as blocked; it does
+not edit TCC or substitute internal rendering buffers. The helper's capture is
+window-content evidence, not a measurement of physical display latency.
+
+The combined Linux development gate passed 174 Rust tests, Clippy, release,
+MCP and no_std checks after these production changes. Windows GNU cross-target
+type checking passed; it is not native execution. See the
+[local gate log](measurements/native-cwd-link-local-gates-2026-11-18.log) and
+[source hashes](measurements/native-cwd-link-local-gates-2026-11-18.json).
+Apple SDK compilation and the new macOS/Windows native checks still require
+the next actual runner execution.
+
 ## Remaining release gates
 
-These fixes need a new source-pinned native run; re-running the old commit
-would not test them. Native Wayland, real GPU/VRAM, macOS pixels/IME,
+The linker and visible-location corrections need another source-pinned native
+run; re-running either old commit would not test those changes. Native Wayland, real GPU/VRAM, macOS pixels/IME,
 physical input matrices and the macOS/Windows shared-session feature set
 remain incomplete. Apple Developer ID/notarization and Windows signing
 have not been supplied. No full production-release or all-platform

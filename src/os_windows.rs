@@ -305,6 +305,19 @@ pub fn child_environment() -> Vec<u16> {
     output
 }
 
+/// Called only at startup, before PTY or GUI helper threads exist.
+pub fn enter_startup_directory(path: &str) -> Result<(), u32> {
+    if path.contains('\0') {
+        return Err(87); // ERROR_INVALID_PARAMETER
+    }
+    let path: Vec<u16> = path.encode_utf16().chain([0]).collect();
+    if unsafe { SetCurrentDirectoryW(path.as_ptr()) } == 0 {
+        Err(unsafe { GetLastError() })
+    } else {
+        Ok(())
+    }
+}
+
 pub fn resolve(program: &CStr) -> Result<Vec<u16>, &'static str> {
     let name: Vec<u16> = program
         .to_str()
@@ -395,6 +408,7 @@ unsafe extern "system" {
         flags: u32,
         template: Handle,
     ) -> Handle;
+    fn SetCurrentDirectoryW(path: *const u16) -> i32;
     fn GetLastError() -> u32;
     fn GetFileType(file: Handle) -> u32;
     fn CloseHandle(handle: Handle) -> i32;

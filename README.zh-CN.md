@@ -39,14 +39,16 @@ Kitty 增强键盘和同步输出协议。图片支持内联 PNG、RGB、RGBA，
 
 | 平台 | 原生实现 | 当前验收状态 |
 | --- | --- | --- |
-| Linux | X11/XWayland 窗口、Xft 文字、Xrender 图片合成、Linux PTY | Xvfb 下 12 项界面和 7 项图像检查通过；实际 Hyprland/XWayland 中照片、透明 PNG 与自动探测通过 |
+| Linux | X11/XWayland 窗口、Xft 文字、Xrender 图片合成、Linux PTY | 当前 x86_64 候选通过 guarded Xvfb 工作区 10、日常工作流 14、Sixel 10 和输入 27 个精确字节向量；ARM64 门槛尚未通过 |
 | macOS | AppKit 窗口、CoreText/CoreGraphics 渲染、Darwin PTY | Intel 与 Apple Silicon 均通过 8 项原生会话/协议检查；像素读回、输入法和键盘验收待完成 |
-| Windows | Win32 窗口、GDI 文字、自行合成 RGBA、ConPTY | x86_64 通过 17 项原生检查，包含真实 ConPTY、窗口像素读回和键盘恢复 |
+| Windows | Win32 窗口、GDI 文字、自行合成 RGBA、ConPTY | x86_64 通过 25 项原生检查，含 6 组 Sixel、窗口像素和键盘恢复；ARM64 尚未验收通过 |
 
 macOS 后端不要求 X11，Windows 后端不要求 WSL。上述原生检查在
 对应操作系统运行；表中明确区分已检查的项目和仍需补齐的验证。
 安装包状态见 [发布记录](docs/releasing.md)，对应源码与验收范围见
 [协议说明](docs/protocols.md#acceptance-coverage)。
+[当前候选记录](docs/native-candidates-2026-11-18.md)保留两轮 ARM64 失败及后续修复。
+Hyprland 图片属于历史验收，当前开发桌面的标准 Xwayland 端点不可用。
 
 默认显示 120×32 个字符。历史记录按需增长，字符存储最多 8 MiB；
 历史达到上限后复用旧行。详细协议范围以 [英文 README](README.md)
@@ -120,7 +122,9 @@ Shift+PageUp/PageDown 浏览历史，Ctrl+点击打开链接。
 应用捕获鼠标时，按住 Shift 可使用本地选择、滚轮历史和中键粘贴。
 
 Linux/macOS 默认使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用
-`COMSPEC`，缺省为 `cmd.exe`。用 `-e` 指定其他命令。macOS 与 Windows
+`COMSPEC`，缺省为 `cmd.exe`。用 `-e` 指定其他命令、`--cwd PATH` 指定初始目录；
+相对命令使用目标目录，相对配置路径仍使用启动器原目录。
+[目录行为与原生验收](docs/startup-directory.md)说明实现范围。macOS 与 Windows
 的打包和原生验收入口见 [发布工作流](.github/workflows/release.yml)。
 Windows 包携带固定版本的 Microsoft ConPTY 运行组件，库也支持回退到
 系统自带 API，细节见 [`zpty` 文档](crates/zpty/README.md)。

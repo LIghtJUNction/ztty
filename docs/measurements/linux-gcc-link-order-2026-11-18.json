@@ -1,0 +1,41 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "working_directory",
+    "--",
+    "--test-threads=1",
+    "--nocapture"
+  ],
+  "cwd": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree",
+  "overrides": {
+    "RUSTFLAGS": "-C link-arg=-fuse-ld=bfd",
+    "CARGO_TARGET_DIR": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/target-linux-link-order",
+    "CARGO_BUILD_JOBS": "1",
+    "RUSTC_LOG": "rustc_codegen_ssa::back::link=info"
+  },
+  "wrapper_environment_preserved": true,
+  "start": 1794959255.86495,
+  "build_rs_sha256": "c2b617e0471c0e8d35e4a41b417589f0e97b9770f7ee800522b8c3695d5345ef",
+  "exit_code": 0,
+  "end": 1794959263.3921733,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/target-linux-link-order/debug/ztty",
+  "binary_sha256": "8d044e20f47e7ebecbeffb4e5963403074a359c9e929b64624ac46030ac882e7",
+  "dynamic_exit_code": 0,
+  "symbols_exit_code": 0,
+  "libgcc_exit_code": 0,
+  "libgcc_path": "/usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libgcc_s.so.1",
+  "needs_real_gcc_s": true,
+  "unwind_resume_import": true,
+  "dynamic_locale": "C",
+  "system_unwind_resume_exported": true,
+  "binary_link_command_count": 1,
+  "gcc_s_after_alloc": true,
+  "gnu_bfd_selected": true,
+  "only_one_gcc_s": true,
+  "version_exit_code": 0,
+  "version_stdout": "ztty 0.2.0\n",
+  "validation_scope": "Native Linux x86_64 GNU bfd debug binary and 4 real libc cwd tests; ARM64 requires next native CI run."
+}

@@ -48,15 +48,18 @@ and Windows terminals remain available through their platform backends.
 
 | Platform | Native implementation | Current acceptance status |
 | --- | --- | --- |
-| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | 12 GUI checks and 7 graphics checks passed under Xvfb; actual `kitten icat` photo, transparent PNG, and automatic transport detection passed in Hyprland/XWayland |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Current x86_64 candidate: workspaces 10, daily workflow 14, Sixel 10 and 27 exact input vectors passed under guarded Xvfb; ARM64 gate remains open |
 | macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | 8 native session/protocol checks passed on Intel and Apple Silicon; pixel readback and IME/keyboard acceptance remain open |
-| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | 17 native checks passed on x86_64, including real ConPTY, window-pixel readback, and keyboard recovery |
+| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | 25 native checks passed on x86_64, including six Sixel groups, window pixels and keyboard recovery; ARM64 remains unaccepted |
 
 The macOS and Windows backends use their native APIs. macOS does not require
 X11, and Windows does not require WSL. Cross-target compilation does not establish
 runtime or visual correctness. See [protocol acceptance](docs/protocols.md#acceptance-coverage)
 and [the release record](docs/releasing.md) for the verified scope and available
-artifacts.
+artifacts. The [current candidate record](docs/native-candidates-2026-11-18.md)
+retains both ARM64 failures and their subsequent fixes. Earlier Hyprland images
+remain historical evidence; the current development desktop has no usable
+standard Xwayland endpoint.
 
 ## Install on Linux
 
@@ -97,7 +100,10 @@ cargo build --locked --release
 `make install` installs the executable and desktop entry under `~/.local`.
 Set `PREFIX` to choose another location. Linux and macOS use `SHELL`, with
 `/bin/sh` as the fallback; Windows uses `COMSPEC`, falling back to `cmd.exe`.
-Use `-e` to select a different command. Child sessions receive
+Use `-e` to select a different command and `--cwd PATH` for its initial
+directory. Relative commands use the selected cwd; relative config paths keep
+the launcher directory. [Startup directory behavior and native acceptance](docs/startup-directory.md)
+describe the platform boundary. Child sessions receive
 `TERM=xterm-256color`, `COLORTERM=truecolor`, and `TERM_PROGRAM=ztty`.
 
 macOS builds link AppKit, CoreText, CoreGraphics, and the Darwin runtime.
@@ -339,7 +345,8 @@ X11 input, clipboard, resize, PTY, and frame presentation paths. They require
 Xvfb, python-xlib, and Pillow; the graphics suite also requires `kitten`.
 They leave the current desktop session untouched and write JSON results and
 screenshots under `artifacts/`. The native macOS and Windows gates are
-[macos_smoke.py](tests/macos_smoke.py) and
+[macos_native.py](tests/macos_native.py), retaining the original eight
+[protocol checks](tests/macos_smoke.py), and
 [windows_native.py](tests/windows_native.py). Their recorded results and remaining
 acceptance gaps are listed in [protocol acceptance](docs/protocols.md#acceptance-coverage).
 
