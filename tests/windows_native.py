@@ -806,13 +806,30 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         assert cw > 0 and ch > 0
         report["client_pixels"] = [rect.right, rect.bottom]
         report["cell_pixels"] = [cw, ch]
+
+        def client_sample(col, row):
+            return [int(col * cw), int(row * ch)]
+
+        if report["paint_diagnostics_enabled"]:
+            x, y = client_sample(19.5, 1.5)
+            assert 0 <= x <= 65535 and 0 <= y <= 65535
+            assert process.poll() is None and window_pid(hwnd) == process.pid, "paint sample window ownership changed"
+            result = ctypes.c_size_t()
+            ctypes.set_last_error(0)
+            delivered = user.SendMessageTimeoutW(hwnd, 0x85A2, 0x5A545459, x | (y << 16),
+                                                  0x0003, 2000, ctypes.byref(result))
+            report["paint_sample_configuration"] = {"client_sample": [x, y],
+                "delivered": bool(delivered), "result": result.value,
+                "last_error": ctypes.get_last_error(), "timeout_ms": 2000}
+            assert delivered and result.value == 1, "paint sample configuration was unavailable or timed out"
+
         def record_resize(stage, stages=None, prefix="resize"):
             if stages is None:
                 stages = report.setdefault("resize_stages", {})
             state = stages.setdefault(stage, {})
             state["monotonic_seconds"] = time.monotonic()
             try:
-                state.update(window_geometry([(19.5 * cw, 1.5 * ch), (15.5 * cw, 1.5 * ch)]))
+                state.update(window_geometry([client_sample(19.5, 1.5), client_sample(15.5, 1.5)]))
                 state["screenshot"] = capture_window(
                     user, gdi, hwnd, process.pid,
                     output.with_name(output.stem + f".{prefix}-{stage}.png"))
@@ -867,7 +884,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                 user.ReleaseDC(hwnd, dc)
 
         def pixel(col, row):
-            return pixel_at(col * cw, row * ch)
+            return pixel_at(*client_sample(col, row))
 
         def post_failure_snapshot():
             # This path is reached only after the original pixel assertion
@@ -912,6 +929,14 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                 diagnostic["after_repaint"] = window_geometry([(x, y)], diagnostics=True)
                 diagnostic["after_repaint_screenshot"] = capture_window(user, gdi, hwnd, process.pid,
                     output.with_name(output.stem + ".post-repaint.png"))
+                # Compare probe coordinates only after all original/flush/repaint
+                # evidence is saved. This never changes the failed pixel result.
+                alignment = diagnostic["paint_sample_alignment"] = {"failed_client_sample": [x, y]}
+                for label, field in (("before_end_paint", "target_after_blit"),
+                                     ("after_end_paint", "target_after_end_paint")):
+                    sample = (state["before"]["last_paint"].get(field) or {}).get("sample")
+                    alignment[label] = {"client_sample": sample,
+                        "matches_failed_pixel": None if sample is None else sample == [x, y]}
             except Exception as error:
                 diagnostic["error"] = repr(error)
 
@@ -944,9 +969,9 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
                 wait_for(matches, name)
             except AssertionError as error:
                 failure = {"name": name, "expected": expected, "actual": actual,
-                           "client_sample": [int(col * cw), int(row * ch)]}
+                           "client_sample": client_sample(col, row)}
                 try:
-                    failure["window"] = window_geometry([(col * cw, row * ch)], diagnostics=True)
+                    failure["window"] = window_geometry([client_sample(col, row)], diagnostics=True)
                 except Exception as diagnostic_error:
                     failure["diagnostic_error"] = repr(diagnostic_error)
                 report["failed_pixel"] = failure
@@ -1151,7 +1176,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
             # A failed size request/capture also retains this process's state;
             # no diagnostic rerun can replace the failed burst.
             report.setdefault("failed_pixel", {"name": "back_to_back_resize_restores_visible_image",
-                "expected": [255, 0, 0], "actual": None, "client_sample": [int(19.5 * cw), int(1.5 * ch)]})
+                "expected": [255, 0, 0], "actual": None, "client_sample": client_sample(19.5, 1.5)})
         if report.get("failed_pixel", {}).get("name") in (
                 "resize_restores_visible_image", "back_to_back_resize_restores_visible_image"):
             post_failure_snapshot()
