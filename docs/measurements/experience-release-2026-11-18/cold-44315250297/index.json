@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "504fa770a97069e32bed4d8f45616066d5c4dbc5",
+  "run_id": 44315250297,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44315250297",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "status": "failed",
+  "required_cold_starts_per_architecture": 8,
+  "required_base_checks_per_cold_start": 31,
+  "required_rapid_resizes_per_cold_start": 10,
+  "native_rendering_change_since_5cd6f3c": false,
+  "x86_64": {
+    "completed_cold_starts": 7,
+    "failed_cold_start": 8,
+    "failure": "resize_restores_visible_image",
+    "base_checks_before_failure": 23,
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      0,
+      0,
+      0
+    ],
+    "same_process_snapshot": "windows-x86_64/ztty-windows-x86_64.native.cold-08.post-failure.json",
+    "cpu_and_source_after_flush": [
+      255,
+      0,
+      0
+    ],
+    "window_after_flush": [
+      0,
+      0,
+      0
+    ],
+    "window_after_normal_repaint": [
+      255,
+      0,
+      0
+    ],
+    "summary": "windows-x86_64-summary.json",
+    "png_files_verified": 251,
+    "resize_png_samples_verified": 390
+  },
+  "aarch64": {
+    "completed_cold_starts": 3,
+    "failed_cold_start": 4,
+    "base_checks_passed_in_failed_run": 31,
+    "rapid_resizes_passed_in_failed_run": 10,
+    "failure": "temporary directory remained locked after application exit 0",
+    "summary": "windows-aarch64-summary.json",
+    "png_files_verified": 140,
+    "resize_png_samples_verified": 220
+  },
+  "workspace": "not_entered_on_either_architecture",
+  "diagnostic_recovery_does_not_accept_failure": true,
+  "root_cause_limit": "The x64 snapshot localizes the visible failure to presentation/repaint. It does not establish that a naturally reentrant WM_PAINT caused it. The ARM cleanup exception does not identify the process holding the file lock.",
+  "publication": "not_requested_build_only",
+  "installation": "not_performed",
+  "notes": [
+    "Raw JSON and PNG entries are byte-identical copies, including original CRLF.",
+    "Only the listed compact records are copied; paths inside native JSON still refer to original runner artifacts.",
+    "The prior failed v0.3.0 formal tag and its evidence are unchanged."
+  ]
+}

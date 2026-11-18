@@ -373,6 +373,43 @@ def desktop_state(user):
             user.CloseDesktop(handle)
 
 
+def remove_owned_directory(temporary_directory, cleanup):
+    """Retry only Windows sharing/lock violations within one fixed deadline."""
+    started = time.monotonic()
+    deadline = started + 2.0
+    removal = {"attempts": 0, "elapsed_seconds": 0.0, "retry_timeout_seconds": 2.0}
+    cleanup["directory_removal"] = removal
+    last_error = None
+    try:
+        while True:
+            # A delayed wake must not start another attempt after the budget.
+            if removal["attempts"] and time.monotonic() >= deadline:
+                cleanup["directory_error"] = repr(last_error)
+                return
+            removal["attempts"] += 1
+            try:
+                temporary_directory.cleanup()
+                cleanup["temporary_directory_removed"] = not Path(temporary_directory.name).exists()
+                if not cleanup["temporary_directory_removed"]:
+                    cleanup["directory_error"] = "temporary directory still exists after cleanup"
+                return
+            except Exception as error:
+                last_error = error
+                removal.setdefault("first_error", {
+                    "type": type(error).__name__, "repr": repr(error),
+                    "errno": getattr(error, "errno", None),
+                    "winerror": getattr(error, "winerror", None),
+                })
+                remaining = deadline - time.monotonic()
+                if (sys.platform != "win32" or not isinstance(error, OSError)
+                        or getattr(error, "winerror", None) not in (32, 33) or remaining <= 0):
+                    cleanup["directory_error"] = repr(error)
+                    return
+                time.sleep(min(0.05, remaining))
+    finally:
+        removal["elapsed_seconds"] = time.monotonic() - started
+
+
 def cleanup_owned(process, close_window, temporary_directory, report):
     """Finish owned processes before deleting paths, retaining the first error."""
     cleanup = {"process_exited": process is None, "temporary_directory_removed": temporary_directory is None}
@@ -396,15 +433,20 @@ def cleanup_owned(process, close_window, temporary_directory, report):
         except Exception as error:
             cleanup["process_error"] = repr(error)
             report["passed"] = False
-    # Windows locks a process's current directory until it exits. Dispose
-    # the owned process before removing its directory on every exit path.
+    # Windows may briefly retain a sharing lock after the owned process exits.
+    # Never delete its directory until that exit has actually been observed.
     if temporary_directory:
-        try:
-            temporary_directory.cleanup()
-            cleanup["temporary_directory_removed"] = not Path(temporary_directory.name).exists()
-        except Exception as error:
-            cleanup["directory_error"] = repr(error)
-            report["passed"] = False
+        if cleanup["process_exited"]:
+            try:
+                remove_owned_directory(temporary_directory, cleanup)
+            except Exception as error:
+                cleanup["directory_error"] = repr(error)
+                report["passed"] = False
+        else:
+            cleanup["directory_removal"] = {
+                "attempts": 0, "elapsed_seconds": 0.0, "retry_timeout_seconds": 2.0,
+                "skipped": "owned process exit was not confirmed",
+            }
     if not cleanup["process_exited"] or not cleanup["temporary_directory_removed"]:
         report["passed"] = False
 
@@ -657,7 +699,9 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         if expected_arch is not None:
             assert architecture == expected_arch, f"expected {expected_arch}; runner is {architecture}"
         checks.append({"name": "native_python_and_binary_architecture", "passed": True})
-        temporary_directory = tempfile.TemporaryDirectory(prefix="ztty native 图像 ")
+        # Only cleanup_owned may delete it, after confirming the owned exit.
+        # A finalizer must not try again behind a still-running failed child.
+        temporary_directory = tempfile.TemporaryDirectory(prefix="ztty native 图像 ", delete=False)
         directory = Path(temporary_directory.name)
         clean_environment = os.environ.copy()
         clean_environment["APPDATA"] = str(directory / "missing-parent" / "config")

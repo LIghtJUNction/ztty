@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-summary",
+  "run_id": 44315250297,
+  "job_id": 134839617507,
+  "source_sha": "504fa770a97069e32bed4d8f45616066d5c4dbc5",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "architecture": "aarch64",
+  "status": "failed",
+  "passed": false,
+  "binary_sha256": "4befb1f54d92b7151cee56b9787915125390a3e9acbbb3405e43c19c11a181f1",
+  "cold_start_runs": {
+    "required": 8,
+    "completed": 3,
+    "attempted": 4,
+    "runs": [
+      {
+        "number": 1,
+        "report": "ztty-windows-aarch64.native.cold-01.json",
+        "report_sha256": "e90a28a17fc6ada131bbec5637a7f4aeb6a5decbc6f9f3c23dc729d82b3f3e3b",
+        "passed": true,
+        "base_checks_passed": 31,
+        "rapid_resizes_passed": 10,
+        "application_pid": 2976,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0
+        }
+      },
+      {
+        "number": 2,
+        "report": "ztty-windows-aarch64.native.cold-02.json",
+        "report_sha256": "e10e21ece3f26f47f291355c16b7fd683e6450f08b1a45e444c8d8e5e356b916",
+        "passed": true,
+        "base_checks_passed": 31,
+        "rapid_resizes_passed": 10,
+        "application_pid": 764,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0
+        }
+      },
+      {
+        "number": 3,
+        "report": "ztty-windows-aarch64.native.cold-03.json",
+        "report_sha256": "b270460fee0c4cbc8cec6d7f0ed759cd8fa61effd6a51cd397030d382d6fbcfd",
+        "passed": true,
+        "base_checks_passed": 31,
+        "rapid_resizes_passed": 10,
+        "application_pid": 8144,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": true,
+          "returncode": 0
+        }
+      },
+      {
+        "number": 4,
+        "report": "ztty-windows-aarch64.native.cold-04.json",
+        "report_sha256": "dbd66ef115388cac083960bf211afbac5e78cdda3d038e5ebff292732371a4e8",
+        "passed": false,
+        "base_checks_passed": 31,
+        "rapid_resizes_passed": 10,
+        "application_pid": 3256,
+        "cleanup": {
+          "process_exited": true,
+          "temporary_directory_removed": false,
+          "returncode": 0,
+          "directory_error": "PermissionError(13, 'The process cannot access the file because it is being used by another process')"
+        }
+      }
+    ]
+  },
+  "failure": "cold start 4 passed all native pixel checks but its temporary directory remained locked after the owned application exited with code 0",
+  "workspace": "not_entered",
+  "desktop_elapsed_seconds": 5.926,
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-1684-5170d8c373b3475e8b368f5ec7de2f81",
+    "input_after_restore": "Default"
+  },
+  "worker_exit_code": 1,
+  "artifact": {
+    "artifact_id": 14431579513,
+    "artifact_zip_bytes": 875485,
+    "artifact_zip_sha256": "7cce108b6e601461531a86666c5910cfe497c6dd13ceb618828a2f096ad676c9",
+    "artifact_zip_sha256_verified": true,
+    "build_source_verified": true,
+    "native_binary_sha256_verified": true
+  },
+  "png_files_verified": 140,
+  "resize_png_samples_verified": 220,
+  "runtime_trace_enabled": false,
+  "diagnostic_retries": false,
+  "scope": "Original fixed-eight-cold-start gate. The cleanup failure remains a failure; later code changes cannot modify this record."
+}

@@ -547,7 +547,14 @@ impl App {
         (ok != 0 && read == core::mem::size_of::<u32>()).then_some(pixel)
     }
 
-    fn failure_snapshot(&mut self, x: i32, y: i32, dispatch_resize_pending: bool) -> isize {
+    fn failure_snapshot(
+        &mut self,
+        x: i32,
+        y: i32,
+        dispatch_resize_pending: bool,
+        dispatch_paint_pending: bool,
+        deferred_paints: u64,
+    ) -> isize {
         // Only an explicitly configured test process may write this one-shot
         // record. No path or pointer is accepted from a window message.
         let Some(path) = self.native_snapshot_path.take() else {
@@ -578,6 +585,7 @@ impl App {
         let before = format!(
             concat!(
                 "{{\"surface\":{{\"size\":[{},{}],\"clip\":[{},{},{},{}]}},\"cpu_rgb\":{},\"dispatch_resize_pending\":{},",
+                "\"dispatch_paint_pending\":{},\"deferred_paints\":{},",
                 "\"app_resize_pending\":{},\"full_redraw\":{},\"pane\":{},\"last_paint\":{{\"sequence\":{},",
                 "\"surface\":[{},{}],\"region\":[{},{},{},{}],\"blit\":{}}}}}"
             ),
@@ -589,6 +597,8 @@ impl App {
             self.surface.clip.height,
             rgb(cpu),
             dispatch_resize_pending,
+            dispatch_paint_pending,
+            deferred_paints,
             self.resize_pending,
             self.full_redraw,
             pane,
@@ -2426,10 +2436,18 @@ unsafe extern "system" fn window_proc(
     }
     let state = unsafe { &*pointer };
     if message == WM_NATIVE_SNAPSHOT && wparam == NATIVE_SNAPSHOT_MAGIC {
-        let pending = state.dispatch.resize_pending();
+        let resize_pending = state.dispatch.resize_pending();
+        let paint_pending = state.dispatch.paint_pending();
+        let deferred_paints = state.dispatch.deferred_paints();
         return state
             .with(|app| {
-                app.failure_snapshot(lparam as u16 as i32, (lparam >> 16) as u16 as i32, pending)
+                app.failure_snapshot(
+                    lparam as u16 as i32,
+                    (lparam >> 16) as u16 as i32,
+                    resize_pending,
+                    paint_pending,
+                    deferred_paints,
+                )
             })
             .unwrap_or(0);
     }
@@ -2454,7 +2472,14 @@ unsafe extern "system" fn window_proc(
             return Some(0);
         }
         match message {
-            WM_PAINT => app.paint(),
+            WM_PAINT => {
+                // A sent resize can precede this paint while the outer loop is
+                // still draining messages. Commit its latest client size first.
+                if state.dispatch.take_resize() && !app.panes.is_empty() {
+                    app.resize();
+                }
+                app.paint();
+            }
             0x0014 => return Some(1),
             WM_CLOSE => {
                 app.running = false;
@@ -2529,6 +2554,11 @@ unsafe extern "system" fn window_proc(
         }
         Some(0)
     });
+    if message == WM_PAINT && handled.is_none() {
+        // Default processing validates the region even though App could not
+        // paint. Retain the obligation and re-invalidate outside the guard.
+        state.dispatch.defer_paint();
+    }
     handled
         .flatten()
         .unwrap_or_else(|| unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) })
@@ -2709,11 +2739,17 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
         if !running {
             break;
         }
+        // Consume before entering Win32; a reentrant paint creates a fresh
+        // obligation for the next turn. Never call paint through an App borrow.
+        if state.dispatch.take_paint() && unsafe { ffi::InvalidateRect(hwnd, ptr::null(), 0) } == 0
+        {
+            state.dispatch.retry_paint();
+        }
         unsafe {
             ffi::UpdateWindow(hwnd);
         }
         let timeout = state.with(|app| app.wait_timeout()).unwrap_or(8);
-        let timeout = if state.dispatch.resize_pending() {
+        let timeout = if state.dispatch.resize_pending() || state.dispatch.paint_pending() {
             0
         } else {
             timeout
