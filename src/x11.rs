@@ -1549,6 +1549,7 @@ impl Window {
             );
         }
         let mut changed = force;
+        let mut damaged_start = None;
         for row in 0..rows {
             if !(force
                 || terminal.row_dirty(row)
@@ -1558,9 +1559,15 @@ impl Window {
                         .flatten()
                         .any(|((_, y), _)| y == row)))
             {
+                if let Some(start) = damaged_start.take() {
+                    self.publish_rows(start, row);
+                }
                 continue;
             }
             changed = true;
+            if !force {
+                damaged_start.get_or_insert(row);
+            }
             let y = self.padding + row as i32 * self.ch;
             let mut col = 0;
             while col < cols {
@@ -1695,22 +1702,11 @@ impl Window {
             if let Some(((column, _), shape)) = cursor.filter(|((_, y), _)| *y == row) {
                 self.draw_cursor(terminal, column.min(cols - 1), row, y, shape);
             }
-            // Publish complete rows from the retained pixmap; an expose can
-            // redraw without reparsing or moving terminal screen contents.
-            unsafe {
-                XCopyArea(
-                    self.display,
-                    self.pixmap,
-                    self.id,
-                    self.gc,
-                    0,
-                    y,
-                    self.width as u32,
-                    self.ch as u32,
-                    0,
-                    y,
-                );
-            }
+        }
+        // Submit adjacent damaged rows together. A forced frame is published
+        // once below, including padding, without redundant per-row copies.
+        if let Some(start) = damaged_start {
+            self.publish_rows(start, rows);
         }
         if force {
             unsafe {
@@ -1738,6 +1734,24 @@ impl Window {
         self.graphics_alternate = terminal.modes().alternate_screen;
         terminal.clear_dirty();
     }
+    fn publish_rows(&self, start: usize, end: usize) {
+        let y = self.padding + start as i32 * self.ch;
+        unsafe {
+            XCopyArea(
+                self.display,
+                self.pixmap,
+                self.id,
+                self.gc,
+                0,
+                y,
+                self.width as u32,
+                ((end - start) as i32 * self.ch) as u32,
+                0,
+                y,
+            );
+        }
+    }
+
     fn draw_cursor(
         &mut self,
         terminal: &Terminal,
