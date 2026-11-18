@@ -234,6 +234,91 @@ fn known_invalid_sequences_do_not_wait_for_output_that_cannot_repair_them() {
 }
 
 #[test]
+fn malformed_sequences_at_page_boundaries_always_make_progress() {
+    for bytes in [
+        b"\xe2X".as_slice(),
+        b"\xf0\x9fX",
+        b"\xe2\x82X",
+        b"\xc2\xc2\xa2",
+        b"\xe2\xe4\xb8\xad",
+        b"\xf0\x9f\xe2\x82\xac",
+        b"\xff\xe2X\xf0\x9f\xe4\xb8\xad\xf0\x9f\x9a\x80END",
+    ] {
+        let mut tail = OutputTail::new();
+        tail.append(bytes, false);
+        for eof in [false, true] {
+            for max in 1..=4 {
+                let mut cursor = 0;
+                let mut raw = Vec::new();
+                let mut text = String::new();
+                while cursor < bytes.len() as u64 {
+                    let page = tail.read(cursor, Some(max), eof).unwrap();
+                    assert!(
+                        page.next_cursor > cursor,
+                        "stalled: bytes={bytes:x?}, cursor={cursor}, max={max}, eof={eof}"
+                    );
+                    assert!(page.bytes.len() <= max as usize + 3);
+                    assert_eq!(page.next_cursor, cursor + page.bytes.len() as u64);
+                    assert_eq!(page.first_cursor, 0);
+                    assert!(!page.truncated);
+                    assert_eq!(page.has_more, page.next_cursor < bytes.len() as u64);
+                    text.push_str(&String::from_utf8_lossy(&page.bytes));
+                    raw.extend_from_slice(&page.bytes);
+                    cursor = page.next_cursor;
+                }
+                assert_eq!(raw, bytes);
+                assert_eq!(text, String::from_utf8_lossy(bytes));
+            }
+        }
+    }
+}
+
+#[test]
+fn page_lookahead_distinguishes_malformed_bytes_from_a_pending_suffix() {
+    let mut tail = OutputTail::new();
+    tail.append(b"\xe2X\xf0\x9f", false);
+    let malformed = tail.read(0, Some(1), false).unwrap();
+    assert_eq!(malformed.bytes, b"\xe2");
+    assert_eq!(malformed.next_cursor, 1);
+    let ascii = tail.read(1, Some(1), false).unwrap();
+    assert_eq!(ascii.bytes, b"X");
+    assert_eq!(ascii.next_cursor, 2);
+    for max in 1..=4 {
+        let pending = tail.read(2, Some(max), false).unwrap();
+        assert!(pending.bytes.is_empty() && pending.has_more);
+        assert_eq!(pending.next_cursor, 2);
+    }
+    tail.append(b"\x9a\x80END", false);
+    let completed = tail.read(2, Some(1), false).unwrap();
+    assert_eq!(completed.bytes, "🚀".as_bytes());
+    assert_eq!(completed.next_cursor, 6);
+    assert!(completed.has_more);
+    let independent = tail.read(0, None, false).unwrap();
+    assert_eq!(String::from_utf8_lossy(&independent.bytes), "�X🚀END");
+    assert_eq!(independent.next_cursor, 9);
+    assert!(!independent.has_more);
+}
+
+#[test]
+fn malformed_prefix_at_large_page_limits_does_not_stall_the_next_read() {
+    for max in [16384, 65536] {
+        let mut bytes = vec![b'a'; max - 1];
+        bytes.extend_from_slice(b"\xe2X");
+        let mut tail = OutputTail::new();
+        tail.append(&bytes, true);
+        let first = tail.read(0, Some(max as u64), false).unwrap();
+        assert_eq!(first.bytes.len(), max);
+        assert_eq!(first.bytes, &bytes[..max]);
+        assert_eq!(first.next_cursor, max as u64);
+        assert!(first.has_more && !first.truncated);
+        let last = tail.read(first.next_cursor, Some(1), false).unwrap();
+        assert_eq!(last.bytes, b"X");
+        assert_eq!(last.next_cursor, max as u64 + 1);
+        assert!(!last.has_more);
+    }
+}
+
+#[test]
 fn eof_flushes_an_incomplete_suffix_lossily_without_changing_byte_cursors() {
     let mut tail = OutputTail::new();
     tail.append(b"\xff\xe2\x82", false);
