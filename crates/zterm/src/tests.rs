@@ -333,7 +333,11 @@ fn cursor_restore_recovers_both_character_sets_and_the_active_selection() {
             t.feed(b"q\x0fq\x0eq");
             assert_eq!(
                 line(&t, 0),
-                if shifted { "─q─     " } else { "qq─     " },
+                if shifted {
+                    "─q─     "
+                } else {
+                    "qq─     "
+                },
                 "save={save:?}, shifted={shifted}"
             );
             assert!(!t.modes().alternate_screen);
