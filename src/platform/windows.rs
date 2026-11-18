@@ -16,13 +16,12 @@ use zterm::{
 use ztty::{
     actions,
     layout::{Axis, Layout, Rect},
+    native_resize as session_resize,
     session_core::{ReadStep, SessionCore},
 };
 
 #[path = "windows_frame.rs"]
 mod session_frame;
-#[path = "windows_resize.rs"]
-mod session_resize;
 #[path = "windows_wait.rs"]
 mod session_wait;
 

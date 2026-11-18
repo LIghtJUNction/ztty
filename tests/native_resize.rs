@@ -1,6 +1,5 @@
-//! Failure injection for the production Windows multi-PTY resize transaction.
-#[path = "../src/platform/windows_resize.rs"]
-mod resize;
+//! Failure injection for the production native multi-PTY resize transaction.
+use ztty::native_resize as resize;
 
 fn size(cols: u16) -> zpty::Size {
     zpty::Size::new(cols, 24)
