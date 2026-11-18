@@ -20,6 +20,17 @@ using the binary built from `3730b28` (SHA-256
 It checks real mouse gestures, history anchoring and read-only ownership. The
 earlier six-suite Linux candidate below predates this view change.
 
+The subsequent development-machine `ZTTY_BARE_METAL=1 make check` at fixed
+source `8a2f4bee22324685f2193e91a16744dda21d0df9` exited 0 after 271 ordinary
+Rust tests, 6 doctests and 8 separate SessionCore PTY checks. It also passed
+strict workspace Clippy, the release build, production dependency/symbol audits,
+17 installer checks, 11 Bash checks, the MCP suites and the portable-library
+`x86_64-unknown-none` check. Darwin native tests were explicitly skipped.
+[Source and exit status](measurements/experience-release-2026-11-18/scroll-prompt/full-check-8a.json)
+and the [full log](measurements/experience-release-2026-11-18/scroll-prompt/full-check-8a.log)
+retain the dependency future-compatibility warning. This local gate and the
+18-group GUI run have different source identities from the native candidates.
+
 ## Native candidate evidence by source
 
 [Run 44293476047](https://github.com/LIghtJUNction/ztty/actions/runs/44293476047)
@@ -94,6 +105,36 @@ verified, and the saved PNG samples reproduce the reported failure. Passing
 cleanup does not make the native gate pass. Linux and macOS were outside this
 Windows-only retry; their earlier results retain their recorded source scope.
 
+### Windows startup and history retries
+
+The next Windows-only candidates retained each original outcome:
+
+| Source and run | Native result on both x64 and ARM64 | Scope |
+| --- | --- | --- |
+| `8a2f4bee22324685f2193e91a16744dda21d0df9`, [44303751871](https://github.com/LIghtJUNction/ztty/actions/runs/44303751871) | Failed after 7 base checks: the child could not set its console input mode and reported `WinError 6` | The new host stderr capture exposed inherited redirected handles; resize and workspace checks were not reached |
+| `e334cf7ed6bb757f092ebabdcae5291c0d54b03a`, [44305368950](https://github.com/LIghtJUNction/ztty/actions/runs/44305368950) | Passed all 31 base checks, including redirected-host startup and original rapid resize; failed pane history after 5 workspace groups | The original rapid path used no runtime tracing or additional resize acknowledgements; both failed workspace runs cleaned up their owned processes |
+| `3418b82dcfa1b9323379e36aec0f3926371b0eb6`, [44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420) | Accepted: 31/31 base checks and 19/19 workspace groups per architecture | Original rapid resize, redirected-host startup, pane history/selection, keyboard routing, tabs, layout, hidden output and child cleanup passed; owned Job and desktop cleanup also passed |
+
+The `e334cf7` production fix explicitly gives ConPTY children console standard
+handles when the host's streams are redirected. The native regression redirects
+all three host streams, checks all three child console handles and their actual
+20×10 terminal size, and requires the child's output to stay out of the host's
+captured streams. The ordinary pixel run again inherits its original stdio;
+diagnostic capture remains separate.
+
+The `3418b82` fix changes viewport handling only when keyboard encoding produces
+no bytes. Releasing Shift after Shift+PageUp and using silent modifiers for pane
+focus now preserve history and selection. Both architectures retained the blue
+history sample `[0, 0, 255]` and selection `[34, 68, 102]`; real Enter input
+produced `0d` and restored the live red/green pane images. The native checks
+retain the original pixels and also verify that silent keys send no PTY input.
+
+Both `3418b82` jobs used `build_only=true` and `candidate_platform=windows`.
+The 31-check base run used no runtime tracing or staged resize acknowledgements;
+the diagnostic retry paths did not run. Its passing rapid-resize result is a
+source-bound observation, not proof of a particular cause for the earlier
+resize failures. Linux and macOS receive no new acceptance from these runs.
+
 These candidate records supply evidence for their source commits. Formal
 publication requires all six native architecture jobs to accept the exact
 final tagged source with `candidate_platform=all`.
@@ -118,6 +159,8 @@ the operating system, Python process and tested executable architectures.
 Its functional and visible-pixel checks include Sixel, working-directory and
 owned-window cleanup cases, with PNG captures on success and failure. Each
 architecture must execute these checks on its native Windows runner.
+The current Windows gate requires all 31 base checks and all 19 workspace
+groups; a passing base report cannot hide a workspace failure.
 
 Both Linux jobs run `tests/linux_native.py` against a clean, pinned checkout
 and the freshly built ELF. Its six suites cover workspace restore, daily
