@@ -1,9 +1,10 @@
 # ztty
 
-**0.3.1 is being prepared.** The source version awaits a new tagged Verify run
-and all six native architecture gates. Download only assets listed in the
+**ztty 0.3.1** adds familiar font zoom and tab switching on Linux and Windows,
+repairs Windows resize presentation, and strengthens terminal state and MCP
+session guards. Download published assets from the
 [official Releases](https://github.com/LIghtJUNction/ztty/releases).
-[Current preparation and earlier release history](docs/releasing.md#031-preparation).
+[Release gate and source-bound history](docs/releasing.md#031-release-gate).
 
 <!-- terminal-benchmark:start -->
 [![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
@@ -100,8 +101,10 @@ rapid-resize failure prevented publication, and the Release-by-tag API returned
 404. A later local Linux candidate, source `19274145`, was installed as
 `ztty 0.3.0-1`; that installation used different source and was not an official
 Release download. The [release record](docs/releasing.md) preserves both outcomes.
-The new `0.3.1` formal Verify, six-platform acceptance and official installation
-are still pending. macOS IME/keyboard input and physical display latency remain
+The complete `0.3.1` build-only candidate at `90ec70fe` passed all six native
+architecture jobs in [run 44365691692](https://github.com/LIghtJUNction/ztty/actions/runs/44365691692).
+Formal tag verification, published assets and device installation each have
+their own records. macOS IME/keyboard input and physical display latency remain
 outside the recorded native window checks.
 
 Windows preserves pane history and selection when silent modifier keys are
@@ -127,8 +130,8 @@ acceptance scopes.
 
 The examples below describe the current source tree. Release downloads follow
 the latest published [GitHub Release](https://github.com/LIghtJUNction/ztty/releases),
-not every Git tag; build from source for unreleased changes. The `0.3.1`
-preparation above does not make that version available to the installer yet.
+not every Git tag; build from source for unreleased changes. A source version
+number alone does not establish that downloadable assets have been published.
 
 On Arch Linux, install the AUR package with `yay -S ztty`. Other Linux
 distributions can install a prebuilt x86_64 or AArch64 binary with:

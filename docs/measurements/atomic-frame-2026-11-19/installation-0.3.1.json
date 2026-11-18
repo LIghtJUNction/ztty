@@ -1,0 +1,31 @@
+{
+  "installed_at_utc": "2026-11-18T19:19:16.954967+00:00",
+  "package": "ztty 0.3.1-2",
+  "binary_version": "ztty 0.3.1",
+  "binary_sha256": "6739a4f1d535ada1885cafed39a808cbe667cc527f83f19769d664be5597de07",
+  "package_sha256": "d8c2d70cc6e7e040853e8323e0c4de99b86a50eba684746302d3ed16ebe99d1c",
+  "source_commit": "4f7872bcd78df67431074c7ed3265c1f28bbed93",
+  "published_equivalent_commit": "cabeba6a7d74b36497e861febe5b7bb04d01c8ba",
+  "published_equivalent_tree": "a04fa0107313894f6f57ec1532b960250b510985",
+  "published_tree_matches_tested_tree": true,
+  "package_integrity": {
+    "files_checked": 9,
+    "files_altered": 0,
+    "command": "pacman -Qkk ztty"
+  },
+  "preexisting_process_count": 3,
+  "preexisting_processes_preserved": true,
+  "user_launchers_unchanged": true,
+  "private_rollback_package_verified": true,
+  "running_processes_hot_upgraded": false,
+  "broker_boundary": {
+    "checked_at_utc": "2026-11-18T19:22:05.442204+00:00",
+    "default_socket_listening": false,
+    "version_handshake_present": false,
+    "existing_broker_is_reused": true,
+    "legacy_v0_1_2_has_shared_broker_source": false,
+    "old_processes_in_same_network_namespace": true,
+    "effective_scope": "At verification no default broker was listening, so the next default launch forks the installed executable. Already running legacy windows retain their old code. If a broker is already listening, new launches reuse it without checking its executable version.",
+    "isolation_option": "Set ZTTY_SOCKET to an unused abstract Unix socket name when launching the installed binary to create an independent broker while preserving existing sessions."
+  }
+}

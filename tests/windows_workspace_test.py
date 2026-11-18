@@ -2,6 +2,7 @@
 """Portable failure contracts, never substitutes for native workspace pixels."""
 import copy
 import ctypes
+import errno
 import hashlib
 import json
 from pathlib import Path
@@ -12,6 +13,120 @@ from unittest.mock import patch
 
 import windows_desktop as desktop
 import windows_workspace_native as workspace
+
+
+class ProbeReadClock:
+    def __init__(self):
+        self.now, self.sleeps = 0.0, []
+
+    def monotonic(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.sleeps.append(seconds)
+        self.now += seconds
+
+
+class ProbeReadContract(unittest.TestCase):
+    def test_transient_windows_conflicts_return_exact_snapshot_and_record_retries(self):
+        for name, payload in (("state.json", b'{"pid":17,"cols":64,"rows":20}'),
+                              ("keyboard.bin", b"\x1b[6;19;9t\x00\xff")):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as temporary:
+                path = Path(temporary) / name
+                path.write_bytes(payload)
+                original_read, clock, calls, report = Path.read_bytes, ProbeReadClock(), [], {}
+                conflict = PermissionError(errno.EACCES, "owned snapshot sharing conflict", str(path))
+                conflict.winerror = 32
+                def read(current):
+                    calls.append(clock.now)
+                    if len(calls) < 3:
+                        raise conflict
+                    return original_read(current)
+                with (patch.object(workspace.sys, "platform", "win32"),
+                      patch.object(workspace.time, "monotonic", clock.monotonic),
+                      patch.object(workspace.time, "sleep", clock.sleep),
+                      patch.object(Path, "read_bytes", autospec=True, side_effect=read)):
+                    self.assertEqual(workspace.read_probe_bytes(path, report), payload)
+                self.assertEqual(clock.sleeps, [0.005, 0.005])
+                self.assertEqual(len(calls), 3)
+                event = report["probe_file_read_retries"][0]
+                self.assertEqual((event["attempts"], event["retries"], event["outcome"]), (3, 2, "read"))
+                self.assertEqual(event["path"], str(path))
+                self.assertEqual(event["first_error"], {"type": "PermissionError", "errno": errno.EACCES, "winerror": 32})
+                self.assertAlmostEqual(event["elapsed_seconds"], 0.01)
+                self.assertEqual(path.read_bytes(), payload)
+
+    def test_permanent_conflict_fails_without_starting_a_read_after_deadline(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path, clock, calls, report = Path(temporary) / "state.json", ProbeReadClock(), [], {}
+            conflict = PermissionError(errno.EACCES, "persistent owned snapshot conflict", str(path))
+            def read(current):
+                calls.append(clock.now)
+                raise conflict
+            with (patch.object(workspace.sys, "platform", "win32"),
+                  patch.object(workspace.time, "monotonic", clock.monotonic),
+                  patch.object(workspace.time, "sleep", clock.sleep),
+                  patch.object(Path, "read_bytes", autospec=True, side_effect=read),
+                  self.assertRaises(PermissionError) as raised):
+                workspace.read_probe_bytes(path, report)
+            self.assertIs(raised.exception, conflict)
+            self.assertGreater(len(calls), 1)
+            self.assertTrue(all(start < 1.0 for start in calls))
+            self.assertAlmostEqual(clock.now, 1.0)
+            self.assertAlmostEqual(sum(clock.sleeps), 1.0)
+            self.assertTrue(all(0 < delay <= 0.005 for delay in clock.sleeps))
+            event = report["probe_file_read_retries"][0]
+            self.assertEqual(event["attempts"], len(calls))
+            self.assertEqual(event["retries"], len(calls) - 1)
+            self.assertEqual(event["outcome"], "failed")
+            self.assertAlmostEqual(event["elapsed_seconds"], 1.0)
+
+    def test_non_windows_and_other_errors_are_not_retried(self):
+        unrecognized = PermissionError(errno.EACCES, "not an accepted sharing conflict")
+        unrecognized.winerror = 87
+        cases = [("linux", PermissionError(errno.EACCES, "denied")),
+                 ("win32", PermissionError(errno.EPERM, "not EACCES")),
+                 ("win32", unrecognized), ("win32", FileNotFoundError(errno.ENOENT, "absent")),
+                 ("win32", OSError(errno.EIO, "failed storage"))]
+        for platform, error in cases:
+            with self.subTest(platform=platform, error=repr(error)):
+                report = {}
+                with (patch.object(workspace.sys, "platform", platform),
+                      patch.object(workspace.time, "sleep") as sleep,
+                      patch.object(Path, "read_bytes", side_effect=error) as read,
+                      self.assertRaises(type(error)) as raised):
+                    workspace.read_probe_bytes(Path("state.json"), report)
+                self.assertIs(raised.exception, error)
+                read.assert_called_once_with()
+                sleep.assert_not_called()
+                self.assertEqual(report, {})
+
+    def test_json_corruption_is_not_hidden_or_retried(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            probe = workspace.Probe.__new__(workspace.Probe)
+            probe.path = Path(temporary)
+            probe.window = types.SimpleNamespace(report={})
+            (probe.path / "state.json").write_bytes(b'{"pid":17, broken')
+            with patch.object(workspace.time, "sleep") as sleep, self.assertRaises(json.JSONDecodeError):
+                probe.state()
+            sleep.assert_not_called()
+            self.assertEqual(probe.window.report, {})
+
+    def test_absent_probe_input_is_empty_but_denied_input_still_fails(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            probe = workspace.Probe.__new__(workspace.Probe)
+            probe.path = Path(temporary)
+            probe.window = types.SimpleNamespace(report={})
+            self.assertEqual(probe.input(), b"")
+            payload = b"possible-leaked-key\x1b[6;19;9t"
+            (probe.path / "keyboard.bin").write_bytes(payload)
+            self.assertEqual(probe.input(), payload)
+            denied = PermissionError(errno.EACCES, "denied keyboard snapshot")
+            with (patch.object(workspace, "read_probe_bytes", side_effect=denied),
+                  self.assertRaises(PermissionError) as raised):
+                probe.input()
+            self.assertIs(raised.exception, denied)
+            self.assertEqual(probe.window.report, {})
 
 
 def complete_report():
