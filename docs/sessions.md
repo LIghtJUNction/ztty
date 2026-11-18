@@ -254,3 +254,11 @@ UTF-8 cursor boundaries, creator environment isolation, namespaced addressing,
 exit status and persistence. The GUI test covers shared-window behavior on
 a private Xvfb display. These shared-session tests exercise Linux X11/XWayland;
 native macOS and Windows frontends have their own acceptance records.
+
+## Split output and byte cursors
+
+Output reads preserve an incomplete UTF-8 suffix until its remaining bytes or EOF
+arrive, including when earlier bytes are malformed. A returned cursor counts
+raw bytes. A nonadvancing cursor with has_more=true can mean an incomplete
+character, so wait before retrying it. Independent observers do not consume one
+another's cursor. See [the bounded output contract and real PTY regression](session-core.md#bounded-output-and-independent-byte-cursors).

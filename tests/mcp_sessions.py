@@ -138,6 +138,43 @@ time.sleep(30)
             "received_bytes": observed["received"], "sha256": observed["sha256"],
             "queue_full_before_reacquire": True}
 
+
+def invalid_prefix_split_utf8(client, directory, sessions):
+    """Malformed earlier bytes must not consume a later unfinished codepoint."""
+    ready = pathlib.Path(directory) / "invalid-prefix-ready"
+    resume = pathlib.Path(directory) / "invalid-prefix-resume"
+    child = r'''import os,pathlib,sys,time
+os.write(1,b"\xff\xf0\x9f")
+pathlib.Path(sys.argv[1]).touch()
+while not pathlib.Path(sys.argv[2]).exists(): time.sleep(.01)
+os.write(1,b"\x9a\x80END")
+'''
+    created = client.tool("session_create", {
+        "name": "invalid-prefix-utf8", "history": 0,
+        "command": ["python3", "-c", child, str(ready), str(resume)],
+    })
+    uri = created["uri"]
+    sessions.append(uri)
+    deadline = time.monotonic() + 5
+    partial = None
+    while time.monotonic() < deadline:
+        partial = client.tool("session_read", {"session": uri, "max_bytes": 65536})
+        if ready.exists() and (partial["has_more"] or partial["next_cursor"]):
+            break
+        time.sleep(.01)
+    assert partial is not None and partial["running"], partial
+    assert partial["output"] == "\ufffd" and partial["next_cursor"] == 1, partial
+    assert partial["has_more"] and not partial["truncated"], partial
+    pending = client.tool("session_read", {"session": uri, "cursor": 1, "max_bytes": 1})
+    assert pending["output"] == "" and pending["next_cursor"] == 1 and pending["has_more"], pending
+    resume.touch()
+    suffix, cursor, finished = collect(client.tool, uri, cursor=1, byte_limit=1, exited=True)
+    assert suffix == "🚀END" and cursor == 8 and finished["exit_code"] == 0, (suffix, cursor, finished)
+    client.tool("session_close", {"session": uri})
+    sessions.remove(uri)
+    return {"status": "passed", "initial_cursor": 1, "final_cursor": cursor,
+            "output": partial["output"] + suffix}
+
 def main(binary):
     os.environ["ZTTY_SOCKET"] = f"@ztty-mcp-sessions-{os.getpid()}"
     os.environ["ZTTY_MCP_SMOKE"] = f"真实-{os.getpid()}-🛰"
@@ -186,6 +223,8 @@ def main(binary):
             stdio.tool("session_close", {"session": split["uri"]})
             sessions.remove(split["uri"])
             report["split_pty_utf8"] = "passed"
+            report["invalid_prefix_split_utf8"] = invalid_prefix_split_utf8(
+                stdio, directory, sessions)
 
             http = HttpServer(binary)
             sid = http.initialize()
