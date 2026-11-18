@@ -59,7 +59,7 @@ the verified scope and the remaining native runtime work.
 
 | Platform | Native implementation | Current acceptance status |
 | --- | --- | --- |
-| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 7a1d06b passed five GUI suites on ARM64; x86_64 passed four suites and cwd regressions at 81c1c06; the latest x86_64 job is pending |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 7a1d06b passed five GUI suites and cwd regressions on both native x86_64 and ARM64 under guarded Xvfb |
 | macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Both architectures previously passed 12 protocol/startup checks; the latest pixel helper stopped at Swift compilation, with a method-call correction awaiting native rerun |
 | Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | Source 7a1d06b passed all 30 functional checks, 19 visible-pixel checks and full process/desktop cleanup on native x64 and ARM64 |
 

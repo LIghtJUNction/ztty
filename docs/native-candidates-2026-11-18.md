@@ -329,12 +329,11 @@ runner window remains untouched; the new evidence comes from the uniquely
 owned visible desktop. These checks accept the existing native frontend and
 shared SessionCore, not the still developing native Tabs/Splits feature.
 
-Linux ARM64 passes five native GUI suites: workspace 10, daily workflow 15,
+Linux x86_64 and ARM64 pass five native GUI suites each: workspace 10, daily workflow 15,
 Sixel 10, input 8 groups with 27 vectors, and repaint 7. All owned-process
-cleanup reports are empty. Its 30 nested evidence files were independently
-checked against the native manifest. Linux x86_64 is still installing its
-native dependencies at this checkpoint; the accepted fourth-run evidence
-remains separate.
+cleanup reports are empty. Each archive contains 30 nested evidence files,
+independently checked against its native manifest. The x86_64 quiet-final-frame
+PNG was reviewed and retains the final text after output becomes idle.
 
 Both macOS jobs stop while compiling the Swift helper, before running the
 native gate. `NSApplication.activationPolicy` was incorrectly used as a
@@ -347,16 +346,17 @@ reports correctly retain `status=not_run` and `pixel_readback=not_performed`.
 
 The [fifth-run record](measurements/native-fifth-run-2026-11-18.json) retains
 artifact IDs, ZIP and build-manifest hashes, checked member counts, exact
-Drive archive links, cleanup evidence and original compiler errors. All five
-available artifacts were verified against GitHub byte counts and SHA-256;
+Drive archive links, cleanup evidence and original compiler errors. All six
+artifacts were verified against GitHub byte counts and SHA-256;
 all build-manifest members and sidecars match. Failed Mac artifacts are
 explicitly named as helper-compilation failures. No Release was published.
 
 ## Remaining release gates
 
-The fifth run accepts both Windows architectures and Linux ARM64; both Linux
-architectures were accepted on the fourth source. The corrected macOS helper
-requires native compilation and pixel acceptance. Native Wayland, GPU/VRAM,
+The fifth run accepts both Windows and both Linux architectures. The corrected
+macOS helper is now queued in [run 44220056623](https://github.com/LIghtJUNction/ztty/actions/runs/44220056623),
+pinned to `ef3c2fc187a74aa6ce4eb7963b4d7d564f4dc969` in build-only mode.
+It still requires native compilation and pixel acceptance. Native Wayland, GPU/VRAM,
 macOS pixels/IME, physical input matrices and macOS/Windows shared sessions
 remain incomplete.
 Apple Developer ID/notarization and Windows signing have not been supplied.
