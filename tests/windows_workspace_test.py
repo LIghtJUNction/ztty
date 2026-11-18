@@ -161,7 +161,7 @@ class WorkspaceContract(unittest.TestCase):
                 return original(source, destination)
             with patch.object(Path, "replace", replace), patch.object(workspace.time, "sleep"):
                 workspace.write_json(path, {"pid": 123, "cwd": "会话"})
-            self.assertEqual(json.loads(path.read_text()), {"pid": 123, "cwd": "会话"})
+            self.assertEqual(json.loads(path.read_text(encoding="utf-8")), {"pid": 123, "cwd": "会话"})
             self.assertEqual(len(calls), 2)
             self.assertFalse(path.with_suffix(".json.tmp").exists())
 
