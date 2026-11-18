@@ -353,6 +353,25 @@ x64 的 8 个冷启动窗口进程、1 个工作区窗口进程及工作区 4 �
 
 本轮 5 个终端窗口进程及其临时目录全部清理，32 个独立对照进程全部退出，四个隔离 Job 清空并恢复原桌面。终端 worker 分别在 12.648 秒、14.682 秒以退出码 1 结束；对照 worker 分别在 1.096 秒、1.289 秒以退出码 0 结束。对照没有创建每进程临时目录，通用 cleanup 字段不能被解释为实际删除了 32 个目录。候选继续失败，本轮未发布或安装新正式版本。[x64 原始文件索引](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-x86_64/evidence-index.json) · [ARM64 原始文件索引](measurements/experience-release-2026-11-18/nccalc-control-44333731432/windows-aarch64/evidence-index.json)
 
+### 5.13. 默认位置创建并实际移动的对照：32 个进程通过，终端故障仍在
+
+源码 `ce176ffb96f6e000e71af88f8f8ce5395e085967` 的 [run 44335859956](https://github.com/LIghtJUNction/ztty/actions/runs/44335859956) 补齐了上一轮对照的定位证据：C 程序改用 `CW_USEDEFAULT` 创建，harness 保存移动前后的真实窗口矩形、可见状态、所有者与位移。两架构各 16 个对照进程均记录实际移动并通过指定缩放检查；终端原始门禁仍分别在第 5、第 4 次冷启动失败。Windows 前端源码与 `ab79d233…` 逐字节相同，本轮没有修改终端绘制策略；`paint_diagnostics_enabled=true`、`runtime_trace_enabled=false`，这些记录继续只用于诊断。[源码与结果索引](measurements/experience-release-2026-11-18/control-moved-44335859956/index.json)
+
+| 架构 | 终端原始结果 | 实际移动对照 | 图像与采样复核 |
+| --- | --- | --- | --- |
+| Windows x64 | 第 1–4 次各完成 31＋10＋10；第 5 次完成 23 项后，原红色恢复点为黑色 `[0,0,0]` | 16／16 通过，全部 `moved=true` | 终端 186 PNG／307 有效点；对照 48 PNG／144 点 |
+| Windows ARM64 | 第 1–3 次各完成 31＋10＋10；第 4 次完成 23 项后，同一点为灰色 `[20,20,20]` | 16／16 通过，全部 `moved=true` | 终端 141 PNG／232 有效点；对照 48 PNG／144 点 |
+
+本轮的“实际移动”有逐进程记录支持。每个架构的 16 份原始报告均核对了同一存活 PID／HWND 的移动前后几何、可见状态和非零位移；起点覆盖 `(26,26)`、`(52,52)`、`(78,78)`、`(104,104)`、`(130,130)`、`(156,156)`，最终外框都为 `[32,32,228,261]`。定位完成后，仍以原 `0x16` 标志执行 160×229→196×229 的 shrink／restore，并使用原像素要求。对照起点也覆盖了失败终端本轮的移前位置：x64 为 `(52,52)`，ARM64 为 `(156,156)`。[x64 对照摘要](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-x86_64/control-summary.json) · [ARM64 对照摘要](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-aarch64/control-summary.json) · [全部 32 次移动索引](measurements/experience-release-2026-11-18/control-moved-44335859956/index.json)
+
+这组结果补上了上一轮“固定坐标创建请求、没有移动前实测”的缺口。在本轮简化对照中，默认位置创建后进行真实可见移动没有复现终端错误；它仍使用独立的保留 DIB 绘制、默认有效区策略，且没有终端模型和 PTY 工作，绘制及消息时序没有与 ztty 逐项匹配。因此，可以收窄对照条件的差异，但还不能确定故障属于哪一层，也不能把对照通过当成已经排除全部系统路径。[新 C 程序](https://github.com/LIghtJUNction/ztty/blob/ce176ffb96f6e000e71af88f8f8ce5395e085967/tests/windows_resize_control.c) · [新定位 harness](https://github.com/LIghtJUNction/ztty/blob/ce176ffb96f6e000e71af88f8f8ce5395e085967/tests/windows_resize_control.py) · [对照边界](measurements/experience-release-2026-11-18/control-moved-44335859956/index.json)
+
+终端失败现场仍由原始检查决定。两架构失败进程都未进入其后的 warm／背靠背，后续冷启动和 workspace 也未执行；背景点 `(178,95)` 在 `EndPaint` 前的 target 记录正确，后来在原失败图变成黑色或灰色。空有效矩形已提交、显式 flush 未恢复原失败图、普通重画恢复画面的记录仍被保留；这些观测继续不提供红色验收点 `(175,28)` 的复制时刻像素，也没有把恢复后的画面提升为通过。[x64 原始失败](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-x86_64/ztty-windows-x86_64.native.cold-05.json) · [ARM64 原始失败](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-aarch64/ztty-windows-aarch64.native.cold-04.json)
+
+本轮新 C artifact 为 5,900 字节、150 个 CRLF 换行，仅归一化 CRLF 后与固定提交 `ce176ffb…` 的 5,750 字节源码逐字节一致；上一轮 `ab79d233…` 的旧源码和旧观察保持不变。32 份对照均由原始报告 SHA、source SHA、run ID、实际 EXE 与 C 文件 SHA 绑定，各架构的第一次完整对照报告还直接保存在精简证据目录中。[x64 对照原始报告](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-x86_64/ztty-windows-x86_64.resize-control.cold-01.json) · [ARM64 对照原始报告](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-aarch64/ztty-windows-aarch64.resize-control.cold-01.json) · [源码身份](measurements/experience-release-2026-11-18/control-moved-44335859956/index.json)
+
+9 个终端进程及其临时目录、32 个对照进程全部清理，四个隔离 Job 清空并恢复桌面。x64／ARM64 终端 worker 分别用时 17.331／16.278 秒、退出码均为 1；对照 worker 分别用时 0.836／1.250 秒、退出码均为 0。这些时间只记录本次运行，不作为性能比较。两个终端门禁仍然失败，本轮未取得正式发布或设备安装资格。[x64 文件身份与清理](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-x86_64/evidence-index.json) · [ARM64 文件身份与清理](measurements/experience-release-2026-11-18/control-moved-44335859956/windows-aarch64/evidence-index.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
