@@ -19,6 +19,8 @@ use ztty::{
     session_core::{ReadStep, SessionCore},
 };
 
+#[path = "windows_frame.rs"]
+mod session_frame;
 #[path = "windows_resize.rs"]
 mod session_resize;
 #[path = "windows_wait.rs"]
@@ -28,6 +30,7 @@ type Handle = *mut c_void;
 const NULL: Handle = ptr::null_mut();
 const WINDOW_STYLE: u32 = 0x00cf0000;
 const MAX_INPUT: usize = 8 * 1024 * 1024;
+const MAX_SURFACE_PIXELS: usize = 16 * 1024 * 1024;
 const GWLP_USERDATA: i32 = -21;
 const WM_PAINT: u32 = 0x000f;
 const WM_CLOSE: u32 = 0x0010;
@@ -81,7 +84,8 @@ impl Surface {
         if width == self.width && height == self.height {
             return true;
         }
-        if width <= 0 || height <= 0 || (width as u64) * (height as u64) > 16 * 1024 * 1024 {
+        if width <= 0 || height <= 0 || (width as u64) * (height as u64) > MAX_SURFACE_PIXELS as u64
+        {
             return false;
         }
         let info = ffi::BitmapInfo {
@@ -126,6 +130,35 @@ impl Surface {
         };
         self.fill(0, 0, width, height, 0);
         true
+    }
+    fn snapshot(
+        &self,
+        viewport: Rect,
+        budget: usize,
+    ) -> Result<session_frame::Snapshot, &'static str> {
+        if self.pixels.is_null() || self.width <= 0 || self.height <= 0 {
+            return Err("no committed workspace surface is available");
+        }
+        // CreateDIBSection requires the GDI queue to finish before CPU access.
+        unsafe {
+            ffi::GdiFlush();
+        }
+        let pixels = unsafe {
+            core::slice::from_raw_parts(self.pixels, self.width as usize * self.height as usize)
+        };
+        session_frame::Snapshot::capture(pixels, self.width as usize, viewport, budget)
+    }
+    fn restore_snapshot(&mut self, snapshot: &session_frame::Snapshot, viewport: Rect) {
+        if self.pixels.is_null() {
+            return;
+        }
+        unsafe {
+            ffi::GdiFlush();
+        }
+        let pixels = unsafe {
+            core::slice::from_raw_parts_mut(self.pixels, self.width as usize * self.height as usize)
+        };
+        snapshot.blit(pixels, self.width as usize, viewport);
     }
     fn fill(&mut self, x: i32, y: i32, width: i32, height: i32, rgb: u32) {
         if self.pixels.is_null() {
@@ -402,6 +435,7 @@ struct Pane {
     dragging: bool,
     graphics_revision: u64,
     sync_since: Option<u64>,
+    held_frame: Option<session_frame::Snapshot>,
     cursor_on: bool,
     blink_deadline: u64,
     last_cursor: (usize, usize),
@@ -433,6 +467,7 @@ impl Pane {
             dragging: false,
             graphics_revision: 0,
             sync_since: None,
+            held_frame: None,
             cursor_on: true,
             blink_deadline: os::milliseconds() + 500,
             last_cursor: (0, 0),
@@ -478,6 +513,8 @@ struct App {
     pending_key: Option<PendingKey>,
     suppress_char: bool,
     surrogate: u16,
+    mouse_capture: Option<(u64, u8)>,
+    cancelled_mouse_buttons: u8,
     title: String,
     focused: bool,
 }
@@ -557,6 +594,40 @@ impl App {
         Self::grid_size(cols, rows, fonts)
     }
 
+    fn preserve_held_frames(&mut self) -> Result<(), &'static str> {
+        let now = os::milliseconds();
+        for pane in &mut self.panes {
+            if pane.core.terminal.modes().synchronized_output {
+                let start = *pane.sync_since.get_or_insert(now);
+                if now.saturating_sub(start) >= 150 {
+                    pane.core.terminal.force_end_sync();
+                    pane.sync_since = None;
+                }
+            }
+            if !pane.core.terminal.modes().synchronized_output {
+                pane.held_frame = None;
+            }
+        }
+        let used: usize = self
+            .panes
+            .iter()
+            .filter_map(|pane| pane.held_frame.as_ref())
+            .map(session_frame::Snapshot::pixel_count)
+            .sum();
+        let mut remaining = MAX_SURFACE_PIXELS.saturating_sub(used);
+        for pane in &mut self.panes {
+            if pane.visible
+                && pane.core.terminal.modes().synchronized_output
+                && pane.held_frame.is_none()
+            {
+                let frame = self.surface.snapshot(pane.rect, remaining)?;
+                remaining -= frame.pixel_count();
+                pane.held_frame = Some(frame);
+            }
+        }
+        Ok(())
+    }
+
     /// Coordinate all live PTYs before committing any terminal grid/view/font.
     /// Failed compensation is tracked by pty_size; that pane's output is held
     /// in zpty's bounded queue until a retry restores a matching parser grid.
@@ -570,11 +641,22 @@ impl App {
         let width = client.right.max(1);
         let height = client.bottom.max(1);
         let changed = self.surface.width != width || self.surface.height != height;
+        let placements = layout.placements(width, height);
+        let geometry_changed = changed
+            || self.pending_fonts.is_some()
+            || self.panes.iter().any(|pane| {
+                let next = placements.iter().find(|(id, _)| *id == pane.id);
+                pane.visible != next.is_some() || next.is_some_and(|(_, rect)| pane.rect != *rect)
+            });
+        if geometry_changed || self.full_redraw {
+            // Do this before replacing the DIB or changing pane coordinates.
+            // Repeated resizes keep the original committed snapshot.
+            self.preserve_held_frames()?;
+        }
         if !self.surface.resize(width, height) {
             return Err("cannot allocate the Windows workspace surface");
         }
         self.full_redraw |= changed;
-        let placements = layout.placements(width, height);
         let fonts = self.pending_fonts.as_ref().unwrap_or(&self.fonts);
         let mut plan = Vec::with_capacity(self.panes.len());
         for pane in &self.panes {
@@ -648,7 +730,7 @@ impl App {
             .position(|pane| pane.id == self.layout.focused)
             .unwrap_or(0);
         self.resize_pending = false;
-        self.full_redraw = true;
+        self.full_redraw |= geometry_changed;
         self.caption_dirty = true;
         if old_focus != self.panes.get(self.active).map(|pane| pane.id) {
             if let Some(old) =
@@ -657,7 +739,6 @@ impl App {
                 let bytes =
                     input::encode_focus(false, &self.panes[old].core.terminal.modes().input());
                 self.panes[old].core.input.push(&bytes);
-                self.panes[old].dragging = false;
             }
             for (held, intercepted) in self.held.iter_mut().zip(&mut self.intercepted) {
                 if held.take().is_some() {
@@ -667,17 +748,16 @@ impl App {
             self.pending_key = None;
             self.surrogate = 0;
             self.suppress_char = true;
-            unsafe {
-                ffi::ReleaseCapture();
-            }
+            self.cancel_mouse_capture(true);
             let bytes = input::encode_focus(
                 self.focused,
                 &self.panes[self.active].core.terminal.modes().input(),
             );
             self.panes[self.active].core.input.push(&bytes);
             self.reset_cursor();
-            self.ime_position();
         }
+        // Origin, cell metrics or viewport can change without cursor movement.
+        self.ime_position();
         unsafe {
             ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
         }
@@ -750,10 +830,9 @@ impl App {
             .unwrap_or(0);
         self.layout.remove(id);
         let pane = self.panes.remove(index);
-        if pane.dragging {
-            unsafe {
-                ffi::ReleaseCapture();
-            }
+        if pane.dragging || self.mouse_capture.is_some_and(|(owner, _)| owner == id) {
+            self.cancelled_mouse_buttons |= u8::from(pane.dragging);
+            self.cancel_mouse_capture(true);
         }
         drop(pane); // Waits cancel/join before its PTY closes its own process tree.
         if self.panes.is_empty() {
@@ -782,7 +861,6 @@ impl App {
             );
             self.panes[self.active].core.input.push(&bytes);
         }
-        self.full_redraw = true;
         self.resize_with_fonts(None);
         if focus_changed {
             self.reset_cursor();
@@ -977,6 +1055,9 @@ impl App {
                 }
             } else {
                 pane.sync_since = None;
+            }
+            if !pane.core.terminal.modes().synchronized_output {
+                pane.held_frame = None;
             }
             if pane.visible
                 && index == self.active
@@ -1375,6 +1456,23 @@ impl App {
         }
         for index in 0..self.panes.len() {
             let pane = &self.panes[index];
+            if pane.visible && pane.core.terminal.modes().synchronized_output {
+                if self.full_redraw {
+                    let rect = pane.rect;
+                    self.surface.clip = rect;
+                    self.surface.fill(
+                        rect.x,
+                        rect.y,
+                        rect.width,
+                        rect.height,
+                        self.appearance.theme.background,
+                    );
+                    if let Some(frame) = &pane.held_frame {
+                        self.surface.restore_snapshot(frame, rect);
+                    }
+                }
+                continue;
+            }
             if pane.visible
                 && !pane.core.terminal.modes().synchronized_output
                 && (self.full_redraw || pane.dirty || pane.core.terminal.dirty())
@@ -1588,7 +1686,31 @@ impl App {
             self.reset_cursor();
         }
     }
+    fn cancel_mouse_capture(&mut self, release: bool) {
+        if let Some((_, buttons)) = self.mouse_capture.take() {
+            self.cancelled_mouse_buttons |= buttons;
+        }
+        for pane in &mut self.panes {
+            if pane.dragging {
+                self.cancelled_mouse_buttons |= 1;
+                pane.dragging = false;
+            }
+        }
+        if release {
+            unsafe {
+                ffi::ReleaseCapture();
+            }
+        }
+    }
     fn mouse(&mut self, message: u32, wparam: usize, lparam: isize) {
+        if let Some((button, pressed)) = mouse_button(message) {
+            let bit = 1 << button;
+            let cancelled = self.cancelled_mouse_buttons & bit != 0;
+            self.cancelled_mouse_buttons &= !bit;
+            if !pressed && cancelled {
+                return;
+            }
+        }
         let mut point = ffi::Point {
             x: lparam as i16 as i32,
             y: (lparam >> 16) as i16 as i32,
@@ -1605,7 +1727,12 @@ impl App {
                 && point.x < pane.rect.x.saturating_add(pane.rect.width)
                 && point.y < pane.rect.y.saturating_add(pane.rect.height)
         });
-        let index = if self.panes[self.active].dragging {
+        let capture = self
+            .mouse_capture
+            .and_then(|(id, _)| self.panes.iter().position(|pane| pane.id == id));
+        let index = if let Some(index) = capture {
+            index
+        } else if self.panes[self.active].dragging {
             self.active
         } else if let Some(index) = hit {
             index
@@ -1635,8 +1762,11 @@ impl App {
         }
         let (col, row) = self.cell_at(index, point.x, point.y);
         let mods = modifiers();
-        let app_tracking = self.panes[index].core.terminal.modes().mouse_tracking != 0
-            && !mods.contains(Modifiers::SHIFT);
+        let app_tracking = (self.panes[index].core.terminal.modes().mouse_tracking != 0
+            && !mods.contains(Modifiers::SHIFT))
+            || self
+                .mouse_capture
+                .is_some_and(|(owner, _)| owner == self.panes[index].id);
         let event = match message {
             0x0201 => Some(MouseEvent::Press {
                 button: 0,
@@ -1669,11 +1799,11 @@ impl App {
                 row,
             }),
             0x0200 => Some(MouseEvent::Motion {
-                button: if wparam & 1 != 0 {
+                button: if wparam & 1 != 0 && self.cancelled_mouse_buttons & 1 == 0 {
                     Some(0)
-                } else if wparam & 0x10 != 0 {
+                } else if wparam & 0x10 != 0 && self.cancelled_mouse_buttons & 2 == 0 {
                     Some(1)
-                } else if wparam & 2 != 0 {
+                } else if wparam & 2 != 0 && self.cancelled_mouse_buttons & 4 == 0 {
                     Some(2)
                 } else {
                     None
@@ -1689,6 +1819,13 @@ impl App {
             _ => None,
         };
         if app_tracking {
+            if let Some((button, true)) = mouse_button(message) {
+                let capture = self.mouse_capture.get_or_insert((self.panes[index].id, 0));
+                capture.1 |= 1 << button;
+                unsafe {
+                    ffi::SetCapture(self.hwnd);
+                }
+            }
             if let Some(event) = event {
                 self.encoded.clear();
                 input::encode_mouse_into(
@@ -1698,6 +1835,17 @@ impl App {
                     &mut self.encoded,
                 );
                 self.enqueue_encoded_for(index);
+            }
+            if let Some((button, false)) = mouse_button(message)
+                && let Some((_, buttons)) = self.mouse_capture.as_mut()
+            {
+                *buttons &= !(1 << button);
+                if *buttons == 0 {
+                    self.mouse_capture = None;
+                    unsafe {
+                        ffi::ReleaseCapture();
+                    }
+                }
             }
             return;
         }
@@ -1774,6 +1922,18 @@ impl App {
                 1,
             );
         }
+    }
+}
+
+fn mouse_button(message: u32) -> Option<(u8, bool)> {
+    match message {
+        0x0201 => Some((0, true)),
+        0x0202 => Some((0, false)),
+        0x0204 => Some((2, true)),
+        0x0205 => Some((2, false)),
+        0x0207 => Some((1, true)),
+        0x0208 => Some((1, false)),
+        _ => None,
     }
 }
 
@@ -1965,6 +2125,7 @@ unsafe extern "system" fn window_proc(
                 } else {
                     app.held.fill(None);
                     app.intercepted.fill(false);
+                    app.cancel_mouse_capture(true);
                 }
             }
             WM_KEYDOWN | WM_KEYUP | WM_SYSKEYDOWN | WM_SYSKEYUP => {
@@ -1985,11 +2146,8 @@ unsafe extern "system" fn window_proc(
                 }
             }
             0x0200..=0x020a => app.mouse(message, wparam, lparam),
-            0x0215 => {
-                for pane in &mut app.panes {
-                    pane.dragging = false;
-                }
-            }
+            0x001f => app.cancel_mouse_capture(true),
+            0x0215 => app.cancel_mouse_capture(false),
             0x02e0 => {
                 let dpi = wparam as u16 as u32;
                 let candidate = Fonts::new(app.surface.dc, &app.appearance.font, dpi).ok();
@@ -2094,6 +2252,8 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             pending_key: None,
             suppress_char: false,
             surrogate: 0,
+            mouse_capture: None,
+            cancelled_mouse_buttons: 0,
             title: String::new(),
             focused: false,
         }),
