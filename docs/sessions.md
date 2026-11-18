@@ -177,10 +177,27 @@ versions. It supports `2025-11-25`, `2025-06-18` and
 | `session_read` | `session`; optional `cursor`, `max_bytes`, `expected_session`, `wait_ms` | Output page, screen snapshot, next cursor, `output_eof` and state; positive waits also return `timed_out` |
 | `session_commands` | `session` | At most 128 OSC 133 records, exit status and availability |
 | `session_command_read` | `session`, `command_id`; optional `part`, `max_bytes` | Rendered command input/output, `complete` and `truncated` |
-| `session_write` | `session`, `data` | Queued input and session state |
-| `session_resize` | `session`, `cols`, `rows` | Updated PTY and screen dimensions |
-| `session_close` | `session` | Closed session metadata |
-| `session_control` | `session`, `action`; optional `takeover` | Acquire/release input ownership; takeover is explicit |
+| `session_write` | `session`, `data`; optional `expected_session` | Queued input and session state |
+| `session_resize` | `session`, `cols`, `rows`; optional `expected_session` | Updated PTY and screen dimensions |
+| `session_close` | `session`; optional `expected_session` | Closed session metadata |
+| `session_control` | `session`, `action`; optional `takeover`, `expected_session` | Acquire/release input ownership; takeover is explicit |
+
+### Guarding session changes
+
+`session_write`, `session_resize`, `session_control` and `session_close` accept
+the same optional `expected_session` object as `session_read`. Copy `uri`,
+`id`, `created_at` and `broker_pid` from the session you intend to change.
+The broker checks all four fields before queuing input, resizing the PTY,
+changing its owner or closing it. If a name or URI was reused, the mutation
+returns the tool error `session identity changed; refresh session metadata`
+and leaves the replacement session unchanged.
+
+The guard also works with a short-name selector; its `uri` field remains the
+canonical creation URI. Omitting the guard preserves existing behavior and
+selects the session currently matching that name. These public identifiers
+do not grant input ownership. A matching guard does not deduplicate requests:
+sending a write twice still delivers its bytes twice. After a mismatch, inspect
+the replacement before deciding whether a previously planned action still applies.
 
 ### Observation and input ownership
 
