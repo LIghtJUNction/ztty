@@ -3258,8 +3258,14 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
         return Err("cannot create a native Windows window");
     }
     let dark = 1i32;
+    // Keep standard Win32 decorations while isolating the retained GDI client
+    // from the separate DWM nonclient rendering path.
+    let nonclient_policy = 1i32; // DWMNCRP_DISABLED
     unsafe {
         ffi::DwmSetWindowAttribute(hwnd, 20, (&dark as *const i32).cast(), 4);
+        if ffi::DwmSetWindowAttribute(hwnd, 2, (&nonclient_policy as *const i32).cast(), 4) < 0 {
+            os::print(2, b"ztty: native window frame policy unavailable\n");
+        }
         ffi::ShowWindow(hwnd, 5);
     }
     state.with(App::resize);

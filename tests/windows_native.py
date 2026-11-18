@@ -128,15 +128,16 @@ class BitmapInfo(ctypes.Structure):
     _fields_ = [("header", BitmapInfoHeader), ("colors", ctypes.c_uint32 * 1)]
 
 
-def capture_window(user, gdi, hwnd, expected_pid, path):
-    """Capture only our client DC; save the actual BitBlt/GetDIBits pixels."""
+def capture_window(user, gdi, hwnd, expected_pid, path, include_frame=False):
+    """Capture an owned client DC, or its full frame for appearance review."""
     owner = wintypes.DWORD()
     user.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
     if owner.value != expected_pid:
         raise AssertionError("refusing to capture a window owned by another process")
     rect = wintypes.RECT()
-    if not user.GetClientRect(hwnd, ctypes.byref(rect)):
-        raise OSError("GetClientRect failed during window capture")
+    get_rect = user.GetWindowRect if include_frame else user.GetClientRect
+    if not get_rect(hwnd, ctypes.byref(rect)):
+        raise OSError("window dimensions unavailable during capture")
     width, height = rect.right - rect.left, rect.bottom - rect.top
     if not (0 < width <= 8192 and 0 < height <= 8192 and width * height <= 16 * 1024 * 1024):
         raise AssertionError(f"invalid native capture dimensions: {width}x{height}")
@@ -158,7 +159,10 @@ def capture_window(user, gdi, hwnd, expected_pid, path):
     gdi.DeleteObject.restype = wintypes.BOOL
     gdi.DeleteDC.argtypes = [wintypes.HDC]
     gdi.DeleteDC.restype = wintypes.BOOL
-    dc = user.GetDC(hwnd)
+    if include_frame:
+        user.GetWindowDC.argtypes = [wintypes.HWND]
+        user.GetWindowDC.restype = wintypes.HDC
+    dc = user.GetWindowDC(hwnd) if include_frame else user.GetDC(hwnd)
     if not dc:
         raise OSError("GetDC failed during window capture")
     memory = bitmap = previous = None
@@ -201,7 +205,8 @@ def capture_window(user, gdi, hwnd, expected_pid, path):
         path.write_bytes(encoded)
         return {"path": str(path), "width": width, "height": height, "window_pid": owner.value,
                 "sha256": hashlib.sha256(encoded).hexdigest(),
-                "capture": "owned Win32 client DC via BitBlt/GetDIBits"}
+                "capture": ("owned Win32 window DC including nonclient frame via BitBlt/GetDIBits"
+                            if include_frame else "owned Win32 client DC via BitBlt/GetDIBits")}
     finally:
         if previous and memory:
             gdi.SelectObject(memory, previous)
@@ -1207,6 +1212,13 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         assert burst["completed"] == burst["required"] == 10
         burst["passed"] = True
         assert process.poll() is None, "ztty exited unexpectedly"
+        # Read only after every original pixel/resize requirement has passed.
+        # Normal acceptance never changes the application's window policy.
+        report["final_dwm_state"] = dwm_state()
+        assert report["final_dwm_state"].get("nonclient_rendering") == {"hresult": 0, "value": 0}, \
+            "the native GDI window did not retain its nonclient rendering policy"
+        report["window_frame"] = capture_window(user, gdi, hwnd, process.pid,
+            output.with_name(output.stem + ".window-frame.png"), include_frame=True)
         report["passed"] = True
     except BaseException as error:
         report["passed"] = False
