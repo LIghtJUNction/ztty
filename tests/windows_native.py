@@ -515,6 +515,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
     report = {"platform": sys.platform, "binary": str(binary.resolve()),
               "transport": "real ConPTY", "renderer": "Win32 retained DIB",
               "runtime_trace_enabled": trace_runtime,
+              "paint_diagnostics_enabled": os.environ.get("ZTTY_NATIVE_PAINT_DIAGNOSTICS") == "1",
               "resize_path": "staged" if staged_resize else "rapid",
               "rapid_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
               "back_to_back_resize_repetitions": {"required": 10, "completed": 0, "passed": False, "iterations": []},
