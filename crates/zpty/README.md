@@ -7,10 +7,48 @@ Version 0.2 adds macOS PTYs and a Windows ConPTY implementation. The caller owns
 | Platform | Session API | Readiness | System boundary |
 | --- | --- | --- | --- |
 | Linux | `unsafe Pty::spawn` | `Pty::fd()` for poll/epoll | C runtime and `libutil` |
-| macOS | `unsafe Pty::spawn` | `Pty::fd()` for poll/kqueue | Darwin C runtime |
+| macOS | `Pty::spawn_with_helper`; legacy `unsafe Pty::spawn` | `Pty::fd()` for poll/kqueue | Darwin C runtime |
 | Windows 10 build 17763+ | `Pty::spawn_utf16` | `output_event()` and `process_event()` for native wait sets | ConPTY and Win32 worker threads |
 
-## Linux and macOS
+## macOS hosts with active threads
+
+Use `Pty::spawn_with_helper` when the host may already have threads, including AppKit workers. The executable must call `run_spawn_helper` before configuration, cwd changes, UI initialization or starting its own threads. Ordinary launches return immediately from that entry; a helper launch configures the terminal and replaces itself with the requested program.
+
+```rust,no_run
+# #[cfg(target_os = "macos")] {
+use std::ffi::{CStr, CString};
+use std::os::unix::ffi::OsStrExt;
+use zpty::{Pty, Size};
+
+// At executable entry, before host initialization:
+let owned: Vec<CString> = std::env::args_os()
+    .map(|argument| CString::new(argument.as_bytes()).unwrap())
+    .collect();
+let arguments: Vec<&CStr> = owned.iter().map(CString::as_c_str).collect();
+zpty::run_spawn_helper(&arguments);
+
+// This operation can also run later, after host worker threads have started.
+let helper = zpty::current_executable().unwrap();
+let pty = Pty::spawn_with_helper(
+    &helper,
+    c"/bin/sh",
+    &[c"sh", c"-c", c"printf hello"],
+    &[c"PATH=/usr/bin:/bin", c"TERM=xterm-256color"],
+    Size::new(80, 24),
+).unwrap();
+// Register pty.fd() with the host's native event loop.
+# }
+```
+
+`current_executable` uses the kernel-reported absolute executable path, independent of argv[0] or cwd. Darwin's `posix_spawn` starts a fresh image with a new session; the helper establishes its controlling terminal, foreground group and initial dimensions before executing the target. Arguments and the complete environment retain their original bytes. A successful helper becomes the target with the same child PID.
+
+The parent receives real spawn, terminal-setup and exec errors through a private close-on-exec pipe. A fixed ready frame must arrive before EOF is accepted as exec handoff. The handshake has a five-second deadline after `posix_spawn` returns; failure closes the descriptors and cleans up only the directly owned child. Kernel creation and kill/reap completion are not hard-real-time bounded. The caller must retain exclusive child-reaping ownership and must not enable automatic SIGCHLD reaping.
+
+All private descriptors are moved above fd 2 before standard-stream file actions. `POSIX_SPAWN_CLOEXEC_DEFAULT` excludes unrelated and concurrent-spawn descriptors. Darwin's `pipe` followed by `fcntl` has a short close-on-exec setup gap; unrelated foreign fork/exec code must manage its own inheritance policy. This guarantee is specific to the new API and does not change the unsafe legacy constructor's contract.
+
+The native `cargo test --locked -p zpty --test darwin_spawn` gate checks Apple SDK ABI declarations, active worker threads, concurrent spawns, controlling-terminal semantics, exact argv/environment, dimensions, descriptor inheritance, errors, timeout, reaping and all seven initially closed-stdio combinations. It requires real macOS; cross-target checks and the non-macOS skip are not native acceptance.
+
+## Legacy fork-based Linux and macOS constructor
 
 Supply a resolved executable path, argv including argv[0], a complete environment, and descriptors that must be closed in the child. Argument pointer arrays are prepared before the fork. After `forkpty` returns, the child uses only `close`, `execve`, `write`, and `_exit`; it does not allocate Rust memory or search PATH.
 

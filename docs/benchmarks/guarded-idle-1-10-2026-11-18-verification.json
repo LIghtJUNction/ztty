@@ -1,0 +1,1062 @@
+{
+  "ok": true,
+  "started_at": "2026-11-17T23:18:25.049047+00:00",
+  "source_commit": "fa2f2017b2c54ede7887de4e3ae05d63582efbff",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/observer-watch-candidate-ztty",
+  "binary_sha256": "a339a7d258ad313379b5cfea40d8b125aa8c810ecaebd40005b489413a1b6d4d",
+  "command": [
+    "/usr/bin/python3",
+    "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tools/benchmark_terminals.py",
+    "--ztty",
+    "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/observer-watch-candidate-ztty",
+    "--counts",
+    "1,10",
+    "--modes",
+    "shared",
+    "--workloads",
+    "idle",
+    "--apps",
+    "ztty,ghostty,kitty",
+    "--repetitions",
+    "3",
+    "--purpose",
+    "comparison",
+    "--no-readme",
+    "--json",
+    "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/docs/benchmarks/guarded-idle-1-10-2026-11-18.json",
+    "--svg",
+    "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/docs/benchmarks/guarded-idle-1-10-2026-11-18.svg"
+  ],
+  "publication": "New raw evidence only; README and historical reports untouched.",
+  "binary_bytes": 676936,
+  "production_source_sha256": {
+    "Cargo.lock": "77826a3a1dd20d8d896b291e28fb795aa1e82ce07af8bbcbf8a29bcc8fdb35ac",
+    "Cargo.toml": "6158a5d4fb5e2e1fc444acd21ee4e3b7545f02dcebc6e890176007313f5483b1",
+    "crates/zgraphics/Cargo.toml": "4bbc49452d1e6ee1666278c412a255038e43977997b6451f520bf0818fcb98e0",
+    "crates/zgraphics/LICENSE": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+    "crates/zgraphics/README.md": "8a9a225612a40249b30faff2f847545ce20f8271f837144ef3347f6e152159e1",
+    "crates/zgraphics/src/decode.rs": "ef7c165b1d53c5154c5b739da312089b4f9697022c357bb0c0430a034bab6f8d",
+    "crates/zgraphics/src/lib.rs": "6de28c07f898b929c5fc292ca6c9b86e332d5763afb4ea2746d0e2fd8d7acdae",
+    "crates/zgraphics/src/protocol.rs": "57f83c8496ffa8c8548168984f50895b4ea1c9cc2d07a4bc863043c42f006bf7",
+    "crates/zgraphics/src/sixel.rs": "94d893643d8147b3e98f5ad8b4d4c5e23366d106c6ff0077117a18bdd073c41f",
+    "crates/zgraphics/src/sixel_tests.rs": "dea926c857f5a2b6fa38567fdcf27512bba1a079c0aa5c9ecc8800febf61f196",
+    "crates/zgraphics/src/stream.rs": "ff36a13f3fef855b2304d3301c76a64563c8ccdd7bf1f2ee5c493057fa78a032",
+    "crates/zgraphics/src/tests.rs": "de32087e8313d0b459fbed937101c83ece7143a2215568bee5ff130c0eef2d97",
+    "crates/zgraphics/tests/data/adam7.png": "bd6ec7125c2cc6f58ece0d563465092d08c0cb61ef6ce37094e8bd90aa53cef3",
+    "crates/zgraphics/tests/data/gray-alpha.png": "a5f0df4664ccbe20e78ff7fdb36ff31196322c490375ae5a6055d35ebc97584b",
+    "crates/zgraphics/tests/data/gray.png": "d88558ab32a01e8eb055a7ca943bc3e9e26c8bd296eb52854400047ef21b9ec5",
+    "crates/zgraphics/tests/data/inflate-bomb.png": "622172ba76ba12d54c222dbbdd1d508df852edea5eef74cea6153e53e5a47f2a",
+    "crates/zgraphics/tests/data/large-inline-rgb.zlib": "bf9348d65798b046c1c8e3be51cdfa45ef82169fb91e86df9dcfa4a6a197afde",
+    "crates/zgraphics/tests/data/metadata.png": "c061ef1dbc3bbd8f8a2bc8ea4501a6ce437ee482b028b76402b83e7dd487e328",
+    "crates/zgraphics/tests/data/oversized.png": "529b5b992d1ad8849402782532ad73a9d85e5802738bbf6298ba401c669a95e5",
+    "crates/zgraphics/tests/data/palette.png": "bd09abaf98b2725ba2e405634cccf5372b131dddec0d2000e02eaa5c4bdbb7b1",
+    "crates/zgraphics/tests/data/rgb.png": "270e0f5225d10d622609824f83aab07b24ea4c11cbd5d7de0b6ef8b439c517bc",
+    "crates/zgraphics/tests/data/rgb.zlib": "3bb6995c3520cfc37fb25c328b3dc440f7569eaeaeb1dbd5137b43a85b065a27",
+    "crates/zgraphics/tests/data/rgba.png": "a19ac7ccc3307baa3c0664604822592018f5bb7883cd87fa455468c0468f639b",
+    "crates/zgraphics/tests/data/rgba16.png": "7b4022be6f177825d413802b52a97f3b811f980c4100ab76d42fdac13ccf4d36",
+    "crates/zinput/Cargo.toml": "978381a202ad8de932f2ca4962791ec61fb42df8991a39499e413be506399a26",
+    "crates/zinput/LICENSE": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+    "crates/zinput/README.md": "afe3ac04fc82f00f6f5dc313fe86c28eab44d3eb6b150782175c54971938467a",
+    "crates/zinput/src/lib.rs": "17e8083ea6ebf28ab2f53e46f010ae20a8ce08e11a0233ec88a09bb46db1b265",
+    "crates/zpty/Cargo.toml": "cdcb5dc7ea477cd04561e2747bc3fdeeb54333079e8cee881cc2a04ecc348553",
+    "crates/zpty/LICENSE": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+    "crates/zpty/README.md": "a0292eba305d1d5780db765c2a67bd56a14b1e7a74686452d91f10fcbc8d571e",
+    "crates/zpty/examples/capture.rs": "81ec57fea3be8f749acc70fa3376fe0f32330aee7565e0f90b4193ebe30b357e",
+    "crates/zpty/src/lib.rs": "22779be10924e40908394da8a8db28c02cbc32e15a05d915a5fd0e4d2d3d4d8f",
+    "crates/zpty/src/linux.rs": "e86cf63c2c5f398f1a9a2ca666976e7b82f3f882a591f1498c4a94c73cc5f0b7",
+    "crates/zpty/src/macos.rs": "67664cae0c8995ebbd361d45f9c916e12f46a014b904bb6061e2a0e2fd9a152d",
+    "crates/zpty/src/windows.rs": "fe69c05c6c4ebb07f254a8daf4d9dcb529185436a627551ddfea4cbf4625160e",
+    "crates/zterm/Cargo.toml": "9681ecdb6695b6a203df870e45473fb38b17cccb0312149b034dc44ebcdc7d40",
+    "crates/zterm/LICENSE": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+    "crates/zterm/README.md": "348af1f19fdd2afaaa6d1d98cb4fe0c06851b998006eca69a3cc59f7e4a050f1",
+    "crates/zterm/examples/benchmark.rs": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+    "crates/zterm/examples/shell_probe.rs": "2ff60541fd1c3aa561592339345f9d45333ac0e41ce7ad4388d04362e02d30f4",
+    "crates/zterm/examples/sixel_probe.rs": "ce3a3f532388dc4302dca510dad2dff3e8e234a07a47746ddf004d2a10ca4b98",
+    "crates/zterm/src/lib.rs": "29dc98d13fbbcee89ad0463436a46a5710ce0d4981337529643780ea397c9a4c",
+    "crates/zterm/src/screen.rs": "7b485d5c7223afd18d5db22f616205b3f19f30fa40fca3be399ba213ab133a11",
+    "crates/zterm/src/shell.rs": "a105b2971057d882f232257081e6f65c6088e6d4921d3521e87aeb8965586c4a",
+    "crates/zterm/src/shell_tests.rs": "8bd20c8f1818dcfb2f57a1841a13674f63d49d02d97ce7e7af57fee9833a2367",
+    "crates/zterm/src/sixel_tests.rs": "ae7537fa8984acb852fb679c434348e0b6456b606960ce6b792ed9cc271356e9",
+    "crates/zterm/src/terminal.rs": "a6add38c9f57d37c316458640120b10d7b2ed8334136552d631d55c8a3d55f28",
+    "crates/zterm/src/tests.rs": "15526330128581e127f0d3530772a5d07c4a97822c7e894da2aab1d84f6704b7",
+    "crates/zterm/src/theme_tests.rs": "c390f94a7c020000e0be5416dadf8799ab871f0b7d81a4fadec815193d092c91",
+    "rust-toolchain.toml": "2005a6440b4cf56de43085410f26315d73dece6d34a6d32920669f65f33062c4",
+    "shell/README.md": "2456e03f863b2b505a6bbcf322b3965448cb2cefd4b67c4bfe18f329821a5f7e",
+    "shell/ztty.bash": "bf76374fe6ca0ddafba2fac21949ffaf3e096e2a5d2c6385a3f0279987e3e73b",
+    "shell/ztty.fish": "7ed1b9a4b84e278b58ed396c70e21612ba4182b128c5109d5cbf860bbfe9193b",
+    "shell/ztty.nu": "edf23776b13e0f1dcd532952486a326c2f916bce8e59e9a182c15f4a51e16896",
+    "shell/ztty.zsh": "199012940a843ceeafa677eaf40a2e7f2aec288e0c7ffd93e5f4bbc979caac96",
+    "src/actions.rs": "8650d63e1fa4543a1ee7d6a1fb0e340c5bcfb6d7fc48ecb828f2125dc853e075",
+    "src/appearance.rs": "19907be84aa48ba316c99f75f85b0847200d4e7ed9eb82eef0e9e9471cbd98fb",
+    "src/broker.rs": "46568ce102ef93cbe4d3a3659e669a4ced44fad8c2350fa7b4d4260fb8a74e16",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "src/json.rs": "8dc363b989aafb3cf5e94a9b734270afd4b20c0192ed86a1189757d7dd681f36",
+    "src/layout.rs": "2a9a06a49c3bb3eaca3a4d57dd376be888898c5ee0870295a13ab9708e1e485e",
+    "src/main.rs": "9e8a0575a1c5c639baffe1c3d2bb2287d1c5059582ecc74600e73728055d41f8",
+    "src/mcp.rs": "ba72199de9284ac0b67cd9a6dbb395d196808032830d6a57ed381ba34bac67ef",
+    "src/mcp_http.rs": "c7b4bd585d6091c4403bb646acf3b58265282cecce52f9dc46b1d09fa0b4b78e",
+    "src/os.rs": "e898d297a0f5f89b36a6a40ea6edb589a7a204e9951d8011ee0972f7349a794b",
+    "src/os_macos.rs": "3205fb0568f20f8aa25c6a32928469d96865741e328b64f5acc8b8671eee4505",
+    "src/os_windows.rs": "93d68d994f7e25fcb9406cb4752b7bc766b3154252e91d8b7fd5360fe8b42e18",
+    "src/platform/linux.rs": "c9207ce4443f68ca6a645967bbb295faa4fb88834a4dc4ef0fff59c1a7f56693",
+    "src/platform/macos.rs": "dac9a94661c9beb7e1f63ff1d0a35d92c411d4b62093a61396c7dbe53022905e",
+    "src/platform/windows.rs": "1b5d2b1390d42063472b5ed4188afde1bcefc50ea1dd6f41c8c4eeffd8bdbc66",
+    "src/search.rs": "6262c89f7260ea534f23e258e27fc0362e24bc43b6269f6978a02d216f1b2ee6",
+    "src/session.rs": "9d760ba54e921b07cbd00270d332147368c4f89e598bd3d5f3ca6cf2ef46076a",
+    "src/workspace_state.rs": "2ccd9f84dee4edb6bf4bf68142e75483f925a3342163efac921d6816365f5b48",
+    "src/x11.rs": "587410686c51358e759310b69061113c62ed7eb953c01c5195cf5a0e96853825"
+  },
+  "collector_source_sha256": {
+    "benchmark_terminals.py": "c98b060c13f1180ed25087d74ab84fb9da4cc4c05b75a6de3ed8ee7dee1ae60d",
+    "measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25",
+    "isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+  },
+  "git_status_before": "",
+  "host_before": {
+    "MemTotal_bytes": 16476708864,
+    "MemAvailable_bytes": 2867191808,
+    "SwapTotal_bytes": 40925782016,
+    "SwapFree_bytes": 22283939840,
+    "swap_used_bytes": 18641842176,
+    "load_average": [
+      4.46337890625,
+      5.61083984375,
+      6.24462890625
+    ],
+    "logical_cpus": 24,
+    "psi": {
+      "cpu": "some avg10=0.00 avg60=0.01 avg300=0.03 total=1162184724\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+      "memory": "some avg10=0.24 avg60=0.30 avg300=0.43 total=2154782942\nfull avg10=0.24 avg60=0.30 avg300=0.42 total=1915929472",
+      "io": "some avg10=0.64 avg60=1.11 avg300=0.70 total=4517927935\nfull avg10=0.56 avg60=0.97 avg300=0.59 total=3508051191"
+    }
+  },
+  "collector_exit": 0,
+  "completed_cells": 18,
+  "verified_display_ownership": [
+    {
+      "app": "ztty",
+      "windows": 1,
+      "repetition": 1,
+      "display": ":9647",
+      "pid": 2393152,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X9647",
+          "inode": 70411591,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X9647",
+          "inode": 70411590,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ghostty",
+      "windows": 1,
+      "repetition": 1,
+      "display": ":3856",
+      "pid": 2393716,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X3856",
+          "inode": 70405989,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X3856",
+          "inode": 70405988,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "kitty",
+      "windows": 1,
+      "repetition": 1,
+      "display": ":16470",
+      "pid": 2394239,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X16470",
+          "inode": 70414070,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X16470",
+          "inode": 70414069,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ztty",
+      "windows": 10,
+      "repetition": 1,
+      "display": ":13764",
+      "pid": 2395616,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X13764",
+          "inode": 70420868,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X13764",
+          "inode": 70420867,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ghostty",
+      "windows": 10,
+      "repetition": 1,
+      "display": ":18138",
+      "pid": 2396408,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X18138",
+          "inode": 70423822,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X18138",
+          "inode": 70423821,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "kitty",
+      "windows": 10,
+      "repetition": 1,
+      "display": ":21236",
+      "pid": 2397900,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X21236",
+          "inode": 70472593,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X21236",
+          "inode": 70472592,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ghostty",
+      "windows": 1,
+      "repetition": 2,
+      "display": ":10309",
+      "pid": 2402685,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X10309",
+          "inode": 70501521,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X10309",
+          "inode": 70501520,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "kitty",
+      "windows": 1,
+      "repetition": 2,
+      "display": ":3537",
+      "pid": 2403384,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X3537",
+          "inode": 70501599,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X3537",
+          "inode": 70501598,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ztty",
+      "windows": 1,
+      "repetition": 2,
+      "display": ":749",
+      "pid": 2404017,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X749",
+          "inode": 70501664,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X749",
+          "inode": 70501663,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ghostty",
+      "windows": 10,
+      "repetition": 2,
+      "display": ":2050",
+      "pid": 2404287,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X2050",
+          "inode": 70503686,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X2050",
+          "inode": 70503685,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "kitty",
+      "windows": 10,
+      "repetition": 2,
+      "display": ":13196",
+      "pid": 2406153,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X13196",
+          "inode": 70510254,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X13196",
+          "inode": 70510253,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ztty",
+      "windows": 10,
+      "repetition": 2,
+      "display": ":11052",
+      "pid": 2411388,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X11052",
+          "inode": 70532521,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X11052",
+          "inode": 70532520,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "kitty",
+      "windows": 1,
+      "repetition": 3,
+      "display": ":15739",
+      "pid": 2412074,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X15739",
+          "inode": 70519235,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X15739",
+          "inode": 70519234,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ztty",
+      "windows": 1,
+      "repetition": 3,
+      "display": ":18834",
+      "pid": 2413168,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X18834",
+          "inode": 70547811,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X18834",
+          "inode": 70547810,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ghostty",
+      "windows": 1,
+      "repetition": 3,
+      "display": ":13605",
+      "pid": 2413894,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X13605",
+          "inode": 70525679,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X13605",
+          "inode": 70525678,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "kitty",
+      "windows": 10,
+      "repetition": 3,
+      "display": ":1507",
+      "pid": 2414671,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X1507",
+          "inode": 70549864,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X1507",
+          "inode": 70549863,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ztty",
+      "windows": 10,
+      "repetition": 3,
+      "display": ":15189",
+      "pid": 2425022,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X15189",
+          "inode": 70570550,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X15189",
+          "inode": 70570549,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    {
+      "app": "ghostty",
+      "windows": 10,
+      "repetition": 3,
+      "display": ":21844",
+      "pid": 2426240,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X21844",
+          "inode": 70587144,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X21844",
+          "inode": 70587143,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    }
+  ],
+  "no_owned_processes_remaining": true,
+  "source_unchanged": true,
+  "report_timestamp": "2026-11-17T23:18:25.553528+00:00",
+  "report_completed_at": "2026-11-17T23:20:48.988784+00:00",
+  "output_sha256": {
+    "docs/benchmarks/guarded-idle-1-10-2026-11-18.json": "4898184e21b2f6303b73ff2c3bce58dbf6b0c953387e39661736bef7215f6ac5",
+    "docs/benchmarks/guarded-idle-1-10-2026-11-18.svg": "757d40c387dc957a70aeadc3a9d0c1ca906b9717e47b3fe84c2218584647d88c",
+    "docs/benchmarks/guarded-idle-1-10-2026-11-18-scaling.svg": "18a6221a4fb5839e5b23b3a3eb7a1c274147424cf8c6f30b7914757e16e48168"
+  },
+  "summary": [
+    {
+      "app": "ghostty",
+      "windows": 1,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 356917248,
+      "median_pss_bytes": 336922624,
+      "median_private_bytes": 325517312,
+      "median_idle_cpu_percent": 19.990898303930017,
+      "median_swap_bytes": 0,
+      "median_app_plus_xserver_pss_bytes": 426901504,
+      "app_plus_xserver_pss_range_bytes": [
+        419981312,
+        428682240
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        -6431744,
+        -5096448
+      ],
+      "median_latency_p50_us": 36.6275,
+      "median_latency_p95_us": 1115.946,
+      "median_output_mib_per_second": 148.46450034922395,
+      "pss_range_bytes": [
+        329979904,
+        338328576
+      ],
+      "latency_p50_range_us": [
+        26.8185,
+        133.14499999999998
+      ],
+      "output_range_mib_per_second": [
+        91.53683405734934,
+        169.02533715816548
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        1
+      ]
+    },
+    {
+      "app": "kitty",
+      "windows": 1,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 219693056,
+      "median_pss_bytes": 191628288,
+      "median_private_bytes": 178872320,
+      "median_idle_cpu_percent": 0.0,
+      "median_swap_bytes": 0,
+      "median_app_plus_xserver_pss_bytes": 280492032,
+      "app_plus_xserver_pss_range_bytes": [
+        278683648,
+        280871936
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        -7681024,
+        -6713344
+      ],
+      "median_latency_p50_us": 5292.200500000001,
+      "median_latency_p95_us": 7466.141,
+      "median_output_mib_per_second": 38.71983957557311,
+      "pss_range_bytes": [
+        189779968,
+        192003072
+      ],
+      "latency_p50_range_us": [
+        4776.187,
+        5322.537
+      ],
+      "output_range_mib_per_second": [
+        38.54169703252814,
+        61.421035324470765
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        2
+      ]
+    },
+    {
+      "app": "ztty",
+      "windows": 1,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 23085056,
+      "median_pss_bytes": 15604736,
+      "median_private_bytes": 14036992,
+      "median_idle_cpu_percent": 0.0,
+      "median_swap_bytes": 0,
+      "median_app_plus_xserver_pss_bytes": 114970624,
+      "app_plus_xserver_pss_range_bytes": [
+        114295808,
+        115674112
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        3553280,
+        3744768
+      ],
+      "median_latency_p50_us": 22.7985,
+      "median_latency_p95_us": 27.991,
+      "median_output_mib_per_second": 15.753717369243887,
+      "pss_range_bytes": [
+        15329280,
+        15754240
+      ],
+      "latency_p50_range_us": [
+        9.2675,
+        28.418
+      ],
+      "output_range_mib_per_second": [
+        15.447672119518366,
+        17.64399558878882
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        2
+      ]
+    },
+    {
+      "app": "ghostty",
+      "windows": 10,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 876593152,
+      "median_pss_bytes": 857219072,
+      "median_private_bytes": 845836288,
+      "median_idle_cpu_percent": 25.989912639404295,
+      "median_swap_bytes": 0,
+      "median_app_plus_xserver_pss_bytes": 974263296,
+      "app_plus_xserver_pss_range_bytes": [
+        966519808,
+        977091584
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        2064384
+      ],
+      "max_sampled_application_swap_bytes": 2064384,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        2064384
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 2064384,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        20534272,
+        21443584
+      ],
+      "median_latency_p50_us": 46.0755,
+      "median_latency_p95_us": 608.78,
+      "median_output_mib_per_second": 138.49649436389467,
+      "pss_range_bytes": [
+        849410048,
+        860582912
+      ],
+      "latency_p50_range_us": [
+        39.6175,
+        46.7415
+      ],
+      "output_range_mib_per_second": [
+        123.90384033024354,
+        160.16508365167493
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        1
+      ]
+    },
+    {
+      "app": "kitty",
+      "windows": 10,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 420634624,
+      "median_pss_bytes": 377543680,
+      "median_private_bytes": 351846400,
+      "median_idle_cpu_percent": 0.0,
+      "median_swap_bytes": 0,
+      "median_app_plus_xserver_pss_bytes": 480011264,
+      "app_plus_xserver_pss_range_bytes": [
+        475422720,
+        482566144
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        5856256,
+        7346176
+      ],
+      "median_latency_p50_us": 5645.736000000001,
+      "median_latency_p95_us": 8822.369,
+      "median_output_mib_per_second": 48.8281480355341,
+      "pss_range_bytes": [
+        372840448,
+        380227584
+      ],
+      "latency_p50_range_us": [
+        5581.217000000001,
+        5668.2575
+      ],
+      "output_range_mib_per_second": [
+        48.435995529532505,
+        52.95428775301975
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        2
+      ]
+    },
+    {
+      "app": "ztty",
+      "windows": 10,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 63803392,
+      "median_pss_bytes": 21292032,
+      "median_private_bytes": 19148800,
+      "median_idle_cpu_percent": 0.0,
+      "median_swap_bytes": 0,
+      "median_app_plus_xserver_pss_bytes": 152079360,
+      "app_plus_xserver_pss_range_bytes": [
+        152061952,
+        152189952
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        34341888,
+        35507200
+      ],
+      "median_latency_p50_us": 17.9735,
+      "median_latency_p95_us": 41.392,
+      "median_output_mib_per_second": 21.917392846561278,
+      "pss_range_bytes": [
+        21267456,
+        21540864
+      ],
+      "latency_p50_range_us": [
+        15.845500000000001,
+        18.0045
+      ],
+      "output_range_mib_per_second": [
+        19.29482102928585,
+        22.739127589605847
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        11
+      ]
+    }
+  ],
+  "limitations": [
+    "Software X11/Xvfb only; not native GPU/VRAM or compositor results.",
+    "DSR measures logical PTY completion, not presented frames or input-to-display latency.",
+    "Only 1 and 10 shared idle windows; other counts, modes and workloads remain separate.",
+    "RSS, PSS and Swap remain distinct; no sub-10-MiB claim without the actual RSS measurement."
+  ],
+  "finished_at": "2026-11-17T23:20:49.187380+00:00",
+  "new_failure_diagnostics": [],
+  "git_status_after": "?? docs/benchmarks/guarded-idle-1-10-2026-11-18-scaling.svg\n?? docs/benchmarks/guarded-idle-1-10-2026-11-18.json\n?? docs/benchmarks/guarded-idle-1-10-2026-11-18.svg",
+  "collection_output_sha256": {
+    "docs/benchmarks/guarded-idle-1-10-2026-11-18.json": "7aefc0eafcf34bbfba9639009fe1a8597fd931ac1edbd51f766c63ff901ad0c1",
+    "docs/benchmarks/guarded-idle-1-10-2026-11-18.svg": "a1ca886ddda41487362539130d6006028ce4b7ce4737b44d693beb6525aa5bde",
+    "docs/benchmarks/guarded-idle-1-10-2026-11-18-scaling.svg": "18a6221a4fb5839e5b23b3a3eb7a1c274147424cf8c6f30b7914757e16e48168"
+  },
+  "render_only": {
+    "timestamp_utc": "2026-11-17T23:24:18.560447+00:00",
+    "command": [
+      "python3",
+      "tools/benchmark_terminals.py",
+      "--render-only",
+      "--no-readme",
+      "--json",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/docs/benchmarks/guarded-idle-1-10-2026-11-18.json",
+      "--svg",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/docs/benchmarks/guarded-idle-1-10-2026-11-18.svg"
+    ],
+    "exit_code": 0,
+    "original_collector_sha256": "c98b060c13f1180ed25087d74ab84fb9da4cc4c05b75a6de3ed8ee7dee1ae60d",
+    "previous_renderer_sha256": "c98b060c13f1180ed25087d74ab84fb9da4cc4c05b75a6de3ed8ee7dee1ae60d",
+    "renderer_sha256": "e880a34baa65371639ab8ed2b56c77583fab513ed93776cb905789fc4695ca7b",
+    "source_label": "docs/benchmarks/guarded-idle-1-10-2026-11-18.json",
+    "raw_runs_sha256_before": "f05a9fe5eea168fc3f47833ee7b49e3895772cd605ff55fe4c426a7b6da24681",
+    "raw_runs_sha256_after": "f05a9fe5eea168fc3f47833ee7b49e3895772cd605ff55fe4c426a7b6da24681",
+    "collection_identity_unchanged": true,
+    "numerical_summary_unchanged": true,
+    "changed_report_fields": [
+      "derived"
+    ],
+    "tests": {
+      "command": [
+        "python3",
+        "tests/test_benchmark_terminals.py"
+      ],
+      "passed": 23,
+      "exit_code": 0,
+      "log": "artifacts/guarded-benchmark-renderer-tests.log",
+      "source_sha256": "056a2bd8da39a395055c9a05b00815127b835ebcdaf38b4f8e71d31161c41d5a"
+    },
+    "note": "Only derived rendering metadata and SVG source label changed. The original fa2f201 collection source, binary identity, collector/helper hashes, raw observations, settings, timestamps, and numerical summaries remain unchanged. Production source may advance after collection; source_unchanged above describes the collection interval."
+  },
+  "ztty_process_rss_breakdown": {
+    "method": "Identify the broker using the raw X11 gui_owner_pids; all other exact marked ztty executable processes are waiting launchers. For each role take the median across three memory snapshots per run, then the median across three independent runs. Role medians are not assumed to sum to the median total. No additional measurement was performed.",
+    "per_run": [
+      {
+        "windows": 1,
+        "repetition": 1,
+        "broker_rss_bytes": 18743296,
+        "launchers_rss_bytes": 4313088
+      },
+      {
+        "windows": 10,
+        "repetition": 1,
+        "broker_rss_bytes": 20242432,
+        "launchers_rss_bytes": 43601920
+      },
+      {
+        "windows": 1,
+        "repetition": 2,
+        "broker_rss_bytes": 18800640,
+        "launchers_rss_bytes": 4284416
+      },
+      {
+        "windows": 10,
+        "repetition": 2,
+        "broker_rss_bytes": 20094976,
+        "launchers_rss_bytes": 43511808
+      },
+      {
+        "windows": 1,
+        "repetition": 3,
+        "broker_rss_bytes": 18706432,
+        "launchers_rss_bytes": 4415488
+      },
+      {
+        "windows": 10,
+        "repetition": 3,
+        "broker_rss_bytes": 20144128,
+        "launchers_rss_bytes": 43659264
+      }
+    ],
+    "summary": [
+      {
+        "windows": 1,
+        "broker_rss_MiB": 17.875,
+        "launchers_rss_MiB": 4.11328125
+      },
+      {
+        "windows": 10,
+        "broker_rss_MiB": 19.2109375,
+        "launchers_rss_MiB": 41.58203125
+      }
+    ]
+  },
+  "binary_linkage": {
+    "binary_sha256": "a339a7d258ad313379b5cfea40d8b125aa8c810ecaebd40005b489413a1b6d4d",
+    "command": [
+      "readelf",
+      "-d",
+      "artifacts/observer-watch-candidate-ztty"
+    ],
+    "needed_libraries": [
+      "libc.so.6",
+      "libXrender.so.1",
+      "libX11.so.6",
+      "libXft.so.2",
+      "libgcc_s.so.1"
+    ],
+    "flags": [
+      "BIND_NOW",
+      "NOW",
+      "PIE"
+    ],
+    "note": "These are direct ELF dependencies, not proof that the launcher initializes fonts or opens an X display. Source inspection finds those operations in the broker only."
+  },
+  "readme_promotion": {
+    "changed_only_marker_blocks": true,
+    "historical_default_artifacts_unchanged": {
+      "docs/benchmarks/terminals-10-windows.json": "d41310c9d47955689cb559965a974cdebc9f6d720869c32b4efad82091f6967a",
+      "docs/benchmarks/terminals-10-windows.svg": "0f97cf5b0159697af13f708626d3da9787043a9b2d1bd63ab65e0d2cc787477a"
+    },
+    "new_report": "docs/benchmarks/guarded-idle-1-10-2026-11-18.md",
+    "normal_marker_publication_tested": true,
+    "publisher_changed": false,
+    "test_suite_passed": 23,
+    "test_exit_code": 0,
+    "test_source_sha256": "056a2bd8da39a395055c9a05b00815127b835ebcdaf38b4f8e71d31161c41d5a"
+  },
+  "visual_review": {
+    "overview_rasterized_and_inspected": true,
+    "scaling_rasterized_and_inspected": true,
+    "corrected_overview_source_label_visible": true,
+    "text_clipping_observed": false,
+    "method": "Inkscape rasterization and image inspection; original vector figures remain the published artifacts."
+  },
+  "report_sha256": "e763fa5a5a034ee13695de772acbbf85db8bc8e0bf44062ebbb35e9ded34e707"
+}

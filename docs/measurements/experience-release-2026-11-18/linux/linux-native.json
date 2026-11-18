@@ -1,0 +1,518 @@
+{
+  "schema": 1,
+  "passed": false,
+  "status": "failed",
+  "cases": [
+    {
+      "name": "workspaces",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/tests/workspaces.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/workspaces/report.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/workspaces/screenshot.png"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/workspaces/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/workspaces/stderr.log",
+      "harness_pid": 2042188,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.825,
+      "checks_completed": 17,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/workspaces/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "69e1aa7878e1ce4a706061de88af53396ef811b47e006d01e7b3cdbc42b2c194"
+        },
+        "workspace-cwd.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "626e46d38c9883526f779b77820dbcc54b77481aa3cfe7b5b0378c36fdf2ca89"
+        }
+      }
+    },
+    {
+      "name": "daily_workflow",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/tests/daily_workflow.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/daily_workflow/report.json",
+        "--screenshots",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/daily_workflow/screenshots"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/daily_workflow/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/daily_workflow/stderr.log",
+      "harness_pid": 2042858,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.056,
+      "checks_completed": 15,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/daily_workflow/report.json",
+      "screenshots": {
+        "screenshots/command-palette.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "5feddcfc2e2490091edadec299ede24dfdbc8096a32681d4297644f90d0598c5"
+        },
+        "screenshots/history-search.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "0c2465c3ef336ce40591cadee12e01a1b3bf90ace501ae4ff0f7be324f9b1df0"
+        },
+        "screenshots/invalid-config-diagnostic.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+        },
+        "screenshots/reloaded-terminal.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+        }
+      }
+    },
+    {
+      "name": "session_switcher",
+      "passed": false,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/tests/session_switcher.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/session_switcher/report.json",
+        "--screenshots",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/session_switcher/screenshots"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/session_switcher/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/session_switcher/stderr.log",
+      "harness_pid": 2043016,
+      "exit_code": 1,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 10.779,
+      "checks_completed": 4,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/session_switcher/report.json",
+      "screenshots": {
+        "screenshots/attach-read-only.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "fd819c9eb007b8a6285b47f5f290258093935e0b4b331eeffc03414efb2f1167"
+        },
+        "screenshots/command-palette.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "af1c2931f066778d0762762dcb4b095e12ab31215a57580175561cba6f320b1b"
+        },
+        "screenshots/failure-2.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "8976bae41e56fe3d062011b7d684ce03b5afb7534b853a7d420f4b403e5d1a36"
+        },
+        "screenshots/failure-4.png": {
+          "width": 932,
+          "height": 656,
+          "sha256": "faffed35b5886062e7a4782d2a5c18706bbacdfe75f4dc1dc8fc412703a999cc"
+        },
+        "screenshots/sessions.png": {
+          "width": 940,
+          "height": 664,
+          "sha256": "c0d7e65e86f7878c049d4ed5ddc41b1df034e54c74371960ebddeccd35668a6c"
+        }
+      },
+      "error": "stale focus entry rejected"
+    },
+    {
+      "name": "sixel_gui",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/tests/sixel_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/sixel_gui/report.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/sixel_gui/screenshot.png",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/sixel_gui/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/sixel_gui/stderr.log",
+      "harness_pid": 2045023,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 0.808,
+      "checks_completed": 10,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/sixel_gui/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 948,
+          "height": 848,
+          "sha256": "aa64fca868aeca8b1f23b9fe34b39d61addefd77cb3ee7c710c1e5c535435d75"
+        }
+      }
+    },
+    {
+      "name": "input_gui",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/tests/input_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/input_gui/report.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/input_gui/screenshot.png",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/input_gui/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/input_gui/stderr.log",
+      "harness_pid": 2045162,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 4.65,
+      "checks_completed": 9,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/input_gui/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 900,
+          "height": 672,
+          "sha256": "177e18ff9a42043c5e84385ed633b3ae1c42376f161a984ab1ff4f2d91980fb5"
+        }
+      }
+    },
+    {
+      "name": "repaint_gui",
+      "passed": true,
+      "command": [
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/tests/repaint_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/repaint_gui/report.json",
+        "--screenshots",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/repaint_gui/screenshots"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/repaint_gui/stdout.log",
+      "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/repaint_gui/stderr.log",
+      "harness_pid": 2045696,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.37,
+      "checks_completed": 7,
+      "report": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/repaint_gui/report.json",
+      "screenshots": {
+        "screenshots/fairness-flood.png": {
+          "width": 1112,
+          "height": 768,
+          "sha256": "dc0d07bbc6c72ed7314c9f353eb2e11d8e7acb029ad857f565843104ee3d3c8c"
+        },
+        "screenshots/fairness-interaction.png": {
+          "width": 1112,
+          "height": 768,
+          "sha256": "b0cb1e3a4249677812b67680889a4b4b143393c60be3fd1a21f2b1d188d0a097"
+        },
+        "screenshots/quiet-final-frame.png": {
+          "width": 1112,
+          "height": 768,
+          "sha256": "6a077c67991b8b33da2afa055046ef88435019da871c67b5a3b35eb57362bafc"
+        },
+        "screenshots/sync-release.png": {
+          "width": 1112,
+          "height": 768,
+          "sha256": "adc5c4cb460e19ab8b3f9bb7b5483d0649f6a8fd80e3648bf60c55c3db6539f2"
+        },
+        "screenshots/sync-same-feed.png": {
+          "width": 1112,
+          "height": 768,
+          "sha256": "13364cf21c78e5aeb8e8f010b938bcebfefdff1cfcba3fdbef3f9b14904ebf4a"
+        },
+        "screenshots/sync-timeout.png": {
+          "width": 1112,
+          "height": 768,
+          "sha256": "4bc401daaca8ab4e6d1ce86c5287bdac29e6def7f1b8ef63f7e2f55a32a74c06"
+        }
+      }
+    }
+  ],
+  "timestamp_utc": "2026-11-18T11:27:57.426458+00:00",
+  "source_sha": "cfc7ae80e785e4d3de11ffa5e1fba3f63d158222",
+  "architecture": "x86_64",
+  "host_machine": "x86_64",
+  "platform": "Linux-7.3.4-arch1-1-x86_64-with-glibc2.44",
+  "python": "3.14.10 (main, Nov  4 2026, 18:21:50) [GCC 16.2.1 20260810]",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+  "evidence_dir": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native",
+  "scope": "Native Linux ELF and real PTY/X11 GUI acceptance under guarded private Xvfb",
+  "pixel_readback": "Actual XGetImage captures from owned X11 windows in private Xvfb",
+  "ime_keyboard": "synthetic XTEST input; no hardware IME acceptance",
+  "limitations": [
+    "No native Wayland or hardware GPU/scanout acceptance.",
+    "No physical input-to-display latency measurement."
+  ],
+  "wrapper_sha256": "ead7c4cad657d5cacec5e104493024d11b0b04ee9aaf6b6bd421817ddb4889ce",
+  "elf": {
+    "class_bits": 64,
+    "byte_order": "little",
+    "machine": 62,
+    "architecture": "x86_64",
+    "type": 3
+  },
+  "binary_sha256": "c6e6a8105c30e9b16be7def46a558eb3aee6154c9539c0f74b3a6501698e3ae6",
+  "source_before": {
+    "commit": "cfc7ae80e785e4d3de11ffa5e1fba3f63d158222",
+    "tracked_changes": []
+  },
+  "source_files_sha256": {
+    "tests/workspaces.py": "581d9c72b1f3114a874636c7841948599f0c300a0d0587087a67dcf67e5e7850",
+    "tests/daily_workflow.py": "9193f495c1d1d46b57d096fdae03309d46611ccb4e1e429e0ff13228b225d152",
+    "tests/session_switcher.py": "c923b87a6b88d626f25f40847dc568789568b9dc6c6e2fc39dbbf9e7e6eb29cd",
+    "tests/sixel_gui.py": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+    "tests/input_gui.py": "a4e4a4401422060e6147ec9df4a6152194eae9b56da311bbf9e64eed11150e9a",
+    "tests/repaint_gui.py": "b70319eb2eb87ccc9890bde005b1e4bf22af716426c35e77862cebe6daef7050",
+    "tests/ioctl_resize_fault.c": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tests/linux_native.py": "ead7c4cad657d5cacec5e104493024d11b0b04ee9aaf6b6bd421817ddb4889ce"
+  },
+  "dependencies": {
+    "python-xlib": "0.33",
+    "Pillow": "13.0.0"
+  },
+  "programs": {
+    "Xvfb": "/usr/bin/Xvfb",
+    "cc": "/usr/bin/cc",
+    "fc-match": "/usr/bin/fc-match"
+  },
+  "version_check": {
+    "command": [
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/ztty-cloud-candidate",
+      "--version"
+    ],
+    "timeout_seconds": 30,
+    "timed_out": false,
+    "stdout": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/version/stdout.log",
+    "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/linux-native/version/stderr.log",
+    "harness_pid": 2042176,
+    "exit_code": 0,
+    "cleanup": {
+      "leftover_owned_pids": [],
+      "remaining_owned_pids": [],
+      "removed_owned_leases": []
+    },
+    "duration_seconds": 0.09,
+    "stdout_text": "ztty 0.3.0\n",
+    "passed": true
+  },
+  "source_after": {
+    "commit": "cfc7ae80e785e4d3de11ffa5e1fba3f63d158222",
+    "tracked_changes": []
+  },
+  "binary_sha256_after": "c6e6a8105c30e9b16be7def46a558eb3aee6154c9539c0f74b3a6501698e3ae6",
+  "evidence_files": {
+    "daily_workflow/report.json": {
+      "bytes": 4912,
+      "sha256": "6fc4bcf674138d545b629978f1493fc4f48d0d96b4dfb1437fa84b0a21c535c3"
+    },
+    "daily_workflow/screenshots/command-palette.png": {
+      "bytes": 65249,
+      "sha256": "5feddcfc2e2490091edadec299ede24dfdbc8096a32681d4297644f90d0598c5"
+    },
+    "daily_workflow/screenshots/history-search.png": {
+      "bytes": 69875,
+      "sha256": "0c2465c3ef336ce40591cadee12e01a1b3bf90ace501ae4ff0f7be324f9b1df0"
+    },
+    "daily_workflow/screenshots/invalid-config-diagnostic.png": {
+      "bytes": 75223,
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "daily_workflow/screenshots/reloaded-terminal.png": {
+      "bytes": 57242,
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    },
+    "daily_workflow/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "daily_workflow/stdout.log": {
+      "bytes": 4912,
+      "sha256": "6fc4bcf674138d545b629978f1493fc4f48d0d96b4dfb1437fa84b0a21c535c3"
+    },
+    "input_gui/report.json": {
+      "bytes": 10925,
+      "sha256": "35166e6c0212ee218c49e80a2e0d09ca3831b6d364292a0ba65cc27eaeae783b"
+    },
+    "input_gui/screenshot.png": {
+      "bytes": 15126,
+      "sha256": "177e18ff9a42043c5e84385ed633b3ae1c42376f161a984ab1ff4f2d91980fb5"
+    },
+    "input_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "input_gui/stdout.log": {
+      "bytes": 10925,
+      "sha256": "35166e6c0212ee218c49e80a2e0d09ca3831b6d364292a0ba65cc27eaeae783b"
+    },
+    "repaint_gui/report.json": {
+      "bytes": 7346,
+      "sha256": "b1c64ae832a8b3ac5dff94c9319f3f9bb661c6d359f23059c5ba3d910a8e28cf"
+    },
+    "repaint_gui/screenshots/fairness-flood.png": {
+      "bytes": 51819,
+      "sha256": "dc0d07bbc6c72ed7314c9f353eb2e11d8e7acb029ad857f565843104ee3d3c8c"
+    },
+    "repaint_gui/screenshots/fairness-interaction.png": {
+      "bytes": 5855,
+      "sha256": "b0cb1e3a4249677812b67680889a4b4b143393c60be3fd1a21f2b1d188d0a097"
+    },
+    "repaint_gui/screenshots/quiet-final-frame.png": {
+      "bytes": 5877,
+      "sha256": "6a077c67991b8b33da2afa055046ef88435019da871c67b5a3b35eb57362bafc"
+    },
+    "repaint_gui/screenshots/sync-release.png": {
+      "bytes": 4659,
+      "sha256": "adc5c4cb460e19ab8b3f9bb7b5483d0649f6a8fd80e3648bf60c55c3db6539f2"
+    },
+    "repaint_gui/screenshots/sync-same-feed.png": {
+      "bytes": 5324,
+      "sha256": "13364cf21c78e5aeb8e8f010b938bcebfefdff1cfcba3fdbef3f9b14904ebf4a"
+    },
+    "repaint_gui/screenshots/sync-timeout.png": {
+      "bytes": 4996,
+      "sha256": "4bc401daaca8ab4e6d1ce86c5287bdac29e6def7f1b8ef63f7e2f55a32a74c06"
+    },
+    "repaint_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "repaint_gui/stdout.log": {
+      "bytes": 200,
+      "sha256": "851c95360b9713c0f825a084c5f79b1b468921fb3bd7524216958d8e38ae7311"
+    },
+    "session_switcher/report.json": {
+      "bytes": 8672,
+      "sha256": "d0124bdec628c5b7b240b1fa0b51f3557cd8d05fed590ba7e0240ceb0d6bf57d"
+    },
+    "session_switcher/screenshots/attach-read-only.png": {
+      "bytes": 18333,
+      "sha256": "fd819c9eb007b8a6285b47f5f290258093935e0b4b331eeffc03414efb2f1167"
+    },
+    "session_switcher/screenshots/command-palette.png": {
+      "bytes": 14391,
+      "sha256": "af1c2931f066778d0762762dcb4b095e12ab31215a57580175561cba6f320b1b"
+    },
+    "session_switcher/screenshots/failure-2.png": {
+      "bytes": 7782,
+      "sha256": "8976bae41e56fe3d062011b7d684ce03b5afb7534b853a7d420f4b403e5d1a36"
+    },
+    "session_switcher/screenshots/failure-4.png": {
+      "bytes": 10959,
+      "sha256": "faffed35b5886062e7a4782d2a5c18706bbacdfe75f4dc1dc8fc412703a999cc"
+    },
+    "session_switcher/screenshots/sessions.png": {
+      "bytes": 24325,
+      "sha256": "c0d7e65e86f7878c049d4ed5ddc41b1df034e54c74371960ebddeccd35668a6c"
+    },
+    "session_switcher/stderr.log": {
+      "bytes": 801,
+      "sha256": "8236fdea8dea419b6ef2a818a6da026c6551323bd695fcd3d52e2a740f09b583"
+    },
+    "session_switcher/stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sixel_gui/report.json": {
+      "bytes": 4792,
+      "sha256": "c345b0c1a18b5baae51b185be1c0bfb676f291ba05e5298ce508f030bf6c8aa0"
+    },
+    "sixel_gui/screenshot.png": {
+      "bytes": 10929,
+      "sha256": "aa64fca868aeca8b1f23b9fe34b39d61addefd77cb3ee7c710c1e5c535435d75"
+    },
+    "sixel_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sixel_gui/stdout.log": {
+      "bytes": 385,
+      "sha256": "92daa73832c01eb6c1130025c49c54a2bed60fdbb18ce4d5fc085f09a1041f2a"
+    },
+    "version/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "version/stdout.log": {
+      "bytes": 11,
+      "sha256": "3d5ab43d78f238a58bf0556f17752d2f34278f42cf284887d77fbd6498ad03a4"
+    },
+    "workspaces/report.json": {
+      "bytes": 7749,
+      "sha256": "90866a4deb02b2f0445905f3eacee2622878f31ff7d0b3c7919b1881ae8320b0"
+    },
+    "workspaces/screenshot.png": {
+      "bytes": 9825,
+      "sha256": "69e1aa7878e1ce4a706061de88af53396ef811b47e006d01e7b3cdbc42b2c194"
+    },
+    "workspaces/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspaces/stdout.log": {
+      "bytes": 7749,
+      "sha256": "90866a4deb02b2f0445905f3eacee2622878f31ff7d0b3c7919b1881ae8320b0"
+    },
+    "workspaces/workspace-cwd.png": {
+      "bytes": 14047,
+      "sha256": "626e46d38c9883526f779b77820dbcc54b77481aa3cfe7b5b0378c36fdf2ca89"
+    }
+  }
+}

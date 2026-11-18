@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="805" viewBox="0 0 1120 805" role="img" aria-labelledby="title desc">
+<title id="title">Terminal memory scaling by window count and process mode</title>
+<desc id="desc">Measured application PSS in MiB. Each panel has its own vertical scale. PTY child workloads and Xvfb memory are recorded separately.</desc>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#e8eaed}.muted{fill:#aeb5c2}</style>
+<rect width="1120" height="805" fill="#111318"/>
+<text x="36" y="43" font-size="27">Terminal memory scaling — validation run</text>
+<text x="36" y="73" font-size="14" class="muted">Application PSS · MiB · 1 fresh-process runs · isolated X11 software rendering</text>
+<text x="36" y="110" font-size="18">idle / independent</text>
+<line x1="84" x2="524" y1="310.00" y2="310.00" stroke="#343944"/>
+<text x="76" y="314.00" text-anchor="end" font-size="12" class="muted">0.0</text>
+<line x1="84" x2="524" y1="253.33" y2="253.33" stroke="#343944"/>
+<text x="76" y="257.33" text-anchor="end" font-size="12" class="muted">170.4</text>
+<line x1="84" x2="524" y1="196.67" y2="196.67" stroke="#343944"/>
+<text x="76" y="200.67" text-anchor="end" font-size="12" class="muted">340.8</text>
+<line x1="84" x2="524" y1="140.00" y2="140.00" stroke="#343944"/>
+<text x="76" y="144.00" text-anchor="end" font-size="12" class="muted">511.2</text>
+<text x="84.00" y="332" text-anchor="middle" font-size="12" class="muted">2</text>
+<polyline points="84.00,303.84" fill="none" stroke="#72a7ff" stroke-width="2"/>
+<circle cx="84.00" cy="303.84" r="3.5" fill="#72a7ff"><title>ztty, 2 windows: 18.51 MiB</title></circle>
+<text x="36" y="367" font-size="13" style="fill:#72a7ff">ztty 18.51 MiB</text>
+<polyline points="84.00,158.21" fill="none" stroke="#6dcbb1" stroke-width="2"/>
+<circle cx="84.00" cy="158.21" r="3.5" fill="#6dcbb1"><title>Ghostty, 2 windows: 456.42 MiB</title></circle>
+<text x="205" y="367" font-size="13" style="fill:#6dcbb1">Ghostty 456.42 MiB</text>
+<polyline points="84.00,223.15" fill="none" stroke="#c09aff" stroke-width="2"/>
+<circle cx="84.00" cy="223.15" r="3.5" fill="#c09aff"><title>Kitty, 2 windows: 261.15 MiB</title></circle>
+<text x="374" y="367" font-size="13" style="fill:#c09aff">Kitty 261.15 MiB</text>
+<text x="584" y="110" font-size="18">history / independent</text>
+<line x1="632" x2="1072" y1="310.00" y2="310.00" stroke="#343944"/>
+<text x="624" y="314.00" text-anchor="end" font-size="12" class="muted">0.0</text>
+<line x1="632" x2="1072" y1="253.33" y2="253.33" stroke="#343944"/>
+<text x="624" y="257.33" text-anchor="end" font-size="12" class="muted">173.5</text>
+<line x1="632" x2="1072" y1="196.67" y2="196.67" stroke="#343944"/>
+<text x="624" y="200.67" text-anchor="end" font-size="12" class="muted">347.0</text>
+<line x1="632" x2="1072" y1="140.00" y2="140.00" stroke="#343944"/>
+<text x="624" y="144.00" text-anchor="end" font-size="12" class="muted">520.5</text>
+<text x="632.00" y="332" text-anchor="middle" font-size="12" class="muted">2</text>
+<polyline points="632.00,299.84" fill="none" stroke="#72a7ff" stroke-width="2"/>
+<circle cx="632.00" cy="299.84" r="3.5" fill="#72a7ff"><title>ztty, 2 windows: 31.10 MiB</title></circle>
+<text x="584" y="367" font-size="13" style="fill:#72a7ff">ztty 31.10 MiB</text>
+<polyline points="632.00,158.21" fill="none" stroke="#6dcbb1" stroke-width="2"/>
+<circle cx="632.00" cy="158.21" r="3.5" fill="#6dcbb1"><title>Ghostty, 2 windows: 464.70 MiB</title></circle>
+<text x="753" y="367" font-size="13" style="fill:#6dcbb1">Ghostty 464.70 MiB</text>
+<polyline points="632.00,217.44" fill="none" stroke="#c09aff" stroke-width="2"/>
+<circle cx="632.00" cy="217.44" r="3.5" fill="#c09aff"><title>Kitty, 2 windows: 283.38 MiB</title></circle>
+<text x="922" y="367" font-size="13" style="fill:#c09aff">Kitty 283.38 MiB</text>
+<text x="36" y="420" font-size="18">images / independent</text>
+<line x1="84" x2="524" y1="620.00" y2="620.00" stroke="#343944"/>
+<text x="76" y="624.00" text-anchor="end" font-size="12" class="muted">0.0</text>
+<line x1="84" x2="524" y1="563.33" y2="563.33" stroke="#343944"/>
+<text x="76" y="567.33" text-anchor="end" font-size="12" class="muted">171.6</text>
+<line x1="84" x2="524" y1="506.67" y2="506.67" stroke="#343944"/>
+<text x="76" y="510.67" text-anchor="end" font-size="12" class="muted">343.1</text>
+<line x1="84" x2="524" y1="450.00" y2="450.00" stroke="#343944"/>
+<text x="76" y="454.00" text-anchor="end" font-size="12" class="muted">514.7</text>
+<text x="84.00" y="642" text-anchor="middle" font-size="12" class="muted">2</text>
+<polyline points="84.00,613.63" fill="none" stroke="#72a7ff" stroke-width="2"/>
+<circle cx="84.00" cy="613.63" r="3.5" fill="#72a7ff"><title>ztty, 2 windows: 19.29 MiB</title></circle>
+<text x="36" y="677" font-size="13" style="fill:#72a7ff">ztty 19.29 MiB</text>
+<polyline points="84.00,468.21" fill="none" stroke="#6dcbb1" stroke-width="2"/>
+<circle cx="84.00" cy="468.21" r="3.5" fill="#6dcbb1"><title>Ghostty, 2 windows: 459.54 MiB</title></circle>
+<text x="205" y="677" font-size="13" style="fill:#6dcbb1">Ghostty 459.54 MiB</text>
+<polyline points="84.00,529.51" fill="none" stroke="#c09aff" stroke-width="2"/>
+<circle cx="84.00" cy="529.51" r="3.5" fill="#c09aff"><title>Kitty, 2 windows: 273.96 MiB</title></circle>
+<text x="374" y="677" font-size="13" style="fill:#c09aff">Kitty 273.96 MiB</text>
+<text x="584" y="420" font-size="18">hidden / independent</text>
+<line x1="632" x2="1072" y1="620.00" y2="620.00" stroke="#343944"/>
+<text x="624" y="624.00" text-anchor="end" font-size="12" class="muted">0.0</text>
+<line x1="632" x2="1072" y1="563.33" y2="563.33" stroke="#343944"/>
+<text x="624" y="567.33" text-anchor="end" font-size="12" class="muted">167.2</text>
+<line x1="632" x2="1072" y1="506.67" y2="506.67" stroke="#343944"/>
+<text x="624" y="510.67" text-anchor="end" font-size="12" class="muted">334.3</text>
+<line x1="632" x2="1072" y1="450.00" y2="450.00" stroke="#343944"/>
+<text x="624" y="454.00" text-anchor="end" font-size="12" class="muted">501.5</text>
+<text x="632.00" y="642" text-anchor="middle" font-size="12" class="muted">2</text>
+<polyline points="632.00,614.03" fill="none" stroke="#72a7ff" stroke-width="2"/>
+<circle cx="632.00" cy="614.03" r="3.5" fill="#72a7ff"><title>ztty, 2 windows: 17.61 MiB</title></circle>
+<text x="584" y="677" font-size="13" style="fill:#72a7ff">ztty 17.61 MiB</text>
+<polyline points="632.00,468.21" fill="none" stroke="#6dcbb1" stroke-width="2"/>
+<circle cx="632.00" cy="468.21" r="3.5" fill="#6dcbb1"><title>Ghostty, 2 windows: 447.78 MiB</title></circle>
+<text x="753" y="677" font-size="13" style="fill:#6dcbb1">Ghostty 447.78 MiB</text>
+<polyline points="632.00,531.78" fill="none" stroke="#c09aff" stroke-width="2"/>
+<circle cx="632.00" cy="531.78" r="3.5" fill="#c09aff"><title>Kitty, 2 windows: 260.25 MiB</title></circle>
+<text x="922" y="677" font-size="13" style="fill:#c09aff">Kitty 260.25 MiB</text>
+<text x="36" y="769" font-size="13" class="muted">Panel scales are independent. Legends show the largest window count. Native GPU memory and display latency remain unmeasured.</text>
+</svg>

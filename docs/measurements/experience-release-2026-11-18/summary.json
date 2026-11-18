@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-18T11:44:23.140365+00:00",
+  "report_checkpoint": "0563554b95dc6321f6e45bdd53659b6c85f90850",
+  "source_files_sha256_at_checkpoint": {
+    "src/search.rs": "99b22e23fbde5c13a0ef9a9c18ab082950fc142294bc7cafc25cb9eeca4f3df5",
+    "src/selection.rs": "a0bcf186d6bf2877b3d2926c10b2541359b62f611289c03487bb97a42399617a",
+    "src/session.rs": "62b6bfbccce844209fc0de16ac14c06a01f994059acca4f3cd905a1e317090c6",
+    "src/actions.rs": "88a2148301dc665266a3aaa323a9870c16f8665aafdd1570016281d69caef260",
+    "crates/zinput/src/lib.rs": "54cd002f1355f6c98bb5c54ffbd101e27ecfcc2b9dda8a7f0bc9553e2ea8b5eb",
+    "crates/zterm/src/screen.rs": "b275499b99ebebffcf4d35dcae718179bad4b9992b9f1ae6f35e5344ad4c9d64",
+    "crates/zterm/src/terminal.rs": "6041ed43f25eea5c5e3ceaededdcf1275f34970223934eab72722de2926987c7",
+    "crates/zterm/examples/benchmark.rs": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+    "tests/session_switcher.py": "aa2d638ff24cb679a02023e707ee13bb05a6cef732c219b05d7ba62285e2acd5",
+    "install.sh": "76bb322245f62a1517b4bfb27e095d1b6d8357e4c25d86825e748f91fe9bc321",
+    "tests/install_test.py": "de16ee217f7787cb7f4d486cf5d2b2ac3b29b03e92429e135ff9fa5521912da0"
+  },
+  "release": {
+    "status": "pending",
+    "tag": null,
+    "commit": null,
+    "url": null,
+    "assets_verified": false
+  },
+  "device_installation": {
+    "status": "pending",
+    "installed_path": null,
+    "version": null,
+    "binary_sha256": null,
+    "rollback_path": null
+  },
+  "local_workspace": {
+    "source_sha": "0563554b95dc6321f6e45bdd53659b6c85f90850",
+    "exit_code": 0,
+    "regular_tests": 264,
+    "doctests": 6,
+    "custom_session_core_checks": 8,
+    "native_darwin_spawn": "skipped on Linux",
+    "raw_summary": "linux/local-workspace-tests.json",
+    "raw_log": "linux/local-workspace-tests.log"
+  },
+  "linux_device": {
+    "runtime_source_sha": "cfc7ae80e785e4d3de11ffa5e1fba3f63d158222",
+    "recheck_harness_source_sha": "0563554b95dc6321f6e45bdd53659b6c85f90850",
+    "binary_sha256": "c6e6a8105c30e9b16be7def46a558eb3aee6154c9539c0f74b3a6501698e3ae6",
+    "binary_bytes": 728232,
+    "original_wrapper_status": "failed; session_switcher stopped at an impossible broker-stderr assertion",
+    "original_other_suites_passed": 5,
+    "session_switcher_recheck_passed_groups": 6,
+    "recheck_did_not_change_runtime_binary": true,
+    "scope": "Linux x86_64 real PTY and owned X11 window pixels in private Xvfb; synthetic XTEST input"
+  },
+  "performance": {
+    "summary": "performance/core-throughput-summary.json",
+    "baseline_sha": "072111be0fb13062d2d5369ac4a5d58b64cfaa35",
+    "ux_sha": "114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847",
+    "measured_optimized_source": "114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847 + performance/core-inline-optimization.patch",
+    "production_optimization_sha": "cfc7ae80e785e4d3de11ffa5e1fba3f63d158222",
+    "screen_sha256": "b275499b99ebebffcf4d35dcae718179bad4b9992b9f1ae6f35e5344ad4c9d64",
+    "source_match_scope": "screen.rs byte identity; benchmark used its recorded base plus patch, not the later shipped runtime binary"
+  },
+  "macos_candidates": [
+    {
+      "run_id": 44293476047,
+      "source_sha": "a045871a76ff51c1acd29881ff280869e093efbb",
+      "build_only": true,
+      "platform": "macos",
+      "aarch64": "accepted: 8 spawn checks, 24 native checks, 13 stages; 10 actual PNGs recorded by artifact inventory",
+      "x86_64": "failed in spawn; native and package skipped"
+    },
+    {
+      "run_id": 44295578969,
+      "source_sha": "bfd2732e238b3864e95e721e873f6c9498507bec",
+      "build_only": true,
+      "platform": "macos",
+      "aarch64": "failed: no_children assertion saw waitpid(..., WNOHANG) return 0; native and package skipped",
+      "x86_64": "8 spawn checks passed; native RGB check failed (actual red [255,0,3], expected [255,0,0]); package skipped"
+    }
+  ],
+  "limitations": [
+    "No formal release or device installation claimed at this report checkpoint.",
+    "Earlier accepted native jobs do not establish acceptance for a later source or all-platform feature parity.",
+    "Core throughput is not search, PTY, GUI, GPU, compositor or physical input latency performance.",
+    "Copied JSON may retain original machine paths to logs or images not copied here; the manifest identifies precisely what is retained."
+  ]
+}

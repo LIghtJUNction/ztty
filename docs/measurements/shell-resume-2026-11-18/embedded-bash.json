@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "binary": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+    "sha256": "a6e1254283d888954698c8e92a61eded6703417e6854d6a16421290a98ccdb6e",
+    "size": 682224,
+    "source": "f2a49ec23a54ed3334d825087e1cd97fd00816af"
+  },
+  "script_sha256": "b67a54158f43329ae4d7b5f1f90946415a67aa75d557b1c5a148bf533815514f",
+  "command": [
+    "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+    "shell-integration",
+    "bash"
+  ]
+}

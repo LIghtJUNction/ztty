@@ -1,0 +1,136 @@
+{
+  "ok": true,
+  "checks": [
+    "OSC 133 metadata, exit codes, bounded command output and command CLI agree with the real PTY",
+    "real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input",
+    "command navigation copies the selected first and second command regions through the real clipboard",
+    "filtered command palette executes a font action, font reset restores the grid and both preserve the running PTY",
+    "custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release",
+    "command navigation skips regions invalidated by live-screen width changes and retains intact historical output",
+    "atomic config saves update pixels/font without restarting; explicit truecolor survives theme change; malformed reload retains the previous valid state",
+    "config watching recovers after the containing directory is renamed or deleted and recreated",
+    "history shows a temporary return control; new PTY output preserves the inspected rows and marks new output; clicking returns live, clears the indication and sends no application mouse bytes",
+    "the return control avoids search and palette rows; clicking preserves both modal input flows, clipboard search and the unchanged PTY grid",
+    "observing an already attached workspace pane preserves the other pane's actual X input focus",
+    "a read-only observer can return live after new output without acquiring input, resizing or replacing the PTY, or sending mouse input",
+    "closing an observer by action or WM_DELETE preserves the agent-owned PTY and permits reattachment",
+    "observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY",
+    "same-owner local acquire leaves observation mode and restores real GUI input without replacing the PTY",
+    "attach --observe on an already attached local-owned view preserves the same live PTY when the observing window closes",
+    "a fresh --observe window owns and reaps only its newly created child when closed",
+    "launch waiter exits and session/PTY resources are released"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/back-to-live/ztty-device-candidate",
+  "binary_sha256": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada",
+  "source_sha256": {
+    "src/session.rs": "76242966307ff6a3f3d1e1ff190258e9a81279962f22f04225a268325f1957d9",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/output_tail.rs": "3a8435adbc9645df51e1e0b21a7c8c2e63891a6f2bb51ab9e8b5cfdd77df8e68",
+    "src/session_core.rs": "7eed11c01eb96780f739ce08877e825c7aee15137c4ed20f6801f9778bcd5d58",
+    "src/input_queue.rs": "e34883d0376d2439454e93920fcb813657fbf69007c5937dfae8dd6c4929c44d",
+    "src/search.rs": "99b22e23fbde5c13a0ef9a9c18ab082950fc142294bc7cafc25cb9eeca4f3df5",
+    "src/scroll_prompt.rs": "27e9b9edb16d4bed1c6b63f600122c774f42bc6b701f90cc9cf51d867cad75ff",
+    "src/actions.rs": "88a2148301dc665266a3aaa323a9870c16f8665aafdd1570016281d69caef260",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "src/x11.rs": "584f6e81dd962a654ec62e72c57d80de50a17a58f81f7f722c13ff01ae1cf807",
+    "src/appearance.rs": "0e8135892dbb42d3053a01c287f8e180cb4599f21699cc6febb7676e79f1c2bf",
+    "src/main.rs": "2c06838a41a374a30d39f05d33d139f43c9e2e9eb9837fab5c5913d2d72acd7d",
+    "tests/daily_workflow.py": "5f1b1bf3c9d3cff127e8fc677d4134a881441912c77e00e5f71c2f0c37c457d2"
+  },
+  "screenshots": {
+    "history-search": {
+      "path": "artifacts/experience-release/device/scroll-prompt/history-search.png",
+      "sha256": "d0e6f2a6b3ba498b1818f16ea6cad866aaa515c1fbe3d4a254296415c3963e6e"
+    },
+    "command-palette": {
+      "path": "artifacts/experience-release/device/scroll-prompt/command-palette.png",
+      "sha256": "9f522d38efe05f2cb97ba172c4e2a6414067af04968ca68033912e4381c79c4a"
+    },
+    "invalid-config-diagnostic": {
+      "path": "artifacts/experience-release/device/scroll-prompt/invalid-config-diagnostic.png",
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "reloaded-terminal": {
+      "path": "artifacts/experience-release/device/scroll-prompt/reloaded-terminal.png",
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    },
+    "scrollback-return": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-return.png",
+      "sha256": "a3a7e4256af9286b3411e709237b3b898123271150e5e7a3f9141f8ba54a18ba"
+    },
+    "scrollback-new-output": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-new-output.png",
+      "sha256": "3da127495566c4156eb256a197f476d1f8d7d3e8faf560ee3386b011f1910ef4"
+    },
+    "scrollback-live": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-live.png",
+      "sha256": "3a52e9be32b0ff603f951d005bd2fafaf09ea736826cb8d1f2bb8ac1ee1075e1"
+    },
+    "scrollback-search": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-search.png",
+      "sha256": "d0e6f2a6b3ba498b1818f16ea6cad866aaa515c1fbe3d4a254296415c3963e6e"
+    },
+    "scrollback-palette": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-palette.png",
+      "sha256": "fc721217e55bc1f6ae4c172431289a5ca45be5b9a84b6f88dc0785ce76dac1e6"
+    },
+    "scrollback-observer": {
+      "path": "artifacts/experience-release/device/scroll-prompt/scrollback-observer.png",
+      "sha256": "57591461828b234be1b6ee4201e03570bcc1b969a848e2730621aea0f3b15ec3"
+    }
+  },
+  "display_ownership": {
+    "display": ":17475",
+    "pid": 2651274,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X17475",
+        "inode": 14909701,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X17475",
+        "inode": 14909700,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "scroll_prompt": {
+    "normal_bounds": [
+      778,
+      612,
+      920,
+      644
+    ],
+    "new_output_bounds": [
+      661,
+      612,
+      920,
+      644
+    ],
+    "search_bounds": [
+      778,
+      582,
+      920,
+      614
+    ],
+    "palette_bounds": [
+      778,
+      438,
+      920,
+      470
+    ],
+    "observer": {
+      "input_owner": "workflow-owner",
+      "read_only": true,
+      "pid_preserved": true
+    }
+  },
+  "stderr": ""
+}

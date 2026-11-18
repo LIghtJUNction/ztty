@@ -1,0 +1,9 @@
+{
+  "stdio": "passed",
+  "tool_count": 9,
+  "http": "passed",
+  "concurrent_requests": 16,
+  "chunked": "passed",
+  "authentication": "passed",
+  "ipv6": "passed"
+}

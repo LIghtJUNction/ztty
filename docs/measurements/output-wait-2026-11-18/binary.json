@@ -1,0 +1,14 @@
+{
+  "source_commit": "c2fdb7caf8d4a6f548a29c9decf33bc4ccddd80c",
+  "source_tree": "e9dba20b23f049584185e218c30017520bd32027",
+  "sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+  "bytes": 708456,
+  "built_at_utc": "2026-11-18T09:37:36.393902+00:00",
+  "build_command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--release"
+  ],
+  "git_status": ""
+}

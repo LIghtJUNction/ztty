@@ -1,0 +1,152 @@
+{
+  "stdio_pty": "passed",
+  "unicode_cursor_pages": "passed",
+  "cwd_environment_resize": "passed",
+  "same_owner_preserves_queued_pty_input": {
+    "status": "passed",
+    "accepted_bytes": 1048576,
+    "received_bytes": 1048576,
+    "sha256": "aca1cd027e979588d14b877b7b0cb8585ad9fec599eb45801992ee5382b3760f",
+    "queue_full_before_reacquire": true
+  },
+  "split_pty_utf8": "passed",
+  "invalid_prefix_split_utf8": {
+    "status": "passed",
+    "initial_cursor": 1,
+    "final_cursor": 8,
+    "output": "�🚀END"
+  },
+  "creator_cwd_argv_env_isolation": "passed",
+  "http_stdio_shared_broker": "passed",
+  "namespaces_and_ambiguity": "passed",
+  "exit_code": 7,
+  "exclusive_input_owner_and_explicit_takeover": "passed",
+  "bounded_command_reads_across_observers": "passed",
+  "guarded_output_resume": {
+    "status": "passed",
+    "old_identity": {
+      "uri": "ztty://mcp/stdio/resume-reuse",
+      "id": 8,
+      "created_at": 1794996172830,
+      "broker_pid": 818730
+    },
+    "replacement_identity": {
+      "uri": "ztty://mcp/stdio/resume-reuse",
+      "id": 9,
+      "created_at": 1794996172866,
+      "broker_pid": 818730
+    },
+    "resumed_stdio": "LD",
+    "independent_observer": "D",
+    "resumed_http": "LD",
+    "mismatched_identity_fields_rejected": [
+      "uri",
+      "id",
+      "created_at",
+      "broker_pid"
+    ],
+    "malformed_guards_rejected": 11,
+    "rename_preserved_identity": true,
+    "stale_guard_error": "session identity changed; start a new read",
+    "legacy_unguarded_output": "LACEMENT"
+  },
+  "invalid_utf8_page_boundaries": {
+    "status": "passed",
+    "payload_hex": "e258f09f58e4b8ade69687f09f9a80e2c2a2454e44",
+    "eof_suffix_hex": "f09f",
+    "open_reads": [
+      {
+        "transport": "stdio",
+        "max_bytes": 1,
+        "cursors": [
+          0,
+          1,
+          2,
+          4,
+          5,
+          8,
+          11,
+          15,
+          16,
+          18,
+          19,
+          20,
+          21
+        ],
+        "output": "�X�X中文🚀�¢END",
+        "output_eof": false
+      },
+      {
+        "transport": "http",
+        "max_bytes": 2,
+        "cursors": [
+          2,
+          4,
+          8,
+          11,
+          15,
+          18,
+          20,
+          21
+        ],
+        "output": "�X中文🚀�¢END",
+        "output_eof": false
+      }
+    ],
+    "closed_reads": [
+      {
+        "transport": "stdio",
+        "max_bytes": 2,
+        "cursors": [
+          0,
+          2,
+          4,
+          8,
+          11,
+          15,
+          18,
+          20,
+          23
+        ],
+        "output": "�X�X中文🚀�¢END�",
+        "output_eof": true
+      },
+      {
+        "transport": "http",
+        "max_bytes": 1,
+        "cursors": [
+          2,
+          4,
+          5,
+          8,
+          11,
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          23
+        ],
+        "output": "�X中文🚀�¢END�",
+        "output_eof": true
+      }
+    ]
+  },
+  "descendant_output_eof": {
+    "status": "passed",
+    "after_direct_child_exit": {
+      "output": "PREFIX",
+      "running": false,
+      "exit_code": 7,
+      "has_more": false,
+      "output_eof": false
+    },
+    "later_descendant_output": "SUFFIX",
+    "final_cursor": 12,
+    "final_output_eof": true
+  },
+  "transport_exit_persistence": "passed",
+  "attach_default_list": "passed",
+  "close_releases_sessions": "passed"
+}

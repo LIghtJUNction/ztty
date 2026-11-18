@@ -1,0 +1,325 @@
+{
+  "schema": 1,
+  "scope": "Unmodified zterm parser/screen development microbenchmark. No PTY, GUI, rendering, search invocation, competitors or native-platform claims.",
+  "baseline_commit": "072111be0fb13062d2d5369ac4a5d58b64cfaa35",
+  "ux_commit": "114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847",
+  "optimized_source": {
+    "base_commit": "114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847",
+    "patch": "core-inline-optimization.patch",
+    "patch_sha256": "6467c0dc21c2192467a27df9932cc8250df9e67d6fac847ab2b65b605186d9ac",
+    "screen_sha256": "b275499b99ebebffcf4d35dcae718179bad4b9992b9f1ae6f35e5344ad4c9d64",
+    "shared_screen_matches_measured_source": true
+  },
+  "method": {
+    "outer_rounds": 3,
+    "order": "ABBAAB",
+    "internal_throughput_samples": 7,
+    "internal_summary": "median",
+    "feeds_per_internal_sample": 4096,
+    "warmup_feeds_per_workload": 4096,
+    "geometry": [
+      120,
+      32
+    ],
+    "history_workload_limit": 2048,
+    "cache_flushed": false,
+    "exclusive_cpu": false,
+    "frequency_locked": false
+  },
+  "environment": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "affinity_available": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "benchmark_cpu": 8,
+    "build_env": {
+      "RUSTFLAGS": null,
+      "CARGO_ENCODED_RUSTFLAGS": null,
+      "CARGO_PROFILE_RELEASE_OPT_LEVEL": null,
+      "CARGO_PROFILE_RELEASE_LTO": null
+    },
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+    "cgroup_cpu_max": null,
+    "cpu_governor": null,
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor"
+  },
+  "initial_regression_ratios_of_medians": {
+    "ascii_mib_s": 0.8674889617456037,
+    "ascii_full_history_mib_s": 0.8984651188016782,
+    "sgr_mib_s": 0.9386882078256669,
+    "unicode_mib_s": 0.8947102476696129
+  },
+  "diagnosis": {
+    "change": "Physical row metadata previously reconstructed the row index by dividing the linear cell index by columns; the added overwrite checks also caused overwrite_span to stop inlining.",
+    "source_fix": "Reuse the bounded ring row index directly, and retain inline(always) on overwrite_span. No wrap semantics, history budget, cell layout, fields, or allocation changes.",
+    "assembly_evidence": {
+      "before": {
+        "binary_sha256": "aa43cc3e162d789a7455e57b3a8482e0a928901e4ba2f10907fc85380c6a627d",
+        "overwrite_span_outlined_symbol": false
+      },
+      "initial_ux": {
+        "binary_sha256": "354274d8dc0f643e8baabffb4c07109a1a471fef47783d2a43e60bfe14f5af5c",
+        "overwrite_span_outlined_symbol": true,
+        "symbol_bytes": 395,
+        "static_div_instructions": [
+          "7ddb1:\t49 f7 f2             \tdiv    %r10",
+          "7de5b:\t41 f7 f2             \tdiv    %r10d"
+        ]
+      },
+      "rowindex_only": {
+        "binary_sha256": "6f631c4ab8349c4834c45a69f44422c2c0ab552854ea18f2f4a55c929c03cadc",
+        "overwrite_span_outlined_symbol": true,
+        "symbol_bytes": 338,
+        "static_div_instructions": []
+      },
+      "rowindex_and_inline": {
+        "binary_sha256": "852bfb3f00db502cb92f511445b0e9126c9546979b562afe79b0a032bd3400a1",
+        "overwrite_span_outlined_symbol": false
+      }
+    },
+    "rowindex_only_ratios_over_initial_ux": {
+      "ascii_mib_s": {
+        "ratio_of_medians": 1.0610701904576239,
+        "paired_ratios": [
+          1.0903626387227197,
+          0.9355733054515224,
+          1.0610701904576239
+        ],
+        "median_paired_ratio": 1.0610701904576239,
+        "range": [
+          0.9355733054515224,
+          1.0903626387227197
+        ]
+      },
+      "ascii_full_history_mib_s": {
+        "ratio_of_medians": 1.1862978662633317,
+        "paired_ratios": [
+          1.0535551948051947,
+          1.1862978662633317,
+          1.1843436835837
+        ],
+        "median_paired_ratio": 1.1843436835837,
+        "range": [
+          1.0535551948051947,
+          1.1862978662633317
+        ]
+      },
+      "sgr_mib_s": {
+        "ratio_of_medians": 1.0401531449839683,
+        "paired_ratios": [
+          1.1045226368911094,
+          1.1225861749147685,
+          0.9710301353190072
+        ],
+        "median_paired_ratio": 1.1045226368911094,
+        "range": [
+          0.9710301353190072,
+          1.1225861749147685
+        ]
+      },
+      "unicode_mib_s": {
+        "ratio_of_medians": 1.0577901341894835,
+        "paired_ratios": [
+          1.089468315804812,
+          1.0657843724667817,
+          1.0577901341894835
+        ],
+        "median_paired_ratio": 1.0657843724667817,
+        "range": [
+          1.0577901341894835,
+          1.089468315804812
+        ]
+      }
+    }
+  },
+  "final_results": {
+    "ascii_mib_s": {
+      "before": {
+        "samples": [
+          239.454,
+          273.578,
+          218.181
+        ],
+        "median": 239.454,
+        "min": 218.181,
+        "max": 273.578,
+        "sample_stddev": 27.94582710054101,
+        "sample_cv_percent": 11.465534844378181
+      },
+      "after": {
+        "samples": [
+          248.575,
+          258.943,
+          250.514
+        ],
+        "median": 250.514,
+        "min": 248.575,
+        "max": 258.943,
+        "sample_stddev": 5.512156051250114,
+        "sample_cv_percent": 2.1815000097291857
+      },
+      "ratio_of_medians": 1.0461884119705664,
+      "paired_ratios": [
+        1.0380908232896506,
+        0.9465052014416364,
+        1.148193472392188
+      ],
+      "median_paired_ratio": 1.0380908232896506,
+      "paired_ratio_range": [
+        0.9465052014416364,
+        1.148193472392188
+      ]
+    },
+    "ascii_full_history_mib_s": {
+      "before": {
+        "samples": [
+          197.402,
+          175.331,
+          124.881
+        ],
+        "median": 175.331,
+        "min": 124.881,
+        "max": 197.402,
+        "sample_stddev": 37.174424411594224,
+        "sample_cv_percent": 22.41160281559254
+      },
+      "after": {
+        "samples": [
+          187.815,
+          188.319,
+          193.582
+        ],
+        "median": 188.319,
+        "min": 187.815,
+        "max": 193.582,
+        "sample_stddev": 3.1940432578995126,
+        "sample_cv_percent": 1.6819134048716446
+      },
+      "ratio_of_medians": 1.0740770314433843,
+      "paired_ratios": [
+        0.9514341293401283,
+        1.0740770314433843,
+        1.5501317254025833
+      ],
+      "median_paired_ratio": 1.0740770314433843,
+      "paired_ratio_range": [
+        0.9514341293401283,
+        1.5501317254025833
+      ]
+    },
+    "sgr_mib_s": {
+      "before": {
+        "samples": [
+          183.975,
+          173.214,
+          186.574
+        ],
+        "median": 183.975,
+        "min": 173.214,
+        "max": 186.574,
+        "sample_stddev": 7.0833551607506875,
+        "sample_cv_percent": 3.9079645879274727
+      },
+      "after": {
+        "samples": [
+          180.544,
+          179.166,
+          186.734
+        ],
+        "median": 180.544,
+        "min": 179.166,
+        "max": 186.734,
+        "sample_stddev": 4.030914040264321,
+        "sample_cv_percent": 2.2129883612580543
+      },
+      "ratio_of_medians": 0.9813507270009513,
+      "paired_ratios": [
+        0.9813507270009513,
+        1.0343621185354532,
+        1.0008575685786874
+      ],
+      "median_paired_ratio": 1.0008575685786874,
+      "paired_ratio_range": [
+        0.9813507270009513,
+        1.0343621185354532
+      ]
+    },
+    "unicode_mib_s": {
+      "before": {
+        "samples": [
+          122.761,
+          136.208,
+          141.144
+        ],
+        "median": 136.208,
+        "min": 122.761,
+        "max": 141.144,
+        "sample_stddev": 9.514205116561241,
+        "sample_cv_percent": 7.133638584520803
+      },
+      "after": {
+        "samples": [
+          129.972,
+          128.425,
+          139.129
+        ],
+        "median": 129.972,
+        "min": 128.425,
+        "max": 139.129,
+        "sample_stddev": 5.785318689003502,
+        "sample_cv_percent": 4.3659926814876275
+      },
+      "ratio_of_medians": 0.9542170797603666,
+      "paired_ratios": [
+        1.058740153631854,
+        0.942859450252555,
+        0.9857237998072889
+      ],
+      "median_paired_ratio": 0.9857237998072889,
+      "paired_ratio_range": [
+        0.942859450252555,
+        1.058740153631854
+      ]
+    }
+  },
+  "heap_bytes": {
+    "before": [
+      107676
+    ],
+    "after": [
+      107932
+    ]
+  },
+  "steady_state_allocations_all_runs": 0,
+  "interpretation": "The original UX change showed >10% regressions on this core microbenchmark. After the minimal hot-path fix, none of the three final paired throughput ratios in any workload was below 0.90; final ratios of medians range from 0.954 to 1.074. Shared-host variance is substantial, especially baseline history throughput, so these samples do not establish universal speedups or equality.",
+  "limitations": [
+    "Three independent process samples per binary; no confidence interval or universal throughput claim.",
+    "The unchanged runner emits each workload median of seven inner samples, not all inner raw timings; outer raw outputs are preserved.",
+    "Same shared Linux environment and CPU affinity; no exclusive core, fixed frequency, or cold cache.",
+    "Core parser/screen throughput only; does not benchmark search/highlight execution, PTY throughput, GUI latency, rendering, or platforms other than this Linux host."
+  ],
+  "raw_files": {
+    "core-throughput-072111be-114ca5bb.json": "390cc9e6e85fed456f32314b2ef1a9675e830df51ba061e2f150c09a4e55cdfc",
+    "core-throughput-rowindex-diagnosis.json": "e1d972558bbe0d42deff25713377f4f0326ebdf6ed3766b1638fb0fb6fcadad4",
+    "core-throughput-optimized-final.json": "93696aa70300737d6d8f92a861f27d5f51c28349923b4c8c3363b26685c278e8",
+    "core-rowindex-optimization.patch": "c48f4888ab72a694d43e8b2f40e5fdde5aff61e71a9e10cbe01027f0130e0c49",
+    "core-inline-optimization.patch": "6467c0dc21c2192467a27df9932cc8250df9e67d6fac847ab2b65b605186d9ac"
+  },
+  "shared_patch_validation": {
+    "command": "cargo test --locked --offline -p zterm --lib --target-dir /workspace/scratch/130f1831bee7/ztty-core-perf-target-inline --jobs 2",
+    "exit": 0,
+    "passed": 88,
+    "failed": 0,
+    "rustfmt_screen_check_exit": 0,
+    "note": "Shared screen.rs is byte-identical to the measured optimized variant; root separately moved the cfg(test) history-budget module within terminal.rs without changing runtime code."
+  }
+}

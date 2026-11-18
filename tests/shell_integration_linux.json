@@ -1,0 +1,88 @@
+{
+  "schema": "ztty.shell-integration.v1",
+  "platform": "Linux",
+  "source_sha256": {
+    "crates/zterm/src/lib.rs": "d47a5677f5f580643b38f7624e939b9a4b859b4af202c5bf0c4ce7ebaad5b7fb",
+    "crates/zterm/src/screen.rs": "fa6e442485b4e25233f526d6777c320c4194e0455d7843e9c7455dc861a82e85",
+    "crates/zterm/src/shell.rs": "a105b2971057d882f232257081e6f65c6088e6d4921d3521e87aeb8965586c4a",
+    "crates/zterm/src/shell_tests.rs": "8bd20c8f1818dcfb2f57a1841a13674f63d49d02d97ce7e7af57fee9833a2367",
+    "crates/zterm/src/terminal.rs": "6b5ebcbf8780053fa5956ac4aa6cb280910f4c480915136e50a08290d77100f4",
+    "crates/zterm/src/tests.rs": "98386430d75b31b3b45d6b80989db2c6995781db55befe9f3b582318c27b187e",
+    "crates/zterm/examples/shell_probe.rs": "2ff60541fd1c3aa561592339345f9d45333ac0e41ce7ad4388d04362e02d30f4",
+    "shell/ztty.bash": "bf76374fe6ca0ddafba2fac21949ffaf3e096e2a5d2c6385a3f0279987e3e73b",
+    "shell/ztty.fish": "7ed1b9a4b84e278b58ed396c70e21612ba4182b128c5109d5cbf860bbfe9193b",
+    "shell/ztty.nu": "edf23776b13e0f1dcd532952486a326c2f916bce8e59e9a182c15f4a51e16896",
+    "shell/ztty.zsh": "199012940a843ceeafa677eaf40a2e7f2aec288e0c7ffd93e5f4bbc979caac96",
+    "tests/shell_integration.py": "016c33b3eb6ba25a48ff5662f054d4e7bf1be00d1eed63dec54de74eba957d0f"
+  },
+  "checks": [
+    {
+      "shell": "bash",
+      "status": "passed",
+      "version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+      "records": 8,
+      "transcript_bytes": 3523,
+      "transcript_sha256": "745f922f4b551f055e78956f9b7f2ccd6c1c9cd5a60634bff0b0bb40d53a36f6",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces"
+      ]
+    },
+    {
+      "shell": "zsh",
+      "status": "passed",
+      "version": "zsh 5.9.2 (x86_64-pc-linux-gnu)",
+      "records": 4,
+      "transcript_bytes": 2335,
+      "transcript_sha256": "ff3c02dd39a5a8aa76b87ac32fdf717188ca16580fbbbb73eb07e6c28fd40637",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces"
+      ]
+    },
+    {
+      "shell": "fish",
+      "status": "passed",
+      "version": "fish，版本 4.9.3",
+      "records": 5,
+      "transcript_bytes": 4576,
+      "transcript_sha256": "dca94022b469f3053a3e3f7c98f9e72ff26014536f11793072caf9b8927b97fb",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces"
+      ]
+    },
+    {
+      "shell": "nu",
+      "status": "passed",
+      "version": "0.117.0",
+      "records": 5,
+      "transcript_bytes": 259788,
+      "transcript_sha256": "82baed1bc63db0cdb37ba496d0376570f539a12ab4e708811fc75c038e253975",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces"
+      ]
+    }
+  ]
+}

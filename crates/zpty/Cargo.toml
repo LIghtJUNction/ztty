@@ -9,10 +9,15 @@ repository = "https://github.com/LIghtJUNction/ztty"
 readme = "README.md"
 keywords = ["pty", "terminal", "no-std", "linux"]
 categories = ["os::unix-apis", "no-std"]
-include = ["src/**", "examples/**", "Cargo.toml", "README.md", "LICENSE"]
+include = ["src/**", "examples/**", "tests/**", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
 
 [[example]]
 name = "capture"
 path = "examples/capture.rs"
+
+[[test]]
+name = "darwin_spawn"
+path = "tests/darwin_spawn.rs"
+harness = false

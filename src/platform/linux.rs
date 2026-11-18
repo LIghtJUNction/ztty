@@ -9,6 +9,7 @@ pub fn run(cfg: Config) -> Result<i32, String> {
         ("op", Value::from("create")),
         ("origin", Value::from("local")),
         ("headless", Value::Bool(false)),
+        ("observe", Value::Bool(cfg.observe)),
         ("cols", Value::from(cfg.cols)),
         ("rows", Value::from(cfg.rows)),
         ("history", Value::from(cfg.history)),
@@ -25,6 +26,16 @@ pub fn run(cfg: Config) -> Result<i32, String> {
     ]);
     if let Some(name) = cfg.name {
         request.set("name", Value::from(name));
+    }
+    if let Some((target, mode)) = cfg.target {
+        request.set("target", Value::from(target));
+        request.set("layout", Value::from(mode));
+    }
+    if let Some(cwd) = cfg.cwd {
+        request.set("cwd", Value::from(cwd));
+    }
+    if let Some(path) = cfg.config_path {
+        request.set("_config", Value::from(broker::hex(path.to_bytes())));
     }
     let created = broker::request(&request)?;
     wait_session(&created)
@@ -84,8 +95,13 @@ pub fn attach(args: &[&CStr]) -> Result<i32, String> {
         }
         return Ok(0);
     }
+    let (observe, args) = if args.first().is_some_and(|s| s.to_bytes() == b"--observe") {
+        (true, &args[1..])
+    } else {
+        (false, args)
+    };
     if args.len() != 1 {
-        return Err("usage: ztty attach [NAME | ztty://ADDRESS]".into());
+        return Err("usage: ztty attach [--observe] [NAME | ztty://ADDRESS]".into());
     }
     let name = args[0]
         .to_str()
@@ -94,7 +110,74 @@ pub fn attach(args: &[&CStr]) -> Result<i32, String> {
     let value = broker::request(&object([
         ("op", Value::from("attach")),
         ("session", Value::from(name)),
+        ("observe", Value::Bool(observe)),
         ("_appearance", appearance.to_json()),
     ]))?;
     wait_session(&value)
+}
+
+/// Scriptable desktop/session actions return one bounded JSON result. The
+/// local broker still checks input ownership on every mutating operation.
+pub fn command(args: &[&CStr]) -> Result<i32, String> {
+    use json::{Value, object};
+    let text = |index: usize| -> Result<&str, String> {
+        args.get(index)
+            .ok_or_else(|| String::from("missing argument; run ztty --help"))?
+            .to_str()
+            .map_err(|_| String::from("argument must be UTF-8"))
+    };
+    let op = text(0)?;
+    let mut request = object([("op", Value::from(op))]);
+    if op == "restore-layout" {
+        if args.len() != 2 {
+            return Err("usage: ztty restore-layout FILE".into());
+        }
+        let bytes = os::read_config(args[1])
+            .map_err(|e| alloc::format!("cannot read layout (OS error {e})"))?;
+        let layout = json::parse(&bytes).map_err(String::from)?;
+        request.set("layout", layout);
+    } else if op == "list" {
+        if args.len() > 2 {
+            return Err("usage: ztty list [FILTER]".into());
+        }
+        if args.len() == 2 {
+            request.set("filter", Value::from(text(1)?));
+        }
+    } else {
+        let selector = text(1)?;
+        request.set("session", Value::from(selector));
+        match op {
+            "info" | "detach" | "close" | "commands" | "save-layout" if args.len() == 2 => {}
+            "command-output" if args.len() == 3 => {
+                request.set("op", Value::from("command-read"));
+                let id = text(2)?
+                    .parse::<u64>()
+                    .map_err(|_| String::from("command ID must be an integer"))?;
+                request.set("command_id", Value::from(id));
+            }
+            "rename" if args.len() == 3 => request.set("name", Value::from(text(2)?)),
+            "action" if args.len() == 3 => request.set("action", Value::from(text(2)?)),
+            "move" if (3..=4).contains(&args.len()) => {
+                request.set("target", Value::from(text(2)?));
+                request.set(
+                    "layout",
+                    Value::from(if args.len() == 4 { text(3)? } else { "tab" }),
+                );
+            }
+            "control" if (3..=4).contains(&args.len()) => {
+                request.set("action", Value::from(text(2)?));
+                if args.len() == 4 {
+                    if text(3)? != "--takeover" {
+                        return Err("expected --takeover".into());
+                    }
+                    request.set("takeover", Value::Bool(true));
+                }
+            }
+            _ => return Err("invalid arguments; run ztty --help".into()),
+        }
+    }
+    let value = broker::request(&request)?;
+    os::print(1, json::stringify(&value).as_bytes());
+    os::print(1, b"\n");
+    Ok(0)
 }

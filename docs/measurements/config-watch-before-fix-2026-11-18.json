@@ -1,0 +1,67 @@
+{
+  "ok": false,
+  "checks": [
+    "OSC 133 metadata, exit codes, bounded command output and command CLI agree with the real PTY",
+    "real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input",
+    "command navigation copies the selected first and second command regions through the real clipboard",
+    "filtered command palette executes a font action, font reset restores the grid and both preserve the running PTY",
+    "custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release",
+    "command navigation skips regions invalidated by live-screen width changes and retains intact historical output",
+    "atomic config saves update pixels/font without restarting; explicit truecolor survives theme change; malformed reload retains the previous valid state"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/observer-candidate-v2-ztty",
+  "binary_sha256": "142618ed15798899ad9529a0d1b6dd83f40f16a23356656f4895ef3a19196095",
+  "source_sha256": {
+    "src/session.rs": "9d760ba54e921b07cbd00270d332147368c4f89e598bd3d5f3ca6cf2ef46076a",
+    "src/search.rs": "6262c89f7260ea534f23e258e27fc0362e24bc43b6269f6978a02d216f1b2ee6",
+    "src/actions.rs": "8650d63e1fa4543a1ee7d6a1fb0e340c5bcfb6d7fc48ecb828f2125dc853e075",
+    "src/config_watch.rs": "4fe12b27a19f859d822b6a661f2ac7c50e932ca868233260201632d519f2657b",
+    "src/x11.rs": "587410686c51358e759310b69061113c62ed7eb953c01c5195cf5a0e96853825",
+    "src/appearance.rs": "19907be84aa48ba316c99f75f85b0847200d4e7ed9eb82eef0e9e9471cbd98fb",
+    "src/main.rs": "9e8a0575a1c5c639baffe1c3d2bb2287d1c5059582ecc74600e73728055d41f8",
+    "tests/daily_workflow.py": "367b236bc7fbf79f86f16a9aa1f47ac851eda778c5f70bda0031383ef4a2277e"
+  },
+  "screenshots": {
+    "history-search": {
+      "path": "artifacts/observer-v2-daily/history-search.png",
+      "sha256": "1b62aaab087a3e6c9a380e2ff2cc545c39c599f0ba52b0b2f9c5324b9fb557ec"
+    },
+    "command-palette": {
+      "path": "artifacts/observer-v2-daily/command-palette.png",
+      "sha256": "c73cc7a45d293c62668804cb76a23c67925858a373fe2d037fc1c9f6230f51ad"
+    },
+    "invalid-config-diagnostic": {
+      "path": "artifacts/observer-v2-daily/invalid-config-diagnostic.png",
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "reloaded-terminal": {
+      "path": "artifacts/observer-v2-daily/reloaded-terminal.png",
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    }
+  },
+  "display_ownership": {
+    "display": ":28713",
+    "pid": 2136325,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X28713",
+        "inode": 69148404,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X28713",
+        "inode": 69148403,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "error": "config watcher after directory rename/recreation",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/daily_workflow.py\", line 373, in main\n    wait(lambda: image().getpixel((1, 1)) == (3, 6, 9), \"config watcher after directory rename/recreation\")\n    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/tests/daily_workflow.py\", line 104, in wait\n    raise TimeoutError(label)\nTimeoutError: config watcher after directory rename/recreation\n",
+  "stderr": ""
+}

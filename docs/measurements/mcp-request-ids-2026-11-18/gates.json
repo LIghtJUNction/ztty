@@ -1,0 +1,157 @@
+[
+  {
+    "name": "fmt",
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit": 0,
+    "seconds": 0.329
+  },
+  {
+    "name": "protocol",
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "ztty",
+      "--test",
+      "mcp_protocol",
+      "--test",
+      "json",
+      "--test",
+      "output_tail"
+    ],
+    "exit": 0,
+    "seconds": 7.868
+  },
+  {
+    "name": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "-p",
+      "ztty",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit": 0,
+    "seconds": 3.506
+  },
+  {
+    "name": "release",
+    "command": [
+      "cargo",
+      "build",
+      "--release"
+    ],
+    "exit": 0,
+    "seconds": 9.831
+  },
+  {
+    "name": "no-std",
+    "command": [
+      "python3",
+      "tools/check_no_std.py"
+    ],
+    "exit": 0,
+    "seconds": 0.091
+  },
+  {
+    "name": "mcp-wait",
+    "command": [
+      "python3",
+      "tests/mcp_wait.py",
+      "--binary",
+      "./target/release/ztty",
+      "--output",
+      "<checkout>/artifacts/mcp-request-ids-20261118/mcp-wait.json"
+    ],
+    "exit": 0,
+    "seconds": 16.349
+  },
+  {
+    "name": "mcp-transport",
+    "command": [
+      "python3",
+      "tests/mcp_transport.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit": 0,
+    "seconds": 0.214
+  },
+  {
+    "name": "mcp-sessions",
+    "command": [
+      "python3",
+      "tests/mcp_sessions.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit": 0,
+    "seconds": 1.016
+  },
+  {
+    "name": "mcp-security",
+    "command": [
+      "python3",
+      "tests/mcp_security.py",
+      "--binary",
+      "./target/release/ztty"
+    ],
+    "exit": 0,
+    "seconds": 0.215
+  },
+  {
+    "name": "mcp-wait-final",
+    "command": [
+      "python3",
+      "tests/mcp_wait.py",
+      "--binary",
+      "./target/release/ztty",
+      "--output",
+      "<checkout>/artifacts/mcp-request-ids-20261118/mcp-wait-final.json"
+    ],
+    "exit": 0,
+    "expected_exit": 0,
+    "seconds": 15.447
+  },
+  {
+    "name": "before-stdio",
+    "command": [
+      "python3",
+      "tests/mcp_wait.py",
+      "--binary",
+      "<before-checkout>/target/release/ztty",
+      "--check",
+      "stdio_numeric_request_ids",
+      "--output",
+      "<checkout>/artifacts/mcp-request-ids-20261118/before-stdio.json"
+    ],
+    "exit": 1,
+    "expected_exit": 1,
+    "seconds": 5.374
+  },
+  {
+    "name": "before-http",
+    "command": [
+      "python3",
+      "tests/mcp_wait.py",
+      "--binary",
+      "<before-checkout>/target/release/ztty",
+      "--check",
+      "http_numeric_request_ids",
+      "--output",
+      "<checkout>/artifacts/mcp-request-ids-20261118/before-http.json"
+    ],
+    "exit": 1,
+    "expected_exit": 1,
+    "seconds": 5.274
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "source": "f2a49ec23a54ed3334d825087e1cd97fd00816af",
+  "binary": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+    "sha256": "a6e1254283d888954698c8e92a61eded6703417e6854d6a16421290a98ccdb6e",
+    "size": 682224,
+    "source": "f2a49ec23a54ed3334d825087e1cd97fd00816af"
+  },
+  "checks": [
+    {
+      "name": "bash",
+      "command": [
+        "python3",
+        "tests/bash_integration.py",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/bash.json"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.458,
+      "log": "bash.log"
+    },
+    {
+      "name": "shells",
+      "command": [
+        "python3",
+        "tests/shell_integration.py",
+        "--probe",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/debug/examples/shell_probe",
+        "--artifacts",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/shells",
+        "--report",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/shells.json"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.681,
+      "log": "shells.log"
+    },
+    {
+      "name": "workspaces",
+      "command": [
+        "python3",
+        "tests/workspaces.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/workspaces.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/p0-followup-20261118/workspaces.png"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.894,
+      "log": "workspaces.log"
+    }
+  ]
+}

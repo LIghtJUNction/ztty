@@ -1,0 +1,40 @@
+   Compiling zpty v0.2.0 (/Users/runner/work/ztty/ztty/crates/zpty)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.60s
+     Running tests/darwin_spawn.rs (target/aarch64-apple-darwin/debug/build/zpty/0657e5a350491355/out/darwin_spawn-0657e5a350491355)
+darwin_spawn: child pid=1537 metadata=true phase=spawned
+darwin_spawn: child pid=1537 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1537 phase=exited-and-drained
+darwin_spawn: child pid=1538 metadata=false phase=spawned
+darwin_spawn: child pid=1539 metadata=false phase=spawned
+darwin_spawn: child pid=1540 metadata=false phase=spawned
+darwin_spawn: child pid=1538 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1539 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1540 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1538 phase=exited-and-drained
+darwin_spawn: child pid=1539 phase=exited-and-drained
+darwin_spawn: child pid=1540 phase=exited-and-drained
+darwin_spawn: child pid=1542 metadata=false phase=spawned
+darwin_spawn: child pid=1541 metadata=false phase=spawned
+darwin_spawn: child pid=1541 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1543 metadata=false phase=spawned
+darwin_spawn: child pid=1542 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1541 phase=exited-and-drained
+darwin_spawn: child pid=1542 phase=exited-and-drained
+darwin_spawn: child pid=1544 metadata=false phase=spawned
+darwin_spawn: child pid=1543 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1545 metadata=false phase=spawned
+darwin_spawn: child pid=1544 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1543 phase=exited-and-drained
+darwin_spawn: child pid=1546 metadata=false phase=spawned
+darwin_spawn: child pid=1544 phase=exited-and-drained
+darwin_spawn: child pid=1545 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1546 phase=drain-and-exit deadline_ms=2000
+darwin_spawn: child pid=1545 phase=exited-and-drained
+darwin_spawn: child pid=1546 phase=exited-and-drained
+
+thread 'main' (7853) panicked at crates/zpty/tests/darwin_spawn.rs:203:9:
+assertion `left == right` failed: unreaped owned child
+  left: 0
+ right: -1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: test failed, to rerun pass `-p zpty --test darwin_spawn`

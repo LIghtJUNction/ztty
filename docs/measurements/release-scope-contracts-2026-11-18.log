@@ -1,0 +1,11 @@
+test_branch_cannot_publish (__main__.ReleaseScope.test_branch_cannot_publish) ... ok
+test_build_only_accepts_all_four_explicit_scopes (__main__.ReleaseScope.test_build_only_accepts_all_four_explicit_scopes) ... ok
+test_full_tag_publish_remains_available (__main__.ReleaseScope.test_full_tag_publish_remains_available) ... ok
+test_partial_tag_publish_is_rejected (__main__.ReleaseScope.test_partial_tag_publish_is_rejected) ... ok
+test_unknown_scope_is_rejected (__main__.ReleaseScope.test_unknown_scope_is_rejected) ... ok
+test_wrong_version_tag_is_rejected (__main__.ReleaseScope.test_wrong_version_tag_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.041s
+
+OK

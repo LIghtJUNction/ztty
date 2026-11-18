@@ -1,0 +1,8 @@
+{
+  "stdio_observer": "passed",
+  "http_observer": "passed",
+  "role_session_binding": "passed",
+  "host_origin_allowlist": "passed",
+  "strict_jsonrpc": "passed",
+  "hostile_framing_and_limits": "passed"
+}

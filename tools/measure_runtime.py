@@ -14,7 +14,6 @@ import os
 from pathlib import Path
 import platform
 import runpy
-import select
 import shutil
 import signal
 import socket
@@ -23,6 +22,8 @@ import subprocess
 import sys
 import tempfile
 import time
+
+from isolated_xvfb import start_xvfb
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -303,29 +304,17 @@ def measure(app, binary, repetition, args, profile="default"):
     from Xlib import X, display
     result = {"app": app, "profile": profile, "configuration": configuration_label(app, profile),
               "repetition": repetition, "ok": False}
-    terminal = xvfb = connection = d = None
+    terminal = xvfb = xserver = connection = d = None
     child_identity = {}
     with tempfile.TemporaryDirectory(prefix=f"ztty-runtime-{app}-") as temporary:
         directory = Path(temporary)
         xlog_path, tlog_path = directory / "xvfb.stderr", directory / "terminal.stderr"
         xlog, tlog = xlog_path.open("wb"), tlog_path.open("wb")
         try:
-            read_fd, write_fd = os.pipe()
-            try:
-                xvfb_command = ["Xvfb", "-displayfd", str(write_fd), "-screen", "0", "1920x1200x24", "-dpi", "96", "-nolisten", "tcp"]
-                xvfb = subprocess.Popen(xvfb_command, pass_fds=(write_fd,), stdout=subprocess.DEVNULL,
-                                        stderr=xlog, start_new_session=True)
-            finally:
-                os.close(write_fd)
-            try:
-                if not select.select([read_fd], [], [], 10)[0]:
-                    raise TimeoutError("Xvfb did not allocate a display")
-                number = os.read(read_fd, 64).strip().decode("ascii")
-                if not number.isdecimal():
-                    raise RuntimeError("Xvfb returned an invalid display number")
-            finally:
-                os.close(read_fd)
-            display_name = ":" + number
+            xserver = start_xvfb(screen="1920x1200x24", dpi=96, stderr=xlog, timeout=10)
+            xvfb = xserver.process
+            display_name = xserver.display
+            result["display_ownership"] = xserver.evidence
             d = display.Display(display_name)
             root = d.screen().root
             result["xserver"] = {"pid": xvfb.pid, "screen_pixels": [1920, 1200], "depth": 24,
@@ -439,7 +428,8 @@ def measure(app, binary, repetition, args, profile="default"):
                 with contextlib.suppress(Exception):
                     d.close()
             try:
-                leftovers.extend(stop(xvfb))
+                if xserver is not None:
+                    xserver.close()
             except Exception as error:
                 result["xvfb_cleanup_error"] = repr(error)
             result["unreaped_or_live_owned_pids"] = sorted(set(leftovers))

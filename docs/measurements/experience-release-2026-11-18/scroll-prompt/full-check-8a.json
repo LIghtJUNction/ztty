@@ -1,0 +1,8 @@
+{
+  "source": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+  "source_after": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+  "command": "ZTTY_BARE_METAL=1 make check",
+  "exit_code": 0,
+  "seconds": 70.01253175735474,
+  "log_sha256": "099582bb9f8b830984d3368424c85a1df54d19fed663eb79f5a52bf39961acbb"
+}

@@ -1,0 +1,258 @@
+{
+  "source": "3c5b8e28a0c9baccd0dca1f24e1d3c3d558c449d",
+  "checks": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.51,
+      "log": "fmt.log"
+    },
+    {
+      "name": "rust-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 44.226,
+      "log": "rust-tests.log"
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 14.422,
+      "log": "clippy.log"
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 11.876,
+      "log": "release.log"
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.167,
+      "log": "no-std.log"
+    },
+    {
+      "name": "bare-metal",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "-p",
+        "zterm",
+        "-p",
+        "zinput",
+        "-p",
+        "zgraphics",
+        "--target",
+        "x86_64-unknown-none"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.033,
+      "log": "bare-metal.log"
+    },
+    {
+      "name": "windows-typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--target",
+        "x86_64-pc-windows-gnu"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 3.037,
+      "log": "windows-typecheck.log"
+    },
+    {
+      "name": "macos-intel-typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--target",
+        "x86_64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.024,
+      "log": "macos-intel-typecheck.log"
+    },
+    {
+      "name": "macos-arm-typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--locked",
+        "--target",
+        "aarch64-apple-darwin"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.801,
+      "log": "macos-arm-typecheck.log"
+    },
+    {
+      "name": "workspaces",
+      "command": [
+        "python3",
+        "tests/workspaces.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/workspaces.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/workspaces.png"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.16,
+      "log": "workspaces.log"
+    },
+    {
+      "name": "daily-workflow",
+      "command": [
+        "python3",
+        "tests/daily_workflow.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow.json",
+        "--screenshots",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.338,
+      "log": "daily-workflow.log"
+    },
+    {
+      "name": "repaint",
+      "command": [
+        "python3",
+        "tests/repaint_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/repaint.json",
+        "--screenshots",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/repaint"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.57,
+      "log": "repaint.log"
+    },
+    {
+      "name": "sixel",
+      "command": [
+        "python3",
+        "tests/sixel_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/sixel.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/sixel.png",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.961,
+      "log": "sixel.log"
+    },
+    {
+      "name": "gui",
+      "command": [
+        "python3",
+        "tests/gui_smoke.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--artifacts",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/gui"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.907,
+      "log": "gui.log"
+    },
+    {
+      "name": "graphics",
+      "command": [
+        "python3",
+        "tests/graphics_smoke.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+        "--artifacts",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/graphics"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.052,
+      "log": "graphics.log"
+    },
+    {
+      "name": "mcp-transport",
+      "command": [
+        "python3",
+        "tests/mcp_transport.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.203,
+      "log": "mcp-transport.log"
+    },
+    {
+      "name": "mcp-sessions",
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.619,
+      "log": "mcp-sessions.log"
+    },
+    {
+      "name": "mcp-security",
+      "command": [
+        "python3",
+        "tests/mcp_security.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.179,
+      "log": "mcp-security.log"
+    }
+  ]
+}

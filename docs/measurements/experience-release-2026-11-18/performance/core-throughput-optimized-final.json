@@ -1,0 +1,506 @@
+{
+  "variants": {
+    "before": {
+      "source": "072111be0fb13062d2d5369ac4a5d58b64cfaa35",
+      "checkout": "/workspace/scratch/130f1831bee7/ztty-perf-before-072111be",
+      "target": "/workspace/scratch/130f1831bee7/ztty-core-perf-target-before",
+      "source_sha256": {
+        "crates/zterm/examples/benchmark.rs": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+        "crates/zterm/src/screen.rs": "cd001b2dcbe8463038cebf88dd440a9f600ef9cde07a82048e783033308f9549",
+        "crates/zterm/src/terminal.rs": "d86bcad159dd2bee987f2c169c2b4a6ea5956299ba30c5c37024ebc876d9d91a",
+        "crates/zinput/src/lib.rs": "17e8083ea6ebf28ab2f53e46f010ae20a8ce08e11a0233ec88a09bb46db1b265",
+        "Cargo.lock": "8f715d57c334ed0f8944f4fb14a11cb089033560e6572851a0cffa99c211831c",
+        "Cargo.toml": "479ead8d66ab7b4394304399d59db38a5ca3934bfbd5ff3037d19290ae8983b0"
+      },
+      "binary_path": "/workspace/scratch/130f1831bee7/ztty-core-perf-target-before/release/examples/benchmark",
+      "binary_sha256": "aa43cc3e162d789a7455e57b3a8482e0a928901e4ba2f10907fc85380c6a627d",
+      "binary_bytes": 636280
+    },
+    "after": {
+      "source_base": "114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847",
+      "checkout": "/workspace/scratch/130f1831bee7/ztty-perf-rowindex-114ca5bb",
+      "binary_path": "/workspace/scratch/130f1831bee7/ztty-core-perf-target-inline/release/examples/benchmark",
+      "patch_path": "core-inline-optimization.patch",
+      "patch_sha256": "6467c0dc21c2192467a27df9932cc8250df9e67d6fac847ab2b65b605186d9ac",
+      "screen_sha256": "b275499b99ebebffcf4d35dcae718179bad4b9992b9f1ae6f35e5344ad4c9d64",
+      "binary_sha256": "852bfb3f00db502cb92f511445b0e9126c9546979b562afe79b0a032bd3400a1",
+      "binary_bytes": 639888
+    }
+  },
+  "environment": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "affinity_available": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "benchmark_cpu": 8,
+    "build_env": {
+      "RUSTFLAGS": null,
+      "CARGO_ENCODED_RUSTFLAGS": null,
+      "CARGO_PROFILE_RELEASE_OPT_LEVEL": null,
+      "CARGO_PROFILE_RELEASE_LTO": null
+    },
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+    "cgroup_cpu_max": null,
+    "cpu_governor": null,
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor"
+  },
+  "purpose": "Final paired check after eliminating dynamic row-index division and restoring inline overwrite_span; source is bound by base SHA plus the recorded patch.",
+  "schema": 1,
+  "timestamp_utc": "2026-11-18T11:23:15.124405+00:00",
+  "scope": "Unmodified zterm parser/screen development microbenchmark. No PTY, GUI, rendering, search invocation, competitors or native-platform claims.",
+  "protocol": {
+    "outer_rounds": 3,
+    "order": "ABBAAB",
+    "internal_throughput_samples": 7,
+    "internal_summary": "median",
+    "feeds_per_internal_sample": 4096,
+    "warmup_feeds_per_workload": 4096,
+    "geometry": [
+      120,
+      32
+    ],
+    "history_workload_limit": 2048,
+    "cache_flushed": false,
+    "exclusive_cpu": false,
+    "frequency_locked": false
+  },
+  "runs": [
+    {
+      "order": 1,
+      "pair": 1,
+      "variant": "before",
+      "seconds": 2.3148316750011873,
+      "load_before": [
+        0.19384765625,
+        0.20849609375,
+        0.166015625
+      ],
+      "load_after": [
+        0.19384765625,
+        0.20849609375,
+        0.166015625
+      ],
+      "exit": 0,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 239.454,
+        "ascii_full_history_mib_s": 197.402,
+        "sgr_mib_s": 183.975,
+        "unicode_mib_s": 122.761,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 36,
+          "p95": 67,
+          "p99": 87,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2511,
+          "p95": 4680,
+          "p99": 9450,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 2,
+      "pair": 1,
+      "variant": "after",
+      "seconds": 2.2519364710024092,
+      "load_before": [
+        0.19384765625,
+        0.20849609375,
+        0.166015625
+      ],
+      "load_after": [
+        0.19384765625,
+        0.20849609375,
+        0.166015625
+      ],
+      "exit": 0,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 248.575,
+        "ascii_full_history_mib_s": 187.815,
+        "sgr_mib_s": 180.544,
+        "unicode_mib_s": 129.972,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 37,
+          "p95": 38,
+          "p99": 65,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2700,
+          "p95": 4853,
+          "p99": 8464,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 3,
+      "pair": 2,
+      "variant": "after",
+      "seconds": 2.2861064879980404,
+      "load_before": [
+        0.19384765625,
+        0.20849609375,
+        0.166015625
+      ],
+      "load_after": [
+        0.2587890625,
+        0.2216796875,
+        0.1708984375
+      ],
+      "exit": 0,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 258.943,
+        "ascii_full_history_mib_s": 188.319,
+        "sgr_mib_s": 179.166,
+        "unicode_mib_s": 128.425,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 37,
+          "p95": 38,
+          "p99": 38,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2669,
+          "p95": 4178,
+          "p99": 8529,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 4,
+      "pair": 2,
+      "variant": "before",
+      "seconds": 2.2238061030075187,
+      "load_before": [
+        0.2587890625,
+        0.2216796875,
+        0.1708984375
+      ],
+      "load_after": [
+        0.2587890625,
+        0.2216796875,
+        0.1708984375
+      ],
+      "exit": 0,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 273.578,
+        "ascii_full_history_mib_s": 175.331,
+        "sgr_mib_s": 173.214,
+        "unicode_mib_s": 136.208,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 36,
+          "p95": 37,
+          "p99": 37,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2510,
+          "p95": 3728,
+          "p99": 7659,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 5,
+      "pair": 3,
+      "variant": "before",
+      "seconds": 2.352696671994636,
+      "load_before": [
+        0.2587890625,
+        0.2216796875,
+        0.1708984375
+      ],
+      "load_after": [
+        0.318359375,
+        0.23486328125,
+        0.17578125
+      ],
+      "exit": 0,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 218.181,
+        "ascii_full_history_mib_s": 124.881,
+        "sgr_mib_s": 186.574,
+        "unicode_mib_s": 141.144,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 36,
+          "p95": 38,
+          "p99": 67,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2509,
+          "p95": 3916,
+          "p99": 8219,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 6,
+      "pair": 3,
+      "variant": "after",
+      "seconds": 2.1278612699970836,
+      "load_before": [
+        0.318359375,
+        0.23486328125,
+        0.17578125
+      ],
+      "load_after": [
+        0.318359375,
+        0.23486328125,
+        0.17578125
+      ],
+      "exit": 0,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 250.514,
+        "ascii_full_history_mib_s": 193.582,
+        "sgr_mib_s": 186.734,
+        "unicode_mib_s": 139.129,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 37,
+          "p95": 37,
+          "p99": 38,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2669,
+          "p95": 3489,
+          "p99": 6040,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "ascii_mib_s": {
+      "before": {
+        "samples": [
+          239.454,
+          273.578,
+          218.181
+        ],
+        "median": 239.454,
+        "min": 218.181,
+        "max": 273.578,
+        "sample_stddev": 27.94582710054101,
+        "sample_cv_percent": 11.465534844378181
+      },
+      "after": {
+        "samples": [
+          248.575,
+          258.943,
+          250.514
+        ],
+        "median": 250.514,
+        "min": 248.575,
+        "max": 258.943,
+        "sample_stddev": 5.512156051250114,
+        "sample_cv_percent": 2.1815000097291857
+      },
+      "ratio_of_medians": 1.0461884119705664,
+      "paired_ratios": [
+        1.0380908232896506,
+        0.9465052014416364,
+        1.148193472392188
+      ],
+      "median_paired_ratio": 1.0380908232896506,
+      "paired_ratio_range": [
+        0.9465052014416364,
+        1.148193472392188
+      ]
+    },
+    "ascii_full_history_mib_s": {
+      "before": {
+        "samples": [
+          197.402,
+          175.331,
+          124.881
+        ],
+        "median": 175.331,
+        "min": 124.881,
+        "max": 197.402,
+        "sample_stddev": 37.174424411594224,
+        "sample_cv_percent": 22.41160281559254
+      },
+      "after": {
+        "samples": [
+          187.815,
+          188.319,
+          193.582
+        ],
+        "median": 188.319,
+        "min": 187.815,
+        "max": 193.582,
+        "sample_stddev": 3.1940432578995126,
+        "sample_cv_percent": 1.6819134048716446
+      },
+      "ratio_of_medians": 1.0740770314433843,
+      "paired_ratios": [
+        0.9514341293401283,
+        1.0740770314433843,
+        1.5501317254025833
+      ],
+      "median_paired_ratio": 1.0740770314433843,
+      "paired_ratio_range": [
+        0.9514341293401283,
+        1.5501317254025833
+      ]
+    },
+    "sgr_mib_s": {
+      "before": {
+        "samples": [
+          183.975,
+          173.214,
+          186.574
+        ],
+        "median": 183.975,
+        "min": 173.214,
+        "max": 186.574,
+        "sample_stddev": 7.0833551607506875,
+        "sample_cv_percent": 3.9079645879274727
+      },
+      "after": {
+        "samples": [
+          180.544,
+          179.166,
+          186.734
+        ],
+        "median": 180.544,
+        "min": 179.166,
+        "max": 186.734,
+        "sample_stddev": 4.030914040264321,
+        "sample_cv_percent": 2.2129883612580543
+      },
+      "ratio_of_medians": 0.9813507270009513,
+      "paired_ratios": [
+        0.9813507270009513,
+        1.0343621185354532,
+        1.0008575685786874
+      ],
+      "median_paired_ratio": 1.0008575685786874,
+      "paired_ratio_range": [
+        0.9813507270009513,
+        1.0343621185354532
+      ]
+    },
+    "unicode_mib_s": {
+      "before": {
+        "samples": [
+          122.761,
+          136.208,
+          141.144
+        ],
+        "median": 136.208,
+        "min": 122.761,
+        "max": 141.144,
+        "sample_stddev": 9.514205116561241,
+        "sample_cv_percent": 7.133638584520803
+      },
+      "after": {
+        "samples": [
+          129.972,
+          128.425,
+          139.129
+        ],
+        "median": 129.972,
+        "min": 128.425,
+        "max": 139.129,
+        "sample_stddev": 5.785318689003502,
+        "sample_cv_percent": 4.3659926814876275
+      },
+      "ratio_of_medians": 0.9542170797603666,
+      "paired_ratios": [
+        1.058740153631854,
+        0.942859450252555,
+        0.9857237998072889
+      ],
+      "median_paired_ratio": 0.9857237998072889,
+      "paired_ratio_range": [
+        0.942859450252555,
+        1.058740153631854
+      ]
+    }
+  },
+  "heap_summary": {
+    "before": [
+      107676
+    ],
+    "after": [
+      107932
+    ]
+  },
+  "limitations": [
+    "Three independent process samples per binary; no confidence interval or universal throughput claim.",
+    "The unchanged runner emits each workload median of seven inner samples, not all inner raw timings; outer raw outputs are preserved.",
+    "Same shared Linux environment and CPU affinity; no exclusive core, fixed frequency, or cold cache.",
+    "Core parser/screen throughput only; does not benchmark search/highlight execution, PTY throughput, GUI latency, rendering, or platforms other than this Linux host."
+  ]
+}

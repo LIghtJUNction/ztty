@@ -54,7 +54,8 @@ def stdio(binary):
         tools = line(proc)["result"]["tools"]
         assert {tool["name"] for tool in tools} == {
             "session_create", "session_list", "session_read",
-            "session_write", "session_resize", "session_close"}
+            "session_write", "session_resize", "session_close", "session_control",
+            "session_commands", "session_command_read"}
         schemas = {tool["name"]: tool["inputSchema"] for tool in tools}
         assert schemas["session_read"]["properties"]["max_bytes"]["maximum"] == 65536
         assert schemas["session_write"]["properties"]["data"]["maxLength"] == 65536
@@ -86,13 +87,16 @@ def stdio(binary):
         proc.stderr.close()
 
 class HttpServer:
-    def __init__(self, binary, host="127.0.0.1", token=None):
+    def __init__(self, binary, host="127.0.0.1", token=None, observer_token=None, extra_args=()):
         env = dict(os.environ)
         env.pop("ZTTY_MCP_TOKEN", None)
+        env.pop("ZTTY_MCP_OBSERVER_TOKEN", None)
+        if observer_token:
+            env["ZTTY_MCP_OBSERVER_TOKEN"] = observer_token
         if token:
             env["ZTTY_MCP_TOKEN"] = token
         self.proc = subprocess.Popen([binary, "mcp", "--transport", "http",
-                                      "--host", host, "--port", "0"],
+                                      "--host", host, "--port", "0", *extra_args],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
         assert select.select([self.proc.stderr], [], [], 5)[0], "HTTP startup timed out"
         message = self.proc.stderr.readline().decode()

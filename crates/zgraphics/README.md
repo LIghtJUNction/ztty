@@ -1,6 +1,6 @@
 # zgraphics
 
-Bounded Kitty Graphics Protocol processing for `no_std` terminals. The library
+Bounded Kitty Graphics Protocol and DEC Sixel processing for `no_std` terminals. The library
 uses `alloc`, performs no operating-system calls, and does not select a window
 system or renderer. All production Rust dependencies disable default features.
 
@@ -57,3 +57,48 @@ different scene. Full-screen upward scrolls can retain images in history, while
 partial-region scrolls move only placements whose anchors lie inside the region.
 
 Protocol reference: <https://sw.kovidgoyal.net/kitty/graphics-protocol/>.
+
+## Sixel
+
+`begin_sixel`, `sixel_put`, `finish_sixel`, and `abort_sixel` decode a DCS body
+incrementally into the same image scene used by Kitty images. The decoder handles
+repeat counts, raster extents, integer pixel aspect ratios, graphics carriage
+return/newline, 256 color registers, RGB percentages, DEC HLS colors, and opaque
+or transparent backgrounds. Raster extents are minimum dimensions, so following
+pixel data may extend them. Redefining a register recolors earlier pixels within
+the image. The initial 16 registers use VT340 colors; remaining registers start
+black. The host can retain the returned palette for shared-register mode.
+
+The decoder creates no image storage before its first pixel or declared raster.
+It counts encoded input against `max_transfer_bytes`, decoded RGBA capacity
+against `max_image_bytes`, and expanded painting/copying work against eight times
+`max_image_bytes` pixel operations. Dimensions include the vertical aspect scale;
+aspect ratios are rounded to an integer of at least one and bounded at 64.
+Malformed parameters or a quota violation immediately release the partial
+decoder. A host must call `finish_sixel` only for ST; CAN, SUB, replacement escape
+sequences and a truncated stream must cancel it. Invalid input cannot replace a
+completed image or move the text cursor.
+
+During decoding the indexed canvas uses at most half the decoded-image quota.
+Final conversion can briefly hold that canvas and one RGBA buffer together
+(24 MiB with the default 16 MiB image quota). Completed images remain subject to
+the existing 32 MiB scene quota; renderer-owned uploads are separate. Palette
+changes in a later image do not recolor already completed RGBA images.
+
+The `zterm` host implements default scrolling, display mode (DECSDM 80), the
+right-of-image cursor option (8452), and private/shared color registers (1070).
+It accepts `ESC P` introducers and either `ESC \\` or the 8-bit ST byte as the
+terminator. It preserves framing across arbitrary PTY read boundaries.
+
+Sixel protocol and raster/color definitions:
+<https://vt100.net/docs/vt3xx-gp/chapter14.html>.
+Modern DECSDM polarity and cursor extensions:
+<https://invisible-island.net/xterm/ctlseqs/ctlseqs.html>.
+The DEC manual's DECSDM set/reset prose conflicts with modern xterm behavior;
+this implementation follows xterm: mode 80 set disables scrolling and uses the
+top-left origin, while reset enables scrolling at the text cursor.
+
+`tests/sixel_reference.py` compares independently generated fixture pixels,
+libsixel's `sixel2png`, and the real `zterm` parser at five input chunk sizes.
+Its checked-in measurement report is separate from renderer/native-platform
+acceptance; a pixel comparison does not prove GUI presentation.

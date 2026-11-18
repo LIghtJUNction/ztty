@@ -8,7 +8,7 @@ mod appearance;
 #[cfg(target_os = "linux")]
 mod broker;
 #[cfg(target_os = "linux")]
-mod json;
+mod config_watch;
 #[cfg(target_os = "linux")]
 mod mcp;
 #[cfg(target_os = "linux")]
@@ -31,7 +31,11 @@ mod platform;
 #[cfg(target_os = "linux")]
 mod repaint;
 #[cfg(target_os = "linux")]
+mod search;
+#[cfg(target_os = "linux")]
 mod session;
+#[cfg(target_os = "linux")]
+mod working_directory;
 #[cfg(target_os = "linux")]
 mod x11;
 #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
@@ -45,17 +49,17 @@ use core::ffi::{CStr, c_char, c_int};
 #[cfg(target_os = "linux")]
 use input::{Key, ModifierKey, Modifiers};
 #[cfg(target_os = "linux")]
+use input_queue::InputQueue;
+#[cfg(target_os = "linux")]
 use zterm::{Terminal, input};
+#[cfg(target_os = "linux")]
+use ztty::{
+    actions, input_queue, json, layout, session_control, session_core, session_identity,
+    workspace_state,
+};
 
 #[global_allocator]
 static ALLOCATOR: os::Allocator = os::Allocator;
-
-// Stable Rust's precompiled alloc contains unwind cleanup references even for
-// panic=abort consumers. Use the platform unwinder for those ABI references;
-// this application's Rust panic/personality boundaries always terminate.
-#[cfg(target_os = "linux")]
-#[link(name = "gcc_s")]
-unsafe extern "C" {}
 
 #[unsafe(no_mangle)]
 extern "C" fn rust_eh_personality(
@@ -78,8 +82,21 @@ fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
 const HELP: &str = "ztty — shared no_std terminal sessions for Linux\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty attach [NAME | ztty://ADDRESS]\n\
+       ztty attach --observe NAME\n\
+       ztty detach NAME | close NAME | rename NAME NEW_NAME | list [FILTER]\n\
+       ztty action NAME ACTION | move NAME TARGET [tab|right|down]\n\
+       ztty control NAME acquire|release [--takeover]\n\
+       ztty commands NAME | command-output NAME COMMAND_ID\n\
+       ztty shell-integration bash|zsh|fish|nu\n\
+       ztty save-layout NAME > workspace.json\n\
+       ztty restore-layout workspace.json\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
   --name NAME          Name this local session\n\
+  --observe            Open a standalone read-only view without requesting focus\n\
+  --tab NAME           Open a new tab in NAME's window\n\
+  --split-right NAME   Open a pane to the right of NAME\n\
+  --split-down NAME    Open a pane below NAME\n\
+  --cwd PATH           Start the command in PATH\n\
   --config PATH        Load an appearance file\n\
   --font NAME          Fontconfig name (default: monospace:size=11)\n\
   --geometry COLSxROWS Initial character dimensions (default: 120x32)\n\
@@ -90,6 +107,20 @@ Ctrl+Shift+C copies a selection; Ctrl+Shift+V pastes.\n\
 Shift+PageUp/PageDown and the wheel browse scrollback.\n\
 Shift+drag selects while applications use the mouse; Ctrl+click opens links.\n\
 Multiple windows share one process, display connection and font cache.\n\
+Ctrl+Shift+T adds a tab; E/O splits right/down; PageUp/PageDown switches tabs.\n\
+Ctrl+Shift+Left/Right focuses panes; Up/Down swaps; Enter maximizes/restores.\n\
+Ctrl+Shift+D detaches; U moves a pane to a new window; G takes input control.\n\
+Ctrl+Shift+S opens the session switcher (action: sessions).\n\
+Type name/title/URI words; Up/Down selects; Enter focuses or explicitly attaches.\n\
+Switching preserves the PTY and input owner; observing attaches stay read-only.\n\
+Ctrl+Shift+F searches across soft-wrapped text; Enter/Shift+Enter finds next/previous.\n\
+Copy joins soft-wrapped rows and preserves explicit line breaks.\n\
+Ctrl+Shift+P opens actions: filter with multiple words and see effective bindings.\n\
+Ctrl+U clears an overlay query; Esc closes it. Ctrl+Shift+R reloads configuration.\n\
+Ctrl+Shift+K/J browses shell commands; Y copies the selected command output.\n\
+Ctrl+Equal/Minus/0 adjusts or resets font size.\n\
+Lock keys stay silent in legacy mode.\n\
+With Num Lock off, keypad zero sends Insert in normal keypad mode.\n\
 attach without a name lists all local and MCP sessions.\n\
 MCP defaults to stdio; HTTP defaults to 127.0.0.1:8732/mcp.\n\
 Runs on X11 and XWayland. Use ztty mcp --help for transport options.\n";
@@ -97,6 +128,7 @@ Runs on X11 and XWayland. Use ztty mcp --help for transport options.\n";
 #[cfg(not(target_os = "linux"))]
 const HELP: &str = "ztty — a small no_std Rust terminal\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\n\
+  --cwd PATH           Start the command in PATH\n\
   --config PATH        Load an appearance file\n\
   --font NAME          Fontconfig name (default: monospace:size=11)\n\
   --geometry COLSxROWS Initial character dimensions (default: 120x32)\n\
@@ -116,6 +148,13 @@ struct Config {
     command: Vec<CString>,
     #[cfg(target_os = "linux")]
     name: Option<String>,
+    #[cfg(target_os = "linux")]
+    observe: bool,
+    #[cfg(target_os = "linux")]
+    target: Option<(String, &'static str)>,
+    cwd: Option<String>,
+    #[cfg(target_os = "linux")]
+    config_path: Option<CString>,
 }
 
 fn number(bytes: &[u8]) -> Option<usize> {
@@ -133,6 +172,13 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         command: Vec::new(),
         #[cfg(target_os = "linux")]
         name: None,
+        #[cfg(target_os = "linux")]
+        observe: false,
+        #[cfg(target_os = "linux")]
+        target: None,
+        cwd: None,
+        #[cfg(target_os = "linux")]
+        config_path: None,
     };
     let mut i = 1;
     while i < args.len() {
@@ -159,6 +205,33 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
             b"--config" => {
                 i += 1;
                 config_path = Some(*args.get(i).ok_or("--config needs a path")?);
+            }
+            #[cfg(target_os = "linux")]
+            b"--observe" => cfg.observe = true,
+            #[cfg(target_os = "linux")]
+            b"--tab" | b"--split-right" | b"--split-down" => {
+                let mode = match args[i].to_bytes() {
+                    b"--tab" => "tab",
+                    b"--split-right" => "right",
+                    _ => "down",
+                };
+                i += 1;
+                let name = args
+                    .get(i)
+                    .ok_or("layout option needs a target session")?
+                    .to_str()
+                    .map_err(|_| "session selector must be UTF-8")?;
+                cfg.target = Some((name.into(), mode));
+            }
+            b"--cwd" => {
+                i += 1;
+                cfg.cwd = Some(
+                    args.get(i)
+                        .ok_or("--cwd needs a path")?
+                        .to_str()
+                        .map_err(|_| "cwd must be UTF-8")?
+                        .into(),
+                );
             }
             #[cfg(target_os = "linux")]
             b"--name" => {
@@ -209,6 +282,13 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         }
         i += 1;
     }
+    #[cfg(target_os = "linux")]
+    if cfg.observe && cfg.target.is_some() {
+        return Err(
+            "--observe opens a standalone view; it cannot be combined with tab/split options"
+                .into(),
+        );
+    }
     if cfg.command.is_empty() {
         #[cfg(unix)]
         {
@@ -222,6 +302,12 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         cfg.command.push(os::default_shell());
     }
     cfg.appearance = Appearance::load(config_path)?;
+    #[cfg(target_os = "linux")]
+    {
+        cfg.config_path = config_path
+            .map(CString::from)
+            .or_else(os::default_config_path);
+    }
     if let Some(font) = font {
         cfg.appearance.set_font(font)?;
     }
@@ -229,48 +315,9 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
 }
 
 #[cfg(target_os = "linux")]
-struct Queue {
-    bytes: Vec<u8>,
-    offset: usize,
-}
-#[cfg(target_os = "linux")]
-impl Queue {
-    fn new() -> Self {
-        Self {
-            bytes: Vec::new(),
-            offset: 0,
-        }
-    }
-    fn push(&mut self, bytes: &[u8]) {
-        if bytes.is_empty() {
-            return;
-        }
-        if self.offset != 0 {
-            self.bytes.drain(..self.offset);
-            self.offset = 0;
-        }
-        if self.bytes.len().saturating_add(bytes.len()) <= 1024 * 1024 {
-            self.bytes.extend_from_slice(bytes);
-        } else {
-            os::print(2, b"ztty: input queue full; paste was rejected\n");
-        }
-    }
-    fn pending(&self) -> bool {
-        self.offset < self.bytes.len()
-    }
-    fn flush(&mut self, pty: &zpty::Pty) {
-        while self.pending() {
-            let bytes = &self.bytes[self.offset..];
-            match pty.write(bytes) {
-                Ok(0) => break,
-                Ok(n) => self.offset += n,
-                Err(_) => break,
-            }
-        }
-        if !self.pending() {
-            self.bytes.clear();
-            self.offset = 0;
-        }
+fn queue_input(queue: &mut InputQueue, bytes: &[u8]) {
+    if !queue.push(bytes) {
+        os::print(2, b"ztty: input queue full; paste was rejected\n");
     }
 }
 
@@ -383,9 +430,12 @@ fn key_modifiers(state: u32, symbol: u64, pressed: bool, held: &[u64; 256]) -> M
 }
 
 #[cfg(target_os = "linux")]
-fn paste(bytes: Vec<u8>, terminal: &Terminal, queue: &mut Queue) {
+fn paste(bytes: Vec<u8>, terminal: &Terminal, queue: &mut InputQueue) {
     let text = String::from_utf8_lossy(&bytes);
-    queue.push(&input::encode_paste(&text, &terminal.modes().input()));
+    queue_input(
+        queue,
+        &input::encode_paste(&text, &terminal.modes().input()),
+    );
 }
 
 fn launch(args: &[&CStr]) -> Result<i32, String> {
@@ -397,12 +447,35 @@ fn launch(args: &[&CStr]) -> Result<i32, String> {
             }
             #[cfg(not(target_os = "linux"))]
             {
+                // Native single-PTY processes enter cwd before command lookup,
+                // PTY helpers or UI frameworks can start threads. Linux's
+                // shared broker applies cwd separately for each new session.
+                if let Some(path) = cfg.cwd.as_deref() {
+                    os::enter_startup_directory(path).map_err(|error| {
+                        alloc::format!("cannot enter command working directory (OS error {error})")
+                    })?;
+                }
                 platform::run(cfg).map_err(String::from)
             }
         } else {
             Ok(0)
         }
     })
+}
+
+fn shell_integration(args: &[&CStr]) -> Result<i32, String> {
+    let script = match args {
+        [name] => match name.to_bytes() {
+            b"bash" => include_str!("../shell/ztty.bash"),
+            b"zsh" => include_str!("../shell/ztty.zsh"),
+            b"fish" => include_str!("../shell/ztty.fish"),
+            b"nu" | b"nushell" => include_str!("../shell/ztty.nu"),
+            _ => return Err("shell integration supports bash, zsh, fish or nu".into()),
+        },
+        _ => return Err("usage: ztty shell-integration bash|zsh|fish|nu".into()),
+    };
+    os::print(1, script.as_bytes());
+    Ok(0)
 }
 
 #[cfg(target_os = "linux")]
@@ -422,6 +495,8 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
         .iter()
         .map(|&ptr| unsafe { CStr::from_ptr(ptr) })
         .collect();
+    #[cfg(target_os = "macos")]
+    zpty::run_spawn_helper(&args);
     #[cfg(windows)]
     let owned_args = os::arguments();
     #[cfg(windows)]
@@ -431,11 +506,23 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
     #[cfg(target_os = "linux")]
     let result = match args.get(1).map(|s| s.to_bytes()) {
         Some(b"mcp") => mcp::run(&args[2..]),
+        Some(b"shell-integration") => shell_integration(&args[2..]),
         Some(b"attach") => platform::attach(&args[2..]),
+        Some(
+            b"list" | b"info" | b"detach" | b"close" | b"rename" | b"action" | b"move" | b"control"
+            | b"commands" | b"command-output" | b"save-layout" | b"restore-layout",
+        ) => platform::command(&args[1..]),
         _ => launch(&args),
     };
     #[cfg(not(target_os = "linux"))]
-    let result = launch(&args);
+    let result = if args
+        .get(1)
+        .is_some_and(|arg| arg.to_bytes() == b"shell-integration")
+    {
+        shell_integration(&args[2..])
+    } else {
+        launch(&args)
+    };
     match result {
         Ok(status) => status,
         Err(message) => {

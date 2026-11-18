@@ -8,4 +8,4 @@ Icon=utilities-terminal
 Terminal=false
 Categories=System;TerminalEmulator;
 Keywords=terminal;shell;console;
-StartupWMClass=ztty
+StartupWMClass=Ztty

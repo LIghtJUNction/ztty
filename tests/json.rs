@@ -1,7 +1,6 @@
 extern crate alloc;
-#[path = "../src/json.rs"]
-mod json;
 use json::{Value, object, parse, stringify};
+use ztty::json;
 
 #[test]
 fn unicode_roundtrip_preserves_request_identifiers() {
@@ -50,4 +49,25 @@ fn values_build_and_read_without_loss() {
     assert_eq!(value.get("name").unwrap().as_str(), Some("test"));
     assert_eq!(Value::Array(vec![1u64.into()]).as_array().unwrap().len(), 1);
     assert_eq!(parse(stringify(&value).as_bytes()).unwrap(), value);
+}
+
+#[test]
+fn large_objects_preserve_order_and_reject_late_duplicate_keys() {
+    let mut input = String::from("{");
+    for index in (0..20000).rev() {
+        if input.len() != 1 {
+            input.push(',');
+        }
+        input.push_str(&format!(r#""key{index}":{index}"#));
+    }
+    input.push('}');
+    let parsed = parse(input.as_bytes()).unwrap();
+    assert_eq!(stringify(&parsed), input);
+    input.pop();
+    input.push_str(r#","key19999":false}"#);
+    assert_eq!(parse(input.as_bytes()), Err("duplicate JSON object key"));
+    assert_eq!(
+        parse(br#"{"a":1,"\u0061":2}"#),
+        Err("duplicate JSON object key")
+    );
 }

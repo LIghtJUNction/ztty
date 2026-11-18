@@ -1,0 +1,17 @@
+{
+  "base_sha": "64214768a0021452c708b8057fbce9b4801784ba",
+  "imported_commit": "f73d44ae13d072f5c932f8704761ed8971bc704e",
+  "checks": {
+    "python_failure_contracts": 14,
+    "actionlint": "passed"
+  },
+  "source_sha256": {
+    "tests/windows_desktop.py": "93766b9093bd371666f7687b14d7d2b87f518583a2b177aaf972226f8a7eafc5",
+    "tests/windows_desktop_test.py": "8071c3c1c40437b47c4ae50b47487c2067c8bf22e5477e2da5aec3897ec9c02d",
+    "tests/windows_native.py": "4fbf316a98ca5d29c68f714ace3f5f41edc0f7ae0883f57963d06d87163c2d40",
+    "tests/windows_native_test.py": "693932e052f057815742727ce70e61949240a0115f674757bf766936ee7249fa",
+    ".github/workflows/release.yml": "6c0d42b116ec143e91e2ae7f1e6bacd7a4cec203044a78d3dc84c0895ae7d7d0"
+  },
+  "original_native_gate_unchanged": true,
+  "native_execution": "pending Windows x86_64/ARM64 candidate; contract fixtures are not native execution"
+}

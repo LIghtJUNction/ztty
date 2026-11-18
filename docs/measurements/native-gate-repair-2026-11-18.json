@@ -1,0 +1,54 @@
+{
+  "base_commit": "b9359106d6073362ae2c535c155c66ec2e97d5da",
+  "native_execution": false,
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/windows_native_test.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ".....\n----------------------------------------------------------------------\nRan 5 tests in 0.033s\n\nOK\n"
+    },
+    {
+      "command": [
+        "python3",
+        "-B",
+        "tests/macos_native_test.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "test_contradictory_status (__main__.GateContract.test_contradictory_status) ... ok\ntest_false_never_passes (__main__.GateContract.test_false_never_passes) ... ok\ntest_forged_permission_success_rejected (__main__.GateContract.test_forged_permission_success_rejected) ... ok\ntest_good_status (__main__.GateContract.test_good_status) ... ok\ntest_malformed_helper_json_preserves_evidence (__main__.GateContract.test_malformed_helper_json_preserves_evidence) ... ok\ntest_missing_png_signature_rejected (__main__.GateContract.test_missing_png_signature_rejected) ... ok\ntest_nonzero_never_passes (__main__.GateContract.test_nonzero_never_passes) ... ok\ntest_permission_block_preserves_evidence (__main__.GateContract.test_permission_block_preserves_evidence) ... ok\ntest_png_dimensions_and_hash (__main__.GateContract.test_png_dimensions_and_hash) ... ok\ntest_unicode_atomic_control_record (__main__.GateContract.test_unicode_atomic_control_record) ... ok\n\n----------------------------------------------------------------------\nRan 10 tests in 0.194s\n\nOK\n"
+    },
+    {
+      "command": [
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-input-worktree/artifacts/release-validation/actionlint",
+        "-shellcheck=",
+        ".github/workflows/release.yml"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "source_sha256": {
+    "tests/windows_native.py": "4fbf316a98ca5d29c68f714ace3f5f41edc0f7ae0883f57963d06d87163c2d40",
+    "tests/windows_native_test.py": "693932e052f057815742727ce70e61949240a0115f674757bf766936ee7249fa",
+    "tests/macos_native.py": "ee987ff6815e786b61f0633ea103f34464b7de159d623686fd905a091de10977",
+    "tests/macos_native_test.py": "51bdadebfb7bc00011832ad97405bb9e17ba89acc4b0419cdbcb3a5811a4f000",
+    "tests/macos_window_probe.swift": "770ce0b760fe495fa63dfcb1dfd9dfabf8a9f2d3a11bcf3ea8a4ae01cd1bcb78",
+    ".github/workflows/release.yml": "f4ac72cbffda6866fb0dc3f525960beef462753a72fff7ba1e00f956becaa3e2"
+  }
+}

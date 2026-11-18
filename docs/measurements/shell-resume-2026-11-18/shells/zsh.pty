@@ -1,0 +1,13 @@
+[1m[7m%[27m[1m[0m                                                                                                                        [0m[27m[24m[JZT> [K[?2004h__ztty_test_hook(){ printf '__ZTTY_EXISTING_HOOK__\n'; PS1='ZT> '; }; precmd_functions=(_ztty_test_hook); RPROMPT=''; [K  source /home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/shell/ztty.zsh; source /home/lightjunct [Kiion/Documents/GITHUB/ztty/artifacts/integration-20261118/shell/ztty.zsh[?2004l
+[1m[7m%[27m[1m[0m                                                                                                                        ]133;D;0]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[0m[27m[24m[J]133;AZT> ]133;B[K[?2004hpprintf '__ZTTY_SUCCESS__\n'[?2004l
+]133;C__ZTTY_SUCCESS__
+[1m[7m%[27m[1m[0m                                                                                                                        ]133;D;0]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[0m[27m[24m[J]133;AZT> ]133;B[K[?2004h//bin/sh -c 'exit 7'[?2004l
+]133;C[1m[7m%[27m[1m[0m                                                                                                                        ]133;D;7]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[0m[27m[24m[J]133;AZT> ]133;B[K[?2004hpprintf '__ZTTY_UTF8_界__\n'[?2004l
+]133;C__ZTTY_UTF8_界__
+[1m[7m%[27m[1m[0m                                                                                                                        ]133;D;0]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[0m[27m[24m[J]133;AZT> ]133;B[K[?2004hccd '/tmp/ztty-shell-2swyjftn/with space-界'[?2004l
+]133;C[1m[7m%[27m[1m[0m                                                                                                                        ]133;D;0]7;file://light/tmp/ztty-shell-2swyjftn/with%20space-%E7%95%8C__ZTTY_EXISTING_HOOK__
+[0m[27m[24m[J]133;AZT> ]133;B[K[?2004h

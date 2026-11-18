@@ -100,6 +100,143 @@ fn ascii_batch_overwrites_complete_wide_glyphs_and_handles_the_last_column() {
 }
 
 #[test]
+fn unicode_narrow_overwrite_repairs_either_wide_half_and_replaces_metadata() {
+    for column in [1, 2] {
+        let mut t = Terminal::new(5, 2, 0);
+        t.feed("\x1b[1;31;44m\x1b]8;;https://example.com/old\x1b\\界\u{301}Z".as_bytes());
+        let untouched = *t.cell(2, 0);
+        t.clear_dirty();
+        t.feed(
+            format!(
+                "\x1b[0;4;38;2;5;6;7;48;2;1;2;3m\
+                 \x1b]8;;https://example.com/new\x1b\\\x1b[1;{column}Hé"
+            )
+            .as_bytes(),
+        );
+        let cell = t.cell(column - 1, 0);
+        assert_eq!((cell.ch, cell.width, cell.combining), ('é', 1, ['\0'; 2]));
+        assert_eq!((cell.fg, cell.bg), (0x050607, 0x010203));
+        assert_eq!(cell.flags, UNDERLINE | EXPLICIT_FG | EXPLICIT_BG);
+        assert_eq!(cell.palette_indices, 0);
+        assert_eq!(t.hyperlink(cell.link_id), Some("https://example.com/new"));
+        let blank = t.cell(2 - column, 0);
+        assert_eq!(
+            (blank.ch, blank.width, blank.combining),
+            (' ', 1, ['\0'; 2])
+        );
+        assert_eq!((blank.fg, blank.bg), (0x050607, 0x010203));
+        assert_eq!(blank.flags, EXPLICIT_FG | EXPLICIT_BG);
+        assert_eq!((blank.palette_indices, blank.link_id), (0, 0));
+        assert_eq!(*t.cell(2, 0), untouched);
+        assert_eq!(t.cursor(), (column, 0));
+        assert!(t.row_dirty(0));
+    }
+}
+
+#[test]
+fn unicode_wide_overwrite_repairs_both_outside_halves() {
+    let mut t = Terminal::new(8, 2, 0);
+    t.feed("甲\u{301}乙\u{308}丙Z".as_bytes());
+    let untouched: Vec<_> = (4..8).map(|x| *t.cell(x, 0)).collect();
+    t.feed("\x1b[48;2;1;2;3m\x1b[1;2H界".as_bytes());
+    for (x, ch, width) in [(0, ' ', 1), (1, '界', 2), (2, '\0', 0), (3, ' ', 1)] {
+        let cell = t.cell(x, 0);
+        assert_eq!(
+            (cell.ch, cell.width, cell.combining),
+            (ch, width, ['\0'; 2])
+        );
+        assert_eq!(cell.bg, 0x010203);
+        assert_eq!(cell.link_id, 0);
+    }
+    assert_eq!((4..8).map(|x| *t.cell(x, 0)).collect::<Vec<_>>(), untouched);
+    assert_eq!(t.cursor(), (3, 0));
+}
+
+#[test]
+fn unicode_insert_preserves_shifted_glyphs_and_repairs_split_glyphs() {
+    for (column, text, expected, cursor) in [
+        (2, "é", "Aé界\0BC  ", (2, 0)),
+        (3, "語", "A 語\0 BC ", (4, 0)),
+    ] {
+        let mut t = Terminal::new(8, 1, 0);
+        t.feed("A界BC".as_bytes());
+        t.feed(format!("\x1b[4h\x1b[1;{column}H{text}").as_bytes());
+        assert_eq!(line(&t, 0), expected);
+        assert_eq!(t.cell(2, 0).width, 2);
+        assert_eq!(t.cell(3, 0).width, 0);
+        assert_eq!(t.cursor(), cursor);
+    }
+}
+
+#[test]
+fn unicode_overwrite_handles_narrow_screens_and_wrap_boundaries() {
+    let mut narrow = Terminal::new(1, 2, 0);
+    narrow.feed("界é".as_bytes());
+    assert_eq!(line(&narrow, 0), "\u{fffd}");
+    assert_eq!(line(&narrow, 1), "é");
+    assert_eq!(narrow.cell(0, 0).width, 1);
+    assert_eq!(narrow.cell(0, 1).width, 1);
+
+    let mut no_wrap = Terminal::new(4, 2, 0);
+    no_wrap.feed("甲乙\x1b[?7l界".as_bytes());
+    assert_eq!(line(&no_wrap, 0), "甲\0 \u{fffd}");
+    assert_eq!(no_wrap.cell(2, 0).width, 1);
+    assert_eq!(no_wrap.cell(3, 0).width, 1);
+    assert_eq!(no_wrap.cursor(), (3, 0));
+    no_wrap.feed("é".as_bytes());
+    assert_eq!(line(&no_wrap, 0), "甲\0 é");
+    assert_eq!(line(&no_wrap, 1), "    ");
+
+    let mut overflow = Terminal::new(4, 2, 0);
+    overflow.feed("甲乙\x1b[1;4H界".as_bytes());
+    assert_eq!(line(&overflow, 0), "甲\0  ");
+    assert_eq!(line(&overflow, 1), "界\0  ");
+    assert_eq!(overflow.cell(2, 0).width, 1);
+    assert_eq!(overflow.cell(3, 0).width, 1);
+    assert_eq!(overflow.cursor(), (2, 1));
+
+    let mut wrap = Terminal::new(4, 2, 0);
+    wrap.feed("A界\x1b[1;3H語\u{301}é".as_bytes());
+    assert_eq!(line(&wrap, 0), "A 語\0");
+    assert_eq!(wrap.cell(2, 0).combining, ['\u{301}', '\0']);
+    assert_eq!(line(&wrap, 1), "é   ");
+    assert_eq!(wrap.cursor(), (1, 1));
+}
+
+#[test]
+fn unicode_overwrites_are_independent_of_pty_chunk_sizes() {
+    let bytes = "甲\u{301}乙\u{308}丙Z\x1b[1;2Hé\x1b[1;3H語\
+                 \x1b[4h\x1b[1;2Hλ\x1b[4l\x1b[1;5H界\u{301}\
+                 \x1b[?7l語é\x1b[?7h\r\n\
+                 \x1b[1;38;2;3;7;11m甲乙\x1b[1;2Hé\u{308}\r\n"
+        .repeat(4);
+    for cols in [1, 2, 5, 8] {
+        let mut whole = Terminal::new(cols, 3, 4);
+        whole.feed(bytes.as_bytes());
+        for chunk_size in [1, 2, 3, 7, bytes.len()] {
+            let mut split = Terminal::new(cols, 3, 4);
+            for chunk in bytes.as_bytes().chunks(chunk_size) {
+                split.feed(chunk);
+            }
+            assert_eq!(split.cursor(), whole.cursor());
+            assert_eq!(split.modes(), whole.modes());
+            assert_eq!(split.history_len(), whole.history_len());
+            for offset in 0..=whole.history_len() {
+                for y in 0..whole.rows() {
+                    for x in 0..cols {
+                        assert_eq!(
+                            split.view_cell(x, y, offset),
+                            whole.view_cell(x, y, offset),
+                            "cols={cols}, chunk={chunk_size}, offset={offset}, x={x}, y={y}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[test]
 fn wide_character_wraps_before_last_column() {
     let mut t = Terminal::new(4, 2, 0);
     t.feed("abc界".as_bytes());
@@ -266,6 +403,66 @@ fn sync_output_and_mode_queries_report_actual_state() {
     assert!(!t.modes().synchronized_output);
     t.feed(b"\x1b[?2004h\x1b[?1004h");
     assert!(t.modes().bracketed_paste && t.modes().focus_events);
+}
+
+#[test]
+fn synchronized_frame_commit_survives_all_chunk_boundaries_until_painted() {
+    let frame = b"\x1b[?2026h\x1b[Hframe\x1b[?2026l";
+    for split in 0..=frame.len() {
+        let mut terminal = Terminal::new(10, 2, 0);
+        terminal.clear_dirty();
+        terminal.feed(&frame[..split]);
+        terminal.feed(&frame[split..]);
+        assert!(!terminal.modes().synchronized_output, "split {split}");
+        assert!(terminal.sync_commit_pending(), "split {split}");
+        assert_eq!(line(&terminal, 0), "frame     ");
+        terminal.feed(b"\x1b[6n");
+        assert!(terminal.sync_commit_pending());
+        assert_eq!(terminal.responses(), b"\x1b[1;6R");
+        terminal.clear_dirty();
+        assert!(!terminal.sync_commit_pending());
+        terminal.feed(b"\x1b[?2026l");
+        assert!(
+            !terminal.sync_commit_pending(),
+            "redundant reset is not a commit"
+        );
+    }
+}
+
+#[test]
+fn synchronized_frame_timeout_and_reset_preserve_pending_commit() {
+    let mut terminal = Terminal::new(10, 2, 0);
+    terminal.clear_dirty();
+    terminal.feed(b"\x1b[?2026hA");
+    assert!(!terminal.sync_commit_pending());
+    terminal.force_end_sync();
+    assert!(!terminal.modes().synchronized_output);
+    assert!(terminal.sync_commit_pending());
+    terminal.clear_dirty();
+    terminal.force_end_sync();
+    assert!(!terminal.sync_commit_pending());
+
+    terminal.feed(b"\x1b[?2026hB\x1bc");
+    assert!(!terminal.modes().synchronized_output);
+    assert!(terminal.sync_commit_pending(), "RIS ends a held frame");
+    terminal.feed(b"\x1bc");
+    assert!(
+        terminal.sync_commit_pending(),
+        "unpainted commit survives RIS"
+    );
+    terminal.feed(b"\x1b[?2026hC");
+    assert!(terminal.modes().synchronized_output);
+    assert!(
+        terminal.sync_commit_pending(),
+        "new held frame does not consume commit"
+    );
+    terminal.force_end_sync();
+    terminal.clear_dirty();
+    terminal.feed(b"\x1bc");
+    assert!(
+        !terminal.sync_commit_pending(),
+        "ordinary RIS does not invent a commit"
+    );
 }
 
 #[test]
@@ -458,7 +655,7 @@ fn graphics_query_precedes_device_attributes_and_reports_actual_cell_size() {
 }
 
 #[test]
-fn icat_probe_finishes_on_da1_without_advertising_additional_capabilities() {
+fn icat_probe_finishes_on_da1_and_advertises_only_sixel() {
     let probe = b"\x1b_Ga=q,f=24,s=1,v=1,S=3,i=1;MTIz\x1b\\\
                   \x1b_Ga=q,t=t,f=24,s=1,v=1,i=2;L3RtcC9pY2F0\x1b\\\
                   \x1b_Ga=q,t=s,f=24,s=1,v=1,i=3;aWNhdA==\x1b\\\x1b[c";
@@ -471,7 +668,7 @@ fn icat_probe_finishes_on_da1_without_advertising_additional_capabilities() {
             t.responses(),
             b"\x1b_Gi=1;OK\x1b\\\
               \x1b_Gi=2;ENOTSUP:only direct transmission is supported\x1b\\\
-              \x1b_Gi=3;ENOTSUP:only direct transmission is supported\x1b\\\x1b[?06c"
+              \x1b_Gi=3;ENOTSUP:only direct transmission is supported\x1b\\\x1b[?62;4c"
         );
         let start = t
             .responses()
@@ -481,11 +678,12 @@ fn icat_probe_finishes_on_da1_without_advertising_additional_capabilities() {
         let da1 = &t.responses()[start + 2..];
         // Existing icat recognizes this final reply only when len > 3.
         assert!(da1.len() > 3 && da1[0] == b'?' && da1[da1.len() - 1] == b'c');
-        let numeric_id = core::str::from_utf8(&da1[1..da1.len() - 1])
+        let capabilities: Vec<u16> = core::str::from_utf8(&da1[1..da1.len() - 1])
             .unwrap()
-            .parse::<u16>()
-            .unwrap();
-        assert_eq!(numeric_id, 6);
+            .split(';')
+            .map(|number| number.parse().unwrap())
+            .collect();
+        assert_eq!(capabilities, [62, 4]);
         assert_eq!(t.graphics().image_count(), 0);
         assert_eq!(t.cursor(), (0, 0));
     }
@@ -613,63 +811,21 @@ fn large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding
 }
 
 #[test]
-fn synchronized_frame_commit_survives_all_chunk_boundaries_until_painted() {
-    let frame = b"\x1b[?2026h\x1b[Hframe\x1b[?2026l";
-    for split in 0..=frame.len() {
-        let mut terminal = Terminal::new(10, 2, 0);
-        terminal.clear_dirty();
-        terminal.feed(&frame[..split]);
-        terminal.feed(&frame[split..]);
-        assert!(!terminal.modes().synchronized_output, "split {split}");
-        assert!(terminal.sync_commit_pending(), "split {split}");
-        assert_eq!(line(&terminal, 0), "frame     ");
-        terminal.feed(b"\x1b[6n");
-        assert!(terminal.sync_commit_pending());
-        assert_eq!(terminal.responses(), b"\x1b[1;6R");
-        terminal.clear_dirty();
-        assert!(!terminal.sync_commit_pending());
-        terminal.feed(b"\x1b[?2026l");
-        assert!(
-            !terminal.sync_commit_pending(),
-            "redundant reset is not a commit"
-        );
-    }
-}
-
-#[test]
-fn synchronized_frame_timeout_and_reset_preserve_pending_commit() {
-    let mut terminal = Terminal::new(10, 2, 0);
-    terminal.clear_dirty();
-    terminal.feed(b"\x1b[?2026hA");
-    assert!(!terminal.sync_commit_pending());
-    terminal.force_end_sync();
-    assert!(!terminal.modes().synchronized_output);
-    assert!(terminal.sync_commit_pending());
-    terminal.clear_dirty();
-    terminal.force_end_sync();
-    assert!(!terminal.sync_commit_pending());
-
-    terminal.feed(b"\x1b[?2026hB\x1bc");
-    assert!(!terminal.modes().synchronized_output);
-    assert!(terminal.sync_commit_pending(), "RIS ends a held frame");
-    terminal.feed(b"\x1bc");
-    assert!(
-        terminal.sync_commit_pending(),
-        "unpainted commit survives RIS"
-    );
-    terminal.feed(b"\x1b[?2026hC");
-    assert!(terminal.modes().synchronized_output);
-    assert!(
-        terminal.sync_commit_pending(),
-        "new held frame does not consume commit"
-    );
-    terminal.force_end_sync();
-    terminal.clear_dirty();
-    terminal.feed(b"\x1bc");
-    assert!(
-        !terminal.sync_commit_pending(),
-        "ordinary RIS does not invent a commit"
-    );
+fn x10_mouse_mode_negotiation_preserves_other_tracking_modes() {
+    let mut terminal = Terminal::new(20, 8, 0);
+    terminal.feed(b"\x1b[?9h\x1b[?9$p");
+    assert_eq!(terminal.modes().mouse_tracking, 9);
+    assert_eq!(terminal.responses(), b"\x1b[?9;1$y");
+    terminal.clear_responses();
+    terminal.feed(b"\x1b[?1002h\x1b[?9l\x1b[?9$p\x1b[?1002$p");
+    assert_eq!(terminal.modes().mouse_tracking, 1002);
+    assert_eq!(terminal.responses(), b"\x1b[?9;2$y\x1b[?1002;1$y");
+    terminal.feed(b"\x1b[?9h\x1b[?1002l");
+    assert_eq!(terminal.modes().mouse_tracking, 9);
+    terminal.feed(b"\x1b[?1000h\x1b[?9l");
+    assert_eq!(terminal.modes().mouse_tracking, 1000);
+    terminal.feed(b"\x1b[?1000l");
+    assert_eq!(terminal.modes().mouse_tracking, 0);
 }
 
 #[test]
@@ -684,13 +840,13 @@ fn sgr_streaming_preserves_missing_invalid_and_mixed_parameter_groups() {
             b"\x1b[38:2::1:2:3;48;5;24;1mA",
             0x010203,
             0x005f87,
-            EXPLICIT_BG | BOLD,
+            EXPLICIT_FG | EXPLICIT_BG | BOLD,
         ),
         (
             b"\x1b[38;2;3;4;5;48:2::6:7:8;4mA",
             0x030405,
             0x060708,
-            EXPLICIT_BG | UNDERLINE,
+            EXPLICIT_FG | EXPLICIT_BG | UNDERLINE,
         ),
         (b"\x1b[?31mA", DEFAULT_FG, DEFAULT_BG, 0),
     ];
