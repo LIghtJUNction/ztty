@@ -570,6 +570,60 @@
       "bytes": 2666,
       "sha256": "bad227647e00c70ea4e5db3fa43973991edd32cc9a1a04998be08e4eff6a5820",
       "kind": "derived"
+    },
+    {
+      "path": "cold-44315250297/windows-x86_64-summary.json",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-x86_64/summary.json",
+      "bytes": 8735,
+      "sha256": "2a822663b3cfbd4ad089be698c0ea5daab9b233455f1d99bc18d72fceec5803c"
+    },
+    {
+      "path": "cold-44315250297/windows-aarch64-summary.json",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-aarch64/summary.json",
+      "bytes": 3622,
+      "sha256": "0579c7188a5a6829c0c1f62588685901148eba68e8525837a944c01170bec091"
+    },
+    {
+      "path": "cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.json",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.json",
+      "bytes": 41271,
+      "sha256": "6ef6fada7f313dc520cc66ae4b3266261b5f85ef542afa33d9d38ece86923c74"
+    },
+    {
+      "path": "cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.post-failure.json",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.post-failure.json",
+      "bytes": 795,
+      "sha256": "22ec63c960a683cbb8d955acbdbd524c829a01448492a51a0dd4012627c50c41"
+    },
+    {
+      "path": "cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-before.png",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-before.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    {
+      "path": "cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-restored.png",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-restored.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d"
+    },
+    {
+      "path": "cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.post-repaint.png",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    {
+      "path": "cold-44315250297/windows-aarch64/ztty-windows-aarch64.native.cold-04.json",
+      "source_path": "artifacts/release-audit/cold-44315250297/windows-aarch64/ztty-windows-aarch64.native.cold-04.json",
+      "bytes": 166749,
+      "sha256": "dbd66ef115388cac083960bf211afbac5e78cdda3d038e5ebff292732371a4e8"
+    },
+    {
+      "path": "cold-44315250297/index.json",
+      "source_path": "derived from immutable candidate artifacts and independently verified native reports",
+      "bytes": 2261,
+      "sha256": "8f89d4d04cc78eca1cc2e6cad9b7b0454906358bc9f60b49463f5f8964ec8964"
     }
   ],
   "notes": [
@@ -578,7 +632,8 @@
     "The performance executables are development-only std benchmark programs, separate from the no_std terminal runtime.",
     "The six added PNGs are original scrollback captures. No image was modified, and the source tar archive and four older screenshots were not duplicated.",
     "pre-release/index.json is an additional derived index; all other pre-release entries preserve the source bytes, including CRLF in native JSON records.",
-    "formal-v0.3.0/index.json, github-status.json and windows-*-summary.json are derived audit records. Other formal-v0.3.0 files preserve source bytes, including CRLF. This formal run failed on Windows ARM; diagnostic successes do not override it. The v0.3.0 tag remains fixed, Publish was skipped, the Release API returned 404, and installation was not performed."
+    "formal-v0.3.0/index.json, github-status.json and windows-*-summary.json are derived audit records. Other formal-v0.3.0 files preserve source bytes, including CRLF. This formal run failed on Windows ARM; diagnostic successes do not override it. The v0.3.0 tag remains fixed, Publish was skipped, the Release API returned 404, and installation was not performed.",
+    "cold-44315250297/index.json and windows-*-summary.json are derived audits. The two failed cold-start reports, same-process snapshot and three PNGs preserve original source bytes. Both architectures failed; a diagnostic repaint recovery does not accept the original pixel failure."
   ],
   "appended_checkpoints": [
     {
@@ -624,6 +679,15 @@
       "publish": "skipped",
       "release_by_tag_http_status": 404,
       "installation": "not_performed"
+    },
+    {
+      "name": "fixed-eight-cold-start-reproduction",
+      "source_sha": "504fa770a97069e32bed4d8f45616066d5c4dbc5",
+      "run_id": 44315250297,
+      "index": "cold-44315250297/index.json",
+      "status": "failed",
+      "x64_failed_cold_start": 8,
+      "arm_failed_cold_start": 4
     }
   ]
 }

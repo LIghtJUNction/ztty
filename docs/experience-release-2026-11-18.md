@@ -4,6 +4,8 @@
 
 **当前发布状态：正式 `v0.3.0` 门禁失败，未发布、未安装。** tag 已固定在 `9b5497dac5402603ba0f633152fa4b07e6c11c9e`。同源运行的 Verify、Linux 两种架构、macOS 两种架构和 Windows x64 通过；Windows ARM 在原快速缩放恢复检查失败，Publish 被跳过，Release-by-tag API 返回 404。失败后的两个带 trace 诊断进程通过，不改变正式失败结论；修复后使用新 tag，旧 tag 保持不动。[正式运行与状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
 
+后续固定八次冷启动实验已在 Windows x64 第八次取得同进程失败现场：内部画布正确，窗口右侧仍为黑色，刷新 GDI 队列无效，正常补画后恢复。ARM 第四次完成全部像素检查后因临时目录仍被占用而失败。两项失败分别保留，尚未据此宣称发布修复已通过。[冷启动实验与原始快照](measurements/experience-release-2026-11-18/cold-44315250297/index.json)
+
 本轮让终端里已经存在的内容和会话更容易继续使用。搜索可以跨屏幕自动折行，复制保留真正的文本边界；会话切换能找到其他窗口和隐藏标签里的既有 PTY，并保留输入所有权。Linux 本地工作区测试通过，开发机上的五套既有 GUI 检查通过，新增会话切换脚本修正后通过六组检查。新增行元数据曾导致核心微基准回退，定位并修正热路径后保留了全部对照样本；这些结果只用于评价该核心负载。[验收索引](measurements/experience-release-2026-11-18/summary.json) · [文件校验清单](measurements/experience-release-2026-11-18/manifest.json)
 
 追加的 Linux 返回底部入口通过全部 18 组日常 GUI 检查，包含新输出到达、搜索／命令面板并存和只读观察视图。后续 `2ac46e2` 的 macOS 两种架构通过原生候选；Windows 的 `dc43870` 缩放恢复失败与 `8a2f4be` 子进程启动失败分别保留，均未记作通过。[追加源码与文件身份](measurements/experience-release-2026-11-18/scroll-prompt/source-binding.json) · [18 组原始记录](measurements/experience-release-2026-11-18/scroll-prompt/daily-workflow.json)
@@ -209,6 +211,19 @@ Windows ARM 的失败检查为 `resize_restores_visible_image`。窗口已恢复
 ![Windows ARM 原始快速缩放恢复失败帧，采样位置未恢复为预期红色](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-restored.png)
 
 原进程 PID 为 8344。失败后分别新建 PID 5644 和 7884，启用运行时 trace，运行 rapid 与 staged 诊断；两者各通过 31 项基础检查并清理自身资源。诊断 JSON 自身未重复写入 source SHA 或二进制哈希，其来源由正式原始报告的 `diagnostic_retries`、同一个已校验 artifact 和相同可执行路径绑定。这两个进程不是对原失败进程的恢复，也没有使正式门禁转为通过；启用 trace 后的成功不足以确定未启用 trace 时的失败原因。原 rapid 历史问题的因果边界继续保留，不在本报告推断根因。[rapid 原始诊断](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.json) · [rapid trace](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.runtime.log) · [staged 原始诊断](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.json) · [staged trace](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.runtime.log)
+
+### 5.5 固定八次冷启动捕获同进程显示故障
+
+候选源码 `504fa770a97069e32bed4d8f45616066d5c4dbc5` 在 [44315250297](https://github.com/LIghtJUNction/ztty/actions/runs/44315250297) 要求每个 Windows 架构顺序完成八次独立冷启动。每次完整运行原 31 项检查和额外 10 轮快速缩放；前一进程及其目录清理完成后才启动下一次。任何失败立即停止剩余冷启动和工作区检查。原始报告按字节保留，最终检查重新读取报告并核对源码、二进制、所属桌面和 SHA-256；原采样、窗口参数、像素阈值和 180 秒总时限保持不变。[实验索引与文件身份](measurements/experience-release-2026-11-18/cold-44315250297/index.json)
+
+| 架构 | 实际结果 | 原始证据 |
+| --- | --- | --- |
+| Windows x64 | 前七次各通过 31 项和 10 轮缩放；第八次在原缩放恢复检查失败，此前通过 23 项，未进入额外缩放或工作区检查；所有进程与目录清理通过 | [独立审计](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64-summary.json) · [第八次原始报告](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.json) |
+| Windows ARM64 | 前三次完整通过；第四次完成 31 项和 10 轮缩放，主进程退出码为 0，但删除临时目录遇到文件占用，整体保持失败；第五至八次及工作区未启动 | [独立审计](measurements/experience-release-2026-11-18/cold-44315250297/windows-aarch64-summary.json) · [第四次原始报告](measurements/experience-release-2026-11-18/cold-44315250297/windows-aarch64/ztty-windows-aarch64.native.cold-04.json) |
+
+x64 第八次的原失败进程为 PID `8576`、HWND `2294132`。超时后的快照显示，client、surface、selected bitmap 均为 `180×190`，终端与 PTY 均为 `20×10`，CPU 像素及 source DIB 在 `(175,28)` 为红色；窗口 ClientDC 与 ScreenDC 却同时为黑色。待处理尺寸、dirty 和 full redraw 标记均已清除，最后一次 paint 记录全幅区域且 BitBlt 返回成功。显式 GdiFlush 前后窗口没有变化；随后单独请求正常失效化并经消息泵补画，同一点才恢复为红色。这将本次问题缩小到窗口画面提交与补画的边界，尚不能确认自然重入或某一种窗口管理事件就是根因。[同进程原始快照](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.post-failure.json)
+
+原失败 PNG 与 flush 后 PNG 完全相同；补画后的 PNG 与缩放前正确画面完全相同。x64 的 251 张 PNG、390 个缩放采样点，以及 ARM 的 140 张 PNG、220 个缩放采样点均已独立核对。原失败画面的右侧分界为 `144+8=152` 像素，作为窗口尺寸与边框相关的线索保留。诊断补画的恢复不改变原失败结论，也没有使这轮候选获得发布或安装资格。[缩放前](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-before.png) · [原始失败](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-restored.png) · [诊断补画后](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.post-repaint.png)
 
 ## 6. 发布与设备安装状态
 
