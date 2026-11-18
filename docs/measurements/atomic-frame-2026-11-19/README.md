@@ -2,7 +2,50 @@
 
 Date: 2026-11-19
 
-## Result
+## Integrated with 0.3.1
+
+The final source candidate `4f7872bcd78df67431074c7ed3265c1f28bbed93` merges the
+0.3.1 mainline `cbcd480f861904a2265af52ab5ca8a5e19cebe9d` with the
+frame fix. All normal terminal and overlay drawing paths remain inside the
+single `finish_frame` call. Expose alone restores retained pixels directly.
+
+The published equivalent is `cabeba6a7d74b36497e861febe5b7bb04d01c8ba`.
+Its Git tree, `a04fa0107313894f6f57ec1532b960250b510985`, is identical to
+the tested source tree. The source was merged through GitHub after the native
+Git transport stopped connecting; the tested local commit is retained in the
+evidence to keep the build provenance exact.
+
+The incremental release build reused the existing target directory. Its exact
+binary passed all **11 repaint checks** and the existing Linux input GUI suite:
+**12 checks, 59 input vectors and 14 zoom measurements**. This covers
+zoom/reset, non-US plus keys, custom bindings and Ctrl+Tab/Ctrl+Shift+Tab, with
+no consumed key-release leakage. The first input-suite launch stopped before
+any GUI scenario because its 5-second source-status read timed out; the source
+read then completed in 0.063 seconds, and the unchanged suite passed.
+
+[Integrated evidence](integrated-0.3.1.json) records source hashes, the exact
+binary hash, copied regions and cleanup. A local **0.3.1-2** package was prepared
+from that same binary without recompilation or stripping. Extraction verifies
+byte identity. The [installation receipt](installation-0.3.1.json) records
+the subsequent local installation: all 9 package files passed integrity checks,
+the installed executable matches the GUI-tested hash, and all 3 preexisting
+terminal processes and the user's launchers were preserved.
+
+New launches normally reuse the shared broker, and that connection has no
+executable-version handshake. At installation verification, no default broker
+was listening in the common network namespace; the older 0.1.2 windows use the
+earlier independent-window implementation. In that observed state, a new default
+launch creates a broker from the newly installed executable. Existing windows
+keep their old code. If a broker is already listening, an unused `ZTTY_SOCKET`
+name starts an independent broker without closing existing sessions.
+
+Binary SHA-256: `6739a4f1d535ada1885cafed39a808cbe667cc527f83f19769d664be5597de07`
+
+Package SHA-256: `d8c2d70cc6e7e040853e8323e0c4de99b86a50eba684746302d3ed16ebe99d1c`
+
+![Integrated scrollback frame](integrated-0.3.1-scroll.png)
+
+## Original baseline verification
 
 The Linux renderer now publishes one complete frame after painting the terminal
 and its view overlays. The real-window regression passes all 11 checks.
@@ -63,5 +106,6 @@ This verifies software frame composition and X11 presentation on a private
 display. It does not measure physical monitor scanout, compositor vblank timing
 or a hardware-specific tearing guarantee. Applications that write a logical
 frame in several PTY chunks should bracket it with synchronized output; the
-ssmcp sender change is tracked separately. This report records a tested source
-candidate, not an installation or a public release.
+ssmcp sender change is tracked separately. This report records source and GUI
+verification. The separate installation receipt records the local deployment;
+neither claims a hot upgrade of existing windows or physical scanout testing.
