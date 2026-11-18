@@ -1,8 +1,10 @@
 # ztty 体验迭代与发布验收记录
 
-日期：2026-11-18。主体验收检查点：[`0563554b95dc6321f6e45bdd53659b6c85f90850`](https://github.com/LIghtJUNction/ztty/commit/0563554b95dc6321f6e45bdd53659b6c85f90850)。本记录覆盖逻辑行搜索与复制、会话切换、锁定键输入和安装升级，并独立记录 macOS 候选门禁。正式 Release 与用户设备安装尚待完成，见文末状态表。
+日期：2026-11-18。初始主体验收检查点：[`0563554b95dc6321f6e45bdd53659b6c85f90850`](https://github.com/LIghtJUNction/ztty/commit/0563554b95dc6321f6e45bdd53659b6c85f90850)；返回底部的追加验收绑定运行时 `3730b28` 和脚本 `aef55d9`。本记录覆盖逻辑行搜索与复制、会话切换、历史滚动、锁定键输入和安装升级，并按源码独立记录原生平台候选。正式 Release 与用户设备安装尚待完成，见文末状态表。
 
 本轮让终端里已经存在的内容和会话更容易继续使用。搜索可以跨屏幕自动折行，复制保留真正的文本边界；会话切换能找到其他窗口和隐藏标签里的既有 PTY，并保留输入所有权。Linux 本地工作区测试通过，开发机上的五套既有 GUI 检查通过，新增会话切换脚本修正后通过六组检查。新增行元数据曾导致核心微基准回退，定位并修正热路径后保留了全部对照样本；这些结果只用于评价该核心负载。[验收索引](measurements/experience-release-2026-11-18/summary.json) · [文件校验清单](measurements/experience-release-2026-11-18/manifest.json)
+
+追加的 Linux 返回底部入口通过全部 18 组日常 GUI 检查，包含新输出到达、搜索／命令面板并存和只读观察视图。后续 `2ac46e2` 的 macOS 两种架构通过原生候选；Windows 的 `dc43870` 缩放恢复失败与 `8a2f4be` 子进程启动失败分别保留，均未记作通过。[追加源码与文件身份](measurements/experience-release-2026-11-18/scroll-prompt/source-binding.json) · [18 组原始记录](measurements/experience-release-2026-11-18/scroll-prompt/daily-workflow.json)
 
 ## 1. 固定源码与验收对象
 
@@ -15,8 +17,11 @@
 | 搜索、复制、会话切换 | [`114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847`](https://github.com/LIghtJUNction/ztty/commit/114ca5bb9fdcc2378eab6cdbbd2a995ddd8e1847) | 主要体验改动；初次性能测量对象 |
 | 安装升级 | [`a045871a76ff51c1acd29881ff280869e093efbb`](https://github.com/LIghtJUNction/ztty/commit/a045871a76ff51c1acd29881ff280869e093efbb) | 暂存校验、原子替换、回滚副本 |
 | 核心热路径修复 | [`cfc7ae80e785e4d3de11ffa5e1fba3f63d158222`](https://github.com/LIghtJUNction/ztty/commit/cfc7ae80e785e4d3de11ffa5e1fba3f63d158222) | 开发机 Linux 候选的生产源码 |
-| 最终 Linux 测试脚本 | `0563554b95dc6321f6e45bdd53659b6c85f90850` | 只修正会话切换的观测方式；工作区测试与 GUI 复验检查点 |
+| 初始 Linux 测试脚本 | `0563554b95dc6321f6e45bdd53659b6c85f90850` | 只修正会话切换的观测方式；工作区测试与 GUI 复验检查点 |
 | Linux GUI／协议候选 | 728,232 字节；SHA-256 `c6e6a8105c30e9b16be7def46a558eb3aee6154c9539c0f74b3a6501698e3ae6` | 在云工作区构建，在 Linux x86_64 开发机运行 |
+| 返回底部运行时 | [`3730b28a16f48b15809581213bccab284f6f4f22`](https://github.com/LIghtJUNction/ztty/commit/3730b28a16f48b15809581213bccab284f6f4f22) | 临时入口、到达标记和鼠标事件隔离；开发机构建并运行 |
+| 返回底部验收脚本 | [`aef55d95747c38aad34d161043ad1b9c72127b44`](https://github.com/LIghtJUNction/ztty/commit/aef55d95747c38aad34d161043ad1b9c72127b44) | 18 组日常 GUI 检查；新剪贴板断言拒绝沿用旧值 |
+| 返回底部测试二进制 | SHA-256 `2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada` | 本报告追加 GUI 结果所使用的文件，独立于前述 `cfc7ae8` 候选 |
 
 Linux 候选的构建与运行环境记录在[二进制身份](measurements/experience-release-2026-11-18/linux/candidate-builder.json)和[原始 GUI 汇总](measurements/experience-release-2026-11-18/linux/linux-native.json)中。后者保留了首次执行的失败状态；会话切换的通过结论来自另存的[复验记录](measurements/experience-release-2026-11-18/linux/session-switcher-recheck.json)。
 
@@ -54,6 +59,18 @@ Caps Lock、Num Lock、Scroll Lock 在传统键盘模式下不再向子进程写
 
 安装回归覆盖正在运行的 ELF 替换、重复安装、回滚、校验失败、错误版本、符号链接及含特殊字符的安装路径，开发机脚本退出码为 0。这里的原子性指单个文件的替换；二进制、桌面文件和回滚文件依次更新。本记录的测试结果不等同于用户设备已经安装，也没有把整个多文件升级描述为断电事务。[测试源码](https://github.com/LIghtJUNction/ztty/blob/a045871a76ff51c1acd29881ff280869e093efbb/tests/install_test.py) · [开发机回归退出状态](measurements/experience-release-2026-11-18/linux/regressions.json)
 
+### 2.4 历史视图可以直接返回最新输出
+
+用滚轮或 Shift+PageUp/PageDown 向上浏览后，右下角出现 **Back to live ↓**。点击入口即返回最新输出并隐藏入口，终端继续使用完整行数。浏览期间收到新的 PTY 输出时，当前阅读位置保持锚定，入口变为蓝边的 **New output · Back to live ↓**；返回底部会清除这次到达标记，再次上翻时使用普通提示。[视图实现](https://github.com/LIghtJUNction/ztty/blob/3730b28a16f48b15809581213bccab284f6f4f22/src/session.rs) · [入口绘制](https://github.com/LIghtJUNction/ztty/blob/3730b28a16f48b15809581213bccab284f6f4f22/src/x11.rs)
+
+入口避让搜索行和完整命令面板，点击后保留它们的输入模式。只读观察视图可以执行同一操作，同时保留输入所有者、PTY 和尺寸。入口的按下、移动和松开由视图处理；真实 GUI 用例在应用开启鼠标报告时确认 PTY 输入字节没有增加。窄窗口逐级使用较短标签，空间不足时隐藏完整目标。[交互范围](daily-workflow.md#returning-to-live-output) · [原始检查和入口矩形](measurements/experience-release-2026-11-18/scroll-prompt/daily-workflow.json)
+
+图 3 是新输出到达后的实际历史视图。图 4 保留打开的命令面板，入口位于面板上方。六张新截图全部保持原始像素，另有[普通入口](measurements/experience-release-2026-11-18/scroll-prompt/scrollback-return.png)、[返回后实时视图](measurements/experience-release-2026-11-18/scroll-prompt/scrollback-live.png)、[搜索并存](measurements/experience-release-2026-11-18/scroll-prompt/scrollback-search.png)和[只读观察视图](measurements/experience-release-2026-11-18/scroll-prompt/scrollback-observer.png)。
+
+![历史阅读期间的新输出入口](measurements/experience-release-2026-11-18/scroll-prompt/scrollback-new-output.png)
+
+![返回底部入口位于命令面板上方](measurements/experience-release-2026-11-18/scroll-prompt/scrollback-palette.png)
+
 ## 3. Linux 验收与测试脚本修正
 
 表 2 的工作区结果来自 `0563554`，开发机 GUI 与协议结果来自表 1 中的 `cfc7ae8` 二进制。Linux 上的 Darwin spawn 用例明确跳过，未算入通过数量。
@@ -72,6 +89,20 @@ Caps Lock、Num Lock、Scroll Lock 在传统键盘模式下不再向子进程写
 修正后的脚本使用后续普通按键到达源 PTY 作为处理屏障，随即捕获实际错误提示，并逐项核对源会话和脱离目标的身份、进程、所有权、窗口、工作区及尺寸。它同时确认提示区域出现文字、列表区域恢复、目标未被隐式挂接。复验使用相同二进制哈希并通过六组检查；这次修正只改变测试脚本，没有对应的产品运行时代码修复。[复验状态及 143 个提示前景像素](measurements/experience-release-2026-11-18/linux/session-switcher-recheck.json) · [实际拒绝提示截图](measurements/experience-release-2026-11-18/linux/screenshots/stale-focus-rejected.png)
 
 这些 GUI 检查运行在开发机的专属 Xvfb 中，使用真实 PTY、实际 X11 窗口像素回读和合成 XTEST 输入。它们覆盖指定软件路径，没有测量真实显示器扫描输出、物理键盘或 IME，也没有给出端到端输入呈现延迟。[环境与限制](measurements/experience-release-2026-11-18/linux/linux-native.json)
+
+### 3.1 追加：返回底部的 18 组设备 GUI 复验
+
+开发机使用表 1 的新二进制运行修订后的 `daily_workflow.py`，退出码为 0，18 组全部通过。原有 15 组继续执行，新增三组分别检查历史锚定与到达标记、搜索／面板并存、实际 `--observe` 重附后的只读行为。点击前后逐项比较输入所有者、只读状态、PTY PID 和行列数，并核对应用收到的完整输入字节。脚本通过自有 PTY 内的线程发出新输出，不向应用注入测试按键；沿用自有 Xvfb、进程与临时目录的清理路径。[原始 JSON](measurements/experience-release-2026-11-18/scroll-prompt/daily-workflow.json) · [完整日志](measurements/experience-release-2026-11-18/scroll-prompt/daily-workflow.log) · [设备运行摘要](measurements/experience-release-2026-11-18/scroll-prompt/summary.json)
+
+原始报告中的 13 个源码哈希全部与固定脚本检查点 `aef55d9` 相符；其中运行时文件也与 `3730b28` 相符。六张新 PNG 的 SHA-256 与原始报告逐项一致。原始运行还生成四张既有流程截图，本次追加目录只复制六张新图，原始 JSON 的路径保留原样。[来源与校验方法](measurements/experience-release-2026-11-18/scroll-prompt/source-binding.json) · [总清单](measurements/experience-release-2026-11-18/manifest.json)
+
+对保存 PNG 的独立解码显示，普通入口与新输出入口两张图的 26 行正文均含前景像素，正文区域逐像素相同；全图差异只位于入口矩形 `(661,612)–(920,644)`。面板图左侧正文的前 19 行也与普通历史图一致，底部七行由面板使用。该分析覆盖保存图像，不构成连续帧或物理显示器验收。[逐行像素与差异记录](measurements/experience-release-2026-11-18/scroll-prompt/pixel-review.json)
+
+### 3.2 完整 Linux 本地门禁
+
+开发机在固定源码 `8a2f4bee22324685f2193e91a16744dda21d0df9` 运行 `ZTTY_BARE_METAL=1 make check`，70.01 秒后退出 0，检查前后的 Git 提交一致。通过范围为 271 项普通 Rust 测试、6 项文档测试、独立 SessionCore runner 的 8 项实际 PTY 检查，以及严格工作区 Clippy、发行构建、生产依赖与符号审计、17 项安装回归、11 项 Bash 集成检查、MCP transport／sessions／security／wait／SSE 检查和 `x86_64-unknown-none` 可移植性编译。Darwin 原生用例明确跳过，未计入 Linux 通过数量；依赖 `zune-png` 的未来 Rust 兼容性提示保留在日志中。[固定源码与退出状态](measurements/experience-release-2026-11-18/scroll-prompt/full-check-8a.json) · [完整门禁日志](measurements/experience-release-2026-11-18/scroll-prompt/full-check-8a.log)
+
+此前在 `3730b28` 启动的一次检查因开发机连接重建而中断，没有完成状态，未记为通过。该次的日志与中断记录仍保留。上述完整本地门禁和返回底部 GUI 结果分别绑定各自的源码与可执行文件；正式发布仍要求最终 tag 的 Verify 和六个原生架构任务。[中断记录](measurements/experience-release-2026-11-18/scroll-prompt/full-check-interrupted-3730.json) · [中断时日志](measurements/experience-release-2026-11-18/scroll-prompt/full-check-interrupted-3730.log)
 
 ## 4. 行元数据的性能回退、定位和修复
 
@@ -98,16 +129,32 @@ Caps Lock、Num Lock、Scroll Lock 在传统键盘模式下不再向子进程写
 
 基准记录的初始活动堆字节数从 107,676 变为 107,932，增加 256 字节，与该几何下 32 行的行元数据相符；各变体记录的稳态吞吐阶段堆分配次数均为 0。它没有测量完整进程 RSS/PSS、渲染资源或 GPU 显存。搜索、高亮、PTY、GUI、其他操作系统和其他终端软件均不在这次性能对照范围内。最终热路径修复另通过全部 88 项 zterm 测试。[内存及验证记录](measurements/experience-release-2026-11-18/performance/core-throughput-summary.json)
 
-## 5. macOS 候选：按源码和架构保留结果
+## 5. 原生候选：按源码和架构保留结果
 
-两次 macOS 运行均为 `build_only=true`、`candidate_platform=macos`。它们不能替代正式 tag 的全平台发布门禁，也不能把一个架构或旧源码的成功推广到另一个架构或新源码。
+### 5.1 macOS 后续双架构通过
+
+前两次 macOS 运行使用 `build_only=true`、`candidate_platform=macos`；后续 `2ac46e2` 使用 `candidate_platform=all`。表中各项均为候选结果，不能替代正式 tag 的全平台发布门禁，也不能把一个架构或旧源码的成功推广到另一个架构或新源码。
 
 | 运行与固定源码 | Apple Silicon | Intel | 证据 |
 | --- | --- | --- | --- |
 | [44293476047](https://github.com/LIghtJUNction/ztty/actions/runs/44293476047)，`a045871a76ff51c1acd29881ff280869e093efbb` | 8 项 spawn、24 项原生检查、13 个阶段通过；清单记录 10 张实际 PNG，应用退出 0、无遗留自有进程；候选接受 | spawn 阶段失败，后续原生窗口与打包跳过 | [运行索引](measurements/experience-release-2026-11-18/macos/run-44293476047/index.json) · [ARM 原生记录](measurements/experience-release-2026-11-18/macos/run-44293476047/ztty-macos-aarch64.native.json) · [Intel 失败摘要](measurements/experience-release-2026-11-18/macos/run-44293476047/macos-x86_64-summary.json) |
 | [44295578969](https://github.com/LIghtJUNction/ztty/actions/runs/44295578969)，`bfd2732e238b3864e95e721e873f6c9498507bec` | spawn 的子进程清理断言失败：`waitpid(..., WNOHANG)` 返回 0；后续原生窗口与打包跳过 | 8 项 spawn 通过；实际像素的红色向量得到 `[255,0,3]`，预期 `[255,0,0]`，原生门禁失败，打包跳过 | [ARM 构建](measurements/experience-release-2026-11-18/macos/run-44295578969/ztty-macos-aarch64.build.json) · [清理断言日志](measurements/experience-release-2026-11-18/macos/run-44295578969/ztty-macos-aarch64.spawn.stderr.log) · [Intel 构建](measurements/experience-release-2026-11-18/macos/run-44295578969/ztty-macos-x86_64.build.json) · [像素向量](measurements/experience-release-2026-11-18/macos/run-44295578969/ztty-macos-x86_64.native.sixel_rgb_native_pixels.json) |
+| [44298970562](https://github.com/LIghtJUNction/ztty/actions/runs/44298970562)，`2ac46e2fd6e6c373752221d5f1bed9923c67fc1a` | 8/8 spawn、24/24 原生检查、13 个阶段和 10 张 PNG；退出 0、无遗留自有进程；候选接受 | 同样通过 8/8、24/24、13 个阶段和 10 张 PNG；退出 0、无遗留自有进程；候选接受 | [ARM 审计摘要](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44298970562/macos-aarch64-summary.json) · [Intel 审计摘要](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44298970562/macos-x86_64-summary.json) |
 
-第一次 ARM 记录实际使用 AppKit、Darwin PTY 和 ScreenCaptureKit 的 WindowServer 窗口回读，覆盖图像、窗口缩放／最小化恢复及 PTY 恢复等指定路径；其 IME／键盘字段仍为 `not_performed`。第二次运行保留了新的失败，不能用第一次成功覆盖它。后续色彩格式与子进程问题的修正、复验以及最终发行源码的验收状态应追加到下面的状态区。[ARM 范围](measurements/experience-release-2026-11-18/macos/run-44293476047/ztty-macos-aarch64.native.json) · [历史原生候选记录](native-candidates-2026-11-18.md)
+第一次 ARM 记录实际使用 AppKit、Darwin PTY 和 ScreenCaptureKit 的 WindowServer 窗口回读，覆盖图像、窗口缩放／最小化恢复及 PTY 恢复等指定路径；其 IME／键盘字段仍为 `not_performed`。前两次的失败记录全部保留。后续修正包含 sRGB 窗口 backing，以及在创建 PTY／子进程前按有效用户身份检查 helper 的执行权限；后者保留检查与执行之间发生路径变化的边界。[ARM 原始范围](measurements/experience-release-2026-11-18/macos/run-44293476047/ztty-macos-aarch64.native.json) · [实现与原生复验边界](darwin-threaded-pty.md)
+
+`2ac46e2` 的两个架构各自完成实际窗口缩放、最小化恢复和后续 PTY 恢复。保存 PNG 中的 20 个采样点分别重新读取后，与报告值的最大通道差均为 0。该结果建立此源码下的候选通过状态，IME／键盘输入与物理显示延迟仍在窗口门禁范围之外。[ARM 像素复核](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44298970562/macos-aarch64-summary.json) · [Intel 像素复核](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44298970562/macos-x86_64-summary.json)
+
+### 5.2 Windows 缩放与启动失败分别保留
+
+Windows 后续两轮均为 `build_only=true`、`candidate_platform=windows`，运行于各自原生架构。它们在不同阶段失败，后一次未到达的路径保持未验收状态。
+
+| 固定源码与运行 | 两种架构的实际结果 | 未到达范围与清理 |
+| --- | --- | --- |
+| `dc43870ef2c8e3c54894d0124e47a23445a3c624`，[44300272576](https://github.com/LIghtJUNction/ztty/actions/runs/44300272576) | 各完成 22/30 基础检查、12 项可见像素检查后，快速缩小／恢复的 `resize_restores_visible_image` 失败；预期红色 `[255,0,0]`，x64 为 `[0,0,0]`，ARM64 为 `[20,20,20]` | 19 组工作区检查未开始；应用退出 0，自有 Job 为空，输入桌面／线程桌面恢复，句柄关闭 |
+| `8a2f4bee22324685f2193e91a16744dda21d0df9`，[44303751871](https://github.com/LIghtJUNction/ztty/actions/runs/44303751871) | 各完成前 7 项检查后，重定向宿主路径中的 ConPTY 测试子进程在 `SetConsoleMode(stdin, 0x200)` 返回 `WinError 6`，没有到达 ready 标记 | 未到缩放、rapid/staged 诊断或工作区检查；无 PNG；应用退出 1，所有自有进程、Job、临时目录及桌面资源清理完成 |
+
+第一轮的像素失败保留原样；第二轮是更早发生的启动问题，不能用来判定新版本的缩放恢复已通过，也不能把缺少截图写成视觉检查通过。启动失败的 stderr 随证据归档，后续修正及复验仍待记录。[缩放 x64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44300272576/windows-x86_64-summary.json) · [缩放 ARM64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44300272576/windows-aarch64-summary.json) · [启动 x64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-x86_64-summary.json) · [启动 ARM64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-aarch64-summary.json) · [x64 子进程 stderr](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-x86_64.runtime.log) · [ARM64 子进程 stderr](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-aarch64.runtime.log)
 
 ## 6. 发布与设备安装状态
 
@@ -115,14 +162,16 @@ Caps Lock、Num Lock、Scroll Lock 在传统键盘模式下不再向子进程写
 
 | 交付项 | 当前状态 | 完成时需要补入的记录 |
 | --- | --- | --- |
-| 后续 macOS 修正与复验 | 待完成 | 固定提交、运行 ID、两个架构分别的 spawn／native／package 结果 |
+| 返回底部追加验收 | 所列 Linux 候选 18/18 组通过 | 已保留运行时、脚本与二进制身份及六张新图；最终发行文件仍需其自身门禁 |
+| 后续 macOS 修正与复验 | `2ac46e2` 两种架构候选通过 | 已保留 44298970562 的分架构结果；最终 tag 的全平台验收仍待完成 |
+| Windows 原生复验 | 未通过 | `dc43870` 缩放失败、`8a2f4be` 启动失败分别保留；后续修复与同源码复验待完成 |
 | 正式 Release | 待完成 | tag、发行源码、Release URL、最终平台门禁与资产校验记录 |
 | 用户设备安装 | 待完成 | 安装绝对路径、实际 `--version`、二进制 SHA-256、启动器目标 |
 | 回滚与既有会话 | 待完成设备实测记录 | `ztty.previous` 身份与校验、既有进程／会话的保留情况 |
 
 ## 7. 仍然存在的范围限制
 
-Linux 会话切换和多工作区体验的实测结论限于本报告列出的 X11 路径。macOS／Windows 的原生共享会话、Tabs／Splits 与同等交互仍有缺口；共享文本提取函数在源码上接入三个前端，并不自动证明三个平台的真实剪贴板与输入路径都已经验收。原生 Wayland、硬件 GPU／VRAM、物理输入矩阵、IME 和端到端延迟继续需要独立证据。Apple Developer ID／notarization 与 Windows 签名也不由本次候选记录提供。[架构范围](architecture.md) · [原生候选与剩余门禁](native-candidates-2026-11-18.md) · [已有性能口径](performance.md)
+Linux 会话切换、返回底部和多工作区体验的实测结论限于本报告列出的 X11 路径。Windows Tabs／Splits 已有实现，本轮 19 组原生工作区门禁仍未通过；macOS 工作区界面及 macOS／Windows 的共享会话、搜索和命令面板仍有缺口。共享文本提取函数在源码上接入三个前端，并不自动证明三个平台的真实剪贴板与输入路径都已经验收。原生 Wayland、硬件 GPU／VRAM、物理输入矩阵、IME 和端到端延迟继续需要独立证据。Apple Developer ID／notarization 与 Windows 签名也不由本次候选记录提供。[架构范围](architecture.md) · [原生候选与剩余门禁](native-candidates-2026-11-18.md) · [已有性能口径](performance.md)
 
 搜索目前是有长度上限的字面查询，命中计数仍需扫描保留的历史；可见高亮有时需要回溯到一条很长的逻辑行开头，才能保持非重叠匹配顺序。没有整份历史字符串副本有助于控制临时内存，但不构成搜索耗时的常数上界。本轮没有给这部分新增交互延迟承诺。[搜索算法及边界](https://github.com/LIghtJUNction/ztty/blob/0563554b95dc6321f6e45bdd53659b6c85f90850/src/search.rs)
 
@@ -134,16 +183,17 @@ Linux 会话切换和多工作区体验的实测结论限于本报告列出的 X
 | --- | --- | --- |
 | 自动折行可搜索、完整复制，并拒绝过期命中 | 13 项搜索测试、5 项选区测试、六组 GUI 的最后一组 | 在所列 Linux／核心范围内支持 |
 | 会话切换保留所有权，过期 Focus 不隐式挂接 | GUI 的身份、输入、尺寸和实际提示断言 | 复验支持；首轮脚本失败已保留 |
+| 上翻后可点击返回，新输出有提示，观察者不夺权 | 18 组日常 GUI 原始记录、源码绑定和六张新 PNG | 在所列 Linux 候选范围内支持 |
 | 新元数据的明显热路径回退得到缓解 | 原始对照、中间版本、最终配对、汇编与源码身份 | 仅支持所测核心负载，不支持普遍加速 |
 | 安装路径先校验再替换并保留回滚 | 安装回归源码和开发机退出状态 | 支持脚本验收；设备实际安装待记录 |
-| 原生候选和正式交付已分开 | 两轮 macOS 的分架构结果及交付状态表 | 正式 Release／设备安装待完成 |
+| 原生候选和正式交付已分开 | macOS 三轮分架构结果、Windows 两轮不同阶段失败及交付状态表 | 正式 Release／设备安装待完成 |
 
 ### 五项自审
 
 | 维度 | 核对问题与处理 |
 | --- | --- |
-| 改进价值 | 是否对应用户可见的问题？已用跨折行文本、既有会话聚焦、锁定键和运行中升级说明具体行为。 |
+| 改进价值 | 是否对应用户可见的问题？已用跨折行文本、既有会话聚焦、返回最新输出、锁定键和运行中升级说明具体行为。 |
 | 表达清晰 | 是否混淆物理行与逻辑行、候选与发布、脚本与运行时修复？各自定义并固定源码，首轮失败单独说明。 |
 | 实验证据 | 是否把波动当作加速？保留全部外层样本、比值范围、变异系数和最初回退，限制结论到同一核心负载。 |
-| 验收完整性 | 是否遗漏失败或平台缺口？保留两次 macOS 的架构差异、首次 Linux 脚本失败、Darwin 本地跳过和未完成门禁。 |
+| 验收完整性 | 是否遗漏失败或平台缺口？保留早期 macOS 的架构差异、两次 Windows 不同阶段的失败、首次 Linux 脚本失败、Darwin 本地跳过和未完成门禁。 |
 | 设计边界 | 是否把有界内存理解为无成本，或把单文件原子替换理解为多文件事务？明确历史预算、查询上限、扫描代价和安装原子性的范围。 |

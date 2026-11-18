@@ -1,0 +1,1030 @@
+sh tools/check.sh
+   Compiling ztty v0.3.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree)
+   Compiling zpty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zpty)
+   Compiling zterm v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zterm)
+   Compiling zgraphics v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zgraphics)
+   Compiling zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zinput)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 38.49s
+     Running unittests src/lib.rs (target/debug/build/zgraphics/63d530df0e5d72fc/out/zgraphics-63d530df0e5d72fc)
+
+running 31 tests
+test sixel_tests::sixel_bits_repeat_and_color_overprint_are_exact ... ok
+test sixel_tests::malformed_sixel_cannot_replace_an_existing_image ... ok
+test sixel_tests::aborted_sixel_releases_storage_and_palette_only_streams_are_valid ... ok
+test tests::chunked_rgba_is_atomic_and_uses_final_cursor_position ... ok
+test sixel_tests::sixel_default_palette_and_embedded_controls ... ok
+test tests::crop_aspect_ratio_letterboxing_and_metric_resize ... ok
+test sixel_tests::sixel_macro_and_raster_aspect_ratios_change_only_destination ... ok
+test sixel_tests::sixel_transparency_raster_extent_and_growth_preserve_pixels ... ok
+test tests::compressed_rgb_decodes_and_wrong_dimensions_fail ... ok
+test tests::malformed_base64_is_rejected_without_partial_append ... ok
+test sixel_tests::sixel_hls_uses_dec_hue_origin_and_palette_redefinitions ... ok
+test sixel_tests::sixel_transfer_painting_and_scene_limits_are_independent ... ok
+test tests::invalid_chunks_abort_but_leave_existing_images_untouched ... ok
+test tests::invalid_png_crc_truncation_and_bombs_are_rejected ... ok
+test tests::deletion_frees_only_selected_unreferenced_images ... ok
+test tests::query_decodes_without_storing_or_replacing_an_image ... ok
+test tests::retained_pixels_outlive_scene_deletion_without_copying ... ok
+test tests::streamed_m_flags_quiet_errors_and_transfer_limit_are_preserved ... ok
+test tests::feature_query_is_honest_and_does_not_cancel_pending_transfer ... ok
+test tests::numbers_allocate_unique_ids_and_delete_newest_only ... ok
+test tests::partial_scroll_does_not_move_unaffected_placements ... ok
+test tests::scroll_keeps_images_in_history_and_trims_expired_placements ... ok
+test tests::replacement_and_placement_ids_follow_lifecycle ... ok
+test tests::quiet_modes_and_response_queue_are_bounded ... ok
+test tests::limits_bound_transfer_store_and_placement_counts ... ok
+test tests::failed_combined_transmission_does_not_evict_or_replace_valid_images ... ok
+test tests::png_formats_decode_to_straight_rgba ... ok
+test tests::padded_and_unpadded_final_base64_decode_identically ... ok
+test tests::malformed_png_headers_with_valid_checksums_remain_recoverable ... ok
+test tests::current_icat_128k_chunks_can_repeat_action_and_quiet_on_continuations ... ok
+test tests::large_single_apc_like_icat_streams_with_bounded_staging_and_unpadded_tail ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/build/zinput/2a1421d7cc46e7f4/out/zinput-2a1421d7cc46e7f4)
+
+running 18 tests
+test tests::all_keyboard_flag_combinations_preserve_reset_key_release_rules ... ok
+test tests::all_xterm_mouse_buttons_have_distinct_press_codes ... ok
+test tests::clipboard_cannot_inject_a_bracket_end_or_control_keys ... ok
+test tests::ime_commits_are_never_truncated_or_discarded ... ok
+test tests::focus_and_reusable_buffer_append ... ok
+test tests::alternate_fields_and_release_text_obey_negotiated_flags ... ok
+test tests::kitty_alternate_keys_and_complete_associated_text ... ok
+test tests::invalid_mouse_inputs_never_append_partial_bytes ... ok
+test tests::kitty_disambiguates_without_breaking_reset_keys ... ok
+test tests::kitty_event_reporting_and_release_exceptions ... ok
+test tests::legacy_ctrl_shift_shortcuts_do_not_collapse_to_control_characters ... ok
+test tests::legacy_text_control_and_application_cursor ... ok
+test tests::lock_keys_are_silent_until_the_child_requests_enhanced_events ... ok
+test tests::modifier_keys_keypad_and_lock_state ... ok
+test tests::sgr_encoding_does_not_itself_enable_tracking ... ok
+test tests::tracking_modes_filter_motion_and_legacy_coordinates_are_bounded ... ok
+test tests::wheel_releases_and_motion_are_suppressed_but_extra_buttons_can_drag ... ok
+test tests::x10_tracking_sends_only_primary_presses_without_modifiers ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/build/zpty/2f0eed6209dc601c/out/zpty-2f0eed6209dc601c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/darwin_spawn.rs (target/debug/build/zpty/88288eaff424c6e8/out/darwin_spawn-88288eaff424c6e8)
+SKIP darwin_spawn: requires native macOS
+     Running unittests src/lib.rs (target/debug/build/zterm/7a9a4007144c3252/out/zterm-7a9a4007144c3252)
+
+running 88 tests
+test shell_tests::semantic_boundaries_extract_input_and_output_and_status ... ok
+test shell_tests::semantic_byte_limit_never_splits_utf8 ... ok
+test shell_tests::semantic_history_clear_marks_evicted_output_truncated ... ok
+test shell_tests::semantic_invalid_exit_status_and_unknown_marks_do_not_end_command ... ok
+test shell_tests::semantic_resize_clear_and_reset_never_return_reassigned_ranges ... ok
+test shell_tests::semantic_alt_screen_marks_are_ignored_and_primary_output_survives ... ok
+test sixel_tests::sixel_cancellation_and_truncation_never_display_partial_images ... ok
+test shell_tests::semantic_next_prompt_closes_output_without_inventing_exit_status ... ok
+test shell_tests::semantic_prompt_redraw_secondary_prompt_and_duplicate_marks_are_bounded ... ok
+test sixel_tests::sixel_scrolls_with_history_and_respects_display_and_right_modes ... ok
+test tests::alternate_screen_restores_primary_cursor_style_and_content ... ok
+test sixel_tests::sixel_palette_scope_background_and_mode_queries_are_explicit ... ok
+test shell_tests::semantic_output_anchors_survive_scroll_and_history_eviction ... ok
+test tests::ascii_batch_repairs_both_wide_boundaries_without_touching_other_glyphs ... ok
+test sixel_tests::sixel_interoperates_with_kitty_dcs_queries_and_alternate_screen ... ok
+test tests::ascii_batch_uses_only_the_selected_character_set ... ok
+test tests::ascii_batch_overwrites_complete_wide_glyphs_and_handles_the_last_column ... ok
+test tests::ascii_delayed_wrap_and_carriage_return ... ok
+test tests::damage_tracking_marks_changed_rows_and_cursor_rows ... ok
+test tests::erase_half_of_wide_character_clears_both_halves ... ok
+test tests::cell_storage_has_no_heap_pointer_and_is_compact ... ok
+test sixel_tests::sixel_c1_terminator_and_large_scrolling_region_are_bounded ... ok
+test tests::graphics_cursor_policy_and_reset_generation_are_stable ... ok
+test tests::graphics_dispatch_cancels_previous_osc_and_dcs_without_text_leakage ... ok
+test tests::graphics_follow_scroll_resize_alternate_screen_and_deletion ... ok
+test tests::graphics_query_precedes_device_attributes_and_reports_actual_cell_size ... ok
+test shell_tests::semantic_markers_are_independent_of_chunk_boundaries ... ok
+test tests::history_is_bounded_and_view_orders_oldest_to_newest ... ok
+test tests::hyperlink_survives_closure_sgr_reset_and_scroll ... ok
+test tests::icat_probe_finishes_on_da1_and_advertises_only_sixel ... ok
+test tests::incomplete_graphics_transfers_do_not_consume_following_text ... ok
+test tests::insert_delete_characters_and_lines_are_bounded ... ok
+test tests::kitty_keyboard_flags_and_stacks_are_screen_local ... ok
+test tests::mouse_encoding_and_tracking_modes_are_independent ... ok
+test sixel_tests::sixel_every_chunk_boundary_has_identical_pixels_and_cursor ... ok
+test tests::osc_color_queries_reply_with_resolved_rgb_and_valid_indices ... ok
+test tests::origin_mode_coordinates_and_cursor_report_follow_margins ... ok
+test tests::repeated_alternate_screen_enable_keeps_primary_saved_state ... ok
+test tests::resize_in_alternate_screen_preserves_primary_cursor_and_history ... ok
+test tests::overflowing_osc_is_rejected_as_a_whole ... ok
+test tests::resize_keeps_the_cursor_row_and_moves_discarded_rows_into_history ... ok
+test tests::missing_st_unknown_apc_and_oversize_apc_recover_on_cancellation ... ok
+test tests::resize_preserves_cells_and_removes_split_wide_glyph ... ok
+test tests::kitty_graphics_framing_is_independent_of_every_pty_chunk_boundary ... ok
+test tests::semicolons_in_osc_metadata_are_preserved ... ok
+test tests::scroll_region_preserves_outside_rows_and_does_not_enter_history ... ok
+test tests::sgr_supports_indexed_rgb_and_colon_forms ... ok
+test tests::sync_output_and_mode_queries_report_actual_state ... ok
+test tests::repeated_ring_wraps_keep_history_partial_margins_and_reverse_index_ordered ... ok
+test tests::synchronized_frame_timeout_and_reset_preserve_pending_commit ... ok
+test tests::tabs_and_dec_line_drawing_work_without_allocated_glyphs ... ok
+test tests::terminal_capability_queries_reject_unknown_names ... ok
+test tests::sgr_streaming_preserves_missing_invalid_and_mixed_parameter_groups ... ok
+test tests::synchronized_frame_commit_survives_all_chunk_boundaries_until_painted ... ok
+test tests::unicode_insert_preserves_shifted_glyphs_and_repairs_split_glyphs ... ok
+test tests::unicode_narrow_overwrite_repairs_either_wide_half_and_replaces_metadata ... ok
+test tests::unicode_wide_overwrite_repairs_both_outside_halves ... ok
+test tests::unicode_overwrite_handles_narrow_screens_and_wrap_boundaries ... ok
+test tests::wide_character_wraps_before_last_column ... ok
+test tests::wide_glyphs_and_combining_marks_occupy_correct_cells ... ok
+test tests::x10_mouse_mode_negotiation_preserves_other_tracking_modes ... ok
+test theme_tests::color_resets_clear_only_the_corresponding_provenance ... ok
+test theme_tests::defaults_change_but_identical_explicit_rgb_does_not ... ok
+test theme_tests::erased_cells_keep_color_sources_and_resized_blanks_use_current_defaults ... ok
+test theme_tests::history_and_rotated_screen_rows_update_without_losing_text ... ok
+test theme_tests::invalid_color_sequences_preserve_the_previous_source ... ok
+test theme_tests::provenance_fits_existing_cell_and_style_storage ... ok
+test theme_tests::every_ansi_index_follows_the_palette_for_all_sgr_encodings ... ok
+test theme_tests::osc_queries_report_current_colors_with_unchanged_terminators ... ok
+test theme_tests::no_op_does_not_dirty_rows_and_shell_metadata_survives_theme_change ... ok
+test theme_tests::saved_styles_update_in_both_primary_and_cached_alternate_screens ... ok
+test theme_tests::truecolor_and_extended_indices_never_become_palette_references ... ok
+test tests::utf8_and_sequences_are_independent_of_chunk_boundaries ... ok
+test theme_tests::wide_cells_combining_marks_hyperlinks_and_rendition_survive ... ok
+test wrap_tests::alternate_screens_keep_independent_wrap_metadata_through_resize_and_clear ... ok
+test wrap_tests::insert_delete_and_manual_scroll_sever_only_changed_row_adjacencies ... ok
+test wrap_tests::erasure_and_character_shifts_invalidate_the_affected_wrap_endpoint ... ok
+test wrap_tests::soft_wrap_is_recorded_only_after_automatic_row_advance ... ok
+test wrap_tests::resize_retains_complete_wraps_and_severs_clipped_successors ... ok
+test wrap_tests::replacing_screen_rows_breaks_history_links_without_mutating_inactive_history ... ok
+test wrap_tests::wrapped_rows_follow_ring_rotation_history_and_eviction ... ok
+test tests::unicode_overwrites_are_independent_of_pty_chunk_sizes ... ok
+test wrap_tests::soft_wrap_metadata_is_independent_of_pty_chunk_boundaries ... ok
+test tests::malformed_input_cannot_escape_grid_bounds ... ok
+test tests::query_reply_storage_is_bounded ... ok
+test tests::bulk_and_bytewise_feeds_agree_through_scroll_styles_and_charset_switches ... ok
+test tests::large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding ... ok
+test terminal::history_budget_tests::retained_history_counts_wrap_metadata_spare_slots_and_reused_cell_capacity ... ok
+
+test result: ok. 88 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (target/debug/build/ztty/251ac58ddb657176/out/ztty-251ac58ddb657176)
+
+running 4 tests
+test session_identity::tests::large_identifiers_are_compared_without_number_rounding ... ok
+test session_identity::tests::all_four_fields_bind_the_expected_stream ... ok
+test session_identity::tests::identity_fields_are_complete_unique_and_strictly_typed ... ok
+test output_tail::tests::storage_and_read_allocations_remain_bounded_through_wraps_and_limit_changes ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests/actions.rs (target/debug/build/ztty/015dc8abb6a25085/out/actions-015dc8abb6a25085)
+
+running 5 tests
+test custom_bindings_override_defaults_and_can_disable_them ... ok
+test multiword_matching_ignores_case_and_word_order_across_fields ... ok
+test invalid_keys_modifiers_and_actions_are_rejected ... ok
+test session_switcher_has_an_overrideable_default_and_truthful_shortcut_hints ... ok
+test mouse_and_function_keys_are_not_ambiguous ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/config_watch.rs (target/debug/build/ztty/91f79a59f9e9269a/out/config_watch-91f79a59f9e9269a)
+
+running 3 tests
+test missing_deep_directories_created_before_ancestor_watch_do_not_lose_file_updates ... ok
+test renamed_parent_recreated_before_ancestor_watch_still_reloads_later_file ... ok
+test retaining_one_path_preserves_shared_descriptor_and_releases_the_last_reference ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/json.rs (target/debug/build/ztty/3e4d0ef9c774d3a7/out/json-3e4d0ef9c774d3a7)
+
+running 4 tests
+test unicode_roundtrip_preserves_request_identifiers ... ok
+test values_build_and_read_without_loss ... ok
+test rejects_ambiguous_and_malformed_json ... ok
+test large_objects_preserve_order_and_reject_late_duplicate_keys ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/layout.rs (target/debug/build/ztty/c461d681fd619e1e/out/layout-c461d681fd619e1e)
+
+running 6 tests
+test closing_earlier_tab_keeps_current_tab_selected ... ok
+test tabs_hide_other_sessions_without_losing_their_layout ... ok
+test closing_pane_collapses_only_its_parent_and_preserves_focus ... ok
+test focus_swap_resize_and_maximize_are_reversible ... ok
+test tiny_window_never_emits_nonpositive_dimensions ... ok
+test limits_and_duplicate_ids_leave_tree_unchanged ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mcp_protocol.rs (target/debug/build/ztty/367c7704120e909c/out/mcp_protocol-367c7704120e909c)
+
+running 27 tests
+test mcp::http::tests::accept_quality_zero_is_not_an_accepted_representation ... ok
+test mcp::http::tests::authority_allowlist_rejects_urls_userinfo_and_controls ... ok
+test mcp::http::tests::framing_rejects_smuggling_controls_and_duplicate_headers ... ok
+test mcp::http::tests::authentication_binds_role_and_keeps_actor_separate_from_session_secret ... ok
+test mcp::http::tests::sse_heartbeat_waits_for_delivery_and_overload_never_restarts_http ... ok
+test mcp::http::tests::sse_frames_one_json_response_and_preserves_initial_session_header ... ok
+test mcp::http::tests::invalid_envelopes_return_http_400_and_never_create_sessions ... ok
+test mcp::tests::actor_cannot_be_forged_by_tool_arguments ... ok
+test mcp::http::tests::host_and_origin_must_both_match_the_endpoint ... ok
+test mcp::http::tests::sse_final_response_keeps_partially_written_comments ... ok
+test mcp::tests::cancellation_requires_a_valid_notification_and_id ... ok
+test mcp::http::tests::sse_selection_keeps_http_errors_notifications_and_delete_nonstreaming ... ok
+test mcp::http::tests::chunk_parser_handles_fragmentation_and_rejects_unsafe_trailers ... ok
+test mcp::tests::command_reads_validate_ids_parts_and_bounds_for_observers ... ok
+test mcp::tests::distinct_request_ids_do_not_collide ... ok
+test mcp::tests::guarded_reads_preserve_identity_and_observer_permissions ... ok
+test mcp::tests::malformed_ready_notification_does_not_advance_lifecycle ... ok
+test mcp::tests::malformed_read_guards_fail_before_broker_dispatch ... ok
+test mcp::tests::input_control_maps_only_explicit_valid_actions ... ok
+test mcp::tests::malformed_envelopes_never_run_requests ... ok
+test mcp::tests::request_ids_are_exact_integers_without_float_rounding ... ok
+test mcp::tests::uncorrelated_error_responses_are_accepted_without_dispatch ... ok
+test mcp::tests::waiting_reads_are_deferred_and_validate_bounds ... ok
+test mcp::tests::numeric_request_ids_match_by_exact_value ... ok
+test mcp::tests::observer_catalog_and_dispatch_enforce_same_permissions ... ok
+test mcp::http::tests::sse_buffer_budget_includes_framing_and_existing_unsent_bytes ... ok
+test mcp::tests::request_id_exponent_carries_stay_bounded_by_input_size ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/native_resize.rs (target/debug/build/ztty/3df393c00d143bb0/out/native_resize-3df393c00d143bb0)
+
+running 5 tests
+test a_hidden_or_cancelled_pane_with_uncommitted_size_is_restored ... ok
+test all_ptys_accept_before_the_caller_can_commit_any_grid ... ok
+test a_middle_failure_rolls_back_only_changed_ptys_and_keeps_old_grids ... ok
+test failed_rollback_retains_actual_size_and_a_later_retry_recovers ... ok
+test unchanged_grid_font_changes_still_require_every_pty_to_accept ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/output_tail.rs (target/debug/build/ztty/f79570244e24160a/out/output_tail-f79570244e24160a)
+
+running 19 tests
+test an_explicit_cursor_inside_a_codepoint_keeps_existing_raw_byte_semantics ... ok
+test consumers_can_disconnect_and_replay_without_advancing_each_other ... ok
+test complete_utf8_pages_preserve_characters_and_extend_at_most_three_bytes ... ok
+test empty_output_and_end_cursor_have_no_more_data ... ok
+test known_invalid_sequences_do_not_wait_for_output_that_cannot_repair_them ... ok
+test page_lookahead_distinguishes_malformed_bytes_from_a_pending_suffix ... ok
+test invalid_prefix_does_not_consume_a_later_incomplete_utf8_suffix ... ok
+test evicted_utf8_continuation_prefix_is_skipped_without_losing_byte_offsets ... ok
+test malformed_sequences_at_page_boundaries_always_make_progress ... ok
+test four_byte_utf8_fed_one_byte_at_a_time_waits_then_extends_a_one_byte_page ... ok
+test eof_flushes_an_incomplete_suffix_lossily_without_changing_byte_cursors ... ok
+test multiple_malformed_sequences_before_an_incomplete_suffix_are_consumed_once ... ok
+test increasing_retention_never_resurrects_already_evicted_bytes ... ok
+test wholly_evicted_continuation_runs_advance_to_the_available_end ... ok
+test malformed_prefix_at_large_page_limits_does_not_stall_the_next_read ... ok
+test lowering_retention_drops_only_the_oldest_bytes ... ok
+test request_limits_and_default_page_size_match_the_wire_contract ... ok
+test disconnected_consumers_get_explicit_truncation_after_eviction ... ok
+test persistent_retention_is_exactly_256_kib_across_independent_pages ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/repaint_schedule.rs (target/debug/build/ztty/30c4eb1c7a0077aa/out/repaint_schedule-30c4eb1c7a0077aa)
+
+running 6 tests
+test force_first_frame_and_expose_bypass_the_budget ... ok
+test ongoing_output_keeps_the_original_deadline ... ok
+test quiet_final_damage_has_a_deadline_but_idle_has_none ... ok
+test canceling_input_and_protocol_output_cannot_create_interaction_priority ... ok
+test synchronized_frames_do_not_return_expired_repaint_deadlines ... ok
+test old_screen_repaint_does_not_consume_pending_input ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/scroll_prompt.rs (target/debug/build/ztty/3c617d8e39bb8a77/out/scroll_prompt-3c617d8e39bb8a77)
+
+running 3 tests
+test narrow_and_short_views_require_a_complete_label_and_target ... ok
+test prompt_avoids_search_and_palette_without_changing_the_viewport ... ok
+test only_visible_target_pixels_are_clickable ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/search.rs (target/debug/build/ztty/8d909b1e25578937/out/search-8d909b1e25578937)
+
+running 13 tests
+test copied_matches_reject_stale_history_and_resized_coordinates ... ok
+test soft_wrapped_matches_count_and_navigate_across_history_and_screen ... ok
+test clipped_history_does_not_invent_a_contiguous_match ... ok
+test visible_non_overlapping_matches_keep_the_offscreen_logical_line_alignment ... ok
+test explicit_line_breaks_never_create_a_cross_row_match ... ok
+test wrapped_unicode_and_combining_matches_select_complete_cells ... ok
+test empty_absent_and_oversized_queries_allocate_no_highlight_map ... ok
+test visible_highlights_use_the_selected_scrollback_page ... ok
+test unicode_matches_select_complete_wide_and_combining_cells ... ok
+test partial_matches_at_both_viewport_edges_are_highlighted_and_copy_in_full ... ok
+test wide_wrap_padding_is_skipped_but_real_spaces_are_retained ... ok
+test history_search_wraps_both_directions_and_counts_all_matches ... ok
+test maximum_query_spans_many_rows_without_building_a_logical_line ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/selection.rs (target/debug/build/ztty/46d484b54b877c2a/out/selection-46d484b54b877c2a)
+
+running 5 tests
+test autowrapped_text_copies_as_one_logical_line_in_either_direction ... ok
+test invalid_or_outside_selection_coordinates_are_bounded ... ok
+test explicit_newlines_stay_separate_and_only_hard_line_padding_is_trimmed ... ok
+test selection_can_span_retained_history_and_more_than_one_viewport ... ok
+test wide_wrap_padding_is_omitted_and_partial_glyphs_copy_whole_cells ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/session_control.rs (target/debug/build/ztty/4dd59f17a56aa74d/out/session_control-4dd59f17a56aa74d)
+
+running 9 tests
+test actor_validation_retains_ascii_and_length_boundaries ... ok
+test an_unowned_session_can_be_acquired_without_forcing_takeover ... ok
+test reacquiring_current_owner_does_not_request_input_cancellation ... ok
+test initial_owner_has_exclusive_control ... ok
+test rejected_takeover_keeps_the_original_owner ... ok
+test explicit_takeover_revokes_previous_owner_and_requests_cancellation_once ... ok
+test released_control_denies_every_actor_until_reacquired ... ok
+test repeated_transfers_keep_one_owner_and_preserve_rejected_state ... ok
+test release_by_another_actor_does_not_change_control ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/session_core.rs (target/debug/build/ztty/697ab5afca1af61f/out/session_core-697ab5afca1af61f)
+bounded atomic input ... ok
+control and queue cancellation ... ok
+bounded terminal responses ... ok
+transactional PTY resize ... ok
+reaped child output drain ... ok
+fragmented UTF-8 and EOF ... ok
+per-feed history anchor ... ok
+native errors and descriptor cleanup ... ok
+SessionCore: 8 checks passed; every test child joined.
+     Running tests/windows_dispatch.rs (target/debug/build/ztty/e7c5509fe0ad80a7/out/windows_dispatch-e7c5509fe0ad80a7)
+
+running 4 tests
+test minimize_cancels_resize_until_the_window_has_a_client_again ... ok
+test resize_queued_during_commit_waits_for_the_next_outer_turn ... ok
+test nested_resize_survives_the_mutable_dispatch_guard ... ok
+test rapid_resizes_commit_only_the_latest_client_dimensions ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/windows_frame.rs (target/debug/build/ztty/884c3f49aab8ca2e/out/windows_frame-884c3f49aab8ca2e)
+
+running 4 tests
+test aggregate_budget_rejection_keeps_the_source_untouched ... ok
+test moved_held_frame_keeps_committed_pixels_and_does_not_touch_neighbours ... ok
+test repeated_resize_uses_the_original_committed_frame ... ok
+test offscreen_capture_and_target_clipping_do_not_copy_outside_either_view ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/working_directory.rs (target/debug/build/ztty/401e5cf983621f7c/out/working_directory-401e5cf983621f7c)
+
+running 4 tests
+test failed_target_preserves_cwd_errno_and_descriptor_count ... ok
+test switches_restores_and_closes_a_cloexec_path_handle ... ok
+test search_only_original_directory_can_be_saved_and_restored ... ok
+test saved_directory_failure_reports_original_emfile_before_target_lookup ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace_state.rs (target/debug/build/ztty/8c22a614509ced76/out/workspace_state-8c22a614509ced76)
+
+running 13 tests
+test a_recreated_session_with_the_same_uri_cannot_replace_the_saved_pty ... ok
+test focus_must_be_a_live_leaf_in_the_active_tab ... ok
+test duplicate_ids_uris_and_resolver_aliases_cannot_duplicate_a_session ... ok
+test identity_integer_boundaries_survive_json_without_precision_loss ... ok
+test identity_fields_are_required_nonzero_and_exact_integers ... ok
+test graph_cycles_forward_references_shared_children_and_orphans_are_rejected ... ok
+test invalid_dimensions_versions_and_field_types_are_rejected ... ok
+test invalid_split_ratios_axes_and_unexpected_fields_are_rejected ... ok
+test legacy_uri_only_snapshots_are_rejected_before_session_lookup ... ok
+test roundtrip_preserves_nested_tabs_geometry_focus_and_maximization ... ok
+test missing_sessions_and_unsafe_or_oversized_addresses_are_rejected ... ok
+test tab_and_pane_limits_are_enforced_in_both_directions ... ok
+test deepest_supported_tree_stays_within_json_parser_depth ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests zgraphics
+
+running 1 test
+test crates/zgraphics/src/../README.md - (line 14) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.22s; merged doctests compilation took 0.22s
+   Doc-tests zinput
+
+running 2 tests
+test crates/zinput/src/lib.rs - (line 60) ... ok
+test crates/zinput/src/lib.rs - (line 29) ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.18s; merged doctests compilation took 0.17s
+   Doc-tests zpty
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests zterm
+
+running 3 tests
+test crates/zterm/src/../README.md - (line 71) ... ok
+test crates/zterm/src/../README.md - (line 105) ... ok
+test crates/zterm/src/../README.md - (line 23) ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.23s; merged doctests compilation took 0.22s
+   Doc-tests ztty
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+    Checking simd-adler32 v0.3.10
+    Checking zune-core v0.5.3
+    Checking zune-inflate v0.2.54
+   Compiling ztty v0.3.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree)
+    Checking zune-png v0.5.2
+    Checking unicode-width v0.2.3
+    Checking zgraphics v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zgraphics)
+    Checking zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zinput)
+    Checking zvte v0.1.3
+    Checking zpty v0.2.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zpty)
+    Checking zterm v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zterm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.86s
+    Finished `release` profile [optimized] target(s) in 0.07s
+ztty 0.3.0: no_std, features=[]
+zterm 0.2.1: no_std, features=[]
+zvte 0.1.3: no_std, features=[]
+zinput 0.1.0: no_std, features=[]
+zgraphics 0.1.0: no_std, features=[]
+zune-png 0.5.2: no_std, features=[]
+zune-inflate 0.2.54: no_std, features=['simd-adler32', 'zlib']
+simd-adler32 0.3.10: no_std, features=[]
+zune-core 0.5.3: no_std, features=[]
+unicode-width 0.2.3: no_std, features=[]
+zpty 0.2.0: no_std, features=[]
+release executable: no Rust std symbols
+System C ABI libraries are listed separately by ldd; this check covers Rust std.
+test_archive_symlink_is_not_executed (__main__.InstallerTests.test_archive_symlink_is_not_executed) ... ok
+test_backup_and_desktop_symlinks_do_not_overwrite_referents (__main__.InstallerTests.test_backup_and_desktop_symlinks_do_not_overwrite_referents) ... ok
+test_checksum_failure_preserves_installed_files_without_execution (__main__.InstallerTests.test_checksum_failure_preserves_installed_files_without_execution) ... ok
+test_checksum_tool_failure_does_not_allow_local_install (__main__.InstallerTests.test_checksum_tool_failure_does_not_allow_local_install) ... ok
+test_control_characters_in_installation_path_are_rejected (__main__.InstallerTests.test_control_characters_in_installation_path_are_rejected) ... ok
+test_directory_target_is_rejected (__main__.InstallerTests.test_directory_target_is_rejected) ... ok
+test_invalid_requested_tag_does_not_download (__main__.InstallerTests.test_invalid_requested_tag_does_not_download) ... ok
+test_launcher_runs_installed_binary_with_escaped_path_and_old_path_entry (__main__.InstallerTests.test_launcher_runs_installed_binary_with_escaped_path_and_old_path_entry) ... ok
+test_local_input_requires_regular_native_binary (__main__.InstallerTests.test_local_input_requires_regular_native_binary) ... ok
+test_local_runtime_and_version_failures_preserve_old_binary (__main__.InstallerTests.test_local_runtime_and_version_failures_preserve_old_binary) ... ok
+test_make_install_and_uninstall_respect_prefix_and_destdir (__main__.InstallerTests.test_make_install_and_uninstall_respect_prefix_and_destdir) ... ok
+test_pinned_binary_version_must_match_before_replacement (__main__.InstallerTests.test_pinned_binary_version_must_match_before_replacement) ... ok
+test_pinned_download_uses_requested_tag (__main__.InstallerTests.test_pinned_download_uses_requested_tag) ... ok
+test_running_elf_upgrade_keeps_process_and_verified_rollback (__main__.InstallerTests.test_running_elf_upgrade_keeps_process_and_verified_rollback) ... ok
+test_same_source_target_is_rejected (__main__.InstallerTests.test_same_source_target_is_rejected) ... ok
+test_symlink_targets_preserve_link_and_referent (__main__.InstallerTests.test_symlink_targets_preserve_link_and_referent) ... ok
+test_verified_latest_download_and_desktop_entry (__main__.InstallerTests.test_verified_latest_download_and_desktop_entry) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 1.166s
+
+OK
+{
+  "schema": "ztty.bash-integration.v1",
+  "ok": true,
+  "platform": "Linux",
+  "source_path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/shell/ztty.bash",
+  "source_sha256": "b67a54158f43329ae4d7b5f1f90946415a67aa75d557b1c5a148bf533815514f",
+  "test_sha256": "87c7619a3fde7411ef2e334c8f9b57bdac27aca59326744a93ded67e7c7a2590",
+  "bash_version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+  "checks": [
+    "production script passes bash -n before any PTY is started",
+    "array: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "array: both existing prompt hooks run once; nonzero hook/command statuses match the original Bash behavior",
+    "array: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "nested: exported PS0 receives one execution marker; re-source is idempotent; parent hooks/status survive child exit",
+    "string: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "string: both existing prompt hooks run once; nonzero hook/command statuses match the original Bash behavior",
+    "string: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "unset: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "unset: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "noninteractive sourcing is inert and emits no terminal controls"
+  ],
+  "syntax": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "transcripts": {
+    "array.pty": {
+      "bytes": 2376,
+      "sha256": "d434f1711de00ee7179a0c8a90050f879fbab46cd98586c03ba4e2e3bea2b64d"
+    },
+    "string.pty": {
+      "bytes": 1239,
+      "sha256": "3557d896a0ab42eddf5d0c9e43997f8436d5515f6405f285e81c769bf99d1bde"
+    },
+    "unset.pty": {
+      "bytes": 872,
+      "sha256": "ad1bdc89b40a8e33d57ee563afc571412c606e68aecae92be9c51228b83b4562"
+    }
+  }
+}
+{
+  "stdio": "passed",
+  "tool_count": 9,
+  "http": "passed",
+  "concurrent_requests": 16,
+  "chunked": "passed",
+  "authentication": "passed",
+  "ipv6": "passed"
+}
+{
+  "stdio_pty": "passed",
+  "unicode_cursor_pages": "passed",
+  "cwd_environment_resize": "passed",
+  "same_owner_preserves_queued_pty_input": {
+    "status": "passed",
+    "accepted_bytes": 1048576,
+    "received_bytes": 1048576,
+    "sha256": "aca1cd027e979588d14b877b7b0cb8585ad9fec599eb45801992ee5382b3760f",
+    "queue_full_before_reacquire": true
+  },
+  "split_pty_utf8": "passed",
+  "invalid_prefix_split_utf8": {
+    "status": "passed",
+    "initial_cursor": 1,
+    "final_cursor": 8,
+    "output": "�🚀END"
+  },
+  "creator_cwd_argv_env_isolation": "passed",
+  "http_stdio_shared_broker": "passed",
+  "namespaces_and_ambiguity": "passed",
+  "exit_code": 7,
+  "exclusive_input_owner_and_explicit_takeover": "passed",
+  "bounded_command_reads_across_observers": "passed",
+  "guarded_output_resume": {
+    "status": "passed",
+    "old_identity": {
+      "uri": "ztty://mcp/stdio/resume-reuse",
+      "id": 8,
+      "created_at": 1795005233825,
+      "broker_pid": 2824689
+    },
+    "replacement_identity": {
+      "uri": "ztty://mcp/stdio/resume-reuse",
+      "id": 9,
+      "created_at": 1795005233854,
+      "broker_pid": 2824689
+    },
+    "resumed_stdio": "LD",
+    "independent_observer": "D",
+    "resumed_http": "LD",
+    "mismatched_identity_fields_rejected": [
+      "uri",
+      "id",
+      "created_at",
+      "broker_pid"
+    ],
+    "malformed_guards_rejected": 11,
+    "rename_preserved_identity": true,
+    "stale_guard_error": "session identity changed; start a new read",
+    "legacy_unguarded_output": "LACEMENT"
+  },
+  "invalid_utf8_page_boundaries": {
+    "status": "passed",
+    "payload_hex": "e258f09f58e4b8ade69687f09f9a80e2c2a2454e44",
+    "eof_suffix_hex": "f09f",
+    "open_reads": [
+      {
+        "transport": "stdio",
+        "max_bytes": 1,
+        "cursors": [
+          0,
+          1,
+          2,
+          4,
+          5,
+          8,
+          11,
+          15,
+          16,
+          18,
+          19,
+          20,
+          21
+        ],
+        "output": "�X�X中文🚀�¢END",
+        "output_eof": false
+      },
+      {
+        "transport": "http",
+        "max_bytes": 2,
+        "cursors": [
+          2,
+          4,
+          8,
+          11,
+          15,
+          18,
+          20,
+          21
+        ],
+        "output": "�X中文🚀�¢END",
+        "output_eof": false
+      }
+    ],
+    "closed_reads": [
+      {
+        "transport": "stdio",
+        "max_bytes": 2,
+        "cursors": [
+          0,
+          2,
+          4,
+          8,
+          11,
+          15,
+          18,
+          20,
+          23
+        ],
+        "output": "�X�X中文🚀�¢END�",
+        "output_eof": true
+      },
+      {
+        "transport": "http",
+        "max_bytes": 1,
+        "cursors": [
+          2,
+          4,
+          5,
+          8,
+          11,
+          15,
+          16,
+          18,
+          19,
+          20,
+          21,
+          23
+        ],
+        "output": "�X中文🚀�¢END�",
+        "output_eof": true
+      }
+    ]
+  },
+  "descendant_output_eof": {
+    "status": "passed",
+    "after_direct_child_exit": {
+      "output": "PREFIX",
+      "running": false,
+      "exit_code": 7,
+      "has_more": false,
+      "output_eof": false
+    },
+    "later_descendant_output": "SUFFIX",
+    "final_cursor": 12,
+    "final_output_eof": true
+  },
+  "transport_exit_persistence": "passed",
+  "attach_default_list": "passed",
+  "close_releases_sessions": "passed"
+}
+{
+  "stdio_observer": "passed",
+  "http_observer": "passed",
+  "role_session_binding": "passed",
+  "host_origin_allowlist": "passed",
+  "strict_jsonrpc": "passed",
+  "hostile_framing_and_limits": "passed"
+}
+{
+  "binary_sha256": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada",
+  "selected_checks": [
+    "stdio_concurrency",
+    "timeouts_and_bounds",
+    "fragmented_utf8",
+    "retained_output_is_immediate",
+    "eof_waits",
+    "replacement_identity",
+    "stdio_cancellation_and_limits",
+    "stdio_numeric_request_ids",
+    "http_concurrency_and_observers",
+    "http_cancellation_and_disconnect",
+    "http_numeric_request_ids",
+    "http_long_wait",
+    "completed_input_preserves_ordinary_requests"
+  ],
+  "checks": {
+    "stdio_concurrency": {
+      "status": "passed",
+      "elapsed_ms": 233.967,
+      "ping_and_list_ms": 0.405,
+      "output": "stdio-ready"
+    },
+    "timeouts_and_bounds": {
+      "status": "passed",
+      "elapsed_ms": 214.604,
+      "timeout_ms": 140.753,
+      "zero_wait_ms": 0.309,
+      "invalid_values": 5
+    },
+    "fragmented_utf8": {
+      "status": "passed",
+      "elapsed_ms": 203.156,
+      "output": "😀",
+      "cursor": 4,
+      "requested_max_bytes": 1
+    },
+    "retained_output_is_immediate": {
+      "status": "passed",
+      "elapsed_ms": 63.743,
+      "expired_cursor_ms": 0.2,
+      "first_cursor": 45056,
+      "bounded_bytes": 7
+    },
+    "eof_waits": {
+      "status": "passed",
+      "elapsed_ms": 265.358,
+      "silent_eof": "passed",
+      "direct_child_exit_code": 7,
+      "descendant_output": "LATE"
+    },
+    "replacement_identity": {
+      "status": "passed",
+      "elapsed_ms": 254.906,
+      "old_id": 7,
+      "new_id": 8,
+      "old_wait_rejected": true
+    },
+    "stdio_cancellation_and_limits": {
+      "status": "passed",
+      "elapsed_ms": 807.557,
+      "wait_limit": 24,
+      "management_responsive": true,
+      "quota_reused_after_cancel": true,
+      "stdin_eof_ms": 1.146
+    },
+    "stdio_numeric_request_ids": {
+      "status": "passed",
+      "elapsed_ms": 550.765,
+      "wait_limit": 24,
+      "numeric_aliases_rejected": [
+        "1",
+        "1.0",
+        "0.0",
+        "10e9223372036854775807"
+      ],
+      "negative_zero_cancelled_by_zero": true,
+      "string_and_number_ids_distinct": true,
+      "adjacent_large_integer_ids_distinct": [
+        "9007199254740992",
+        "9007199254740993"
+      ],
+      "huge_exponent_cancelled_by_alias": true,
+      "fresh_id_used_released_wait_slot": true,
+      "echoed_ids": [
+        {
+          "type": "number",
+          "token": "1"
+        },
+        {
+          "type": "number",
+          "token": "1.0"
+        },
+        {
+          "type": "number",
+          "token": "1e0"
+        },
+        {
+          "type": "number",
+          "token": "7.0"
+        },
+        {
+          "type": "string",
+          "token": "7"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740992"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740993"
+        },
+        {
+          "type": "number",
+          "token": "0.0"
+        },
+        {
+          "type": "number",
+          "token": "10e9223372036854775807"
+        },
+        {
+          "type": "number",
+          "token": "2e9223372036854775808"
+        }
+      ]
+    },
+    "http_concurrency_and_observers": {
+      "status": "passed",
+      "elapsed_ms": 358.997,
+      "ping_ms": 0.159,
+      "independent_cursors": [
+        14,
+        14
+      ]
+    },
+    "http_cancellation_and_disconnect": {
+      "status": "passed",
+      "elapsed_ms": 781.571,
+      "wait_limit": 32,
+      "ping_at_limit_ms": 0.161,
+      "duplicate_id_rejected": true,
+      "cross_session_cancel_ignored": true,
+      "disconnect_releases_capacity": true,
+      "delete_retains_terminal": true
+    },
+    "http_numeric_request_ids": {
+      "status": "passed",
+      "elapsed_ms": 409.411,
+      "wait_limit": 32,
+      "numeric_aliases_rejected": [
+        "1",
+        "1.0",
+        "0.0",
+        "10e9223372036854775807"
+      ],
+      "negative_zero_cancelled_by_zero": true,
+      "string_and_number_ids_distinct": true,
+      "adjacent_large_integer_ids_distinct": [
+        "9007199254740992",
+        "9007199254740993"
+      ],
+      "huge_exponent_cancelled_by_alias": true,
+      "fresh_id_used_released_wait_slot": true,
+      "echoed_ids": [
+        {
+          "type": "number",
+          "token": "1"
+        },
+        {
+          "type": "number",
+          "token": "1.0"
+        },
+        {
+          "type": "number",
+          "token": "1e0"
+        },
+        {
+          "type": "number",
+          "token": "7.0"
+        },
+        {
+          "type": "string",
+          "token": "7"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740992"
+        },
+        {
+          "type": "number",
+          "token": "9007199254740993"
+        },
+        {
+          "type": "number",
+          "token": "0.0"
+        },
+        {
+          "type": "number",
+          "token": "10e9223372036854775807"
+        },
+        {
+          "type": "number",
+          "token": "2e9223372036854775808"
+        }
+      ]
+    },
+    "http_long_wait": {
+      "status": "passed",
+      "elapsed_ms": 11001.309,
+      "requested_ms": 11000
+    },
+    "completed_input_preserves_ordinary_requests": {
+      "status": "passed",
+      "elapsed_ms": 56.075,
+      "single_stdio_write_messages": 4,
+      "stdio_response_ids": [
+        1,
+        "eof-list",
+        "eof-read"
+      ],
+      "http_half_closed_ordinary_requests": 2
+    }
+  },
+  "cleanup": "passed"
+}
+{
+  "binary_sha256": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada",
+  "selected_checks": [
+    "sse_lifecycle",
+    "prompt_payload_and_observer",
+    "heartbeat_and_idle",
+    "timeout_and_half_close",
+    "cancellation_and_exact_ids",
+    "capacity_disconnect_and_delete",
+    "json_default_and_cli"
+  ],
+  "checks": {
+    "sse_lifecycle": {
+      "status": "passed",
+      "elapsed_ms": 6.818,
+      "sse_initialization": true,
+      "single_event_and_zero_chunk": true,
+      "escaped_identifier": "init🙂\r\nid: injected\ndata: injected",
+      "request_errors_are_sse": true,
+      "http_errors_remain_json": true,
+      "notifications_empty_202": true,
+      "get_not_advertised": true
+    },
+    "prompt_payload_and_observer": {
+      "status": "passed",
+      "elapsed_ms": 66.566,
+      "headers_before_child_release_ms": 0.37,
+      "payload_bytes": 59,
+      "observer_read": true,
+      "observer_write_denied": true,
+      "role_session_isolation": true,
+      "output_has_no_sse_line_injection": true
+    },
+    "heartbeat_and_idle": {
+      "status": "passed",
+      "elapsed_ms": 5057.733,
+      "heartbeat_ms": 5004.841,
+      "transport_cpu_seconds": 0.0,
+      "comments": [
+        ": ztty",
+        ": keepalive"
+      ],
+      "final_output_after_heartbeat": true
+    },
+    "timeout_and_half_close": {
+      "status": "passed",
+      "elapsed_ms": 193.666,
+      "timeout_ms": 150.876,
+      "ordinary_half_close": true,
+      "waiting_half_close_releases_request": true
+    },
+    "cancellation_and_exact_ids": {
+      "status": "passed",
+      "elapsed_ms": 44.876,
+      "equivalent_numeric_duplicate_rejected": true,
+      "equivalent_numeric_cancelled": true,
+      "original_token_echoed": true,
+      "adjacent_large_ids_remain_distinct": true,
+      "cross_session_cancel_ignored": true
+    },
+    "capacity_disconnect_and_delete": {
+      "status": "passed",
+      "elapsed_ms": 53.978,
+      "wait_limit": 32,
+      "all_slots_reused_after_disconnect": true,
+      "management_at_limit_ms": 0.383,
+      "delete_cancels_stream_and_preserves_terminal": true
+    },
+    "json_default_and_cli": {
+      "status": "passed",
+      "elapsed_ms": 13.132,
+      "default_json": true,
+      "explicit_json": true,
+      "invalid_cli_cases": 4
+    }
+  },
+  "cleanup": "passed"
+}
+    Checking simd-adler32 v0.3.10
+    Checking zune-core v0.5.3
+    Checking unicode-width v0.2.3
+    Checking zune-inflate v0.2.54
+    Checking zvte v0.1.3
+    Checking zune-png v0.5.2
+    Checking zinput v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zinput)
+    Checking zgraphics v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zgraphics)
+    Checking zterm v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/crates/zterm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.01s
+warning: the following packages contain code that will be rejected by a future version of Rust: zune-png v0.5.2
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`

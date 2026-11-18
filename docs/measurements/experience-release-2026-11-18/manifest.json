@@ -260,11 +260,175 @@
       "source_path": "derived from copied evidence and git show at report_checkpoint",
       "bytes": 4376,
       "sha256": "88a329ed2cf14f373feddd34a713629d92ef1593eddeb9ad4708f060a8d4e7c8"
+    },
+    {
+      "path": "scroll-prompt/daily-workflow.json",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/daily-workflow.json",
+      "bytes": 6793,
+      "sha256": "6358a88d28f6b7963ae36d4ea33cc82afebf2a28c317d5aa3204633a8cbdf861"
+    },
+    {
+      "path": "scroll-prompt/daily-workflow.log",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/daily-workflow.log",
+      "bytes": 6793,
+      "sha256": "6358a88d28f6b7963ae36d4ea33cc82afebf2a28c317d5aa3204633a8cbdf861"
+    },
+    {
+      "path": "scroll-prompt/summary.json",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/summary.json",
+      "bytes": 2342,
+      "sha256": "1d5213264d89a529cb68f3362e25b590c84b1225f47667ce48bac35a2c88f1d5"
+    },
+    {
+      "path": "scroll-prompt/scrollback-return.png",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/scrollback-return.png",
+      "bytes": 72174,
+      "sha256": "a3a7e4256af9286b3411e709237b3b898123271150e5e7a3f9141f8ba54a18ba"
+    },
+    {
+      "path": "scroll-prompt/scrollback-new-output.png",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/scrollback-new-output.png",
+      "bytes": 72971,
+      "sha256": "3da127495566c4156eb256a197f476d1f8d7d3e8faf560ee3386b011f1910ef4"
+    },
+    {
+      "path": "scroll-prompt/scrollback-live.png",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/scrollback-live.png",
+      "bytes": 58721,
+      "sha256": "3a52e9be32b0ff603f951d005bd2fafaf09ea736826cb8d1f2bb8ac1ee1075e1"
+    },
+    {
+      "path": "scroll-prompt/scrollback-search.png",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/scrollback-search.png",
+      "bytes": 71801,
+      "sha256": "d0e6f2a6b3ba498b1818f16ea6cad866aaa515c1fbe3d4a254296415c3963e6e"
+    },
+    {
+      "path": "scroll-prompt/scrollback-palette.png",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/scrollback-palette.png",
+      "bytes": 70121,
+      "sha256": "fc721217e55bc1f6ae4c172431289a5ca45be5b9a84b6f88dc0785ce76dac1e6"
+    },
+    {
+      "path": "scroll-prompt/scrollback-observer.png",
+      "source_path": "artifacts/experience-release/device/scroll-prompt/scrollback-observer.png",
+      "bytes": 77596,
+      "sha256": "57591461828b234be1b6ee4201e03570bcc1b969a848e2730621aea0f3b15ec3"
+    },
+    {
+      "path": "scroll-prompt/native/run-44298970562/macos-aarch64-summary.json",
+      "source_path": "artifacts/release-audit/all-candidate-44298970562/macos-aarch64-summary.json",
+      "bytes": 5432,
+      "sha256": "727aa43c46992f1cc71404edf829c664a5a90ce549e82b4d771c9771c8da9f0c"
+    },
+    {
+      "path": "scroll-prompt/native/run-44300272576/windows-aarch64-summary.json",
+      "source_path": "artifacts/release-audit/windows-retry-44300272576/windows-aarch64-summary.json",
+      "bytes": 4353,
+      "sha256": "0f2a1854539e97e4ed11e4f57ed38cffb80e9518987fc1b8bd25c2f0a14918f2"
+    },
+    {
+      "path": "scroll-prompt/native/run-44303751871/windows-aarch64-summary.json",
+      "source_path": "artifacts/release-audit/windows-diagnostic-44303751871/windows-aarch64-summary.json",
+      "bytes": 2410,
+      "sha256": "b6ac2742562ee114c54058a4744c8f66605c28d67c0613ddd6b01cfd04d1d6c3"
+    },
+    {
+      "path": "scroll-prompt/native/run-44303751871/windows-aarch64.runtime.log",
+      "source_path": "artifacts/release-audit/windows-diagnostic-44303751871/ztty-windows-aarch64/ztty-windows-aarch64.native.runtime.log",
+      "bytes": 449,
+      "sha256": "32fd330db1d39e1463480e3a025d3993828480d240fb4839cc7be7a52a88cfcd"
+    },
+    {
+      "path": "scroll-prompt/native/run-44298970562/macos-x86_64-summary.json",
+      "source_path": "artifacts/release-audit/all-candidate-44298970562/macos-x86_64-summary.json",
+      "bytes": 5442,
+      "sha256": "6b6a82170e7d3ee511499a379e4e84663c4946c2b3a404651f9213d36d4f8f84"
+    },
+    {
+      "path": "scroll-prompt/native/run-44300272576/windows-x86_64-summary.json",
+      "source_path": "artifacts/release-audit/windows-retry-44300272576/windows-x86_64-summary.json",
+      "bytes": 4348,
+      "sha256": "c1e54375adf99b25ad0b6ff8165ce1e5cb239d559f2c9fd20a48e3b3b5e8760b"
+    },
+    {
+      "path": "scroll-prompt/native/run-44303751871/windows-x86_64-summary.json",
+      "source_path": "artifacts/release-audit/windows-diagnostic-44303751871/windows-x86_64-summary.json",
+      "bytes": 2408,
+      "sha256": "ed611ece4e464d19939b6678afa4395570e237dd4d4b20f667eeee44b61cf32d"
+    },
+    {
+      "path": "scroll-prompt/native/run-44303751871/windows-x86_64.runtime.log",
+      "source_path": "artifacts/release-audit/windows-diagnostic-44303751871/ztty-windows-x86_64/ztty-windows-x86_64.native.runtime.log",
+      "bytes": 449,
+      "sha256": "8974eee218eb6c7727539ec8289e17be08324eb162e9ebd4658c845e54ca597a"
+    },
+    {
+      "path": "scroll-prompt/source-binding.json",
+      "source_path": "derived from the unchanged device report/summary, archive SHA-256 and git show at 3730b28/aef55d9",
+      "bytes": 2965,
+      "sha256": "db0730c06545ab66fcdd93b2bf00dbbffed773601a22dfb8372cdb35e19802d4"
+    },
+    {
+      "path": "scroll-prompt/pixel-review.json",
+      "source_path": "derived directly from the three copied original scrollback PNGs",
+      "bytes": 2396,
+      "sha256": "16678bb077ef5774f3f89980ec9f90d0a0dd46bcd61baa2591ae824471762c6a"
+    },
+    {
+      "path": "scroll-prompt/full-check-8a.json",
+      "source_path": "artifacts/experience-release/back-to-live-gates/full-check-8a.json",
+      "bytes": 300,
+      "sha256": "9023678718e9c359efaa38e6f9102c74c88b9010bc483af27b83267d0b724cc5"
+    },
+    {
+      "path": "scroll-prompt/full-check-8a.log",
+      "source_path": "artifacts/experience-release/back-to-live-gates/full-check-8a.log",
+      "bytes": 46266,
+      "sha256": "099582bb9f8b830984d3368424c85a1df54d19fed663eb79f5a52bf39961acbb"
+    },
+    {
+      "path": "scroll-prompt/full-check-interrupted-3730.json",
+      "source_path": "artifacts/experience-release/back-to-live-gates/full-check-interrupted-3730.json",
+      "bytes": 219,
+      "sha256": "904f9e32c3a2da167c3431208b1951d522e06b9225e79f1c37b7d3c917758a2c"
+    },
+    {
+      "path": "scroll-prompt/full-check-interrupted-3730.log",
+      "source_path": "artifacts/experience-release/back-to-live-gates/full-check-interrupted-3730.log",
+      "bytes": 803,
+      "sha256": "5a3f4c9dada4d683b6685e51bd26d1b69f8a7f81f6dd90a28449bc6ff1233ea0"
     }
   ],
   "notes": [
     "Original failure statuses are retained. This manifest does not claim that every path referenced inside a source JSON has been copied.",
-    "summary.json is a derived index; all other entries are exact copies.",
-    "The performance executables are development-only std benchmark programs, separate from the no_std terminal runtime."
+    "summary.json, scroll-prompt/source-binding.json and scroll-prompt/pixel-review.json are derived indexes or analyses; all other entries are byte-identical copies from the recorded source paths.",
+    "The performance executables are development-only std benchmark programs, separate from the no_std terminal runtime.",
+    "The six added PNGs are original scrollback captures. No image was modified, and the source tar archive and four older screenshots were not duplicated."
+  ],
+  "appended_checkpoints": [
+    {
+      "name": "scroll-prompt-and-native-follow-up",
+      "runtime_source_sha": "3730b28a16f48b15809581213bccab284f6f4f22",
+      "harness_source_sha": "aef55d95747c38aad34d161043ad1b9c72127b44",
+      "index": "scroll-prompt/source-binding.json",
+      "macos_pass_source": "2ac46e2fd6e6c373752221d5f1bed9923c67fc1a",
+      "windows_failed_sources": [
+        "dc43870ef2c8e3c54894d0124e47a23445a3c624",
+        "8a2f4bee22324685f2193e91a16744dda21d0df9"
+      ]
+    },
+    {
+      "name": "complete-linux-local-gate",
+      "source_sha": "8a2f4bee22324685f2193e91a16744dda21d0df9",
+      "command": "ZTTY_BARE_METAL=1 make check",
+      "result": "passed",
+      "rust_ordinary": 271,
+      "rust_doctests": 6,
+      "custom_session_core_checks": 8,
+      "summary": "scroll-prompt/full-check-8a.json",
+      "log": "scroll-prompt/full-check-8a.log",
+      "interrupted_attempt": "scroll-prompt/full-check-interrupted-3730.json"
+    }
   ]
 }

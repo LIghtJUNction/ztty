@@ -1,0 +1,205 @@
+{
+  "run_id": 44298970562,
+  "job_id": 134783563929,
+  "job_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44298970562/job/134783563929",
+  "source_sha": "2ac46e2fd6e6c373752221d5f1bed9923c67fc1a",
+  "build_only": true,
+  "candidate_platform": "all",
+  "formal_release": false,
+  "artifact_id": 14424083947,
+  "artifact_sha256": "f441fcf80f815d3ff84fb5bbc8bc0f4f50febbd1b6cf08238269c2b58ac6a32a",
+  "artifact_sha256_verified": true,
+  "source_files_sha256_verified": {
+    "crates/zpty/src/macos/spawn.rs": "1bef2a4f4dd6118b0afa1fa900d7b46a3a8a1cfe40e3878dc699c16914789b4e",
+    "crates/zpty/src/macos.rs": "1cf31df4950c11ee5819134fe4b311d609977f93a5e015af55d98035ee358bdb",
+    "crates/zpty/tests/darwin_spawn.rs": "afed17de0cc250c0f9315a3dadee40d6242edd7e53a6766aaa59ea3e75525cac",
+    "crates/zpty/tests/darwin_spawn_abi.c": "629a40ccd7f3a3809503bd90f222dd453f0e0a47eafa6442a96492098c01084f"
+  },
+  "build_file_hashes_verified": 59,
+  "spawn": {
+    "suite": "darwin-threaded-spawn",
+    "passed": true,
+    "checks": [
+      "Apple SDK ABI constants, layout and prototypes",
+      "worker-active spawn: controlling tty, session/group, exact argv/env/cwd, input and resize",
+      "nine concurrent PTY spawns drain READY/DONE through EOF, exit, and exclude peer handshakes and a non-CLOEXEC sentinel",
+      "missing/non-executable helper and target errors preserve ENOENT/EACCES without descriptors or owned children",
+      "empty/partial readiness and early helper death cannot report successful handoff",
+      "stalled helper reaches the bounded handshake failure and is reaped",
+      "hangup targets the owned session and wait/drop release its child and master",
+      "seven isolated closed-stdio masks preserve control stdio and cannot collide with helper fd sources"
+    ],
+    "worker_iterations": 4714,
+    "timeout_seconds": 5.004044989,
+    "duration_seconds": 8.041714715,
+    "architecture": "x86_64"
+  },
+  "native": {
+    "passed": true,
+    "host": "macOS-15.7.9-x86_64-i386-64bit-Mach-O",
+    "architecture": "x86_64",
+    "check_count": 24,
+    "stage_count": 13,
+    "png_count": 10,
+    "png_samples_rechecked": 20,
+    "png_sample_max_channel_error": 0,
+    "rgb_samples": [
+      {
+        "actual": [
+          255,
+          0,
+          0
+        ],
+        "alpha": 255,
+        "client": [
+          16,
+          38
+        ],
+        "expected": [
+          255,
+          0,
+          0
+        ],
+        "passed": true,
+        "provider_bytes": [
+          0,
+          0,
+          255,
+          255
+        ]
+      },
+      {
+        "actual": [
+          0,
+          255,
+          0
+        ],
+        "alpha": 255,
+        "client": [
+          32,
+          38
+        ],
+        "expected": [
+          0,
+          255,
+          0
+        ],
+        "passed": true,
+        "provider_bytes": [
+          0,
+          255,
+          0,
+          255
+        ]
+      },
+      {
+        "actual": [
+          0,
+          0,
+          255
+        ],
+        "alpha": 255,
+        "client": [
+          48,
+          46
+        ],
+        "expected": [
+          0,
+          0,
+          255
+        ],
+        "passed": true,
+        "provider_bytes": [
+          255,
+          0,
+          0,
+          255
+        ]
+      }
+    ],
+    "capture_image": {
+      "alpha_info": 2,
+      "bitmap_info": 8194,
+      "bits_per_component": 8,
+      "bits_per_pixel": 32,
+      "bytes_per_row": 1280,
+      "color_space": "kCGColorSpaceDeviceRGB",
+      "height": 208,
+      "requested_color_space": "kCGColorSpaceSRGB",
+      "requested_pixel_format": "32BGRA",
+      "width": 320
+    },
+    "minimized": true,
+    "minimized_on_screen_window_ids": [],
+    "restored_window": {
+      "client_pixel_rect": [
+        0,
+        28,
+        320,
+        180
+      ],
+      "client_points": [
+        0,
+        0,
+        320,
+        180
+      ],
+      "displays": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            1080
+          ],
+          "id": 25165824
+        }
+      ],
+      "filter_content_points": [
+        800,
+        216,
+        320,
+        208
+      ],
+      "frame_points": [
+        800,
+        216,
+        320,
+        208
+      ],
+      "inside_display": true,
+      "layer": 0,
+      "on_screen": true,
+      "pid": 2437,
+      "point_pixel_scale": 1,
+      "title": "ztty-native-ztty-macos-native-9jmo7cin",
+      "window_id": 26
+    },
+    "restore_ax": [
+      {
+        "matches_target": true,
+        "minimized": false,
+        "modal": false,
+        "pid": 2437,
+        "pid_error": 0,
+        "role": "AXWindow",
+        "subrole": "AXStandardWindow",
+        "title": "ztty-native-ztty-macos-native-9jmo7cin"
+      }
+    ],
+    "application_pid": 2437,
+    "child_pid": 2438,
+    "application_exit": 0,
+    "remaining_owned_processes": []
+  },
+  "package": {
+    "signature": "ad-hoc-verified",
+    "notarized": false
+  },
+  "limits": [
+    "Source-specific macOS candidate acceptance; not a formal release or other-platform acceptance.",
+    "Helper execute-access preflight is not an atomic check-and-exec or a helper file-format/interpreter validation.",
+    "Immediate child-free assertions cover preflight errors and failures after posix_spawn handed over a PID; no production global waitpid or PID guessing.",
+    "Native window suite does not cover IME/keyboard or physical-display latency."
+  ]
+}
