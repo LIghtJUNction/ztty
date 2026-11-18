@@ -19,6 +19,7 @@ import sys
 import tempfile
 import threading
 import time
+import traceback
 
 import windows_native as native
 
@@ -867,6 +868,18 @@ def run(binary, output, expected_arch=None):
         report["passed"] = True
     except BaseException as error:
         report["error"] = repr(error)
+        try:
+            stack = "".join(traceback.format_tb(error.__traceback__, limit=-32)).encode("utf-8", errors="replace")
+            report["exception"] = {"type": type(error).__name__[:256],
+                "errno": getattr(error, "errno", None), "winerror": getattr(error, "winerror", None),
+                "traceback": stack[-16384:].decode("utf-8", errors="ignore"),
+                "traceback_truncated": len(stack) > 16384}
+            for name in ("filename", "filename2"):
+                value = getattr(error, name, None)
+                report["exception"][name] = (str(value).encode("utf-8", errors="replace")[:2048]
+                    .decode("utf-8", errors="ignore")) if value is not None else None
+        except Exception as diagnostic_error:
+            report["exception_capture_error"] = repr(diagnostic_error)[:2048]
         report["status"] = "blocked" if isinstance(error, native.DesktopBlocked) else "failed"
         if window and window.user.IsWindow(window.hwnd):
             try:
