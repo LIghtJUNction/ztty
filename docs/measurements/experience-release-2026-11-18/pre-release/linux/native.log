@@ -1,0 +1,7 @@
+{"case": "workspaces", "passed": true, "checks": 17, "error": null}
+{"case": "daily_workflow", "passed": true, "checks": 18, "error": null}
+{"case": "session_switcher", "passed": true, "checks": 6, "error": null}
+{"case": "sixel_gui", "passed": true, "checks": 10, "error": null}
+{"case": "input_gui", "passed": true, "checks": 9, "error": null}
+{"case": "repaint_gui", "passed": true, "checks": 7, "error": null}
+{"passed": true, "source_sha": "8a2f4bee22324685f2193e91a16744dda21d0df9", "architecture": "x86_64", "output": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/experience-release-worktree/artifacts/experience-release/device/linux-final-local/native.json", "error": null}

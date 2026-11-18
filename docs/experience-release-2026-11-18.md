@@ -6,6 +6,8 @@
 
 追加的 Linux 返回底部入口通过全部 18 组日常 GUI 检查，包含新输出到达、搜索／命令面板并存和只读观察视图。后续 `2ac46e2` 的 macOS 两种架构通过原生候选；Windows 的 `dc43870` 缩放恢复失败与 `8a2f4be` 子进程启动失败分别保留，均未记作通过。[追加源码与文件身份](measurements/experience-release-2026-11-18/scroll-prompt/source-binding.json) · [18 组原始记录](measurements/experience-release-2026-11-18/scroll-prompt/daily-workflow.json)
 
+发布前复验进一步通过 Linux 六套 GUI 的 67 组检查，以及 Windows `3418b82` 双架构各 31 项基础、19 项工作区检查。Linux wrapper 的 `source_sha` 是测试检出的 `8a2f4be`，运行文件仍为 `3730b28` 构建、哈希为 `2a50377…` 的二进制；Windows 结果来自独立的原生候选。各平台尚未共同验收最终 tag，正式发布和设备安装保持待完成。[发布前证据索引](measurements/experience-release-2026-11-18/pre-release/index.json)
+
 ## 1. 固定源码与验收对象
 
 表 1 将实现、测试脚本和运行二进制分别绑定到固定提交。不同来源的证据不能合并成对同一最终发行文件的通过结论。
@@ -22,6 +24,8 @@
 | 返回底部运行时 | [`3730b28a16f48b15809581213bccab284f6f4f22`](https://github.com/LIghtJUNction/ztty/commit/3730b28a16f48b15809581213bccab284f6f4f22) | 临时入口、到达标记和鼠标事件隔离；开发机构建并运行 |
 | 返回底部验收脚本 | [`aef55d95747c38aad34d161043ad1b9c72127b44`](https://github.com/LIghtJUNction/ztty/commit/aef55d95747c38aad34d161043ad1b9c72127b44) | 18 组日常 GUI 检查；新剪贴板断言拒绝沿用旧值 |
 | 返回底部测试二进制 | SHA-256 `2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada` | 本报告追加 GUI 结果所使用的文件，独立于前述 `cfc7ae8` 候选 |
+| 完整 Linux GUI 测试检出 | `8a2f4bee22324685f2193e91a16744dda21d0df9` | 六套 wrapper 的源码身份；运行文件继续使用上一行的 `3730b28` 二进制 |
+| Windows 完整原生候选 | [`3418b82dcfa1b9323379e36aec0f3926371b0eb6`](https://github.com/LIghtJUNction/ztty/commit/3418b82dcfa1b9323379e36aec0f3926371b0eb6) | 两个原生架构分别构建、运行和验收；各自二进制哈希保存在发布前索引与原始 JSON |
 
 Linux 候选的构建与运行环境记录在[二进制身份](measurements/experience-release-2026-11-18/linux/candidate-builder.json)和[原始 GUI 汇总](measurements/experience-release-2026-11-18/linux/linux-native.json)中。后者保留了首次执行的失败状态；会话切换的通过结论来自另存的[复验记录](measurements/experience-release-2026-11-18/linux/session-switcher-recheck.json)。
 
@@ -104,6 +108,22 @@ Caps Lock、Num Lock、Scroll Lock 在传统键盘模式下不再向子进程写
 
 此前在 `3730b28` 启动的一次检查因开发机连接重建而中断，没有完成状态，未记为通过。该次的日志与中断记录仍保留。上述完整本地门禁和返回底部 GUI 结果分别绑定各自的源码与可执行文件；正式发布仍要求最终 tag 的 Verify 和六个原生架构任务。[中断记录](measurements/experience-release-2026-11-18/scroll-prompt/full-check-interrupted-3730.json) · [中断时日志](measurements/experience-release-2026-11-18/scroll-prompt/full-check-interrupted-3730.log)
 
+### 3.3 完整 Linux GUI：67 组通过，运行文件保持固定
+
+开发机在测试检出 `8a2f4bee22324685f2193e91a16744dda21d0df9` 运行完整六套 Xvfb GUI wrapper，所有组均通过。检查前后记录同一源码且无受跟踪文件改动；实际 ELF 的 SHA-256 前后均为 `2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada`，即此前 `3730b28` 的运行文件。这里的测试源码身份与二进制构建身份分别保留。[原始 wrapper](measurements/experience-release-2026-11-18/pre-release/linux/native.json) · [完整日志](measurements/experience-release-2026-11-18/pre-release/linux/native.log) · [来源说明](measurements/experience-release-2026-11-18/pre-release/index.json)
+
+| 套件 | 通过组数 | wrapper 记录的 PNG 数 |
+| --- | ---: | ---: |
+| 工作区 | 17 | 2 |
+| 日常流程与返回底部 | 18 | 10 |
+| 会话切换 | 6 | 7 |
+| Sixel | 10 | 1 |
+| 输入 | 9 | 1 |
+| 重绘 | 7 | 6 |
+| 合计 | 67 | 27 |
+
+各套件退出码均为 0，清理记录中的遗留自有 PID 列表均为空。27 张 PNG 的文件身份保存在原始 wrapper 中；本次发布前子目录复制报告与日志，实际图片归档范围仍以总清单为准。该运行覆盖原生 Linux x86_64 ELF、真实 PTY、专属 Xvfb 的窗口像素和合成 XTEST 输入，未增加物理显示延迟、原生 Wayland 或硬件输入的结论。[运行范围与文件身份](measurements/experience-release-2026-11-18/pre-release/linux/native.json) · [总清单](measurements/experience-release-2026-11-18/manifest.json)
+
 ## 4. 行元数据的性能回退、定位和修复
 
 ### 4.1 对照方法与发现
@@ -145,16 +165,27 @@ Caps Lock、Num Lock、Scroll Lock 在传统键盘模式下不再向子进程写
 
 `2ac46e2` 的两个架构各自完成实际窗口缩放、最小化恢复和后续 PTY 恢复。保存 PNG 中的 20 个采样点分别重新读取后，与报告值的最大通道差均为 0。该结果建立此源码下的候选通过状态，IME／键盘输入与物理显示延迟仍在窗口门禁范围之外。[ARM 像素复核](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44298970562/macos-aarch64-summary.json) · [Intel 像素复核](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44298970562/macos-x86_64-summary.json)
 
-### 5.2 Windows 缩放与启动失败分别保留
+### 5.2 Windows 历史失败分别保留
 
-Windows 后续两轮均为 `build_only=true`、`candidate_platform=windows`，运行于各自原生架构。它们在不同阶段失败，后一次未到达的路径保持未验收状态。
+Windows 的以下三轮均为 `build_only=true`、`candidate_platform=windows`，运行于各自原生架构。它们在不同阶段失败，各轮没有到达的路径均不计为该轮通过。
 
 | 固定源码与运行 | 两种架构的实际结果 | 未到达范围与清理 |
 | --- | --- | --- |
 | `dc43870ef2c8e3c54894d0124e47a23445a3c624`，[44300272576](https://github.com/LIghtJUNction/ztty/actions/runs/44300272576) | 各完成 22/30 基础检查、12 项可见像素检查后，快速缩小／恢复的 `resize_restores_visible_image` 失败；预期红色 `[255,0,0]`，x64 为 `[0,0,0]`，ARM64 为 `[20,20,20]` | 19 组工作区检查未开始；应用退出 0，自有 Job 为空，输入桌面／线程桌面恢复，句柄关闭 |
 | `8a2f4bee22324685f2193e91a16744dda21d0df9`，[44303751871](https://github.com/LIghtJUNction/ztty/actions/runs/44303751871) | 各完成前 7 项检查后，重定向宿主路径中的 ConPTY 测试子进程在 `SetConsoleMode(stdin, 0x200)` 返回 `WinError 6`，没有到达 ready 标记 | 未到缩放、rapid/staged 诊断或工作区检查；无 PNG；应用退出 1，所有自有进程、Job、临时目录及桌面资源清理完成 |
+| `e334cf7ed6bb757f092ebabdcae5291c0d54b03a`，[44305368950](https://github.com/LIghtJUNction/ztty/actions/runs/44305368950) | 重定向标准流回归及原 rapid 基础门禁各 31/31 通过；工作区通过前 5 项后，在 pane A 历史视图检查失败 | 完整工作区和候选总体仍为失败；该轮的基础通过保留为独立结果 |
 
-第一轮的像素失败保留原样；第二轮是更早发生的启动问题，不能用来判定新版本的缩放恢复已通过，也不能把缺少截图写成视觉检查通过。启动失败的 stderr 随证据归档，后续修正及复验仍待记录。[缩放 x64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44300272576/windows-x86_64-summary.json) · [缩放 ARM64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44300272576/windows-aarch64-summary.json) · [启动 x64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-x86_64-summary.json) · [启动 ARM64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-aarch64-summary.json) · [x64 子进程 stderr](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-x86_64.runtime.log) · [ARM64 子进程 stderr](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-aarch64.runtime.log)
+第一轮的像素失败保留原样；第二轮是更早发生的启动问题，不能用来判定该版本的缩放恢复已通过，也不能把缺少截图写成视觉检查通过。第三轮进一步暴露历史视图问题，完整修正和后续通过记录见 5.3。启动失败的 stderr 保留原始字节。[缩放 x64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44300272576/windows-x86_64-summary.json) · [缩放 ARM64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44300272576/windows-aarch64-summary.json) · [启动 x64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-x86_64-summary.json) · [启动 ARM64](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-aarch64-summary.json) · [x64 子进程 stderr](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-x86_64.runtime.log) · [ARM64 子进程 stderr](measurements/experience-release-2026-11-18/scroll-prompt/native/run-44303751871/windows-aarch64.runtime.log) · [e334 x64](measurements/experience-release-2026-11-18/pre-release/windows-e334/x86_64-summary.json) · [e334 ARM64](measurements/experience-release-2026-11-18/pre-release/windows-e334/aarch64-summary.json)
+
+### 5.3 Windows 双架构完整候选通过
+
+固定源码 `3418b82dcfa1b9323379e36aec0f3926371b0eb6` 的 [Windows 原生运行 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420)在 x64 和 ARM64 均被接受。运行使用 `build_only=true`、`candidate_platform=windows`。两种架构各通过 31 项基础检查、19 项工作区检查，基础可见像素检查 19 项，工作区像素组 12 组；各自记录 12 张 PNG。应用、工作区探针、Job 和桌面资源均完成清理。[x64 审计摘要](measurements/experience-release-2026-11-18/pre-release/windows-3418/x86_64-summary.json) · [ARM64 审计摘要](measurements/experience-release-2026-11-18/pre-release/windows-3418/aarch64-summary.json)
+
+这次验收包含两项具体运行时修复。ConPTY 创建子进程时显式使用空的标准句柄槽，让伪控制台提供实际控制台句柄；重定向宿主的标准流不会被误用为子进程控制台。新增原生回归确认子进程的 stdin、stdout、stderr 都是有效控制台句柄，并以 0 退出。Windows 输入处理则只在编码结果非空时入队、返回底部并清除选区，因此静默的 Shift／Control 按下或松开不会撤销刚完成的历史滚动；真正的 Enter 输入仍会返回实时视图。两种架构的历史用例都记录静默修饰键保持历史、实际输入为 `0d` 后恢复实时像素。[ConPTY 实现](https://github.com/LIghtJUNction/ztty/blob/3418b82dcfa1b9323379e36aec0f3926371b0eb6/crates/zpty/src/windows.rs) · [Windows 输入实现](https://github.com/LIghtJUNction/ztty/blob/3418b82dcfa1b9323379e36aec0f3926371b0eb6/src/platform/windows.rs) · [x64 原始原生记录](measurements/experience-release-2026-11-18/pre-release/windows-3418/x86_64.native.json) · [ARM64 原始原生记录](measurements/experience-release-2026-11-18/pre-release/windows-3418/aarch64.native.json)
+
+工作区检查还覆盖独立 ConPTY、真实键盘焦点、非活动 pane 鼠标处理、选区隔离、第三个 pane、最大化恢复、尺寸同步、交换、隐藏标签输出、标签切回以及关闭时兄弟会话的生存。两种架构均完成全部 19 项，原始检查与像素向量单独保留。[x64 工作区记录](measurements/experience-release-2026-11-18/pre-release/windows-3418/x86_64.native.workspace.json) · [ARM64 工作区记录](measurements/experience-release-2026-11-18/pre-release/windows-3418/aarch64.native.workspace.json)
+
+基础门禁使用原来的快速缩小／恢复路径，没有启用运行时 trace，也没有增加逐阶段 ACK。`e334` 和 `3418` 在两种架构上各连续通过该路径，保存的恢复前后图像相同，红色采样为 `[255,0,0]`。这些是候选的实际通过结果；`dc43870` 历史黑带的最初机制尚未经过独立复现并确定，因此不把本轮通过写成该历史问题的因果闭环或所有调度时序的保证。正式发布仍需最终 tag 自身的六个原生架构门禁。[原 rapid 结果和边界](measurements/experience-release-2026-11-18/pre-release/index.json)
 
 ## 6. 发布与设备安装状态
 
@@ -163,15 +194,16 @@ Windows 后续两轮均为 `build_only=true`、`candidate_platform=windows`，�
 | 交付项 | 当前状态 | 完成时需要补入的记录 |
 | --- | --- | --- |
 | 返回底部追加验收 | 所列 Linux 候选 18/18 组通过 | 已保留运行时、脚本与二进制身份及六张新图；最终发行文件仍需其自身门禁 |
+| 完整 Linux GUI | 六套 67/67 组通过，记录 27 张 PNG | 测试检出 `8a2f4be`，运行时构建 `3730b28`；身份分别保留 |
 | 后续 macOS 修正与复验 | `2ac46e2` 两种架构候选通过 | 已保留 44298970562 的分架构结果；最终 tag 的全平台验收仍待完成 |
-| Windows 原生复验 | 未通过 | `dc43870` 缩放失败、`8a2f4be` 启动失败分别保留；后续修复与同源码复验待完成 |
+| Windows 原生复验 | `3418b82` 双架构各 31+19 项通过，候选接受 | 三轮历史失败保留；原 rapid 历史根因边界和最终 tag 验收仍独立记录 |
 | 正式 Release | 待完成 | tag、发行源码、Release URL、最终平台门禁与资产校验记录 |
 | 用户设备安装 | 待完成 | 安装绝对路径、实际 `--version`、二进制 SHA-256、启动器目标 |
 | 回滚与既有会话 | 待完成设备实测记录 | `ztty.previous` 身份与校验、既有进程／会话的保留情况 |
 
 ## 7. 仍然存在的范围限制
 
-Linux 会话切换、返回底部和多工作区体验的实测结论限于本报告列出的 X11 路径。Windows Tabs／Splits 已有实现，本轮 19 组原生工作区门禁仍未通过；macOS 工作区界面及 macOS／Windows 的共享会话、搜索和命令面板仍有缺口。共享文本提取函数在源码上接入三个前端，并不自动证明三个平台的真实剪贴板与输入路径都已经验收。原生 Wayland、硬件 GPU／VRAM、物理输入矩阵、IME 和端到端延迟继续需要独立证据。Apple Developer ID／notarization 与 Windows 签名也不由本次候选记录提供。[架构范围](architecture.md) · [原生候选与剩余门禁](native-candidates-2026-11-18.md) · [已有性能口径](performance.md)
+Linux 会话切换、返回底部和多工作区体验的实测结论限于本报告列出的 X11 路径。Windows Tabs／Splits 的指定路径已在 `3418b82` 通过双架构 19 项原生工作区检查；macOS 工作区界面及 macOS／Windows 的共享会话、搜索和命令面板仍有缺口。共享文本提取函数在源码上接入三个前端，并不自动证明三个平台的真实剪贴板与输入路径都已经验收。原生 Wayland、硬件 GPU／VRAM、物理输入矩阵、IME 和端到端延迟继续需要独立证据。Apple Developer ID／notarization 与 Windows 签名也不由本次候选记录提供。[架构范围](architecture.md) · [原生候选与剩余门禁](native-candidates-2026-11-18.md) · [已有性能口径](performance.md)
 
 搜索目前是有长度上限的字面查询，命中计数仍需扫描保留的历史；可见高亮有时需要回溯到一条很长的逻辑行开头，才能保持非重叠匹配顺序。没有整份历史字符串副本有助于控制临时内存，但不构成搜索耗时的常数上界。本轮没有给这部分新增交互延迟承诺。[搜索算法及边界](https://github.com/LIghtJUNction/ztty/blob/0563554b95dc6321f6e45bdd53659b6c85f90850/src/search.rs)
 
@@ -184,9 +216,10 @@ Linux 会话切换、返回底部和多工作区体验的实测结论限于本�
 | 自动折行可搜索、完整复制，并拒绝过期命中 | 13 项搜索测试、5 项选区测试、六组 GUI 的最后一组 | 在所列 Linux／核心范围内支持 |
 | 会话切换保留所有权，过期 Focus 不隐式挂接 | GUI 的身份、输入、尺寸和实际提示断言 | 复验支持；首轮脚本失败已保留 |
 | 上翻后可点击返回，新输出有提示，观察者不夺权 | 18 组日常 GUI 原始记录、源码绑定和六张新 PNG | 在所列 Linux 候选范围内支持 |
+| Linux 六套 GUI 全部执行，Windows 两项具体修复完成原生回归 | Linux 67 组 wrapper；Windows 双架构 31 项基础、19 项工作区记录 | 分别支持所列测试检出／运行文件及 Windows 固定候选 |
 | 新元数据的明显热路径回退得到缓解 | 原始对照、中间版本、最终配对、汇编与源码身份 | 仅支持所测核心负载，不支持普遍加速 |
 | 安装路径先校验再替换并保留回滚 | 安装回归源码和开发机退出状态 | 支持脚本验收；设备实际安装待记录 |
-| 原生候选和正式交付已分开 | macOS 三轮分架构结果、Windows 两轮不同阶段失败及交付状态表 | 正式 Release／设备安装待完成 |
+| 原生候选和正式交付已分开 | macOS 分架构结果、Windows 三轮历史失败与后续完整通过、交付状态表 | 最终同源 tag 门禁、正式 Release／设备安装待完成 |
 
 ### 五项自审
 
@@ -195,5 +228,5 @@ Linux 会话切换、返回底部和多工作区体验的实测结论限于本�
 | 改进价值 | 是否对应用户可见的问题？已用跨折行文本、既有会话聚焦、返回最新输出、锁定键和运行中升级说明具体行为。 |
 | 表达清晰 | 是否混淆物理行与逻辑行、候选与发布、脚本与运行时修复？各自定义并固定源码，首轮失败单独说明。 |
 | 实验证据 | 是否把波动当作加速？保留全部外层样本、比值范围、变异系数和最初回退，限制结论到同一核心负载。 |
-| 验收完整性 | 是否遗漏失败或平台缺口？保留早期 macOS 的架构差异、两次 Windows 不同阶段的失败、首次 Linux 脚本失败、Darwin 本地跳过和未完成门禁。 |
+| 验收完整性 | 是否遗漏失败或平台缺口？保留早期 macOS 的架构差异、三轮 Windows 失败及原 rapid 根因边界、首次 Linux 脚本失败、Darwin 本地跳过和未完成门禁。 |
 | 设计边界 | 是否把有界内存理解为无成本，或把单文件原子替换理解为多文件事务？明确历史预算、查询上限、扫描代价和安装原子性的范围。 |
