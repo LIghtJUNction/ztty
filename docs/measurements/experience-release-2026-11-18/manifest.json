@@ -624,6 +624,108 @@
       "source_path": "derived from immutable candidate artifacts and independently verified native reports",
       "bytes": 2261,
       "sha256": "8f89d4d04cc78eca1cc2e6cad9b7b0454906358bc9f60b49463f5f8964ec8964"
+    },
+    {
+      "path": "presentation-44317542062/index.json",
+      "source_path": "derived audit index from the verified original candidate artifacts",
+      "bytes": 1968,
+      "sha256": "24e6489cba53107f02175ffcd0460ff85dffa00fd41c416653cdffd4146e921a"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/evidence-index.json",
+      "source_path": "derived audit index from the verified original candidate artifacts",
+      "bytes": 3500,
+      "sha256": "ea3c23cb19a322a07196fefb0235eb7f8d41c7f6f6d70c9c511f40ea9dd3c464"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/summary.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/summary.json",
+      "bytes": 13636,
+      "sha256": "1b0c03b8f50593c59a82ddebefbe5968e027745e55bbcd3d92910e378a470a73"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 42494,
+      "sha256": "445a282adaaf51f864a7fbc04512181ae7a6af286718b145dab50af476341a33"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.json",
+      "bytes": 41825,
+      "sha256": "1ed3c82d385302205d764b8076ed78736b3bc2d51759ed0b8468f6bf2f45c6eb"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.json",
+      "bytes": 850,
+      "sha256": "de83980389b8855401b8d77dcf7a7d2071bd20914851ebc2e5b88291ddbd309e"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-repaint.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    {
+      "path": "presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.resize-restored.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/evidence-index.json",
+      "source_path": "derived audit index from the verified original candidate artifacts",
+      "bytes": 2817,
+      "sha256": "5eec9ab4b0ad5f0b2574dedd648ac8966a68bbc9fb474679d544c52bb6de1987"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/summary.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/summary.json",
+      "bytes": 7254,
+      "sha256": "e30ed90573c47be1e9288e740c320e3436ab6fa28d9191a8e9150db26ce0ea7f"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 16714,
+      "sha256": "121243426fa664321b392e41cb169416245fcf34e3cce02e79cbf632d430de92"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.json",
+      "bytes": 41385,
+      "sha256": "4946aac513af953b4d68a64ad28b7f2b2485a4410afca584292ded2f62b6c1c6"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.json",
+      "bytes": 845,
+      "sha256": "2442cc8a4d7c33b1caa00698295a0d3ea93271c2c3b23ba2a583c191b9bea2ea"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-repaint.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    {
+      "path": "presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.resize-restored.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.resize-restored.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d"
     }
   ],
   "notes": [
@@ -633,7 +735,8 @@
     "The six added PNGs are original scrollback captures. No image was modified, and the source tar archive and four older screenshots were not duplicated.",
     "pre-release/index.json is an additional derived index; all other pre-release entries preserve the source bytes, including CRLF in native JSON records.",
     "formal-v0.3.0/index.json, github-status.json and windows-*-summary.json are derived audit records. Other formal-v0.3.0 files preserve source bytes, including CRLF. This formal run failed on Windows ARM; diagnostic successes do not override it. The v0.3.0 tag remains fixed, Publish was skipped, the Release API returned 404, and installation was not performed.",
-    "cold-44315250297/index.json and windows-*-summary.json are derived audits. The two failed cold-start reports, same-process snapshot and three PNGs preserve original source bytes. Both architectures failed; a diagnostic repaint recovery does not accept the original pixel failure."
+    "cold-44315250297/index.json and windows-*-summary.json are derived audits. The two failed cold-start reports, same-process snapshot and three PNGs preserve original source bytes. Both architectures failed; a diagnostic repaint recovery does not accept the original pixel failure.",
+    "presentation-44317542062 retains both new failures. Its indexes/summaries are derived; build and failed-native JSON, snapshots and PNGs preserve original bytes. Both snapshots recorded deferred_paints=0. A successful bounded ARM cleanup retry did not accept the pixel failure."
   ],
   "appended_checkpoints": [
     {
@@ -688,6 +791,16 @@
       "status": "failed",
       "x64_failed_cold_start": 8,
       "arm_failed_cold_start": 4
+    },
+    {
+      "name": "presentation-contract-candidate",
+      "source_sha": "04cfd7bb9a516fe7914dc34daff380fa4c232cf2",
+      "run_id": 44317542062,
+      "index": "presentation-44317542062/index.json",
+      "status": "failed",
+      "x64_failed_cold_start": 3,
+      "arm_failed_cold_start": 7,
+      "both_deferred_paints": 0
     }
   ]
 }

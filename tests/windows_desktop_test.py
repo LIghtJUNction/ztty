@@ -275,9 +275,13 @@ class DesktopContract(unittest.TestCase):
             raw = path.read_bytes()
             path.write_bytes(raw + b" ")
             self.assertFalse(desktop.validate_cold_runs(aggregate, identity, directory))
-            # Even a matching digest cannot accept a truncated warm gate,
+            # Even a matching digest cannot accept a truncated resize gate,
             # traced run, wrong desktop, or unfinished process cleanup.
             for field, value in (("rapid_resize_repetitions", {"passed": True, "required": 10, "completed": 9}),
+                                 ("back_to_back_resize_repetitions", None),
+                                 ("back_to_back_resize_repetitions", {"passed": True, "required": 10, "completed": 9}),
+                                 ("back_to_back_resize_repetitions", {"passed": True, "required": 10, "completed": 10,
+                                    "iterations": [{"number": n, "passed": n != 7} for n in range(1, 11)]}),
                                  ("runtime_trace_enabled", True), ("checks", []),
                                  ("desktop", {"thread": {"name": "Default"}}),
                                  ("cleanup", {"process_exited": False, "temporary_directory_removed": True})):

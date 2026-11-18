@@ -225,6 +225,14 @@ x64 第八次的原失败进程为 PID `8576`、HWND `2294132`。超时后的快
 
 原失败 PNG 与 flush 后 PNG 完全相同；补画后的 PNG 与缩放前正确画面完全相同。x64 的 251 张 PNG、390 个缩放采样点，以及 ARM 的 140 张 PNG、220 个缩放采样点均已独立核对。原失败画面的右侧分界为 `144+8=152` 像素，作为窗口尺寸与边框相关的线索保留。诊断补画的恢复不改变原失败结论，也没有使这轮候选获得发布或安装资格。[缩放前](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-before.png) · [原始失败](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.resize-restored.png) · [诊断补画后](measurements/experience-release-2026-11-18/cold-44315250297/windows-x86_64/ztty-windows-x86_64.native.cold-08.post-repaint.png)
 
+### 5.6 补画契约候选仍失败，排除本次重入并验证清理恢复
+
+源码 `04cfd7bb9a516fe7914dc34daff380fa4c232cf2` 补齐了被可变借用保护拒绝的补画请求，并在绘制前处理已排队的尺寸变化。它同时对 Windows 临时目录的共享冲突增加 2 秒有界等待。新候选 [44317542062](https://github.com/LIghtJUNction/ztty/actions/runs/44317542062) 中，x64 前两次冷启动完整通过，第三次在原快速缩放恢复处失败；ARM 前六次完整通过，第七次在同一检查失败。两侧均在失败前通过 23 项，未进入该次额外缩放和后续工作区检查。[两架构证据索引](measurements/experience-release-2026-11-18/presentation-44317542062/index.json)
+
+两个原失败进程的 `deferred_paints` 都为 0，待处理补画标记也为 false，说明本次失败没有经历 guard 拒绝的绘制。内部画布、终端尺寸和图像像素仍正确，显式 flush 仍不能恢复窗口，正常补画后恢复。此前补齐的重入契约因此不能被写成本次实际故障的直接原因。下一项生产候选调整 Windows 在真实尺寸变化时保存、回贴旧客户端像素的策略，仍需独立原生验收。[x64 原始快照](measurements/experience-release-2026-11-18/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.json) · [ARM 原始快照](measurements/experience-release-2026-11-18/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.post-failure.json)
+
+ARM 第七次在主进程退出码为 0 后真实遇到 `winerror=32` 的临时文件占用，第二次删除在 0.055527 秒后成功，首次异常仍保存在报告中。所有已启动进程、临时目录、Job 和桌面均完成清理；像素失败保持 `passed=false`。这验证了测试脚本能等待本次短暂锁释放，不构成对生产子进程生命周期的额外修复声明。[ARM 清理与原失败报告](measurements/experience-release-2026-11-18/presentation-44317542062/windows-aarch64/ztty-windows-aarch64.native.cold-07.json) · [x64 审计](measurements/experience-release-2026-11-18/presentation-44317542062/windows-x86_64/summary.json) · [ARM 审计](measurements/experience-release-2026-11-18/presentation-44317542062/windows-aarch64/summary.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)

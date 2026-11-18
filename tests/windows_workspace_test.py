@@ -35,6 +35,8 @@ def complete_native_report(name):
             "runtime_trace_enabled": False, "resize_path": "rapid", "visible_pixel_checks_completed": 19,
             "rapid_resize_repetitions": {"required": 10, "completed": 10, "passed": True,
                 "iterations": [{"number": number, "passed": True} for number in range(1, 11)]},
+            "back_to_back_resize_repetitions": {"required": 10, "completed": 10, "passed": True,
+                "iterations": [{"number": number, "passed": True} for number in range(1, 11)]},
             "cleanup": {"process_exited": True, "temporary_directory_removed": True, "returncode": 0},
             "desktop": {"thread": {"name": name}, "input": {"name": name}}}
 
@@ -185,7 +187,7 @@ class WorkspaceContract(unittest.TestCase):
         name = "ztty-native-1-" + "c" * 32
         api = types.SimpleNamespace(context=lambda: {
             "station": "WinSta0", "visible": True, "thread": name, "input": name})
-        for fault in ("pixel", "cleanup"):
+        for fault in ("pixel", "cleanup", "burst"):
             with self.subTest(fault=fault), tempfile.TemporaryDirectory() as temporary:
                 output, state = Path(temporary) / "native.json", Path(temporary) / "worker.json"
                 calls, originals = [], {}
@@ -197,8 +199,10 @@ class WorkspaceContract(unittest.TestCase):
                             evidence.update({"passed": False, "status": "failed", "error": "cold restore stayed black",
                                              "failed_pixel": {"name": "resize_restores_visible_image"},
                                              "post_failure_snapshot": {"before": {"surface": {"size": [144, 190]}}}})
-                        else:
+                        elif fault == "cleanup":
                             evidence["cleanup"]["process_exited"] = False
+                        else:
+                            evidence["back_to_back_resize_repetitions"]["completed"] = 9
                     desktop.write_json(report, evidence)
                     originals[len(calls)] = report.read_bytes()
                     if len(calls) == 4 and fault == "pixel":

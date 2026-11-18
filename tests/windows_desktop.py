@@ -482,14 +482,17 @@ def source_identity(binary):
 
 
 def complete_native_run(report, identity):
-    """Require the original uninstrumented 31 checks and all ten rapid resizes."""
+    """Require the uninstrumented 31 checks and both ten-round resize gates."""
     if not isinstance(report, dict):
         return False
     checks, rapid, cleanup = report.get("checks"), report.get("rapid_resize_repetitions", {}), report.get("cleanup", {})
-    if not isinstance(checks, list) or len(checks) != 31 or not isinstance(rapid, dict) or not isinstance(cleanup, dict):
+    burst = report.get("back_to_back_resize_repetitions", {})
+    if (not isinstance(checks, list) or len(checks) != 31 or not isinstance(rapid, dict)
+            or not isinstance(burst, dict) or not isinstance(cleanup, dict)):
         return False
     names = [check.get("name") for check in checks if isinstance(check, dict)]
     iterations = rapid.get("iterations")
+    burst_iterations = burst.get("iterations")
     return (report.get("passed") is True and report.get("status") == "passed"
             and report.get("runtime_trace_enabled") is False and report.get("resize_path") == "rapid"
             and len(names) == 31 and all(isinstance(name, str) and name for name in names)
@@ -499,6 +502,10 @@ def complete_native_run(report, identity):
             and isinstance(iterations, list) and len(iterations) == 10
             and all(isinstance(item, dict) and item.get("number") == number and item.get("passed") is True
                     for number, item in enumerate(iterations, 1))
+            and burst.get("passed") is True and burst.get("required") == burst.get("completed") == 10
+            and isinstance(burst_iterations, list) and len(burst_iterations) == 10
+            and all(isinstance(item, dict) and item.get("number") == number and item.get("passed") is True
+                    for number, item in enumerate(burst_iterations, 1))
             and cleanup.get("process_exited") is True and cleanup.get("temporary_directory_removed") is True
             and cleanup.get("returncode") == 0
             and all(report.get(key, value) == value for key, value in identity.items() if key != "desktop")
@@ -571,9 +578,10 @@ def run_cold_starts(args, identity, run_native):
             report = json.loads(raw)
             entry["checks_completed"] = len(report.get("checks", []))
             entry["rapid_resizes_completed"] = report.get("rapid_resize_repetitions", {}).get("completed", 0)
+            entry["back_to_back_resizes_completed"] = report.get("back_to_back_resize_repetitions", {}).get("completed", 0)
             entry["cleanup"] = report.get("cleanup", {})
             if error or returned is not True or not complete_native_run(report, identity):
-                raise ValueError(error or report.get("error") or "native checks, rapid resizes, or cleanup incomplete")
+                raise ValueError(error or report.get("error") or "native checks, resize repetitions, or cleanup incomplete")
             current = [check["name"] for check in report["checks"]]
             if names is not None and current != names:
                 raise ValueError("cold-start native check set changed")
