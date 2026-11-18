@@ -1835,6 +1835,10 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
     if window.is_null() {
         return Err("cannot create the AppKit window");
     }
+    // Keep the backing store in the same space as terminal RGB and image
+    // pixels. A display-profile backing store adds an avoidable 8-bit color
+    // conversion before WindowServer composites or captures the window.
+    send!(window, c"setColorSpace:", (), Id => send!(class(c"NSColorSpace"), c"sRGBColorSpace", Id));
     send!(window, c"setReleasedWhenClosed:", (), bool => false);
     send!(window, c"setOpaque:", (), bool => false);
     send!(window, c"setBackgroundColor:", (), Id => send!(class(c"NSColor"), c"clearColor", Id));

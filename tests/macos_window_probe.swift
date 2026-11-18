@@ -441,6 +441,11 @@ final class WindowProbe {
             "color_space": colorName,
             "requested_color_space": CGColorSpace.sRGB as String,
             "requested_pixel_format": "32BGRA",
+            "bits_per_component": image.bitsPerComponent,
+            "bits_per_pixel": image.bitsPerPixel,
+            "bytes_per_row": image.bytesPerRow,
+            "bitmap_info": image.bitmapInfo.rawValue,
+            "alpha_info": image.alphaInfo.rawValue,
         ]
         guard window.isOnScreen, visible else {
             throw GateError("the owned window is not wholly on an active display")
@@ -456,6 +461,7 @@ final class WindowProbe {
         }
         phase("pixel_comparison")
         let bytes = try rgba(image)
+        let providerData = image.dataProvider?.data
         var matches = true
         var samples: [[String: Any]] = []
         for sample in request.samples ?? [] {
@@ -467,8 +473,20 @@ final class WindowProbe {
             let actual = Array(bytes[offset..<(offset + 3)]).map(Int.init)
             let match = zip(actual, sample.rgb).allSatisfy { abs($0.0 - $0.1) <= 1 }
             matches = matches && match
-            samples.append(["client": [sample.x, sample.y], "expected": sample.rgb,
-                            "actual": actual, "alpha": Int(bytes[offset + 3]), "passed": match])
+            var result: [String: Any] = [
+                "client": [sample.x, sample.y], "expected": sample.rgb,
+                "actual": actual, "alpha": Int(bytes[offset + 3]), "passed": match,
+            ]
+            // Diagnostic bytes only: the comparison still uses the color-
+            // managed sRGB normalization above, with its unchanged tolerance.
+            if image.bitsPerComponent == 8, image.bitsPerPixel == 32,
+               let data = providerData, let pointer = CFDataGetBytePtr(data) {
+                let rawOffset = (top + sample.y) * image.bytesPerRow + (left + sample.x) * 4
+                if rawOffset + 4 <= CFDataGetLength(data) {
+                    result["provider_bytes"] = (0..<4).map { Int(pointer[rawOffset + $0]) }
+                }
+            }
+            samples.append(result)
         }
         report["samples"] = samples
         return matches
