@@ -100,6 +100,143 @@ fn ascii_batch_overwrites_complete_wide_glyphs_and_handles_the_last_column() {
 }
 
 #[test]
+fn unicode_narrow_overwrite_repairs_either_wide_half_and_replaces_metadata() {
+    for column in [1, 2] {
+        let mut t = Terminal::new(5, 2, 0);
+        t.feed("\x1b[1;31;44m\x1b]8;;https://example.com/old\x1b\\界\u{301}Z".as_bytes());
+        let untouched = *t.cell(2, 0);
+        t.clear_dirty();
+        t.feed(
+            format!(
+                "\x1b[0;4;38;2;5;6;7;48;2;1;2;3m\
+                 \x1b]8;;https://example.com/new\x1b\\\x1b[1;{column}Hé"
+            )
+            .as_bytes(),
+        );
+        let cell = t.cell(column - 1, 0);
+        assert_eq!((cell.ch, cell.width, cell.combining), ('é', 1, ['\0'; 2]));
+        assert_eq!((cell.fg, cell.bg), (0x050607, 0x010203));
+        assert_eq!(cell.flags, UNDERLINE | EXPLICIT_FG | EXPLICIT_BG);
+        assert_eq!(cell.palette_indices, 0);
+        assert_eq!(t.hyperlink(cell.link_id), Some("https://example.com/new"));
+        let blank = t.cell(2 - column, 0);
+        assert_eq!(
+            (blank.ch, blank.width, blank.combining),
+            (' ', 1, ['\0'; 2])
+        );
+        assert_eq!((blank.fg, blank.bg), (0x050607, 0x010203));
+        assert_eq!(blank.flags, EXPLICIT_FG | EXPLICIT_BG);
+        assert_eq!((blank.palette_indices, blank.link_id), (0, 0));
+        assert_eq!(*t.cell(2, 0), untouched);
+        assert_eq!(t.cursor(), (column, 0));
+        assert!(t.row_dirty(0));
+    }
+}
+
+#[test]
+fn unicode_wide_overwrite_repairs_both_outside_halves() {
+    let mut t = Terminal::new(8, 2, 0);
+    t.feed("甲\u{301}乙\u{308}丙Z".as_bytes());
+    let untouched: Vec<_> = (4..8).map(|x| *t.cell(x, 0)).collect();
+    t.feed("\x1b[48;2;1;2;3m\x1b[1;2H界".as_bytes());
+    for (x, ch, width) in [(0, ' ', 1), (1, '界', 2), (2, '\0', 0), (3, ' ', 1)] {
+        let cell = t.cell(x, 0);
+        assert_eq!(
+            (cell.ch, cell.width, cell.combining),
+            (ch, width, ['\0'; 2])
+        );
+        assert_eq!(cell.bg, 0x010203);
+        assert_eq!(cell.link_id, 0);
+    }
+    assert_eq!((4..8).map(|x| *t.cell(x, 0)).collect::<Vec<_>>(), untouched);
+    assert_eq!(t.cursor(), (3, 0));
+}
+
+#[test]
+fn unicode_insert_preserves_shifted_glyphs_and_repairs_split_glyphs() {
+    for (column, text, expected, cursor) in [
+        (2, "é", "Aé界\0BC  ", (2, 0)),
+        (3, "語", "A 語\0 BC ", (4, 0)),
+    ] {
+        let mut t = Terminal::new(8, 1, 0);
+        t.feed("A界BC".as_bytes());
+        t.feed(format!("\x1b[4h\x1b[1;{column}H{text}").as_bytes());
+        assert_eq!(line(&t, 0), expected);
+        assert_eq!(t.cell(2, 0).width, 2);
+        assert_eq!(t.cell(3, 0).width, 0);
+        assert_eq!(t.cursor(), cursor);
+    }
+}
+
+#[test]
+fn unicode_overwrite_handles_narrow_screens_and_wrap_boundaries() {
+    let mut narrow = Terminal::new(1, 2, 0);
+    narrow.feed("界é".as_bytes());
+    assert_eq!(line(&narrow, 0), "\u{fffd}");
+    assert_eq!(line(&narrow, 1), "é");
+    assert_eq!(narrow.cell(0, 0).width, 1);
+    assert_eq!(narrow.cell(0, 1).width, 1);
+
+    let mut no_wrap = Terminal::new(4, 2, 0);
+    no_wrap.feed("甲乙\x1b[?7l界".as_bytes());
+    assert_eq!(line(&no_wrap, 0), "甲\0 \u{fffd}");
+    assert_eq!(no_wrap.cell(2, 0).width, 1);
+    assert_eq!(no_wrap.cell(3, 0).width, 1);
+    assert_eq!(no_wrap.cursor(), (3, 0));
+    no_wrap.feed("é".as_bytes());
+    assert_eq!(line(&no_wrap, 0), "甲\0 é");
+    assert_eq!(line(&no_wrap, 1), "    ");
+
+    let mut overflow = Terminal::new(4, 2, 0);
+    overflow.feed("甲乙\x1b[1;4H界".as_bytes());
+    assert_eq!(line(&overflow, 0), "甲\0  ");
+    assert_eq!(line(&overflow, 1), "界\0  ");
+    assert_eq!(overflow.cell(2, 0).width, 1);
+    assert_eq!(overflow.cell(3, 0).width, 1);
+    assert_eq!(overflow.cursor(), (2, 1));
+
+    let mut wrap = Terminal::new(4, 2, 0);
+    wrap.feed("A界\x1b[1;3H語\u{301}é".as_bytes());
+    assert_eq!(line(&wrap, 0), "A 語\0");
+    assert_eq!(wrap.cell(2, 0).combining, ['\u{301}', '\0']);
+    assert_eq!(line(&wrap, 1), "é   ");
+    assert_eq!(wrap.cursor(), (1, 1));
+}
+
+#[test]
+fn unicode_overwrites_are_independent_of_pty_chunk_sizes() {
+    let bytes = "甲\u{301}乙\u{308}丙Z\x1b[1;2Hé\x1b[1;3H語\
+                 \x1b[4h\x1b[1;2Hλ\x1b[4l\x1b[1;5H界\u{301}\
+                 \x1b[?7l語é\x1b[?7h\r\n\
+                 \x1b[1;38;2;3;7;11m甲乙\x1b[1;2Hé\u{308}\r\n"
+        .repeat(4);
+    for cols in [1, 2, 5, 8] {
+        let mut whole = Terminal::new(cols, 3, 4);
+        whole.feed(bytes.as_bytes());
+        for chunk_size in [1, 2, 3, 7, bytes.len()] {
+            let mut split = Terminal::new(cols, 3, 4);
+            for chunk in bytes.as_bytes().chunks(chunk_size) {
+                split.feed(chunk);
+            }
+            assert_eq!(split.cursor(), whole.cursor());
+            assert_eq!(split.modes(), whole.modes());
+            assert_eq!(split.history_len(), whole.history_len());
+            for offset in 0..=whole.history_len() {
+                for y in 0..whole.rows() {
+                    for x in 0..cols {
+                        assert_eq!(
+                            split.view_cell(x, y, offset),
+                            whole.view_cell(x, y, offset),
+                            "cols={cols}, chunk={chunk_size}, offset={offset}, x={x}, y={y}"
+                        );
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[test]
 fn wide_character_wraps_before_last_column() {
     let mut t = Terminal::new(4, 2, 0);
     t.feed("abc界".as_bytes());

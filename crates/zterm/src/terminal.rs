@@ -1178,11 +1178,11 @@ impl State {
         if self.insert {
             self.insert_chars(width);
         }
-        self.screen.clear_range(y, x, x + width, self.style.blank());
-        let index = self.screen.index(x, y);
-        self.screen.cells[index] = self.style.cell(ch, width as u8);
+        let style = self.style;
+        let cells = self.screen.overwrite_span(y, x, x + width, style.blank());
+        cells[0] = style.cell(ch, width as u8);
         if width == 2 {
-            self.screen.cells[index + 1] = self.style.cell('\0', 0);
+            cells[1] = style.cell('\0', 0);
         }
         self.screen.dirty[y] = true;
         self.last_char = ch;
