@@ -99,6 +99,8 @@ struct Ui {
     attachment: u64,
     selection: Option<Selection>,
     history: usize,
+    new_output: bool,
+    scroll_prompt: Option<crate::layout::Rect>,
     force: bool,
     repaint: Repaint,
     open: bool,
@@ -132,6 +134,8 @@ impl Ui {
             attachment,
             selection: None,
             history: 0,
+            new_output: false,
+            scroll_prompt: None,
             force: true,
             repaint: Repaint::default(),
             open: true,
@@ -174,6 +178,59 @@ impl Ui {
         self.window.cancel_paste();
         self.reset_input();
     }
+
+    fn set_history(&mut self, history: usize) {
+        self.history = history;
+        if history == 0 {
+            self.new_output = false;
+            self.scroll_prompt = None;
+        }
+    }
+
+    fn scroll_bottom(&mut self) {
+        self.set_history(0);
+        self.selection = None;
+        self.force = true;
+    }
+
+    // A drawn view control takes precedence over application mouse reports and
+    // custom mouse bindings. Keep ownership of its release after it disappears.
+    fn scroll_prompt_event(&mut self, event: &x11::Event) -> bool {
+        match unsafe { event.kind } {
+            x11::BUTTON_PRESS | x11::BUTTON_RELEASE => {
+                let e = unsafe { event.button };
+                if !(1..=11).contains(&e.button) {
+                    return false;
+                }
+                let button = e.button as usize;
+                if e.kind == x11::BUTTON_RELEASE && self.swallowed_buttons[button] {
+                    self.swallowed_buttons[button] = false;
+                    return true;
+                }
+                if e.kind != x11::BUTTON_PRESS
+                    || (4..=7).contains(&e.button)
+                    || self.history == 0
+                    || !ztty::scroll_prompt::contains(self.scroll_prompt, e.x, e.y)
+                {
+                    return false;
+                }
+                self.swallowed_buttons[button] = true;
+                self.local_buttons[button] = false;
+                self.reported_buttons &= !(1u16 << button);
+                if button == 1 {
+                    self.scroll_bottom();
+                }
+                true
+            }
+            x11::MOTION_NOTIFY => {
+                let e = unsafe { event.motion };
+                self.swallowed_buttons.iter().any(|held| *held)
+                    || self.history != 0
+                        && ztty::scroll_prompt::contains(self.scroll_prompt, e.x, e.y)
+            }
+            _ => false,
+        }
+    }
     fn find(&mut self, terminal: &Terminal, forward: bool, restart: bool) {
         let Some(search) = &mut self.search else {
             return;
@@ -189,7 +246,7 @@ impl Ui {
         search.ordinal = result.ordinal;
         if let Some(hit) = result.hit {
             let (history, row) = search::viewport(terminal, hit);
-            self.history = history;
+            self.set_history(history);
             self.selection = Some(Selection {
                 start: (hit.start, row),
                 end: (hit.end, row + hit.end_row - hit.row),
@@ -397,8 +454,7 @@ impl Ui {
                 }
                 if !encoded.is_empty() {
                     if self.history != 0 {
-                        self.history = 0;
-                        self.force = true;
+                        self.scroll_bottom();
                     }
                     if self.selection.is_some() {
                         self.selection = None;
@@ -426,8 +482,11 @@ impl Ui {
                     self.swallowed_buttons[button_index] = false;
                     return Ok(());
                 }
-                let mut local =
-                    !allow_input || mods.0 & 1 != 0 || core.terminal.modes().mouse_tracking == 0;
+                let mut local = !allow_input
+                    || mods.0 & 1 != 0
+                    || core.terminal.modes().mouse_tracking == 0
+                    || self.history != 0
+                        && ztty::scroll_prompt::contains(self.scroll_prompt, e.x, e.y);
                 if pressed && local {
                     self.local_buttons[button_index] = true;
                 }
@@ -467,13 +526,13 @@ impl Ui {
                             self.window.paste(true);
                         }
                     } else if pressed && (e.button == 4 || e.button == 5) {
-                        self.history = if e.button == 4 {
+                        self.set_history(if e.button == 4 {
                             self.history
                                 .saturating_add(3)
                                 .min(core.terminal.history_len())
                         } else {
                             self.history.saturating_sub(3)
-                        };
+                        });
                         self.selection = None;
                         self.force = true;
                     }
@@ -542,13 +601,14 @@ impl Ui {
                     return Ok(());
                 }
                 let (cols, rows) = self.window.resize(e.width, e.height);
+                self.scroll_prompt = None;
                 if allow_input
                     && (cols != core.terminal.cols() || rows != core.terminal.rows())
                     && let Err(error) = core.resize(pty_size(cols, rows, Some(&self.window)))
                 {
                     self.error(format!("cannot resize the PTY: {error}"));
                 }
-                self.history = self.history.min(core.terminal.history_len());
+                self.set_history(self.history.min(core.terminal.history_len()));
                 self.selection = None;
                 self.force = true;
             }
@@ -623,6 +683,10 @@ impl Ui {
         {
             self.message = None;
             self.force = true;
+        }
+        if self.history == 0 {
+            self.new_output = false;
+            self.scroll_prompt = None;
         }
         let now = os::milliseconds();
         if terminal.modes().synchronized_output {
@@ -699,11 +763,13 @@ impl Ui {
             }
             self.window
                 .render(terminal, self.history, self.selection, self.force, cursor);
+            let mut overlay_rows = 0;
             if let Some(search) = &self.search {
                 self.window.overlay(&format!(
                     "Find: {}   {}/{}   Enter / Shift+Enter · Esc",
                     search.query, search.ordinal, search.count
                 ));
+                overlay_rows = 1;
             }
             if let Some(palette) = &self.palette {
                 let mut lines = alloc::vec![format!(
@@ -754,10 +820,17 @@ impl Ui {
                 };
                 lines.push(format!("↑/↓ select · Enter {verb} · Esc close"));
                 self.window.overlay_lines(&lines);
+                overlay_rows = lines.len();
             }
             if let Some((message, _)) = &self.message {
                 self.window.overlay(&format!("ztty: {message}"));
+                overlay_rows = overlay_rows.max(1);
             }
+            self.scroll_prompt = if self.history != 0 {
+                self.window.scroll_prompt(self.new_output, overlay_rows)
+            } else {
+                None
+            };
             self.force = false;
             self.repaint.painted(os::milliseconds());
         }
@@ -873,10 +946,12 @@ impl Session {
                         // screen and is consumed only after subsequent PTY output.
                         ui.repaint.output_received();
                         if ui.history != 0 {
-                            ui.history = ui
-                                .history
-                                .saturating_add(history_after.saturating_sub(history_before))
-                                .min(history_after);
+                            ui.new_output = true;
+                            ui.set_history(
+                                ui.history
+                                    .saturating_add(history_after.saturating_sub(history_before))
+                                    .min(history_after),
+                            );
                             ui.force = true;
                         }
                     }
@@ -1479,13 +1554,15 @@ impl Pool {
                     // Keep the model at the accepted PTY size after a failed
                     // ioctl so the next arrange retries instead of skipping it.
                     if resized {
-                        ui.history = ui.history.min(session.core.terminal.history_len());
+                        ui.set_history(ui.history.min(session.core.terminal.history_len()));
                         ui.selection = None;
                     }
                 }
                 ui.window.visible(true);
+                ui.scroll_prompt = None;
                 ui.force = true;
             } else {
+                ui.scroll_prompt = None;
                 ui.window.visible(false);
                 ui.reset_input();
                 ui.blink_deadline = None;
@@ -1994,13 +2071,13 @@ impl Pool {
                 let session = &mut self.sessions[index];
                 if let Some(ui) = &mut session.ui {
                     let step = session.core.terminal.rows().saturating_sub(1).max(1);
-                    ui.history = if action == "scroll-up" {
+                    ui.set_history(if action == "scroll-up" {
                         ui.history
                             .saturating_add(step)
                             .min(session.core.terminal.history_len())
                     } else {
                         ui.history.saturating_sub(step)
-                    };
+                    });
                     ui.selection = None;
                     ui.force = true;
                 }
@@ -2027,7 +2104,7 @@ impl Pool {
                     .command_scroll_offset(command.id)
                     .ok_or("command has left the retained history")?;
                 ui.command = Some(command.id);
-                ui.history = offset;
+                ui.set_history(offset);
                 ui.selection = None;
                 ui.force = true;
             }
@@ -2162,7 +2239,8 @@ impl Pool {
             if allow_resize && session.core.eof() {
                 session.core.terminal.resize(cols, rows);
             }
-            ui.history = ui.history.min(session.core.terminal.history_len());
+            ui.set_history(ui.history.min(session.core.terminal.history_len()));
+            ui.scroll_prompt = None;
             ui.selection = None;
             ui.last_cursor = None;
             ui.force = true;
@@ -2425,7 +2503,8 @@ impl Pool {
                 if let Some(ui) = &mut session.ui {
                     ui.window.resize_grid(cols, rows);
                     ui.force = true;
-                    ui.history = ui.history.min(session.core.terminal.history_len());
+                    ui.set_history(ui.history.min(session.core.terminal.history_len()));
+                    ui.scroll_prompt = None;
                 }
                 Ok(Reply::Value(session.info()))
             }
@@ -2559,6 +2638,21 @@ impl Pool {
                     })
                 }) {
                     let kind = unsafe { event.kind };
+                    if self.sessions[index]
+                        .ui
+                        .as_mut()
+                        .unwrap()
+                        .scroll_prompt_event(&event)
+                    {
+                        if kind == x11::BUTTON_PRESS {
+                            let session_id = self.sessions[index].id;
+                            if let Some(workspace) = self.workspace(session_id) {
+                                self.workspaces[workspace].layout.focus(session_id);
+                            }
+                            self.sessions[index].ui.as_ref().unwrap().window.raise();
+                        }
+                        continue;
+                    }
                     if kind == x11::KEY_RELEASE {
                         let code = (unsafe { event.key.keycode } as usize).min(255);
                         if self.shortcuts[code] {

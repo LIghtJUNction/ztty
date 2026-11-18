@@ -1671,8 +1671,11 @@ impl Window {
     }
 
     fn overlay_line(&mut self, text: &str, y: i32) {
+        self.overlay_text(text, self.padding, y, self.width - self.padding);
+    }
+
+    fn overlay_text(&mut self, text: &str, mut x: i32, y: i32, right: i32) {
         let color = self.color(0xcdd6e4);
-        let mut x = self.padding;
         let baseline = y + unsafe { (*self.font).ascent } + 1;
         for ch in text.chars().take(1024) {
             let font = self.glyph_font(ch);
@@ -1688,7 +1691,7 @@ impl Window {
                     &mut metrics,
                 );
             }
-            if x + i32::from(metrics.x_off).max(1) > self.width - self.padding {
+            if x + i32::from(metrics.x_off).max(1) > right {
                 break;
             }
             unsafe {
@@ -1704,6 +1707,85 @@ impl Window {
             }
             x += i32::from(metrics.x_off);
         }
+    }
+
+    fn overlay_width(&mut self, text: &str) -> i32 {
+        let mut width: i32 = 0;
+        for ch in text.chars() {
+            let font = self.glyph_font(ch);
+            let mut bytes = [0; 4];
+            let text = ch.encode_utf8(&mut bytes);
+            let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
+            unsafe {
+                XftTextExtentsUtf8(
+                    self.display,
+                    font,
+                    text.as_ptr(),
+                    text.len() as i32,
+                    &mut metrics,
+                );
+            }
+            width = width.saturating_add(i32::from(metrics.x_off).max(1));
+        }
+        width
+    }
+
+    /// A small view-local affordance; no terminal rows are reserved for it.
+    pub fn scroll_prompt(
+        &mut self,
+        new_output: bool,
+        overlay_rows: usize,
+    ) -> Option<crate::layout::Rect> {
+        use ztty::scroll_prompt::{INSET_X, INSET_Y, place};
+        if self.suspended {
+            return None;
+        }
+        let labels = if new_output {
+            ["New output · Back to live ↓", "New · Live ↓", "↓"]
+        } else {
+            ["Back to live ↓", "Live ↓", "↓"]
+        };
+        for text in labels {
+            let width = self.overlay_width(text);
+            let Some(rect) = place(
+                self.width,
+                self.height,
+                self.padding,
+                self.ch,
+                width,
+                overlay_rows,
+            ) else {
+                continue;
+            };
+            let border = self.color(if new_output { 0x89b4fa } else { 0x64748b });
+            unsafe {
+                XftDrawRect(
+                    self.draw,
+                    &border,
+                    rect.x,
+                    rect.y,
+                    rect.width as u32,
+                    rect.height as u32,
+                );
+            }
+            self.fill_background(
+                self.background,
+                false,
+                rect.x + 1,
+                rect.y + 1,
+                (rect.width - 2) as u32,
+                (rect.height - 2) as u32,
+            );
+            self.overlay_text(
+                text,
+                rect.x + INSET_X,
+                rect.y + INSET_Y,
+                rect.x + rect.width - INSET_X,
+            );
+            self.present();
+            return Some(rect);
+        }
+        None
     }
     pub fn graphics_changed(&self, terminal: &Terminal) -> bool {
         self.graphics_revision != terminal.graphics().revision()
