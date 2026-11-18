@@ -2,8 +2,7 @@
 #![allow(dead_code)]
 extern crate alloc;
 
-#[path = "../src/json.rs"]
-mod json;
+use ztty::json;
 #[path = "../src/mcp.rs"]
 mod mcp;
 #[path = "../src/os.rs"]

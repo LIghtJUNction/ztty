@@ -1,7 +1,6 @@
 extern crate alloc;
-#[path = "../src/layout.rs"]
-mod layout;
 use layout::{Axis, Layout, MAX_PANES, MAX_TABS, Node};
+use ztty::layout;
 
 #[test]
 fn tabs_hide_other_sessions_without_losing_their_layout() {

@@ -1,15 +1,6 @@
 extern crate alloc;
 
-// These production modules expose additional operations exercised by their
-// own tests; this target specifically covers the snapshot boundary.
-#[allow(dead_code)]
-#[path = "../src/json.rs"]
-mod json;
-#[allow(dead_code)]
-#[path = "../src/layout.rs"]
-mod layout;
-#[path = "../src/workspace_state.rs"]
-mod workspace_state;
+use ztty::{json, layout, workspace_state};
 
 use json::Value;
 use layout::{Axis, Layout, MAX_PANES, MAX_TABS, Node};
