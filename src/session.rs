@@ -890,7 +890,7 @@ impl Session {
         let _ = self.core.flush_input();
         let _ = self.core.pty.reap();
     }
-    fn read(&self, request: &Value) -> Result<Reply, String> {
+    fn check_identity(&self, request: &Value) -> Result<(), String> {
         if let Some(expected) = request.get("expected_session")
             && !crate::session_identity::ExpectedSession::parse(expected)?.matches(
                 &self.uri,
@@ -899,8 +899,12 @@ impl Session {
                 unsafe { os::getpid() } as u32,
             )
         {
-            return Err("session identity changed; start a new read".into());
+            return Err("session identity changed; refresh session identity".into());
         }
+        Ok(())
+    }
+
+    fn read(&self, request: &Value) -> Result<Reply, String> {
         let cursor = match request.get("cursor") {
             None => 0,
             Some(v) => v
@@ -2271,6 +2275,9 @@ impl Pool {
             }
         }
         let index = self.selector(request)?;
+        // Resolve and validate in the same broker turn, before any data is
+        // exposed or ownership, input queues, PTY size or lifecycle can change.
+        self.sessions[index].check_identity(request)?;
         if matches!(op, "write" | "resize" | "close" | "rename")
             && !self.sessions[index].core.owns(actor(request)?)
         {

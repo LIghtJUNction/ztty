@@ -26,6 +26,16 @@ impl Value {
         }
     }
 
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut Self> {
+        match self {
+            Self::Object(fields) => fields
+                .iter_mut()
+                .find(|(name, _)| name == key)
+                .map(|(_, v)| v),
+            _ => None,
+        }
+    }
+
     pub fn set(&mut self, key: &str, value: Self) {
         if let Self::Object(fields) = self {
             if let Some((_, old)) = fields.iter_mut().find(|(name, _)| name == key) {

@@ -1,4 +1,4 @@
-//! Borrowed identity guard for resuming a particular terminal output stream.
+//! Borrowed identity guard for operations on a particular terminal session.
 //! These public identifiers prevent accidental reuse; they are not credentials.
 use crate::json::Value;
 

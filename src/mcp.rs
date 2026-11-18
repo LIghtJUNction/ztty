@@ -17,12 +17,14 @@ const MAX_WAITING: usize = 24;
 const MAX_BUFFERED: usize = 4 * 1024 * 1024;
 const OUTPUT_TIMEOUT: u64 = 5000;
 
+const EXPECTED_SESSION_SCHEMA: &str = r#"{"type":"object","description":"Optional identity guard copied from uri/id/created_at/broker_pid returned by create/list/read. Rejects a replaced PTY before reading or changing it; public identifiers, not credentials.","properties":{"uri":{"type":"string","minLength":1,"maxLength":2048},"id":{"type":"integer","minimum":1},"created_at":{"type":"integer","minimum":1},"broker_pid":{"type":"integer","minimum":1,"maximum":4294967295}},"required":["uri","id","created_at","broker_pid"],"additionalProperties":false}"#;
+
 const TOOLS: &str = r#"[
 {"name":"session_create","description":"Create a persistent terminal session in the shared ztty process. Commands are argv; use an explicit shell for shell syntax. Attach the returned URI with ztty attach.","inputSchema":{"type":"object","properties":{"name":{"type":"string","description":"Optional unique name within this MCP transport namespace"},"command":{"type":"array","items":{"type":"string"},"minItems":1,"description":"Executable and arguments; defaults to the configured shell"},"cwd":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256},"history":{"type":"integer","minimum":0,"maximum":100000}},"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":true}},
 {"name":"session_list","description":"List terminal sessions, canonical ztty:// URIs, process state and attached windows.","inputSchema":{"type":"object","properties":{},"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_commands","description":"List up to 128 retained OSC 133 shell command boundaries, exit codes and availability. Requires shell integration; records refer to the retained terminal history.","inputSchema":{"type":"object","properties":{"session":{"type":"string"}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_command_read","description":"Read one shell command input or output from retained terminal cells, bounded to 65536 UTF-8 bytes. This is rendered text, not immutable raw stdout. Check complete and truncated.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"command_id":{"type":"integer","minimum":1},"part":{"type":"string","enum":["input","output"]},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session","command_id"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
-{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. Reuse next_cursor and send expected_session from prior uri/id/created_at/broker_pid fields to reject a replaced session. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish UTF-8. truncated reports expired output. wait_ms (0..30000, default 0) waits without blocking other requests until output, truncation or EOF; timed_out marks expiry. Only output_eof together with has_more=false means the output stream is drained; running=false alone does not.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536},"wait_ms":{"type":"integer","minimum":0,"maximum":30000},"expected_session":{"type":"object","description":"Optional identity guard copied from a previous create/list/read response; rejects a new PTY that reused the URI. Public identifiers, not credentials.","properties":{"uri":{"type":"string","minLength":1,"maxLength":2048},"id":{"type":"integer","minimum":1},"created_at":{"type":"integer","minimum":1},"broker_pid":{"type":"integer","minimum":1,"maximum":4294967295}},"required":["uri","id","created_at","broker_pid"],"additionalProperties":false}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
+{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. Reuse next_cursor and send expected_session from prior uri/id/created_at/broker_pid fields to reject a replaced session. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish UTF-8. truncated reports expired output. wait_ms (0..30000, default 0) waits without blocking other requests until output, truncation or EOF; timed_out marks expiry. Only output_eof together with has_more=false means the output stream is drained; running=false alone does not.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536},"wait_ms":{"type":"integer","minimum":0,"maximum":30000}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_write","description":"Send up to 65536 UTF-8 bytes or terminal control bytes to a session. Include a newline to submit a shell command; use \\u0003 to interrupt.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"data":{"type":"string","maxLength":65536}},"required":["session","data"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":true}},
 {"name":"session_resize","description":"Resize a session PTY and screen; attached windows use the new terminal dimensions.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256}},"required":["session","cols","rows"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":false}},
 {"name":"session_control","description":"Acquire or release exclusive input control. takeover=true explicitly replaces another operator; observers cannot acquire control.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"action":{"type":"string","enum":["acquire","release"]},"takeover":{"type":"boolean"}},"required":["session","action"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}},
@@ -479,9 +481,9 @@ fn dispatch_message(
             ("capabilities", object([("tools", object([("listChanged", false.into())]))])),
             ("serverInfo", object([("name", "ztty".into()), ("version", env!("CARGO_PKG_VERSION").into())])),
             ("instructions", if session.read_only {
-                "Observer access: list sessions and read output. Input, session creation and control changes are denied."
+                "Observer access: list sessions and read output. Pass expected_session from list/read to bind subsequent session operations to that PTY. Input, session creation and control changes are denied."
             } else {
-                "Create persistent PTYs, read output incrementally, acquire input control, write input, and attach their ztty:// URIs in a desktop window."
+                "Create persistent PTYs, read output incrementally, acquire input control, write input, and attach their ztty:// URIs in a desktop window. Pass expected_session from create/list/read to bind subsequent session operations to that PTY."
             }.into()),
         ])));
     }
@@ -501,14 +503,25 @@ fn dispatch_message(
                 return Some(error(id, -32602, "No pagination cursor is supported"));
             }
             let mut tools = json::parse(TOOLS.as_bytes()).expect("static tool schema");
-            if session.read_only
-                && let Value::Array(values) = &mut tools
-            {
-                values.retain(|tool| {
-                    tool.get("name")
-                        .and_then(Value::as_str)
-                        .is_some_and(observable_tool)
-                });
+            let expected = json::parse(EXPECTED_SESSION_SCHEMA.as_bytes())
+                .expect("static session identity schema");
+            if let Value::Array(values) = &mut tools {
+                for tool in values.iter_mut() {
+                    if let Some(properties) = tool
+                        .get_mut("inputSchema")
+                        .and_then(|schema| schema.get_mut("properties"))
+                        && properties.get("session").is_some()
+                    {
+                        properties.set("expected_session", expected.clone());
+                    }
+                }
+                if session.read_only {
+                    values.retain(|tool| {
+                        tool.get("name")
+                            .and_then(Value::as_str)
+                            .is_some_and(observable_tool)
+                    });
+                }
             }
             Some(success(id, object([("tools", tools)])))
         }
@@ -546,16 +559,7 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
             &["name", "command", "cwd", "cols", "rows", "history"],
         ),
         "session_list" => ("list", &[]),
-        "session_read" => (
-            "read",
-            &[
-                "session",
-                "cursor",
-                "max_bytes",
-                "expected_session",
-                "wait_ms",
-            ],
-        ),
+        "session_read" => ("read", &["session", "cursor", "max_bytes", "wait_ms"]),
         "session_commands" => ("commands", &["session"]),
         "session_command_read" => (
             "command-read",
@@ -567,10 +571,10 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         "session_control" => ("control", &["session", "action", "takeover"]),
         _ => return Err("Unknown tool"),
     };
-    if fields
-        .iter()
-        .any(|(key, _)| !allowed.contains(&key.as_str()))
-    {
+    if fields.iter().any(|(key, _)| {
+        !allowed.contains(&key.as_str())
+            && !(key == "expected_session" && allowed.contains(&"session"))
+    }) {
         return Err("Unknown tool argument");
     }
     if let Some(expected) = arguments.get("expected_session") {
@@ -1415,8 +1419,161 @@ mod tests {
                 ]),
                 "mcp/stdio"
             )
-            .is_err()
+            .is_ok()
         );
+    }
+
+    fn scoped_tools() -> [(&'static str, Value); 7] {
+        [
+            ("session_read", object([("session", "work".into())])),
+            ("session_commands", object([("session", "work".into())])),
+            (
+                "session_command_read",
+                object([("session", "work".into()), ("command_id", 1u64.into())]),
+            ),
+            (
+                "session_write",
+                object([("session", "work".into()), ("data", "x".into())]),
+            ),
+            (
+                "session_resize",
+                object([
+                    ("session", "work".into()),
+                    ("cols", 80u32.into()),
+                    ("rows", 24u32.into()),
+                ]),
+            ),
+            (
+                "session_control",
+                object([
+                    ("session", "work".into()),
+                    ("action", "acquire".into()),
+                    ("takeover", true.into()),
+                ]),
+            ),
+            ("session_close", object([("session", "work".into())])),
+        ]
+    }
+
+    #[test]
+    fn every_session_tool_preserves_and_validates_its_identity_guard() {
+        let expected = json::parse(br#"{"uri":"ztty://mcp/stdio/work","id":9007199254740993,"created_at":18446744073709551615,"broker_pid":42}"#).unwrap();
+        for (name, mut arguments) in scoped_tools() {
+            assert!(
+                tool_request(name, &arguments, "mcp/stdio").is_ok(),
+                "{name}"
+            );
+            arguments.set("expected_session", expected.clone());
+            let request = tool_request(name, &arguments, "mcp/stdio").unwrap();
+            assert_eq!(request.get("expected_session"), Some(&expected), "{name}");
+            arguments.set("expected_session", Value::Null);
+            let message = object([
+                ("jsonrpc", "2.0".into()),
+                ("id", 1i32.into()),
+                ("method", "tools/call".into()),
+                (
+                    "params",
+                    object([("name", name.into()), ("arguments", arguments)]),
+                ),
+            ]);
+            let result = dispatch(&message, &mut ready(false), "mcp/stdio");
+            assert!(result.action.is_none(), "{name}");
+            assert_eq!(
+                code(result.response.as_ref().unwrap()),
+                Some(-32602),
+                "{name}"
+            );
+        }
+        for name in ["session_create", "session_list"] {
+            assert!(
+                tool_request(
+                    name,
+                    &object([("expected_session", expected.clone())]),
+                    "mcp/stdio"
+                )
+                .is_err(),
+                "{name}"
+            );
+        }
+    }
+
+    #[test]
+    fn identity_guards_never_grant_observers_mutation_rights() {
+        let expected =
+            json::parse(br#"{"uri":"ztty://mcp/stdio/work","id":1,"created_at":2,"broker_pid":3}"#)
+                .unwrap();
+        for (name, mut arguments) in scoped_tools() {
+            arguments.set("expected_session", expected.clone());
+            let message = object([
+                ("jsonrpc", "2.0".into()),
+                ("id", 1i32.into()),
+                ("method", "tools/call".into()),
+                (
+                    "params",
+                    object([("name", name.into()), ("arguments", arguments)]),
+                ),
+            ]);
+            let result = dispatch(&message, &mut ready(true), "mcp/stdio");
+            if observable_tool(name) {
+                let Some(Action::Tool { request, .. }) = result.action else {
+                    panic!("observer read must be deferred: {name}");
+                };
+                assert_eq!(request.get("expected_session"), Some(&expected), "{name}");
+            } else {
+                assert!(result.action.is_none(), "{name}");
+                assert_eq!(
+                    code(result.response.as_ref().unwrap()),
+                    Some(-32001),
+                    "{name}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn catalog_exposes_one_optional_identity_schema_for_all_session_tools() {
+        let expected = json::parse(EXPECTED_SESSION_SCHEMA.as_bytes()).unwrap();
+        for read_only in [false, true] {
+            let mut session = ready(read_only);
+            let listed = call(
+                r#"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#,
+                &mut session,
+            )
+            .unwrap();
+            let tools = listed
+                .get("result")
+                .unwrap()
+                .get("tools")
+                .unwrap()
+                .as_array()
+                .unwrap();
+            let mut guarded = 0;
+            for tool in tools {
+                let name = tool.get("name").unwrap().as_str().unwrap();
+                let schema = tool.get("inputSchema").unwrap();
+                let properties = schema.get("properties").unwrap();
+                if properties.get("session").is_some() {
+                    guarded += 1;
+                    assert_eq!(
+                        properties.get("expected_session"),
+                        Some(&expected),
+                        "{name}"
+                    );
+                    assert!(
+                        !schema
+                            .get("required")
+                            .unwrap()
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .any(|field| field.as_str() == Some("expected_session"))
+                    );
+                } else {
+                    assert!(properties.get("expected_session").is_none(), "{name}");
+                }
+            }
+            assert_eq!(guarded, if read_only { 3 } else { 7 });
+        }
     }
 
     #[test]
