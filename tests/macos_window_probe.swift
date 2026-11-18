@@ -180,14 +180,23 @@ final class WindowProbe {
         // shared establishes the WindowServer connection before NSWindow geometry
         // or screenshot APIs. Prohibited policy prevents helper windows/activation.
         let application = NSApplication.shared
-        guard application.setActivationPolicy(.prohibited),
-              application.activationPolicy() == .prohibited else {
+        let previousPolicy = application.activationPolicy()
+        var initialization: [String: Any] = [
+            "initialized": true, "main_thread": Thread.isMainThread,
+            "activation_policy_before": previousPolicy.rawValue,
+            "transition_requested": previousPolicy != .prohibited,
+        ]
+        // Unbundled executables already default to prohibited. Accept that
+        // observed state without requiring a redundant transition to succeed.
+        if previousPolicy != .prohibited {
+            initialization["transition_returned"] = application.setActivationPolicy(.prohibited)
+        }
+        let currentPolicy = application.activationPolicy()
+        initialization["activation_policy"] = currentPolicy.rawValue
+        report["appkit"] = initialization
+        guard currentPolicy == .prohibited else {
             throw GateError("cannot initialize AppKit with prohibited activation")
         }
-        report["appkit"] = [
-            "initialized": true, "main_thread": Thread.isMainThread,
-            "activation_policy": application.activationPolicy().rawValue,
-        ]
     }
 
     func preflight() throws {
