@@ -59,6 +59,30 @@ python3 tests/linux_native.py --binary target/release/ztty \
   --evidence-dir artifacts/linux-native
 ```
 
+## Scoped native candidate validation
+
+Build-only dispatches accept `candidate_platform=all|linux|macos|windows`.
+The default remains `all`. Selecting one platform runs both of its native
+architecture jobs and keeps source, binary, harness and evidence manifests.
+Each build manifest records the selected scope. This lets a platform-specific
+repair reach its actual OS without repeatedly rebuilding unchanged targets.
+Skipped platforms provide no new acceptance evidence.
+
+```sh
+gh workflow run release.yml --ref feat/production-roadmap-20261118 \
+  -f build_only=true -f candidate_platform=macos
+```
+
+Publishing rejects a partial scope even with a matching version tag. The
+publish job still requires the verification gate, all native platform jobs,
+all six artifact manifests and `candidate_platform=all` in each manifest.
+The workflow keeps its existing non-cancelling release concurrency group.
+Six local tests execute the actual workflow version/scope shell gate against
+14 input combinations, including partial publication, branch publication,
+wrong tags and unknown scopes; actionlint passes. The isolated tests supply
+only the version and Git facts, not a replacement implementation of the guard.
+[Validation record](measurements/release-scope-2026-11-18.json).
+
 ## Published packages
 
 | Package | Version | Embedded source commit | Publication time, Asia/Taipei |
