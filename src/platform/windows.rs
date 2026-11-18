@@ -2,7 +2,7 @@
 //! composites decoded RGBA pixels itself. ConPTY pipe work lives in zpty.
 
 use crate::{Config, appearance::Appearance, os};
-use alloc::{boxed::Box, string::String, vec::Vec};
+use alloc::{boxed::Box, string::String, vec, vec::Vec};
 use core::{
     cell::{Cell, UnsafeCell},
     ffi::c_void,
@@ -13,7 +13,10 @@ use zterm::{
     input::{self, Key, KeyEvent, ModifierKey, Modifiers, MouseEvent},
 };
 
-use ztty::session_core::{ReadStep, SessionCore};
+use ztty::{
+    layout::Rect,
+    session_core::{ReadStep, SessionCore},
+};
 
 type Handle = *mut c_void;
 const NULL: Handle = ptr::null_mut();
@@ -43,6 +46,7 @@ struct Surface {
     bitmap: Handle,
     previous: Handle,
     pixels: *mut u32,
+    clip: Rect,
     width: i32,
     height: i32,
 }
@@ -57,6 +61,12 @@ impl Surface {
             bitmap: NULL,
             previous: NULL,
             pixels: ptr::null_mut(),
+            clip: Rect {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+            },
             width: 0,
             height: 0,
         })
@@ -102,6 +112,12 @@ impl Surface {
         self.pixels = pixels.cast();
         self.width = width;
         self.height = height;
+        self.clip = Rect {
+            x: 0,
+            y: 0,
+            width,
+            height,
+        };
         self.fill(0, 0, width, height, 0);
         true
     }
@@ -109,10 +125,16 @@ impl Surface {
         if self.pixels.is_null() {
             return;
         }
-        let left = x.clamp(0, self.width);
-        let right = x.saturating_add(width).clamp(0, self.width);
-        let top = y.clamp(0, self.height);
-        let bottom = y.saturating_add(height).clamp(0, self.height);
+        let left = x.max(self.clip.x).clamp(0, self.width);
+        let right = x
+            .saturating_add(width)
+            .min(self.clip.x.saturating_add(self.clip.width))
+            .clamp(0, self.width);
+        let top = y.max(self.clip.y).clamp(0, self.height);
+        let bottom = y
+            .saturating_add(height)
+            .min(self.clip.y.saturating_add(self.clip.height))
+            .clamp(0, self.height);
         if left >= right || top >= bottom {
             return;
         }
@@ -129,12 +151,13 @@ impl Surface {
     fn image(
         &mut self,
         draw: &zterm::graphics::Draw<'_>,
+        viewport: Rect,
         padding: i32,
-        cols: usize,
-        rows: usize,
-        cell_width: i32,
-        cell_height: i32,
+        grid: (usize, usize),
+        cell_size: (i32, i32),
     ) {
+        let (cols, rows) = grid;
+        let (cell_width, cell_height) = cell_size;
         if self.pixels.is_null()
             || draw.dest.width == 0
             || draw.dest.height == 0
@@ -143,15 +166,19 @@ impl Surface {
         {
             return;
         }
-        let dx = i64::from(draw.dest.x) + i64::from(padding);
-        let dy = i64::from(draw.dest.y) + i64::from(padding);
-        let left = dx.max(padding as i64).max(0);
-        let top = dy.max(padding as i64).max(0);
+        let px = i64::from(viewport.x) + i64::from(padding);
+        let py = i64::from(viewport.y) + i64::from(padding);
+        let dx = i64::from(draw.dest.x) + px;
+        let dy = i64::from(draw.dest.y) + py;
+        let left = dx.max(px).max(self.clip.x as i64).max(0);
+        let top = dy.max(py).max(self.clip.y as i64).max(0);
         let right = (dx + i64::from(draw.dest.width))
-            .min(i64::from(padding) + cols as i64 * i64::from(cell_width))
+            .min(px + cols as i64 * i64::from(cell_width))
+            .min(i64::from(self.clip.x) + i64::from(self.clip.width))
             .min(self.width as i64);
         let bottom = (dy + i64::from(draw.dest.height))
-            .min(i64::from(padding) + rows as i64 * i64::from(cell_height))
+            .min(py + rows as i64 * i64::from(cell_height))
+            .min(i64::from(self.clip.y) + i64::from(self.clip.height))
             .min(self.height as i64);
         if left >= right || top >= bottom {
             return;
@@ -353,35 +380,41 @@ struct PendingKey {
     event: KeyEvent,
 }
 
+struct Pane {
+    rect: Rect,
+    core: SessionCore,
+    dirty: bool,
+    history: usize,
+    selection: Option<Selection>,
+    dragging: bool,
+    graphics_revision: u64,
+    sync_since: Option<u64>,
+    cursor_on: bool,
+    blink_deadline: u64,
+    last_cursor: (usize, usize),
+}
+
 struct App {
     hwnd: Handle,
-    core: SessionCore,
+    panes: Vec<Pane>,
+    active: usize,
     appearance: Appearance,
     surface: Surface,
     fonts: Fonts,
     encoded: Vec<u8>,
     running: bool,
-    dirty: bool,
-    history: usize,
-    selection: Option<Selection>,
-    dragging: bool,
     held: [Option<Key>; 256],
     intercepted: [bool; 256],
     pending_key: Option<PendingKey>,
     suppress_char: bool,
     surrogate: u16,
     title: String,
-    graphics_revision: u64,
-    sync_since: Option<u64>,
-    cursor_on: bool,
-    blink_deadline: u64,
-    last_cursor: (usize, usize),
     focused: bool,
 }
 
 impl App {
     fn enqueue(&mut self, bytes: &[u8]) {
-        if !self.core.input.push(bytes) {
+        if !self.panes[self.active].core.input.push(bytes) {
             os::print(2, b"ztty: input queue full; paste was rejected\n");
         }
     }
@@ -394,7 +427,7 @@ impl App {
     fn flush(&mut self) {
         // The event loop still owns process lifetime and readiness policy.
         // A failed write keeps its unwritten suffix in the shared queue.
-        let _ = self.core.flush_input();
+        let _ = self.panes[self.active].core.flush_input();
     }
     fn input(&mut self, key: Key, modifiers: Modifiers, event: KeyEvent, text: &str) {
         self.encoded.clear();
@@ -403,25 +436,28 @@ impl App {
             modifiers,
             event,
             text,
-            &self.core.terminal.modes().input(),
+            &self.panes[self.active].core.terminal.modes().input(),
             &mut self.encoded,
         );
         self.enqueue_encoded();
-        self.history = 0;
-        self.selection = None;
+        self.panes[self.active].history = 0;
+        self.panes[self.active].selection = None;
         self.reset_cursor();
     }
     fn reset_cursor(&mut self) {
-        self.cursor_on = true;
-        self.blink_deadline = os::milliseconds() + self.appearance.cursor_blink_interval;
-        self.dirty = true;
+        self.panes[self.active].cursor_on = true;
+        self.panes[self.active].blink_deadline =
+            os::milliseconds() + self.appearance.cursor_blink_interval;
+        self.panes[self.active].dirty = true;
     }
     fn cell_at(&self, x: i32, y: i32) -> (usize, usize) {
         (
-            (((x - self.appearance.padding).max(0) / self.fonts.width) as usize)
-                .min(self.core.terminal.cols() - 1),
-            (((y - self.appearance.padding).max(0) / self.fonts.height) as usize)
-                .min(self.core.terminal.rows() - 1),
+            (((x - self.panes[self.active].rect.x - self.appearance.padding).max(0)
+                / self.fonts.width) as usize)
+                .min(self.panes[self.active].core.terminal.cols() - 1),
+            (((y - self.panes[self.active].rect.y - self.appearance.padding).max(0)
+                / self.fonts.height) as usize)
+                .min(self.panes[self.active].core.terminal.rows() - 1),
         )
     }
     fn resize(&mut self) {
@@ -435,6 +471,12 @@ impl App {
         if !self.surface.resize(rect.right.max(1), rect.bottom.max(1)) {
             return;
         }
+        self.panes[self.active].rect = Rect {
+            x: 0,
+            y: 0,
+            width: rect.right.max(1),
+            height: rect.bottom.max(1),
+        };
         let fonts = candidate.as_ref().unwrap_or(&self.fonts);
         let cols = ((rect.right - 2 * self.appearance.padding).max(fonts.width) / fonts.width)
             .clamp(1, 1024) as usize;
@@ -446,13 +488,13 @@ impl App {
             pixel_width: (cols as i32 * fonts.width).min(u16::MAX as i32) as u16,
             pixel_height: (rows as i32 * fonts.height).min(u16::MAX as i32) as u16,
         };
-        if self
+        if self.panes[self.active]
             .core
             .resize_with_cell_size(size, (fonts.width as u32, fonts.height as u32))
             .is_err()
         {
             os::print(2, b"ztty: PTY resize failed; retaining the terminal grid\n");
-            self.dirty = true;
+            self.panes[self.active].dirty = true;
             unsafe {
                 ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
             }
@@ -461,9 +503,11 @@ impl App {
         if let Some(fonts) = candidate {
             self.fonts = fonts;
         }
-        self.selection = None;
-        self.history = self.history.min(self.core.terminal.history_len());
-        self.dirty = true;
+        self.panes[self.active].selection = None;
+        self.panes[self.active].history = self.panes[self.active]
+            .history
+            .min(self.panes[self.active].core.terminal.history_len());
+        self.panes[self.active].dirty = true;
         unsafe {
             ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
         }
@@ -472,19 +516,19 @@ impl App {
         self.flush();
         let mut buffer = [0u8; 65536];
         for _ in 0..16 {
-            match self.core.read_once(&mut buffer, false) {
+            match self.panes[self.active].core.read_once(&mut buffer, false) {
                 Ok(ReadStep::Data {
                     history_before,
                     history_after,
                     ..
                 }) => {
-                    if self.history != 0 {
-                        self.history = self
+                    if self.panes[self.active].history != 0 {
+                        self.panes[self.active].history = self.panes[self.active]
                             .history
                             .saturating_add(history_after.saturating_sub(history_before))
                             .min(history_after);
                     }
-                    self.dirty = true;
+                    self.panes[self.active].dirty = true;
                 }
                 Ok(ReadStep::Pending) => break,
                 Ok(ReadStep::Eof) | Err(_) => {
@@ -495,18 +539,25 @@ impl App {
         }
         // Preserve the existing ConPTY exit policy. Reaping alone does not
         // imply pipe EOF; waiting for it may require closing the pseudoconsole.
-        if self.core.pty.reap().ok().flatten().is_some() {
+        if self.panes[self.active]
+            .core
+            .pty
+            .reap()
+            .ok()
+            .flatten()
+            .is_some()
+        {
             self.running = false;
         }
-        if !self.core.queue_responses() {
+        if !self.panes[self.active].core.queue_responses() {
             os::print(
                 2,
                 b"ztty: input queue full; terminal replies were rejected\n",
             );
         }
         self.flush();
-        if self.title != self.core.terminal.title() {
-            self.title = String::from(self.core.terminal.title());
+        if self.title != self.panes[self.active].core.terminal.title() {
+            self.title = String::from(self.panes[self.active].core.terminal.title());
             let title = wide(if self.title.is_empty() {
                 "ztty"
             } else {
@@ -517,54 +568,65 @@ impl App {
             }
         }
         let now = os::milliseconds();
-        let cursor = self.core.terminal.cursor();
-        if cursor != self.last_cursor {
-            self.last_cursor = cursor;
+        let cursor = self.panes[self.active].core.terminal.cursor();
+        if cursor != self.panes[self.active].last_cursor {
+            self.panes[self.active].last_cursor = cursor;
             self.reset_cursor();
             self.ime_position();
         }
-        if self.core.terminal.modes().synchronized_output {
-            let start = *self.sync_since.get_or_insert(now);
+        if self.panes[self.active]
+            .core
+            .terminal
+            .modes()
+            .synchronized_output
+        {
+            let start = *self.panes[self.active].sync_since.get_or_insert(now);
             if now.saturating_sub(start) < 150 {
                 return;
             }
-            self.core.terminal.force_end_sync();
+            self.panes[self.active].core.terminal.force_end_sync();
         }
-        self.sync_since = None;
-        if self
+        self.panes[self.active].sync_since = None;
+        if self.panes[self.active]
             .core
             .terminal
             .modes()
             .cursor_blink
             .unwrap_or(self.appearance.cursor_blink)
             && self.focused
-            && now >= self.blink_deadline
+            && now >= self.panes[self.active].blink_deadline
         {
-            self.cursor_on = !self.cursor_on;
-            self.blink_deadline = now + self.appearance.cursor_blink_interval;
-            self.dirty = true;
+            self.panes[self.active].cursor_on = !self.panes[self.active].cursor_on;
+            self.panes[self.active].blink_deadline = now + self.appearance.cursor_blink_interval;
+            self.panes[self.active].dirty = true;
         }
-        let revision = self.core.terminal.graphics().revision();
-        if revision != self.graphics_revision {
-            self.graphics_revision = revision;
-            self.dirty = true;
+        let revision = self.panes[self.active].core.terminal.graphics().revision();
+        if revision != self.panes[self.active].graphics_revision {
+            self.panes[self.active].graphics_revision = revision;
+            self.panes[self.active].dirty = true;
         }
-        if self.dirty || self.core.terminal.dirty() {
+        if self.panes[self.active].dirty || self.panes[self.active].core.terminal.dirty() {
             unsafe {
                 ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
             }
         }
     }
     fn images(&mut self, range: core::ops::Range<i64>) {
-        for draw in self.core.terminal.graphics_draws(self.history) {
+        for draw in self.panes[self.active]
+            .core
+            .terminal
+            .graphics_draws(self.panes[self.active].history)
+        {
             if range.contains(&i64::from(draw.z)) {
                 self.surface.image(
                     &draw,
+                    self.panes[self.active].rect,
                     self.appearance.padding,
-                    self.core.terminal.cols(),
-                    self.core.terminal.rows(),
-                    self.fonts.width,
-                    self.fonts.height,
+                    (
+                        self.panes[self.active].core.terminal.cols(),
+                        self.panes[self.active].core.terminal.rows(),
+                    ),
+                    (self.fonts.width, self.fonts.height),
                 );
             }
         }
@@ -577,36 +639,66 @@ impl App {
         unsafe {
             ffi::GdiFlush();
         }
-        let p = self.appearance.padding;
+        let rect = self.panes[self.active].rect;
+        self.surface.clip = rect;
+        let px = rect.x + self.appearance.padding;
+        let py = rect.y + self.appearance.padding;
+        let saved = unsafe { ffi::SaveDC(self.surface.dc) };
+        if saved == 0 {
+            return;
+        }
+        if unsafe {
+            ffi::IntersectClipRect(
+                self.surface.dc,
+                rect.x,
+                rect.y,
+                rect.x + rect.width,
+                rect.y + rect.height,
+            )
+        } == 0
+        {
+            unsafe {
+                ffi::RestoreDC(self.surface.dc, saved);
+            }
+            return;
+        }
         let cw = self.fonts.width;
         let ch = self.fonts.height;
         self.surface.fill(
-            0,
-            0,
-            self.surface.width,
-            self.surface.height,
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
             self.appearance.theme.background,
         );
-        for row in 0..self.core.terminal.rows() {
-            for col in 0..self.core.terminal.cols() {
-                let cell = self.core.terminal.view_cell(col, row, self.history);
+        for row in 0..self.panes[self.active].core.terminal.rows() {
+            for col in 0..self.panes[self.active].core.terminal.cols() {
+                let cell = self.panes[self.active].core.terminal.view_cell(
+                    col,
+                    row,
+                    self.panes[self.active].history,
+                );
                 let bg = if cell.flags & zterm::INVERSE != 0 {
                     cell.fg
                 } else {
                     cell.bg
                 };
                 self.surface
-                    .fill(p + col as i32 * cw, p + row as i32 * ch, cw, ch, bg);
+                    .fill(px + col as i32 * cw, py + row as i32 * ch, cw, ch, bg);
             }
         }
         self.images(i32::MIN as i64..-1073741824);
-        for row in 0..self.core.terminal.rows() {
-            for col in 0..self.core.terminal.cols() {
-                let cell = self.core.terminal.view_cell(col, row, self.history);
+        for row in 0..self.panes[self.active].core.terminal.rows() {
+            for col in 0..self.panes[self.active].core.terminal.cols() {
+                let cell = self.panes[self.active].core.terminal.view_cell(
+                    col,
+                    row,
+                    self.panes[self.active].history,
+                );
                 if cell.flags & (zterm::EXPLICIT_BG | zterm::INVERSE) != 0 {
                     self.surface.fill(
-                        p + col as i32 * cw,
-                        p + row as i32 * ch,
+                        px + col as i32 * cw,
+                        py + row as i32 * ch,
                         cw,
                         ch,
                         if cell.flags & zterm::INVERSE != 0 {
@@ -619,15 +711,14 @@ impl App {
             }
         }
         self.images(-1073741824..0);
-        for row in 0..self.core.terminal.rows() {
-            for col in 0..self.core.terminal.cols() {
-                if self
-                    .selection
-                    .is_some_and(|s| s.contains(col, row, self.core.terminal.cols()))
-                {
+        for row in 0..self.panes[self.active].core.terminal.rows() {
+            for col in 0..self.panes[self.active].core.terminal.cols() {
+                if self.panes[self.active].selection.is_some_and(|s| {
+                    s.contains(col, row, self.panes[self.active].core.terminal.cols())
+                }) {
                     self.surface.fill(
-                        p + col as i32 * cw,
-                        p + row as i32 * ch,
+                        px + col as i32 * cw,
+                        py + row as i32 * ch,
                         cw,
                         ch,
                         self.appearance.selection_background,
@@ -639,9 +730,13 @@ impl App {
             ffi::SetBkMode(self.surface.dc, 1);
         }
         let previous_font = unsafe { ffi::SelectObject(self.surface.dc, self.fonts.normal) };
-        for row in 0..self.core.terminal.rows() {
-            for col in 0..self.core.terminal.cols() {
-                let cell = self.core.terminal.view_cell(col, row, self.history);
+        for row in 0..self.panes[self.active].core.terminal.rows() {
+            for col in 0..self.panes[self.active].core.terminal.cols() {
+                let cell = self.panes[self.active].core.terminal.view_cell(
+                    col,
+                    row,
+                    self.panes[self.active].history,
+                );
                 if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 {
                     continue;
                 }
@@ -653,19 +748,18 @@ impl App {
                 if cell.flags & zterm::DIM != 0 {
                     fg = ((fg & 0xfefefe) >> 1) & 0x7f7f7f;
                 }
-                if self
-                    .selection
-                    .is_some_and(|s| s.contains(col, row, self.core.terminal.cols()))
-                {
+                if self.panes[self.active].selection.is_some_and(|s| {
+                    s.contains(col, row, self.panes[self.active].core.terminal.cols())
+                }) {
                     fg = self.appearance.selection_foreground;
                 }
-                let x = p + col as i32 * cw;
-                let y = p + row as i32 * ch;
+                let x = px + col as i32 * cw;
+                let y = py + row as i32 * ch;
                 let clip = ffi::Rect {
                     left: x,
                     top: y,
                     right: (x + cw * cell.width as i32)
-                        .min(p + self.core.terminal.cols() as i32 * cw),
+                        .min(px + self.panes[self.active].core.terminal.cols() as i32 * cw),
                     bottom: y + ch,
                 };
                 let mut text = [0u16; 6];
@@ -699,9 +793,13 @@ impl App {
             ffi::SelectObject(self.surface.dc, previous_font);
             ffi::GdiFlush();
         }
-        for row in 0..self.core.terminal.rows() {
-            for col in 0..self.core.terminal.cols() {
-                let cell = self.core.terminal.view_cell(col, row, self.history);
+        for row in 0..self.panes[self.active].core.terminal.rows() {
+            for col in 0..self.panes[self.active].core.terminal.cols() {
+                let cell = self.panes[self.active].core.terminal.view_cell(
+                    col,
+                    row,
+                    self.panes[self.active].history,
+                );
                 if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 {
                     continue;
                 }
@@ -710,8 +808,8 @@ impl App {
                 } else {
                     cell.fg
                 };
-                let x = p + col as i32 * cw;
-                let y = p + row as i32 * ch;
+                let x = px + col as i32 * cw;
+                let y = py + row as i32 * ch;
                 if cell.flags & zterm::UNDERLINE != 0 {
                     self.surface
                         .fill(x, y + ch - 2, cw * cell.width as i32, 1, fg);
@@ -723,22 +821,22 @@ impl App {
             }
         }
         self.images(0..i32::MAX as i64 + 1);
-        if self.history == 0
-            && self.core.terminal.modes().cursor_visible
-            && (self.cursor_on
+        if self.panes[self.active].history == 0
+            && self.panes[self.active].core.terminal.modes().cursor_visible
+            && (self.panes[self.active].cursor_on
                 || !self.focused
-                || !self
+                || !self.panes[self.active]
                     .core
                     .terminal
                     .modes()
                     .cursor_blink
                     .unwrap_or(self.appearance.cursor_blink))
         {
-            let (col, row) = self.core.terminal.cursor();
-            let x = p + col as i32 * cw;
-            let y = p + row as i32 * ch;
+            let (col, row) = self.panes[self.active].core.terminal.cursor();
+            let x = px + col as i32 * cw;
+            let y = py + row as i32 * ch;
             let color = self.appearance.cursor_color;
-            match self
+            match self.panes[self.active]
                 .core
                 .terminal
                 .modes()
@@ -754,7 +852,7 @@ impl App {
                         self.surface.fill(x, y, 1, ch, color);
                         self.surface.fill(x + cw - 1, y, 1, ch, color);
                     } else {
-                        let cell = self.core.terminal.cell(col, row);
+                        let cell = self.panes[self.active].core.terminal.cell(col, row);
                         let width = cw * i32::from(cell.width.max(1));
                         self.surface.fill(x, y, width, ch, color);
                         if cell.width != 0 && cell.flags & zterm::HIDDEN == 0 {
@@ -780,7 +878,9 @@ impl App {
                             let clip = ffi::Rect {
                                 left: x,
                                 top: y,
-                                right: (x + width).min(p + self.core.terminal.cols() as i32 * cw),
+                                right: (x + width).min(
+                                    px + self.panes[self.active].core.terminal.cols() as i32 * cw,
+                                ),
                                 bottom: y + ch,
                             };
                             unsafe {
@@ -805,14 +905,21 @@ impl App {
                 }
             }
         }
-        self.dirty = false;
-        self.core.terminal.clear_dirty();
+        unsafe {
+            ffi::RestoreDC(self.surface.dc, saved);
+        }
+        self.panes[self.active].dirty = false;
+        self.panes[self.active].core.terminal.clear_dirty();
     }
     fn paint(&mut self) {
         let mut paint: ffi::PaintStruct = unsafe { core::mem::zeroed() };
         let dc = unsafe { ffi::BeginPaint(self.hwnd, &mut paint) };
-        if !self.core.terminal.modes().synchronized_output
-            && (self.dirty || self.core.terminal.dirty())
+        if !self.panes[self.active]
+            .core
+            .terminal
+            .modes()
+            .synchronized_output
+            && (self.panes[self.active].dirty || self.panes[self.active].core.terminal.dirty())
         {
             self.draw();
         }
@@ -840,12 +947,16 @@ impl App {
         if context.is_null() {
             return;
         }
-        let (col, row) = self.core.terminal.cursor();
+        let (col, row) = self.panes[self.active].core.terminal.cursor();
         let form = ffi::CompositionForm {
             style: 2,
             position: ffi::Point {
-                x: self.appearance.padding + col as i32 * self.fonts.width,
-                y: self.appearance.padding + (row + 1) as i32 * self.fonts.height,
+                x: self.panes[self.active].rect.x
+                    + self.appearance.padding
+                    + col as i32 * self.fonts.width,
+                y: self.panes[self.active].rect.y
+                    + self.appearance.padding
+                    + (row + 1) as i32 * self.fonts.height,
             },
             area: ffi::Rect::default(),
         };
@@ -855,10 +966,13 @@ impl App {
         }
     }
     fn copy(&self) {
-        let Some(selection) = self.selection else {
+        let Some(selection) = self.panes[self.active].selection else {
             return;
         };
-        let text = wide(&selection.text(&self.core.terminal, self.history));
+        let text = wide(&selection.text(
+            &self.panes[self.active].core.terminal,
+            self.panes[self.active].history,
+        ));
         if unsafe { ffi::OpenClipboard(self.hwnd) } == 0 {
             return;
         }
@@ -902,7 +1016,7 @@ impl App {
                     self.encoded.clear();
                     input::encode_paste_into(
                         &text,
-                        &self.core.terminal.modes().input(),
+                        &self.panes[self.active].core.terminal.modes().input(),
                         &mut self.encoded,
                     );
                     self.enqueue_encoded();
@@ -915,7 +1029,7 @@ impl App {
         unsafe {
             ffi::CloseClipboard();
         }
-        self.history = 0;
+        self.panes[self.active].history = 0;
         self.reset_cursor();
     }
     fn key(&mut self, message: u32, vk: usize, flags: isize) -> bool {
@@ -949,16 +1063,22 @@ impl App {
                 return true;
             }
             if mods.contains(Modifiers::SHIFT) && (vk == 0x21 || vk == 0x22) {
-                let step = self.core.terminal.rows().saturating_sub(1).max(1);
-                self.history = if vk == 0x21 {
-                    self.history
+                let step = self.panes[self.active]
+                    .core
+                    .terminal
+                    .rows()
+                    .saturating_sub(1)
+                    .max(1);
+                self.panes[self.active].history = if vk == 0x21 {
+                    self.panes[self.active]
+                        .history
                         .saturating_add(step)
-                        .min(self.core.terminal.history_len())
+                        .min(self.panes[self.active].core.terminal.history_len())
                 } else {
-                    self.history.saturating_sub(step)
+                    self.panes[self.active].history.saturating_sub(step)
                 };
-                self.selection = None;
-                self.dirty = true;
+                self.panes[self.active].selection = None;
+                self.panes[self.active].dirty = true;
                 self.intercepted[vk] = true;
                 self.suppress_char = true;
                 return true;
@@ -1021,9 +1141,13 @@ impl App {
             self.input(key.key, key.modifiers, key.event, text);
         } else {
             self.encoded.clear();
-            input::encode_text_into(text, &self.core.terminal.modes().input(), &mut self.encoded);
+            input::encode_text_into(
+                text,
+                &self.panes[self.active].core.terminal.modes().input(),
+                &mut self.encoded,
+            );
             self.enqueue_encoded();
-            self.history = 0;
+            self.panes[self.active].history = 0;
             self.reset_cursor();
         }
     }
@@ -1039,8 +1163,8 @@ impl App {
         }
         let (col, row) = self.cell_at(point.x, point.y);
         let mods = modifiers();
-        let app_tracking =
-            self.core.terminal.modes().mouse_tracking != 0 && !mods.contains(Modifiers::SHIFT);
+        let app_tracking = self.panes[self.active].core.terminal.modes().mouse_tracking != 0
+            && !mods.contains(Modifiers::SHIFT);
         let event = match message {
             0x0201 => Some(MouseEvent::Press {
                 button: 0,
@@ -1098,7 +1222,7 @@ impl App {
                 input::encode_mouse_into(
                     event,
                     mods,
-                    &self.core.terminal.modes().input(),
+                    &self.panes[self.active].core.terminal.modes().input(),
                     &mut self.encoded,
                 );
                 self.enqueue_encoded();
@@ -1111,24 +1235,24 @@ impl App {
                     self.open_link(col, row);
                     return;
                 }
-                self.selection = Some(Selection {
+                self.panes[self.active].selection = Some(Selection {
                     start: (col, row),
                     end: (col, row),
                 });
-                self.dragging = true;
-                self.dirty = true;
+                self.panes[self.active].dragging = true;
+                self.panes[self.active].dirty = true;
                 unsafe {
                     ffi::SetCapture(self.hwnd);
                 }
             }
-            0x0200 if self.dragging => {
-                if let Some(selection) = self.selection.as_mut() {
+            0x0200 if self.panes[self.active].dragging => {
+                if let Some(selection) = self.panes[self.active].selection.as_mut() {
                     selection.end = (col, row);
-                    self.dirty = true;
+                    self.panes[self.active].dirty = true;
                 }
             }
-            0x0202 if self.dragging => {
-                self.dragging = false;
+            0x0202 if self.panes[self.active].dragging => {
+                self.panes[self.active].dragging = false;
                 unsafe {
                     ffi::ReleaseCapture();
                 }
@@ -1137,22 +1261,27 @@ impl App {
             0x020a => {
                 let delta = (wparam >> 16) as i16 as i32;
                 let lines = (delta.unsigned_abs() as usize / 120).max(1) * 3;
-                self.history = if delta > 0 {
-                    self.history
+                self.panes[self.active].history = if delta > 0 {
+                    self.panes[self.active]
+                        .history
                         .saturating_add(lines)
-                        .min(self.core.terminal.history_len())
+                        .min(self.panes[self.active].core.terminal.history_len())
                 } else {
-                    self.history.saturating_sub(lines)
+                    self.panes[self.active].history.saturating_sub(lines)
                 };
-                self.selection = None;
-                self.dirty = true;
+                self.panes[self.active].selection = None;
+                self.panes[self.active].dirty = true;
             }
             _ => {}
         }
     }
     fn open_link(&self, col: usize, row: usize) {
-        let id = self.core.terminal.view_cell(col, row, self.history).link_id;
-        let Some(uri) = self.core.terminal.hyperlink(id) else {
+        let id = self.panes[self.active]
+            .core
+            .terminal
+            .view_cell(col, row, self.panes[self.active].history)
+            .link_id;
+        let Some(uri) = self.panes[self.active].core.terminal.hyperlink(id) else {
             return;
         };
         if uri.len() > 8192
@@ -1299,7 +1428,10 @@ unsafe extern "system" fn window_proc(
             }
             0x0007 | 0x0008 => {
                 app.focused = message == 0x0007;
-                app.encoded = input::encode_focus(app.focused, &app.core.terminal.modes().input());
+                app.encoded = input::encode_focus(
+                    app.focused,
+                    &app.panes[app.active].core.terminal.modes().input(),
+                );
                 app.enqueue_encoded();
                 app.reset_cursor();
                 if app.focused {
@@ -1327,7 +1459,7 @@ unsafe extern "system" fn window_proc(
                 }
             }
             0x0200..=0x020a => app.mouse(message, wparam, lparam),
-            0x0215 => app.dragging = false,
+            0x0215 => app.panes[app.active].dragging = false,
             0x02e0 => {
                 let dpi = wparam as u16 as u32;
                 let candidate = Fonts::new(app.surface.dc, &app.appearance.font, dpi).ok();
@@ -1390,27 +1522,36 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
     let state = Box::new(WindowState {
         app: UnsafeCell::new(App {
             hwnd: NULL,
-            core: SessionCore::new(pty, terminal, String::from("local"), MAX_INPUT),
+            panes: vec![Pane {
+                rect: Rect {
+                    x: 0,
+                    y: 0,
+                    width,
+                    height,
+                },
+                core: SessionCore::new(pty, terminal, String::from("local"), MAX_INPUT),
+                dirty: true,
+                history: 0,
+                selection: None,
+                dragging: false,
+                graphics_revision: 0,
+                sync_since: None,
+                cursor_on: true,
+                blink_deadline: os::milliseconds() + 500,
+                last_cursor: (0, 0),
+            }],
+            active: 0,
             appearance: cfg.appearance,
             surface,
             fonts,
             encoded: Vec::with_capacity(128),
             running: true,
-            dirty: true,
-            history: 0,
-            selection: None,
-            dragging: false,
             held: [None; 256],
             intercepted: [false; 256],
             pending_key: None,
             suppress_char: false,
             surrogate: 0,
             title: String::new(),
-            graphics_revision: 0,
-            sync_since: None,
-            cursor_on: true,
-            blink_deadline: os::milliseconds() + 500,
-            last_cursor: (0, 0),
             focused: false,
         }),
         dispatching: Cell::new(false),
@@ -1506,25 +1647,31 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             .with(|app| {
                 let now = os::milliseconds();
                 let mut timeout = if app.focused
-                    && app
+                    && app.panes[app.active]
                         .core
                         .terminal
                         .modes()
                         .cursor_blink
                         .unwrap_or(app.appearance.cursor_blink)
                 {
-                    app.blink_deadline.saturating_sub(now).min(500) as u32
+                    app.panes[app.active]
+                        .blink_deadline
+                        .saturating_sub(now)
+                        .min(500) as u32
                 } else {
                     1000
                 };
-                if app.core.input.pending() {
+                if app.panes[app.active].core.input.pending() {
                     timeout = timeout.min(8);
                 }
-                if app.sync_since.is_some() {
+                if app.panes[app.active].sync_since.is_some() {
                     timeout = timeout.min(8);
                 }
                 (
-                    [app.core.pty.output_event(), app.core.pty.process_event()],
+                    [
+                        app.panes[app.active].core.pty.output_event(),
+                        app.panes[app.active].core.pty.process_event(),
+                    ],
                     timeout,
                 )
             })
@@ -1535,8 +1682,13 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
     }
     let status = state
         .with(|app| {
-            let _ = app.core.pty.wait_timeout(20);
-            app.core.pty.status().and_then(|s| s.code()).unwrap_or(0)
+            let _ = app.panes[app.active].core.pty.wait_timeout(20);
+            app.panes[app.active]
+                .core
+                .pty
+                .status()
+                .and_then(|s| s.code())
+                .unwrap_or(0)
         })
         .unwrap_or(0);
     unsafe {
@@ -1770,6 +1922,9 @@ mod ffi {
             operation: u32,
         ) -> i32;
         pub fn GdiFlush() -> i32;
+        pub fn SaveDC(dc: Handle) -> i32;
+        pub fn RestoreDC(dc: Handle, saved: i32) -> i32;
+        pub fn IntersectClipRect(dc: Handle, left: i32, top: i32, right: i32, bottom: i32) -> i32;
     }
     #[link(name = "kernel32")]
     unsafe extern "system" {
