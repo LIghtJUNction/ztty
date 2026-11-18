@@ -1,0 +1,58 @@
+{
+  "base_sha": "7e085a03e201225af16db9e6c869d7d4555c8936",
+  "source_sha256": {
+    "src/lib.rs": "ef380d64b380ac5e53a9cbc3d50146a17c61363ee556392967a209c400498b2d",
+    "src/main.rs": "3e56336166124b85a63bbac8380323b1d86053255063c502c2859863f05afac8",
+    "src/input_queue.rs": "e34883d0376d2439454e93920fcb813657fbf69007c5937dfae8dd6c4929c44d",
+    "src/output_tail.rs": "fa9c12ac62f76e9cfc266651e63948d1901e4aa85808da44d0d4bf888e996e08",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/session_core.rs": "7eed11c01eb96780f739ce08877e825c7aee15137c4ed20f6801f9778bcd5d58",
+    "src/platform/macos.rs": "53559bf52f8555403543feff04ed2a1c8c71a1734e43bb091d6db878d13c6851",
+    "src/platform/windows.rs": "df0f362ce341932a3fb41b33abcd455a5bbac5cca38f153ce8f384223ec072c1",
+    "tests/session_core.rs": "1ab97e89b773069c95abb19a66578fc53207b87a91498231af52ac76ef9224d6",
+    "tests/output_tail.rs": "dd5e071a25a5dfc8fd1e71cd24ac4d9eab4abf93968b7e14b5a0db5a366a80f7",
+    "tests/session_control.rs": "4a40db2da9b87e0989e242049807b7ba77c8b851aa8d6b359c859fce6f1efc6b"
+  },
+  "binary": {
+    "linux_sha256": "1eeb93a64bf68d24414686b883a92b910df9eafed85c61fa5df6b281e696c3ef",
+    "bytes": 679224
+  },
+  "linux_full_gate": {
+    "exit": 0,
+    "command": "CARGO_BUILD_JOBS=1 sh tools/check.sh",
+    "regular_rust_tests": 200,
+    "single_thread_core_checks": 8
+  },
+  "linux_gui": {
+    "daily_workflow": 15,
+    "exit": 0
+  },
+  "cross_typechecks": {
+    "x86_64-pc-windows-gnu": "passed",
+    "aarch64-apple-darwin": "passed",
+    "x86_64-apple-darwin": "passed"
+  },
+  "native_execution": "pending source-pinned macOS and Windows candidate; cross-checking is not native acceptance",
+  "recovered_local_failures": [
+    "core integration test needed the library session_control import",
+    "public OutputTail::new required Default under strict Clippy; now derived"
+  ],
+  "toolchain_note": "rustup Darwin target add encountered existing libaddr2line file conflict and rolled back; no toolchain files were deleted, no wrapper changed; direct checks using existing target files then passed",
+  "evidence_sha256": {
+    "linux-full.log": "df3ebff24994ef0ab234b82f09847e9058ea26b910abbaaf76e97979df415a46",
+    "linux-full-02.log": "f076ad2ec3f764d608d65e06c821dc3579e0b84741e430bf4da9271ecc3ac861",
+    "linux-full-03.log": "c29b90da87c0dddb74a3dc2da202e4982c8fa937b5b1cf46b92778ba3ba5244f",
+    "windows-typecheck.log": "16cdfbb06d0b01e8bd4c47e66848b43eb476412dc7eec1b7f96101c0a5c3dc58",
+    "darwin-targets.log": "6f8ada7e7557453874cde80fcee9098d27c1b89a589b3d1b0f0ec4153f916b91",
+    "aarch64-apple-darwin.log": "42308a94c456689ae3ad117f150599853988ce1f718ae99a2d0a6feef54e9574",
+    "x86_64-apple-darwin.log": "e1e2f199b853a81caddce438297b26af3a3d19944f11c5904f0f413af29a5a93",
+    "daily15.log": "63c8772795d1928260b9e31eb9e188eba50e4cfb4d32fd5ede19a877ca7525f3",
+    "x86_64-pc-windows-gnu-final.log": "93c54363603f5053aff502f27aa4f810c060b81c74d9f8926567ea5d37244797",
+    "aarch64-apple-darwin-final.log": "7913afc33cece138f63ec7f2b782096598d27bf748f47fb114a8ead32ccc80a3",
+    "x86_64-apple-darwin-final.log": "3aab6d3caf914a6f22c8edd581f194d1cdcc28bbdd2f25d5acb68711f1a4daae"
+  },
+  "review_fixes": [
+    "macOS backing scale commits only after PTY resize succeeds",
+    "Windows candidate DPI fonts commit only after PTY resize succeeds"
+  ]
+}

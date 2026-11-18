@@ -12,8 +12,6 @@ mod broker;
 #[cfg(target_os = "linux")]
 mod config_watch;
 #[cfg(target_os = "linux")]
-mod input_queue;
-#[cfg(target_os = "linux")]
 mod json;
 #[cfg(target_os = "linux")]
 mod layout;
@@ -28,8 +26,6 @@ mod os;
 #[path = "os_macos.rs"]
 mod os;
 #[cfg(target_os = "linux")]
-mod output_tail;
-#[cfg(target_os = "linux")]
 #[path = "platform/linux.rs"]
 mod platform;
 #[cfg(target_os = "windows")]
@@ -42,10 +38,6 @@ mod platform;
 mod search;
 #[cfg(target_os = "linux")]
 mod session;
-#[cfg(target_os = "linux")]
-mod session_control;
-#[cfg(target_os = "linux")]
-mod session_core;
 #[cfg(target_os = "linux")]
 mod working_directory;
 #[cfg(target_os = "linux")]
@@ -66,6 +58,8 @@ use input::{Key, ModifierKey, Modifiers};
 use input_queue::InputQueue;
 #[cfg(target_os = "linux")]
 use zterm::{Terminal, input};
+#[cfg(target_os = "linux")]
+use ztty::{input_queue, session_control, session_core};
 
 #[global_allocator]
 static ALLOCATOR: os::Allocator = os::Allocator;

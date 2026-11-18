@@ -4,6 +4,8 @@
 
 ### Added
 
+- Export a shared no_std session library and route Windows/macOS PTY reads, bounded writes and resize commits through it; native runtime acceptance is pending.
+
 - Shared no_std PTY pump and bounded input queue, now used by the Linux broker, with per-read history anchors and PTY-first resize commits.
 
 - Portable alloc-only input ownership state, used by the Linux broker, with same-owner queue preservation and explicit local observer recovery covered by real PTY and GUI regressions.

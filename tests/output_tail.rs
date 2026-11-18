@@ -1,9 +1,6 @@
 extern crate alloc;
 
-#[path = "../src/output_tail.rs"]
-mod output_tail;
-
-use output_tail::OutputTail;
+use ztty::output_tail::OutputTail;
 
 const LOCAL: usize = 64 * 1024;
 const PERSISTENT: usize = 256 * 1024;

@@ -1,9 +1,6 @@
 extern crate alloc;
 
-#[path = "../src/session_control.rs"]
-mod session_control;
-
-use session_control::{SessionControl, valid_actor};
+use ztty::session_control::{SessionControl, valid_actor};
 
 #[test]
 fn initial_owner_has_exclusive_control() {

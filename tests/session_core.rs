@@ -2,20 +2,6 @@
 //! process-wide safety contract. The PTY child is this executable, never a shell.
 extern crate alloc;
 
-#[path = "../src/input_queue.rs"]
-mod input_queue;
-// This custom harness does not register the imported module's #[test] items.
-// Its memory regression runs in the normal output_tail integration target.
-#[allow(unused_imports)]
-#[path = "../src/output_tail.rs"]
-mod output_tail;
-#[path = "../src/session_control.rs"]
-mod session_control;
-#[path = "../src/session_core.rs"]
-mod session_core;
-
-use input_queue::InputQueue;
-use session_core::{ReadStep, SessionCore};
 use std::{
     fs,
     io::Write,
@@ -24,6 +10,11 @@ use std::{
 };
 use zpty::Size;
 use zterm::Terminal;
+use ztty::{
+    input_queue::InputQueue,
+    session_control,
+    session_core::{ReadStep, SessionCore},
+};
 
 const DEADLINE: Duration = Duration::from_secs(10);
 
