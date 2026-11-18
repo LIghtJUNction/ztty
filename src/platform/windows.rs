@@ -595,6 +595,8 @@ struct Fonts {
     bold: Handle,
     italic: Handle,
     bold_italic: Handle,
+    description: String,
+    size: u32,
     width: i32,
     height: i32,
 }
@@ -636,6 +638,8 @@ impl Fonts {
             bold: make(700, 0),
             italic: make(400, 1),
             bold_italic: make(700, 1),
+            description: String::from(description),
+            size,
             width: 0,
             height: 0,
         };
@@ -1244,6 +1248,41 @@ impl App {
         }
     }
 
+    fn font_action(&mut self, action: &str) -> Result<(), &'static str> {
+        // Repeated shortcuts build on the requested font even while PTY
+        // compensation is pending; arrange commits font and all grids together.
+        let current = self.pending_fonts.as_ref().unwrap_or(&self.fonts);
+        let description = if action == "font-reset" {
+            self.appearance.font.clone()
+        } else {
+            let size = if action == "font-increase" {
+                current.size.saturating_add(1)
+            } else {
+                current.size.saturating_sub(1)
+            }
+            .clamp(5, 96);
+            if size == current.size {
+                return Ok(());
+            }
+            let mut description = String::new();
+            for (index, part) in current.description.split(':').enumerate() {
+                if index != 0 && part.starts_with("size=") {
+                    continue;
+                }
+                if index != 0 {
+                    description.push(':');
+                }
+                description.push_str(part);
+            }
+            format!("{description}:size={size}")
+        };
+        let candidate = Fonts::new(self.surface.dc, &description, unsafe {
+            ffi::GetDpiForWindow(self.hwnd)
+        })?;
+        self.resize_with_fonts(Some(candidate));
+        Ok(())
+    }
+
     fn grid_size(cols: usize, rows: usize, fonts: &Fonts) -> zpty::Size {
         zpty::Size {
             cols: cols as u16,
@@ -1567,6 +1606,7 @@ impl App {
                 self.paste();
                 Ok(())
             }
+            "font-increase" | "font-decrease" | "font-reset" => self.font_action(action),
             "scroll-up" | "scroll-down" => {
                 let pane = &mut self.panes[self.active];
                 let step = pane.core.terminal.rows().saturating_sub(1).max(1);
@@ -2724,6 +2764,9 @@ pub(crate) fn action_supported(action: &str) -> bool {
             | "close"
             | "copy"
             | "paste"
+            | "font-increase"
+            | "font-decrease"
+            | "font-reset"
             | "scroll-up"
             | "scroll-down"
             | "none"
@@ -2740,6 +2783,9 @@ fn binding_state(modifiers: Modifiers) -> u32 {
 fn binding_symbol(key: Key) -> u64 {
     match key {
         Key::Character(ch) => u64::from(ch as u32),
+        Key::KeypadAdd => 0xffab,
+        Key::KeypadSubtract => 0xffad,
+        Key::KeypadDigit(0) => 0xffb0,
         Key::Escape => 0xff1b,
         Key::Enter | Key::KeypadEnter => 0xff0d,
         Key::Tab => 0xff09,
@@ -3078,7 +3124,8 @@ unsafe extern "system" fn window_proc(
             0x0215 => app.cancel_mouse_capture(false),
             0x02e0 => {
                 let dpi = wparam as u16 as u32;
-                let candidate = Fonts::new(app.surface.dc, &app.appearance.font, dpi).ok();
+                let current = app.pending_fonts.as_ref().unwrap_or(&app.fonts);
+                let candidate = Fonts::new(app.surface.dc, &current.description, dpi).ok();
                 let rect = unsafe { &*(lparam as *const ffi::Rect) };
                 unsafe {
                     ffi::SetWindowPos(
@@ -3473,6 +3520,7 @@ mod ffi {
     unsafe extern "system" {
         pub fn SetProcessDpiAwarenessContext(context: Handle) -> i32;
         pub fn GetDpiForSystem() -> u32;
+        pub fn GetDpiForWindow(hwnd: Handle) -> u32;
         pub fn RegisterClassExW(class: *const WindowClass) -> u16;
         pub fn UnregisterClassW(name: *const u16, instance: Handle) -> i32;
         pub fn CreateWindowExW(

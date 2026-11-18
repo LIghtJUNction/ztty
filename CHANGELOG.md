@@ -8,6 +8,19 @@ The failed `v0.3.0` tag stays fixed; this version carries its previously
 unreleased application features together with the following corrections.
 [Preparation status](docs/releasing.md#031-preparation).
 
+### Added
+
+- Font zoom and reset shortcuts on Linux and Windows: Ctrl+Plus/Equal,
+  Ctrl+Minus and Ctrl+0, their Ctrl+Shift variants, and Ctrl+keypad
+  Add/Subtract/0. Keypad 0 requires Num Lock; ordinary Num-Lock-off Insert
+  behavior remains available. Font changes keep the window and PTY processes;
+  Windows coordinates the new metrics across all panes in the workspace.
+- Ctrl+Tab and Ctrl+Shift+Tab cycle workspace tabs alongside the existing
+  Ctrl+Shift+PageDown/PageUp bindings. Move split grow/shrink to
+  Ctrl+Alt+Shift+Equal/Minus so Ctrl+Shift+Plus/Minus changes font size.
+  Custom bindings keep priority over defaults. These shortcuts apply to Linux
+  and Windows; macOS does not yet implement font zoom or workspace UI.
+
 ### Fixed
 
 - Request disabled DWM nonclient rendering before showing the retained GDI
@@ -51,6 +64,9 @@ unreleased application features together with the following corrections.
   NC-policy diagnostics were disabled; every final NC readback reported disabled
   rendering, and owned-resource cleanup passed. This is a build-only Windows
   candidate, not the new version's complete tagged release gate.
+- That candidate predates the additional zoom and tab-shortcut changes. Their
+  keyboard checks require a new source-bound run; the earlier 19 workspace
+  groups are not evidence for the added font actions.
 - The four reusable libraries are published independently:
   `zinput 0.1.1`, `zgraphics 0.1.1`, `zpty 0.2.1`, and `zterm 0.3.0`.
   [Registry checks](docs/releasing.md#published-packages) do not imply that the

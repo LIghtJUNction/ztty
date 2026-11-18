@@ -78,9 +78,29 @@ class WorkspaceContract(unittest.TestCase):
         window.chord(0x45)
         self.assertEqual(calls, [(0x11, 0, 0), (0x10, 0, 0), (0x45, 0, 0),
                                  (0x45, 0, 2), (0x10, 0, 2), (0x11, 0, 2)])
+        calls.clear()
+        window.chord(0xBB, alt=True)
+        self.assertEqual(calls, [(0x11, 0, 0), (0x12, 0, 0), (0x10, 0, 0), (0xBB, 0, 0),
+                                 (0xBB, 0, 2), (0x10, 0, 2), (0x12, 0, 2), (0x11, 0, 2)])
         window.user.GetForegroundWindow = lambda: 999
         with self.assertRaises(workspace.native.DesktopBlocked):
             window.text("must not reach another window")
+
+    def test_font_metrics_require_one_valid_cell_reply(self):
+        self.assertEqual(workspace.cell_reply(b"\x1b_Gi=7;OK\x1b\\\x1b[6;19;9t"), (9, 19))
+        for data in (b"", b"\x1b[8;20;64t", b"\x1b[6;0;9t", b"\x1b[6;19;0t",
+                     b"\x1b[6;4097;9t", b"\x1b[6;19;4097t",
+                     b"\x1b[6;19;9t\x1b[6;19;9t"):
+            with self.subTest(data=data):
+                with self.assertRaises(AssertionError):
+                    workspace.cell_reply(data)
+
+    def test_probe_reply_filter_preserves_leaked_keys_and_unexpected_replies(self):
+        leaked = b"+-0\t\x1b[27;7;43~"
+        unexpected = b"\x1b_Gi=7;ERROR\x1b\\\x1b[6;bad;9t"
+        replies = b"\x1b[6;19;9t\x1b_Gi=7;OK\x1b\\"
+        self.assertEqual(workspace.without_probe_replies(leaked + replies + unexpected),
+                         leaked + unexpected)
 
     def test_all_native_checks_images_and_cleanup_are_required(self):
         report = complete_report()
