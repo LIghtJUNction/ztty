@@ -1,0 +1,231 @@
+{
+  "purpose": "Validate optional identity guards for MCP session mutations against same-name PTY replacement.",
+  "candidate_commit": "0971198a1e6e7a7526b5d3d6774cd6281bd16f25",
+  "tested_source": {
+    "base_commit": "0971198a1e6e7a7526b5d3d6774cd6281bd16f25",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "platform": "linux",
+    "binary_sha256": "3c037b67bee176b427539a7c69184acae026009284e9179ac2791846da6b615c",
+    "binary_bytes": 742008,
+    "source_sha256": {
+      "src/mcp.rs": "26da3ee90267db8d23b5f1a670e60cf1265424e34b775713e61ba5a53152445a",
+      "src/session.rs": "3fc52a413eef359b431c34777cbc68f469b625f05517997e08d2b7c1195683d3",
+      "src/session_identity.rs": "15695bd3fb7c05ed8ce27b24d7f37610b874e44c98f71b57859424b87e7c05e6",
+      "tests/mcp_sessions.py": "5383ba0ecb3fd2f73494977e25e29adafbdd19d2833e6393101e43da3325e7ac",
+      "tests/mcp_transport.py": "6b9ea9c13b04ac2bcce36b6168f428e7f8f3628a0df05f2ecf85c0073678873a",
+      "docs/sessions.md": "7019e25dd48c5ed21c15bcc271324e3e9c946bd936ba16037fd45966b7f0a64e"
+    },
+    "source_note": "Candidate commit plus rustfmt-only wrapping of the session_control match arm in src/mcp.rs. Exact SHA-256 values identify the tested files; the follow-up commit records those bytes and this evidence.",
+    "mcp_git_blob": "fe0565598d863252cc6578595ccfb888c5078999"
+  },
+  "baseline": {
+    "source": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+    "binary_sha256": "2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada",
+    "harness_source": "0971198a1e6e7a7526b5d3d6774cd6281bd16f25",
+    "exit_code": 1,
+    "seconds": 0.7830804129989701,
+    "expected_failure": true,
+    "observed_error": {
+      "operation": "session_write",
+      "json_rpc_code": -32602,
+      "message": "Unknown tool argument"
+    },
+    "interpretation": "The previous implementation rejects expected_session on a mutation; the new real-PTY regression fails at that missing capability."
+  },
+  "build_checks": [
+    {
+      "check": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.364
+    },
+    {
+      "check": "rust-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--workspace",
+        "-j",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 21.67
+    },
+    {
+      "check": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "-j",
+        "4",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 7.136
+    },
+    {
+      "check": "release-build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "-j",
+        "4"
+      ],
+      "exit_code": 0,
+      "seconds": 10.442
+    }
+  ],
+  "rust_tests": {
+    "cargo_tests_passed": 271,
+    "doctests_passed": 6,
+    "session_core_pty_checks_passed": 8,
+    "session_core_test_children": "all joined"
+  },
+  "runtime_checks": [
+    {
+      "check": "mcp-transport",
+      "exit_code": 0,
+      "seconds": 0.17,
+      "log_sha256": "4da19e34008f0117ebf92a6fb944370a8388489224dee621e53960ade1a69c18"
+    },
+    {
+      "check": "mcp-sessions",
+      "exit_code": 0,
+      "seconds": 0.921,
+      "log_sha256": "25d2dda035f99ecd25a3f715cc67cc65c6cded18958428725068caa1828ddcc3"
+    },
+    {
+      "check": "mcp-security",
+      "exit_code": 0,
+      "seconds": 0.22,
+      "log_sha256": "9536b5a8589899f1b3e320e1b79c3ae0de20476a094dbd7e5a82caa25b1c799e"
+    },
+    {
+      "check": "mcp-wait",
+      "exit_code": 0,
+      "seconds": 15.548,
+      "log_sha256": "04a093e4914951b33514347c3ea6d94a81ed8bb74f8cb45f7879b941d183fe3d"
+    },
+    {
+      "check": "mcp-sse",
+      "exit_code": 0,
+      "seconds": 5.777,
+      "log_sha256": "a88a0d8449abb2a13a58488171f8f671db15621d6ad378a5b2671731edb0a4f0"
+    },
+    {
+      "check": "no-std",
+      "exit_code": 0,
+      "seconds": 0.214,
+      "log_sha256": "e98fc58744721fb9e7260bb5a7b6a8762522a0e8892ca4008b4a5e15087ca5ea"
+    }
+  ],
+  "guarded_mutations": [
+    {
+      "status": "passed",
+      "transport": "stdio",
+      "stale_mutations_rejected": 5,
+      "stale_cross_actor_takeover_rejected": true,
+      "mismatched_identity_fields_rejected": [
+        "uri",
+        "id",
+        "created_at",
+        "broker_pid"
+      ],
+      "unguarded_compatibility": true,
+      "guarded_mutations": true,
+      "identity_does_not_grant_control": true,
+      "recreated_uri_preserved": true,
+      "recreated_session_id_changed": true
+    },
+    {
+      "status": "passed",
+      "transport": "http",
+      "stale_mutations_rejected": 5,
+      "stale_cross_actor_takeover_rejected": true,
+      "mismatched_identity_fields_rejected": [
+        "uri",
+        "id",
+        "created_at",
+        "broker_pid"
+      ],
+      "unguarded_compatibility": true,
+      "guarded_mutations": true,
+      "identity_does_not_grant_control": true,
+      "recreated_uri_preserved": true,
+      "recreated_session_id_changed": true
+    }
+  ],
+  "waiting_and_sse": [
+    {
+      "suite": "mcp-wait",
+      "checks_passed": 13,
+      "checks": {
+        "stdio_concurrency": "passed",
+        "timeouts_and_bounds": "passed",
+        "fragmented_utf8": "passed",
+        "retained_output_is_immediate": "passed",
+        "eof_waits": "passed",
+        "replacement_identity": "passed",
+        "stdio_cancellation_and_limits": "passed",
+        "stdio_numeric_request_ids": "passed",
+        "http_concurrency_and_observers": "passed",
+        "http_cancellation_and_disconnect": "passed",
+        "http_numeric_request_ids": "passed",
+        "http_long_wait": "passed",
+        "completed_input_preserves_ordinary_requests": "passed"
+      },
+      "cleanup": "passed"
+    },
+    {
+      "suite": "mcp-sse",
+      "checks_passed": 7,
+      "checks": {
+        "sse_lifecycle": "passed",
+        "prompt_payload_and_observer": "passed",
+        "heartbeat_and_idle": "passed",
+        "timeout_and_half_close": "passed",
+        "cancellation_and_exact_ids": "passed",
+        "capacity_disconnect_and_delete": "passed",
+        "json_default_and_cli": "passed"
+      },
+      "cleanup": "passed"
+    }
+  ],
+  "no_std": {
+    "production_crates_checked": 11,
+    "release_has_rust_std_symbols": false,
+    "scope": "Rust production dependency features and linked Rust std symbols; native system C ABI libraries remain part of the runtime."
+  },
+  "reproduce": [
+    "cargo fmt --all -- --check",
+    "cargo test --locked --workspace -j 4",
+    "cargo clippy --locked --workspace --all-targets -j 4 -- -D warnings",
+    "cargo build --locked --release -j 4",
+    "python3 tests/mcp_transport.py --binary ./target/release/ztty",
+    "python3 tests/mcp_sessions.py --binary ./target/release/ztty",
+    "python3 tests/mcp_security.py --binary ./target/release/ztty",
+    "python3 tests/mcp_wait.py --binary ./target/release/ztty",
+    "python3 tests/mcp_sse.py --binary ./target/release/ztty",
+    "python3 tools/check_no_std.py"
+  ],
+  "limits": [
+    "Runtime acceptance covers the Linux shared broker and stdio/HTTP MCP paths; it does not add GUI or native macOS/Windows acceptance.",
+    "The identity guard is optional. Unguarded requests intentionally retain existing current-selector behavior.",
+    "Matching identities do not grant input ownership or deduplicate repeated writes.",
+    "No routine CI workflow was requested; the checks were run on the development machine."
+  ]
+}

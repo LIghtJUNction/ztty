@@ -582,7 +582,10 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         "session_write" => ("write", &["session", "data", "expected_session"]),
         "session_resize" => ("resize", &["session", "cols", "rows", "expected_session"]),
         "session_close" => ("close", &["session", "expected_session"]),
-        "session_control" => ("control", &["session", "action", "takeover", "expected_session"]),
+        "session_control" => (
+            "control",
+            &["session", "action", "takeover", "expected_session"],
+        ),
         _ => return Err("Unknown tool"),
     };
     if fields
