@@ -1,0 +1,78 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "65dcd2ce3e69a4cbadcb98c7d9e08f431962270f",
+  "run_id": 44320248994,
+  "architecture": "x86_64",
+  "artifact_id": 14434541912,
+  "artifact_zip_sha256": "6a61e66e090a82f1ce4d129283b968dd28ce0b0be708904088f1834379df3dd4",
+  "binary_sha256": "433d5ec17d840487e64b786c77f43b58bc2fc61986eb118e35e8d8a93127a043",
+  "passed": false,
+  "status": "failed",
+  "failed_cold_start": 2,
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/burst-44320248994/windows-x86_64/summary.json",
+      "bytes": 7172,
+      "sha256": "7999862eb83464deaf70c3b6b9e71f6c47c9c71309a7637f9dff36c95d363703",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/burst-44320248994/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 12118,
+      "sha256": "cfdcf4dc3b04fb84472ced1f761fd5011c3ba28ab2835d4b09c46f8c8b2a5479",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 295
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-02.json",
+      "source_path": "artifacts/release-audit/burst-44320248994/windows-x86_64/ztty-windows-x86_64.native.cold-02.json",
+      "bytes": 41519,
+      "sha256": "676321e49c643b8b71757472130ab9286913fa88be0aaa8e8f19c4997afbdcd9",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2000
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-02.post-failure.json",
+      "source_path": "artifacts/release-audit/burst-44320248994/windows-x86_64/ztty-windows-x86_64.native.cold-02.post-failure.json",
+      "bytes": 845,
+      "sha256": "6f7e615ce1d9703a3c2f643337874f3759343abf98370480ad64fd0c086dcbd2",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-02.resize-restored.png",
+      "source_path": "artifacts/release-audit/burst-44320248994/windows-x86_64/ztty-windows-x86_64.native.cold-02.resize-restored.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-02.post-failure.png",
+      "source_path": "artifacts/release-audit/burst-44320248994/windows-x86_64/ztty-windows-x86_64.native.cold-02.post-failure.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-02.post-repaint.png",
+      "source_path": "artifacts/release-audit/burst-44320248994/windows-x86_64/ztty-windows-x86_64.native.cold-02.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "scope": "Compact original failed cold-start report, build identity, same-process snapshot and three original PNGs. Earlier successful cold reports and other PNGs remain in the verified original artifact and are indexed by the derived summary.",
+  "notes": [
+    "Raw JSON, original line endings and PNG bytes are preserved.",
+    "The first failure is the original resize_restores_visible_image pixel assertion; it is not a back-to-back contract rejection.",
+    "Post-flush and post-repaint evidence does not accept the original failure.",
+    "The snapshot does not record whether the NOCOPYBITS policy branch ran or the final WINDOWPOS flags; no inference that Windows ignored a flag is supported."
+  ]
+}

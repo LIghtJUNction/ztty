@@ -1,0 +1,1460 @@
+{
+  "source_sha": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+  "source_ref": "refs/heads/fix/windows-resize-release-20261118",
+  "version": "0.3.0",
+  "architecture": "aarch64",
+  "runner": "windows-11-arm",
+  "runner_image": "20261112.217.1",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "rust_toolchain": "1.100.0",
+  "run_id": "44343658618",
+  "run_attempt": "1",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "passed": false,
+  "status": "failed",
+  "llvm_mingw": {
+    "version": "20261104",
+    "sha256": "7d7f8387a8706639b0b47a629d6e23f8b3ef9acce67e9832b8cd4c5bb2816eab"
+  },
+  "rust_host": "aarch64-pc-windows-msvc",
+  "rust_target": "aarch64-pc-windows-gnullvm",
+  "windows_architecture": "arm64",
+  "paint_diagnostics_enabled": true,
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "native": "failure",
+    "package": "success"
+  },
+  "resize_control_diagnostic": {
+    "requested": true,
+    "outcome": "failure"
+  },
+  "files": {
+    "ztty-windows-aarch64.manifest.json": {
+      "bytes": 1257,
+      "sha256": "df7a89acad380a5c41011206dd59c6bf0247e83bff02167fab97aff051082251"
+    },
+    "ztty-windows-aarch64.manifest.json.sha256": {
+      "bytes": 102,
+      "sha256": "46b326db209702d46c864bed8d4a2fb3f9fc2352452628f7cafd757dce17685c"
+    },
+    "ztty-windows-aarch64.native.back-to-back-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.back-to-back-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-01.json": {
+      "bytes": 215381,
+      "sha256": "f6447a88ff068a9b1532e7e3aa7573ffc59ab5b11bae9a31d4644324bbc88bd5"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.back-to-back-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.json": {
+      "bytes": 216131,
+      "sha256": "ff294a10a10de99b78ce2cbbb55664ed4f010b714b8a1f2944dd6d9efee2cf9e"
+    },
+    "ztty-windows-aarch64.native.cold-02.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-01-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-01-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-02-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-02-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-03-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-03-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-04-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-04-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-05-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-05-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-06-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-06-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-07-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-07-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-08-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-08-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-09-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-09-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-10-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.rapid-10-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.resize-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-02.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-02.sixel.png": {
+      "bytes": 606,
+      "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.back-to-back-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.json": {
+      "bytes": 216235,
+      "sha256": "25c23c7b138823b3d252c4541bb6128c26463e0e7867ee5fea97fcb987588ba1"
+    },
+    "ztty-windows-aarch64.native.cold-03.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-01-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-01-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-02-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-02-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-03-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-03-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-04-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-04-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-05-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-05-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-06-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-06-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-07-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-07-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-08-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-08-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-09-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-09-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-10-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.rapid-10-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.resize-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-03.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-03.sixel.png": {
+      "bytes": 606,
+      "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.back-to-back-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.json": {
+      "bytes": 216248,
+      "sha256": "60449df9ad081116f16c73c766c9c77a1df0f2922566a9ae932d25272481f47a"
+    },
+    "ztty-windows-aarch64.native.cold-04.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-01-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-01-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-02-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-02-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-03-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-03-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-04-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-04-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-05-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-05-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-06-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-06-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-07-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-07-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-08-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-08-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-09-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-09-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-10-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.rapid-10-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.resize-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-04.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-04.sixel.png": {
+      "bytes": 606,
+      "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.back-to-back-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.json": {
+      "bytes": 216238,
+      "sha256": "ea6065bf0d4280a6a4cb536e3bfd5e17394149ddda210c3cfb79fe190f836e60"
+    },
+    "ztty-windows-aarch64.native.cold-05.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-01-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-01-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-02-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-02-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-03-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-03-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-04-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-04-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-05-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-05-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-06-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-06-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-07-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-07-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-08-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-08-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-09-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-09-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-10-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.rapid-10-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.resize-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-05.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-05.sixel.png": {
+      "bytes": 606,
+      "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.back-to-back-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.json": {
+      "bytes": 215856,
+      "sha256": "b2c2632d3e86fd4e75085313d36611e7da0dc5eaf4bd6b4b01edf6483fe75812"
+    },
+    "ztty-windows-aarch64.native.cold-06.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-01-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-01-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-02-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-02-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-03-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-03-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-04-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-04-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-05-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-05-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-06-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-06-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-07-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-07-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-08-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-08-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-09-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-09-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-10-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.rapid-10-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.resize-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-06.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-06.sixel.png": {
+      "bytes": 606,
+      "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.back-to-back-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.json": {
+      "bytes": 216238,
+      "sha256": "10ffabf68009b12ab3a99e1133b212d5e8d663f48562b79027d21eab953adad8"
+    },
+    "ztty-windows-aarch64.native.cold-07.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-01-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-01-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-02-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-02-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-03-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-03-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-04-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-04-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-05-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-05-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-06-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-06-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-07-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-07-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-08-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-08-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-09-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-09-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-10-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.rapid-10-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.resize-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-07.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.cold-07.sixel.png": {
+      "bytes": 606,
+      "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174"
+    },
+    "ztty-windows-aarch64.native.cold-08.json": {
+      "bytes": 48149,
+      "sha256": "1360a0fb647d265d23d8bc9abcd7abb5a88d7df0c288b4aad9b916a07bb9f8c9"
+    },
+    "ztty-windows-aarch64.native.cold-08.png": {
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    "ztty-windows-aarch64.native.cold-08.post-failure.json": {
+      "bytes": 2769,
+      "sha256": "095efa116733a069f86e8e82bf198139c89b743eece282d32575683a38c5dc06"
+    },
+    "ztty-windows-aarch64.native.cold-08.post-failure.png": {
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    "ztty-windows-aarch64.native.cold-08.post-repaint.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-08.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.cold-08.resize-restored.png": {
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    "ztty-windows-aarch64.native.cold-08.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.contract.log": {
+      "bytes": 133,
+      "sha256": "b72d9d32cbe26f045e323e41e974ad271ce77dcb35984492038119c4b2277466"
+    },
+    "ztty-windows-aarch64.native.desktop.json": {
+      "bytes": 2961,
+      "sha256": "879cf7bacf22d36aad6b405823a262831f48674cbf6cd0e92163e8ca5d1c8ed5"
+    },
+    "ztty-windows-aarch64.native.desktop.stderr.log": {
+      "bytes": 1159,
+      "sha256": "9b4336165393d503fb7698bd045479616f87fe0c23c4a79da8e3dfe9ab2f0589"
+    },
+    "ztty-windows-aarch64.native.desktop.stdout.log": {
+      "bytes": 1560476,
+      "sha256": "cc2500c060d77cc1d5f72ca56e12ad4d48509a097f1e5777ca9a9a4691ef7162"
+    },
+    "ztty-windows-aarch64.native.desktop.worker.json": {
+      "bytes": 485,
+      "sha256": "80ebc71ddf9e6fcbd647350d5d994e99f36ffd1433dfa0aa0f38b8fe4b338add"
+    },
+    "ztty-windows-aarch64.native.json": {
+      "bytes": 226793,
+      "sha256": "153e3fb798a8535462ac1e808e51d457a116e72bc3d7751d74f9c1948655c92b"
+    },
+    "ztty-windows-aarch64.native.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-01-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-01-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-01-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-02-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-02-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-02-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-03-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-03-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-03-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-04-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-04-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-04-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-05-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-05-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-05-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-06-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-06-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-06-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-07-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-07-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-07-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-08-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-08-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-08-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-09-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-09-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-09-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.rapid-10-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-10-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.rapid-10-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.resize-before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.resize-restored.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.native.resize-shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.native.sixel.png": {
+      "bytes": 606,
+      "sha256": "2e962c2e0e074747933a0ec1bf6688d3e7f19b689faabe87fff4f97141fee174"
+    },
+    "ztty-windows-aarch64.native.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ztty-windows-aarch64.native.stdout.log": {
+      "bytes": 226477,
+      "sha256": "a756cb2b6f10961fba14b1d010944ead91c5486815f4d9cffe564db8e935a64d"
+    },
+    "ztty-windows-aarch64.resize-control.cold-01.before.png": {
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
+    },
+    "ztty-windows-aarch64.resize-control.cold-01.failure.png": {
+      "bytes": 598,
+      "sha256": "6484bc7b3138b7a02cb3fee4d50a5f7f57aff3054a070a6a6892aab116675460"
+    },
+    "ztty-windows-aarch64.resize-control.cold-01.json": {
+      "bytes": 13013,
+      "sha256": "7f2ad78bcaad921d5401498e4ed3630bdd234addbee737035dadd2474c678b96"
+    },
+    "ztty-windows-aarch64.resize-control.cold-01.restored.png": {
+      "bytes": 598,
+      "sha256": "6484bc7b3138b7a02cb3fee4d50a5f7f57aff3054a070a6a6892aab116675460"
+    },
+    "ztty-windows-aarch64.resize-control.cold-01.shrunk.png": {
+      "bytes": 544,
+      "sha256": "745ce3c59c9d8375b4c7446c0b2409f3d5c1f6e7301a9a7b421ddd71cb454012"
+    },
+    "ztty-windows-aarch64.resize-control.cold-01.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ztty-windows-aarch64.resize-control.cold-01.stdout.log": {
+      "bytes": 310,
+      "sha256": "32b24b4c4189546577e2f4c6a6724ff39df00cc31be395f1b407b6423d3ef898"
+    },
+    "ztty-windows-aarch64.resize-control.desktop.json": {
+      "bytes": 1398,
+      "sha256": "0a513bf5b45d16ca9146221a9ee59148313aea834760e9d5e6355cefa8534552"
+    },
+    "ztty-windows-aarch64.resize-control.desktop.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ztty-windows-aarch64.resize-control.desktop.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ztty-windows-aarch64.resize-control.desktop.worker.json": {
+      "bytes": 585,
+      "sha256": "8f9e6017fce88967b3a392732bc450d79380899059b3ebf2622745cff0bca742"
+    },
+    "ztty-windows-aarch64.resize-control.json": {
+      "bytes": 3078,
+      "sha256": "c1cdddb6ebe629fdecc3ac8d70285c23542725855b571204aac48fd0e82bea3c"
+    },
+    "ztty-windows-aarch64.resize-control.zip": {
+      "bytes": 26432,
+      "sha256": "8a213c2af96a88bbbaf4703d2085fba95ef3e3d6d02014d29223facec43f6387"
+    },
+    "ztty-windows-aarch64.resize-control.zip.sha256": {
+      "bytes": 107,
+      "sha256": "91627905a2d3271f5bbeb9d86acd69dffcc54fb7259c94ec5562136e2e7d12d6"
+    },
+    "ztty-windows-aarch64.zip": {
+      "bytes": 771596,
+      "sha256": "f74a85d39052b2e1b22fcca0fcf388d983bd6430695290a96ae3f1c61790f891"
+    },
+    "ztty-windows-aarch64.zip.sha256": {
+      "bytes": 92,
+      "sha256": "2a3d79641c19c5b042b2c683a3638857dc4eba2dcf7f1a90da5899d7cac2b23e"
+    }
+  }
+}

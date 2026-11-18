@@ -21,7 +21,7 @@ import tempfile
 import time
 
 
-CHILD = r'''import json,os,re,select,socket,sys,time,tty
+CHILD = r'''import fcntl,json,os,re,select,socket,struct,sys,termios,time,tty
 tty.setraw(0)
 record=open(sys.argv[1],"w+b",buffering=0)
 control=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
@@ -56,7 +56,8 @@ while True:
                 record.write(data[:reply.start()]+data[reply.end():])
                 if command.get("clear"):
                     record.seek(0);record.truncate()
-                connection.sendall(json.dumps({"ok":True,"dsr":bytes(reply.group()).hex()}).encode()+b"\n")
+                size=list(struct.unpack("HHHH",fcntl.ioctl(0,termios.TIOCGWINSZ,bytes(8))))
+                connection.sendall(json.dumps({"ok":True,"dsr":bytes(reply.group()).hex(),"winsize":size}).encode()+b"\n")
                 break
         else: raise TimeoutError("cursor-position barrier")
         if not reply: raise TimeoutError("cursor-position barrier")
@@ -111,6 +112,7 @@ def main():
         raise OSError("PR_SET_CHILD_SUBREAPER failed")
     xvfb = connection = launcher = None
     owned_pids = {}
+    original_mappings = {}
 
     def wait(predicate, label, seconds=12):
         deadline = time.monotonic() + seconds
@@ -162,16 +164,24 @@ def main():
             # A non-US layout can have tilde as an unshifted key. Configure an
             # otherwise unused key in the private display before ztty connects.
             tilde_code = connection.display.info.max_keycode
+            original_mappings[tilde_code] = tuple(connection.get_keyboard_mapping(tilde_code, 1)[0])
             connection.change_keyboard_mapping(tilde_code, [(XK.string_to_keysym("asciitilde"),)])
             connection.sync()
             assert connection.get_keyboard_mapping(tilde_code, 1)[0][0] == ord("~")
             report["tilde_keycode"] = tilde_code
             punctuation_code = tilde_code - 1
+            original_mappings[punctuation_code] = tuple(connection.get_keyboard_mapping(punctuation_code, 1)[0])
             connection.change_keyboard_mapping(
                 punctuation_code, [(ord(";"), ord("?"))])
             connection.sync()
             assert tuple(connection.get_keyboard_mapping(punctuation_code, 1)[0][:2]) == (ord(";"), ord("?"))
             report["punctuation_keycode"] = punctuation_code
+            plus_code = tilde_code - 2
+            original_mappings[plus_code] = tuple(connection.get_keyboard_mapping(plus_code, 1)[0])
+            connection.change_keyboard_mapping(plus_code, [(ord("^"), ord("+"))])
+            connection.sync()
+            assert tuple(connection.get_keyboard_mapping(plus_code, 1)[0][:2]) == (ord("^"), ord("+"))
+            report["non_us_plus_keycode"] = plus_code
             env = dict(os.environ, DISPLAY=xvfb.display, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
                        XDG_RUNTIME_DIR=temporary, XDG_CONFIG_HOME=str(root / "xdg-config"),
                        ZTTY_SOCKET="@ztty-input-gui-" + root.name)
@@ -201,10 +211,10 @@ def main():
             def info():
                 return rpc({"op": "info", "session": "input-probe"})
 
-            def control(output="", clear=False):
+            def control(output="", clear=False, path=None):
                 with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as channel:
                     channel.settimeout(10)
-                    channel.connect(str(control_path))
+                    channel.connect(str(path or control_path))
                     channel.sendall(json.dumps({"output": output, "clear": clear}).encode() + b"\n")
                     data = bytearray()
                     while b"\n" not in data:
@@ -279,23 +289,24 @@ def main():
                     xtest.fake_input(connection, X.KeyRelease, code)
                 connection.sync()
 
-            def assert_input(label, expected, injection="XTEST"):
+            def assert_input(label, expected, injection="XTEST", path=None, barrier_path=None):
                 # XSync waits for the X server, not for the application to
                 # consume its event queue. Allow the real PTY input to arrive
                 # before taking the final output/reply barrier and sample.
+                record_path = path or input_path
                 deadline = time.monotonic() + 2
                 quiet_since = time.monotonic()
-                previous = input_path.read_bytes()
+                previous = record_path.read_bytes()
                 while time.monotonic() < deadline:
-                    actual = input_path.read_bytes()
+                    actual = record_path.read_bytes()
                     if actual != previous:
                         quiet_since = time.monotonic()
                         previous = actual
                     if actual == expected and time.monotonic() - quiet_since >= 0.12:
                         break
                     time.sleep(0.01)
-                control()
-                actual = input_path.read_bytes()
+                control(path=barrier_path)
+                actual = record_path.read_bytes()
                 vector = {"name": label, "injection": injection, "expected_hex": expected.hex(), "actual_hex": actual.hex(), "ok": actual == expected}
                 report["vectors"].append(vector)
                 assert actual == expected, vector
@@ -469,6 +480,147 @@ def main():
             report["checks"].append("shifted punctuation bindings consume their press, release and palette input using the active XKB layout")
             begin(RESET)
 
+            # Default lookup must work without a custom binding table.
+            base_config = "\n".join(line for line in CONFIG.splitlines()
+                                    if line.split("=", 1)[0].strip() not in ("keybind", "mousebind")) + "\n"
+
+            def reload_config(text):
+                config.write_text(text)
+                rpc({"op": "action", "session": "input-probe", "actor": "local", "action": "reload"})
+                begin(RESET)
+
+            def grid():
+                current = info()
+                return current["cols"], current["rows"]
+
+            def font_metrics():
+                reply = control()
+                current = info()
+                pty_rows, pty_cols, pixel_width, pixel_height = reply["winsize"]
+                assert (pty_cols, pty_rows) == (current["cols"], current["rows"]), (reply, current)
+                assert pixel_width and pixel_height and pixel_width % pty_cols == 0 and pixel_height % pty_rows == 0
+                actual_geometry = view.get_geometry()
+                return {"cols": pty_cols, "rows": pty_rows,
+                        "cell_width": pixel_width // pty_cols, "cell_height": pixel_height // pty_rows,
+                        "pty_winsize": reply["winsize"], "window_pixels": [actual_geometry.width, actual_geometry.height]}
+
+            report["zoom"] = []
+            reload_config(base_config)
+            base_metrics = font_metrics()
+
+            def zoom(label, chord, expected):
+                before = font_metrics()
+                begin(RESET + "\x1b[=3u")
+                key(*chord)
+                target = (base_metrics["cols"], base_metrics["rows"]) if expected == "reset" else None
+                deadline = time.monotonic() + 3
+                while time.monotonic() < deadline:
+                    current = grid()
+                    if (current == target if target else current != (before["cols"], before["rows"])):
+                        break
+                    time.sleep(0.02)
+                after = font_metrics()
+                if expected == "reset":
+                    ok = all(after[field] == base_metrics[field] for field in ("cols", "rows", "cell_width", "cell_height"))
+                elif expected == "increase":
+                    ok = after["cols"] <= before["cols"] and after["rows"] <= before["rows"] and (
+                        after["cell_width"] > before["cell_width"] or after["cell_height"] > before["cell_height"])
+                else:
+                    ok = after["cols"] >= before["cols"] and after["rows"] >= before["rows"] and (
+                        after["cell_width"] < before["cell_width"] or after["cell_height"] < before["cell_height"])
+                item = {"name": label, "injection": "XTEST", "keys": list(chord), "expected": expected,
+                        "before": before, "after": after, "ok": ok}
+                report["zoom"].append(item)
+                assert_input(label + ": shortcut press/release stay out of PTY", b"")
+                assert after["window_pixels"] == before["window_pixels"], item
+                assert ok, item
+
+            # The installed pre-change binary fails this first new vector.
+            zoom("Ctrl+Shift+Plus increases font", ("Control_L", "Shift_L", "equal"), "increase")
+            zoom("Ctrl+Shift+0 restores configured font", ("Control_L", "Shift_L", "0"), "reset")
+            zoom("Ctrl+Shift+Minus decreases font", ("Control_L", "Shift_L", "minus"), "decrease")
+            zoom("Ctrl+0 restores configured font", ("Control_L", "0"), "reset")
+            zoom("Ctrl+Equal retains font increase", ("Control_L", "equal"), "increase")
+            zoom("Ctrl+Minus retains font decrease", ("Control_L", "minus"), "decrease")
+            zoom("default plus on non-US physical key", ("Control_L", "Shift_L", plus_code), "increase")
+            zoom("restore after non-US zoom", ("Control_L", "0"), "reset")
+            begin(RESET)
+            num_lock(False)
+            zoom("Ctrl+keypad Add with Num Lock off", ("Control_L", "KP_Add"), "increase")
+            zoom("Ctrl+keypad Subtract with Num Lock off", ("Control_L", "KP_Subtract"), "decrease")
+            begin(RESET)
+            num_lock(True)
+            zoom("Ctrl+keypad Add with Num Lock on", ("Control_L", "KP_Add"), "increase")
+            zoom("Ctrl+keypad 0 resets with Num Lock on", ("Control_L", "KP_0"), "reset")
+            begin(RESET)
+            num_lock(False)
+            begin()
+            key("Control_L", "KP_0")
+            assert_input("Num Lock off: Ctrl+keypad Insert remains application input", b"\x1b[2;5~")
+            assert font_metrics() == base_metrics
+
+            reload_config(base_config + "keybind = ctrl+shift+equal = none\nkeybind = ctrl+kp-add = font-decrease\n")
+            begin(RESET + "\x1b[=3u")
+            key("Control_L", "Shift_L", "equal")
+            assert_input("custom none disables shifted plus and consumes release", b"")
+            assert font_metrics() == base_metrics
+            zoom("custom keypad remap wins over font increase default", ("Control_L", "KP_Add"), "decrease")
+            zoom("restore after custom keypad remap", ("Control_L", "0"), "reset")
+            reload_config(base_config + "keybind = ctrl+shift+^ = none\n")
+            begin(RESET + "\x1b[=3u")
+            key("Control_L", "Shift_L", plus_code)
+            assert_input("custom base-key none wins over shifted default plus", b"")
+            assert font_metrics() == base_metrics
+            reload_config(CONFIG)
+            assert font_metrics() == base_metrics
+            report["font_restored"] = True
+            report["checks"].append("real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered")
+
+            # Release after the press has already moved focus to another tab.
+            peer_input = root / "peer-input.bin"
+            peer_control = root / "peer-control.sock"
+            peer_launcher = subprocess.Popen(
+                [str(binary), "--name", "input-peer", "--tab", "input-probe", "--config", str(config),
+                 "-e", "/usr/bin/python3", "-c", CHILD, str(peer_input), str(peer_control)],
+                env=env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True,
+            )
+            wait(lambda: next((item for item in rpc({"op": "list"})["sessions"]
+                               if item["name"] == "input-peer"), None), "second raw tab")
+            peer = rpc({"op": "info", "session": "input-peer"})
+            owned_pids[peer["pid"]] = birth(peer["pid"])
+            wait(lambda: peer_control.exists() and peer_input.exists(), "second raw PTY")
+            peer_view = connection.create_resource_object("window", peer["window_id"])
+            peer_view.set_input_focus(X.RevertToParent, X.CurrentTime)
+            connection.sync()
+            begin(RESET + "\x1b[=3u")
+            control(RESET + "\x1b[=3u", clear=True, path=peer_control)
+
+            def navigate(label, chord, destination):
+                assert not rpc({"op": "info", "session": destination})["visible"], label
+                values = codes(chord)
+                try:
+                    for code in values:
+                        xtest.fake_input(connection, X.KeyPress, code)
+                    connection.sync()
+                    wait(lambda: rpc({"op": "info", "session": destination})["visible"], label, 3)
+                finally:
+                    for code in reversed(values):
+                        xtest.fake_input(connection, X.KeyRelease, code)
+                    connection.sync()
+                assert_input(label + ": original PTY stays silent", b"")
+                assert_input(label + ": peer PTY stays silent", b"", path=peer_input, barrier_path=peer_control)
+
+            navigate("Ctrl+Shift+Tab selects previous tab", ("Control_L", "Shift_L", "Tab"), "input-probe")
+            navigate("Ctrl+Tab selects next tab", ("Control_L", "Tab"), "input-peer")
+            navigate("Ctrl+Shift+Tab returns to original tab", ("Control_L", "Shift_L", "Tab"), "input-probe")
+            rpc({"op": "close", "session": "input-peer"})
+            peer_launcher.wait(timeout=5)
+            view.set_input_focus(X.RevertToParent, X.CurrentTime)
+            connection.sync()
+            report["checks"].append("Ctrl+Tab and Ctrl+Shift+Tab move between real raw PTYs without leaking a consumed key release after focus changes")
+            begin(RESET)
+            geometry = view.get_geometry()
+
             assert info()["pid"] == session["pid"] and info()["running"]
             control(RESET + "\r\n  Keyboard, wheel, extra-button and mode tests passed.\r\n  Coverage details are recorded in input-gui.json.\r\n")
             connection.sync()
@@ -496,6 +648,19 @@ def main():
             raise
         finally:
             if connection is not None:
+                if "reload_config" in locals() and not report.get("font_restored"):
+                    try:
+                        reload_config(CONFIG)
+                        report["font_restored"] = True
+                    except Exception as error:
+                        report["font_restore_error"] = str(error)
+                try:
+                    for keycode, mapping in original_mappings.items():
+                        connection.change_keyboard_mapping(keycode, [mapping])
+                    connection.sync()
+                    report["keyboard_mapping_restored"] = True
+                except Exception as error:
+                    report["keyboard_restore_error"] = str(error)
                 connection.close()
             for pid, token in owned_pids.items():
                 try:

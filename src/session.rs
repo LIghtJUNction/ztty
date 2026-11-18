@@ -300,6 +300,8 @@ impl Ui {
         }
         let interactive = geometry_current
             && allow_input
+            && self.visible
+            && self.open
             && !core.eof()
             && self.history == 0
             && self.search.is_none()
@@ -460,8 +462,12 @@ impl Ui {
                         self.native_ui.layout.as_ref().is_none_or(|layout| {
                             layout.geometry == self.window.native_ui_geometry()
                         });
-                    let interactive =
-                        geometry_current && allow_input && !core.eof() && self.history == 0;
+                    let interactive = geometry_current
+                        && allow_input
+                        && self.visible
+                        && self.open
+                        && !core.eof()
+                        && self.history == 0;
                     let (handled, action) = self.native_ui.key(
                         &mut core.terminal,
                         symbol,
@@ -1157,6 +1163,14 @@ struct Workspace {
     title: String,
 }
 
+#[derive(Clone, Copy)]
+struct NativeGesture {
+    session: u64,
+    attachment: u64,
+    display: *mut x11::Display,
+    button: u32,
+}
+
 struct Pool {
     sessions: Vec<Session>,
     workspaces: Vec<Workspace>,
@@ -1168,6 +1182,7 @@ struct Pool {
     reaping: Vec<(i32, u64)>,
     shortcuts: [bool; 256],
     mouse_shortcuts: [bool; 12],
+    native_gestures: Vec<NativeGesture>,
     watcher: config_watch::Watcher,
 }
 
@@ -1265,6 +1280,7 @@ impl Pool {
             reaping: Vec::new(),
             shortcuts: [false; 256],
             mouse_shortcuts: [false; 12],
+            native_gestures: Vec::new(),
             watcher: config_watch::Watcher::new(),
         }
     }
@@ -2664,6 +2680,18 @@ impl Pool {
         }
     }
 
+    fn cancel_native_gesture(&mut self, gesture: NativeGesture) {
+        if let Some(ui) = self
+            .sessions
+            .iter_mut()
+            .find(|session| session.id == gesture.session)
+            .and_then(|session| session.ui.as_mut())
+            .filter(|ui| ui.attachment == gesture.attachment)
+        {
+            ui.native_ui.cancel_button(gesture.button);
+        }
+    }
+
     fn events(&mut self, openers: &mut os::Openers, buffers: &mut InputBuffers) {
         for connection_index in 0..self.connections.len() {
             let connection = self.connections[connection_index].1.clone();
@@ -2680,6 +2708,54 @@ impl Pool {
                 }
                 let id = event.window();
                 let kind = unsafe { event.kind };
+                if matches!(kind, x11::BUTTON_PRESS | x11::BUTTON_RELEASE) {
+                    let button = unsafe { event.button.button };
+                    if let Some(position) = self.native_gestures.iter().position(|gesture| {
+                        gesture.display == connection.display && gesture.button == button
+                    }) {
+                        let gesture = self.native_gestures.swap_remove(position);
+                        let same_view = self.sessions.iter().any(|session| {
+                            session.id == gesture.session
+                                && session.ui.as_ref().is_some_and(|ui| {
+                                    ui.open
+                                        && ui.visible
+                                        && ui.attachment == gesture.attachment
+                                        && ui.window.id == id
+                                        && ui.window.display == connection.display
+                                })
+                        });
+                        if kind == x11::BUTTON_PRESS || !same_view {
+                            // A new press supersedes a release delivered outside our
+                            // windows. Cross-view releases belong to the original UI.
+                            self.cancel_native_gesture(gesture);
+                        }
+                        if kind == x11::BUTTON_RELEASE && !same_view {
+                            continue;
+                        }
+                    }
+                }
+                if kind == x11::MOTION_NOTIFY {
+                    let state = unsafe { event.motion.state };
+                    for position in (0..self.native_gestures.len()).rev() {
+                        let gesture = self.native_gestures[position];
+                        if gesture.display == connection.display
+                            && gesture.button <= 5
+                            && state & (1 << (gesture.button + 7)) == 0
+                        {
+                            // Unmapping a view drops X11's implicit grab. A
+                            // release outside this client may never be delivered.
+                            let gesture = self.native_gestures.swap_remove(position);
+                            self.cancel_native_gesture(gesture);
+                        }
+                    }
+                    if self
+                        .native_gestures
+                        .iter()
+                        .any(|gesture| gesture.display == connection.display && gesture.button <= 5)
+                    {
+                        continue;
+                    }
+                }
                 if matches!(kind, x11::FOCUS_IN | x11::FOCUS_OUT)
                     && (kind == x11::FOCUS_IN) != (x11::input_focus(connection.display) == id)
                 {
@@ -2772,6 +2848,13 @@ impl Pool {
                     if native_handled {
                         if kind == x11::BUTTON_PRESS {
                             let session_id = self.sessions[index].id;
+                            let attachment = self.sessions[index].ui.as_ref().unwrap().attachment;
+                            self.native_gestures.push(NativeGesture {
+                                session: session_id,
+                                attachment,
+                                display: connection.display,
+                                button: unsafe { event.button.button },
+                            });
                             if let Some(workspace) = self.workspace(session_id) {
                                 self.workspaces[workspace].layout.focus(session_id);
                             }
@@ -2791,7 +2874,8 @@ impl Pool {
                         let window = &self.sessions[index].ui.as_ref().unwrap().window;
                         let symbol = window.key_symbol(&mut e, false);
                         let bindings = &self.sessions[index].appearance.bindings;
-                        let shifted = (e.state & 1 != 0 && !bindings.is_empty())
+                        let shifted = (e.state & 1 != 0
+                            && (!bindings.is_empty() || e.state & 4 != 0))
                             .then(|| window.key_symbol(&mut e, true));
                         if let Some(action) =
                             actions::key_action_with_shifted(bindings, symbol, shifted, e.state)

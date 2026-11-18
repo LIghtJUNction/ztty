@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "07851a38374f5794e1f0013de0821d0be76ae32b",
+  "run_id": 44330414544,
+  "job_id": 134893220945,
+  "architecture": "aarch64",
+  "artifact_id": 14438108951,
+  "artifact_zip_sha256": "1490a6b79fd3c47af367a50a226203cac417779c3ece9f8b5ce836b276abe95c",
+  "binary_sha256": "26b0fab392fad60c5ee682416050c266c93af2a01d5a27d3b66487c6575b04c2",
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "native_gate_passed": false,
+  "formal_release_eligible": false,
+  "completed_cold_starts": 5,
+  "attempted_cold_starts": 6,
+  "required_cold_starts": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/summary.json",
+      "bytes": 11366,
+      "sha256": "3b4e2191bc08a543a0987e0008ffc096e357406b72c1ee3ecd65330d4dc0fe92",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 45432,
+      "sha256": "1e8967180906aebf84c2c8eded477334deb93a21aac2db35c62c3da334637ffb",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 1032
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.json",
+      "bytes": 43833,
+      "sha256": "00181c5ba658fdf05bf5a9ab5fbc9c3aee60fd5c56cc0f70b985704e312b1bf5",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2085
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.post-failure.json",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.json",
+      "bytes": 1734,
+      "sha256": "20fe1c8f177882c02aa388e526ec9dca59954f2f8c90c429011f4f3790c16751",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.resize-restored.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.post-failure.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-06.post-repaint.png",
+      "source_path": "artifacts/release-audit/preserve-none-44330414544/windows-aarch64/ztty-windows-aarch64.native.cold-06.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "status": "failed",
+  "failed_cold_start": 6,
+  "failed_original_checks_completed": 23,
+  "workspace_entered": false,
+  "scope": "Compact failed cold6 report, build identity, same-process failure-only snapshot and three original PNGs. Successful cold1 through cold5 reports and other PNGs remain in the verified original artifact and are source/binary/hash indexed by the summary.",
+  "notes": [
+    "Raw JSON line endings and PNG bytes are preserved.",
+    "The failure is the unchanged original resize-restoration pixel gate; warm and back-to-back did not enter for cold6. Cold7, cold8 and workspace did not run.",
+    "The snapshot is sampled only after the original failure. Its red source pixel cannot establish the source pixel during the last BitBlt.",
+    "The extra paint diagnostics were disabled; target_after_blit is null. No immediate post-copy pixel, clip or origin measurement is imported from another source.",
+    "Explicit flush left the target gray; normal repaint restored the picture. Neither diagnostic operation accepts the failed gate.",
+    "The candidate did not record the NCCALCSIZE input/default/submitted rectangles; the requested empty-valid-region policy is not proof of the internal window copy or backing behavior."
+  ]
+}

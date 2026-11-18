@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "07851a38374f5794e1f0013de0821d0be76ae32b",
+  "run_id": 44330414544,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44330414544",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "status": "failed",
+  "formal_release_eligible": false,
+  "production_policy_under_test": "After default WM_NCCALCSIZE calculation, preserve the default client rectangle, clear the source and destination valid rectangles, and return only WVR_VALIDRECTS for TRUE/non-null parameters. The earlier NOCOPYBITS request and queued paint policy remain.",
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "x86_64": {
+    "status": "passed",
+    "completed_cold_starts": 8,
+    "attempted_cold_starts": 8,
+    "every_cold_original_warm_back_to_back": [
+      31,
+      10,
+      10
+    ],
+    "workspace_checks": 19,
+    "workspace_passed": true,
+    "original_trace_or_extra_paint_diagnostics": false,
+    "pngs_verified": 367,
+    "native_png_samples_exact": 600,
+    "native_screen_dc_samples": 0,
+    "workspace_live_query_samples_exact": 34,
+    "workspace_png_samples_exact": 19,
+    "workspace_live_samples_without_matching_stage_png": 15,
+    "failure_snapshots_or_diagnostic_retries": 0,
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "status": "failed",
+    "completed_cold_starts": 5,
+    "attempted_cold_starts": 6,
+    "cold1_to_5": "each original31/warm10/back-to-back10 passed",
+    "failed_cold_start": 6,
+    "failed_cold_pid": 8544,
+    "original_checks_completed_before_failure": 23,
+    "failed_check": "resize_restores_visible_image",
+    "failed_sample": [
+      175,
+      28
+    ],
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "failed_cold_warm_and_back_to_back_entered": false,
+    "cold7_and_8_entered": false,
+    "workspace_entered": false,
+    "pngs_verified": 231,
+    "geometry_samples_verified": 382,
+    "difference_bbox_from_before": [
+      152,
+      0,
+      180,
+      190
+    ],
+    "failure_row_28_segments": [
+      {
+        "x_inclusive": [
+          0,
+          151
+        ],
+        "rgb": [
+          16,
+          24,
+          32
+        ]
+      },
+      {
+        "x_inclusive": [
+          152,
+          178
+        ],
+        "rgb": [
+          20,
+          20,
+          20
+        ]
+      },
+      {
+        "x_inclusive": [
+          179,
+          179
+        ],
+        "rgb": [
+          55,
+          55,
+          55
+        ]
+      }
+    ],
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "arm_failure_only_snapshot": {
+    "surface_client_bitmap": [
+      180,
+      190
+    ],
+    "grid_and_pty": [
+      20,
+      10
+    ],
+    "cpu_and_source_rgb_after_failure": [
+      255,
+      0,
+      0
+    ],
+    "target_rgb_after_explicit_flush": [
+      20,
+      20,
+      20
+    ],
+    "app_and_dispatch_resize_pending": false,
+    "dispatch_paint_pending": false,
+    "full_redraw_and_pane_dirty": false,
+    "deferred_paints": 0,
+    "last_paint_region": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "last_paint_blit_return": 1,
+    "last_paint_target_after_blit": null,
+    "failed_png_identical_after_flush": true,
+    "before_png_identical_after_repaint": true
+  },
+  "cleanup": {
+    "x64_application_window_processes_exited": 9,
+    "x64_workspace_pty_probe_processes_exited": 4,
+    "arm_application_window_processes_exited": 6,
+    "all_application_directories_actually_removed_on_first_attempt": true,
+    "both_jobs_empty_and_desktops_restored": true
+  },
+  "worker_elapsed_seconds": {
+    "x86_64": 14.48,
+    "aarch64": 19.514
+  },
+  "worker_exit_codes": {
+    "x86_64": 0,
+    "aarch64": 1
+  },
+  "inference_limits": [
+    "This normal-mode candidate passed x64 but failed ARM; the production policy did not eliminate the observed failure.",
+    "The original failed pixel and failed result are not superseded by explicit flush, recovery repaint, or earlier successful cold starts.",
+    "The ARM source RGB and full clip are post-failure observations. The extra copy-stage queries were disabled.",
+    "No NCCALCSIZE before/default/submitted rectangle record exists for this source. Do not infer that a particular internal copy or backing-surface operation occurred or that a flag was ignored.",
+    "No statistical failure-rate claim or formal six-platform acceptance follows from these fixed-size samples."
+  ],
+  "delivery_scope": "Windows build-only candidate, overall failed. No Release publication or device installation; the failed formal v0.3.0 tag and all earlier evidence remain unchanged."
+}

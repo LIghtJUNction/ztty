@@ -1,0 +1,346 @@
+{
+  "run_id": 44330414544,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44330414544",
+  "source_sha": "07851a38374f5794e1f0013de0821d0be76ae32b",
+  "source_ref": "refs/heads/fix/windows-resize-release-20261118",
+  "architecture": "x86_64",
+  "artifact_id": 14439615986,
+  "artifact_zip_sha256": "1ca273e62a089de306654cd8e3b9123e5f974434410083bdc2fceae1af910049",
+  "binary_sha256": "e23d08e41b245506b08052312351e361a44acee091325e101c64cc7ffc305217",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "build_status": "accepted",
+  "passed": true,
+  "native_gate_passed": true,
+  "release_eligible": false,
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "contract_tests": 29,
+  "cold_required": 8,
+  "cold_completed": 8,
+  "cold_attempted": 8,
+  "reports": [
+    {
+      "number": 1,
+      "raw_report": "ztty-windows-x86_64.native.cold-01.json",
+      "raw_report_sha256": "674e7a368a8509ce437389d0f78ba463957ace6b99b49b649c1c55a5cea09e5b",
+      "pid": 8436,
+      "hwnd": 393622,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006401999999980035,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 2,
+      "raw_report": "ztty-windows-x86_64.native.cold-02.json",
+      "raw_report_sha256": "37142f9145d9aeac628534ef51da53b19f1acc3bb7e5a49eee4f5ed46805663f",
+      "pid": 6740,
+      "hwnd": 655566,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.0066171999999937725,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 3,
+      "raw_report": "ztty-windows-x86_64.native.cold-03.json",
+      "raw_report_sha256": "5c904c0352cc66183b0b9e4c5275f42f95c8fe758497a7c74fda60e029a3c02b",
+      "pid": 5308,
+      "hwnd": 918032,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006400300000052539,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 4,
+      "raw_report": "ztty-windows-x86_64.native.cold-04.json",
+      "raw_report_sha256": "4bf800052def8c0db6657026e9400371442d68489c83c0697458354e4f6efc0b",
+      "pid": 4276,
+      "hwnd": 1310886,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006820100000027196,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 5,
+      "raw_report": "ztty-windows-x86_64.native.cold-05.json",
+      "raw_report_sha256": "e921bd36688c07d2cd96b7486499b17d8b8838cdf4d1a023b38589e94555012c",
+      "pid": 5188,
+      "hwnd": 1573328,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.0067348000000038155,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 6,
+      "raw_report": "ztty-windows-x86_64.native.cold-06.json",
+      "raw_report_sha256": "e10f31fc9fdc44e9413e27fc1fbc899e42d84b401c249084be91d69fa8e62dd2",
+      "pid": 1424,
+      "hwnd": 1835160,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006916200000034678,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 7,
+      "raw_report": "ztty-windows-x86_64.native.cold-07.json",
+      "raw_report_sha256": "eebf57ce312747cb396843b82dd4762e89aea7cd523fb9537e63451800bd2757",
+      "pid": 2068,
+      "hwnd": 2163094,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006882099999984348,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 8,
+      "raw_report": "ztty-windows-x86_64.native.cold-08.json",
+      "raw_report_sha256": "566732d1ce19c4246e2d72f323796afa58222d95a172d7a9b1bc47356cb8e1bd",
+      "pid": 2512,
+      "hwnd": 2425038,
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "passed": true,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.006394099999965874,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    }
+  ],
+  "base_check_names": [
+    "native_python_and_binary_architecture",
+    "absent_default_config_and_cmd_exit",
+    "invalid_cwd_missing_rejected",
+    "invalid_cwd_regular_file_rejected",
+    "invalid_cwd_empty_rejected",
+    "relative_program_uses_requested_cwd",
+    "redirected_host_uses_conpty_standard_handles",
+    "native_ztty_process_architecture",
+    "unicode_arguments_and_native_child",
+    "unicode_cwd_and_relative_config",
+    "capability_query_roundtrip",
+    "opaque_red",
+    "half_alpha_green",
+    "fully_transparent",
+    "image_scrolls_with_content",
+    "old_image_position_repainted",
+    "alternate_hides_primary_image",
+    "primary_image_restored",
+    "deletion_repaints_image",
+    "png_decode_and_alpha",
+    "rgb24_decode",
+    "right_edge_clips_image",
+    "resize_clips_without_ghosts",
+    "resize_restores_visible_image",
+    "sixel_rgb_native_pixels",
+    "sixel_transparent_preserves_underlying_image",
+    "sixel_opaque_uses_current_background",
+    "sixel_erase_display_repaints",
+    "sixel_cancel_and_input_recovery",
+    "sixel_recovers_after_oversized_raster",
+    "keyboard_recovers_after_malformed_graphics"
+  ],
+  "native_resize_repetitions": {
+    "original_cycles": 8,
+    "warm": 80,
+    "back_to_back": 80
+  },
+  "workspace": {
+    "passed": true,
+    "checks": 19,
+    "names": [
+      "native_architecture_and_initial_pty",
+      "split_right_distinct_pty",
+      "split_viewport_pixels",
+      "pane_keyboard_focus_isolation",
+      "inactive_pane_mouse_tracking",
+      "pane_history_isolation",
+      "pane_selection_isolation",
+      "split_down_distinct_pty",
+      "three_pane_pixels_and_shared_window",
+      "maximize_restore_keeps_pty_identity",
+      "grow_shrink_updates_child_geometry",
+      "swap_keeps_session_identity",
+      "window_resize_coordinates_all_ptys",
+      "new_tab_distinct_pty",
+      "hidden_tab_output_and_response",
+      "tab_switch_restores_pane_images",
+      "natural_exit_keeps_siblings",
+      "close_keeps_other_tab",
+      "last_pane_closes_window"
+    ],
+    "report": "ztty-windows-x86_64.native.workspace.json",
+    "report_sha256": "7720a60332c32285c21d075caea5889e0681eba57928bfb0c133aa51d5a79a81",
+    "window_pid": 1328,
+    "child_pids": {
+      "a": 4908,
+      "b": 8820,
+      "c": 3328,
+      "d": 4068
+    },
+    "all_probe_processes_exited": true,
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 0,
+      "directory_removal": {
+        "attempts": 1,
+        "elapsed_seconds": 0.009861000000000786,
+        "retry_timeout_seconds": 2.0
+      },
+      "all_probe_processes_exited": true
+    },
+    "live_query_samples_exact": 34,
+    "png_samples_independently_recomputed": 19,
+    "live_samples_without_matching_stage_png": 15,
+    "window_sizes": [
+      [
+        600,
+        404
+      ],
+      [
+        528,
+        328
+      ],
+      [
+        600,
+        404
+      ]
+    ],
+    "keyboard_focus_markers_isolated": true,
+    "history_silent_modifiers": [
+      "shift",
+      "control"
+    ],
+    "actual_enter_returns_live": "0d"
+  },
+  "pngs_verified": 367,
+  "unique_png_contents": 9,
+  "native_resize_png_samples_exact": 600,
+  "workspace_live_query_samples_exact": 34,
+  "workspace_png_samples_exact": 19,
+  "native_screen_dc_sample_count": 0,
+  "failure_snapshots_or_diagnostic_retries": 0,
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-1844-8bf453ee806c4f6b86f28220002a89ab",
+    "input_after_restore": "Default"
+  },
+  "desktop_elapsed_seconds": 14.48,
+  "worker_exit_code": 0,
+  "verified_application_window_processes": 9,
+  "all_application_directories_removed_on_first_attempt": true,
+  "scope": "Source-bound Windows x64 candidate passed all eight independent original 31+warm10+back-to-back10 native runs and all 19 workspace checks with runtime trace and extra paint queries disabled. This is x64-only candidate evidence, not a formal six-platform release or proof that the intermittent fault has been eliminated; the same candidate ARM gate failed. No native rerun, CI dispatch, or production edit was performed during this audit.",
+  "artifact_verification": "independent-artifact-verification.json",
+  "png_analysis": "png-analysis.json",
+  "pixel_capture_scope": "600 native resize samples have owned ClientDC RGB and matching captured client PNG pixels; optional direct ScreenDC RGB was not sampled in these normal records. Workspace has 34 exact live GetPixel samples, 19 also paired with a corresponding captured stage PNG.",
+  "visual_review": {
+    "unique_workspace_png_contents_directly_inspected": 6,
+    "native_png_unique_contents_match_prior_reviewed_hashes": 3
+  }
+}

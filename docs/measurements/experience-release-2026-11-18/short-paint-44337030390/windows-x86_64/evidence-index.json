@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "31bdb1cdfc8dc8b176f16410376fb007d8ff0a90",
+  "run_id": 44337030390,
+  "job_id": 134916516113,
+  "architecture": "x86_64",
+  "artifact_id": 14441378650,
+  "artifact_zip_sha256": "b2e865195eace8aa755b251907464f7a3c6ce8eb515ccb8002d26608a110b371",
+  "binary_sha256": "d136b35ad43cda7967e57d347a2ea55e74d539c05af5905c8defa5c9c7ec4386",
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "resize_control_diagnostic": {
+    "requested": false,
+    "outcome": "skipped"
+  },
+  "native_gate_passed": true,
+  "formal_release_eligible": false,
+  "required_cold_starts": 8,
+  "completed_cold_starts": 8,
+  "attempted_cold_starts": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/short-paint-44337030390/windows-x86_64/summary.json",
+      "bytes": 11677,
+      "sha256": "9cb36c375aac285cc9a36e0c8622f4d5b3aed9e3dd100c2590b901c8ba840147",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 70060,
+      "sha256": "47775f89880ac7025ea9f352a7b3ecda08d2803e80991feb05f1c56945628fb7",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 1588
+    },
+    {
+      "path": "ztty-windows-x86_64.native.json",
+      "source_path": "artifacts/release-audit/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.native.json",
+      "bytes": 255931,
+      "sha256": "1345edb018afca910a5b707999378590fe7722866813b7c34079333765fefdf5",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 9704
+    },
+    {
+      "path": "ztty-windows-x86_64.native.workspace.json",
+      "source_path": "artifacts/release-audit/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.native.workspace.json",
+      "bytes": 26226,
+      "sha256": "4ac6d30e0df22870f9592975a32871d704bf495bf08da6ef28fe7422855d474f",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "source_path": "artifacts/release-audit/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.workspace.three-panes.png",
+      "source_path": "artifacts/release-audit/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.native.workspace.three-panes.png",
+      "bytes": 2241,
+      "sha256": "ccf7dec33d1f03a0d35abe33556cae7e4fd39bd1e00d9e3c2137324d5e00a357",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.workspace.resized.png",
+      "source_path": "artifacts/release-audit/short-paint-44337030390/windows-x86_64/ztty-windows-x86_64.native.workspace.resized.png",
+      "bytes": 1820,
+      "sha256": "a93302c74648a45f0a53b926dac70ee4556af4b056111f9a0295d95941f4b290",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ],
+  "status": "accepted-windows-x64-candidate",
+  "workspace_checks_passed": 19,
+  "scope": "Source-bound successful x64 aggregate and workspace report, build identity and three representative original PNGs. Full eight cold reports and other PNGs remain in the verified original artifact; their raw SHA values are retained in the aggregate and summary.",
+  "notes": [
+    "Raw JSON line endings and PNG bytes are preserved.",
+    "All eight cold runs passed original31/warm10/back-to-back10 and workspace19 passed afterward, with extra paint queries and runtime trace disabled.",
+    "600 native ClientDC samples matched their PNGs; normal direct ScreenDC sample count is0. Workspace has34 exact live samples,19 paired with matching PNGs.",
+    "This x64 result cannot accept the same-source ARM failure or establish that the strategy eliminated the defect."
+  ]
+}

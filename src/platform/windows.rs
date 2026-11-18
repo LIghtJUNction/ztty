@@ -37,12 +37,310 @@ const WM_PAINT: u32 = 0x000f;
 const WM_CLOSE: u32 = 0x0010;
 const WM_DESTROY: u32 = 0x0002;
 const WM_SIZE: u32 = 0x0005;
+const WM_NCCALCSIZE: u32 = 0x0083;
+const WM_WINDOWPOSCHANGING: u32 = 0x0046;
+const WVR_VALIDRECTS: isize = 0x0400;
+const SWP_NOSIZE: u32 = 0x0001;
+const SWP_NOREDRAW: u32 = 0x0008;
+const SWP_NOCOPYBITS: u32 = 0x0100;
 const WM_KEYDOWN: u32 = 0x0100;
 const WM_KEYUP: u32 = 0x0101;
 const WM_CHAR: u32 = 0x0102;
 const WM_SYSKEYDOWN: u32 = 0x0104;
 const WM_SYSKEYUP: u32 = 0x0105;
 const WM_SYSCHAR: u32 = 0x0106;
+const WM_NATIVE_SNAPSHOT: u32 = 0x85a1;
+const WM_NATIVE_PAINT_SAMPLE: u32 = 0x85a2;
+const NATIVE_SNAPSHOT_MAGIC: usize = 0x5a545459;
+
+#[derive(Default)]
+struct PaintRecord {
+    sequence: u64,
+    surface: [i32; 2],
+    region: [i32; 4],
+    blit: i32,
+    start_event_sequence: u64,
+    end_event_sequence: u64,
+    default_message: u32,
+    default_depth: u32,
+    target: Option<PaintTarget>,
+    target_after_end: Option<PaintAfterEnd>,
+}
+
+struct PaintTarget {
+    sample: [i32; 2],
+    cpu_before_blit: Option<u32>,
+    flush_after_blit: i32,
+    target_after_flush: Option<u32>,
+    source_after_target_read: Option<u32>,
+    clip_type: i32,
+    clip: [i32; 4],
+    origin_ok: bool,
+    origin: [i32; 2],
+}
+
+struct PaintAfterEnd {
+    sample: [i32; 2],
+    sample_end_event_sequence: u64,
+    end_paint_return: i32,
+    client_dc_ok: bool,
+    target_rgb: Option<u32>,
+    release_dc_return: Option<i32>,
+}
+
+struct SurfaceResizeRecord {
+    count: u64,
+    from: [i32; 2],
+    to: [i32; 2],
+}
+
+const POSITION_MESSAGES: [u32; 6] = [
+    WM_WINDOWPOSCHANGING,
+    0x0047,
+    0x0088,
+    0x0085,
+    0x0014,
+    WM_SIZE,
+];
+
+#[derive(Clone, Copy, Default)]
+struct MessagePhase {
+    received: u64,
+    default_enter: u64,
+    default_exit: u64,
+}
+
+#[derive(Clone, Copy, Default)]
+struct PositionEvent {
+    sequence: u64,
+    flags_in: u32,
+    flags_submitted: u32,
+    position: [i32; 4],
+    current_outer: Option<[i32; 4]>,
+}
+impl PositionEvent {
+    fn json(self) -> String {
+        let outer = self.current_outer.map_or_else(
+            || String::from("null"),
+            |rect| format!("[{},{},{},{}]", rect[0], rect[1], rect[2], rect[3]),
+        );
+        format!(
+            concat!(
+                "{{\"sequence\":{},\"flags_in\":{},\"flags_submitted\":{},",
+                "\"position\":[{},{},{},{}],\"current_outer\":{}}}"
+            ),
+            self.sequence,
+            self.flags_in,
+            self.flags_submitted,
+            self.position[0],
+            self.position[1],
+            self.position[2],
+            self.position[3],
+            outer
+        )
+    }
+}
+
+#[derive(Clone, Copy)]
+struct NcCalcStage {
+    rects: [[i32; 4]; 3],
+    position: Option<ffi::WindowPos>,
+}
+impl NcCalcStage {
+    fn capture(params: &ffi::NcCalcSizeParams) -> Self {
+        Self {
+            rects: params
+                .rects
+                .each_ref()
+                .map(|rect| [rect.left, rect.top, rect.right, rect.bottom]),
+            position: unsafe { params.position.as_ref() }.copied(),
+        }
+    }
+    fn json(self) -> String {
+        let rects = self
+            .rects
+            .map(|rect| format!("[{},{},{},{}]", rect[0], rect[1], rect[2], rect[3]));
+        let position = self.position.map_or_else(
+            || String::from("null"),
+            |position| {
+                format!(
+                    concat!(
+                        "{{\"hwnd\":{},\"insert_after\":{},\"x\":{},\"y\":{},",
+                        "\"width\":{},\"height\":{},\"flags\":{}}}"
+                    ),
+                    position.hwnd as usize,
+                    position.insert_after as usize,
+                    position.x,
+                    position.y,
+                    position.width,
+                    position.height,
+                    position.flags
+                )
+            },
+        );
+        format!(
+            "{{\"rects\":[{},{},{}],\"lppos\":{}}}",
+            rects[0], rects[1], rects[2], position
+        )
+    }
+}
+
+#[derive(Clone, Copy)]
+struct NcCalcEvent {
+    sequence: u64,
+    wparam: usize,
+    input: NcCalcStage,
+    default_return: isize,
+    after_default: NcCalcStage,
+    submitted_return: isize,
+    submitted: NcCalcStage,
+}
+impl NcCalcEvent {
+    fn json(self) -> String {
+        format!(
+            concat!(
+                "{{\"sequence\":{},\"wparam\":{},\"input\":{},\"default_return\":{},",
+                "\"after_default\":{},\"submitted_return\":{},\"submitted\":{}}}"
+            ),
+            self.sequence,
+            self.wparam,
+            self.input.json(),
+            self.default_return,
+            self.after_default.json(),
+            self.submitted_return,
+            self.submitted.json()
+        )
+    }
+}
+
+#[derive(Clone, Copy, Default)]
+struct NativeEventRecord {
+    messages: [MessagePhase; 6],
+    changing: PositionEvent,
+    changed: PositionEvent,
+    size: [u32; 3],
+    default_message: u32,
+    default_depth: u32,
+    nccalc_valid_rects: Option<NcCalcEvent>,
+}
+
+/// Memory-only ordering evidence. Every Cell update finishes before a native
+/// call can reenter; formatting happens only for the failure snapshot.
+struct NativeEvents {
+    enabled: bool,
+    paint_diagnostics: bool,
+    paint_sample: Cell<Option<[i32; 2]>>,
+    sequence: Cell<u64>,
+    record: Cell<NativeEventRecord>,
+}
+impl NativeEvents {
+    fn new(enabled: bool, paint_diagnostics: bool) -> Self {
+        Self {
+            enabled,
+            paint_diagnostics,
+            paint_sample: Cell::new(None),
+            sequence: Cell::new(0),
+            record: Cell::new(NativeEventRecord::default()),
+        }
+    }
+    fn next(&self) -> u64 {
+        if !self.enabled {
+            return 0;
+        }
+        let sequence = self.sequence.get().saturating_add(1);
+        self.sequence.set(sequence);
+        sequence
+    }
+    fn update(&self, update: impl FnOnce(&mut NativeEventRecord)) {
+        if self.enabled {
+            let mut record = self.record.get();
+            update(&mut record);
+            self.record.set(record);
+        }
+    }
+    fn received(&self, message: u32) -> u64 {
+        if !self.enabled {
+            return 0;
+        }
+        let sequence = self.next();
+        if let Some(index) = POSITION_MESSAGES.iter().position(|value| *value == message) {
+            self.update(|record| record.messages[index].received = sequence);
+        }
+        sequence
+    }
+    fn enter_default(&self, message: u32) -> u32 {
+        if !self.enabled {
+            return 0;
+        }
+        let previous = self.record.get().default_message;
+        let sequence = self.next();
+        self.update(|record| {
+            record.default_depth = record.default_depth.saturating_add(1);
+            record.default_message = message;
+            if let Some(index) = POSITION_MESSAGES.iter().position(|value| *value == message) {
+                record.messages[index].default_enter = sequence;
+            }
+        });
+        previous
+    }
+    fn exit_default(&self, message: u32, previous: u32) {
+        if !self.enabled {
+            return;
+        }
+        let sequence = self.next();
+        self.update(|record| {
+            record.default_depth = record.default_depth.saturating_sub(1);
+            record.default_message = previous;
+            if let Some(index) = POSITION_MESSAGES.iter().position(|value| *value == message) {
+                record.messages[index].default_exit = sequence;
+            }
+        });
+    }
+    fn json(&self) -> String {
+        let record = self.record.get();
+        let mut messages = String::new();
+        for (index, message) in POSITION_MESSAGES.iter().enumerate() {
+            if index != 0 {
+                messages.push(',');
+            }
+            let phase = record.messages[index];
+            messages.push_str(&format!(
+                "{{\"message\":{},\"received\":{},\"default_enter\":{},\"default_exit\":{}}}",
+                message, phase.received, phase.default_enter, phase.default_exit
+            ));
+        }
+        let changed = record.changed;
+        let changed = format!(
+            "{{\"sequence\":{},\"flags_reported\":{},\"position\":[{},{},{},{}]}}",
+            changed.sequence,
+            changed.flags_in,
+            changed.position[0],
+            changed.position[1],
+            changed.position[2],
+            changed.position[3]
+        );
+        format!(
+            concat!(
+                "{{\"enabled\":{},\"sequence\":{},\"default_message\":{},\"default_depth\":{},",
+                "\"messages\":[{}],\"changing\":{},\"changed\":{},\"nccalc_valid_rects\":{},",
+                "\"last_size\":{{\"kind\":{},\"size\":[{},{}]}}}}"
+            ),
+            self.enabled,
+            self.sequence.get(),
+            record.default_message,
+            record.default_depth,
+            messages,
+            record.changing.json(),
+            changed,
+            record
+                .nccalc_valid_rects
+                .map_or_else(|| String::from("null"), NcCalcEvent::json),
+            record.size[0],
+            record.size[1],
+            record.size[2]
+        )
+    }
+}
 
 struct NativeTrace {
     remaining: Cell<u16>,
@@ -297,6 +595,8 @@ struct Fonts {
     bold: Handle,
     italic: Handle,
     bold_italic: Handle,
+    description: String,
+    size: u32,
     width: i32,
     height: i32,
 }
@@ -338,6 +638,8 @@ impl Fonts {
             bold: make(700, 0),
             italic: make(400, 1),
             bold_italic: make(700, 1),
+            description: String::from(description),
+            size,
             width: 0,
             height: 0,
         };
@@ -504,9 +806,256 @@ struct App {
     title: String,
     focused: bool,
     native_trace: NativeTrace,
+    native_snapshot_path: Option<Vec<u16>>,
+    surface_resize: Option<SurfaceResizeRecord>,
+    last_paint: PaintRecord,
 }
 
 impl App {
+    /// An explicit diagnostic read of our DIB through the kernel, without asking
+    /// GDI to flush its batch. The value may precede queued GDI work.
+    fn diagnostic_cpu_pixel(&self, x: i32, y: i32) -> Option<u32> {
+        if self.surface.pixels.is_null()
+            || x < 0
+            || y < 0
+            || x >= self.surface.width
+            || y >= self.surface.height
+        {
+            return None;
+        }
+        let mut pixel = 0u32;
+        let mut read = 0;
+        let ok = unsafe {
+            ffi::ReadProcessMemory(
+                -1isize as Handle,
+                self.surface
+                    .pixels
+                    .add((y * self.surface.width + x) as usize)
+                    .cast(),
+                (&mut pixel as *mut u32).cast(),
+                core::mem::size_of::<u32>(),
+                &mut read,
+            )
+        };
+        (ok != 0 && read == core::mem::size_of::<u32>()).then_some(pixel)
+    }
+
+    fn failure_snapshot(
+        &mut self,
+        x: i32,
+        y: i32,
+        dispatch_resize_pending: bool,
+        dispatch_paint_pending: bool,
+        deferred_paints: u64,
+        events: &NativeEvents,
+    ) -> isize {
+        // Only an explicitly configured test process may write this one-shot
+        // record. No path or pointer is accepted from a window message.
+        let Some(path) = self.native_snapshot_path.take() else {
+            return 0;
+        };
+        let rgb = |pixel: Option<u32>| {
+            pixel.map_or_else(
+                || String::from("null"),
+                |value| {
+                    format!(
+                        "[{},{},{}]",
+                        value >> 16 & 255,
+                        value >> 8 & 255,
+                        value & 255
+                    )
+                },
+            )
+        };
+        let cpu = self.diagnostic_cpu_pixel(x, y);
+        let target = self.last_paint.target.as_ref().map_or_else(|| String::from("null"), |target| {
+            format!(concat!("{{\"sample\":[{},{}],\"cpu_before_blit_rgb\":{},\"gdi_flush_after_blit_return\":{},",
+                "\"target_after_flush_rgb\":{},\"source_after_target_read_rgb\":{},",
+                "\"clip_type\":{},\"clip\":[{},{},{},{}],\"origin_ok\":{},\"origin\":[{},{}]}}"),
+                target.sample[0], target.sample[1], rgb(target.cpu_before_blit), target.flush_after_blit,
+                rgb(target.target_after_flush), rgb(target.source_after_target_read),
+                target.clip_type, target.clip[0], target.clip[1], target.clip[2], target.clip[3],
+                target.origin_ok, target.origin[0], target.origin[1])
+        });
+        let target_after_end = self.last_paint.target_after_end.as_ref().map_or_else(
+            || String::from("null"),
+            |target| {
+                format!(
+                    concat!(
+                        "{{\"sample\":[{},{}],\"sample_end_event_sequence\":{},\"end_paint_return\":{},\"client_dc_ok\":{},",
+                        "\"target_rgb\":{},\"release_dc_return\":{}}}"
+                    ),
+                    target.sample[0],
+                    target.sample[1],
+                    target.sample_end_event_sequence,
+                    target.end_paint_return,
+                    target.client_dc_ok,
+                    rgb(target.target_rgb),
+                    target
+                        .release_dc_return
+                        .map_or_else(|| String::from("null"), |value| format!("{value}"))
+                )
+            },
+        );
+        let pane = self.panes.get(self.active).map_or_else(|| String::from("null"), |pane| {
+            format!(concat!("{{\"rect\":[{},{},{},{}],\"grid\":[{},{}],\"pty\":[{},{}],\"images\":{},\"placements\":{},",
+                            "\"dirty\":{},\"terminal_dirty\":{},\"grid_ready\":{},\"synchronized_output\":{}}}"),
+                pane.rect.x, pane.rect.y, pane.rect.width, pane.rect.height,
+                pane.core.terminal.cols(), pane.core.terminal.rows(), pane.pty_size.cols, pane.pty_size.rows,
+                pane.core.terminal.graphics().image_count(), pane.core.terminal.graphics().placement_count(),
+                pane.dirty, pane.core.terminal.dirty(), pane.grid_ready(), pane.core.terminal.modes().synchronized_output)
+        });
+        let surface_resize = self.surface_resize.as_ref().map_or_else(
+            || String::from("null"),
+            |resize| {
+                format!(
+                    "{{\"count\":{},\"last_from\":[{},{}],\"last_to\":[{},{}]}}",
+                    resize.count, resize.from[0], resize.from[1], resize.to[0], resize.to[1]
+                )
+            },
+        );
+        let before = format!(
+            concat!(
+                "{{\"surface\":{{\"size\":[{},{}],\"clip\":[{},{},{},{}],\"resize_changes\":{}}},\"cpu_rgb\":{},\"dispatch_resize_pending\":{},",
+                "\"dispatch_paint_pending\":{},\"deferred_paints\":{},",
+                "\"app_resize_pending\":{},\"full_redraw\":{},\"pane\":{},\"last_paint\":{{\"sequence\":{},",
+                "\"surface\":[{},{}],\"region\":[{},{},{},{}],\"blit\":{},",
+                "\"start_event_sequence\":{},\"end_event_sequence\":{},\"default_message\":{},\"default_depth\":{},\"target_after_blit\":{},",
+                "\"target_after_end_paint\":{}}},",
+                "\"events\":{}}}"
+            ),
+            self.surface.width,
+            self.surface.height,
+            self.surface.clip.x,
+            self.surface.clip.y,
+            self.surface.clip.width,
+            self.surface.clip.height,
+            surface_resize,
+            rgb(cpu),
+            dispatch_resize_pending,
+            dispatch_paint_pending,
+            deferred_paints,
+            self.resize_pending,
+            self.full_redraw,
+            pane,
+            self.last_paint.sequence,
+            self.last_paint.surface[0],
+            self.last_paint.surface[1],
+            self.last_paint.region[0],
+            self.last_paint.region[1],
+            self.last_paint.region[2],
+            self.last_paint.region[3],
+            self.last_paint.blit,
+            self.last_paint.start_event_sequence,
+            self.last_paint.end_event_sequence,
+            self.last_paint.default_message,
+            self.last_paint.default_depth,
+            target,
+            target_after_end,
+            events.json()
+        );
+        // All App/CPU fields above are captured before these native queries.
+        let mut client = ffi::Rect::default();
+        let mut update = ffi::Rect::default();
+        let client_ok = unsafe { ffi::GetClientRect(self.hwnd, &mut client) } != 0;
+        let update_pending = unsafe { ffi::GetUpdateRect(self.hwnd, &mut update, 0) } != 0;
+        let flush = unsafe { ffi::GdiFlush() };
+        let after_cpu = self.diagnostic_cpu_pixel(x, y);
+        let mut bitmap: ffi::Bitmap = unsafe { core::mem::zeroed() };
+        let selected = unsafe { ffi::GetCurrentObject(self.surface.dc, 7) };
+        let bitmap_read = unsafe {
+            ffi::GetObjectW(
+                selected,
+                core::mem::size_of::<ffi::Bitmap>() as i32,
+                (&mut bitmap as *mut ffi::Bitmap).cast(),
+            )
+        };
+        let sample = |dc: Handle| {
+            if dc.is_null() {
+                return None;
+            }
+            let value = unsafe { ffi::GetPixel(dc, x, y) };
+            (value != u32::MAX).then(|| colorref(value))
+        };
+        let source = sample(self.surface.dc);
+        let mut source_clip = ffi::Rect::default();
+        let source_clip_type = unsafe { ffi::GetClipBox(self.surface.dc, &mut source_clip) };
+        let target = unsafe { ffi::GetDC(self.hwnd) };
+        let target_rgb = sample(target);
+        let mut target_clip = ffi::Rect::default();
+        let target_clip_type = if target.is_null() {
+            0
+        } else {
+            unsafe { ffi::GetClipBox(target, &mut target_clip) }
+        };
+        if !target.is_null() {
+            unsafe {
+                ffi::ReleaseDC(self.hwnd, target);
+            }
+        }
+        let record = format!(
+            concat!(
+                "{{\"schema\":1,\"paint_diagnostics_enabled\":{},\"pid\":{},\"hwnd\":{},\"sample\":[{},{}],\"before\":{},",
+                "\"client_ok\":{},\"client\":[{},{}],\"update_pending\":{},\"update_rect\":[{},{},{},{}],",
+                "\"after_flush\":{{\"flush\":{},\"cpu_rgb\":{},\"bitmap_read\":{},\"bitmap\":[{},{}],",
+                "\"bitmap_matches\":{},\"source_rgb\":{},\"target_rgb\":{},",
+                "\"source_clip_type\":{},\"source_clip\":[{},{},{},{}],",
+                "\"target_clip_type\":{},\"target_clip\":[{},{},{},{}]}}}}\n"
+            ),
+            events.paint_diagnostics,
+            unsafe { ffi::GetCurrentProcessId() },
+            self.hwnd as usize,
+            x,
+            y,
+            before,
+            client_ok,
+            client.right,
+            client.bottom,
+            update_pending,
+            update.left,
+            update.top,
+            update.right,
+            update.bottom,
+            flush,
+            rgb(after_cpu),
+            bitmap_read,
+            bitmap.width,
+            bitmap.height,
+            selected == self.surface.bitmap,
+            rgb(source),
+            rgb(target_rgb),
+            source_clip_type,
+            source_clip.left,
+            source_clip.top,
+            source_clip.right,
+            source_clip.bottom,
+            target_clip_type,
+            target_clip.left,
+            target_clip.top,
+            target_clip.right,
+            target_clip.bottom
+        );
+        if record.len() > 8192 {
+            return 0;
+        }
+        let file = unsafe { ffi::CreateFileW(path.as_ptr(), 0x40000000, 1, NULL, 1, 0x80, NULL) };
+        if file == -1isize as Handle {
+            return 0;
+        }
+        let mut written = 0;
+        let ok = unsafe {
+            ffi::WriteFile(
+                file,
+                record.as_ptr().cast(),
+                record.len() as u32,
+                &mut written,
+                NULL,
+            )
+        };
+        let closed = unsafe { ffi::CloseHandle(file) };
+        isize::from(ok != 0 && written as usize == record.len() && closed != 0)
+    }
+
     fn trace_frame(&self, event: &str, target: Handle, paint: &ffi::Rect, blit: i32) {
         if !self.native_trace.enabled() {
             return;
@@ -699,6 +1248,41 @@ impl App {
         }
     }
 
+    fn font_action(&mut self, action: &str) -> Result<(), &'static str> {
+        // Repeated shortcuts build on the requested font even while PTY
+        // compensation is pending; arrange commits font and all grids together.
+        let current = self.pending_fonts.as_ref().unwrap_or(&self.fonts);
+        let description = if action == "font-reset" {
+            self.appearance.font.clone()
+        } else {
+            let size = if action == "font-increase" {
+                current.size.saturating_add(1)
+            } else {
+                current.size.saturating_sub(1)
+            }
+            .clamp(5, 96);
+            if size == current.size {
+                return Ok(());
+            }
+            let mut description = String::new();
+            for (index, part) in current.description.split(':').enumerate() {
+                if index != 0 && part.starts_with("size=") {
+                    continue;
+                }
+                if index != 0 {
+                    description.push(':');
+                }
+                description.push_str(part);
+            }
+            format!("{description}:size={size}")
+        };
+        let candidate = Fonts::new(self.surface.dc, &description, unsafe {
+            ffi::GetDpiForWindow(self.hwnd)
+        })?;
+        self.resize_with_fonts(Some(candidate));
+        Ok(())
+    }
+
     fn grid_size(cols: usize, rows: usize, fonts: &Fonts) -> zpty::Size {
         zpty::Size {
             cols: cols as u16,
@@ -776,8 +1360,21 @@ impl App {
             // Repeated resizes keep the original committed snapshot.
             self.preserve_held_frames()?;
         }
+        let previous_surface = [self.surface.width, self.surface.height];
         if !self.surface.resize(width, height) {
             return Err("cannot allocate the Windows workspace surface");
+        }
+        if changed && self.native_snapshot_path.is_some() {
+            // Include the first DIB allocation, but not no-ops or failed sizes.
+            // Later PTY coordination can still reject this layout.
+            self.surface_resize = Some(SurfaceResizeRecord {
+                count: self
+                    .surface_resize
+                    .as_ref()
+                    .map_or(1, |resize| resize.count.saturating_add(1)),
+                from: previous_surface,
+                to: [self.surface.width, self.surface.height],
+            });
         }
         self.full_redraw |= changed;
         let fonts = self.pending_fonts.as_ref().unwrap_or(&self.fonts);
@@ -1009,6 +1606,7 @@ impl App {
                 self.paste();
                 Ok(())
             }
+            "font-increase" | "font-decrease" | "font-reset" => self.font_action(action),
             "scroll-up" | "scroll-down" => {
                 let pane = &mut self.panes[self.active];
                 let step = pane.core.terminal.rows().saturating_sub(1).max(1);
@@ -1557,9 +2155,14 @@ impl App {
         self.panes[index].dirty = false;
         self.panes[index].core.terminal.clear_dirty();
     }
-    fn paint(&mut self) {
-        let mut paint: ffi::PaintStruct = unsafe { core::mem::zeroed() };
-        let dc = unsafe { ffi::BeginPaint(self.hwnd, &mut paint) };
+    fn paint(&mut self, events: &NativeEvents) {
+        let start_event_sequence = events.next();
+        let (default_message, default_depth) = if events.enabled {
+            let context = events.record.get();
+            (context.default_message, context.default_depth)
+        } else {
+            (0, 0)
+        };
         if self.full_redraw {
             unsafe {
                 ffi::GdiFlush();
@@ -1605,6 +2208,23 @@ impl App {
             }
         }
         self.full_redraw = false;
+        // Prepare the retained frame before acquiring the window DC. Keep its
+        // lifetime limited to presentation and the existing opt-in diagnostics.
+        let mut paint: ffi::PaintStruct = unsafe { core::mem::zeroed() };
+        let dc = unsafe { ffi::BeginPaint(self.hwnd, &mut paint) };
+        let diagnostic_sample = (events.paint_diagnostics
+            && !dc.is_null()
+            && self.surface.width > 0
+            && self.surface.height > 0)
+            .then(|| {
+                // Keep an explicitly configured point unchanged across resize,
+                // including when it falls outside the temporarily smaller DIB.
+                events.paint_sample.get().unwrap_or([
+                    self.surface.width.saturating_sub(2).max(0),
+                    self.surface.height / 2,
+                ])
+            });
+        let cpu_before_blit = diagnostic_sample.and_then(|[x, y]| self.diagnostic_cpu_pixel(x, y));
         let mut blit = 0;
         if !self.surface.bitmap.is_null() {
             unsafe {
@@ -1621,9 +2241,72 @@ impl App {
                 );
             }
         }
+        // Opt-in only: flush immediately after BitBlt, then sample target before
+        // source or clip queries can hide a failed batch. Never an acceptance flush.
+        let target = if let Some([x, y]) = diagnostic_sample {
+            let flush_after_blit = unsafe { ffi::GdiFlush() };
+            let target_pixel = unsafe { ffi::GetPixel(dc, x, y) };
+            let source_pixel = unsafe { ffi::GetPixel(self.surface.dc, x, y) };
+            let mut clip = ffi::Rect::default();
+            let mut origin = ffi::Point::default();
+            let clip_type = unsafe { ffi::GetClipBox(dc, &mut clip) };
+            let origin_ok = unsafe { ffi::GetDCOrgEx(dc, &mut origin) } != 0;
+            Some(PaintTarget {
+                sample: [x, y],
+                cpu_before_blit,
+                flush_after_blit,
+                target_after_flush: (target_pixel != u32::MAX).then(|| colorref(target_pixel)),
+                source_after_target_read: (source_pixel != u32::MAX)
+                    .then(|| colorref(source_pixel)),
+                clip_type,
+                clip: [clip.left, clip.top, clip.right, clip.bottom],
+                origin_ok,
+                origin: [origin.x, origin.y],
+            })
+        } else {
+            None
+        };
         self.trace_frame("paint", dc, &paint.paint, blit);
-        unsafe {
-            ffi::EndPaint(self.hwnd, &paint);
+        let end_paint_return = unsafe { ffi::EndPaint(self.hwnd, &paint) };
+        let end_event_sequence = events.next();
+        // Opt-in only: compare the same pixel through a fresh client DC after
+        // EndPaint. Keep both samples local until the complete paint is recorded.
+        let target_after_end = diagnostic_sample.map(|sample| {
+            let client_dc = unsafe { ffi::GetDC(self.hwnd) };
+            let (target_rgb, release_dc_return) = if client_dc.is_null() {
+                (None, None)
+            } else {
+                let pixel = unsafe { ffi::GetPixel(client_dc, sample[0], sample[1]) };
+                let released = unsafe { ffi::ReleaseDC(self.hwnd, client_dc) };
+                ((pixel != u32::MAX).then(|| colorref(pixel)), Some(released))
+            };
+            PaintAfterEnd {
+                sample,
+                sample_end_event_sequence: events.next(),
+                end_paint_return,
+                client_dc_ok: !client_dc.is_null(),
+                target_rgb,
+                release_dc_return,
+            }
+        });
+        if self.native_snapshot_path.is_some() {
+            self.last_paint = PaintRecord {
+                sequence: self.last_paint.sequence.saturating_add(1),
+                surface: [self.surface.width, self.surface.height],
+                region: [
+                    paint.paint.left,
+                    paint.paint.top,
+                    paint.paint.right,
+                    paint.paint.bottom,
+                ],
+                blit,
+                start_event_sequence,
+                end_event_sequence,
+                default_message,
+                default_depth,
+                target,
+                target_after_end,
+            };
         }
     }
     fn ime_position(&self) {
@@ -2081,6 +2764,9 @@ pub(crate) fn action_supported(action: &str) -> bool {
             | "close"
             | "copy"
             | "paste"
+            | "font-increase"
+            | "font-decrease"
+            | "font-reset"
             | "scroll-up"
             | "scroll-down"
             | "none"
@@ -2097,6 +2783,9 @@ fn binding_state(modifiers: Modifiers) -> u32 {
 fn binding_symbol(key: Key) -> u64 {
     match key {
         Key::Character(ch) => u64::from(ch as u32),
+        Key::KeypadAdd => 0xffab,
+        Key::KeypadSubtract => 0xffad,
+        Key::KeypadDigit(0) => 0xffb0,
         Key::Escape => 0xff1b,
         Key::Enter | Key::KeypadEnter => 0xff0d,
         Key::Tab => 0xff09,
@@ -2190,12 +2879,26 @@ struct WindowState {
     app: UnsafeCell<App>,
     dispatch: session_dispatch::Dispatch,
     native_trace: NativeTrace,
+    native_events: NativeEvents,
 }
 impl WindowState {
     fn with<R>(&self, operation: impl FnOnce(&mut App) -> R) -> Option<R> {
         self.dispatch
             .with(|| operation(unsafe { &mut *self.app.get() }))
     }
+}
+
+unsafe fn default_window_proc(
+    state: &WindowState,
+    hwnd: Handle,
+    message: u32,
+    wparam: usize,
+    lparam: isize,
+) -> isize {
+    let previous = state.native_events.enter_default(message);
+    let result = unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
+    state.native_events.exit_default(message, previous);
+    result
 }
 
 unsafe extern "system" fn window_proc(
@@ -2217,10 +2920,129 @@ unsafe extern "system" fn window_proc(
         return unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
     }
     let state = unsafe { &*pointer };
+    let event_sequence = state.native_events.received(message);
+    if message == WM_NCCALCSIZE {
+        // Copy only scalars while the message parameters are valid. No borrow
+        // or pointer into them survives the reentrant default procedure.
+        let input = if state.native_events.enabled && wparam != 0 {
+            unsafe { (lparam as *const ffi::NcCalcSizeParams).as_ref() }.map(NcCalcStage::capture)
+        } else {
+            None
+        };
+        let result = unsafe { default_window_proc(state, hwnd, message, wparam, lparam) };
+        if wparam != 0
+            && let Some(params) = unsafe { (lparam as *mut ffi::NcCalcSizeParams).as_mut() }
+        {
+            let after_default = input.map(|_| NcCalcStage::capture(params));
+            // Keep default frame/client geometry, but preserve no old client
+            // pixels: the retained DIB supplies the resized frame.
+            params.rects[1] = ffi::Rect::default();
+            params.rects[2] = ffi::Rect::default();
+            if let (Some(input), Some(after_default)) = (input, after_default) {
+                let submitted = NcCalcStage::capture(params);
+                state.native_events.update(|record| {
+                    record.nccalc_valid_rects = Some(NcCalcEvent {
+                        sequence: event_sequence,
+                        wparam,
+                        input,
+                        default_return: result,
+                        after_default,
+                        submitted_return: WVR_VALIDRECTS,
+                        submitted,
+                    });
+                });
+            }
+            return WVR_VALIDRECTS;
+        }
+        return result;
+    }
+    if state.native_events.enabled
+        && message == 0x0047
+        && let Some(position) = unsafe { (lparam as *const ffi::WindowPos).as_ref() }
+    {
+        state.native_events.update(|record| {
+            record.changed = PositionEvent {
+                sequence: event_sequence,
+                flags_in: position.flags,
+                flags_submitted: position.flags,
+                position: [position.x, position.y, position.width, position.height],
+                current_outer: None,
+            }
+        });
+    }
+    if message == WM_WINDOWPOSCHANGING {
+        // The retained DIB is the source of every resized frame. Do not also
+        // preserve and copy back old window pixels across a size change.
+        // Keep default frame/minimum-size processing and every other flag.
+        let mut current = ffi::Rect::default();
+        if let Some(position) = unsafe { (lparam as *mut ffi::WindowPos).as_mut() } {
+            let flags_in = position.flags;
+            let mut current_outer = None;
+            if position.flags & (SWP_NOSIZE | SWP_NOREDRAW) == 0
+                && unsafe { ffi::GetWindowRect(hwnd, &mut current) } != 0
+            {
+                current_outer = Some([current.left, current.top, current.right, current.bottom]);
+                if current.right.saturating_sub(current.left) != position.width
+                    || current.bottom.saturating_sub(current.top) != position.height
+                {
+                    position.flags |= SWP_NOCOPYBITS;
+                }
+            }
+            state.native_events.update(|record| {
+                if event_sequence >= record.changing.sequence {
+                    record.changing = PositionEvent {
+                        sequence: event_sequence,
+                        flags_in,
+                        flags_submitted: position.flags,
+                        position: [position.x, position.y, position.width, position.height],
+                        current_outer,
+                    };
+                }
+            });
+        }
+        return unsafe { default_window_proc(state, hwnd, message, wparam, lparam) };
+    }
+    if message == WM_NATIVE_PAINT_SAMPLE {
+        if state.native_events.enabled
+            && state.native_events.paint_diagnostics
+            && wparam == NATIVE_SNAPSHOT_MAGIC
+        {
+            state
+                .native_events
+                .paint_sample
+                .set(Some([lparam as u16 as i32, (lparam >> 16) as u16 as i32]));
+            return 1;
+        }
+        return 0;
+    }
+    if message == WM_NATIVE_SNAPSHOT && wparam == NATIVE_SNAPSHOT_MAGIC {
+        let resize_pending = state.dispatch.resize_pending();
+        let paint_pending = state.dispatch.paint_pending();
+        let deferred_paints = state.dispatch.deferred_paints();
+        return state
+            .with(|app| {
+                app.failure_snapshot(
+                    lparam as u16 as i32,
+                    (lparam >> 16) as u16 as i32,
+                    resize_pending,
+                    paint_pending,
+                    deferred_paints,
+                    &state.native_events,
+                )
+            })
+            .unwrap_or(0);
+    }
     if message == WM_SIZE {
-        // Sent WM_SIZE can arrive while another callback owns App. Retain it
-        // without borrowing App; the outer loop reads the latest client size.
+        // Record sent WM_SIZE before trying App so a reentrant request remains
+        // pending for WM_PAINT or the outer loop when App is already borrowed.
         state.dispatch.resize_event(wparam == 1);
+        state.native_events.update(|record| {
+            record.size = [
+                wparam as u32,
+                lparam as u16 as u32,
+                (lparam >> 16) as u16 as u32,
+            ];
+        });
         if state.native_trace.enabled() {
             let mut client = ffi::Rect::default();
             unsafe {
@@ -2231,6 +3053,13 @@ unsafe extern "system" fn window_proc(
                 os::milliseconds(), wparam, lparam as u16, (lparam >> 16) as u16,
                 client.right, client.bottom));
         }
+        if wparam != 1 {
+            state.with(|app| {
+                if !app.panes.is_empty() && state.dispatch.take_resize() {
+                    app.resize();
+                }
+            });
+        }
         return 0;
     }
     let handled = state.with(|app| {
@@ -2238,7 +3067,14 @@ unsafe extern "system" fn window_proc(
             return Some(0);
         }
         match message {
-            WM_PAINT => app.paint(),
+            WM_PAINT => {
+                // A sent resize can precede this paint while the outer loop is
+                // still draining messages. Commit its latest client size first.
+                if state.dispatch.take_resize() && !app.panes.is_empty() {
+                    app.resize();
+                }
+                app.paint(&state.native_events);
+            }
             0x0014 => return Some(1),
             WM_CLOSE => {
                 app.running = false;
@@ -2288,7 +3124,8 @@ unsafe extern "system" fn window_proc(
             0x0215 => app.cancel_mouse_capture(false),
             0x02e0 => {
                 let dpi = wparam as u16 as u32;
-                let candidate = Fonts::new(app.surface.dc, &app.appearance.font, dpi).ok();
+                let current = app.pending_fonts.as_ref().unwrap_or(&app.fonts);
+                let candidate = Fonts::new(app.surface.dc, &current.description, dpi).ok();
                 let rect = unsafe { &*(lparam as *const ffi::Rect) };
                 unsafe {
                     ffi::SetWindowPos(
@@ -2313,9 +3150,14 @@ unsafe extern "system" fn window_proc(
         }
         Some(0)
     });
+    if message == WM_PAINT && handled.is_none() {
+        // Default processing validates the region even though App could not
+        // paint. Retain the obligation and re-invalidate outside the guard.
+        state.dispatch.defer_paint();
+    }
     handled
         .flatten()
-        .unwrap_or_else(|| unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) })
+        .unwrap_or_else(|| unsafe { default_window_proc(state, hwnd, message, wparam, lparam) })
 }
 
 pub fn run(cfg: Config) -> Result<i32, &'static str> {
@@ -2324,6 +3166,13 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
     }
     let native_trace =
         os::environment_value("ZTTY_NATIVE_TRACE").is_some_and(|value| value == [u16::from(b'1')]);
+    let paint_diagnostics = os::environment_value("ZTTY_NATIVE_PAINT_DIAGNOSTICS")
+        .is_some_and(|value| value == [u16::from(b'1')]);
+    let native_snapshot_path = os::environment_value("ZTTY_NATIVE_SNAPSHOT").map(|mut path| {
+        path.push(0);
+        path
+    });
+    let native_events = NativeEvents::new(native_snapshot_path.is_some(), paint_diagnostics);
     let program = os::resolve(&cfg.command[0])?;
     let arguments: Vec<Vec<u16>> = cfg
         .command
@@ -2397,9 +3246,13 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             title: String::new(),
             focused: false,
             native_trace: NativeTrace::new(native_trace),
+            native_snapshot_path,
+            surface_resize: None,
+            last_paint: PaintRecord::default(),
         }),
         dispatch: session_dispatch::Dispatch::default(),
         native_trace: NativeTrace::new(native_trace),
+        native_events,
     });
     let class_name = wide("ztty.NativeWindow");
     let instance = unsafe { ffi::GetModuleHandleW(ptr::null()) };
@@ -2452,8 +3305,14 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
         return Err("cannot create a native Windows window");
     }
     let dark = 1i32;
+    // Keep standard Win32 decorations while isolating the retained GDI client
+    // from the separate DWM nonclient rendering path.
+    let nonclient_policy = 1i32; // DWMNCRP_DISABLED
     unsafe {
         ffi::DwmSetWindowAttribute(hwnd, 20, (&dark as *const i32).cast(), 4);
+        if ffi::DwmSetWindowAttribute(hwnd, 2, (&nonclient_policy as *const i32).cast(), 4) < 0 {
+            os::print(2, b"ztty: native window frame policy unavailable\n");
+        }
         ffi::ShowWindow(hwnd, 5);
     }
     state.with(App::resize);
@@ -2488,11 +3347,15 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
         if !running {
             break;
         }
-        unsafe {
-            ffi::UpdateWindow(hwnd);
+        // Consume before entering Win32; a reentrant paint creates a fresh
+        // obligation for the next turn. Never call paint through an App borrow.
+        if state.dispatch.take_paint() && unsafe { ffi::InvalidateRect(hwnd, ptr::null(), 0) } == 0
+        {
+            state.dispatch.retry_paint();
         }
+        // The wake mask includes existing paint work; PeekMessage dispatches it.
         let timeout = state.with(|app| app.wait_timeout()).unwrap_or(8);
-        let timeout = if state.dispatch.resize_pending() {
+        let timeout = if state.dispatch.resize_pending() || state.dispatch.paint_pending() {
             0
         } else {
             timeout
@@ -2540,6 +3403,27 @@ mod ffi {
         pub right: i32,
         pub bottom: i32,
     }
+    #[repr(C)]
+    #[derive(Clone, Copy)]
+    pub struct WindowPos {
+        pub hwnd: Handle,
+        pub insert_after: Handle,
+        pub x: i32,
+        pub y: i32,
+        pub width: i32,
+        pub height: i32,
+        pub flags: u32,
+    }
+    #[repr(C)]
+    pub struct NcCalcSizeParams {
+        pub rects: [Rect; 3],
+        pub position: *mut WindowPos,
+    }
+    #[cfg(target_pointer_width = "64")]
+    const _: () = {
+        assert!(core::mem::size_of::<NcCalcSizeParams>() == 56);
+        assert!(core::mem::offset_of!(NcCalcSizeParams, position) == 48);
+    };
     #[repr(C)]
     pub struct WindowClass {
         pub size: u32,
@@ -2636,6 +3520,7 @@ mod ffi {
     unsafe extern "system" {
         pub fn SetProcessDpiAwarenessContext(context: Handle) -> i32;
         pub fn GetDpiForSystem() -> u32;
+        pub fn GetDpiForWindow(hwnd: Handle) -> u32;
         pub fn RegisterClassExW(class: *const WindowClass) -> u16;
         pub fn UnregisterClassW(name: *const u16, instance: Handle) -> i32;
         pub fn CreateWindowExW(
@@ -2659,8 +3544,11 @@ mod ffi {
         pub fn LoadCursorW(instance: Handle, name: *const u16) -> Handle;
         pub fn ShowWindow(hwnd: Handle, show: i32) -> i32;
         pub fn DestroyWindow(hwnd: Handle) -> i32;
-        pub fn UpdateWindow(hwnd: Handle) -> i32;
         pub fn GetClientRect(hwnd: Handle, rect: *mut Rect) -> i32;
+        pub fn GetWindowRect(hwnd: Handle, rect: *mut Rect) -> i32;
+        pub fn GetUpdateRect(hwnd: Handle, rect: *mut Rect, erase: i32) -> i32;
+        pub fn GetDC(hwnd: Handle) -> Handle;
+        pub fn ReleaseDC(hwnd: Handle, dc: Handle) -> i32;
         pub fn InvalidateRect(hwnd: Handle, rect: *const Rect, erase: i32) -> i32;
         pub fn BeginPaint(hwnd: Handle, paint: *mut PaintStruct) -> Handle;
         pub fn EndPaint(hwnd: Handle, paint: *const PaintStruct) -> i32;
@@ -2754,6 +3642,7 @@ mod ffi {
         pub fn GetObjectW(object: Handle, bytes: i32, result: *mut c_void) -> i32;
         pub fn GetPixel(dc: Handle, x: i32, y: i32) -> u32;
         pub fn GetClipBox(dc: Handle, rect: *mut Rect) -> i32;
+        pub fn GetDCOrgEx(dc: Handle, point: *mut Point) -> i32;
         pub fn SaveDC(dc: Handle) -> i32;
         pub fn RestoreDC(dc: Handle, saved: i32) -> i32;
         pub fn IntersectClipRect(dc: Handle, left: i32, top: i32, right: i32, bottom: i32) -> i32;
@@ -2761,6 +3650,31 @@ mod ffi {
     #[link(name = "kernel32")]
     unsafe extern "system" {
         pub fn GetModuleHandleW(name: *const u16) -> Handle;
+        pub fn GetCurrentProcessId() -> u32;
+        pub fn ReadProcessMemory(
+            process: Handle,
+            source: *const c_void,
+            target: *mut c_void,
+            size: usize,
+            read: *mut usize,
+        ) -> i32;
+        pub fn CreateFileW(
+            path: *const u16,
+            access: u32,
+            share: u32,
+            security: *const c_void,
+            disposition: u32,
+            attributes: u32,
+            template: Handle,
+        ) -> Handle;
+        pub fn WriteFile(
+            file: Handle,
+            data: *const c_void,
+            size: u32,
+            written: *mut u32,
+            overlapped: Handle,
+        ) -> i32;
+        pub fn CloseHandle(handle: Handle) -> i32;
         pub fn GlobalAlloc(flags: u32, size: usize) -> Handle;
         pub fn GlobalLock(memory: Handle) -> Handle;
         pub fn GlobalUnlock(memory: Handle) -> i32;

@@ -2,6 +2,7 @@
 """Portable failure contracts, never substitutes for native workspace pixels."""
 import copy
 import ctypes
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -26,6 +27,28 @@ def complete_report():
         name: {"elapsed_seconds": 0.050, "pixels": copy.deepcopy(report["checks"][2]["pixels"])}
         for name in ("focus", "resize")}
     return report
+
+
+def complete_native_report(name):
+    return {"passed": True, "status": "passed",
+            "checks": [{"name": str(index), "passed": True} for index in range(31)],
+            "runtime_trace_enabled": False, "resize_path": "rapid", "visible_pixel_checks_completed": 19,
+            "rapid_resize_repetitions": {"required": 10, "completed": 10, "passed": True,
+                "iterations": [{"number": number, "passed": True} for number in range(1, 11)]},
+            "back_to_back_resize_repetitions": {"required": 10, "completed": 10, "passed": True,
+                "iterations": [{"number": number, "passed": True} for number in range(1, 11)]},
+            "cleanup": {"process_exited": True, "temporary_directory_removed": True, "returncode": 0},
+            "desktop": {"thread": {"name": name}, "input": {"name": name}}}
+
+
+def complete_cold_runs(directory, identity):
+    aggregate = {"required": 8, "completed": 8, "passed": True, "runs": [], **identity}
+    for number in range(1, 9):
+        path = directory / f"native.cold-{number:02d}.json"
+        desktop.write_json(path, complete_native_report(identity["desktop"]))
+        aggregate["runs"].append({"number": number, "report": path.name, "passed": True, **identity,
+                                  "report_sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    return aggregate
 
 
 class WorkspaceContract(unittest.TestCase):
@@ -55,9 +78,29 @@ class WorkspaceContract(unittest.TestCase):
         window.chord(0x45)
         self.assertEqual(calls, [(0x11, 0, 0), (0x10, 0, 0), (0x45, 0, 0),
                                  (0x45, 0, 2), (0x10, 0, 2), (0x11, 0, 2)])
+        calls.clear()
+        window.chord(0xBB, alt=True)
+        self.assertEqual(calls, [(0x11, 0, 0), (0x12, 0, 0), (0x10, 0, 0), (0xBB, 0, 0),
+                                 (0xBB, 0, 2), (0x10, 0, 2), (0x12, 0, 2), (0x11, 0, 2)])
         window.user.GetForegroundWindow = lambda: 999
         with self.assertRaises(workspace.native.DesktopBlocked):
             window.text("must not reach another window")
+
+    def test_font_metrics_require_one_valid_cell_reply(self):
+        self.assertEqual(workspace.cell_reply(b"\x1b_Gi=7;OK\x1b\\\x1b[6;19;9t"), (9, 19))
+        for data in (b"", b"\x1b[8;20;64t", b"\x1b[6;0;9t", b"\x1b[6;19;0t",
+                     b"\x1b[6;4097;9t", b"\x1b[6;19;4097t",
+                     b"\x1b[6;19;9t\x1b[6;19;9t"):
+            with self.subTest(data=data):
+                with self.assertRaises(AssertionError):
+                    workspace.cell_reply(data)
+
+    def test_probe_reply_filter_preserves_leaked_keys_and_unexpected_replies(self):
+        leaked = b"+-0\t\x1b[27;7;43~"
+        unexpected = b"\x1b_Gi=7;ERROR\x1b\\\x1b[6;bad;9t"
+        replies = b"\x1b[6;19;9t\x1b_Gi=7;OK\x1b\\"
+        self.assertEqual(workspace.without_probe_replies(leaked + replies + unexpected),
+                         leaked + unexpected)
 
     def test_all_native_checks_images_and_cleanup_are_required(self):
         report = complete_report()
@@ -131,12 +174,14 @@ class WorkspaceContract(unittest.TestCase):
             with self.subTest(crash=crash), tempfile.TemporaryDirectory() as temporary:
                 output = Path(temporary) / "native.json"
                 state = Path(temporary) / "worker.json"
-                original = {"passed": True, "status": "passed",
-                            "checks": [{"name": str(i), "passed": True} for i in range(30)]}
-                def legacy(*args):
-                    desktop.write_json(output, original)
+                original = complete_native_report(name)
+                calls = []
+                def legacy(binary, report, arch):
+                    calls.append(report)
+                    desktop.write_json(report, original)
                     return True
                 def fail_workspace(binary, report, arch):
+                    self.assertEqual(len(calls), 8)
                     desktop.write_json(report, {"passed": False, "status": "failed",
                                                "checks": [{"name": "partial", "passed": True}],
                                                "error": "actual workspace failure"})
@@ -145,15 +190,63 @@ class WorkspaceContract(unittest.TestCase):
                     return False
                 args = types.SimpleNamespace(worker_desktop=name, binary=Path("ztty.exe"), output=output, arch="arm64")
                 with patch.object(desktop, "WindowsAPI", return_value=api), \
+                        patch.object(desktop, "source_identity", return_value={"source_sha": "1" * 40, "binary_sha256": "2" * 64}), \
                         patch.dict("sys.modules", {"windows_native": types.SimpleNamespace(run=legacy)}), \
                         patch.object(workspace, "run", side_effect=fail_workspace), \
                         patch.object(desktop.traceback, "print_exc"):
                     self.assertEqual(desktop.worker(args, state), 1)
-                result = json.loads(output.read_text())
+                result = json.loads(output.read_text(encoding="utf-8"))
                 self.assertFalse(result["passed"])
+                self.assertTrue(result["cold_start_runs"]["passed"])
+                self.assertEqual(len(set(calls)), 8)
                 self.assertEqual(result["checks"], original["checks"])
                 self.assertEqual(result["workspace"]["error"], "actual workspace failure")
                 self.assertEqual(result["error"], "actual workspace failure")
+
+    def test_cold_failure_or_incomplete_cleanup_stops_without_retry_or_workspace(self):
+        name = "ztty-native-1-" + "c" * 32
+        api = types.SimpleNamespace(context=lambda: {
+            "station": "WinSta0", "visible": True, "thread": name, "input": name})
+        for fault in ("pixel", "cleanup", "burst"):
+            with self.subTest(fault=fault), tempfile.TemporaryDirectory() as temporary:
+                output, state = Path(temporary) / "native.json", Path(temporary) / "worker.json"
+                calls, originals = [], {}
+                def native(binary, report, arch):
+                    calls.append(report)
+                    evidence = complete_native_report(name)
+                    if len(calls) == 4:
+                        if fault == "pixel":
+                            evidence.update({"passed": False, "status": "failed", "error": "cold restore stayed black",
+                                             "failed_pixel": {"name": "resize_restores_visible_image"},
+                                             "post_failure_snapshot": {"before": {"surface": {"size": [144, 190]}}}})
+                        elif fault == "cleanup":
+                            evidence["cleanup"]["process_exited"] = False
+                        else:
+                            evidence["back_to_back_resize_repetitions"]["completed"] = 9
+                    desktop.write_json(report, evidence)
+                    originals[len(calls)] = report.read_bytes()
+                    if len(calls) == 4 and fault == "pixel":
+                        raise AssertionError(evidence["error"])
+                    return evidence["passed"]
+                args = types.SimpleNamespace(worker_desktop=name, binary=Path("ztty.exe"), output=output, arch="arm64")
+                with patch.object(desktop, "WindowsAPI", return_value=api), \
+                        patch.object(desktop, "source_identity", return_value={"source_sha": "1" * 40, "binary_sha256": "2" * 64}), \
+                        patch.dict("sys.modules", {"windows_native": types.SimpleNamespace(run=native)}), \
+                        patch.object(workspace, "run") as workspace_run, patch.object(desktop.traceback, "print_exc"):
+                    self.assertEqual(desktop.worker(args, state), 1)
+                    workspace_run.assert_not_called()
+                result = json.loads(output.read_text(encoding="utf-8"))
+                self.assertFalse(result["passed"])
+                self.assertEqual(result["checks"], complete_native_report(name)["checks"])
+                aggregate = result["cold_start_runs"]
+                self.assertEqual((aggregate["required"], aggregate["completed"], len(aggregate["runs"])), (8, 3, 4))
+                self.assertFalse(aggregate["passed"])
+                self.assertFalse(aggregate["runs"][-1]["passed"])
+                self.assertEqual(calls, [output] + [output.with_suffix(f".cold-{n:02d}.json") for n in range(2, 5)])
+                self.assertEqual(output.with_suffix(".cold-01.json").read_bytes(), originals[1])
+                self.assertEqual(calls[-1].read_bytes(), originals[4])
+                self.assertEqual(aggregate["runs"][-1]["report_sha256"], hashlib.sha256(originals[4]).hexdigest())
+                self.assertFalse(output.with_suffix(".cold-05.json").exists())
 
     def test_atomic_probe_evidence_retries_only_transient_sharing_failure(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -194,6 +287,7 @@ class WorkspaceContract(unittest.TestCase):
                     return True
                 args = types.SimpleNamespace(worker_desktop=name, binary=Path("ztty.exe"), output=output, arch="x64")
                 with patch.object(desktop, "WindowsAPI", return_value=api), \
+                        patch.object(desktop, "source_identity", return_value={"source_sha": "1" * 40, "binary_sha256": "2" * 64}), \
                         patch.dict("sys.modules", {"windows_native": types.SimpleNamespace(run=legacy)}), \
                         patch.object(desktop.traceback, "print_exc"):
                     self.assertEqual(desktop.worker(args, state), 1)

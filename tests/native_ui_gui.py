@@ -123,6 +123,37 @@ def main():
         root = Path(temporary)
         log = (root / "stderr.log").open("wb")
         try:
+            import pty
+            import select
+            import termios
+            master, slave = pty.openpty()
+            original_termios = termios.tcgetattr(slave)
+            fallback = subprocess.Popen(
+                ["/usr/bin/python3", str(source / "examples/native_ui.py")],
+                stdin=slave, stdout=slave, stderr=log, start_new_session=True)
+            try:
+                fallback_output = bytearray()
+                deadline = time.monotonic() + 5
+                while END not in fallback_output and time.monotonic() < deadline:
+                    if select.select([master], [], [], 0.1)[0]:
+                        fallback_output.extend(os.read(master, 8192))
+                assert fallback_output.startswith(PREFIX) and END in fallback_output
+                os.write(master, frame({"v": 1, "type": "capabilities",
+                                        "supported": False, "events": False, "components": []}).encode())
+                assert fallback.wait(timeout=5) == 0
+                while select.select([master], [], [], 0.05)[0]:
+                    fallback_output.extend(os.read(master, 8192))
+                assert b"ZUI/1 is unavailable" in fallback_output
+                assert b"?1049" not in fallback_output and b"?25" not in fallback_output
+                assert termios.tcgetattr(slave) == original_termios
+                report["checks"].append("unsupported producer fallback uses plain text, never changes screen/cursor modes, and restores termios")
+            finally:
+                if fallback.poll() is None:
+                    fallback.kill()
+                    fallback.wait(timeout=5)
+                os.close(master)
+                os.close(slave)
+
             xvfb = start_xvfb(screen="1400x900x24", stderr=log)
             report["xvfb"] = xvfb.evidence
             connection = display.Display(xvfb.display)
@@ -155,10 +186,10 @@ def main():
             def info():
                 return rpc({"op": "info", "session": "ui-probe"})
 
-            def control(output="", clear=False, exit=False):
+            def control(output="", clear=False, exit=False, path=None):
                 with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as channel:
                     channel.settimeout(10)
-                    channel.connect(str(control_path))
+                    channel.connect(str(control_path if path is None else path))
                     channel.sendall(json.dumps({"output": output, "clear": clear, "exit": exit}).encode() + b"\n")
                     data = bytearray()
                     while b"\n" not in data:
@@ -421,11 +452,133 @@ def main():
             control(frame(scene(revision)), clear=True)
             wait(image_pixels, "interactive scene restored")
 
+            # A leading combining acute has negative ink bearing in the test
+            # font. It must not paint into the left inset of a narrow row leaf.
+            revision += 1
+            clipped = scene(revision)
+            clipped["nodes"][1] = {"id": 2, "type": "row", "children": list(range(20, 36))}
+            clipped["nodes"].extend({"id": node, "type": "text", "style": "body",
+                                     "text": "\u0301ABCD" if node == 20 else ""} for node in range(20, 36))
+            control(frame(clipped), clear=True)
+            text_y = ch + 36
+            leaf_width = (inner_width - 12 * 15) // 16
+            background = (18, 26, 36)
+            def narrow_painted():
+                pixels = screenshot()
+                return all(pixels.getpixel((x, text_y + ch // 2)) == background for x in range(80, 180))
+            wait(narrow_painted, "narrow text leaves painted")
+            clipped_pixels = screenshot()
+            inside = [clipped_pixels.getpixel((x, y)) for x in range(28, 28 + leaf_width)
+                      for y in range(text_y, text_y + ch)]
+            assert any(pixel != background for pixel in inside), "glyph probe must draw visible ink"
+            left_ink = [(x, y) for x in range(20, 28) for y in range(text_y, text_y + ch)
+                        if clipped_pixels.getpixel((x, y)) != background]
+            right_ink = [(x, y) for x in range(28 + leaf_width, 28 + leaf_width + 12)
+                         for y in range(text_y, text_y + ch) if clipped_pixels.getpixel((x, y)) != background]
+            assert not left_ink and not right_ink, {"left_ink": left_ink, "right_ink": right_ink}
+            report["checks"].append("narrow text leaf renders visible glyphs while clipping combining ink at both horizontal bounds")
+            revision += 1
+            control(frame(scene(revision)), clear=True)
+            wait(lambda: not narrow_painted(), "normal heading after clipped text probe")
+            wait(image_pixels, "normal scene after clipped text probe")
+
             # Preserve a useful final screenshot before checking observer/EOF.
             args.screenshot.parent.mkdir(parents=True, exist_ok=True)
             screenshot().save(args.screenshot)
             report["screenshot"] = {"path": str(args.screenshot),
                                     "sha256": hashlib.sha256(args.screenshot.read_bytes()).hexdigest()}
+            other_input, other_control = root / "other.bin", root / "other.sock"
+            other_launcher = subprocess.Popen([
+                str(binary), "--name", "ui-other", "--tab", "ui-probe", "--config", str(config),
+                "-e", "/usr/bin/python3", "-c", child, str(other_input), str(other_control),
+            ], env=env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True)
+            wait(lambda: other_control.exists(), "second raw PTY tab")
+            other_session = rpc({"op": "info", "session": "ui-other"})
+            owned[other_session["pid"]] = birth(other_session["pid"])
+            other_view = connection.create_resource_object("window", other_session["window_id"])
+            control("\x1b[?1003h\x1b[?1006h", clear=True, path=other_control)
+            rpc({"op": "action", "session": "ui-other", "action": "previous-tab"})
+            wait(lambda: view.get_attributes().map_state == X.IsViewable, "original tab visible")
+            view.set_input_focus(X.RevertToParent, X.CurrentTime)
+            connection.sync()
+            wait(image_pixels, "original tab image")
+            control("\x1b[?1003h\x1b[?1006h", clear=True)
+            move(700, 40)  # Blank panel header: no button keyboard focus.
+            button_event(True)
+            chord("Control_L", "Shift_L", "Next")
+            wait(lambda: other_view.get_attributes().map_state == X.IsViewable, "second tab focused")
+            other_view.warp_pointer(160, 160)
+            connection.sync()
+            button_event(False)
+            time.sleep(0.12)
+            control(path=other_control)
+            assert other_input.read_bytes() == b"", other_input.read_bytes().hex()
+            assert input_path.read_bytes() == b"", input_path.read_bytes().hex()
+            report["cross_view_gesture"] = {
+                "tab_binding": "Ctrl+Shift+PageDown",
+                "mouse_mode": "1003 + SGR 1006 on both raw PTYs",
+                "origin_held_gesture_hex": input_path.read_bytes().hex(),
+                "other_held_gesture_hex": other_input.read_bytes().hex(),
+            }
+            other_view.warp_pointer(190, 160)
+            connection.sync()
+            wait(lambda: other_input.read_bytes(), "normal pointer reporting resumes after native release")
+            control(path=other_control)
+            assert other_input.read_bytes().startswith(b"\x1b[<"), other_input.read_bytes().hex()
+            report["cross_view_gesture"]["other_after_release_hex"] = other_input.read_bytes().hex()
+            report["checks"].append("native press -> tab change -> other-view motion/release never reaches either PTY; reporting resumes after release")
+            control(clear=True, path=other_control)
+            rpc({"op": "action", "session": "ui-other", "action": "previous-tab"})
+            wait(lambda: view.get_attributes().map_state == X.IsViewable, "origin for outside-release probe")
+            view.set_input_focus(X.RevertToParent, X.CurrentTime)
+            connection.sync()
+            control(clear=True)
+            move(700, 40)
+            button_event(True)
+            chord("Control_L", "Shift_L", "Next")
+            wait(lambda: other_view.get_attributes().map_state == X.IsViewable, "origin unmaps before outside release")
+            outside = connection.screen().root.create_window(
+                1050, 100, 200, 200, 0, connection.screen().root_depth,
+                X.InputOutput, X.CopyFromParent, background_pixel=0,
+                event_mask=X.PointerMotionMask | X.ButtonReleaseMask)
+            outside.map()
+            connection.sync()
+            outside.warp_pointer(40, 40)
+            connection.sync()
+            button_event(False)
+
+            def outside_release_seen():
+                while connection.pending_events():
+                    event = connection.next_event()
+                    if event.type == X.ButtonRelease and event.window.id == outside.id and event.detail == 1:
+                        return True
+                return False
+
+            wait(outside_release_seen, "release delivered to harness-owned window, not ztty")
+            control(path=other_control)
+            assert other_input.read_bytes() == b""
+            other_view.warp_pointer(210, 180)
+            connection.sync()
+            wait(lambda: other_input.read_bytes(), "no-button motion retires stale native capture")
+            control(path=other_control)
+            assert other_input.read_bytes().startswith(b"\x1b[<"), other_input.read_bytes().hex()
+            report["checks"].append("release outside every ztty view is observed by a separate X client; return motion retires stale capture and reaches the PTY")
+            report["outside_release"] = {"received_by_harness": True, "button": 1,
+                                         "return_motion_hex": other_input.read_bytes().hex()}
+            outside.destroy()
+            connection.sync()
+            rpc({"op": "close", "session": "ui-other"})
+            other_launcher.wait(timeout=5)
+            wait(lambda: view.get_attributes().map_state == X.IsViewable, "original tab restored")
+            control(clear=True)
+            restored_geometry = view.get_geometry()
+            move(restored_geometry.width - 5, restored_geometry.height - 5)
+            wait(lambda: input_path.read_bytes(), "origin pointer reporting resumes after cross-view release")
+            origin_resumed = sample()
+            assert origin_resumed.startswith(b'\x1b[<')
+            report["cross_view_gesture"]["origin_after_release_hex"] = origin_resumed.hex()
+            control(clear=True)
+
             rpc({"op": "attach", "session": "ui-probe", "observe": True})
             time.sleep(0.1)
             click()

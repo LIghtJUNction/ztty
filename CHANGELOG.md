@@ -1,9 +1,99 @@
 # Changelog
 
+## 0.3.1 — 2026-11-19 (Asia/Taipei)
+
+Release preparation: the new tag's Verify job and all six native architecture
+gates have not run yet. Official publication and installation remain pending.
+The failed `v0.3.0` tag stays fixed; this version carries its previously
+unreleased application features together with the following corrections.
+[Preparation status](docs/releasing.md#031-preparation).
+
+### Added
+
+- Font zoom and reset shortcuts on Linux and Windows: Ctrl+Plus/Equal,
+  Ctrl+Minus and Ctrl+0, Ctrl+Shift+Equal/Minus, and Ctrl+keypad
+  Add/Subtract/0. Keypad 0 requires Num Lock; ordinary Num-Lock-off Insert
+  behavior remains available. Font changes keep the window and PTY processes;
+  Windows coordinates the new metrics across all panes in the workspace.
+  Linux also accepts Ctrl+Shift+0. Windows accepts that alias when the OS
+  delivers it; [Windows can reserve it for keyboard layouts](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size),
+  so Ctrl+0 is the primary Windows reset shortcut.
+- Ctrl+Tab and Ctrl+Shift+Tab cycle workspace tabs alongside the existing
+  Ctrl+Shift+PageDown/PageUp bindings. Move split grow/shrink to
+  Ctrl+Alt+Shift+Equal/Minus so Ctrl+Shift+Plus/Minus changes font size.
+  Custom bindings keep priority over defaults. These shortcuts apply to Linux
+  and Windows; macOS does not yet implement font zoom or workspace UI.
+
+### Fixed
+
+- Request disabled DWM nonclient rendering before showing the retained GDI
+  window on Windows. Keep the standard system frame and its minimize, maximize
+  and close buttons; the captured runner theme uses a classic light-blue title
+  bar. This policy avoids the reproduced stale-edge failure in the normal
+  candidate's repeated resize checks below. It does not preserve the modern
+  dark DWM frame; an unavailable policy produces a diagnostic and leaves the
+  window running with the available system behavior.
+- Clear cached alternate-screen text and images when leaving DEC mode 1047,
+  while retaining its distinct entry behavior and preserving the primary screen.
+- Restore both G0/G1 character-set designations and the selected set with the
+  saved cursor, so DEC line drawing does not leak across cursor or screen state.
+- Preserve pending wrap across height-only resize. The next printable character
+  wraps instead of overwriting the rightmost cell when the width is unchanged.
+- Match Linux shifted punctuation shortcuts using the active keyboard layout,
+  while keeping physical-key fallback and existing default bindings.
+- Accept optional `expected_session` guards on MCP write, resize, input-control
+  and close operations. Bind the mutation to the original URI, ID, creation
+  time and broker PID; reject a replacement session before changing it. The
+  existing read guard and callers that omit the optional guard remain supported.
+
+### Included from the unreleased 0.3.0 work
+
+- Linux shared sessions, tabs and splits; soft-wrap-aware search and copy;
+  temporary session switcher, command palette and **Back to live ↓** control.
+- Bounded MCP output paging, nonblocking waits/cancellation, numeric request-ID
+  equivalence and optional POST SSE responses; observer and input-owner rules.
+- Shared no_std session core, native Windows tabs/panes and redirected-ConPTY
+  handling, Darwin threaded-spawn support, shell integration and atomic local
+  installation with rollback. The historical section below retains the detailed
+  changes and their separate verification sources.
+
+### Verification and publication boundaries
+
+- Normal Windows candidate source `2f2fae44` passed
+  [run 44349551432](https://github.com/LIghtJUNction/ztty/actions/runs/44349551432)
+  on x64 and ARM64. Each architecture completed eight fresh processes, each
+  with 31 base checks, 10 warm rapid resizes and 10 back-to-back resize pairs,
+  plus 19 workspace groups. Runtime tracing, painting diagnostics and harness
+  NC-policy diagnostics were disabled; every final NC readback reported disabled
+  rendering, and owned-resource cleanup passed. This is a build-only Windows
+  candidate, not the new version's complete tagged release gate.
+- That candidate predates the additional zoom and tab-shortcut changes. Their
+  keyboard checks require a new source-bound run; the earlier 19 workspace
+  groups are not evidence for the added font actions.
+- Unified candidate `735ca927` in
+  [run 44355360532](https://github.com/LIghtJUNction/ztty/actions/runs/44355360532)
+  failed the Windows Ctrl+Shift+0 reset check. This is consistent with the
+  documented system reservation; key delivery was not instrumented. Native
+  acceptance now exercises Ctrl+0 and still requires the configured font
+  metrics, all PTY identities, grid sizes and pixels to match.
+- The four reusable libraries are published independently:
+  `zinput 0.1.1`, `zgraphics 0.1.1`, `zpty 0.2.1`, and `zterm 0.3.0`.
+  [Registry checks](docs/releasing.md#published-packages) do not imply that the
+  `ztty 0.3.1` application is already published.
+- The device already has a separately built Linux candidate from `19274145`,
+  installed as `ztty 0.3.0-1`. Its launcher files and five existing processes
+  were preserved; the installed binary passed 36 input vectors in 10 GUI groups.
+  That local installation does not make the failed formal
+  `v0.3.0` attempt a release, or establish a `0.3.1` installation.
+  [Device record](docs/releasing.md#local-device-candidate).
+
 ## 0.3.0 — 2026-11-18
 
-Release preparation: final-tag acceptance, publication and device installation
-remain pending. Verification entries below describe separate source checkpoints.
+Historical unreleased application work: tag `v0.3.0` is fixed at `9b5497d`.
+Its formal release attempt failed the Windows ARM rapid-resize gate; publication
+was skipped and no official Release assets were installed. A later local Linux
+candidate was installed separately, as recorded above. Version 0.3.1 will use a
+new tag. Verification entries below retain their separate source checkpoints.
 
 ### Added
 
@@ -170,14 +260,29 @@ remain pending. Verification entries below describe separate source checkpoints.
 
 ### Verification
 
+- Record the failed formal `v0.3.0` attempt at source `9b5497d` in
+  [run 44309412482](https://github.com/LIghtJUNction/ztty/actions/runs/44309412482).
+  Verify passed 271 ordinary Rust tests, 6 distinct doctests, 8 separate
+  SessionCore checks and 12 GUI smoke groups. Each Linux architecture passed
+  six GUI suites / 67 groups / 27 PNG captures; each Mac architecture passed
+  8 spawn and 24 native checks. Windows x64 passed 31 base and 19 workspace
+  groups. Windows ARM completed 23 base checks, then failed
+  `resize_restores_visible_image`: the 10-second wait ended at RGB `[20,20,20]`
+  instead of `[255,0,0]`. Workspace checks were not reached and cleanup passed.
+  Two fresh traced rapid/staged diagnostic processes each passed 31 checks,
+  without changing the original failure or establishing its cause. Publish was
+  skipped and the by-tag Release API returned 404. The tag remains unchanged;
+  no Release assets were published or installed.
+  [Formal evidence](docs/experience-release-2026-11-18.md#54-正式-v030-门禁失败).
+
 - Accept Windows source `3418b82` in
   [run 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420):
   native x64 and ARM64 each passed all 31 base checks and 19 workspace groups,
   with owned-process and desktop cleanup. The original rapid resize path ran
   without runtime tracing or added resize acknowledgements. Both architectures
   preserved blue history and selection through silent modifiers/focus changes,
-  and actual Enter input returned to live output. This is a build-only candidate;
-  final-tag acceptance, publication and installation remain pending.
+  and actual Enter input returned to live output. This is an earlier build-only
+  candidate; its acceptance does not override the later formal ARM failure.
 
 - Record the intervening Windows candidates separately:
   [source `8a2f4be`, run 44303751871](https://github.com/LIghtJUNction/ztty/actions/runs/44303751871)

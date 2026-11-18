@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "source_sha": "04cfd7bb9a516fe7914dc34daff380fa4c232cf2",
+  "run_id": 44317542062,
+  "architecture": "x86_64",
+  "passed": false,
+  "status": "failed",
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/summary.json",
+      "bytes": 7254,
+      "sha256": "e30ed90573c47be1e9288e740c320e3436ab6fa28d9191a8e9150db26ce0ea7f",
+      "kind": "derived-audit-summary-copy"
+    },
+    {
+      "path": "ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 16714,
+      "sha256": "121243426fa664321b392e41cb169416245fcf34e3cce02e79cbf632d430de92",
+      "kind": "raw-byte-identical-copy"
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-03.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.json",
+      "bytes": 41385,
+      "sha256": "4946aac513af953b4d68a64ad28b7f2b2485a4410afca584292ded2f62b6c1c6",
+      "kind": "raw-byte-identical-copy"
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-03.post-failure.json",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.json",
+      "bytes": 845,
+      "sha256": "2442cc8a4d7c33b1caa00698295a0d3ea93271c2c3b23ba2a583c191b9bea2ea",
+      "kind": "raw-byte-identical-copy"
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-03.resize-restored.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.resize-restored.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy"
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-03.post-failure.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-failure.png",
+      "bytes": 602,
+      "sha256": "4f807ae84aa6c3a3abf5de7df1cd7a1e6dd25434e74f9be2baa51b3eff609c9d",
+      "kind": "raw-byte-identical-copy"
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-03.post-repaint.png",
+      "source_path": "artifacts/release-audit/presentation-44317542062/windows-x86_64/ztty-windows-x86_64.native.cold-03.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy"
+    }
+  ],
+  "scope": "Compact original cold03 failure and same-process snapshot; original bytes and line endings preserved. The zero deferred paint count excludes guard-rejected paint for this failure."
+}

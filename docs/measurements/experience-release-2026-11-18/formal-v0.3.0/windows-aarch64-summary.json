@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-summary",
+  "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "source_ref": "refs/tags/v0.3.0",
+  "version": "0.3.0",
+  "run_id": 44309412482,
+  "run_attempt": 1,
+  "job_id": 134819423861,
+  "build_only": false,
+  "candidate_platform": "all",
+  "architecture": "aarch64",
+  "status": "failed",
+  "passed": false,
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "native": "failure",
+    "package": "success"
+  },
+  "binary_sha256": "ff1aaae6a635b9503084515549c8f4e7774fd85d845c2b2dc2b6948ddd605f45",
+  "native_process_emulated": false,
+  "runtime_trace_enabled": false,
+  "resize_path": "rapid",
+  "base_checks_passed": 23,
+  "base_checks_required": 31,
+  "base_visible_pixel_checks_completed": 12,
+  "workspace": {
+    "status": "not_entered",
+    "checks_passed": 0,
+    "checks_required": 19,
+    "visible_pixel_groups_completed": 0,
+    "cleanup": null
+  },
+  "original_application_pid": 8344,
+  "application_cleanup": {
+    "process_exited": true,
+    "temporary_directory_removed": true,
+    "returncode": 0
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-9276-251520f3c27948f99e6a6255a7a1a56d",
+    "input_after_restore": "Default"
+  },
+  "artifact": {
+    "artifact_id": 14429946338,
+    "artifact_zip_bytes": 798668,
+    "artifact_zip_sha256": "109b746a3d96ca6db5aa4324022545c08e53217a5c557902114cbd387c6b4845",
+    "artifact_zip_sha256_verified": true,
+    "build_source_verified": true,
+    "native_binary_sha256_verified": true
+  },
+  "audit_inputs": [
+    {
+      "path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.native.json",
+      "bytes": 31030,
+      "sha256": "650ee424fe2c82860e7917672332d770bc32b684b86260742f51e7e8ea9fcd26"
+    },
+    {
+      "path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 6119,
+      "sha256": "f285a0233e3415c1769463042b13543ffd592546046793ab88f615bca463e4f9"
+    },
+    {
+      "path": "artifacts/release-audit/formal-44309412482/aarch64-artifact-verification.json",
+      "bytes": 10127,
+      "sha256": "c6529617673a78230f59b98de81505ab7aa5604c4f44605148903871db313071"
+    }
+  ],
+  "scope": "Original formal native gate. Diagnostic retries cannot change this outcome.",
+  "failure": {
+    "name": "resize_restores_visible_image",
+    "expected": [
+      255,
+      0,
+      0
+    ],
+    "actual": [
+      20,
+      20,
+      20
+    ],
+    "client_sample": [
+      175,
+      28
+    ],
+    "error": "resize_restores_visible_image: expected [255, 0, 0], last RGB [20, 20, 20]; timeout: resize_restores_visible_image; last error: None",
+    "wait_timeout_seconds": 10,
+    "timeout_basis": "tests/windows_native.py wait_for default at the tagged source; the original JSON records the timeout failure",
+    "restored_client_pixels": [
+      180,
+      190
+    ],
+    "raw_native_json": "windows-aarch64/ztty-windows-aarch64.native.json",
+    "screenshot": "windows-aarch64/ztty-windows-aarch64.native.resize-restored.png",
+    "screenshot_identity": {
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    }
+  },
+  "diagnostics": [
+    {
+      "mode": "rapid",
+      "passed": true,
+      "runtime_trace_enabled": true,
+      "checks_passed": 31,
+      "application_pid": 5644,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "report": "windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.json",
+      "runtime_log": "windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.runtime.log",
+      "source_binding": "Listed by the source-bound original native report and contained in its verified artifact; diagnostic JSON omits its own source_sha and binary_sha256 fields. Executable path matches the original gate.",
+      "purpose": "Separate fresh process after the original failure; diagnostic only, not an accepted formal retry."
+    },
+    {
+      "mode": "staged",
+      "passed": true,
+      "runtime_trace_enabled": true,
+      "checks_passed": 31,
+      "application_pid": 7884,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      },
+      "report": "windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.json",
+      "runtime_log": "windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.runtime.log",
+      "source_binding": "Listed by the source-bound original native report and contained in its verified artifact; diagnostic JSON omits its own source_sha and binary_sha256 fields. Executable path matches the original gate.",
+      "purpose": "Separate fresh process after the original failure; diagnostic only, not an accepted formal retry."
+    }
+  ],
+  "root_cause": "Not established by these records. A later traced success does not explain the untraced original failure."
+}

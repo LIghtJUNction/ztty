@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-summary",
+  "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "source_ref": "refs/tags/v0.3.0",
+  "version": "0.3.0",
+  "run_id": 44309412482,
+  "run_attempt": 1,
+  "job_id": 134819424029,
+  "build_only": false,
+  "candidate_platform": "all",
+  "architecture": "x86_64",
+  "status": "accepted",
+  "passed": true,
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "native": "success",
+    "package": "success"
+  },
+  "binary_sha256": "0d438e71b1b293441ae1e35c39c49272950c1f907a3e2cb700351bb263632b1a",
+  "native_process_emulated": false,
+  "runtime_trace_enabled": false,
+  "resize_path": "rapid",
+  "base_checks_passed": 31,
+  "base_checks_required": 31,
+  "base_visible_pixel_checks_completed": 19,
+  "workspace": {
+    "status": "passed",
+    "checks_passed": 19,
+    "checks_required": 19,
+    "visible_pixel_groups_completed": 12,
+    "cleanup": {
+      "process_exited": true,
+      "temporary_directory_removed": true,
+      "returncode": 0,
+      "all_probe_processes_exited": true
+    }
+  },
+  "original_application_pid": 10016,
+  "application_cleanup": {
+    "process_exited": true,
+    "temporary_directory_removed": true,
+    "returncode": 0
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-6108-189af88e3988410cb0d79adf8308d54d",
+    "input_after_restore": "Default"
+  },
+  "artifact": {
+    "artifact_id": 14430106352,
+    "artifact_zip_bytes": 858765,
+    "artifact_zip_sha256": "94108b1ac53565e11a6b11eb5026ea5afe38fbdc1e1ba6a446f623e8e15a6eb7",
+    "artifact_zip_sha256_verified": true,
+    "build_source_verified": true,
+    "native_binary_sha256_verified": true
+  },
+  "audit_inputs": [
+    {
+      "path": "artifacts/release-audit/formal-44309412482/windows-x86_64/ztty-windows-x86_64.native.json",
+      "bytes": 60063,
+      "sha256": "755f630e3efe80274d6ded278a2d129bdfbd10fef2b7984e1456289a0c3f0b45"
+    },
+    {
+      "path": "artifacts/release-audit/formal-44309412482/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 5026,
+      "sha256": "98e442c6b799b0cfe314401a106d7a5e28afa083f37e2f009b5fb868e36f17d9"
+    },
+    {
+      "path": "artifacts/release-audit/formal-44309412482/x86_64-artifact-verification.json",
+      "bytes": 7951,
+      "sha256": "020bd2961a1fa4a43762f12e5367fad970ff2d77bb1da6b9e8f0003ff2e4c6f1"
+    }
+  ],
+  "scope": "Original formal native gate. Diagnostic retries cannot change this outcome."
+}

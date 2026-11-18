@@ -387,3 +387,206 @@ fn maximum_valid_tree_and_text_budget_are_accepted() {
         MAX_TEXT
     );
 }
+
+const PROGRESS_TREE: &str = r#"[{"id":1,"type":"column","children":[2,4294967295,4,5]},{"id":2,"type":"progress","value":2000,"label":"编译 A"},{"id":4294967295,"type":"progress","value":3000,"label":"Stage B"},{"id":4,"type":"button","label":"Retry","action":"build.retry"},{"id":5,"type":"text","text":"Ready"}]"#;
+
+fn progress_update(set: &str, base: u64, revision: u64) -> String {
+    format!(r#"{{"v":1,"op":"update","surface":7,"base_rev":{base},"rev":{revision},"set":{set}}}"#)
+}
+
+#[test]
+fn progress_value_update_retains_the_existing_label_allocation() {
+    let mut ui = State::new();
+    ui.apply(replace(TREE, 1, true).as_bytes()).unwrap();
+    let Kind::Progress { label, .. } = &ui.scene().unwrap().node(3).unwrap().kind else {
+        unreachable!()
+    };
+    let original = label.as_ptr();
+    ui.apply(progress_update(r#"[{"id":3,"value":5000}]"#, 1, 2).as_bytes())
+        .unwrap();
+    let Kind::Progress { value, label } = &ui.scene().unwrap().node(3).unwrap().kind else {
+        unreachable!()
+    };
+    assert_eq!(*value, 5000);
+    assert_eq!(label, "Building");
+    assert_eq!(label.as_ptr(), original);
+}
+
+#[test]
+fn numeric_progress_batches_match_general_transaction_observables() {
+    let mut fast = State::new();
+    let mut general = State::new();
+    for state in [&mut fast, &mut general] {
+        state
+            .apply(replace(PROGRESS_TREE, 1, true).as_bytes())
+            .unwrap();
+    }
+    for (i, (a, b)) in [(0, 10000), (1234, 5678), (10000, 0), (10000, 0)]
+        .into_iter()
+        .enumerate()
+    {
+        let revision = i as u64 + 2;
+        let numeric = format!(r#"[{{"id":4294967295,"value":{b}}},{{"id":2,"value":{a}}}]"#);
+        // Supplying unchanged labels exercises the general transaction path.
+        let with_labels = format!(
+            r#"[{{"id":4294967295,"value":{b},"label":"Stage B"}},{{"id":2,"value":{a},"label":"编译 A"}}]"#
+        );
+        assert_eq!(
+            fast.apply(progress_update(&numeric, revision - 1, revision).as_bytes()),
+            general.apply(progress_update(&with_labels, revision - 1, revision).as_bytes())
+        );
+        assert_eq!(fast.scene(), general.scene());
+        assert_eq!(fast.last_revision(), revision);
+        assert_eq!(fast.last_revision(), general.last_revision());
+        assert_eq!(fast.revision(), general.revision());
+        assert!(fast.action(4, 7, revision - 1).is_none());
+        assert!(general.action(4, 7, revision - 1).is_none());
+        assert_eq!(fast.action(4, 7, revision), general.action(4, 7, revision));
+        let mut fast_bytes = String::new();
+        let mut general_bytes = String::new();
+        fast.write_capabilities(&mut fast_bytes).unwrap();
+        general.write_capabilities(&mut general_bytes).unwrap();
+        assert_eq!(fast_bytes.as_bytes(), general_bytes.as_bytes());
+    }
+}
+
+#[test]
+fn numeric_progress_batches_reject_atomically_and_keep_error_precedence() {
+    let mut ui = State::new();
+    ui.apply(replace(PROGRESS_TREE, 1, true).as_bytes())
+        .unwrap();
+    let before = ui.scene().unwrap().clone();
+    let generation = ui.revision();
+    let invalid = [
+        (
+            r#"[{"id":2,"value":1},{"id":4294967295,"value":10001}]"#,
+            Error::Value,
+        ),
+        (
+            r#"[{"id":2,"value":1},{"id":5,"value":2}]"#,
+            Error::UnknownField,
+        ),
+        (r#"[{"id":2,"value":1},{"id":99,"value":2}]"#, Error::Graph),
+        (r#"[{"id":2,"value":1},{"id":2,"value":2}]"#, Error::Graph),
+        (
+            r#"[{"id":2,"value":1},{"id":2,"value":2},{"id":4294967295,"value":10001}]"#,
+            Error::Value,
+        ),
+        (
+            r#"[{"id":2,"value":1},{"id":2,"value":2},{"id":5,"value":3}]"#,
+            Error::UnknownField,
+        ),
+        (r#"[{"id":2,"value":1},{"id":0,"value":2}]"#, Error::Graph),
+        (r#"[{"id":2,"value":1},{"value":2}]"#, Error::Value),
+        (
+            r#"[{"id":2,"value":1},{"id":4294967295,"value":2,"type":"progress"}]"#,
+            Error::UnknownField,
+        ),
+        (
+            r#"[{"id":2,"value":1},{"id":4294967295,"value":2,"value":3}]"#,
+            Error::DuplicateField,
+        ),
+    ];
+    for (set, expected) in invalid {
+        assert_eq!(
+            ui.apply(progress_update(set, 1, 2).as_bytes()),
+            Err(expected),
+            "{set}"
+        );
+        assert_eq!(ui.scene(), Some(&before));
+        assert_eq!(
+            (ui.last_revision(), ui.revision(), ui.event_id),
+            (1, generation, 0)
+        );
+    }
+    for value in ["-1", "1.5", "null", "true", "\"2\"", "18446744073709551616"] {
+        let set = format!(r#"[{{"id":2,"value":1}},{{"id":4294967295,"value":{value}}}]"#);
+        assert!(ui.apply(progress_update(&set, 1, 2).as_bytes()).is_err());
+        assert_eq!(ui.scene(), Some(&before));
+        assert_eq!(
+            (ui.last_revision(), ui.revision(), ui.event_id),
+            (1, generation, 0)
+        );
+    }
+    let valid = r#"[{"id":2,"value":0},{"id":4294967295,"value":10000}]"#;
+    for payload in [
+        progress_update(valid, 1, 1),
+        progress_update(valid, 0, 2),
+        progress_update(valid, 1, 2).replace("\"surface\":7", "\"surface\":8"),
+    ] {
+        assert!(ui.apply(payload.as_bytes()).is_err());
+        assert_eq!(ui.scene(), Some(&before));
+        assert_eq!(
+            (ui.last_revision(), ui.revision(), ui.event_id),
+            (1, generation, 0)
+        );
+    }
+    assert_eq!(
+        ui.apply(progress_update(valid, 1, 2).as_bytes()),
+        Ok(Change::Updated)
+    );
+}
+
+#[test]
+fn mixed_progress_updates_keep_general_graph_validation() {
+    let mut ui = State::new();
+    ui.apply(replace(PROGRESS_TREE, 1, true).as_bytes())
+        .unwrap();
+    ui.apply(
+        progress_update(r#"[{"id":2,"value":5000},{"id":5,"text":"Updated"}]"#, 1, 2).as_bytes(),
+    )
+    .unwrap();
+    assert!(matches!(
+        &ui.scene().unwrap().node(2).unwrap().kind,
+        Kind::Progress { value: 5000, .. }
+    ));
+    assert!(
+        matches!(&ui.scene().unwrap().node(5).unwrap().kind, Kind::Text { text, .. } if text == "Updated")
+    );
+    let before = ui.scene().unwrap().clone();
+    assert_eq!(
+        ui.apply(
+            progress_update(
+                r#"[{"id":2,"value":6000},{"id":1,"children":[2,4294967295,4]}]"#,
+                2,
+                3
+            )
+            .as_bytes()
+        ),
+        Err(Error::Graph)
+    );
+    assert_eq!(ui.scene(), Some(&before));
+    assert_eq!((ui.last_revision(), ui.revision()), (2, 2));
+}
+
+#[test]
+fn numeric_progress_batch_handles_all_progress_nodes_in_maximum_tree() {
+    let mut nodes = format!(
+        r#"[{{"id":1,"type":"column","children":[{}]}}"#,
+        (2u32..=256)
+            .map(|id| id.to_string())
+            .collect::<Vec<_>>()
+            .join(",")
+    );
+    for id in 2..=256 {
+        nodes.push_str(&format!(
+            r#",{{"id":{id},"type":"progress","value":0,"label":"Build"}}"#
+        ));
+    }
+    nodes.push(']');
+    let set = format!(
+        "[{}]",
+        (2u32..=256)
+            .rev()
+            .map(|id| format!(r#"{{"id":{id},"value":{id}}}"#))
+            .collect::<Vec<_>>()
+            .join(",")
+    );
+    let mut ui = State::new();
+    ui.apply(replace(&nodes, 1, false).as_bytes()).unwrap();
+    ui.apply(progress_update(&set, 1, 2).as_bytes()).unwrap();
+    for id in 2..=256 {
+        assert!(matches!(&ui.scene().unwrap().node(id).unwrap().kind,
+            Kind::Progress { value, label } if u32::from(*value) == id && label == "Build"));
+    }
+}
