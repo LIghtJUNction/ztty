@@ -43,6 +43,16 @@ const WM_CHAR: u32 = 0x0102;
 const WM_SYSKEYDOWN: u32 = 0x0104;
 const WM_SYSKEYUP: u32 = 0x0105;
 const WM_SYSCHAR: u32 = 0x0106;
+const WM_NATIVE_SNAPSHOT: u32 = 0x85a1;
+const NATIVE_SNAPSHOT_MAGIC: usize = 0x5a545459;
+
+#[derive(Default)]
+struct PaintRecord {
+    sequence: u64,
+    surface: [i32; 2],
+    region: [i32; 4],
+    blit: i32,
+}
 
 struct NativeTrace {
     remaining: Cell<u16>,
@@ -504,9 +514,194 @@ struct App {
     title: String,
     focused: bool,
     native_trace: NativeTrace,
+    native_snapshot_path: Option<Vec<u16>>,
+    last_paint: PaintRecord,
 }
 
 impl App {
+    /// A failure-only read of our own DIB through the kernel, before any GDI
+    /// query can flush its batch. The value may precede queued GDI work.
+    fn diagnostic_cpu_pixel(&self, x: i32, y: i32) -> Option<u32> {
+        if self.surface.pixels.is_null()
+            || x < 0
+            || y < 0
+            || x >= self.surface.width
+            || y >= self.surface.height
+        {
+            return None;
+        }
+        let mut pixel = 0u32;
+        let mut read = 0;
+        let ok = unsafe {
+            ffi::ReadProcessMemory(
+                -1isize as Handle,
+                self.surface
+                    .pixels
+                    .add((y * self.surface.width + x) as usize)
+                    .cast(),
+                (&mut pixel as *mut u32).cast(),
+                core::mem::size_of::<u32>(),
+                &mut read,
+            )
+        };
+        (ok != 0 && read == core::mem::size_of::<u32>()).then_some(pixel)
+    }
+
+    fn failure_snapshot(&mut self, x: i32, y: i32, dispatch_resize_pending: bool) -> isize {
+        // Only an explicitly configured test process may write this one-shot
+        // record. No path or pointer is accepted from a window message.
+        let Some(path) = self.native_snapshot_path.take() else {
+            return 0;
+        };
+        let rgb = |pixel: Option<u32>| {
+            pixel.map_or_else(
+                || String::from("null"),
+                |value| {
+                    format!(
+                        "[{},{},{}]",
+                        value >> 16 & 255,
+                        value >> 8 & 255,
+                        value & 255
+                    )
+                },
+            )
+        };
+        let cpu = self.diagnostic_cpu_pixel(x, y);
+        let pane = self.panes.get(self.active).map_or_else(|| String::from("null"), |pane| {
+            format!(concat!("{{\"rect\":[{},{},{},{}],\"grid\":[{},{}],\"pty\":[{},{}],\"images\":{},\"placements\":{},",
+                            "\"dirty\":{},\"terminal_dirty\":{},\"grid_ready\":{},\"synchronized_output\":{}}}"),
+                pane.rect.x, pane.rect.y, pane.rect.width, pane.rect.height,
+                pane.core.terminal.cols(), pane.core.terminal.rows(), pane.pty_size.cols, pane.pty_size.rows,
+                pane.core.terminal.graphics().image_count(), pane.core.terminal.graphics().placement_count(),
+                pane.dirty, pane.core.terminal.dirty(), pane.grid_ready(), pane.core.terminal.modes().synchronized_output)
+        });
+        let before = format!(
+            concat!(
+                "{{\"surface\":{{\"size\":[{},{}],\"clip\":[{},{},{},{}]}},\"cpu_rgb\":{},\"dispatch_resize_pending\":{},",
+                "\"app_resize_pending\":{},\"full_redraw\":{},\"pane\":{},\"last_paint\":{{\"sequence\":{},",
+                "\"surface\":[{},{}],\"region\":[{},{},{},{}],\"blit\":{}}}}}"
+            ),
+            self.surface.width,
+            self.surface.height,
+            self.surface.clip.x,
+            self.surface.clip.y,
+            self.surface.clip.width,
+            self.surface.clip.height,
+            rgb(cpu),
+            dispatch_resize_pending,
+            self.resize_pending,
+            self.full_redraw,
+            pane,
+            self.last_paint.sequence,
+            self.last_paint.surface[0],
+            self.last_paint.surface[1],
+            self.last_paint.region[0],
+            self.last_paint.region[1],
+            self.last_paint.region[2],
+            self.last_paint.region[3],
+            self.last_paint.blit
+        );
+        // All App/CPU fields above are captured before these native queries.
+        let mut client = ffi::Rect::default();
+        let mut update = ffi::Rect::default();
+        let client_ok = unsafe { ffi::GetClientRect(self.hwnd, &mut client) } != 0;
+        let update_pending = unsafe { ffi::GetUpdateRect(self.hwnd, &mut update, 0) } != 0;
+        let flush = unsafe { ffi::GdiFlush() };
+        let after_cpu = self.diagnostic_cpu_pixel(x, y);
+        let mut bitmap: ffi::Bitmap = unsafe { core::mem::zeroed() };
+        let selected = unsafe { ffi::GetCurrentObject(self.surface.dc, 7) };
+        let bitmap_read = unsafe {
+            ffi::GetObjectW(
+                selected,
+                core::mem::size_of::<ffi::Bitmap>() as i32,
+                (&mut bitmap as *mut ffi::Bitmap).cast(),
+            )
+        };
+        let sample = |dc: Handle| {
+            if dc.is_null() {
+                return None;
+            }
+            let value = unsafe { ffi::GetPixel(dc, x, y) };
+            (value != u32::MAX).then(|| colorref(value))
+        };
+        let source = sample(self.surface.dc);
+        let mut source_clip = ffi::Rect::default();
+        let source_clip_type = unsafe { ffi::GetClipBox(self.surface.dc, &mut source_clip) };
+        let target = unsafe { ffi::GetDC(self.hwnd) };
+        let target_rgb = sample(target);
+        let mut target_clip = ffi::Rect::default();
+        let target_clip_type = if target.is_null() {
+            0
+        } else {
+            unsafe { ffi::GetClipBox(target, &mut target_clip) }
+        };
+        if !target.is_null() {
+            unsafe {
+                ffi::ReleaseDC(self.hwnd, target);
+            }
+        }
+        let record = format!(
+            concat!(
+                "{{\"schema\":1,\"pid\":{},\"hwnd\":{},\"sample\":[{},{}],\"before\":{},",
+                "\"client_ok\":{},\"client\":[{},{}],\"update_pending\":{},\"update_rect\":[{},{},{},{}],",
+                "\"after_flush\":{{\"flush\":{},\"cpu_rgb\":{},\"bitmap_read\":{},\"bitmap\":[{},{}],",
+                "\"bitmap_matches\":{},\"source_rgb\":{},\"target_rgb\":{},",
+                "\"source_clip_type\":{},\"source_clip\":[{},{},{},{}],",
+                "\"target_clip_type\":{},\"target_clip\":[{},{},{},{}]}}}}\n"
+            ),
+            unsafe { ffi::GetCurrentProcessId() },
+            self.hwnd as usize,
+            x,
+            y,
+            before,
+            client_ok,
+            client.right,
+            client.bottom,
+            update_pending,
+            update.left,
+            update.top,
+            update.right,
+            update.bottom,
+            flush,
+            rgb(after_cpu),
+            bitmap_read,
+            bitmap.width,
+            bitmap.height,
+            selected == self.surface.bitmap,
+            rgb(source),
+            rgb(target_rgb),
+            source_clip_type,
+            source_clip.left,
+            source_clip.top,
+            source_clip.right,
+            source_clip.bottom,
+            target_clip_type,
+            target_clip.left,
+            target_clip.top,
+            target_clip.right,
+            target_clip.bottom
+        );
+        if record.len() > 8192 {
+            return 0;
+        }
+        let file = unsafe { ffi::CreateFileW(path.as_ptr(), 0x40000000, 1, NULL, 1, 0x80, NULL) };
+        if file == -1isize as Handle {
+            return 0;
+        }
+        let mut written = 0;
+        let ok = unsafe {
+            ffi::WriteFile(
+                file,
+                record.as_ptr().cast(),
+                record.len() as u32,
+                &mut written,
+                NULL,
+            )
+        };
+        let closed = unsafe { ffi::CloseHandle(file) };
+        isize::from(ok != 0 && written as usize == record.len() && closed != 0)
+    }
+
     fn trace_frame(&self, event: &str, target: Handle, paint: &ffi::Rect, blit: i32) {
         if !self.native_trace.enabled() {
             return;
@@ -1621,6 +1816,19 @@ impl App {
                 );
             }
         }
+        if self.native_snapshot_path.is_some() {
+            self.last_paint = PaintRecord {
+                sequence: self.last_paint.sequence.saturating_add(1),
+                surface: [self.surface.width, self.surface.height],
+                region: [
+                    paint.paint.left,
+                    paint.paint.top,
+                    paint.paint.right,
+                    paint.paint.bottom,
+                ],
+                blit,
+            };
+        }
         self.trace_frame("paint", dc, &paint.paint, blit);
         unsafe {
             ffi::EndPaint(self.hwnd, &paint);
@@ -2217,6 +2425,14 @@ unsafe extern "system" fn window_proc(
         return unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
     }
     let state = unsafe { &*pointer };
+    if message == WM_NATIVE_SNAPSHOT && wparam == NATIVE_SNAPSHOT_MAGIC {
+        let pending = state.dispatch.resize_pending();
+        return state
+            .with(|app| {
+                app.failure_snapshot(lparam as u16 as i32, (lparam >> 16) as u16 as i32, pending)
+            })
+            .unwrap_or(0);
+    }
     if message == WM_SIZE {
         // Sent WM_SIZE can arrive while another callback owns App. Retain it
         // without borrowing App; the outer loop reads the latest client size.
@@ -2397,6 +2613,11 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             title: String::new(),
             focused: false,
             native_trace: NativeTrace::new(native_trace),
+            native_snapshot_path: os::environment_value("ZTTY_NATIVE_SNAPSHOT").map(|mut path| {
+                path.push(0);
+                path
+            }),
+            last_paint: PaintRecord::default(),
         }),
         dispatch: session_dispatch::Dispatch::default(),
         native_trace: NativeTrace::new(native_trace),
@@ -2661,6 +2882,9 @@ mod ffi {
         pub fn DestroyWindow(hwnd: Handle) -> i32;
         pub fn UpdateWindow(hwnd: Handle) -> i32;
         pub fn GetClientRect(hwnd: Handle, rect: *mut Rect) -> i32;
+        pub fn GetUpdateRect(hwnd: Handle, rect: *mut Rect, erase: i32) -> i32;
+        pub fn GetDC(hwnd: Handle) -> Handle;
+        pub fn ReleaseDC(hwnd: Handle, dc: Handle) -> i32;
         pub fn InvalidateRect(hwnd: Handle, rect: *const Rect, erase: i32) -> i32;
         pub fn BeginPaint(hwnd: Handle, paint: *mut PaintStruct) -> Handle;
         pub fn EndPaint(hwnd: Handle, paint: *const PaintStruct) -> i32;
@@ -2761,6 +2985,31 @@ mod ffi {
     #[link(name = "kernel32")]
     unsafe extern "system" {
         pub fn GetModuleHandleW(name: *const u16) -> Handle;
+        pub fn GetCurrentProcessId() -> u32;
+        pub fn ReadProcessMemory(
+            process: Handle,
+            source: *const c_void,
+            target: *mut c_void,
+            size: usize,
+            read: *mut usize,
+        ) -> i32;
+        pub fn CreateFileW(
+            path: *const u16,
+            access: u32,
+            share: u32,
+            security: *const c_void,
+            disposition: u32,
+            attributes: u32,
+            template: Handle,
+        ) -> Handle;
+        pub fn WriteFile(
+            file: Handle,
+            data: *const c_void,
+            size: u32,
+            written: *mut u32,
+            overlapped: Handle,
+        ) -> i32;
+        pub fn CloseHandle(handle: Handle) -> i32;
         pub fn GlobalAlloc(flags: u32, size: usize) -> Handle;
         pub fn GlobalLock(memory: Handle) -> Handle;
         pub fn GlobalUnlock(memory: Handle) -> i32;
