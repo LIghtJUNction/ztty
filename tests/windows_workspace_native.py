@@ -461,7 +461,9 @@ def run(binary, output, expected_arch=None):
         probe = Probe(root, name, window)
         probes[name] = probe
         window.chord(vk)
-        window.text(f'"{sys.executable}" "{Path(__file__).resolve()}" --child "{probe.path}"\r')
+        window.text(f'"{sys.executable}" "{Path(__file__).resolve()}" --child "{probe.path}"')
+        # Unicode packets carry text; shell submission needs a real Enter key.
+        window.chord(0x0D, control=False, shift=False)
         state = probe.ready()
         native.wait_for(lambda: window.title().endswith("ztty workspace " + name), "new pane title " + name)
         assert all(other.pid != probe.pid for key, other in probes.items() if key != name)
