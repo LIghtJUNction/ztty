@@ -412,6 +412,7 @@ impl Terminal {
     }
     pub fn clear_dirty(&mut self) {
         self.state.screen.dirty.fill(false);
+        self.state.sync_commit_pending = false;
     }
     pub fn mark_all_dirty(&mut self) {
         self.state.screen.mark_all();
@@ -432,9 +433,17 @@ impl Terminal {
             .get(id as usize - 1)
             .map(|link| link.uri.as_str())
     }
+    /// Whether a synchronized frame ended since the frontend last cleared damage.
+    ///
+    /// This remains set when begin/end arrive in the same PTY chunk. Frontends
+    /// still honor an active synchronized-output mode before presenting.
+    pub fn sync_commit_pending(&self) -> bool {
+        self.state.sync_commit_pending
+    }
+
     /// A frontend may end a stalled synchronized frame after a documented timeout.
     pub fn force_end_sync(&mut self) {
-        self.state.modes.synchronized_output = false;
+        self.state.set_mode(true, 2026, false);
     }
 }
 
@@ -471,6 +480,7 @@ struct State {
     history_bytes: usize,
     style: Style,
     modes: Modes,
+    sync_commit_pending: bool,
     autowrap: bool,
     insert: bool,
     newline: bool,
@@ -506,6 +516,7 @@ impl State {
             history_bytes: 0,
             style: theme.style(),
             modes: Modes::default(),
+            sync_commit_pending: false,
             autowrap: true,
             insert: false,
             newline: false,
@@ -647,7 +658,10 @@ impl State {
                 if save_history {
                     self.record_history_row(0);
                 }
-                self.screen.row0 = (self.screen.row0 + 1) % self.screen.rows;
+                self.screen.row0 += 1;
+                if self.screen.row0 == self.screen.rows {
+                    self.screen.row0 = 0;
+                }
                 self.screen.row_mut(bottom).fill(blank);
             } else {
                 for y in top..bottom {
@@ -674,7 +688,11 @@ impl State {
         let blank = self.style.blank();
         for _ in 0..count.min(bottom - top + 1) {
             if top == 0 && bottom + 1 == self.screen.rows {
-                self.screen.row0 = (self.screen.row0 + self.screen.rows - 1) % self.screen.rows;
+                self.screen.row0 = if self.screen.row0 == 0 {
+                    self.screen.rows - 1
+                } else {
+                    self.screen.row0 - 1
+                };
                 self.screen.row_mut(top).fill(blank);
             } else {
                 for y in (top + 1..=bottom).rev() {
@@ -792,7 +810,8 @@ impl State {
     }
 
     fn ascii(&mut self, mut bytes: &[u8]) {
-        if self.insert || self.g0 || self.g1 || !self.autowrap {
+        let graphics_charset = if self.use_g1 { self.g1 } else { self.g0 };
+        if self.insert || graphics_charset || !self.autowrap {
             for &byte in bytes {
                 self.put_char(byte as char);
             }
@@ -939,7 +958,10 @@ impl State {
             1004 => self.modes.focus_events = enabled,
             1006 => self.modes.sgr_mouse = enabled,
             2004 => self.modes.bracketed_paste = enabled,
-            2026 => self.modes.synchronized_output = enabled,
+            2026 => {
+                self.sync_commit_pending |= self.modes.synchronized_output && !enabled;
+                self.modes.synchronized_output = enabled;
+            }
             _ => {}
         }
     }
@@ -1016,10 +1038,11 @@ impl State {
         self.modes.kitty_keyboard = self.screen.keyboard;
     }
 
-    fn sgr(&mut self, groups: &[&[u16]]) {
-        let mut i = 0;
-        while i < groups.len() {
-            let group = groups[i];
+    fn sgr(&mut self, params: &Params) {
+        // SGR is frequent in colored output. Consume parameter groups directly
+        // instead of materializing a 32-entry slice table for every sequence.
+        let mut groups = params.iter().peekable();
+        while let Some(group) = groups.next() {
             let value = group.first().copied().unwrap_or(0);
             match value {
                 0 => {
@@ -1082,22 +1105,23 @@ impl State {
                             _ => None,
                         }
                     } else {
-                        match raw_param(groups, i + 1) {
+                        match groups.peek().and_then(|group| group.first()).copied() {
                             Some(5) => {
-                                let value = raw_param(groups, i + 2)
+                                groups.next();
+                                groups
+                                    .next()
+                                    .and_then(|group| group.first())
+                                    .copied()
                                     .filter(|v| *v <= 255)
-                                    .map(|v| self.theme.color(v));
-                                i += 2;
-                                value
+                                    .map(|v| self.theme.color(v))
                             }
                             Some(2) => {
-                                let value = rgb(
-                                    raw_param(groups, i + 2),
-                                    raw_param(groups, i + 3),
-                                    raw_param(groups, i + 4),
-                                );
-                                i += 4;
-                                value
+                                groups.next();
+                                rgb(
+                                    groups.next().and_then(|group| group.first()).copied(),
+                                    groups.next().and_then(|group| group.first()).copied(),
+                                    groups.next().and_then(|group| group.first()).copied(),
+                                )
                             }
                             _ => None,
                         }
@@ -1113,7 +1137,6 @@ impl State {
                 }
                 _ => {}
             }
-            i += 1;
         }
     }
 
@@ -1211,7 +1234,10 @@ impl Perform for State {
                 let mut inactive_graphics = mem::take(&mut self.inactive_graphics);
                 graphics.clear();
                 inactive_graphics.clear();
+                let sync_commit_pending =
+                    self.sync_commit_pending || self.modes.synchronized_output;
                 *self = Self::new(cols, rows, history, self.theme);
+                self.sync_commit_pending = sync_commit_pending;
                 self.graphics = graphics;
                 self.inactive_graphics = inactive_graphics;
                 self.cell_width = width;
@@ -1232,6 +1258,10 @@ impl Perform for State {
 
     fn csi_dispatch(&mut self, params: &Params, intermediates: &[u8], ignore: bool, action: char) {
         if ignore {
+            return;
+        }
+        if action == 'm' && intermediates.is_empty() {
+            self.sgr(params);
             return;
         }
         let mut storage: [&[u16]; 32] = [&[]; 32];
@@ -1372,7 +1402,6 @@ impl Perform for State {
             }
             'S' => self.scroll_up(self.screen.top, self.screen.bottom, p, false),
             'T' => self.scroll_down(self.screen.top, self.screen.bottom, p),
-            'm' => self.sgr(groups),
             's' => self.save_cursor(),
             'u' => self.restore_cursor(),
             'r' => {
