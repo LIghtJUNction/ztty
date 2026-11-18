@@ -1,0 +1,265 @@
+{
+  "schema": 1,
+  "report_date": "2026-11-19",
+  "report_timezone": "Asia/Taipei",
+  "repository": "LIghtJUNction/ztty",
+  "verdict": "published_and_read_back",
+  "release_identity": {
+    "version": "0.3.1",
+    "tag": "v0.3.1",
+    "annotated_tag_object": "783178f40c4f732c3520c36e2690ba97b027b852",
+    "source_sha": "cbcd480f861904a2265af52ab5ca8a5e19cebe9d",
+    "release_id": 450584279,
+    "draft": false,
+    "latest_at_readback": true,
+    "published_at_utc": "2026-11-18T21:49:22Z",
+    "published_at_taipei": "2026-11-19T05:49:22+08:00",
+    "url": "https://github.com/LIghtJUNction/ztty/releases/tag/v0.3.1",
+    "tag_moved": false,
+    "source_archive": {
+      "id": 765085605,
+      "name": "ztty-0.3.1.tar.gz",
+      "bytes": 4440076,
+      "sha256": "29383193487de4954081ed1a195f4031cd7756de6d547b262f423b97a22ec043",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-0.3.1.tar.gz"
+    },
+    "source_archive_recipe": "git archive --format=tar --prefix=\"ztty-0.3.1/\" HEAD | gzip -n"
+  },
+  "original_acceptance": {
+    "run_id": 44375302476,
+    "run_attempt": 1,
+    "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44375302476",
+    "run_conclusion": "failure",
+    "native_gates_passed": 6,
+    "verify": {
+      "job_id": 135052844405,
+      "conclusion": "success"
+    },
+    "version": {
+      "job_id": 135052765903,
+      "conclusion": "success"
+    },
+    "arch_package_gate": "success",
+    "artifact_ledger_gate": "success",
+    "publication_failure": {
+      "job_id": 135065712440,
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44375302476/job/135065712440",
+      "step": "Publish or verify GitHub Release",
+      "http_status": 400,
+      "error": "Bad Content-Length",
+      "asset": "ztty-macos-aarch64.native.application.stderr.log",
+      "asset_bytes": 0,
+      "historical_run_preserved": true
+    },
+    "original_artifacts": [
+      {
+        "name": "ztty-linux-x86_64",
+        "id": 14462525952,
+        "bytes": 1127914,
+        "sha256": "47fa4cefb1ddcf5baa735f3b45b62a77f063186c2e22f6647fd1f0baf2191c02"
+      },
+      {
+        "name": "ztty-linux-aarch64",
+        "id": 14461920104,
+        "bytes": 1100008,
+        "sha256": "8a3b6eacc323fcb8be1a5299b1b4c58c974bf6728d95c990be05e519920e6af8"
+      },
+      {
+        "name": "ztty-macos-aarch64",
+        "id": 14461647359,
+        "bytes": 442663,
+        "sha256": "9ae988efd691d3cba776b39bf884c4964e276cc5d18fe6b5db2cc08f1000eb2c"
+      },
+      {
+        "name": "ztty-macos-x86_64",
+        "id": 14460743009,
+        "bytes": 476041,
+        "sha256": "b87078596154770ab8d991ebb6bf918467cf6b2d885012979ee1a9aa4f4400ae"
+      },
+      {
+        "name": "ztty-windows-aarch64",
+        "id": 14461452592,
+        "bytes": 1075088,
+        "sha256": "68e856287f64f4433bdd4948b1ce47fc76cd82c59803602b9792bbda06316837"
+      },
+      {
+        "name": "ztty-windows-x86_64",
+        "id": 14460907598,
+        "bytes": 1141037,
+        "sha256": "c06f1e66e7e8a76ec17892689e1ee17c4ae20b1e4b1c1fd33ca3b6d14a74e5c4"
+      }
+    ]
+  },
+  "recovery": {
+    "run_id": 44402524733,
+    "run_attempt": 1,
+    "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44402524733",
+    "job_id": 135149055985,
+    "job_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44402524733/job/135149055985",
+    "status": "completed",
+    "conclusion": "success",
+    "helper_commit": "0f00319e186cee90664e7d43117da23321135716",
+    "original_gates_passed": true,
+    "original_artifact_audit_passed": true,
+    "original_artifact_count": 6,
+    "native_rebuilds": 0,
+    "nonempty_payload_assets": 943,
+    "payloads_downloaded_before_publication": true,
+    "same_uploaded_asset_ids_after_publication": true,
+    "final_release_asset_count": 944,
+    "standalone_zero_byte_assets": 0,
+    "readback_passed": true,
+    "evidence_bundle": {
+      "id": 765085413,
+      "name": "ztty-0.3.1-native-evidence.zip",
+      "bytes": 5368273,
+      "sha256": "97728b14a6c1e261bd4d1a6c4eced77ef7cf552e4dbb4e7dbef23033f8625ec9",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-0.3.1-native-evidence.zip",
+      "original_actions_zip_count": 6,
+      "empty_files_verified": 10
+    },
+    "audit_asset": {
+      "id": 765134925,
+      "name": "ztty-0.3.1-recovery-44402524733-1.json",
+      "bytes": 205547,
+      "sha256": "ca57386c2c4185005c784052dc8448300645b213cdbbc94aab5cbbe2ba3adce1",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-0.3.1-recovery-44402524733-1.json",
+      "readback_passed": true
+    },
+    "workflow_proof": {
+      "id": 14473219084,
+      "name": "ztty-v031-publication-recovery-44402524733-1",
+      "bytes": 28478522,
+      "sha256": "32021ce9c3386835ce95a0b53991854f79ac47810b45afd4a432f0c880bcfdee",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44402524733/artifacts/14473219084",
+      "expires_at_utc": "2026-12-02T21:49:30Z"
+    },
+    "prior_recovery_attempt": {
+      "run_id": 44402143648,
+      "conclusion": "failure",
+      "failure_stage": "read_only_audit",
+      "http_status": 415,
+      "publication_skipped": true,
+      "historical_run_preserved": true
+    }
+  },
+  "native_downloads": [
+    {
+      "platform": "linux",
+      "architecture": "x86_64",
+      "original_gate_job_id": 135052844251,
+      "original_gate_conclusion": "success",
+      "id": 765086107,
+      "name": "ztty-linux-x86_64.tar.gz",
+      "bytes": 361782,
+      "sha256": "54826d2352a72b741f68bc0266faa828da2307bf644eeacdba657d27d8ec3e1f",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-linux-x86_64.tar.gz"
+    },
+    {
+      "platform": "linux",
+      "architecture": "aarch64",
+      "original_gate_job_id": 135052844277,
+      "original_gate_conclusion": "success",
+      "id": 765085810,
+      "name": "ztty-linux-aarch64.tar.gz",
+      "bytes": 344814,
+      "sha256": "1bb554fdb00977aa53ab7a4f6496d91a2da01083f550ed8a8fdf0d22ee6c2349",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-linux-aarch64.tar.gz"
+    },
+    {
+      "platform": "macos",
+      "architecture": "x86_64",
+      "original_gate_job_id": 135052844126,
+      "original_gate_conclusion": "success",
+      "id": 765090907,
+      "name": "ztty-macos-x86_64.zip",
+      "bytes": 185999,
+      "sha256": "d3e0ecae1445cd09c9936f71b294cf03ec08bdf25d0e597bd5423765989b7e3c",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-macos-x86_64.zip"
+    },
+    {
+      "platform": "macos",
+      "architecture": "aarch64",
+      "original_gate_job_id": 135052844191,
+      "original_gate_conclusion": "success",
+      "id": 765088232,
+      "name": "ztty-macos-aarch64.zip",
+      "bytes": 170034,
+      "sha256": "bb0141d7650b531a67219ed7a65b3d9d41950186315e7056a7cc524d43227ca0",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-macos-aarch64.zip"
+    },
+    {
+      "platform": "windows",
+      "architecture": "x86_64",
+      "original_gate_job_id": 135052844446,
+      "original_gate_conclusion": "success",
+      "id": 765119019,
+      "name": "ztty-windows-x86_64.zip",
+      "bytes": 840599,
+      "sha256": "1ef66cc96de048190e29f66657d44c99e6818da188c25462e4ab457a725553c9",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-windows-x86_64.zip"
+    },
+    {
+      "platform": "windows",
+      "architecture": "aarch64",
+      "original_gate_job_id": 135052844216,
+      "original_gate_conclusion": "success",
+      "id": 765106627,
+      "name": "ztty-windows-aarch64.zip",
+      "bytes": 772809,
+      "sha256": "df1f01526a9bddf0a26177b8e7eb6fb39093dc3f03cb2af51dff84f709a3d096",
+      "download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-windows-aarch64.zip"
+    }
+  ],
+  "registry": {
+    "crate": "ztty",
+    "version": "0.3.1",
+    "status": "verified",
+    "passed": true,
+    "read_only": true,
+    "cargo_publish_called": false,
+    "index_url": "https://raw.githubusercontent.com/rust-lang/crates.io-index/master/zt/ty/ztty",
+    "archive_url": "https://static.crates.io/crates/ztty/ztty-0.3.1.crate",
+    "archive_bytes": 4254590,
+    "expected_sha256": "86d4bb0683f7809f7bec61783b50423554e9d29e4ceb3aca26e625055920716b",
+    "sha256": "86d4bb0683f7809f7bec61783b50423554e9d29e4ceb3aca26e625055920716b",
+    "yanked": false,
+    "vcs": {
+      "git": {
+        "sha1": "cbcd480f861904a2265af52ab5ca8a5e19cebe9d"
+      },
+      "path_in_vcs": ""
+    },
+    "dirty_field_present": false,
+    "dirty_when_absent": false,
+    "dirty_interpretation": "The raw git.dirty field is absent; the audit requires git.get('dirty', False) is False.",
+    "normalized_dependencies": {
+      "zpty": "0.2.1",
+      "zterm": "0.3.0"
+    },
+    "dependencies_use_default_registry": true,
+    "ztty_ui_dependency_present": false,
+    "ztty_ui_path_component_in_crate": false
+  },
+  "scope": {
+    "released_application": "ztty native terminal",
+    "future_release_workflow_fix_commit": "99d94633391150c4ca431b568c27139ef63441dd",
+    "future_fix_changes_v031_source": false,
+    "local_installed_package": "0.3.1-2",
+    "local_install_source_differs_from_release": true,
+    "local_install_downgraded": false,
+    "local_install_statement_source": "Existing session installation verification; the GitHub-only recovery does not install packages.",
+    "aur_publication_performed_by_recovery": false,
+    "zui_in_release_acceptance": false,
+    "local_install_evidence_url": "https://github.com/LIghtJUNction/ztty/blob/cf7158bc6696cb246184f4df3d6850a6c1f8994b/docs/measurements/atomic-frame-2026-11-19/installation-0.3.1.json",
+    "local_live_recheck_after_disconnect": false
+  },
+  "evidence_sources": {
+    "release_api": "https://api.github.com/repos/LIghtJUNction/ztty/releases/450584279",
+    "latest_api": "https://api.github.com/repos/LIghtJUNction/ztty/releases/latest",
+    "tag_api": "https://api.github.com/repos/LIghtJUNction/ztty/git/ref/tags/v0.3.1",
+    "compact_log_marker": "ZTTY_RELEASE_RECOVERY_AUDIT=",
+    "full_audit_download": "https://github.com/LIghtJUNction/ztty/releases/download/v0.3.1/ztty-0.3.1-recovery-44402524733-1.json",
+    "recovery_helper": "https://github.com/LIghtJUNction/ztty/blob/0f00319e186cee90664e7d43117da23321135716/tools/recover_release_v031.py"
+  }
+}
