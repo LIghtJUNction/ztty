@@ -1,0 +1,430 @@
+{
+  "schema": 1,
+  "date": "2026-11-18",
+  "timezone": "Asia/Taipei",
+  "source": "3c5b8e28a0c9baccd0dca1f24e1d3c3d558c449d",
+  "merge_source": "b9771a39a5653c488719679d737844180ad45067",
+  "merged_parents": [
+    "7c552acd0765834a4f41b44b4e69b64b97b1f0ac",
+    "cd389099e1f01fd355f542258854d1d446c1aa5d"
+  ],
+  "rust": {
+    "regular_passed": 220,
+    "doctests_passed": 6,
+    "failed": 0
+  },
+  "gui": {
+    "workspaces": {
+      "passed": true,
+      "checks": 10
+    },
+    "daily-workflow": {
+      "passed": true,
+      "checks": 15
+    },
+    "repaint": {
+      "passed": true,
+      "checks": 7
+    },
+    "sixel": {
+      "passed": true,
+      "checks": 10
+    },
+    "gui": {
+      "passed": true,
+      "checks": 12,
+      "path": "gui/gui-smoke.json"
+    },
+    "graphics": {
+      "passed": true,
+      "checks": 7,
+      "path": "graphics/graphics-smoke.json"
+    }
+  },
+  "benchmark_python": {
+    "benchmark_terminals": 25,
+    "throughput": 13,
+    "log": "benchmark-python.log"
+  },
+  "binary": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+    "sha256": "ef2e86087c4dd326df911281dd516bc074328eebd10987632144adee3cf3d6f8",
+    "size": 677768,
+    "source": "3c5b8e28a0c9baccd0dca1f24e1d3c3d558c449d"
+  },
+  "gates": {
+    "source": "3c5b8e28a0c9baccd0dca1f24e1d3c3d558c449d",
+    "checks": [
+      {
+        "name": "fmt",
+        "command": [
+          "cargo",
+          "fmt",
+          "--all",
+          "--",
+          "--check"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 0.51,
+        "log": "fmt.log"
+      },
+      {
+        "name": "rust-tests",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "--workspace",
+          "--",
+          "--test-threads=1"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 44.226,
+        "log": "rust-tests.log"
+      },
+      {
+        "name": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "--locked",
+          "--workspace",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 14.422,
+        "log": "clippy.log"
+      },
+      {
+        "name": "release",
+        "command": [
+          "cargo",
+          "build",
+          "--locked",
+          "--release"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 11.876,
+        "log": "release.log"
+      },
+      {
+        "name": "no-std",
+        "command": [
+          "python3",
+          "tools/check_no_std.py"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 0.167,
+        "log": "no-std.log"
+      },
+      {
+        "name": "bare-metal",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "-p",
+          "zterm",
+          "-p",
+          "zinput",
+          "-p",
+          "zgraphics",
+          "--target",
+          "x86_64-unknown-none"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 1.033,
+        "log": "bare-metal.log"
+      },
+      {
+        "name": "windows-typecheck",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "--target",
+          "x86_64-pc-windows-gnu"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 3.037,
+        "log": "windows-typecheck.log"
+      },
+      {
+        "name": "macos-intel-typecheck",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "--target",
+          "x86_64-apple-darwin"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 1.024,
+        "log": "macos-intel-typecheck.log"
+      },
+      {
+        "name": "macos-arm-typecheck",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "--target",
+          "aarch64-apple-darwin"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 0.801,
+        "log": "macos-arm-typecheck.log"
+      },
+      {
+        "name": "workspaces",
+        "command": [
+          "python3",
+          "tests/workspaces.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+          "--output",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/workspaces.json",
+          "--screenshot",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/workspaces.png"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 1.16,
+        "log": "workspaces.log"
+      },
+      {
+        "name": "daily-workflow",
+        "command": [
+          "python3",
+          "tests/daily_workflow.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+          "--output",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow.json",
+          "--screenshots",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/daily-workflow"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 1.338,
+        "log": "daily-workflow.log"
+      },
+      {
+        "name": "repaint",
+        "command": [
+          "python3",
+          "tests/repaint_gui.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+          "--output",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/repaint.json",
+          "--screenshots",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/repaint"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 1.57,
+        "log": "repaint.log"
+      },
+      {
+        "name": "sixel",
+        "command": [
+          "python3",
+          "tests/sixel_gui.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+          "--output",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/sixel.json",
+          "--screenshot",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/sixel.png",
+          "--source-root",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 0.961,
+        "log": "sixel.log"
+      },
+      {
+        "name": "gui",
+        "command": [
+          "python3",
+          "tests/gui_smoke.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+          "--artifacts",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/gui"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 2.907,
+        "log": "gui.log"
+      },
+      {
+        "name": "graphics",
+        "command": [
+          "python3",
+          "tests/graphics_smoke.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+          "--artifacts",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/graphics"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 1.052,
+        "log": "graphics.log"
+      },
+      {
+        "name": "mcp-transport",
+        "command": [
+          "python3",
+          "tests/mcp_transport.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 0.203,
+        "log": "mcp-transport.log"
+      },
+      {
+        "name": "mcp-sessions",
+        "command": [
+          "python3",
+          "tests/mcp_sessions.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 0.619,
+        "log": "mcp-sessions.log"
+      },
+      {
+        "name": "mcp-security",
+        "command": [
+          "python3",
+          "tests/mcp_security.py",
+          "--binary",
+          "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+        ],
+        "exit_code": 0,
+        "duration_seconds": 0.179,
+        "log": "mcp-security.log"
+      }
+    ]
+  },
+  "microbenchmark": {
+    "pinned": {
+      "ascii_mib_s": {
+        "before": {
+          "median": 175.151,
+          "min": 141.978,
+          "max": 227.035
+        },
+        "after": {
+          "median": 195.128,
+          "min": 176.79,
+          "max": 211.848
+        },
+        "ratio": 1.1140558717906262
+      },
+      "ascii_full_history_mib_s": {
+        "before": {
+          "median": 98.376,
+          "min": 89.958,
+          "max": 127.377
+        },
+        "after": {
+          "median": 137.036,
+          "min": 111.136,
+          "max": 141.11
+        },
+        "ratio": 1.3929820281369438
+      },
+      "sgr_mib_s": {
+        "before": {
+          "median": 144.063,
+          "min": 104.511,
+          "max": 149.641
+        },
+        "after": {
+          "median": 139.914,
+          "min": 128.212,
+          "max": 144.253
+        },
+        "ratio": 0.9712000999562691
+      },
+      "unicode_mib_s": {
+        "before": {
+          "median": 87.76,
+          "min": 68.106,
+          "max": 89.259
+        },
+        "after": {
+          "median": 112.083,
+          "min": 98.42,
+          "max": 115.624
+        },
+        "ratio": 1.2771536007292614
+      }
+    },
+    "unpinned": {
+      "ascii_mib_s": {
+        "before": {
+          "median": 231.413,
+          "min": 159.94,
+          "max": 253.645
+        },
+        "after": {
+          "median": 216.042,
+          "min": 193.075,
+          "max": 228.008
+        },
+        "ratio": 0.9335776296059426
+      },
+      "ascii_full_history_mib_s": {
+        "before": {
+          "median": 136.166,
+          "min": 124.82,
+          "max": 139.335
+        },
+        "after": {
+          "median": 138.761,
+          "min": 119.301,
+          "max": 149.187
+        },
+        "ratio": 1.019057620845145
+      },
+      "sgr_mib_s": {
+        "before": {
+          "median": 132.84,
+          "min": 126.27,
+          "max": 151.037
+        },
+        "after": {
+          "median": 143.888,
+          "min": 143.126,
+          "max": 157.094
+        },
+        "ratio": 1.0831677205660946
+      },
+      "unicode_mib_s": {
+        "before": {
+          "median": 82.717,
+          "min": 74.104,
+          "max": 92.18
+        },
+        "after": {
+          "median": 125.943,
+          "min": 119.861,
+          "max": 130.635
+        },
+        "ratio": 1.5225769793391926
+      }
+    },
+    "initial_core_heap_bytes": [
+      107676
+    ],
+    "steady_state_allocations": [
+      0
+    ]
+  },
+  "native_scope": "Windows GNU and Darwin Intel/ARM typechecks; current source has no new native runtime acceptance"
+}

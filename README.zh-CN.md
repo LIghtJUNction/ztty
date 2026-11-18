@@ -1,5 +1,7 @@
 # ztty
 
+**2026-11-18 整合进展：** 完整工作区分支已纳入主分支吞吐优化，并减少 Unicode 单元格重复写入。候选版本通过 220 项 Rust 单元／集成测试、6 项文档测试和 61 项实际 Linux GUI 检查。固定 CPU 的解析器／屏幕微基准中，Unicode 吞吐为 87.760 → 112.083 MiB/s（+27.7%）；端到端绘制与 Windows／macOS 原生验收分别记录。[实现、原始结果与截图](docs/integration-unicode-2026-11-18.md)。
+
 <!-- terminal-benchmark:start -->
 [![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 

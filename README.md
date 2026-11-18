@@ -1,5 +1,7 @@
 # ztty
 
+**2026-11-18 integration checkpoint:** the full workspace branch now includes the main-branch throughput work and a Unicode cell-write optimization. The candidate passed 220 Rust unit/integration tests, 6 doctests and 61 real Linux GUI checks. A fixed-CPU parser/screen microbenchmark observed Unicode throughput of 87.760 → 112.083 MiB/s (+27.7%); end-to-end rendering and native Windows/macOS acceptance remain separate. [Implementation, raw results and screenshots](docs/integration-unicode-2026-11-18.md).
+
 <!-- terminal-benchmark:start -->
 [![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 

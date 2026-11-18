@@ -1,0 +1,28 @@
+{
+  "stdio_pty": "passed",
+  "unicode_cursor_pages": "passed",
+  "cwd_environment_resize": "passed",
+  "same_owner_preserves_queued_pty_input": {
+    "status": "passed",
+    "accepted_bytes": 1048576,
+    "received_bytes": 1048576,
+    "sha256": "aca1cd027e979588d14b877b7b0cb8585ad9fec599eb45801992ee5382b3760f",
+    "queue_full_before_reacquire": true
+  },
+  "split_pty_utf8": "passed",
+  "invalid_prefix_split_utf8": {
+    "status": "passed",
+    "initial_cursor": 1,
+    "final_cursor": 8,
+    "output": "�🚀END"
+  },
+  "creator_cwd_argv_env_isolation": "passed",
+  "http_stdio_shared_broker": "passed",
+  "namespaces_and_ambiguity": "passed",
+  "exit_code": 7,
+  "exclusive_input_owner_and_explicit_takeover": "passed",
+  "bounded_command_reads_across_observers": "passed",
+  "transport_exit_persistence": "passed",
+  "attach_default_list": "passed",
+  "close_releases_sessions": "passed"
+}
