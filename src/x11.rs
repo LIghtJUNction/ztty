@@ -995,6 +995,7 @@ pub struct Window {
     owns_colormap: bool,
     requested_opacity: u8,
     pixmap: Xid,
+    pending_damage: Option<(i32, i32)>,
     gc: *mut c_void,
     draw: *mut XftDraw,
     font: *mut Font,
@@ -1181,6 +1182,7 @@ impl Window {
                 owns_colormap: alpha.is_some(),
                 requested_opacity: appearance.opacity,
                 pixmap,
+                pending_damage: None,
                 gc,
                 draw,
                 font,
@@ -1337,6 +1339,31 @@ impl Window {
         Ok((cols, rows))
     }
     pub fn present(&self) {
+        self.present_region(0, self.height);
+    }
+
+    fn damage(&mut self, top: i32, bottom: i32) {
+        let top = top.clamp(0, self.height);
+        let bottom = bottom.clamp(top, self.height);
+        if top == bottom {
+            return;
+        }
+        self.pending_damage = Some(match self.pending_damage {
+            Some((start, end)) => (start.min(top), end.max(bottom)),
+            None => (top, bottom),
+        });
+    }
+
+    /// Publish only after terminal rows and view overlays form one complete frame.
+    /// Xlib may send its buffer during drawing, so delaying XFlush alone does not
+    /// prevent several earlier XCopyArea requests from exposing a partial frame.
+    pub fn finish_frame(&mut self) {
+        if let Some((top, bottom)) = self.pending_damage.take() {
+            self.present_region(top, bottom);
+        }
+    }
+
+    fn present_region(&self, top: i32, bottom: i32) {
         if self.suspended || self.id == 0 {
             return;
         }
@@ -1347,11 +1374,11 @@ impl Window {
                 self.id,
                 self.gc,
                 0,
-                0,
+                top,
                 self.width as u32,
-                self.height as u32,
+                (bottom - top) as u32,
                 0,
-                0,
+                top,
             );
             XFlush(self.display);
         }
@@ -1645,7 +1672,7 @@ impl Window {
             (self.height - y) as u32,
         );
         self.overlay_line(text, y);
-        self.present();
+        self.damage(y, self.height);
     }
 
     pub fn overlay_lines(&mut self, lines: &[String]) {
@@ -1667,7 +1694,7 @@ impl Window {
         for (row, line) in lines.iter().take(count).enumerate() {
             self.overlay_line(line, y + row as i32 * self.ch);
         }
-        self.present();
+        self.damage(y, self.height);
     }
 
     fn overlay_line(&mut self, text: &str, y: i32) {
@@ -1782,7 +1809,7 @@ impl Window {
                 rect.y + INSET_Y,
                 rect.x + rect.width - INSET_X,
             );
-            self.present();
+            self.damage(rect.y, rect.y + rect.height);
             return Some(rect);
         }
         None
@@ -2022,8 +2049,9 @@ impl Window {
                 self.height as u32,
             );
         }
-        let mut changed = force;
-        let mut damaged_start = None;
+        if force {
+            self.damage(0, self.height);
+        }
         for row in 0..rows {
             if !(force
                 || terminal.row_dirty(row)
@@ -2033,16 +2061,10 @@ impl Window {
                         .flatten()
                         .any(|((_, y), _)| y == row)))
             {
-                if let Some(start) = damaged_start.take() {
-                    self.publish_rows(start, row);
-                }
                 continue;
             }
-            changed = true;
-            if !force {
-                damaged_start.get_or_insert(row);
-            }
             let y = self.padding + row as i32 * self.ch;
+            self.damage(y, y + self.ch);
             let mut col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
@@ -2186,55 +2208,11 @@ impl Window {
                 self.draw_cursor(terminal, column.min(cols - 1), row, y, shape);
             }
         }
-        // Submit adjacent damaged rows together. A forced frame is published
-        // once below, including padding, without redundant per-row copies.
-        if let Some(start) = damaged_start {
-            self.publish_rows(start, rows);
-        }
-        if force {
-            unsafe {
-                XCopyArea(
-                    self.display,
-                    self.pixmap,
-                    self.id,
-                    self.gc,
-                    0,
-                    0,
-                    self.width as u32,
-                    self.height as u32,
-                    0,
-                    0,
-                );
-            }
-        }
-        if changed {
-            unsafe {
-                XFlush(self.display);
-            }
-        }
         self.last_cursor = cursor;
         self.graphics_revision = terminal.graphics().revision();
         self.graphics_alternate = terminal.modes().alternate_screen;
         terminal.clear_dirty();
     }
-    fn publish_rows(&self, start: usize, end: usize) {
-        let y = self.padding + start as i32 * self.ch;
-        unsafe {
-            XCopyArea(
-                self.display,
-                self.pixmap,
-                self.id,
-                self.gc,
-                0,
-                y,
-                self.width as u32,
-                ((end - start) as i32 * self.ch) as u32,
-                0,
-                y,
-            );
-        }
-    }
-
     fn draw_cursor(
         &mut self,
         terminal: &Terminal,

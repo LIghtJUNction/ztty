@@ -181,7 +181,8 @@ def main():
         "checks": [], "timings_ms": {}, "screenshots": {},
         "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
         "source_sha256": {name: digest(ROOT / name) for name in (
-            "src/repaint.rs", "src/session.rs", "crates/zterm/src/terminal.rs",
+            "src/repaint.rs", "src/session.rs", "src/x11.rs", "crates/zterm/src/terminal.rs",
+            "tests/x11_present_trace.c",
             "tests/repaint_gui.py", "tools/isolated_xvfb.py", "tools/benchmark_terminals.py",
             "tools/measure_runtime.py", "tools/measure_multiwindow.py")},
     }
@@ -211,6 +212,17 @@ def main():
                            ZTTY_REPAINT_TEST=directory.name)
                 for key in ("WAYLAND_DISPLAY", "LD_PRELOAD", "ZTTY_X11_DIAGNOSTIC_CONTROL"):
                     env.pop(key, None)
+                # Trace the real Xlib copy calls in this owned broker. A complete
+                # application frame must not publish disjoint rows or overlays
+                # independently; an ending XFlush is not a transaction boundary.
+                trace = directory / "present.log"
+                trace.write_text("")
+                tracer = directory / "present-trace.so"
+                subprocess.run(["cc", "-shared", "-fPIC", "-O2",
+                                str(ROOT / "tests/x11_present_trace.c"),
+                                "-o", str(tracer), "-ldl"], check=True)
+                env["LD_PRELOAD"] = str(tracer)
+                env["ZTTY_X11_PRESENT_TRACE"] = str(trace)
                 socket_path = directory / "control.sock"
                 listener = socket.socket(socket.AF_UNIX)
                 listener.bind(str(socket_path))
@@ -306,6 +318,72 @@ def main():
 
                 visible(a, BASE, "initial-a")
                 visible(b, BASE, "initial-b")
+                def copies_since(offset, view):
+                    with trace.open() as stream:
+                        stream.seek(offset)
+                        records = [list(map(int, line.split())) for line in stream]
+                    return [record for record in records if record[1] == view["window"].id]
+
+                geometry = a["window"].get_geometry()
+                cw = (geometry.width - PADDING * 2) // COLS
+                ch = (geometry.height - PADDING * 2) // ROWS
+
+                def row_pixel(row):
+                    data = a["window"].get_image(PADDING + (COLS - 2) * cw + 1,
+                                                PADDING + row * ch + 1,
+                                                1, 1, X.ZPixmap, 0xffffffff).data
+                    return Image.frombytes("RGB", (1, 1), data, "raw", "BGRX").getpixel((0, 0))
+
+                # Nonadjacent damage used to be copied to the live window while
+                # later rows were still being painted into its backing pixmap.
+                color = (83, 139, 191)
+                offset = trace.stat().st_size
+                rows = (0, ROWS // 2, ROWS - 1)
+                text = "\x1b[?2026h\x1b[48;2;83;139;191m"
+                text += "".join(f"\x1b[{row+1};1H\x1b[2K" for row in rows)
+                emit(a, text + "\x1b[0m\x1b[?2026l")
+                wait(lambda: all(row_pixel(row) == color for row in rows),
+                     "nonadjacent rows committed")
+                copies = copies_since(offset, a)
+                report["nonadjacent_frame_copies"] = copies
+                assert len(copies) == 1, f"one logical frame published {len(copies)} regions: {copies}"
+                assert copies[0][3] == PADDING and copies[0][5] == ROWS * ch, copies
+                report["checks"].append("nonadjacent dirty rows publish once after the complete frame is painted")
+                capture(a, "nonadjacent-frame")
+
+                # Keep the small-update optimization: batching must not turn a
+                # one-row change into an unconditional whole-window copy.
+                offset = trace.stat().st_size
+                emit(a, f"\x1b[?2026h\x1b[{ROWS};1H\x1b[48;2;91;53;117m\x1b[2K\x1b[0m\x1b[?2026l")
+                wait(lambda: row_pixel(ROWS - 1) == (91, 53, 117), "single row committed")
+                copies = copies_since(offset, a)
+                report["single_row_frame_copies"] = copies
+                assert len(copies) == 1 and copies[0][5] == ch, copies
+                report["checks"].append("one-row updates still copy only one row")
+
+                a["window"].set_input_focus(X.RevertToParent, X.CurrentTime)
+                connection.sync()
+                time.sleep(0.03)
+                offset = trace.stat().st_size
+                rpc({"op": "action", "session": "repaint-a", "action": "search"})
+                def search_visible():
+                    data = a["window"].get_image(0, geometry.height - PADDING - ch,
+                                                geometry.width, ch, X.ZPixmap, 0xffffffff).data
+                    pixels = Image.frombytes("RGB", (geometry.width, ch), data, "raw", "BGRX")
+                    return any(color == (205, 214, 228)
+                               for _, color in pixels.getcolors(pixels.width * pixels.height) or [])
+                wait(search_visible, "search overlay committed")
+                copies = copies_since(offset, a)
+                report["overlay_frame_copies"] = copies
+                assert len(copies) == 1, f"overlay was published separately: {copies}"
+                report["checks"].append("terminal content and search overlay share one visible copy")
+                capture(a, "single-publish-overlay")
+                keycode = connection.keysym_to_keycode(XK.string_to_keysym("Escape"))
+                xtest.fake_input(connection, X.KeyPress, keycode)
+                xtest.fake_input(connection, X.KeyRelease, keycode)
+                connection.sync()
+                wait(lambda: not search_visible(), "search overlay dismissed")
+
                 payload = output_payload()
                 report["payload"] = {"bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()}
                 final = (77, 99, 121)
@@ -411,6 +489,27 @@ def main():
                 visible(a, same_feed, "sync-same-feed")
                 capture(a, "sync-same-feed")
                 report["checks"].append("a synchronized begin/end in one small write publishes its complete final pixels")
+                scroll_color = (31, 47, 63)
+                emit(a, "\x1b[?2026h" + frame(scroll_color)
+                     + "\x1b[48;2;31;47;63m"
+                     + "".join(f"history row {row:03d}\r\n" for row in range(ROWS * 2))
+                     + "\x1b[0m\x1b[?2026l")
+                visible(a, scroll_color, "scroll-history-ready")
+                offset = trace.stat().st_size
+                rpc({"op": "action", "session": "repaint-a", "action": "scroll-up"})
+                def scroll_prompt_visible():
+                    data = a["window"].get_image(0, 0, geometry.width, geometry.height,
+                                                X.ZPixmap, 0xffffffff).data
+                    pixels = Image.frombytes("RGB", (geometry.width, geometry.height),
+                                             data, "raw", "BGRX")
+                    return any(color == (100, 116, 139)
+                               for _, color in pixels.getcolors(pixels.width * pixels.height) or [])
+                wait(scroll_prompt_visible, "scroll prompt committed")
+                copies = copies_since(offset, a)
+                report["scroll_frame_copies"] = copies
+                assert len(copies) == 1, f"scroll prompt was published separately: {copies}"
+                report["checks"].append("scrollback and its return-to-live prompt share one visible copy")
+                capture(a, "single-publish-scroll")
                 assert digest(binary) == report["binary_sha256"]
                 report["ok"] = True
             except Exception as error:

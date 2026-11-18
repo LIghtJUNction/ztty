@@ -831,6 +831,7 @@ impl Ui {
             } else {
                 None
             };
+            self.window.finish_frame();
             self.force = false;
             self.repaint.painted(os::milliseconds());
         }
