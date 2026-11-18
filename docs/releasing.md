@@ -1,18 +1,34 @@
 # Releasing ztty and its reusable libraries
 
-Report date: **2026-11-19, Asia/Taipei**. The application source is prepared as
-**0.3.1**, pending its own formal tagged gates. Library publication, build-only
-candidate acceptance, GitHub Release publication and device installation are
-recorded separately below. The [experience report](experience-release-2026-11-18.md)
+Report date: **2026-11-19, Asia/Taipei**. The application version is **0.3.1**.
+Library publication, build-only candidate acceptance, formal tagged gates,
+GitHub Release publication and device installation are recorded separately below. The [experience report](experience-release-2026-11-18.md)
 retains source identities, raw evidence and failed attempts.
 
-## 0.3.1 preparation
+## 0.3.1 release gate
 
-The next application release will use a new `v0.3.1` tag. Its formal Verify job
-and six native architecture jobs have not run yet; official publication, asset
-readback and installation are pending. The source version change is not a
-published Release. Use the [official Releases page](https://github.com/LIghtJUNction/ztty/releases)
-for available downloads.
+Version 0.3.1 uses a new immutable `v0.3.1` tag. Publication requires a fresh
+Verify job and all six native architecture jobs on that exact tagged source.
+Use the [official Releases page](https://github.com/LIghtJUNction/ztty/releases)
+for published downloads; a source version or a passing build-only candidate
+does not itself establish publication or installation.
+
+The complete candidate at `90ec70fe8359abc02aed1b1d3ced96fd18dd921c` passed
+[run 44365691692](https://github.com/LIghtJUNction/ztty/actions/runs/44365691692),
+attempt 1, with `build_only=true`, `candidate_platform=all` and both Windows
+diagnostic flags false. All six native architecture jobs passed. Linux jobs
+used a fresh isolated Rust 1.100.0 installation, avoiding the preinstalled
+component conflict observed in run 44362817474.
+
+The Windows workspace harness now recovers recognized sharing conflicts only
+when reading its own `state.json` or `keyboard.bin`, for at most one second
+from the first error. It records each recovery and propagates permanent or
+unrelated errors. This follows the exact failing file-open traceback from
+[run 44363824941](https://github.com/LIghtJUNction/ztty/actions/runs/44363824941),
+before the next reset chord was sent. It retains the existing workspace, font,
+PTY, grid and pixel requirements. Existing UI wait parameters are unchanged;
+the bounded file read can extend a cooperative predicate call past its outer
+deadline, so it is not a claim of unchanged strict wall-clock duration.
 
 The normal Windows candidate
 [`2f2fae44f8e4697759b6061b1f99451f2e0dc3c8`](https://github.com/LIghtJUNction/ztty/commit/2f2fae44f8e4697759b6061b1f99451f2e0dc3c8)
@@ -314,7 +330,7 @@ only the version and Git facts, not a replacement implementation of the guard.
 
 The official crates.io version API confirmed these releases and their checksums
 at **2026-11-19 00:29:27 Asia/Taipei (2026-11-18 16:29:27 UTC)**; none was yanked.
-These libraries are published independently of the pending application release.
+These libraries are published independently of the application release.
 
 | Package | Published version | Publication time, Asia/Taipei | Official version API |
 | --- | --- | --- | --- |
