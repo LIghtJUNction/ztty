@@ -595,7 +595,10 @@ fn legacy_key(key: Key, modifiers: Modifiers, text: &str, modes: &Modes, output:
         Key::KeypadPageDown => csi_key(6, b'~', modifiers, output),
         Key::KeypadBegin => csi_key(1, b'E', modifiers, output),
         Key::Menu => csi_key(29, b'~', modifiers, output),
-        Key::Modifier(_) | Key::Unidentified => {}
+        // Lock keys change keyboard state; ordinary shells have no legacy
+        // binding for their private-use CSI-u numbers. Report them only after
+        // the child explicitly opts into the enhanced keyboard protocol.
+        Key::CapsLock | Key::NumLock | Key::ScrollLock | Key::Modifier(_) | Key::Unidentified => {}
         _ => {
             if let Some((number, suffix)) = canonical(key) {
                 csi_key(number, suffix, modifiers, output);
@@ -1055,6 +1058,71 @@ mod tests {
             b"\x1bOq"
         );
         assert!(encode_key(Key::KeypadDigit(15), Modifiers(0), KeyEvent::Press, "", &m).is_empty());
+    }
+
+    #[test]
+    fn lock_keys_are_silent_until_the_child_requests_enhanced_events() {
+        for key in [Key::CapsLock, Key::NumLock, Key::ScrollLock] {
+            for flags in [
+                0,
+                REPORT_ALTERNATES,
+                REPORT_TEXT,
+                REPORT_ALTERNATES | REPORT_TEXT,
+            ] {
+                for event in [KeyEvent::Press, KeyEvent::Repeat, KeyEvent::Release] {
+                    for modifier in [0, 1, 64, 128] {
+                        assert!(
+                            encode_key(key, Modifiers(modifier), event, "", &modes(flags))
+                                .is_empty()
+                        );
+                    }
+                }
+            }
+        }
+        assert_eq!(
+            encode_key(Key::NumLock, Modifiers(0), KeyEvent::Press, "", &modes(1)),
+            b"\x1b[57360u"
+        );
+        assert_eq!(
+            encode_key(
+                Key::NumLock,
+                Modifiers(128),
+                KeyEvent::Press,
+                "",
+                &modes(10)
+            ),
+            b"\x1b[57360;129:1u"
+        );
+        assert_eq!(
+            encode_key(
+                Key::NumLock,
+                Modifiers(128),
+                KeyEvent::Release,
+                "",
+                &modes(10)
+            ),
+            b"\x1b[57360;129:3u"
+        );
+        assert_eq!(
+            encode_key(
+                Key::KeypadDigit(0),
+                Modifiers(128),
+                KeyEvent::Press,
+                "0",
+                &modes(0)
+            ),
+            b"0"
+        );
+        assert_eq!(
+            encode_key(
+                Key::KeypadInsert,
+                Modifiers(0),
+                KeyEvent::Press,
+                "",
+                &modes(0)
+            ),
+            b"\x1b[2~"
+        );
     }
 
     #[test]

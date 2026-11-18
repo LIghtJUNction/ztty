@@ -306,6 +306,36 @@ def main():
             assert_input("Ctrl+unshifted tilde on private keyboard mapping", b"\x1e")
             report["checks"].append("real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings")
 
+            # Read the real X server modifier state. This display is private,
+            # so toggling locks cannot change the user's physical keyboard.
+            def num_lock(enabled):
+                if bool(connection.screen().root.query_pointer().mask & X.Mod2Mask) != enabled:
+                    key("Num_Lock")
+                wait(lambda: bool(connection.screen().root.query_pointer().mask & X.Mod2Mask) == enabled,
+                     "private X server Num Lock state", 2)
+
+            begin(RESET)
+            num_lock(True)
+            assert_input("Num Lock toggles without writing CSI-u into a legacy shell", b"")
+            begin()
+            for digit in range(10):
+                key(f"KP_{digit}")
+            key("KP_Decimal")
+            assert_input("Num Lock on: keypad digits and decimal are text", b"0123456789.")
+            begin()
+            num_lock(False)
+            assert_input("Num Lock off emits no legacy input", b"")
+            begin()
+            key("KP_0")
+            assert_input("Num Lock off: keypad zero retains the standard Insert key", b"\x1b[2~")
+            begin(RESET + "\x1b[=1u")
+            num_lock(True)
+            assert_input("explicit Kitty opt-in still reports Num Lock and its state", b"\x1b[57360;129u")
+            begin(RESET)
+            num_lock(False)
+            assert_input("return to legacy mode stops reporting lock keys", b"")
+            report["checks"].append("Num Lock stays silent in legacy mode; real keypad digits, Insert semantics and explicit enhanced lock reporting are verified")
+
             begin(RESET + "\x1b[?1000h\x1b[?1006h")
             move()
             for button, code in [(4, 64), (5, 65), (6, 66), (7, 67)]:
