@@ -375,6 +375,8 @@ mod ffi {
         pub fn close(fd: c_int) -> c_int;
         pub fn poll(fds: *mut c_void, count: u32, timeout: c_int) -> c_int;
         pub fn fcntl(fd: c_int, command: c_int, ...) -> c_int;
+        pub fn faccessat(directory: c_int, path: *const c_char, mode: c_int, flags: c_int)
+        -> c_int;
         pub fn ioctl(fd: c_int, request: u64, ...) -> c_int;
         pub fn execve(
             file: *const c_char,

@@ -25,6 +25,8 @@ _Static_assert(offsetof(struct winsize, ws_xpixel) == 4, "winsize pixels offset"
 _Static_assert(O_RDWR == 2 && O_NONBLOCK == 4, "open modes");
 _Static_assert(O_NOCTTY == 0x20000 && O_CLOEXEC == 0x1000000, "open flags");
 _Static_assert(F_DUPFD_CLOEXEC == 67 && FD_CLOEXEC == 1, "descriptor flags");
+_Static_assert(AT_FDCWD == -2 && AT_EACCESS == 0x10 && X_OK == 1,
+    "effective-identity executable access");
 _Static_assert(F_GETFD == 1 && F_SETFD == 2 && F_GETFL == 3 && F_SETFL == 4,
     "fcntl commands");
 _Static_assert(TIOCPTYGNAME == 0x40807453 && TIOCSCTTY == 0x20007461, "tty ioctls");
@@ -46,3 +48,4 @@ int (*const zpty_open_signature)(posix_spawn_file_actions_t *, int,
     const char *, int, mode_t) = posix_spawn_file_actions_addopen;
 int (*const zpty_path_signature)(int, void *, uint32_t) = proc_pidpath;
 int (*const zpty_child_pids_signature)(pid_t, void *, int) = proc_listchildpids;
+int (*const zpty_access_signature)(int, const char *, int, int) = faccessat;
