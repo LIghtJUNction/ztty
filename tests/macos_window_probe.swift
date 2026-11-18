@@ -3,6 +3,7 @@
 import AppKit
 import ApplicationServices
 import CoreGraphics
+import CoreVideo
 import Darwin
 import Foundation
 import ImageIO
@@ -100,6 +101,53 @@ func verifyWindowSelection() throws {
     let duplicate = CaptureWindowIdentity(pid: 21, id: 8, title: title, layer: normal, onScreen: true)
     guard (try? uniqueCaptureWindow(candidates + [duplicate], pid: 21, title: title, windowID: nil)) == nil else {
         throw GateError("ambiguous terminal window selection was incorrectly accepted")
+    }
+}
+
+// A miniaturized NSWindow may be reported as AXDialog by AppKit. Only the
+// restore operation can accept that transitional subrole, and only for the
+// already captured terminal with a pinned WindowServer ID. The final capture
+// still has to match that ID, PID, unique title, geometry and actual pixels.
+struct AccessibilityWindowIdentity {
+    let pid: pid_t
+    let title: String?
+    let role: String?
+    let subrole: String?
+    let modal: Bool?
+    let minimized: Bool?
+
+    func matches(pid: pid_t, title: String, restoringWindowID: CGWindowID?) -> Bool {
+        guard self.pid == pid, self.title == title, !title.isEmpty,
+              role == kAXWindowRole else { return false }
+        if subrole == kAXStandardWindowSubrole { return true }
+        return restoringWindowID != nil && restoringWindowID != 0
+            && subrole == kAXDialogSubrole && modal == false && minimized != nil
+    }
+}
+
+func verifyAccessibilitySelection() throws {
+    let title = "ztty-native-ax-fixture"
+    func candidate(pid: pid_t = 21, name: String? = "ztty-native-ax-fixture", role: String? = kAXWindowRole,
+                   subrole: String? = kAXDialogSubrole, modal: Bool? = false,
+                   minimized: Bool? = true) -> AccessibilityWindowIdentity {
+        AccessibilityWindowIdentity(pid: pid, title: name, role: role,
+                                    subrole: subrole, modal: modal, minimized: minimized)
+    }
+    let restored = candidate(minimized: false)
+    let standard = candidate(subrole: kAXStandardWindowSubrole)
+    guard standard.matches(pid: 21, title: title, restoringWindowID: nil),
+          candidate().matches(pid: 21, title: title, restoringWindowID: 7),
+          restored.matches(pid: 21, title: title, restoringWindowID: 7),
+          !candidate().matches(pid: 21, title: title, restoringWindowID: nil),
+          !candidate().matches(pid: 21, title: title, restoringWindowID: 0) else {
+        throw GateError("owned AX window selection failed its restore scope vectors")
+    }
+    for invalid in [candidate(pid: 22), candidate(name: "other"), candidate(name: nil),
+                    candidate(role: kAXSheetRole), candidate(subrole: kAXSystemDialogSubrole),
+                    candidate(modal: true), candidate(modal: nil), candidate(minimized: nil)] {
+        guard !invalid.matches(pid: 21, title: title, restoringWindowID: 7) else {
+            throw GateError("an unrelated or modal AX window passed the restore identity vector")
+        }
     }
 }
 
@@ -226,6 +274,8 @@ final class WindowProbe {
         report["pixel_layout_vector"] = "passed"
         try verifyWindowSelection()
         report["window_selection_vector"] = "passed"
+        try verifyAccessibilitySelection()
+        report["accessibility_selection_vector"] = "passed"
     }
 
     func content() async throws -> SCShareableContent {
@@ -271,6 +321,13 @@ final class WindowProbe {
             }
             return value as? String
         }
+        func booleanAttribute(_ window: AXUIElement, _ name: String) -> Bool? {
+            var value: CFTypeRef?
+            guard AXUIElementCopyAttributeValue(window, name as CFString, &value) == .success else {
+                return nil
+            }
+            return value as? Bool
+        }
         var matches: [AXUIElement] = []
         var inventory: [[String: Any]] = []
         for window in windows {
@@ -279,18 +336,25 @@ final class WindowProbe {
             let title = stringAttribute(window, kAXTitleAttribute)
             let role = stringAttribute(window, kAXRoleAttribute)
             let subrole = stringAttribute(window, kAXSubroleAttribute)
-            let match = ownerError == .success && pid == ownedPID && title == expectedTitle
-                && role == kAXWindowRole && subrole == kAXStandardWindowSubrole
+            let modal = booleanAttribute(window, kAXModalAttribute)
+            let isMinimized = booleanAttribute(window, kAXMinimizedAttribute)
+            let identity = AccessibilityWindowIdentity(pid: pid, title: title, role: role,
+                subrole: subrole, modal: modal, minimized: isMinimized)
+            let match = ownerError == .success && identity.matches(
+                pid: ownedPID, title: expectedTitle,
+                restoringWindowID: request.action == "restore" ? request.windowID : nil)
             inventory.append([
                 "pid": pid, "pid_error": ownerError.rawValue,
                 "title": title ?? "<unavailable>", "role": role ?? "<unavailable>",
                 "subrole": subrole ?? "<unavailable>", "matches_target": match,
+                "modal": modal.map { $0 as Any } ?? NSNull(),
+                "minimized": isMinimized.map { $0 as Any } ?? NSNull(),
             ])
             if match { matches.append(window) }
         }
         report["ax_window_candidates"] = inventory
         guard matches.count == 1 else {
-            throw GateError("expected one owned standard AX terminal window; matching \(matches.count) of \(windows.count)")
+            throw GateError("expected one owned AX terminal window; matching \(matches.count) of \(windows.count)")
         }
         return matches[0]
     }
@@ -361,6 +425,7 @@ final class WindowProbe {
         configuration.height = imageHeight
         configuration.showsCursor = false
         configuration.capturesAudio = false
+        configuration.pixelFormat = kCVPixelFormatType_32BGRA
         configuration.ignoreShadowsSingleWindow = true
         configuration.colorSpaceName = CGColorSpace.sRGB
         phase("windowserver_capture")
@@ -374,6 +439,8 @@ final class WindowProbe {
         report["image"] = [
             "width": image.width, "height": image.height,
             "color_space": colorName,
+            "requested_color_space": CGColorSpace.sRGB as String,
+            "requested_pixel_format": "32BGRA",
         ]
         guard window.isOnScreen, visible else {
             throw GateError("the owned window is not wholly on an active display")

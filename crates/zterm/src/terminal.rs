@@ -14,6 +14,11 @@ const MAX_HISTORY_BYTES: usize = 8 * 1024 * 1024;
 const MAX_LINKS: usize = 1024;
 const MAX_RESPONSES: usize = 65536;
 
+struct HistoryRow {
+    cells: Vec<Cell>,
+    wrapped: usize,
+}
+
 pub const ANSI_PALETTE: [u32; 16] = [
     0x000000, 0xcd0000, 0x00cd00, 0xcdcd00, 0x0000ee, 0xcd00cd, 0x00cdcd, 0xe5e5e5, 0x7f7f7f,
     0xff0000, 0x00ff00, 0xffff00, 0x5c5cff, 0xff00ff, 0x00ffff, 0xffffff,
@@ -161,6 +166,7 @@ pub struct Terminal {
     // DCS headers; framing distinguishes ST from cancellation for image data.
     framing: u8,
     apc: zgraphics::CommandStream,
+    text_revision: u64,
 }
 
 fn dimensions(cols: usize, rows: usize) -> (usize, usize) {
@@ -179,6 +185,7 @@ impl Terminal {
             state: State::new(cols, rows, history_limit, theme),
             framing: 0,
             apc: zgraphics::CommandStream::new(),
+            text_revision: 0,
         }
     }
 
@@ -211,7 +218,7 @@ impl Terminal {
             theme.recolor_screen(alternate);
         }
         for row in &mut self.state.history {
-            for cell in row {
+            for cell in &mut row.cells {
                 theme.recolor_cell(cell);
             }
         }
@@ -219,6 +226,9 @@ impl Terminal {
 
     /// Consume arbitrary PTY chunks, preserving partial UTF-8 and sequences.
     pub fn feed(&mut self, bytes: &[u8]) {
+        if !bytes.is_empty() {
+            self.text_revision = self.text_revision.wrapping_add(1);
+        }
         let mut offset = 0;
         while offset < bytes.len() {
             match self.framing {
@@ -422,6 +432,7 @@ impl Terminal {
         if self.cols() == cols && self.rows() == rows {
             return;
         }
+        self.text_revision = self.text_revision.wrapping_add(1);
         if cols != self.cols() {
             self.state.shell.invalidate_screen(self.state.line_base);
         }
@@ -453,6 +464,7 @@ impl Terminal {
                     self.state.history_limit,
                     &mut self.state.history_bytes,
                     primary.row(row),
+                    primary.row_wrap(row),
                 );
             }
             self.state.inactive_graphics.scroll(
@@ -497,6 +509,13 @@ impl Terminal {
     pub fn rows(&self) -> usize {
         self.state.screen.rows
     }
+
+    /// Invalidation token for borrowed text coordinates in this terminal.
+    /// Nonempty input and actual resizes may change text, history, or its layout.
+    /// Viewport scrolling and theme changes leave this token unchanged.
+    pub fn text_revision(&self) -> u64 {
+        self.text_revision
+    }
     #[inline]
     pub fn cell(&self, col: usize, row: usize) -> &Cell {
         if col >= self.cols() || row >= self.rows() {
@@ -518,11 +537,32 @@ impl Terminal {
         if absolute >= history.len() {
             return self.cell(col, absolute - history.len());
         }
-        let line = &history[absolute];
+        let line = &history[absolute].cells;
         match line.get(col) {
             Some(cell) if !(cell.width == 2 && col + 1 >= self.cols()) => cell,
             _ => &self.state.screen.blank,
         }
+    }
+
+    /// A soft-wrap boundary in the same viewport coordinates as `view_cell`.
+    ///
+    /// `Some(columns)` joins this row to the next without a newline. Only
+    /// `[0, columns)` belongs to its text: a wide glyph can wrap before the
+    /// final padding cell. Real spaces in that range must be retained.
+    /// `None` denotes a hard boundary, an out-of-range row, or a soft wrap
+    /// whose text has been clipped by a narrower viewport.
+    pub fn view_row_wrap(&self, row: usize, offset: usize) -> Option<usize> {
+        if row >= self.rows() {
+            return None;
+        }
+        let history = self.history_len();
+        let absolute = history.saturating_sub(offset.min(history)) + row;
+        let wrapped = if absolute < history {
+            self.state.history[absolute].wrapped
+        } else {
+            self.state.screen.row_wrap(absolute - history)
+        };
+        (wrapped != 0 && wrapped <= self.cols()).then_some(wrapped)
     }
 
     #[inline]
@@ -693,7 +733,7 @@ struct State {
     screen: Screen,
     primary: Option<Screen>,
     inactive_alternate: Option<Screen>,
-    history: VecDeque<Vec<Cell>>,
+    history: VecDeque<HistoryRow>,
     history_limit: usize,
     history_bytes: usize,
     line_base: u64,
@@ -815,7 +855,7 @@ impl State {
         }
         for line in first..=end.line.min(last) {
             let cells = if line < self.line_base {
-                &self.history[(line - oldest) as usize][..]
+                &self.history[(line - oldest) as usize].cells[..]
             } else {
                 screen.row((line - self.line_base) as usize)
             };
@@ -1019,11 +1059,32 @@ impl State {
             self.history_limit,
             &mut self.history_bytes,
             self.screen.row(row),
+            self.screen.row_wrap(row),
         );
+    }
+
+    fn break_before(&mut self, row: usize) {
+        if row != 0 {
+            self.screen.set_row_wrap(row - 1, 0);
+        } else if !self.modes.alternate_screen
+            && let Some(row) = self.history.back_mut()
+        {
+            row.wrapped = 0;
+        }
+    }
+
+    fn erase_range(&mut self, row: usize, start: usize, end: usize, blank: Cell) {
+        if start == 0 && end >= self.screen.cols {
+            self.break_before(row);
+        }
+        self.screen.clear_range(row, start, end, blank);
     }
 
     fn scroll_up(&mut self, top: usize, bottom: usize, count: usize, save_history: bool) {
         let count = count.min(bottom - top + 1);
+        if top != 0 || !save_history {
+            self.break_before(top);
+        }
         if !self.modes.alternate_screen
             && (top != 0 || bottom + 1 != self.screen.rows || !save_history)
         {
@@ -1032,7 +1093,7 @@ impl State {
         let blank = self.style.blank();
         if count == bottom - top + 1 && (top != 0 || bottom + 1 != self.screen.rows) {
             for row in top..=bottom {
-                self.screen.row_mut(row).fill(blank);
+                self.screen.clear_row(row, blank);
             }
         } else {
             for _ in 0..count {
@@ -1044,18 +1105,23 @@ impl State {
                     if self.screen.row0 == self.screen.rows {
                         self.screen.row0 = 0;
                     }
-                    self.screen.row_mut(bottom).fill(blank);
+                    self.screen.clear_row(bottom, blank);
                 } else {
                     for y in top..bottom {
+                        let wrapped = self.screen.row_wrap(y + 1);
                         let source = self.screen.index(0, y + 1);
                         let target = self.screen.index(0, y);
                         self.screen
                             .cells
                             .copy_within(source..source + self.screen.cols, target);
+                        self.screen.set_row_wrap(y, wrapped);
                     }
-                    self.screen.row_mut(bottom).fill(blank);
+                    self.screen.clear_row(bottom, blank);
                 }
             }
+        }
+        if !save_history && count <= bottom - top {
+            self.screen.set_row_wrap(bottom - count, 0);
         }
         self.graphics.scroll(
             top,
@@ -1068,6 +1134,7 @@ impl State {
     }
 
     fn scroll_down(&mut self, top: usize, bottom: usize, count: usize) {
+        self.break_before(top);
         if !self.modes.alternate_screen {
             self.shell.invalidate_screen(self.line_base);
         }
@@ -1079,18 +1146,21 @@ impl State {
                 } else {
                     self.screen.row0 - 1
                 };
-                self.screen.row_mut(top).fill(blank);
+                self.screen.clear_row(top, blank);
             } else {
                 for y in (top + 1..=bottom).rev() {
+                    let wrapped = self.screen.row_wrap(y - 1);
                     let source = self.screen.index(0, y - 1);
                     let target = self.screen.index(0, y);
                     self.screen
                         .cells
                         .copy_within(source..source + self.screen.cols, target);
+                    self.screen.set_row_wrap(y, wrapped);
                 }
-                self.screen.row_mut(top).fill(blank);
+                self.screen.clear_row(top, blank);
             }
         }
+        self.screen.set_row_wrap(bottom, 0);
         self.graphics.scroll(
             top,
             bottom,
@@ -1102,6 +1172,18 @@ impl State {
     }
 
     fn linefeed(&mut self) {
+        self.advance_line(0);
+    }
+
+    fn soft_wrap(&mut self, columns: usize) {
+        self.advance_line(columns);
+        self.screen.x = 0;
+    }
+
+    fn advance_line(&mut self, wrapped: usize) {
+        let advances = self.screen.y == self.screen.bottom || self.screen.y + 1 < self.screen.rows;
+        self.screen
+            .set_row_wrap(self.screen.y, if advances { wrapped } else { 0 });
         self.screen.dirty[self.screen.y] = true;
         if self.screen.y == self.screen.bottom {
             self.scroll_up(self.screen.top, self.screen.bottom, 1, true);
@@ -1154,8 +1236,7 @@ impl State {
             return;
         }
         if self.screen.wrap && self.autowrap {
-            self.linefeed();
-            self.screen.x = 0;
+            self.soft_wrap(self.screen.cols);
         }
         let mut width = width;
         if width == 2 && self.screen.x + 1 >= self.screen.cols {
@@ -1166,8 +1247,7 @@ impl State {
                     self.screen.cols,
                     self.style.blank(),
                 );
-                self.linefeed();
-                self.screen.x = 0;
+                self.soft_wrap(self.screen.cols - 1);
             } else {
                 ch = '\u{fffd}';
                 width = 1;
@@ -1205,8 +1285,7 @@ impl State {
         }
         while !bytes.is_empty() {
             if self.screen.wrap {
-                self.linefeed();
-                self.screen.x = 0;
+                self.soft_wrap(self.screen.cols);
             }
             let count = bytes.len().min(self.screen.cols - self.screen.x);
             let x = self.screen.x;
@@ -1238,6 +1317,9 @@ impl State {
         let cols = self.screen.cols;
         let count = count.min(cols - x);
         let blank = self.style.blank();
+        if x == 0 && count == cols {
+            self.break_before(y);
+        }
         let row = self.screen.row_mut(y);
         if x > 0 && row[x].width == 0 {
             row[x - 1] = blank;
@@ -1246,6 +1328,7 @@ impl State {
         row.copy_within(x..cols - count, x + count);
         row[x..x + count].fill(blank);
         self.screen.repair_row(y, blank);
+        self.screen.set_row_wrap(y, 0);
         self.screen.wrap = false;
     }
 
@@ -1255,11 +1338,12 @@ impl State {
         let cols = self.screen.cols;
         let count = count.min(cols - x);
         let blank = self.style.blank();
-        self.screen.clear_range(y, x, x + count, blank);
+        self.erase_range(y, x, x + count, blank);
         let row = self.screen.row_mut(y);
         row.copy_within(x + count..cols, x);
         row[cols - count..].fill(blank);
         self.screen.repair_row(y, blank);
+        self.screen.set_row_wrap(y, 0);
         self.screen.wrap = false;
     }
 
@@ -1552,20 +1636,24 @@ impl State {
         let y = self.screen.y;
         match mode {
             0 => {
-                self.screen.clear_range(y, x, self.screen.cols, blank);
+                self.erase_range(y, x, self.screen.cols, blank);
                 for row in y + 1..self.screen.rows {
-                    self.screen.row_mut(row).fill(blank);
+                    self.screen.clear_row(row, blank);
                     self.screen.dirty[row] = true;
                 }
             }
             1 => {
+                if y != 0 {
+                    self.break_before(0);
+                }
                 for row in 0..y {
-                    self.screen.row_mut(row).fill(blank);
+                    self.screen.clear_row(row, blank);
                     self.screen.dirty[row] = true;
                 }
-                self.screen.clear_range(y, 0, x + 1, blank);
+                self.erase_range(y, 0, x + 1, blank);
             }
             2 => {
+                self.break_before(0);
                 if !self.modes.alternate_screen {
                     self.shell.invalidate_screen(self.line_base);
                 }
@@ -1661,7 +1749,9 @@ impl Perform for State {
             ([b')'], b'0') => self.g1 = true,
             ([b')'], b'B' | b'A') => self.g1 = false,
             ([b'#'], b'8') => {
+                self.break_before(0);
                 self.screen.cells.fill(self.theme.style().cell('E', 1));
+                self.screen.wrapped.fill(0);
                 self.screen.mark_all();
             }
             _ => {}
@@ -1787,20 +1877,15 @@ impl Perform for State {
             'J' => self.erase_display(raw),
             'K' => {
                 match raw {
-                    0 => self
-                        .screen
-                        .clear_range(y, x, self.screen.cols, self.style.blank()),
-                    1 => self.screen.clear_range(y, 0, x + 1, self.style.blank()),
-                    2 => self
-                        .screen
-                        .clear_range(y, 0, self.screen.cols, self.style.blank()),
+                    0 => self.erase_range(y, x, self.screen.cols, self.style.blank()),
+                    1 => self.erase_range(y, 0, x + 1, self.style.blank()),
+                    2 => self.erase_range(y, 0, self.screen.cols, self.style.blank()),
                     _ => {}
                 }
                 self.screen.wrap = false;
             }
             'X' => {
-                self.screen
-                    .clear_range(y, x, x.saturating_add(p), self.style.blank());
+                self.erase_range(y, x, x.saturating_add(p), self.style.blank());
                 self.screen.wrap = false;
             }
             '@' => self.insert_chars(p),
@@ -2057,20 +2142,33 @@ fn raw_param(groups: &[&[u16]], index: usize) -> Option<u16> {
     groups.get(index).and_then(|group| group.first()).copied()
 }
 
-fn push_history(history: &mut VecDeque<Vec<Cell>>, limit: usize, used: &mut usize, row: &[Cell]) {
+fn push_history(
+    history: &mut VecDeque<HistoryRow>,
+    limit: usize,
+    used: &mut usize,
+    row: &[Cell],
+    wrapped: usize,
+) {
     if limit == 0 {
         return;
     }
     let bytes = mem::size_of_val(row);
-    if bytes > MAX_HISTORY_BYTES {
+    if bytes + mem::size_of::<HistoryRow>() > MAX_HISTORY_BYTES {
         return;
     }
     let mut reusable = None;
-    while !history.is_empty() && (history.len() >= limit || *used + bytes > MAX_HISTORY_BYTES) {
+    while !history.is_empty()
+        && (history.len() >= limit
+            || *used + bytes + history.capacity() * mem::size_of::<HistoryRow>()
+                > MAX_HISTORY_BYTES)
+    {
         let line = history.pop_front().unwrap();
-        *used -= line.capacity() * mem::size_of::<Cell>();
-        reusable = Some(line);
+        *used -= line.cells.capacity() * mem::size_of::<Cell>();
+        reusable = Some(line.cells);
     }
+    // Account for the allocated row container, including spare slots and wrap
+    // metadata, as well as cell capacities. A row's text is still stored once.
+    history.reserve(1);
     let mut line = reusable.unwrap_or_default();
     if line.capacity() > row.len() * 2 {
         line = Vec::new();
@@ -2078,13 +2176,52 @@ fn push_history(history: &mut VecDeque<Vec<Cell>>, limit: usize, used: &mut usiz
     line.resize(row.len(), Cell::BLANK);
     line.copy_from_slice(row);
     while !history.is_empty()
-        && *used + line.capacity() * mem::size_of::<Cell>() > MAX_HISTORY_BYTES
+        && *used
+            + line.capacity() * mem::size_of::<Cell>()
+            + history.capacity() * mem::size_of::<HistoryRow>()
+            > MAX_HISTORY_BYTES
     {
         let old = history.pop_front().unwrap();
-        *used -= old.capacity() * mem::size_of::<Cell>();
+        *used -= old.cells.capacity() * mem::size_of::<Cell>();
     }
     *used += line.capacity() * mem::size_of::<Cell>();
-    history.push_back(line);
+    history.push_back(HistoryRow {
+        cells: line,
+        wrapped,
+    });
+}
+
+#[cfg(test)]
+mod history_budget_tests {
+    use super::*;
+
+    #[test]
+    fn retained_history_counts_wrap_metadata_spare_slots_and_reused_cell_capacity() {
+        let mut history = VecDeque::new();
+        let mut used = 0;
+        for columns in [1, 1024, 80, 1] {
+            let row = alloc::vec![Cell::BLANK; columns];
+            let iterations =
+                (MAX_HISTORY_BYTES / mem::size_of_val(row.as_slice()) + 100).min(70_000);
+            for index in 0..iterations {
+                let wrapped = if index % 7 == 0 { 0 } else { columns };
+                push_history(&mut history, 65_536, &mut used, &row, wrapped);
+                assert!(
+                    used + history.capacity() * mem::size_of::<HistoryRow>() <= MAX_HISTORY_BYTES
+                );
+                assert!(history.len() <= 65_536);
+                assert_eq!(history.back().unwrap().wrapped, wrapped);
+                assert_eq!(history.back().unwrap().cells.len(), columns);
+            }
+            assert_eq!(
+                used,
+                history
+                    .iter()
+                    .map(|row| row.cells.capacity() * mem::size_of::<Cell>())
+                    .sum()
+            );
+        }
+    }
 }
 
 fn join_text_fields(fields: &[&[u8]], max: usize) -> String {

@@ -658,33 +658,7 @@ impl Selection {
         (a.min(b)..=a.max(b)).contains(&at)
     }
     pub fn text(&self, terminal: &Terminal, offset: usize) -> String {
-        let cols = terminal.cols();
-        let a = self.start.1 * cols + self.start.0;
-        let b = self.end.1 * cols + self.end.0;
-        let mut text = String::new();
-        let mut line = String::new();
-        for at in a.min(b)..=a.max(b) {
-            let cell = terminal.view_cell(at % cols, at / cols, offset);
-            if cell.width != 0 {
-                line.push(if cell.ch == '\0' { ' ' } else { cell.ch });
-                for c in cell.combining {
-                    if c != '\0' {
-                        line.push(c);
-                    }
-                }
-            }
-            if at % cols == cols - 1 || at == a.max(b) {
-                text.push_str(line.trim_end_matches(' '));
-                if at != a.max(b) {
-                    text.push('\n');
-                }
-                line.clear();
-            }
-            if text.len() + line.len() > 4 * 1024 * 1024 {
-                break;
-            }
-        }
-        text
+        ztty::selection::text(terminal, self.start, self.end, offset)
     }
 }
 

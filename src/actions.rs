@@ -84,6 +84,10 @@ pub const ACTIONS: &[Action] = &[
         label: "Open command palette",
     },
     Action {
+        name: "sessions",
+        label: "Switch or attach a session",
+    },
+    Action {
         name: "copy",
         label: "Copy selection",
     },
@@ -137,11 +141,23 @@ pub const ACTIONS: &[Action] = &[
     },
 ];
 
-pub fn matching(query: &str) -> impl Iterator<Item = &'static Action> {
-    ACTIONS.iter().filter(move |action| {
-        action.name != "none"
-            && (action.name.contains(query) || action.label.to_ascii_lowercase().contains(query))
+/// Every whitespace-separated word must occur in at least one field. Matching
+/// ignores ASCII case without allocating a lowercase copy of each field.
+pub fn matches(query: &str, fields: &[&str]) -> bool {
+    query.split_whitespace().all(|word| {
+        fields.iter().any(|field| {
+            field
+                .as_bytes()
+                .windows(word.len())
+                .any(|part| part.eq_ignore_ascii_case(word.as_bytes()))
+        })
     })
+}
+
+pub fn matching(query: &str) -> impl Iterator<Item = &'static Action> {
+    ACTIONS
+        .iter()
+        .filter(move |action| action.name != "none" && matches(query, &[action.name, action.label]))
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -152,11 +168,16 @@ pub struct Binding {
 }
 
 impl Binding {
-    pub fn config(&self) -> String {
+    fn chord(&self, display: bool) -> String {
         let mut text = String::new();
-        for (bit, name) in [(4, "ctrl"), (1, "shift"), (8, "alt"), (64, "super")] {
+        for (bit, name, label) in [
+            (4, "ctrl", "Ctrl"),
+            (1, "shift", "Shift"),
+            (8, "alt", "Alt"),
+            (64, "super", "Super"),
+        ] {
             if self.modifiers & bit != 0 {
-                text.push_str(name);
+                text.push_str(if display { label } else { name });
                 text.push('+');
             }
         }
@@ -179,14 +200,37 @@ impl Binding {
             _ => "",
         };
         if !key.is_empty() {
-            text.push_str(key);
+            if display {
+                for (index, ch) in key.chars().enumerate() {
+                    text.push(if index == 0 {
+                        ch.to_ascii_uppercase()
+                    } else {
+                        ch
+                    });
+                }
+            } else {
+                text.push_str(key);
+            }
         } else if (0x1000_0001..=0x1000_000b).contains(&self.symbol) {
-            text.push_str(&format!("button{}", self.symbol - 0x1000_0000));
+            text.push_str(&format!(
+                "{}{}",
+                if display { "Button" } else { "button" },
+                self.symbol - 0x1000_0000
+            ));
         } else if (0xffbe..=0xffe0).contains(&self.symbol) {
-            text.push_str(&format!("f{}", self.symbol - 0xffbd));
+            text.push_str(&format!(
+                "{}{}",
+                if display { "F" } else { "f" },
+                self.symbol - 0xffbd
+            ));
         } else if let Some(ch) = char::from_u32(self.symbol as u32) {
-            text.push(ch);
+            text.push(if display { ch.to_ascii_uppercase() } else { ch });
         }
+        text
+    }
+
+    pub fn config(&self) -> String {
+        let mut text = self.chord(false);
         text.push_str(" = ");
         text.push_str(self.action);
         text
@@ -307,50 +351,68 @@ pub fn key_action(bindings: &[Binding], symbol: u64, state: u32) -> Option<&'sta
     }
     let symbol = canonical(symbol);
     let state = state & (1 | 4 | 8 | 64);
-    if state == 1 {
-        return match symbol {
-            0xff55 => Some("scroll-up"),
-            0xff56 => Some("scroll-down"),
-            _ => None,
-        };
-    }
-    if state == 4 {
-        return match symbol {
-            0x3d => Some("font-increase"),
-            0x2d => Some("font-decrease"),
-            0x30 => Some("font-reset"),
-            _ => None,
-        };
-    }
-    if state != 5 {
-        return None;
-    }
-    match symbol {
-        0x74 => Some("new-tab"),
-        0x65 => Some("split-right"),
-        0x6f => Some("split-down"),
-        0x6e => Some("new-window"),
-        0x75 => Some("move-window"),
-        0x64 => Some("detach"),
-        0x77 => Some("close"),
-        0x67 => Some("take-control"),
-        0x66 => Some("search"),
-        0x70 => Some("palette"),
-        0x63 => Some("copy"),
-        0x76 => Some("paste"),
-        0x72 => Some("reload"),
-        0x6b => Some("previous-command"),
-        0x6a => Some("next-command"),
-        0x79 => Some("copy-command-output"),
-        0xff55 => Some("previous-tab"),
-        0xff56 => Some("next-tab"),
-        0xff51 => Some("previous-pane"),
-        0xff53 => Some("next-pane"),
-        0xff52 => Some("swap-previous"),
-        0xff54 => Some("swap-next"),
-        0xff0d => Some("maximize"),
-        0x3d => Some("grow"),
-        0x2d => Some("shrink"),
-        _ => None,
-    }
+    DEFAULT_KEYS
+        .iter()
+        .find(|&&(key, modifiers, _)| key == symbol && modifiers == state)
+        .map(|&(_, _, action)| action)
+}
+
+// One table serves both dispatch and command-palette hints, so a disabled or
+// remapped default never appears as an active shortcut.
+const DEFAULT_KEYS: &[(u64, u32, &str)] = &[
+    (0xff55, 1, "scroll-up"),
+    (0xff56, 1, "scroll-down"),
+    (0x3d, 4, "font-increase"),
+    (0x2d, 4, "font-decrease"),
+    (0x30, 4, "font-reset"),
+    (0x74, 5, "new-tab"),
+    (0x65, 5, "split-right"),
+    (0x6f, 5, "split-down"),
+    (0x6e, 5, "new-window"),
+    (0x75, 5, "move-window"),
+    (0x64, 5, "detach"),
+    (0x77, 5, "close"),
+    (0x67, 5, "take-control"),
+    (0x66, 5, "search"),
+    (0x70, 5, "palette"),
+    (0x73, 5, "sessions"),
+    (0x63, 5, "copy"),
+    (0x76, 5, "paste"),
+    (0x72, 5, "reload"),
+    (0x6b, 5, "previous-command"),
+    (0x6a, 5, "next-command"),
+    (0x79, 5, "copy-command-output"),
+    (0xff55, 5, "previous-tab"),
+    (0xff56, 5, "next-tab"),
+    (0xff51, 5, "previous-pane"),
+    (0xff53, 5, "next-pane"),
+    (0xff52, 5, "swap-previous"),
+    (0xff54, 5, "swap-next"),
+    (0xff0d, 5, "maximize"),
+    (0x3d, 5, "grow"),
+    (0x2d, 5, "shrink"),
+];
+
+/// A currently effective custom shortcut, falling back to an active default.
+pub fn shortcut(bindings: &[Binding], action: &str) -> Option<String> {
+    bindings
+        .iter()
+        .rev()
+        .copied()
+        .find(|binding| {
+            binding.action == action
+                && lookup(bindings, binding.symbol, binding.modifiers) == Some(binding.action)
+        })
+        .or_else(|| {
+            DEFAULT_KEYS.iter().find_map(|&(symbol, modifiers, name)| {
+                (name == action && key_action(bindings, symbol, modifiers) == Some(name)).then_some(
+                    Binding {
+                        symbol,
+                        modifiers,
+                        action: name,
+                    },
+                )
+            })
+        })
+        .map(|binding| binding.chord(true))
 }
