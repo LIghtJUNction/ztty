@@ -966,16 +966,6 @@ impl Session {
         let _ = self.core.pty.reap();
     }
     fn read(&self, request: &Value) -> Result<Reply, String> {
-        if let Some(expected) = request.get("expected_session")
-            && !crate::session_identity::ExpectedSession::parse(expected)?.matches(
-                &self.uri,
-                self.id,
-                self.created_at,
-                unsafe { os::getpid() } as u32,
-            )
-        {
-            return Err("session identity changed; start a new read".into());
-        }
         let cursor = match request.get("cursor") {
             None => 0,
             Some(v) => v
@@ -2349,6 +2339,22 @@ impl Pool {
             }
         }
         let index = self.selector(request)?;
+        let session = &self.sessions[index];
+        if let Some(expected) = request.get("expected_session")
+            && !crate::session_identity::ExpectedSession::parse(expected)?.matches(
+                &session.uri,
+                session.id,
+                session.created_at,
+                unsafe { os::getpid() } as u32,
+            )
+        {
+            return Err(if op == "read" {
+                "session identity changed; start a new read"
+            } else {
+                "session identity changed; refresh session metadata"
+            }
+            .into());
+        }
         if matches!(op, "write" | "resize" | "close" | "rename")
             && !self.sessions[index].core.owns(actor(request)?)
         {

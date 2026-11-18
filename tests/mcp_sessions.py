@@ -411,6 +411,140 @@ def guarded_output_resume(binary, operator, http, sid, sessions):
                 client.close()
 
 
+def guarded_session_mutations(tool, other, label, sessions):
+    """A reused name must not redirect guarded input, resize, control or close."""
+    child = r'''import os,sys,tty
+tty.setraw(0)
+os.write(1,b"READY\n")
+for data in sys.stdin.buffer:
+    if data == b"size\n":
+        size = os.get_terminal_size(0)
+        os.write(1,f"{size.columns}x{size.lines}\n".encode())
+    else:
+        os.write(1,data)
+'''
+    name = f"mutation-{label}"
+
+    def create():
+        value = tool("session_create", {
+            "name": name, "command": ["python3", "-u", "-c", child],
+            "cols": 83, "rows": 21, "history": 0,
+        })
+        sessions.append(value["uri"])
+        output, cursor, _ = collect(tool, value["uri"], needle="READY\n")
+        assert output == "READY\n", output
+        return value, cursor
+
+    old, cursor = create()
+    uri = old["uri"]
+    # Existing clients can still use all four operations without a guard.
+    tool("session_write", {"session": uri, "data": "LEGACY\n"})
+    output, cursor, _ = collect(tool, uri, needle="LEGACY\n", cursor=cursor)
+    assert output == "LEGACY\n", output
+    resized = tool("session_resize", {"session": uri, "cols": 87, "rows": 25})
+    assert (resized["cols"], resized["rows"]) == (87, 25), resized
+    tool("session_write", {"session": uri, "data": "size\n"})
+    output, cursor, _ = collect(tool, uri, needle="87x25\n", cursor=cursor)
+    assert output == "87x25\n", output
+    assert tool("session_control", {"session": uri, "action": "release"})["input_owner"] is None
+    acquired = tool("session_control", {"session": uri, "action": "acquire"})
+    assert acquired["input_owner"] == old["input_owner"], acquired
+    assert tool("session_close", {"session": uri})["closed"]
+    sessions.remove(uri)
+
+    fresh, cursor = create()
+    expected = session_identity(fresh)
+    stale = session_identity(old)
+    assert fresh["uri"] == uri and fresh["id"] != old["id"], (old, fresh)
+    assert fresh["input_owner"] == old["input_owner"], (old, fresh)
+
+    def unchanged():
+        value = tool("session_read", {
+            "session": uri, "cursor": cursor, "expected_session": expected,
+        })
+        assert session_identity(value) == expected and value["running"], value
+        assert value["pid"] == fresh["pid"], value
+        assert (value["cols"], value["rows"]) == (83, 21), value
+        assert value["input_owner"] == fresh["input_owner"], value
+        assert value["output"] == "" and value["next_cursor"] == cursor, value
+
+    stale_error = {"error": "session identity changed; refresh session metadata"}
+    mutations = [
+        ("session_write", {"data": "STALE\n"}),
+        ("session_resize", {"cols": 7, "rows": 3}),
+        ("session_control", {"action": "release"}),
+        ("session_control", {"action": "acquire", "takeover": True}),
+        ("session_close", {}),
+    ]
+    for method, arguments in mutations:
+        rejected = tool(method, {
+            "session": uri, "expected_session": stale, **arguments,
+        }, expect_error=True)
+        assert rejected == stale_error, (method, rejected)
+        unchanged()
+
+    # A stale explicit takeover from another trusted actor must not steal B.
+    rejected = other("session_control", {
+        "session": uri, "action": "acquire", "takeover": True,
+        "expected_session": stale,
+    }, expect_error=True)
+    assert rejected == stale_error, rejected
+    unchanged()
+
+    # Each identity component matters, also when selecting by a short name.
+    for key in expected:
+        wrong = dict(expected)
+        wrong[key] = "ztty://mcp/stdio/different" if key == "uri" else expected[key] + 1
+        rejected = tool("session_write", {
+            "session": name, "data": "WRONG\n", "expected_session": wrong,
+        }, expect_error=True)
+        assert rejected == stale_error, (key, rejected)
+    unchanged()
+
+    # Public identity fields do not grant input ownership to another client.
+    for method, arguments in mutations[:2] + [("session_close", {})]:
+        rejected = other(method, {
+            "session": uri, "expected_session": expected, **arguments,
+        }, expect_error=True)
+        assert "input control is required" in rejected["error"], (method, rejected)
+    unchanged()
+
+    tool("session_write", {
+        "session": name, "data": "GUARDED\n", "expected_session": expected,
+    })
+    output, cursor, _ = collect(tool, uri, needle="GUARDED\n", cursor=cursor)
+    assert output == "GUARDED\n", output
+    resized = tool("session_resize", {
+        "session": uri, "cols": 91, "rows": 27, "expected_session": expected,
+    })
+    assert (resized["cols"], resized["rows"]) == (91, 27), resized
+    tool("session_write", {
+        "session": uri, "data": "size\n", "expected_session": expected,
+    })
+    output, _, _ = collect(tool, uri, needle="91x27\n", cursor=cursor)
+    assert output == "91x27\n", output
+    released = tool("session_control", {
+        "session": uri, "action": "release", "expected_session": expected,
+    })
+    assert released["input_owner"] is None, released
+    acquired = tool("session_control", {
+        "session": uri, "action": "acquire", "expected_session": expected,
+    })
+    assert acquired["input_owner"] == fresh["input_owner"], acquired
+    closed = tool("session_close", {"session": uri, "expected_session": expected})
+    assert closed["closed"] and not closed["running"], closed
+    sessions.remove(uri)
+    assert all(s["uri"] != uri for s in tool("session_list")["sessions"])
+    return {
+        "status": "passed", "transport": label, "old_identity": stale,
+        "replacement_identity": expected, "stale_mutations_rejected": len(mutations),
+        "stale_cross_actor_takeover_rejected": True,
+        "mismatched_identity_fields_rejected": list(expected),
+        "unguarded_compatibility": True, "guarded_mutations": True,
+        "identity_does_not_grant_control": True,
+    }
+
+
 def descendant_output_eof(operator, directory, sessions):
     """A reaped PTY leader is not EOF while its descendant still owns the slave."""
     ready = pathlib.Path(directory) / "descendant-writer"
@@ -602,6 +736,12 @@ def main(binary):
             report["bounded_command_reads_across_observers"]="passed"
             report["guarded_output_resume"] = guarded_output_resume(
                 binary, stdio, http, sid, sessions)
+            http_calls = lambda name, arguments=None, expect_error=False: http_tool(
+                http, sid, name, arguments, expect_error)
+            report["guarded_session_mutations"] = [
+                guarded_session_mutations(stdio.tool, http_calls, "stdio", sessions),
+                guarded_session_mutations(http_calls, stdio.tool, "http", sessions),
+            ]
             report["invalid_utf8_page_boundaries"] = invalid_utf8_page_boundaries(
                 stdio, http, sid, directory, sessions)
             report["descendant_output_eof"] = descendant_output_eof(

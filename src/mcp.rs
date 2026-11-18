@@ -17,17 +17,35 @@ const MAX_WAITING: usize = 24;
 const MAX_BUFFERED: usize = 4 * 1024 * 1024;
 const OUTPUT_TIMEOUT: u64 = 5000;
 
-const TOOLS: &str = r#"[
+macro_rules! expected_session_schema {
+    () => {
+        r#"{"type":"object","description":"Optional identity guard copied from a previous create/list/read response; rejects a new PTY that reused the URI. Public identifiers, not credentials.","properties":{"uri":{"type":"string","minLength":1,"maxLength":2048},"id":{"type":"integer","minimum":1},"created_at":{"type":"integer","minimum":1},"broker_pid":{"type":"integer","minimum":1,"maximum":4294967295}},"required":["uri","id","created_at","broker_pid"],"additionalProperties":false}"#
+    };
+}
+
+const TOOLS: &str = concat!(
+    r#"[
 {"name":"session_create","description":"Create a persistent terminal session in the shared ztty process. Commands are argv; use an explicit shell for shell syntax. Attach the returned URI with ztty attach.","inputSchema":{"type":"object","properties":{"name":{"type":"string","description":"Optional unique name within this MCP transport namespace"},"command":{"type":"array","items":{"type":"string"},"minItems":1,"description":"Executable and arguments; defaults to the configured shell"},"cwd":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256},"history":{"type":"integer","minimum":0,"maximum":100000}},"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":true}},
 {"name":"session_list","description":"List terminal sessions, canonical ztty:// URIs, process state and attached windows.","inputSchema":{"type":"object","properties":{},"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_commands","description":"List up to 128 retained OSC 133 shell command boundaries, exit codes and availability. Requires shell integration; records refer to the retained terminal history.","inputSchema":{"type":"object","properties":{"session":{"type":"string"}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_command_read","description":"Read one shell command input or output from retained terminal cells, bounded to 65536 UTF-8 bytes. This is rendered text, not immutable raw stdout. Check complete and truncated.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"command_id":{"type":"integer","minimum":1},"part":{"type":"string","enum":["input","output"]},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session","command_id"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
-{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. Reuse next_cursor and send expected_session from prior uri/id/created_at/broker_pid fields to reject a replaced session. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish UTF-8. truncated reports expired output. wait_ms (0..30000, default 0) waits without blocking other requests until output, truncation or EOF; timed_out marks expiry. Only output_eof together with has_more=false means the output stream is drained; running=false alone does not.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536},"wait_ms":{"type":"integer","minimum":0,"maximum":30000},"expected_session":{"type":"object","description":"Optional identity guard copied from a previous create/list/read response; rejects a new PTY that reused the URI. Public identifiers, not credentials.","properties":{"uri":{"type":"string","minLength":1,"maxLength":2048},"id":{"type":"integer","minimum":1},"created_at":{"type":"integer","minimum":1},"broker_pid":{"type":"integer","minimum":1,"maximum":4294967295}},"required":["uri","id","created_at","broker_pid"],"additionalProperties":false}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
-{"name":"session_write","description":"Send up to 65536 UTF-8 bytes or terminal control bytes to a session. Include a newline to submit a shell command; use \\u0003 to interrupt.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"data":{"type":"string","maxLength":65536}},"required":["session","data"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":true}},
-{"name":"session_resize","description":"Resize a session PTY and screen; attached windows use the new terminal dimensions.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256}},"required":["session","cols","rows"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":false}},
-{"name":"session_control","description":"Acquire or release exclusive input control. takeover=true explicitly replaces another operator; observers cannot acquire control.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"action":{"type":"string","enum":["acquire","release"]},"takeover":{"type":"boolean"}},"required":["session","action"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}},
-{"name":"session_close","description":"Close a terminal session, hang up its child process and release its window/history.","inputSchema":{"type":"object","properties":{"session":{"type":"string"}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}}
-]"#;
+{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. Reuse next_cursor and send expected_session from prior uri/id/created_at/broker_pid fields to reject a replaced session. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish UTF-8. truncated reports expired output. wait_ms (0..30000, default 0) waits without blocking other requests until output, truncation or EOF; timed_out marks expiry. Only output_eof together with has_more=false means the output stream is drained; running=false alone does not.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536},"wait_ms":{"type":"integer","minimum":0,"maximum":30000},"expected_session":"#,
+    expected_session_schema!(),
+    r#"},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
+{"name":"session_write","description":"Send up to 65536 UTF-8 bytes or terminal control bytes to a session. Include a newline to submit a shell command; use \\u0003 to interrupt. Include expected_session from create/list/read to reject a replaced session.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"data":{"type":"string","maxLength":65536},"expected_session":"#,
+    expected_session_schema!(),
+    r#"},"required":["session","data"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":true}},
+{"name":"session_resize","description":"Resize a session PTY and screen; attached windows use the new terminal dimensions. Include expected_session from create/list/read to reject a replaced session.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256},"expected_session":"#,
+    expected_session_schema!(),
+    r#"},"required":["session","cols","rows"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":false}},
+{"name":"session_control","description":"Acquire or release exclusive input control. takeover=true explicitly replaces another operator; observers cannot acquire control. Include expected_session from create/list/read to reject a replaced session.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"action":{"type":"string","enum":["acquire","release"]},"takeover":{"type":"boolean"},"expected_session":"#,
+    expected_session_schema!(),
+    r#"},"required":["session","action"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}},
+{"name":"session_close","description":"Close a terminal session, hang up its child process and release its window/history. Include expected_session from create/list/read to reject a replaced session.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"expected_session":"#,
+    expected_session_schema!(),
+    r#"},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}}
+]"#,
+);
 
 unsafe extern "C" {
     fn read(fd: c_int, buffer: *mut c_void, count: usize) -> isize;
@@ -561,10 +579,10 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
             "command-read",
             &["session", "command_id", "part", "max_bytes"],
         ),
-        "session_write" => ("write", &["session", "data"]),
-        "session_resize" => ("resize", &["session", "cols", "rows"]),
-        "session_close" => ("close", &["session"]),
-        "session_control" => ("control", &["session", "action", "takeover"]),
+        "session_write" => ("write", &["session", "data", "expected_session"]),
+        "session_resize" => ("resize", &["session", "cols", "rows", "expected_session"]),
+        "session_close" => ("close", &["session", "expected_session"]),
+        "session_control" => ("control", &["session", "action", "takeover", "expected_session"]),
         _ => return Err("Unknown tool"),
     };
     if fields
@@ -1363,7 +1381,7 @@ mod tests {
     }
 
     #[test]
-    fn guarded_reads_preserve_identity_and_observer_permissions() {
+    fn guarded_tools_preserve_identity_and_observer_permissions() {
         let expected = object([
             ("uri", "ztty://mcp/stdio/work".into()),
             ("id", 7u64.into()),
@@ -1405,18 +1423,44 @@ mod tests {
             )
             .is_ok()
         );
-        assert!(
-            tool_request(
-                "session_write",
-                &object([
-                    ("session", "work".into()),
-                    ("data", "x".into()),
-                    ("expected_session", expected),
-                ]),
-                "mcp/stdio"
-            )
-            .is_err()
-        );
+        for (name, mut arguments) in [
+            ("session_write", object([("data", "x".into())])),
+            (
+                "session_resize",
+                object([("cols", 80u64.into()), ("rows", 24u64.into())]),
+            ),
+            (
+                "session_control",
+                object([("action", "acquire".into()), ("takeover", true.into())]),
+            ),
+            ("session_close", object([])),
+        ] {
+            arguments.set("session", "work".into());
+            arguments.set("expected_session", expected.clone());
+            let message = object([
+                ("jsonrpc", "2.0".into()),
+                ("id", 1i32.into()),
+                ("method", "tools/call".into()),
+                (
+                    "params",
+                    object([("name", name.into()), ("arguments", arguments)]),
+                ),
+            ]);
+            let mut operator = ready(false);
+            let accepted = dispatch(&message, &mut operator, "mcp/stdio");
+            assert!(accepted.response.is_none(), "{name}");
+            let Some(Action::Tool { request, .. }) = accepted.action else {
+                panic!("expected a guarded mutation: {name}");
+            };
+            assert_eq!(request.get("expected_session"), Some(&expected), "{name}");
+            assert_eq!(
+                request.get("_actor").and_then(Value::as_str),
+                Some("trusted-test-actor")
+            );
+            let denied = dispatch(&message, &mut observer, "mcp/stdio");
+            assert!(denied.action.is_none(), "{name}");
+            assert_eq!(code(&denied.response.unwrap()), Some(-32001), "{name}");
+        }
     }
 
     #[test]

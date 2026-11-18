@@ -59,6 +59,25 @@ def stdio(binary):
         schemas = {tool["name"]: tool["inputSchema"] for tool in tools}
         assert schemas["session_read"]["properties"]["max_bytes"]["maximum"] == 65536
         assert schemas["session_write"]["properties"]["data"]["maxLength"] == 65536
+        guard_schema = schemas["session_read"]["properties"]["expected_session"]
+        for offset, (name, arguments) in enumerate([
+            ("session_write", {"data": "never-delivered"}),
+            ("session_resize", {"cols": 80, "rows": 24}),
+            ("session_control", {"action": "acquire", "takeover": True}),
+            ("session_close", {}),
+        ]):
+            schema = schemas[name]
+            assert schema["properties"]["expected_session"] == guard_schema, name
+            assert "expected_session" not in schema["required"], name
+            for index, guard in enumerate((None, {})):
+                send(proc, packet("tools/call", 30 + offset * 2 + index, {
+                    "name": name, "arguments": {
+                        "session": "unused", "expected_session": guard, **arguments,
+                    },
+                }))
+                rejected = line(proc)
+                assert rejected["error"]["code"] == -32602, (name, rejected)
+                assert "expected_session" in rejected["error"]["message"], rejected
         send(proc, packet("tools/call", 21, {"name": "session_read", "arguments": {"session": "unused", "max_bytes": 65537}}))
         assert line(proc)["error"]["code"] == -32602
         send(proc, packet("tools/call", 22, {"name": "session_write", "arguments": {"session": "unused", "data": "界" * 21846}}))
