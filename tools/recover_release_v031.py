@@ -536,23 +536,29 @@ def verified_asset(api, asset, expected):
     return {"id": asset["id"], "name": asset["name"], "bytes": len(payload), "sha256": digest(payload)}
 
 
-def ensure_asset(api, release_id, name, payload):
+def ensure_asset(api, release_id, name, payload, known, *, readback=False):
     require(payload, "refusing a standalone zero-byte asset")
-    existing = release_assets(api, release_id).get(name)
-    if existing is not None:
-        return verified_asset(api, existing, payload)
-    path = f"/repos/{REPO}/releases/{release_id}/assets?" + urllib.parse.urlencode({"name": name})
-    try:
-        asset = api.request("POST", path, payload, upload=True)
-    except ApiError as error:
-        if error.status not in (409, 422):
-            raise
-        # Another publisher may have uploaded the same bytes. Never retry POST
-        # or overwrite; verify the existing asset instead.
-        asset = release_assets(api, release_id).get(name)
-        require(asset is not None, "asset creation conflicted without a visible matching asset")
-    require(asset["name"] == name, "upload returned the wrong asset identity")
-    return verified_asset(api, asset, payload)
+    asset = known.get(name)
+    if asset is None:
+        path = f"/repos/{REPO}/releases/{release_id}/assets?" + urllib.parse.urlencode({"name": name})
+        try:
+            asset = api.request("POST", path, payload, upload=True)
+        except ApiError as error:
+            if error.status not in (409, 422):
+                raise
+            # A concurrent publisher may have uploaded the same file. Read it
+            # back; never retry POST or overwrite an existing asset.
+            asset = release_assets(api, release_id).get(name)
+            require(asset is not None, "asset creation conflicted without a matching asset")
+            readback = True
+        known[name] = asset
+    require(asset["name"] == name and asset["state"] == "uploaded"
+            and asset["size"] == len(payload), "upload metadata does not match its planned payload")
+    if asset.get("digest") is not None:
+        require(asset["digest"] == "sha256:" + digest(payload), "GitHub upload digest differs")
+    if readback:
+        return verified_asset(api, asset, payload)
+    return {"id": asset["id"], "name": name, "bytes": len(payload), "sha256": digest(payload)}
 
 
 def recovery_notes():
@@ -584,6 +590,9 @@ def latest_policy(api):
 
 
 def publish(api, source, out):
+    require(os.environ.get("GITHUB_ACTIONS") == "true" and os.environ.get("GITHUB_REPOSITORY") == REPO
+            and os.environ.get("GITHUB_REF") == "refs/heads/release/recover-v031-20261119",
+            "publication requires the reviewed recovery workflow branch")
     audit_result, plan, assets = prepared(api, source, out)
     empty = plan["bundle_manifest"]["empty_top_level_files"]
     release = release_candidates(api)
@@ -626,15 +635,23 @@ def publish(api, source, out):
             require(item["state"] == "starter", "unexpected empty asset state")
     # Preserve and read back original ZIPs before removing an empty failed upload
     # placeholder. Completed assets, including valid empty assets, are retained.
-    ensure_asset(api, release_id, BUNDLE, assets[BUNDLE])
+    ensure_asset(api, release_id, BUNDLE, assets[BUNDLE], existing, readback=True)
     for name in sorted(empty):
-        item = release_assets(api, release_id).get(name)
+        item = existing.get(name)
+        if item is not None:
+            try:
+                item = api.get(f"releases/assets/{item['id']}")
+            except ApiError as error:
+                if error.status == 404:
+                    continue
+                raise
+            require(item["name"] == name, "empty placeholder was renamed")
         if item is not None and item["state"] == "starter":
             require(item["size"] == 0 and digest(b"") == empty[name], "empty placeholder identity changed")
             api.request("DELETE", f"/repos/{REPO}/releases/assets/{item['id']}")
             state["removed_empty_starters"].append({"id": item["id"], "name": name})
     for name, payload in sorted(assets.items()):
-        ensure_asset(api, release_id, name, payload)
+        ensure_asset(api, release_id, name, payload, existing)
     current = release_assets(api, release_id)
     for name, payload in sorted(assets.items()):
         require(name in current, "release readback is missing an asset: " + name)
@@ -642,7 +659,9 @@ def publish(api, source, out):
     read_bundle = api.get(f"releases/assets/{current[BUNDLE]['id']}", binary=True)
     state["evidence_bundle"] = inspect_bundle(read_bundle, plan["bundle_manifest"])
     state["release_readback"] = {"passed": True, "nonempty_assets": len(assets),
-                                 "empty_files_preserved": len(empty)}
+                                 "empty_files_preserved": len(empty),
+                                 "payloads_downloaded_before_publication": True}
+    write_json(out / "publication-progress.json", state)
     audit_tag(api)
     source_identity(source)
     release = api.get(f"releases/{release_id}")
@@ -657,13 +676,21 @@ def publish(api, source, out):
     audit_tag(api)
     published = api.get(f"releases/{release_id}")
     require(published["draft"] is False and published["tag_name"] == TAG, "published release identity mismatch")
-    current = release_assets(api, release_id)
-    for name, payload in assets.items():
-        require(name in current, "published release lost an asset: " + name)
-        verified_asset(api, current[name], payload)
     state["release"].update({"draft": False, "url": published["html_url"],
                             "published_at": published["published_at"]})
+    write_json(out / "publication-progress.json", state)
+    current = release_assets(api, release_id)
+    downloaded = {entry["name"]: entry for entry in state["asset_readbacks"]}
+    for name, payload in assets.items():
+        require(name in current, "published release lost an asset: " + name)
+        item = current[name]
+        require(item["id"] == downloaded[name]["id"] and item["state"] == "uploaded"
+                and item["size"] == len(payload), "published asset identity changed: " + name)
+        if item.get("digest") is not None:
+            require(item["digest"] == "sha256:" + digest(payload), "published asset digest changed")
+    state["release_readback"]["same_uploaded_asset_ids_after_publication"] = True
     state["passed"] = True
+    write_json(out / "publication-progress.json", state)
     state["recovery_workflow"] = {
         "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
         "helper_commit": os.environ["GITHUB_SHA"], "helper_sha256": digest(Path(__file__).read_bytes()),
@@ -672,7 +699,7 @@ def publish(api, source, out):
     flat_name(audit_name)
     audit_bytes = encoded(state)
     (out / "publication-audit.json").write_bytes(audit_bytes)
-    audit_asset = ensure_asset(api, release_id, audit_name, audit_bytes)
+    audit_asset = ensure_asset(api, release_id, audit_name, audit_bytes, current, readback=True)
     state["audit_asset"] = audit_asset
     write_json(out / "publication-result.json", state)
     return state
