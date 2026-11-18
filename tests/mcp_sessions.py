@@ -336,7 +336,10 @@ if os.fork():
     os.write(1,b"PREFIX")
     os._exit(7)
 os.close(read_fd)
-pathlib.Path(sys.argv[1]).write_text(str(os.getpid()))
+ready=pathlib.Path(sys.argv[1])
+temporary=ready.with_name(ready.name+".tmp")
+temporary.write_text(str(os.getpid()))
+temporary.replace(ready)
 os.write(write_fd,b"R")
 os.close(write_fd)
 deadline=time.monotonic()+6
@@ -363,6 +366,11 @@ os._exit(0)
                 "session": uri, "expected_session": session_identity(created),
             })
             if pending["output"] == "PREFIX" and pending["exit_code"] == 7:
+                # The writer can become ready during session_read itself.
+                # Bind it before leaving the loop so every assertion failure
+                # still waits for this owned process before temporary cleanup.
+                if pidfd is None:
+                    pidfd = os.pidfd_open(int(ready.read_text()))
                 break
             time.sleep(.01)
         assert pending is not None and pending["output"] == "PREFIX", pending
@@ -387,6 +395,17 @@ os._exit(0)
             "final_output_eof": finished["output_eof"],
         }
     finally:
+        # Cover failures between the child writing its ready file and the first
+        # successful read. Bind before releasing it, while it still owns the PTY.
+        if pidfd is None:
+            published = time.monotonic() + 1
+            while not ready.exists() and time.monotonic() < published:
+                time.sleep(.01)
+            if ready.exists():
+                try:
+                    pidfd = os.pidfd_open(int(ready.read_text()))
+                except ProcessLookupError:
+                    pass
         release.touch(exist_ok=True)
         if pidfd is not None:
             if not select.select([pidfd], [], [], 2)[0]:
