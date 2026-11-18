@@ -192,10 +192,12 @@ def main():
                     return picture if ImageChops.difference(before, picture).getbbox() else None
                 return wait(rendered, label)
 
-            def capture(selector, name):
+            def capture(selector, name, picture=None):
                 args.screenshots.mkdir(parents=True, exist_ok=True)
                 path = args.screenshots / (name + ".png")
-                image(selector).save(path)
+                if picture is None:
+                    picture = image(selector)
+                picture.save(path)
                 report["screenshots"][name] = {"path": str(path),
                     "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
 
@@ -291,12 +293,67 @@ def main():
 
             # Snapshot selection uses session identity and the displayed intent:
             # a Focus entry must not silently turn into Attach after detachment.
+            plain_source = image(b)
             switcher(b, "console")
             rpc({"op": "detach", "session": c})
+            detached = info(c)
+            source_before = info(b)
+            before_inputs = {uri: input_bytes(uri) for uri in inputs}
+            capture(b, "stale-focus-before-enter")
+            report["stale_focus"] = {
+                "phase": "target detached while original Focus entry remains open",
+                "source": b, "target": c, "source_barrier_hex": "71",
+                "target_before": detached, "source_before": source_before,
+                "screenshots": ["stale-focus-before-enter"],
+            }
             key(b, "Return")
-            wait(lambda: "session detached; reopen the switcher" in (root / "stderr.log").read_text(),
-                 "stale focus entry rejected")
-            assert not info(c)["attached"] and info(c)["pid"] == gamma["pid"]
+            # The detached broker redirects stderr to /dev/null. Use an actual
+            # keyboard/PTY barrier instead: this later ordinary key reaches the
+            # source only after Enter has been processed and closed the overlay.
+            # An unhandled Enter or still-open query cannot satisfy exact bytes.
+            key(b, "q")
+            report["stale_focus"]["phase"] = "Enter and following source PTY barrier key sent"
+
+            def rejected_frame():
+                received = input_bytes(b)
+                report["stale_focus"]["source_input_hex"] = received.hex()
+                if received != before_inputs[b] + b"q":
+                    return None
+                picture = image(b)
+                line_height = (picture.height - 40) // source_before["rows"]
+                notice_top = picture.height - 20 - line_height
+                cleared = (0, picture.height * 2 // 3, picture.width, notice_top)
+                restored = not ImageChops.difference(plain_source.crop(cleared), picture.crop(cleared)).getbbox()
+                report["stale_focus"]["palette_region_restored"] = restored
+                if not restored:
+                    return None
+                notice = picture.crop((0, notice_top, picture.width, picture.height))
+                # The terminal below READY is blank; overlay text has this
+                # distinct foreground. Observe the transient notice while it
+                # is present, rather than waiting for its expiry or a sleep.
+                pixels = sum(count for count, color in notice.getcolors(notice.width * notice.height)
+                             if color == (205, 214, 228))
+                report["stale_focus"]["notice_pixels"] = pixels
+                return (picture, pixels) if pixels > 10 else None
+
+            rejected, notice_pixels = wait(rejected_frame, "stale Focus rejection renders after Enter is processed")
+            capture(b, "stale-focus-rejected", rejected)
+            after_rejection = info(c)
+            assert not after_rejection["attached"] and after_rejection["running"], after_rejection
+            for field in ("id", "pid", "window_id", "workspace", "input_owner", "read_only", "cols", "rows"):
+                assert after_rejection[field] == detached[field], (field, detached, after_rejection)
+            assert after_rejection["pid"] == gamma["pid"] and focused(b)
+            source_after = info(b)
+            for field in ("id", "pid", "window_id", "workspace", "input_owner", "read_only", "cols", "rows"):
+                assert source_after[field] == source_before[field], (field, source_before, source_after)
+            for uri, before in before_inputs.items():
+                assert input_bytes(uri) == before + (b"q" if uri == b else b""), uri
+            report["stale_focus"].update({
+                "phase": "Enter processed, source PTY barrier received, transient rejection notice visible",
+                "notice_pixels": notice_pixels, "palette_region_restored": True,
+                "target_after": after_rejection, "source_after": source_after,
+                "screenshots": ["stale-focus-before-enter", "stale-focus-rejected"],
+            })
             switcher(b, "stdio logs")
             choose(b, r)
             switcher(r, "console")
