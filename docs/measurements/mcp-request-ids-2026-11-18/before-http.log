@@ -1,0 +1,42 @@
+{
+  "binary_sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+  "selected_checks": [
+    "http_numeric_request_ids"
+  ],
+  "checks": {
+    "http_numeric_request_ids": {
+      "status": "failed",
+      "error": "timed out",
+      "elapsed_ms": 5132.668
+    }
+  },
+  "cleanup": "passed"
+}
+Traceback (most recent call last):
+  File "<checkout>/tests/mcp_wait.py", line 951, in <module>
+    main(os.path.abspath(arguments.binary), arguments.output, checks=arguments.checks)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<checkout>/tests/mcp_wait.py", line 917, in main
+    details = test(harness)
+  File "<checkout>/tests/mcp_wait.py", line 712, in http_numeric_request_ids
+    return numeric_request_ids(h, "http")
+  File "<checkout>/tests/mcp_wait.py", line 651, in numeric_request_ids
+    response = receive(duplicate)
+  File "<checkout>/tests/mcp_wait.py", line 577, in receive
+    status, response, wire = request.receive(with_wire=True)
+                             ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "<checkout>/tests/mcp_wait.py", line 191, in receive
+    response = self.connection.getresponse()
+  File "/usr/lib/python3.14/http/client.py", line 1478, in getresponse
+    response.begin()
+    ~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/http/client.py", line 343, in begin
+    version, status, reason = self._read_status()
+                              ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.14/http/client.py", line 304, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/socket.py", line 729, in readinto
+    return self._sock.recv_into(b)
+           ~~~~~~~~~~~~~~~~~~~~^^^
+TimeoutError: timed out

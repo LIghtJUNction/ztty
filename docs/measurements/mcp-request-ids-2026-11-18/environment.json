@@ -1,0 +1,8 @@
+{
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)",
+  "platform": "Linux x86_64",
+  "source": "7b8aac8b8513ef94213e7f5e7890d9ca0021eb4f",
+  "harness_sha256": "e0ddb7e511779784ff106e34f8fe2af76be76007f1a9aef91bfe6332c4714f1c",
+  "test_commit": "5afe3c0065c10370c2616c7a0401425a38c61e7e"
+}

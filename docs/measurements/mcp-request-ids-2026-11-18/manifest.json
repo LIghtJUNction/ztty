@@ -1,0 +1,82 @@
+{
+  "before-http.json": {
+    "bytes": 314,
+    "sha256": "fcd6a0a23b013eb0778822a1786305b0315b432efdc7b954c46a4acb2636877c"
+  },
+  "before-http.log": {
+    "bytes": 1792,
+    "sha256": "b5046a325e5c8fe75a3fdcf2cb7b4424bc7ccdb89c21107ddee829e00b6ca4ec"
+  },
+  "before-stdio.json": {
+    "bytes": 336,
+    "sha256": "b7e1887757301646875cdd2f1d36bbb73874a7d556f156b503ae654ef299a63c"
+  },
+  "before-stdio.log": {
+    "bytes": 1412,
+    "sha256": "1e3a8f303c78e6020af6b4a2a9c8ebb50e21537bf20f98f0a8e19bccb6c951b2"
+  },
+  "binary.json": {
+    "bytes": 625,
+    "sha256": "3480f7bfea445853f60ee257b87438cd1137dfffa9f1cca636084bbb5f9143b4"
+  },
+  "clippy.log": {
+    "bytes": 512,
+    "sha256": "878a30537527d86bdb3ad9be203bc2640cff891e7cedd1d37fe2aba0c15aafc1"
+  },
+  "environment.json": {
+    "bytes": 340,
+    "sha256": "09f69e2d07dc958be84e679b386556711f095ff8be4a4c418e529083e0920859"
+  },
+  "fmt.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "gates.json": {
+    "bytes": 2808,
+    "sha256": "dd41eef4adc54ae2fc505d7cb963aea26bba8a28d6bcf965ef01a471eaf1521a"
+  },
+  "mcp-security.log": {
+    "bytes": 207,
+    "sha256": "9536b5a8589899f1b3e320e1b79c3ae0de20476a094dbd7e5a82caa25b1c799e"
+  },
+  "mcp-sessions.log": {
+    "bytes": 3466,
+    "sha256": "839cfe8094950dfb9ad4fee2d66ca17b79c9fa6121683ecc13da707ac34cb1d5"
+  },
+  "mcp-transport.log": {
+    "bytes": 165,
+    "sha256": "4da19e34008f0117ebf92a6fb944370a8388489224dee621e53960ade1a69c18"
+  },
+  "mcp-wait-final.json": {
+    "bytes": 5469,
+    "sha256": "9d496a8799a41559d804ea4dd19b9fcb63d3eedd9247f6231c15d639182df65e"
+  },
+  "mcp-wait-final.log": {
+    "bytes": 5469,
+    "sha256": "9d496a8799a41559d804ea4dd19b9fcb63d3eedd9247f6231c15d639182df65e"
+  },
+  "mcp-wait.json": {
+    "bytes": 5032,
+    "sha256": "4844449143e770061c78a4cb86adcce67c3674f30518f69d39dcdc3d7536ec65"
+  },
+  "mcp-wait.log": {
+    "bytes": 5032,
+    "sha256": "4844449143e770061c78a4cb86adcce67c3674f30518f69d39dcdc3d7536ec65"
+  },
+  "no-std.log": {
+    "bytes": 539,
+    "sha256": "177875a4c0166eb270d150e65bf3af4825d470da0ca4f11188773d3337a215be"
+  },
+  "protocol.log": {
+    "bytes": 4580,
+    "sha256": "8e9897090dcbd7b5f34112c1f779b9dc05634c07e261eaf970a04e6164d70057"
+  },
+  "release.log": {
+    "bytes": 502,
+    "sha256": "179b7bb05182e738884cae7046168a27900c9e58a15765d613a892f59423d978"
+  },
+  "summary.json": {
+    "bytes": 950,
+    "sha256": "d7b5d7307d8eff5661dec245f2d88b17451babf5455acbb08b4423c128862276"
+  }
+}
