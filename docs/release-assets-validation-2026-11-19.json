@@ -1,0 +1,119 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-19",
+  "timezone": "Asia/Taipei",
+  "status": "release-targeted helper tests and syntax checks passed; one later checksum-record comparison is statically reviewed only",
+  "permanent_source": {
+    "commit": "99d94633391150c4ca431b568c27139ef63441dd",
+    "tree": "81b9d08b881481908fe6a84717813303a773bef2",
+    "parent": "691fbd5d1b447b8dd35a5865d958e6cef7b37d25"
+  },
+  "executed_validation": {
+    "run_id": 44404653933,
+    "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44404653933",
+    "job_id": 135156541913,
+    "job_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44404653933/job/135156541913",
+    "head_commit": "a4bc61e9964d016d608b97b02f42efc8e47f3fe2",
+    "head_tree": "8a622c82d9cfb7e3e0b6979e177b179b646d35ff",
+    "permanent_logic_equivalent_commit": "691fbd5d1b447b8dd35a5865d958e6cef7b37d25",
+    "permanent_logic_equivalent_tree": "acb3fccebe5d66528725cdc2573a8baed99ed3b9",
+    "only_addition_to_logic_baseline": ".github/workflows/validate-release-evidence.yml",
+    "conclusion": "success",
+    "permissions": {
+      "contents": "read"
+    },
+    "runner": "ubuntu-24.04",
+    "started_at_utc": "2026-11-18T21:44:59Z",
+    "completed_at_utc": "2026-11-18T21:45:18Z",
+    "checks": {
+      "python_ast": {
+        "passed": true,
+        "files": [
+          "tools/release_assets.py",
+          "tests/release_assets_test.py"
+        ]
+      },
+      "unittest": {
+        "passed": 7,
+        "failed": 0,
+        "reported_seconds": 0.013,
+        "command": "python3 -m unittest discover -s tests -p 'release_assets_test.py' -v",
+        "tests": [
+          "test_archive_is_deterministic_and_readback_is_idempotent",
+          "test_changed_nonempty_asset_stops_before_empty_materialization",
+          "test_empty_and_nested_evidence_survive_without_empty_uploads",
+          "test_existing_conflicting_empty_asset_is_never_overwritten",
+          "test_modified_archive_fails_even_if_its_embedded_manifest_is_changed",
+          "test_source_symlinks_and_recursive_outputs_are_rejected",
+          "test_wrong_source_or_version_fails"
+        ]
+      },
+      "yaml_syntax": {
+        "passed": true,
+        "files": [
+          ".github/workflows/release.yml",
+          ".github/workflows/validate-release-evidence.yml"
+        ],
+        "does_not_claim_full_actions_semantic_validation": true
+      },
+      "publication_shell_syntax": {
+        "passed": true,
+        "command": "bash -n",
+        "source_commit": "691fbd5d1b447b8dd35a5865d958e6cef7b37d25",
+        "step": "Publish or verify GitHub Release",
+        "publication_commands_executed": false
+      }
+    }
+  },
+  "file_identity": {
+    "tools/release_assets.py": {
+      "tested_blob": "960048e12535d23e6bbe508b1ff90ca4093d8986",
+      "permanent_blob": "960048e12535d23e6bbe508b1ff90ca4093d8986",
+      "unchanged": true
+    },
+    "tests/release_assets_test.py": {
+      "tested_blob": "607bd4beac908f0fe38cfed5028b32ef0b7f1123",
+      "permanent_blob": "607bd4beac908f0fe38cfed5028b32ef0b7f1123",
+      "unchanged": true
+    },
+    ".github/workflows/release.yml": {
+      "tested_blob": "5e966b669cff3cf14f41edb50143427baa60fd02",
+      "permanent_blob": "3084209a3d4f1fc9f16df8c2e2d35f0c0694cba3"
+    }
+  },
+  "later_static_review": {
+    "commit": "99d94633391150c4ca431b568c27139ef63441dd",
+    "changed_path": ".github/workflows/release.yml",
+    "added_lines": 1,
+    "deleted_lines": 0,
+    "added_line": "cmp \"$evidence.sha256\" \"$readback/${evidence##*/}.sha256\"",
+    "purpose": "Require exact byte equality of the local and downloaded evidence ZIP checksum records.",
+    "review": "static source review",
+    "included_in_a4bc61e": false,
+    "executed_in_recorded_run": false,
+    "covered_by_recorded_bash_n": false,
+    "helper_and_tests_unchanged": true
+  },
+  "source_reviewed_behavior": {
+    "evidence": "A nonempty deterministic ZIP preserves every regular evidence file's relative path and original bytes, including zero-byte logs and nested files. Only nonempty top-level files plus the ZIP and checksum record are uploaded as standalone assets.",
+    "readback": "A separately downloaded ZIP must equal the accepted local ZIP byte-for-byte. Validate identity, entries and payloads, then exact nonempty top-level file bytes before restoring only missing top-level zero-byte files.",
+    "publication": "New releases remain drafts until readback, checksums, installer and six-platform build ledgers pass. Existing releases enter verification without an automatic asset upload or overwrite branch.",
+    "partial_draft": "Missing or conflicting assets stop verification. Automatic completion of an existing partial draft is not claimed.",
+    "latest": "Only a recognizable stable current latest version at or below the target permits --latest=true. A newer or unrecognized latest tag uses false; failed latest lookup stops publication.",
+    "live_github_publication_exercised": false
+  },
+  "scope": {
+    "ordinary_ci_rerun": false,
+    "native_gui_rerun": false,
+    "cross_platform_build_rerun": false,
+    "publication_api_called_by_validation": false,
+    "installation_performed": false,
+    "dedicated_v0_3_1_recovery": {
+      "separate_task": true,
+      "report": "application-release-validation-2026-11-19.zh-CN.md",
+      "machine_record": "application-release-validation-2026-11-19.json",
+      "executed_by_this_validation": false
+    }
+  },
+  "documentation_scope": "A documentation-only child of permanent source 99d9463; this record does not turn the later static line review into an executed validation result."
+}
