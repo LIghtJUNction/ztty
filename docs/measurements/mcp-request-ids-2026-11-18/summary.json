@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-18",
+  "timezone": "Asia/Taipei",
+  "source_commit": "7b8aac8b8513ef94213e7f5e7890d9ca0021eb4f",
+  "test_commit": "5afe3c0065c10370c2616c7a0401425a38c61e7e",
+  "rust_tests": {
+    "mcp_protocol": 22,
+    "json": 4,
+    "output_tail": 19,
+    "total": 45
+  },
+  "wait_checks": 13,
+  "new_wait_checks": 2,
+  "other_mcp_suites": [
+    "mcp-transport",
+    "mcp-sessions",
+    "mcp-security"
+  ],
+  "negative_controls": {
+    "stdio": "timed out waiting for duplicate-ID rejection",
+    "http": "timed out waiting for duplicate-ID rejection",
+    "cancel_assertions_reached": false
+  },
+  "cleanup": {
+    "candidate": "passed",
+    "before_stdio": "passed",
+    "before_http": "passed"
+  },
+  "scope": "Linux x86_64 MCP stdio and Streamable HTTP JSON response mode",
+  "not_measured": [
+    "RSS/PSS",
+    "throughput",
+    "input-to-present latency",
+    "native macOS/Windows runtime"
+  ],
+  "release_status": "draft candidate"
+}
