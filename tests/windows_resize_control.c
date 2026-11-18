@@ -12,7 +12,7 @@ static const wchar_t CLASS_NAME[] = L"Win32ResizeControl";
 static HDC memory_dc;
 static HBITMAP bitmap;
 static HGDIOBJ original_bitmap;
-static int surface_width, surface_height, failed;
+static int surface_width, surface_height, failed, resize_pending;
 
 static int resize_surface(int width, int height) {
     if (width == surface_width && height == surface_height) return 1;
@@ -58,22 +58,26 @@ static LRESULT CALLBACK window_proc(HWND hwnd, UINT message, WPARAM wparam, LPAR
     switch (message) {
     case WM_SIZE:
         if (wparam != SIZE_MINIMIZED) {
-            if (!resize_surface((int)LOWORD(lparam), (int)HIWORD(lparam))) {
-                failed = 1;
-                PostMessageW(hwnd, WM_CLOSE, 0, 0);
-            } else {
-                InvalidateRect(hwnd, NULL, FALSE);
-            }
+            resize_pending = 1;
+            InvalidateRect(hwnd, NULL, FALSE);
         }
         return 0;
     case WM_ERASEBKGND:
         return 1;
     case WM_PAINT: {
+        if (resize_pending) {
+            RECT client;
+            /* Consume first so a nested size request remains pending. */
+            resize_pending = 0;
+            if (!GetClientRect(hwnd, &client) ||
+                !resize_surface(client.right - client.left, client.bottom - client.top)) failed = 1;
+        }
         PAINTSTRUCT paint;
         HDC target = BeginPaint(hwnd, &paint);
         if (!target || !bitmap || !BitBlt(target, 0, 0, surface_width, surface_height,
                                          memory_dc, 0, 0, SRCCOPY)) failed = 1;
         EndPaint(hwnd, &paint);
+        if (resize_pending) InvalidateRect(hwnd, NULL, FALSE);
         if (failed) PostMessageW(hwnd, WM_CLOSE, 0, 0);
         return 0;
     }
@@ -121,6 +125,7 @@ int wmain(void) {
     printf("{\"pid\":%lu,\"dpi_awareness\":-4,\"class_style\":3,"
            "\"window_style\":%lu,\"background_brush_null\":true,"
            "\"creation_position\":{\"x\":\"CW_USEDEFAULT\",\"y\":\"CW_USEDEFAULT\"},"
+           "\"resize_policy\":\"deferred_until_paint\","
            "\"dark_attribute\":20,\"dark_value\":1,\"dark_hresult\":%ld,"
            "\"valid_rect_policy\":\"default\",\"nocopybits_added\":false}\n",
            (unsigned long)GetCurrentProcessId(), (unsigned long)WS_OVERLAPPEDWINDOW,

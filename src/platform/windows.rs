@@ -88,6 +88,12 @@ struct PaintAfterEnd {
     release_dc_return: Option<i32>,
 }
 
+struct SurfaceResizeRecord {
+    count: u64,
+    from: [i32; 2],
+    to: [i32; 2],
+}
+
 const POSITION_MESSAGES: [u32; 6] = [
     WM_WINDOWPOSCHANGING,
     0x0047,
@@ -797,6 +803,7 @@ struct App {
     focused: bool,
     native_trace: NativeTrace,
     native_snapshot_path: Option<Vec<u16>>,
+    surface_resize: Option<SurfaceResizeRecord>,
     last_paint: PaintRecord,
 }
 
@@ -894,9 +901,18 @@ impl App {
                 pane.core.terminal.graphics().image_count(), pane.core.terminal.graphics().placement_count(),
                 pane.dirty, pane.core.terminal.dirty(), pane.grid_ready(), pane.core.terminal.modes().synchronized_output)
         });
+        let surface_resize = self.surface_resize.as_ref().map_or_else(
+            || String::from("null"),
+            |resize| {
+                format!(
+                    "{{\"count\":{},\"last_from\":[{},{}],\"last_to\":[{},{}]}}",
+                    resize.count, resize.from[0], resize.from[1], resize.to[0], resize.to[1]
+                )
+            },
+        );
         let before = format!(
             concat!(
-                "{{\"surface\":{{\"size\":[{},{}],\"clip\":[{},{},{},{}]}},\"cpu_rgb\":{},\"dispatch_resize_pending\":{},",
+                "{{\"surface\":{{\"size\":[{},{}],\"clip\":[{},{},{},{}],\"resize_changes\":{}}},\"cpu_rgb\":{},\"dispatch_resize_pending\":{},",
                 "\"dispatch_paint_pending\":{},\"deferred_paints\":{},",
                 "\"app_resize_pending\":{},\"full_redraw\":{},\"pane\":{},\"last_paint\":{{\"sequence\":{},",
                 "\"surface\":[{},{}],\"region\":[{},{},{},{}],\"blit\":{},",
@@ -910,6 +926,7 @@ impl App {
             self.surface.clip.y,
             self.surface.clip.width,
             self.surface.clip.height,
+            surface_resize,
             rgb(cpu),
             dispatch_resize_pending,
             dispatch_paint_pending,
@@ -1304,8 +1321,21 @@ impl App {
             // Repeated resizes keep the original committed snapshot.
             self.preserve_held_frames()?;
         }
+        let previous_surface = [self.surface.width, self.surface.height];
         if !self.surface.resize(width, height) {
             return Err("cannot allocate the Windows workspace surface");
+        }
+        if changed && self.native_snapshot_path.is_some() {
+            // Include the first DIB allocation, but not no-ops or failed sizes.
+            // Later PTY coordination can still reject this layout.
+            self.surface_resize = Some(SurfaceResizeRecord {
+                count: self
+                    .surface_resize
+                    .as_ref()
+                    .map_or(1, |resize| resize.count.saturating_add(1)),
+                from: previous_surface,
+                to: [self.surface.width, self.surface.height],
+            });
         }
         self.full_redraw |= changed;
         let fonts = self.pending_fonts.as_ref().unwrap_or(&self.fonts);
@@ -3163,6 +3193,7 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             focused: false,
             native_trace: NativeTrace::new(native_trace),
             native_snapshot_path,
+            surface_resize: None,
             last_paint: PaintRecord::default(),
         }),
         dispatch: session_dispatch::Dispatch::default(),
