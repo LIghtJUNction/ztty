@@ -1,0 +1,82 @@
+{
+  "source_commit": "c2fdb7caf8d4a6f548a29c9decf33bc4ccddd80c",
+  "source_tree": "e9dba20b23f049584185e218c30017520bd32027",
+  "binary_sha256": "df97c8609c8c1ded13b41cdbe435347be558823803358decc4c27640cb788b05",
+  "files": [
+    {
+      "path": "bare-metal.log",
+      "bytes": 856,
+      "sha256": "157d4799b7280548a90d4b8428a05beb442f666cb29cae233d7dda837e100677"
+    },
+    {
+      "path": "binary.json",
+      "bytes": 384,
+      "sha256": "01eec512f54a2d2025cf0d8b07682a7a5a8370512f0f7c885721a8a472a5da00"
+    },
+    {
+      "path": "build-gates.json",
+      "bytes": 1273,
+      "sha256": "1cd43b7aed567326ab86029d54b5cc19cd6d3892f9c5b4e5db7bb09791775c1e"
+    },
+    {
+      "path": "clippy.log",
+      "bytes": 822,
+      "sha256": "a024c1c72fb42f59eb32771e5185e950072f7e85152c3e49c718b40a7690c149"
+    },
+    {
+      "path": "format.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "mcp-security.log",
+      "bytes": 207,
+      "sha256": "9536b5a8589899f1b3e320e1b79c3ae0de20476a094dbd7e5a82caa25b1c799e"
+    },
+    {
+      "path": "mcp-sessions.log",
+      "bytes": 3466,
+      "sha256": "5a32da48825ef5f0c9965de1908655779e32c99aa721cb324201721780667a51"
+    },
+    {
+      "path": "mcp-transport.log",
+      "bytes": 165,
+      "sha256": "4da19e34008f0117ebf92a6fb944370a8388489224dee621e53960ade1a69c18"
+    },
+    {
+      "path": "mcp-wait.json",
+      "bytes": 2294,
+      "sha256": "af157bd3dab8b5ad4e8d95c37073895494d5c5513c0302884ee7e3e009a407b6"
+    },
+    {
+      "path": "no-std.log",
+      "bytes": 539,
+      "sha256": "177875a4c0166eb270d150e65bf3af4825d470da0ca4f11188773d3337a215be"
+    },
+    {
+      "path": "release.log",
+      "bytes": 162,
+      "sha256": "24a6aa4bcba83d47262811f3c35a144bb4a501321e8bf6550605c219948b880b"
+    },
+    {
+      "path": "runtime-gates.json",
+      "bytes": 1157,
+      "sha256": "039b6802a153a2844ec4ab1e070c298170172e5a7df307c0b63e7a584c102548"
+    },
+    {
+      "path": "rust-tests.log",
+      "bytes": 23253,
+      "sha256": "967bfc78645b9b5d0a30fb942f42ea6ad554bf7ba6a9f3939ffc75254556b926"
+    },
+    {
+      "path": "shared-gui.json",
+      "bytes": 1634,
+      "sha256": "96d5ee7402d07b35903641b121fe7a3305c8faa3d18bbedb69daa3629d73f341"
+    },
+    {
+      "path": "summary.json",
+      "bytes": 3763,
+      "sha256": "5e11ebd3905920b476deee31de91b417d7817c88994c441b70ba78e1a01ba8ae"
+    }
+  ]
+}
