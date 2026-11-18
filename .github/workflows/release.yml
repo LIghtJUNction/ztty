@@ -814,8 +814,18 @@ jobs:
                   payload = (folder / name).read_bytes()
                   assert len(payload) == details["bytes"] and hashlib.sha256(payload).hexdigest() == details["sha256"], name
           PYREADBACK
-          if [[ "$(gh release view "v$VERSION" --json isDraft --jq .isDraft)" == true ]]; then
-            gh release edit "v$VERSION" --draft=false --latest
+          draft_state="$(gh release view "v$VERSION" --json isDraft --jq .isDraft)"
+          [[ "$draft_state" == true || "$draft_state" == false ]]
+          if [[ "$draft_state" == true ]]; then
+            latest_tag="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)"
+            make_latest="$(python3 - "$VERSION" "$latest_tag" <<'PYLATEST'
+          import re, sys
+          target = tuple(map(int, sys.argv[1].split(".")))
+          match = re.fullmatch(r"v([0-9]+)\.([0-9]+)\.([0-9]+)", sys.argv[2])
+          print("true" if match and tuple(map(int, match.groups())) <= target else "false")
+          PYLATEST
+            )"
+            gh release edit "v$VERSION" --draft=false --latest="$make_latest"
           fi
       - name: Update AUR
         env:
