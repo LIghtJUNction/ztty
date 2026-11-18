@@ -25,6 +25,8 @@
 
 ### Fixed
 
+- Initialize the macOS pixel helper through NSApplication.shared and retain real helper exit/signal and capture-stage evidence before JSON decoding.
+
 - Bounded shared output cursors retain a split UTF-8 suffix even after earlier malformed bytes; a gated real PTY regression proves the prior loss and the corrected byte offsets.
 - Native acceptance now disposes owned Windows processes before their cwd, preserves original failures, and uniquely selects the titled macOS terminal before pinning WindowID; actual third-run Linux ARM64 acceptance and remaining failures are retained.
 - Linux links the real system unwinder after Rust archives so GNU ld --as-needed cannot discard it before debug alloc cleanup references.
@@ -49,6 +51,8 @@
 - Large JSON object duplicate-key validation avoids quadratic work.
 
 ### Verification
+
+- Fourth source-pinned native run accepts Linux x86_64/ARM64 and Windows x86_64 (30 checks plus cleanup); preserves Windows ARM64 occlusion and both macOS helper initialization failures with all artifact hashes.
 
 - Final local gates pass 170 Rust unit/integration/documentation tests, strict Clippy, MCP transport/session/security tests and bare-metal checks; the zune-png bare-metal SIMD future-compatibility warning is retained in the evidence.
 - Real ssmcp relay integration passes three native commands and ten checks, including window reuse and reopening; daily Linux GUI coverage now has fourteen checks.

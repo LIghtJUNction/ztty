@@ -11,6 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 import platform
+import signal
 import sys
 import tempfile
 import unittest
@@ -64,14 +65,17 @@ class GateContract(unittest.TestCase):
         with self.assertRaises(native.NativeFailure):
             native.validate_helper_result({"passed": True, "status": "blocked"}, 0)
 
-    def pipeline(self, stdout, exitcode, expected):
+    def pipeline(self, stdout, exitcode, expected, stderr="", termination_signal=None):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
             binary = self.make_binary(directory)
             helper = directory / "helper"
+            ending = ("os.kill(os.getpid(), " + str(int(termination_signal)) + ")"
+                      if termination_signal is not None else "sys.exit(" + str(exitcode) + ")")
             helper.write_text(
-                "#!" + sys.executable + "\nimport sys\nsys.stdout.write("
-                + repr(stdout) + ")\nsys.exit(" + str(exitcode) + ")\n",
+                "#!" + sys.executable + "\nimport os, sys\nsys.stdout.write("
+                + repr(stdout) + ")\nsys.stdout.flush()\nsys.stderr.write("
+                + repr(stderr) + ")\nsys.stderr.flush()\n" + ending + "\n",
                 encoding="utf-8",
             )
             helper.chmod(0o700)
@@ -87,6 +91,18 @@ class GateContract(unittest.TestCase):
             self.assertEqual(report["pixel_readback"], "not_performed")
             saved = json.loads((directory / "evidence.permissions.json").read_text(encoding="utf-8"))
             self.assertFalse(saved["passed"])
+            expected_exit = -int(termination_signal) if termination_signal is not None else exitcode
+            self.assertEqual(saved["exit_code"], expected_exit)
+            self.assertEqual(saved["stdout_bytes"], len(stdout.encode("utf-8")))
+            self.assertEqual(saved["stderr_tail"], stderr)
+            self.assertEqual(
+                (directory / "evidence.permissions.stderr.log").read_text(encoding="utf-8"),
+                stderr,
+            )
+            if termination_signal is not None:
+                self.assertEqual(saved["termination_signal"], int(termination_signal))
+                self.assertEqual(saved["termination_signal_name"], termination_signal.name)
+                self.assertIn("JSONDecodeError", saved["json_error"])
             self.assertEqual(
                 (directory / "evidence.permissions.stdout.log").read_text(encoding="utf-8"),
                 stdout,
@@ -101,8 +117,17 @@ class GateContract(unittest.TestCase):
         self.assertEqual(report["status"], "blocked")
 
     def test_malformed_helper_json_preserves_evidence(self):
-        report = self.pipeline("this is not JSON\n", 0, 1)
-        self.assertEqual(report["status"], "failed")
+        with self.subTest("malformed"):
+            report = self.pipeline("this is not JSON\n", 0, 1)
+            self.assertEqual(report["status"], "failed")
+        with self.subTest("signal_without_json"):
+            # SIGTERM exercises a real signal exit without creating a core dump.
+            report = self.pipeline(
+                "", 0, 1, stderr="fixture: native initialization failed\n",
+                termination_signal=signal.SIGTERM,
+            )
+            self.assertEqual(report["status"], "failed")
+            self.assertIn("SIGTERM", report["error"])
 
     def test_forged_permission_success_rejected(self):
         value = {

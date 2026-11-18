@@ -15,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import signal
 import struct
 import subprocess
 import sys
@@ -180,7 +181,24 @@ def run(binary: Path, helper: Path, prefix: Path) -> tuple[dict, int]:
                     timeout=float(request["timeout"]) + 8,
                 )
                 stdout, stderr = result.stdout, result.stderr
-                value.update(json.loads(stdout))
+                # Persist process status before decoding: an abort can leave no
+                # JSON at all, while stderr still contains the actual assertion.
+                value["exit_code"] = result.returncode
+                if result.returncode < 0:
+                    value["termination_signal"] = -result.returncode
+                    try:
+                        value["termination_signal_name"] = signal.Signals(-result.returncode).name
+                    except ValueError:
+                        value["termination_signal_name"] = "UNKNOWN"
+                try:
+                    value.update(json.loads(stdout))
+                except (ValueError, TypeError) as error:
+                    value["json_error"] = repr(error)
+                    detail = value.get("termination_signal_name", "no signal")
+                    value["error"] = (
+                        f"native helper exited {result.returncode} ({detail}) without a valid JSON report"
+                    )
+                    raise NativeFailure(value["error"]) from error
                 value["exit_code"] = result.returncode
                 if png.exists():
                     value["png"] = screenshot_metadata(png)
@@ -210,10 +228,15 @@ def run(binary: Path, helper: Path, prefix: Path) -> tuple[dict, int]:
                 if not isinstance(error, NativeFailure):
                     value["error"] = repr(error)
                 if isinstance(error, subprocess.TimeoutExpired):
+                    value["timed_out"] = True
                     stdout = error.stdout.decode(errors="replace") if isinstance(error.stdout, bytes) else error.stdout or ""
                     stderr = error.stderr.decode(errors="replace") if isinstance(error.stderr, bytes) else error.stderr or ""
                 raise
             finally:
+                value["stdout_bytes"] = len(stdout.encode("utf-8"))
+                value["stderr_tail"] = stderr[-4000:]
+                if result is not None:
+                    value["exit_code"] = result.returncode
                 if png.exists() and "png" not in value:
                     try:
                         value["png"] = screenshot_metadata(png)

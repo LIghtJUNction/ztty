@@ -8,13 +8,15 @@ not claim that a `v0.2.0` GitHub Release or AUR update has been published.
 
 ## Roadmap candidate acceptance gates
 
-The roadmap has executed three build-only candidates: fa2f201, 2dc6769 and
-05782fc. The third accepted Linux x86_64/ARM64's four GUI suites and directory
-regressions. Windows x86_64 completed all 30 functional checks but failed
-harness cleanup; Windows ARM64 visibility and macOS window selection failed.
+The roadmap has executed four build-only candidates: fa2f201, 2dc6769,
+05782fc and 81c1c06. The fourth accepted both Linux architectures and Windows
+x86_64, including all 30 Windows functional checks and cleanup. Windows ARM64
+passed ten independent checks and cleanup but was blocked by runner-window
+occlusion; both macOS pixel helpers aborted with an initialization assertion.
 The [source-bound record](native-candidates-2026-11-18.md) preserves exact
-failures and artifact identities. The next candidate contains focused
-harness repairs, with five Windows and ten macOS contract tests.
+results, verified artifact hashes and durable download links. The next
+candidate initializes the macOS helper's WindowServer connection and retains
+real exit/signal evidence before attempting JSON decoding.
 These are not accepted six-platform production releases.
 
 The newer roadmap branch is not covered by run 44165748395. Its Release

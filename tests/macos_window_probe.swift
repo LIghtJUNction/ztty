@@ -166,7 +166,32 @@ final class WindowProbe {
         self.report["action"] = request.action
     }
 
+    func phase(_ name: String) {
+        report["phase"] = name
+        FileHandle.standardError.write(Data("ztty-macos-window-probe phase: \(name)\n".utf8))
+    }
+
+    func initializeAppKit() throws {
+        phase("appkit_initialization")
+        guard Thread.isMainThread else {
+            throw GateError("AppKit helper initialization requires the main thread")
+        }
+        // A command-line helper does not get NSApplicationMain automatically.
+        // shared establishes the WindowServer connection before NSWindow geometry
+        // or screenshot APIs. Prohibited policy prevents helper windows/activation.
+        let application = NSApplication.shared
+        guard application.setActivationPolicy(.prohibited),
+              application.activationPolicy == .prohibited else {
+            throw GateError("cannot initialize AppKit with prohibited activation")
+        }
+        report["appkit"] = [
+            "initialized": true, "main_thread": Thread.isMainThread,
+            "activation_policy": application.activationPolicy.rawValue,
+        ]
+    }
+
     func preflight() throws {
+        phase("permission_preflight")
         let capture = CGPreflightScreenCaptureAccess()
         let accessibility = AXIsProcessTrusted()
         report["permissions"] = ["screen_capture": capture, "accessibility": accessibility]
@@ -195,7 +220,8 @@ final class WindowProbe {
     }
 
     func content() async throws -> SCShareableContent {
-        try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
+        phase("window_inventory")
+        return try await SCShareableContent.excludingDesktopWindows(true, onScreenWindowsOnly: false)
     }
 
     func ownedWindow(_ content: SCShareableContent) throws -> SCWindow {
@@ -289,6 +315,7 @@ final class WindowProbe {
     }
 
     func capture(_ window: SCWindow, _ content: SCShareableContent) async throws -> Bool {
+        phase("capture_geometry")
         let filter = SCContentFilter(desktopIndependentWindow: window)
         let scale = Double(filter.pointPixelScale)
         guard scale.isFinite, scale >= 1, scale <= 8 else {
@@ -327,8 +354,10 @@ final class WindowProbe {
         configuration.capturesAudio = false
         configuration.ignoreShadowsSingleWindow = true
         configuration.colorSpaceName = CGColorSpace.sRGB
+        phase("windowserver_capture")
         let image = try await SCScreenshotManager.captureImage(
             contentFilter: filter, configuration: configuration)
+        phase("pixels_received")
         lastImage = image
         imageWindowID = window.windowID
         var colorName = "unknown"
@@ -349,6 +378,7 @@ final class WindowProbe {
            expected != [clientWidth, clientHeight] {
             throw GateError("client pixels \([clientWidth, clientHeight]) do not match PTY pixels \(expected)")
         }
+        phase("pixel_comparison")
         let bytes = try rgba(image)
         var matches = true
         var samples: [[String: Any]] = []
@@ -473,6 +503,7 @@ final class WindowProbe {
     }
 
     func run() async throws {
+        try initializeAppKit()
         try preflight()
         if request.action == "preflight" { return }
         if request.action == "invalid_cwd" { try await invalidCwd(); return }
@@ -536,6 +567,7 @@ final class WindowProbe {
 
     func saveEvidence() throws {
         guard let image = lastImage, let path = request.png else { return }
+        phase("saving_png")
         let url = URL(fileURLWithPath: path)
         guard let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil) else {
             throw GateError("cannot create the actual window PNG")
