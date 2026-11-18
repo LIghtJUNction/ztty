@@ -1,0 +1,159 @@
+{
+  "ok": true,
+  "checks": [
+    "two PTYs share one workspace and only the focused pane receives real keyboard input",
+    "split resize, swap, maximize and restore change real window geometry",
+    "tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell",
+    "moving panes between native windows and layouts preserves the PTY process",
+    "versioned CLI layout snapshots restore tabs/splits/geometry with unchanged PTY PIDs; unknown sessions and nonlocal restores fail before mutation",
+    "injected ioctl EIO keeps both containers, every view, PTY identity and old dimensions alive; retrying the same snapshot repairs actual PTY sizes",
+    "rename keeps the URI stable; detach and observe reattach preserve PTY/output and enforce read-only input",
+    "per-request input ownership rejects old operators and permits multiple observers",
+    "a stale layout cannot adopt a new PTY that reuses the closed session's origin/name; rejection preserves the replacement view and process",
+    "all launch/attach waiters complete and sessions release their views and PTYs"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+  "binary_sha256": "ef2e86087c4dd326df911281dd516bc074328eebd10987632144adee3cf3d6f8",
+  "test_script_sha256": "4b08e0c060a5a0dd5a0fd608bd9e2e9dd96d01eab5daa443f9ac649b5091b60a",
+  "display": ":23888",
+  "xserver_pid": 2983917,
+  "xserver_ownership": {
+    "display": ":23888",
+    "pid": 2983917,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X23888",
+        "inode": 94404734,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X23888",
+        "inode": 94404733,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "fault_injection": {
+    "source": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/tests/ioctl_resize_fault.c",
+    "source_sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "library_sha256": "fe2aed76f6906445d9192eaef4e2b95f6e59091492d85dd69ef3e3d24eb6a45f",
+    "compile_command": [
+      "/usr/bin/cc",
+      "-shared",
+      "-fPIC",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-o",
+      "/tmp/ztty-workspaces-jhhcj5ph/ioctl_resize_fault.so",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/tests/ioctl_resize_fault.c"
+    ],
+    "compiler_stdout": "",
+    "compiler_stderr": "",
+    "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
+    "attempts": [
+      {
+        "pid": 2984005,
+        "fd": 14,
+        "rows": 26,
+        "cols": 100,
+        "errno": 5
+      },
+      {
+        "pid": 2984005,
+        "fd": 8,
+        "rows": 12,
+        "cols": 100,
+        "errno": 5
+      }
+    ],
+    "error_response": {
+      "ok": false,
+      "error": "cannot resize split PTY: Resize: OS error 5"
+    },
+    "child_pids": {
+      "alpha": 2984008,
+      "beta": 2984010,
+      "gamma": 2984037,
+      "delta": 2984045
+    },
+    "pty_sizes_before": {
+      "alpha": [
+        47,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        47,
+        12
+      ]
+    },
+    "old_container": 2097205,
+    "restored_container_after_error": 2097217,
+    "child_start_ticks": {
+      "alpha": 7824846,
+      "beta": 7824848,
+      "gamma": 7824851,
+      "delta": 7824858
+    },
+    "child_window_ids": {
+      "alpha": 2097154,
+      "beta": 2097160,
+      "gamma": 2097184,
+      "delta": 2097209
+    },
+    "pty_sizes_recovered": {
+      "alpha": [
+        100,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        100,
+        26
+      ]
+    }
+  },
+  "broker_pid": 2984005,
+  "broker_start_ticks": 7824840,
+  "screenshot_glyph_pixels": {
+    "alpha": 1928,
+    "beta": 1502
+  },
+  "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/final-verification/workspaces.png",
+  "incarnation_reuse": {
+    "uri": "ztty://local/incarnation",
+    "previous_id": 5,
+    "replacement_id": 6,
+    "previous_pid": 2984050,
+    "replacement_pid": 2984056,
+    "previous_created_at": 1794986203386,
+    "replacement_created_at": 1794986203411,
+    "rejected_restore": {
+      "ok": false,
+      "error": "workspace session identity is no longer available"
+    }
+  },
+  "stderr": ""
+}

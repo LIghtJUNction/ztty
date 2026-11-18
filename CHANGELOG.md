@@ -35,6 +35,9 @@
 
 ### Fixed
 
+- Avoid clearing Unicode target cells immediately before overwriting them; preserve wide-cell boundary repair, insertion, metadata and wrapping, with five new core regressions.
+- Integrate main-branch throughput optimizations with production workspaces, palette provenance and X11 overlays; fix independent benchmark broker selection and runtime A/B window counts.
+
 - Make macOS helper activation-policy setup idempotent and retain before/after state before failure; the actual prohibited policy remains required. Native execution is pending.
 
 - Call the macOS helper activation-policy method correctly after both native compilers rejected property syntax; preserve the fifth-run failure evidence and require a native rerun.
@@ -68,6 +71,8 @@
 - Large JSON object duplicate-key validation avoids quadratic work.
 
 ### Verification
+
+- Record the 2026-11-18 integrated candidate: 220 Rust unit/integration tests, 6 doctests, 61 real Linux GUI checks, 3 MCP suites and 38 Python benchmark regressions; retain fixed-CPU and unpinned Unicode microbenchmarks with all samples and scope limits. See [the integration report](docs/integration-unicode-2026-11-18.md).
 
 - The integrated shared-core/repaint candidate passes 208 regular Rust tests, eight real PTY checks and five Xvfb suites; native Linux candidates now also require the repaint pixel/fairness/idle checks.
 

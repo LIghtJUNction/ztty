@@ -1,0 +1,321 @@
+{
+  "schema": 1,
+  "scope": "parser and screen model; no PTY, renderer or display",
+  "timestamp_utc": "2026-11-18T07:18:45.899821+00:00",
+  "affinity_cpu": 0,
+  "baseline_source": "b9771a39a5653c488719679d737844180ad45067",
+  "after_source": "3c5b8e28a0c9baccd0dca1f24e1d3c3d558c449d",
+  "change": "State::put_char reuses overwrite_span",
+  "binary_sha256": {
+    "before": "4ed7d32e069ee4daf8bb9bd5c779fe2f284558d696f5b3e42dc2fada7a3141cd",
+    "after": "9a7ee4c7b91fe6eb05919f8ecd68f1b2aec4befa276e53c97a6c32a2b4173372"
+  },
+  "runs": [
+    {
+      "variant": "before",
+      "command": [
+        "taskset",
+        "-c",
+        "0",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/iteration-verification/core-before"
+      ],
+      "duration_seconds": 3.279,
+      "host_load": [
+        6.982421875,
+        8.09814453125,
+        9.244140625
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 175.151,
+        "ascii_full_history_mib_s": 98.376,
+        "sgr_mib_s": 149.641,
+        "unicode_mib_s": 87.76,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 45,
+          "p95": 47,
+          "p99": 50,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3574,
+          "p95": 3989,
+          "p99": 7101,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "after",
+      "command": [
+        "taskset",
+        "-c",
+        "0",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/examples/benchmark"
+      ],
+      "duration_seconds": 2.777,
+      "host_load": [
+        7.14404296875,
+        8.11328125,
+        9.24267578125
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 211.848,
+        "ascii_full_history_mib_s": 141.11,
+        "sgr_mib_s": 128.212,
+        "unicode_mib_s": 115.624,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 48,
+          "p95": 51,
+          "p99": 66,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3413,
+          "p95": 4162,
+          "p99": 4501,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "after",
+      "command": [
+        "taskset",
+        "-c",
+        "0",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/examples/benchmark"
+      ],
+      "duration_seconds": 2.872,
+      "host_load": [
+        7.14404296875,
+        8.11328125,
+        9.24267578125
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 176.79,
+        "ascii_full_history_mib_s": 137.036,
+        "sgr_mib_s": 144.253,
+        "unicode_mib_s": 98.42,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 49,
+          "p95": 59,
+          "p99": 64,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3459,
+          "p95": 3849,
+          "p99": 5422,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "before",
+      "command": [
+        "taskset",
+        "-c",
+        "0",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/iteration-verification/core-before"
+      ],
+      "duration_seconds": 3.136,
+      "host_load": [
+        7.61328125,
+        8.19482421875,
+        9.26318359375
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 227.035,
+        "ascii_full_history_mib_s": 127.377,
+        "sgr_mib_s": 144.063,
+        "unicode_mib_s": 89.259,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 44,
+          "p95": 47,
+          "p99": 49,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 4529,
+          "p95": 8077,
+          "p99": 15538,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "before",
+      "command": [
+        "taskset",
+        "-c",
+        "0",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/iteration-verification/core-before"
+      ],
+      "duration_seconds": 3.815,
+      "host_load": [
+        7.96484375,
+        8.25830078125,
+        9.2783203125
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 141.978,
+        "ascii_full_history_mib_s": 89.958,
+        "sgr_mib_s": 104.511,
+        "unicode_mib_s": 68.106,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 51,
+          "p95": 61,
+          "p99": 81,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3721,
+          "p95": 4356,
+          "p99": 9746,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "variant": "after",
+      "command": [
+        "taskset",
+        "-c",
+        "0",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/examples/benchmark"
+      ],
+      "duration_seconds": 3.283,
+      "host_load": [
+        7.96484375,
+        8.25830078125,
+        9.2783203125
+      ],
+      "values": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 195.128,
+        "ascii_full_history_mib_s": 111.136,
+        "sgr_mib_s": 139.914,
+        "unicode_mib_s": 112.083,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 48,
+          "p95": 52,
+          "p99": 57,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 5483,
+          "p95": 8782,
+          "p99": 17981,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "ascii_mib_s": {
+      "before": {
+        "median": 175.151,
+        "min": 141.978,
+        "max": 227.035
+      },
+      "after": {
+        "median": 195.128,
+        "min": 176.79,
+        "max": 211.848
+      },
+      "ratio": 1.1140558717906262
+    },
+    "ascii_full_history_mib_s": {
+      "before": {
+        "median": 98.376,
+        "min": 89.958,
+        "max": 127.377
+      },
+      "after": {
+        "median": 137.036,
+        "min": 111.136,
+        "max": 141.11
+      },
+      "ratio": 1.3929820281369438
+    },
+    "sgr_mib_s": {
+      "before": {
+        "median": 144.063,
+        "min": 104.511,
+        "max": 149.641
+      },
+      "after": {
+        "median": 139.914,
+        "min": 128.212,
+        "max": 144.253
+      },
+      "ratio": 0.9712000999562691
+    },
+    "unicode_mib_s": {
+      "before": {
+        "median": 87.76,
+        "min": 68.106,
+        "max": 89.259
+      },
+      "after": {
+        "median": 112.083,
+        "min": 98.42,
+        "max": 115.624
+      },
+      "ratio": 1.2771536007292614
+    }
+  }
+}
