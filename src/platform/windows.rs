@@ -124,6 +124,78 @@ impl PositionEvent {
     }
 }
 
+#[derive(Clone, Copy)]
+struct NcCalcStage {
+    rects: [[i32; 4]; 3],
+    position: Option<ffi::WindowPos>,
+}
+impl NcCalcStage {
+    fn capture(params: &ffi::NcCalcSizeParams) -> Self {
+        Self {
+            rects: params
+                .rects
+                .each_ref()
+                .map(|rect| [rect.left, rect.top, rect.right, rect.bottom]),
+            position: unsafe { params.position.as_ref() }.copied(),
+        }
+    }
+    fn json(self) -> String {
+        let rects = self
+            .rects
+            .map(|rect| format!("[{},{},{},{}]", rect[0], rect[1], rect[2], rect[3]));
+        let position = self.position.map_or_else(
+            || String::from("null"),
+            |position| {
+                format!(
+                    concat!(
+                        "{{\"hwnd\":{},\"insert_after\":{},\"x\":{},\"y\":{},",
+                        "\"width\":{},\"height\":{},\"flags\":{}}}"
+                    ),
+                    position.hwnd as usize,
+                    position.insert_after as usize,
+                    position.x,
+                    position.y,
+                    position.width,
+                    position.height,
+                    position.flags
+                )
+            },
+        );
+        format!(
+            "{{\"rects\":[{},{},{}],\"lppos\":{}}}",
+            rects[0], rects[1], rects[2], position
+        )
+    }
+}
+
+#[derive(Clone, Copy)]
+struct NcCalcEvent {
+    sequence: u64,
+    wparam: usize,
+    input: NcCalcStage,
+    default_return: isize,
+    after_default: NcCalcStage,
+    submitted_return: isize,
+    submitted: NcCalcStage,
+}
+impl NcCalcEvent {
+    fn json(self) -> String {
+        format!(
+            concat!(
+                "{{\"sequence\":{},\"wparam\":{},\"input\":{},\"default_return\":{},",
+                "\"after_default\":{},\"submitted_return\":{},\"submitted\":{}}}"
+            ),
+            self.sequence,
+            self.wparam,
+            self.input.json(),
+            self.default_return,
+            self.after_default.json(),
+            self.submitted_return,
+            self.submitted.json()
+        )
+    }
+}
+
 #[derive(Clone, Copy, Default)]
 struct NativeEventRecord {
     messages: [MessagePhase; 6],
@@ -132,6 +204,7 @@ struct NativeEventRecord {
     size: [u32; 3],
     default_message: u32,
     default_depth: u32,
+    nccalc_valid_rects: Option<NcCalcEvent>,
 }
 
 /// Memory-only ordering evidence. Every Cell update finishes before a native
@@ -230,7 +303,8 @@ impl NativeEvents {
         format!(
             concat!(
                 "{{\"enabled\":{},\"sequence\":{},\"default_message\":{},\"default_depth\":{},",
-                "\"messages\":[{}],\"changing\":{},\"changed\":{},\"last_size\":{{\"kind\":{},\"size\":[{},{}]}}}}"
+                "\"messages\":[{}],\"changing\":{},\"changed\":{},\"nccalc_valid_rects\":{},",
+                "\"last_size\":{{\"kind\":{},\"size\":[{},{}]}}}}"
             ),
             self.enabled,
             self.sequence.get(),
@@ -239,6 +313,9 @@ impl NativeEvents {
             messages,
             record.changing.json(),
             changed,
+            record
+                .nccalc_valid_rects
+                .map_or_else(|| String::from("null"), NcCalcEvent::json),
             record.size[0],
             record.size[1],
             record.size[2]
@@ -2714,14 +2791,36 @@ unsafe extern "system" fn window_proc(
     let state = unsafe { &*pointer };
     let event_sequence = state.native_events.received(message);
     if message == WM_NCCALCSIZE {
+        // Copy only scalars while the message parameters are valid. No borrow
+        // or pointer into them survives the reentrant default procedure.
+        let input = if state.native_events.enabled && wparam != 0 {
+            unsafe { (lparam as *const ffi::NcCalcSizeParams).as_ref() }.map(NcCalcStage::capture)
+        } else {
+            None
+        };
         let result = unsafe { default_window_proc(state, hwnd, message, wparam, lparam) };
         if wparam != 0
             && let Some(params) = unsafe { (lparam as *mut ffi::NcCalcSizeParams).as_mut() }
         {
+            let after_default = input.map(|_| NcCalcStage::capture(params));
             // Keep default frame/client geometry, but preserve no old client
             // pixels: the retained DIB supplies the resized frame.
             params.rects[1] = ffi::Rect::default();
             params.rects[2] = ffi::Rect::default();
+            if let (Some(input), Some(after_default)) = (input, after_default) {
+                let submitted = NcCalcStage::capture(params);
+                state.native_events.update(|record| {
+                    record.nccalc_valid_rects = Some(NcCalcEvent {
+                        sequence: event_sequence,
+                        wparam,
+                        input,
+                        default_return: result,
+                        after_default,
+                        submitted_return: WVR_VALIDRECTS,
+                        submitted,
+                    });
+                });
+            }
             return WVR_VALIDRECTS;
         }
         return result;
@@ -3146,6 +3245,7 @@ mod ffi {
         pub bottom: i32,
     }
     #[repr(C)]
+    #[derive(Clone, Copy)]
     pub struct WindowPos {
         pub hwnd: Handle,
         pub insert_after: Handle,
