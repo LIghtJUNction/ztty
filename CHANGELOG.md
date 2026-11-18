@@ -4,6 +4,11 @@
 
 ### Added
 
+- Add opt-in `--http-response sse` for MCP POST responses, with prompt headers,
+  five-second keepalive comments and a final JSON-RPC event. Preserve the default
+  JSON mode, request cancellation, role/session isolation and bounded buffers;
+  verify both forms through real PTYs and integrate SSE checks into the local gate.
+
 - Add bounded `session_read.wait_ms` over stdio and HTTP, with concurrent tool
   requests, cancellation, explicit timeout results and PTY-instance binding.
   Parked reads preserve independent byte cursors and incomplete UTF-8 suffixes.

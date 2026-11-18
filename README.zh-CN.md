@@ -178,6 +178,9 @@ ztty mcp
 # Streamable HTTP，地址为 http://127.0.0.1:8732/mcp
 ztty mcp --transport http --host 127.0.0.1 --port 8732
 
+# 可选 SSE 响应：输出等待期间发送保活注释
+ztty mcp --transport http --http-response sse
+
 ztty attach ztty://mcp/stdio/work
 ```
 
@@ -190,7 +193,9 @@ HTTP 支持配置主机和端口，端口 `0` 自动选择空闲端口。监听�
 需要通过 `ZTTY_MCP_TOKEN` 或 `--token` 配置令牌。每次输入最多 64 KiB；
 读取按字节游标分页，单页可多返回最多 3 字节以补全 UTF-8 字符。
 
-完整的客户端配置、工具参数和生命周期见 [会话与 MCP](docs/sessions.md)。
+HTTP 默认返回 JSON；SSE 模式先建立响应流，等待期间每五秒保活，完成后发送
+一个 JSON-RPC 结果并关闭连接。完整的客户端配置、工具参数和生命周期见
+[会话与 MCP](docs/sessions.md)。
 
 `ztty --observe -e COMMAND` 新建只读命令窗口，启动时不请求焦点；关闭时结束
 这个窗口自己创建的子进程。`ztty attach --observe NAME` 连接既有会话，关闭

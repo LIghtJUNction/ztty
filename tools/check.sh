@@ -12,6 +12,7 @@ if [ "$(uname -s)" = Linux ]; then
     python3 tests/mcp_sessions.py --binary ./target/release/ztty
     python3 tests/mcp_security.py --binary ./target/release/ztty
     python3 tests/mcp_wait.py --binary ./target/release/ztty --output artifacts/mcp-wait/report.json
+    python3 tests/mcp_sse.py --binary ./target/release/ztty --output artifacts/mcp-sse/report.json
 else
     printf '%s\n' 'Shared-session MCP checks: skipped (Linux-only runtime).'
 fi
