@@ -768,6 +768,7 @@ impl Session {
                 "exit_code",
                 self.status().map(Value::from).unwrap_or(Value::Null),
             ),
+            ("output_eof", Value::Bool(self.core.eof())),
             ("title", Value::from(self.core.terminal.title())),
             (
                 "input_owner",
@@ -825,6 +826,16 @@ impl Session {
         let _ = self.core.pty.reap();
     }
     fn read(&self, request: &Value) -> Result<Value, String> {
+        if let Some(expected) = request.get("expected_session")
+            && !crate::session_identity::ExpectedSession::parse(expected)?.matches(
+                &self.uri,
+                self.id,
+                self.created_at,
+                unsafe { os::getpid() } as u32,
+            )
+        {
+            return Err("session identity changed; start a new read".into());
+        }
         let cursor = match request.get("cursor") {
             None => 0,
             Some(v) => v

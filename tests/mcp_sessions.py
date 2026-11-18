@@ -5,6 +5,8 @@ import hashlib
 import json
 import os
 import pathlib
+import select
+import signal
 import subprocess
 import tempfile
 import time
@@ -12,8 +14,9 @@ import time
 from mcp_transport import HttpServer, INIT, READY, line, packet, send
 
 class StdioClient:
-    def __init__(self, binary, cwd=None):
-        self.proc = subprocess.Popen([binary, "mcp"], stdin=subprocess.PIPE,
+    def __init__(self, binary, cwd=None, read_only=False):
+        command = [binary, "mcp"] + (["--read-only"] if read_only else [])
+        self.proc = subprocess.Popen(command, stdin=subprocess.PIPE,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd, env=os.environ)
         send(self.proc, INIT)
         assert "result" in line(self.proc)
@@ -56,7 +59,7 @@ def collect(read, uri, needle=None, cursor=0, byte_limit=7, exited=False):
         output += value["output"]
         last = value
         if ((needle is None or needle in output)
-                and (not exited or (not value["running"] and value["exit_code"] is not None))
+                and (not exited or (value["output_eof"] and value["exit_code"] is not None))
                 and not value["has_more"]):
             return output, cursor, value
         if not value["has_more"]:
@@ -175,6 +178,223 @@ os.write(1,b"\x9a\x80END")
     return {"status": "passed", "initial_cursor": 1, "final_cursor": cursor,
             "output": partial["output"] + suffix}
 
+
+def session_identity(value):
+    return {key: value[key] for key in ("uri", "id", "created_at", "broker_pid")}
+
+
+def guarded_output_resume(binary, operator, http, sid, sessions):
+    """Old cursors must never silently resume a replacement named PTY."""
+    first = None
+    second = None
+    try:
+        old = operator.tool("session_create", {
+            "name": "resume-reuse", "history": 0,
+            "command": ["/bin/sh", "-c", "printf OLD"],
+        })
+        uri = old["uri"]
+        sessions.append(uri)
+        old_output, cursor, state = collect(operator.tool, uri, needle="OLD", exited=True)
+        assert old_output == "OLD" and cursor == 3 and state["output_eof"], state
+        expected = session_identity(state)
+        first = StdioClient(binary, read_only=True)
+        second = StdioClient(binary, read_only=True)
+        first_page = first.tool("session_read", {
+            "session": uri, "cursor": 0, "max_bytes": 1, "expected_session": expected,
+        })
+        second_page = second.tool("session_read", {
+            "session": uri, "cursor": 0, "max_bytes": 2, "expected_session": expected,
+        })
+        assert first_page["output"] == "O" and first_page["next_cursor"] == 1, first_page
+        assert second_page["output"] == "OL" and second_page["next_cursor"] == 2, second_page
+        first.close()
+        first = StdioClient(binary, read_only=True)
+        resumed = first.tool("session_read", {
+            "session": uri, "cursor": first_page["next_cursor"], "expected_session": expected,
+        })
+        other = second.tool("session_read", {
+            "session": uri, "cursor": second_page["next_cursor"], "expected_session": expected,
+        })
+        across_http = http_tool(http, sid, "session_read", {
+            "session": uri, "cursor": first_page["next_cursor"], "expected_session": expected,
+        })
+        assert resumed["output"] == "LD" and other["output"] == "D", (resumed, other)
+        assert across_http["output"] == "LD" and across_http["output_eof"], across_http
+
+        mismatches = []
+        for key in expected:
+            wrong = dict(expected)
+            wrong[key] = "ztty://mcp/stdio/different" if key == "uri" else expected[key] + 1
+            rejected = first.tool("session_read", {
+                "session": uri, "cursor": 0, "expected_session": wrong,
+            }, expect_error=True)
+            assert rejected == {"error": "session identity changed; start a new read"}, rejected
+            mismatches.append(key)
+
+        malformed = []
+        for key in expected:
+            missing = dict(expected)
+            del missing[key]
+            malformed.append((f"missing_{key}", missing))
+            invalid = dict(expected)
+            invalid[key] = None
+            malformed.append((f"type_{key}", invalid))
+        malformed.extend([
+            ("extra_field", {**expected, "cursor": 0}),
+            ("not_object", []),
+        ])
+        for label, guard in malformed:
+            first.identifier += 1
+            send(first.proc, packet("tools/call", first.identifier, {
+                "name": "session_read",
+                "arguments": {"session": uri, "cursor": 0, "expected_session": guard},
+            }))
+            rejected = line(first.proc)
+            assert rejected["error"]["code"] == -32602 and "result" not in rejected, (label, rejected)
+        first.identifier += 1
+        duplicate = json.dumps(expected)[:-1] + ', "id": ' + str(expected["id"]) + "}"
+        wire = json.dumps(packet("tools/call", first.identifier, {
+            "name": "session_read",
+            "arguments": {"session": uri, "expected_session": expected},
+        }))
+        assert wire.count(json.dumps(expected)) == 1
+        first.proc.stdin.write(wire.replace(json.dumps(expected), duplicate).encode() + b"\n")
+        first.proc.stdin.flush()
+        rejected = line(first.proc)
+        assert rejected["error"]["code"] in (-32700, -32602) and "result" not in rejected, rejected
+
+        # Renaming keeps the original URI and PTY identity. CLI actions retain
+        # their normal input-ownership checks rather than injecting an actor.
+        for args in [
+            ["control", uri, "acquire", "--takeover"],
+            ["rename", uri, "resume-renamed"],
+        ]:
+            action = subprocess.run([binary, *args], capture_output=True, text=True, timeout=5)
+            assert action.returncode == 0, (args, action.stdout, action.stderr)
+        renamed = first.tool("session_read", {
+            "session": "resume-renamed", "cursor": 1, "expected_session": expected,
+        })
+        assert renamed["name"] == "resume-renamed" and renamed["output"] == "LD", renamed
+        assert session_identity(renamed) == expected
+        operator.tool("session_control", {"session": uri, "action": "acquire", "takeover": True})
+        operator.tool("session_close", {"session": uri})
+        sessions.remove(uri)
+        replacement = operator.tool("session_create", {
+            "name": "resume-reuse", "history": 0,
+            "command": ["/bin/sh", "-c", "printf REPLACEMENT"],
+        })
+        sessions.append(replacement["uri"])
+        complete, _, replacement_state = collect(
+            operator.tool, replacement["uri"], needle="REPLACEMENT", exited=True)
+        assert replacement["uri"] == uri and replacement["id"] != old["id"], replacement
+        stale = first.tool("session_read", {
+            "session": uri, "cursor": cursor, "expected_session": expected,
+        }, expect_error=True)
+        assert stale == {"error": "session identity changed; start a new read"}, stale
+        stale_http = http_tool(http, sid, "session_read", {
+            "session": uri, "cursor": cursor, "expected_session": expected,
+        }, expect_error=True)
+        assert stale_http == stale, stale_http
+        fresh = first.tool("session_read", {
+            "session": uri, "cursor": 0, "expected_session": session_identity(replacement_state),
+        })
+        legacy = second.tool("session_read", {"session": uri, "cursor": cursor})
+        assert complete == fresh["output"] == "REPLACEMENT" and fresh["output_eof"], fresh
+        assert legacy["output"] == "LACEMENT" and not legacy["truncated"], legacy
+        operator.tool("session_close", {"session": uri})
+        sessions.remove(uri)
+        return {
+            "status": "passed",
+            "old_identity": expected,
+            "replacement_identity": session_identity(replacement_state),
+            "resumed_stdio": resumed["output"],
+            "independent_observer": other["output"],
+            "resumed_http": across_http["output"],
+            "mismatched_identity_fields_rejected": mismatches,
+            "malformed_guards_rejected": len(malformed) + 1,
+            "rename_preserved_identity": True,
+            "stale_guard_error": stale["error"],
+            "legacy_unguarded_output": legacy["output"],
+        }
+    finally:
+        for client in (first, second):
+            if client is not None:
+                client.close()
+
+
+def descendant_output_eof(operator, directory, sessions):
+    """A reaped PTY leader is not EOF while its descendant still owns the slave."""
+    ready = pathlib.Path(directory) / "descendant-writer"
+    release = pathlib.Path(directory) / "descendant-release"
+    child = r'''import os,pathlib,signal,sys,time
+signal.signal(signal.SIGHUP,signal.SIG_IGN)
+read_fd,write_fd=os.pipe()
+if os.fork():
+    os.close(write_fd)
+    assert os.read(read_fd,1)==b"R"
+    os.close(read_fd)
+    os.write(1,b"PREFIX")
+    os._exit(7)
+os.close(read_fd)
+pathlib.Path(sys.argv[1]).write_text(str(os.getpid()))
+os.write(write_fd,b"R")
+os.close(write_fd)
+deadline=time.monotonic()+6
+while not pathlib.Path(sys.argv[2]).exists():
+    if time.monotonic()>deadline: os._exit(9)
+    time.sleep(.01)
+os.write(1,b"SUFFIX")
+os._exit(0)
+'''
+    created = operator.tool("session_create", {
+        "name": "descendant-eof", "history": 0,
+        "command": ["python3", "-c", child, str(ready), str(release)],
+    })
+    uri = created["uri"]
+    sessions.append(uri)
+    pidfd = None
+    try:
+        deadline = time.monotonic() + 5
+        pending = None
+        while time.monotonic() < deadline:
+            if ready.exists() and pidfd is None:
+                pidfd = os.pidfd_open(int(ready.read_text()))
+            pending = operator.tool("session_read", {
+                "session": uri, "expected_session": session_identity(created),
+            })
+            if pending["output"] == "PREFIX" and pending["exit_code"] == 7:
+                break
+            time.sleep(.01)
+        assert pending is not None and pending["output"] == "PREFIX", pending
+        assert not pending["running"] and pending["exit_code"] == 7, pending
+        assert not pending["has_more"] and not pending["output_eof"], pending
+        release.touch()
+        def read_guarded(name, arguments):
+            return operator.tool(name, {**arguments, "expected_session": session_identity(created)})
+        suffix, cursor, finished = collect(
+            read_guarded, uri, cursor=pending["next_cursor"], byte_limit=2, exited=True)
+        assert suffix == "SUFFIX" and cursor == 12, (suffix, cursor, finished)
+        assert finished["output_eof"] and not finished["has_more"] and finished["exit_code"] == 7, finished
+        operator.tool("session_close", {"session": uri})
+        sessions.remove(uri)
+        return {
+            "status": "passed",
+            "after_direct_child_exit": {
+                key: pending[key] for key in ("output", "running", "exit_code", "has_more", "output_eof")
+            },
+            "later_descendant_output": suffix,
+            "final_cursor": cursor,
+            "final_output_eof": finished["output_eof"],
+        }
+    finally:
+        release.touch(exist_ok=True)
+        if pidfd is not None:
+            if not select.select([pidfd], [], [], 2)[0]:
+                signal.pidfd_send_signal(pidfd, signal.SIGKILL)
+                select.select([pidfd], [], [], 2)
+            os.close(pidfd)
+
+
 def main(binary):
     os.environ["ZTTY_SOCKET"] = f"@ztty-mcp-sessions-{os.getpid()}"
     os.environ["ZTTY_MCP_SMOKE"] = f"真实-{os.getpid()}-🛰"
@@ -272,6 +492,10 @@ def main(binary):
             stdio.tool("session_close",{"session":marked["uri"]})
             sessions.remove(marked["uri"])
             report["bounded_command_reads_across_observers"]="passed"
+            report["guarded_output_resume"] = guarded_output_resume(
+                binary, stdio, http, sid, sessions)
+            report["descendant_output_eof"] = descendant_output_eof(
+                stdio, directory, sessions)
 
             stdio.close()
             stdio = None

@@ -197,7 +197,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, default=Path(__file__).resolve().parents[1] / "shell/ztty.bash")
     parser.add_argument("--bash", default=shutil.which("bash"))
-    parser.add_argument("--output", type=Path, default=Path("artifacts/shell-recovery-20261118/bash.json"))
+    parser.add_argument("--output", type=Path, default=Path("artifacts/bash-integration/report.json"))
     args = parser.parse_args()
     source = args.source.resolve(strict=True)
     binary = str(Path(args.bash).resolve(strict=True))
