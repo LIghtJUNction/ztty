@@ -15,6 +15,7 @@ mod darwin {
     use std::ffi::{CStr, CString};
     use std::fs::{self, File, OpenOptions};
     use std::io::Write;
+    use std::ops::{Deref, DerefMut};
     use std::os::fd::AsRawFd;
     use std::os::unix::ffi::OsStrExt;
     use std::os::unix::fs::PermissionsExt;
@@ -41,16 +42,72 @@ mod darwin {
         fn write(fd: i32, bytes: *const std::ffi::c_void, length: usize) -> isize;
     }
 
-    struct Child(Pty);
+    static CLEANUP_FAILED: AtomicBool = AtomicBool::new(false);
+
+    fn diagnostic(message: std::fmt::Arguments<'_>) {
+        // Closed-stdio subtests intentionally close stderr. Diagnostic output
+        // must not reopen that slot or panic when the write is unavailable.
+        let _ = writeln!(std::io::stderr(), "{message}");
+    }
+
+    struct Child(Option<Pty>);
+
+    impl Deref for Child {
+        type Target = Pty;
+
+        fn deref(&self) -> &Self::Target {
+            self.0.as_ref().unwrap()
+        }
+    }
+
+    impl DerefMut for Child {
+        fn deref_mut(&mut self) -> &mut Self::Target {
+            self.0.as_mut().unwrap()
+        }
+    }
 
     impl Drop for Child {
         fn drop(&mut self) {
-            if self.0.status().is_none() {
-                let _ = self.0.hangup();
-                if self.0.wait_timeout(200).ok().flatten().is_none() {
-                    unsafe { kill(self.0.pid(), 9) };
-                    let _ = self.0.wait();
+            let Some(mut pty) = self.0.take() else {
+                return;
+            };
+            if pty.status().is_some() {
+                return;
+            }
+            let pid = pty.pid();
+            let _ = pty.hangup();
+            let deadline = Instant::now() + Duration::from_millis(200);
+            let mut buffer = [0_u8; 4096];
+            loop {
+                let _ = pty.read(&mut buffer);
+                if pty.wait_timeout(0).ok().flatten().is_some() {
+                    return;
                 }
+                if Instant::now() >= deadline {
+                    break;
+                }
+                thread::sleep(Duration::from_millis(1));
+            }
+            unsafe { kill(pid, 9) };
+            // Closing our master also releases any slave-close output drain.
+            // Pty::drop may reap already, so ECHILD below is an owned success.
+            drop(pty);
+            let deadline = Instant::now() + Duration::from_secs(2);
+            loop {
+                let mut status = 0;
+                let result = unsafe { waitpid(pid, &mut status, 1) };
+                let errno = if result < 0 { unsafe { *__error() } } else { 0 };
+                if result == pid || result == -1 && errno == 10 {
+                    return;
+                }
+                if result < 0 && errno != 4 || Instant::now() >= deadline {
+                    CLEANUP_FAILED.store(true, Ordering::Release);
+                    diagnostic(format_args!(
+                        "darwin_spawn: cleanup failed for owned child pid={pid}: waitpid={result}, errno={errno}"
+                    ));
+                    return;
+                }
+                thread::sleep(Duration::from_millis(1));
             }
         }
     }
@@ -151,10 +208,14 @@ mod darwin {
         assert_eq!(unsafe { *__error() }, 10, "expected ECHILD");
     }
 
-    fn collect_until(pty: &Pty, marker: &[u8]) -> Vec<u8> {
+    fn collect_until(pty: &Pty, marker: &[u8], out: &mut Vec<u8>) {
         let deadline = Instant::now() + Duration::from_secs(5);
-        let mut out = Vec::new();
         while Instant::now() < deadline {
+            // READY and DONE can arrive in the same read. Retain both rather
+            // than waiting for a marker which has already been consumed.
+            if out.windows(marker.len()).any(|part| part == marker) {
+                return;
+            }
             let mut buffer = [0_u8; 4096];
             match pty.read(&mut buffer) {
                 Ok(0) => break,
@@ -162,7 +223,7 @@ mod darwin {
                     out.extend_from_slice(&buffer[..count]);
                     assert!(out.len() <= 64 * 1024, "unbounded test output");
                     if out.windows(marker.len()).any(|part| part == marker) {
-                        return out;
+                        return;
                     }
                 }
                 Err(error) if error.is_would_block() => thread::sleep(Duration::from_millis(1)),
@@ -170,10 +231,59 @@ mod darwin {
             }
         }
         panic!(
-            "missing {:?} in {:?}",
+            "child pid={} missing {:?} in {:?}",
+            pty.pid(),
             String::from_utf8_lossy(marker),
-            String::from_utf8_lossy(&out)
+            String::from_utf8_lossy(out)
         );
+    }
+
+    fn finish_probe(child: &mut Child, out: &mut Vec<u8>) {
+        // Waiting alone does not service the PTY. Keep consuming output while
+        // checking the same two-second child-exit deadline, including EOF.
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            let mut buffer = [0_u8; 4096];
+            let eof = match child.read(&mut buffer) {
+                Ok(0) => true,
+                Ok(count) => {
+                    out.extend_from_slice(&buffer[..count]);
+                    assert!(out.len() <= 64 * 1024, "unbounded test output");
+                    false
+                }
+                Err(error) if error.is_would_block() => false,
+                Err(error) => panic!("child pid={} final PTY read: {error}", child.pid()),
+            };
+            let status = child.wait_timeout(0).unwrap();
+            if let Some(status) = status
+                && eof
+            {
+                assert!(
+                    out.windows(b"ZPTY_DONE".len())
+                        .any(|part| part == b"ZPTY_DONE"),
+                    "child pid={} exited without DONE: output={:?}",
+                    child.pid(),
+                    String::from_utf8_lossy(out),
+                );
+                assert!(
+                    status.success(),
+                    "child pid={} status {status:?}",
+                    child.pid()
+                );
+                diagnostic(format_args!(
+                    "darwin_spawn: child pid={} phase=exited-and-drained",
+                    child.pid()
+                ));
+                return;
+            }
+            assert!(
+                Instant::now() < deadline,
+                "child pid={} did not exit and drain within 2s: status={status:?}, eof={eof}, output={:?}",
+                child.pid(),
+                String::from_utf8_lossy(out),
+            );
+            thread::sleep(Duration::from_millis(1));
+        }
     }
 
     fn send(pty: &Pty, mut bytes: &[u8]) {
@@ -289,22 +399,26 @@ mod darwin {
             size,
         )
         .unwrap();
-        let mut child = Child(pty);
-        assert!(child.0.fd() > 2);
-        assert_eq!(unsafe { fcntl(child.0.fd(), 1) } & 1, 1);
-        assert_eq!(unsafe { fcntl(child.0.fd(), 3) } & 4, 4);
-        collect_until(&child.0, b"ZPTY_READY");
+        let mut child = Child(Some(pty));
+        assert!(child.fd() > 2);
+        assert_eq!(unsafe { fcntl(child.fd(), 1) } & 1, 1);
+        assert_eq!(unsafe { fcntl(child.fd(), 3) } & 4, 4);
+        diagnostic(format_args!(
+            "darwin_spawn: child pid={} metadata={metadata} phase=spawned",
+            child.pid()
+        ));
+        let mut output = Vec::new();
+        collect_until(&child, b"ZPTY_READY", &mut output);
         if metadata {
-            child.0.resize(Size::new(100, 30)).unwrap();
-            send(&child.0, b"round trip\n");
-            collect_until(&child.0, b"ZPTY_DONE");
+            child.resize(Size::new(100, 30)).unwrap();
+            send(&child, b"round trip\n");
+            collect_until(&child, b"ZPTY_DONE", &mut output);
         }
-        let status = child
-            .0
-            .wait_timeout(2000)
-            .unwrap()
-            .expect("child did not exit");
-        assert!(status.success(), "child status {status:?}");
+        diagnostic(format_args!(
+            "darwin_spawn: child pid={} phase=drain-and-exit deadline_ms=2000",
+            child.pid()
+        ));
+        finish_probe(&mut child, &mut output);
     }
 
     fn expect_error(helper: &CStr, program: &CStr, environment: &[&CStr], errno: i32) {
@@ -317,7 +431,7 @@ mod darwin {
             Size::new(80, 24),
         ) {
             Ok(pty) => {
-                let _cleanup = Child(pty);
+                let _cleanup = Child(Some(pty));
                 panic!("expected spawn error {errno}");
             }
             Err(error) => error,
@@ -439,7 +553,7 @@ mod darwin {
         });
         drop(sentinel);
         checks
-            .push("nine concurrent PTY spawns exclude peer handshakes and a non-CLOEXEC sentinel");
+            .push("nine concurrent PTY spawns drain READY/DONE through EOF, exit, and exclude peer handshakes and a non-CLOEXEC sentinel");
 
         let missing = c_path(&directory.0.join("missing-program"));
         expect_error(&helper, &missing, &[], 2);
@@ -479,11 +593,10 @@ mod darwin {
             Size::new(80, 24),
         )
         .unwrap();
-        let mut child = Child(pty);
-        let master = child.0.fd();
-        child.0.hangup().unwrap();
+        let mut child = Child(Some(pty));
+        let master = child.fd();
+        child.hangup().unwrap();
         let status = child
-            .0
             .wait_timeout(2000)
             .unwrap()
             .expect("SIGHUP child did not exit");
@@ -515,6 +628,10 @@ mod darwin {
         let worker_iterations = workers.ticks.load(Ordering::Relaxed) - ticks_before;
         assert!(worker_iterations > 0);
         drop(workers);
+        assert!(
+            !CLEANUP_FAILED.load(Ordering::Acquire),
+            "owned child cleanup failed"
+        );
         assert_eq!(open_fds(), baseline, "suite leaked descriptors");
         no_children();
         let encoded = checks
