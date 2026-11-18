@@ -180,3 +180,26 @@ pending on the source-pinned native candidate.
 
 The shared core is groundwork for native shared runtime, tabs/splits,
 attach and MCP. Those features are not implemented by this extraction.
+
+
+## Shared workspace layout and action modules
+
+The no_std library now also exports `actions`, `json`, `layout` and
+`workspace_state`. Linux and the layout tests consume these same library
+modules. The four algorithms are unchanged: 32 tabs, 64 panes, workspace
+schema 2, bounded parsing and stable pane identities retain their existing
+behavior. Native frontends can now use this layout implementation without
+compiling private source copies or adding another dependency.
+
+Source `ba7e82e5678e8a5e7cc5735fac76b242bebc492d` passes 202 unit and integration
+tests, six doctests and the eight single-threaded real-PTY checks. Strict
+Clippy, release/no_std, live MCP transport/session/security and the optional
+bare-metal component gate pass; the known zune-png warning remains. The
+actual X11 workspace suite passes all ten checks, including retained PTYs,
+hidden output and failed-resize recovery. This export does not by itself
+add native tabs, shared windows or attach.
+
+[Integrated record](measurements/portable-layout-2026-11-18.json),
+[full gate log](measurements/portable-layout-2026-11-18.log) and
+[workspace GUI evidence](measurements/portable-layout-workspaces-2026-11-18.json)
+record source, binary and report hashes.

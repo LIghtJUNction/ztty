@@ -1,0 +1,32 @@
+{
+  "source_sha": "ba7e82e5678e8a5e7cc5735fac76b242bebc492d",
+  "upstream_layout_commit": "70b2bed074a24fbabcf79afcf6fc97778e6708d7",
+  "full_gate": {
+    "command": "CARGO_BUILD_JOBS=1 ZTTY_BARE_METAL=1 sh tools/check.sh",
+    "exit": 0,
+    "seconds": 18.165,
+    "sha256": "9f56ff22824bf1310897da95d9ba77aacae24bcd2ffe787661522fc49e730e80",
+    "ordinary_rust_tests": 208,
+    "single_thread_real_pty_checks": 8,
+    "unit_and_integration_tests": 202,
+    "doc_tests": 6
+  },
+  "binary_sha256": "851d304858101b46c90388774a0aae40f304b052c48adcca6d37040823a612a9",
+  "binary_bytes": 677936,
+  "gui": {
+    "command": [
+      "python3",
+      "tests/workspaces.py",
+      "--binary",
+      "artifacts/portable-layout-integrated-ztty",
+      "--output",
+      "artifacts/portable-layout-integrated/workspaces.json",
+      "--screenshot",
+      "artifacts/portable-layout-integrated/workspaces.png"
+    ],
+    "exit": 0,
+    "passed": true,
+    "checks": 10,
+    "report_sha256": "25196c0d413b264afb56c7eb87a5563dc1a3e99a55317adf103ff1e34254f55c"
+  }
+}

@@ -4,6 +4,8 @@
 
 ### Added
 
+- Export the common action, JSON, pane-layout and workspace-state modules from the no_std library; Linux and regression tests consume the same implementations.
+
 - Export a shared no_std session library and route Windows/macOS PTY reads, bounded writes and resize commits through it; native runtime acceptance is pending.
 
 - Shared no_std PTY pump and bounded input queue, now used by the Linux broker, with per-read history anchors and PTY-first resize commits.

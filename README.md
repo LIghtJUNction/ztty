@@ -52,7 +52,10 @@ The shell scripts support opt-in Bash, Zsh, Fish and Nushell integration.
 ## Platforms and verification
 
 Shared sessions, attach, and MCP currently use the Linux broker. Native macOS
-and Windows terminals remain available through their platform backends.
+and Windows terminals remain available through their platform backends. The shared
+no_std library now exposes the PTY session core, action decoding, pane layout
+and workspace state; [integration evidence](docs/session-core.md) records
+the verified scope and the remaining native runtime work.
 
 | Platform | Native implementation | Current acceptance status |
 | --- | --- | --- |
