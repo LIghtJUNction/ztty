@@ -1,8 +1,18 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 — 2026-11-18
+
+Release preparation: final-tag acceptance, publication and device installation
+remain pending. Verification entries below describe separate source checkpoints.
 
 ### Added
+
+- Add a temporary Linux **Back to live ↓** control when viewing scrollback.
+  Mark arriving PTY output, keep the inspected rows anchored, and clear the
+  indicator on returning to the bottom. Preserve search/palette input modes,
+  observing-view ownership and PTY dimensions; withhold the control's mouse
+  gesture from the application. Mouse-wheel and Shift+PageUp/PageDown browsing
+  remain available. [Behavior and limits](docs/daily-workflow.md#returning-to-live-output).
 
 - Add the Linux `sessions` action and default `Ctrl+Shift+S` session switcher.
   Filter names, titles and URIs; select with Up/Down and Enter. Focus existing
@@ -34,7 +44,13 @@
 
 - Export the common action, JSON, pane-layout and workspace-state modules from the no_std library; Linux and regression tests consume the same implementations.
 
-- Export a shared no_std session library and route Windows/macOS PTY reads, bounded writes and resize commits through it; Windows x64/ARM64 now pass the native 30-check gate; macOS acceptance is pending.
+- Export a shared no_std session library and route Windows/macOS PTY reads,
+  bounded writes and resize commits through it.
+
+- Add native Windows tabs and split panes, with independent ConPTY children,
+  pane focus, layout changes and preserved frames during synchronized output.
+  Expanded native workspace acceptance is recorded separately from the earlier
+  single-pane image and input gate.
 
 - Shared no_std PTY pump and bounded input queue, now used by the Linux broker, with per-read history anchors and PTY-first resize commits.
 
@@ -43,7 +59,9 @@
 - macOS WindowServer capture and owned-window resize/minimize acceptance, retaining existing PTY checks and recording Screen Recording/Accessibility blockers explicitly.
 - Three-run guarded 1/10-window benchmark evidence and README charts, including measured RSS/PSS/Swap, source hashes, the unmet 10 MiB RSS target and the PTY throughput gap.
 - Linux standalone `--observe` command windows and the `ztty-observer` external-terminal adapter; `close NAME` follows existing input ownership authorization.
-- Linux x86_64/ARM64 release gates now require five real X11/PTY suites with source, executable and display ownership evidence; Windows ARM64 must execute natively.
+- Linux x86_64/ARM64 release gates require six real X11/PTY suites, including
+  the session switcher, with source, executable and display ownership evidence;
+  Windows ARM64 must execute natively.
 - Versioned Linux workspace snapshots restore live tabs, split ratios, focus and geometry without replacing PTYs; bounded schema/identity checks reject invalid layouts before UI mutation.
 
 - Linux workspace tabs and horizontal/vertical split panes in the shared broker, with pane focus, swap, resizing, maximize/restore and moves between native windows.
@@ -74,6 +92,16 @@
   desktop launcher using the absolute installed path. Running processes keep
   their loaded executable.
 
+- Point the AUR package's desktop launcher at `/usr/bin/ztty`, and align
+  installer/template `StartupWMClass` with the native X11 class `Ztty`.
+
+- Defer and coalesce Windows resize messages received during nested callbacks.
+  Preserve the mutable-state guard, reread the latest client dimensions from
+  the outer loop, and retain requests arriving during a resize for the next turn.
+
+- Send a real Enter key when launching Windows workspace test children; keep
+  Unicode text packets for command text and read UTF-8 evidence explicitly.
+
 - Match equivalent numeric MCP request IDs exactly for pending-request rejection
   and cancellation over stdio and HTTP. Preserve original response tokens,
   string/number separation and arbitrary-size integers without float rounding
@@ -84,9 +112,24 @@
 - Avoid clearing Unicode target cells immediately before overwriting them; preserve wide-cell boundary repair, insertion, metadata and wrapping, with five new core regressions.
 - Integrate main-branch throughput optimizations with production workspaces, palette provenance and X11 overlays; fix independent benchmark broker selection and runtime A/B window counts.
 
-- Make macOS helper activation-policy setup idempotent and retain before/after state before failure; the actual prohibited policy remains required. Native execution is pending.
+- Make macOS helper activation-policy setup idempotent and retain before/after
+  state before failure; the observed prohibited policy remains required before
+  WindowServer acceptance.
 
-- Call the macOS helper activation-policy method correctly after both native compilers rejected property syntax; preserve the fifth-run failure evidence and require a native rerun.
+- Call the macOS helper activation-policy method correctly after both native
+  compilers rejected property syntax, retaining the earlier failure evidence.
+
+- Drain Darwin PTY probe output while waiting for child exit so a full output
+  buffer cannot stall the threaded-spawn test; retain probe phase and child-PID
+  evidence when a native attempt fails.
+
+- Check a Darwin helper's execute access using effective user/group identity
+  before opening a PTY or spawning it. Missing and non-executable helper paths
+  return their original errors without creating a child; the access check does
+  not make filesystem changes between checking and execution atomic.
+
+- Use sRGB window backing on macOS so native RGB image samples retain their
+  protocol colors through the captured window surface.
 
 - Isolate the Windows CI pixel gate on its own visible desktop and owned Job, with explicit handle inheritance, secure-desktop refusal and verified restoration; verified with all 30 checks and desktop restoration on native Windows x64 and ARM64.
 
@@ -118,20 +161,59 @@
 
 ### Verification
 
+- Preserve the failed Windows-only retry at source `dc43870` in
+  [run 44300272576](https://github.com/LIghtJUNction/ztty/actions/runs/44300272576).
+  Both native architectures completed 22 of 30 base checks and 12 visible-pixel
+  checks before failing `resize_restores_visible_image`. Workspace checks were
+  not reached. Application, Job and desktop cleanup passed on both runners;
+  native acceptance remains open.
+
+- Extend the Linux daily-workflow harness to 18 groups with real mouse return,
+  new-output anchoring, search/palette coexistence and read-only control checks.
+  All 18 groups passed on the development device at harness source `aef55d9`,
+  using the `3730b28` executable; the earlier candidate's passing counts
+  do not cover this addition.
+
+- Record source `2ac46e2` in [candidate run 44298970562](https://github.com/LIghtJUNction/ztty/actions/runs/44298970562):
+  both macOS architectures passed 8 threaded-spawn checks, 24 native checks,
+  13 stages and 10 PNG captures each, with application exit 0 and no owned
+  processes remaining. Linux x86_64/ARM64 passed all six GUI suites. Windows
+  x64 failed image restoration; ARM64 passed the initial 30 native checks but
+  failed the new workspace child launch. These results do not establish
+  final-tag acceptance or installation.
+
+- Record source `a045871` on macOS Apple Silicon: all 8 threaded-spawn checks,
+  24 native checks, 13 gate stages and 10 PNG captures passed, with no owned
+  processes left behind. The same run's Intel job failed in threaded-spawn
+  acceptance before its native window gate. [Candidate run 44293476047](https://github.com/LIghtJUNction/ztty/actions/runs/44293476047)
+  is scoped to macOS and does not establish final-tag acceptance; IME/keyboard
+  input and physical display latency remain unmeasured.
+
+- Preserve the failed `bfd2732` [native retry](https://github.com/LIghtJUNction/ztty/actions/runs/44295578969):
+  Intel passed all 8 threaded-spawn checks but failed the first native RGB check
+  with red `[255, 0, 3]` against `[255, 0, 0]`; ARM failed a child-cleanup
+  assertion after its concurrent probes, before window acceptance. Neither
+  architecture produced an accepted build in that retry.
+
 - Validate the shell/resume candidate with 225 Rust tests, 6 doctests, four real Shell integrations, 11 Bash PTY checks, 17 workspace GUI checks and three MCP suites. The Linux local gate now runs Bash PTY acceptance; see [the source-bound report](docs/shell-resume-2026-11-18.md).
 
 - Record the 2026-11-18 integrated candidate: 220 Rust unit/integration tests, 6 doctests, 61 real Linux GUI checks, 3 MCP suites and 38 Python benchmark regressions; retain fixed-CPU and unpinned Unicode microbenchmarks with all samples and scope limits. See [the integration report](docs/integration-unicode-2026-11-18.md).
 
 - The integrated shared-core/repaint candidate passes 208 regular Rust tests, eight real PTY checks and five Xvfb suites; native Linux candidates now also require the repaint pixel/fairness/idle checks.
 
-- Shared core passes eight single-threaded real-PTY checks, the integrated Rust/Clippy/MCP/no_std gates, daily GUI 15 and workspace GUI 10.
+- The earlier shared-core checkpoint passed eight single-threaded real-PTY checks,
+  the integrated Rust/Clippy/MCP/no_std gates, 15 daily GUI groups and 10 workspace
+  GUI groups.
 
 - Fourth source-pinned native run accepts Linux x86_64/ARM64 and Windows x86_64 (30 checks plus cleanup); preserves Windows ARM64 occlusion and both macOS helper initialization failures with all artifact hashes.
 - Bounded repaint passes 70 zterm and 6 scheduling tests, 7 real X11/PTY regressions and the four existing Linux suites (42 checks). Three fixed-binary A/B pairs measured median logical throughput 18.88 → 133.01 MiB/s with identical final pixels; scope, variation and the pending per-hold snapshot behavior are recorded in [the report](docs/benchmarks/repaint-ab-2026-11-18.md).
-- Final local gates pass 170 Rust unit/integration/documentation tests, strict Clippy, MCP transport/session/security tests and bare-metal checks; the zune-png bare-metal SIMD future-compatibility warning is retained in the evidence.
-- Real ssmcp relay integration passes three native commands and ten checks, including window reuse and reopening; daily Linux GUI coverage now has fourteen checks.
-- Windows native gates now exercise six Sixel pixel/recovery groups and save owned-window PNG evidence; execution on x64 and ARM64 is still required.
+- Earlier local gates passed 170 Rust unit/integration/documentation tests, strict Clippy, MCP transport/session/security tests and bare-metal checks; the zune-png bare-metal SIMD future-compatibility warning is retained in the evidence.
+- The earlier real ssmcp relay integration passed three native commands and ten checks, including window reuse and reopening; its daily Linux GUI harness had fourteen checks.
+- Windows native gates exercise six Sixel pixel/recovery groups and save
+  owned-window PNG evidence; source `7a1d06b` accepted both native x64 and ARM64.
+  Each release still requires those gates against its own tagged source.
 - Twenty-seven real X11/PTY vectors cover legacy keyboard bytes, four wheel directions, extra buttons, press ownership, focus transitions, X10 mode and custom bindings. Button 11 uses explicitly recorded synthetic X11 events because the virtual pointer exposes ten buttons.
 - Six layout tests and an isolated real X11/PTY acceptance script cover geometry, actual keyboard routing, hidden output, detach/reattach and ownership.
-- Native macOS/Windows workspace UI and multi-view GUI observation remain pending.
+- Native Windows workspace acceptance remains open; macOS workspace UI and
+  multi-view GUI observation remain pending.
 - Native macOS/Windows search, command palette and shared MCP runtime are not yet implemented.
