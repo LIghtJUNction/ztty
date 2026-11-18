@@ -48,9 +48,9 @@ and Windows terminals remain available through their platform backends.
 
 | Platform | Native implementation | Current acceptance status |
 | --- | --- | --- |
-| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Current x86_64 candidate: workspaces 10, daily workflow 14, Sixel 10 and 27 exact input vectors passed under guarded Xvfb; ARM64 gate remains open |
-| macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | 8 native session/protocol checks passed on Intel and Apple Silicon; pixel readback and IME/keyboard acceptance remain open |
-| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | 25 native checks passed on x86_64, including six Sixel groups, window pixels and keyboard recovery; ARM64 remains unaccepted |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 05782fc passed four GUI suites and cwd regressions on x86_64 and ARM64 under guarded Xvfb |
+| macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Both architectures passed the original 8 protocol checks plus cwd/config/architecture checks; new pixel gate stopped at window selection |
+| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | x86_64 passed all 30 functional checks but failed harness cleanup; ARM64 visible-pixel acceptance remains blocked |
 
 The macOS and Windows backends use their native APIs. macOS does not require
 X11, and Windows does not require WSL. Cross-target compilation does not establish

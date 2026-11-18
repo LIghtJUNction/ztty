@@ -18,6 +18,7 @@ struct Request: Decodable {
     let action: String
     let pid: Int32?
     let windowID: UInt32?
+    let windowTitle: String?
     let png: String?
     let expectedClientPixels: [Int]?
     let targetClientPixels: [Int]?
@@ -29,6 +30,7 @@ struct Request: Decodable {
     enum CodingKeys: String, CodingKey {
         case action, pid, png, samples, timeout, binary, arguments
         case windowID = "window_id"
+        case windowTitle = "window_title"
         case expectedClientPixels = "expected_client_pixels"
         case targetClientPixels = "target_client_pixels"
     }
@@ -45,6 +47,60 @@ struct GateError: Error, CustomStringConvertible {
 
 func rectJSON(_ rect: CGRect) -> [Double] {
     [Double(rect.minX), Double(rect.minY), Double(rect.width), Double(rect.height)]
+}
+
+// WindowServer may expose menu/auxiliary surfaces under the same app PID.
+// Select the explicitly titled terminal, then keep its WindowID pinned.
+@MainActor
+struct CaptureWindowIdentity {
+    let pid: pid_t
+    let id: CGWindowID
+    let title: String?
+    let layer: Int
+    let onScreen: Bool
+
+    func matches(pid: pid_t, title: String, windowID: CGWindowID?) -> Bool {
+        self.pid == pid && self.title == title
+            && layer == NSWindow.Level.normal.rawValue && onScreen
+            && (windowID == nil || id == windowID)
+    }
+}
+
+@MainActor
+func uniqueCaptureWindow(_ candidates: [CaptureWindowIdentity], pid: pid_t,
+                         title: String, windowID: CGWindowID?) throws -> CGWindowID {
+    guard !title.isEmpty else { throw GateError("missing unique terminal window title") }
+    let matches = candidates.filter { $0.matches(pid: pid, title: title, windowID: windowID) }
+    guard matches.count == 1 else {
+        throw GateError("expected one owned terminal window; PID \(pid), title \(title), WindowID \(String(describing: windowID)), matching \(matches.count) of \(candidates.count) candidates")
+    }
+    return matches[0].id
+}
+
+@MainActor
+func verifyWindowSelection() throws {
+    let title = "ztty-native-selection-fixture"
+    let normal = NSWindow.Level.normal.rawValue
+    let terminal = CaptureWindowIdentity(pid: 21, id: 1, title: title, layer: normal, onScreen: true)
+    let candidates = [
+        terminal,
+        CaptureWindowIdentity(pid: 21, id: 2, title: "menu", layer: normal + 1, onScreen: true),
+        CaptureWindowIdentity(pid: 21, id: 3, title: nil, layer: normal, onScreen: true),
+        CaptureWindowIdentity(pid: 21, id: 4, title: title, layer: normal + 1, onScreen: true),
+        CaptureWindowIdentity(pid: 21, id: 5, title: title, layer: normal, onScreen: false),
+        CaptureWindowIdentity(pid: 21, id: 6, title: "other", layer: normal, onScreen: true),
+        CaptureWindowIdentity(pid: 22, id: 7, title: title, layer: normal, onScreen: true),
+    ]
+    guard try uniqueCaptureWindow(candidates, pid: 21, title: title, windowID: nil) == 1,
+          try uniqueCaptureWindow(candidates, pid: 21, title: title, windowID: 1) == 1,
+          (try? uniqueCaptureWindow(candidates, pid: 21, title: title, windowID: 99)) == nil,
+          (try? uniqueCaptureWindow(Array(candidates.dropFirst()), pid: 21, title: title, windowID: nil)) == nil else {
+        throw GateError("owned terminal window selection failed its auxiliary/PID/visibility/pinned-ID vectors")
+    }
+    let duplicate = CaptureWindowIdentity(pid: 21, id: 8, title: title, layer: normal, onScreen: true)
+    guard (try? uniqueCaptureWindow(candidates + [duplicate], pid: 21, title: title, windowID: nil)) == nil else {
+        throw GateError("ambiguous terminal window selection was incorrectly accepted")
+    }
 }
 
 // The synthetic pattern checks byte ordering and top-down row interpretation.
@@ -134,6 +190,8 @@ final class WindowProbe {
         }
         try verifyPixelLayout()
         report["pixel_layout_vector"] = "passed"
+        try verifyWindowSelection()
+        report["window_selection_vector"] = "passed"
     }
 
     func content() async throws -> SCShareableContent {
@@ -141,28 +199,65 @@ final class WindowProbe {
     }
 
     func ownedWindow(_ content: SCShareableContent) throws -> SCWindow {
-        let windows = content.windows.filter {
-            $0.owningApplication?.processID == ownedPID
-                && (request.windowID == nil || $0.windowID == request.windowID)
+        let windows = content.windows.filter { $0.owningApplication?.processID == ownedPID }
+        let identities = windows.map {
+            CaptureWindowIdentity(pid: ownedPID, id: $0.windowID, title: $0.title,
+                                  layer: $0.windowLayer, onScreen: $0.isOnScreen)
         }
-        guard windows.count == 1 else {
-            throw GateError("expected exactly one owned window; PID \(ownedPID), WindowID \(String(describing: request.windowID)), found \(windows.count)")
+        report["window_candidates"] = zip(windows, identities).map { window, identity in
+            [
+                "pid": ownedPID, "window_id": window.windowID,
+                "title": window.title ?? "<unavailable>", "layer": window.windowLayer,
+                "on_screen": window.isOnScreen, "frame_points": rectJSON(window.frame),
+                "matches_target": identity.matches(
+                    pid: ownedPID, title: request.windowTitle ?? "", windowID: request.windowID),
+            ] as [String: Any]
         }
-        return windows[0]
+        let id = try uniqueCaptureWindow(
+            identities, pid: ownedPID, title: request.windowTitle ?? "", windowID: request.windowID)
+        guard let selected = windows.first(where: { $0.windowID == id }) else {
+            throw GateError("selected terminal WindowID disappeared from the owned inventory")
+        }
+        return selected
     }
 
     func accessibilityWindow() throws -> AXUIElement {
         let app = AXUIElementCreateApplication(ownedPID)
         var value: CFTypeRef?
         let error = AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &value)
-        guard error == .success, let windows = value as? [AXUIElement], windows.count == 1 else {
-            throw GateError("cannot uniquely identify the owned AX window: \(error.rawValue)")
+        guard error == .success, let windows = value as? [AXUIElement],
+              let expectedTitle = request.windowTitle, !expectedTitle.isEmpty else {
+            throw GateError("cannot read the owned AX windows or unique title: \(error.rawValue)")
         }
-        var pid: pid_t = 0
-        guard AXUIElementGetPid(windows[0], &pid) == .success, pid == ownedPID else {
-            throw GateError("AX window ownership does not match the launched process")
+        func stringAttribute(_ window: AXUIElement, _ name: String) -> String? {
+            var value: CFTypeRef?
+            guard AXUIElementCopyAttributeValue(window, name as CFString, &value) == .success else {
+                return nil
+            }
+            return value as? String
         }
-        return windows[0]
+        var matches: [AXUIElement] = []
+        var inventory: [[String: Any]] = []
+        for window in windows {
+            var pid: pid_t = 0
+            let ownerError = AXUIElementGetPid(window, &pid)
+            let title = stringAttribute(window, kAXTitleAttribute)
+            let role = stringAttribute(window, kAXRoleAttribute)
+            let subrole = stringAttribute(window, kAXSubroleAttribute)
+            let match = ownerError == .success && pid == ownedPID && title == expectedTitle
+                && role == kAXWindowRole && subrole == kAXStandardWindowSubrole
+            inventory.append([
+                "pid": pid, "pid_error": ownerError.rawValue,
+                "title": title ?? "<unavailable>", "role": role ?? "<unavailable>",
+                "subrole": subrole ?? "<unavailable>", "matches_target": match,
+            ])
+            if match { matches.append(window) }
+        }
+        report["ax_window_candidates"] = inventory
+        guard matches.count == 1 else {
+            throw GateError("expected one owned standard AX terminal window; matching \(matches.count) of \(windows.count)")
+        }
+        return matches[0]
     }
 
     func set(_ window: AXUIElement, _ attribute: CFString, _ value: CFTypeRef) throws {
@@ -213,6 +308,7 @@ final class WindowProbe {
         }
         report["window"] = [
             "pid": ownedPID, "window_id": window.windowID,
+            "title": window.title ?? "<unavailable>", "layer": window.windowLayer,
             "frame_points": rectJSON(frame), "client_points": rectJSON(client),
             "filter_content_points": rectJSON(filter.contentRect),
             "point_pixel_scale": scale,
@@ -381,7 +477,10 @@ final class WindowProbe {
         if request.action == "preflight" { return }
         if request.action == "invalid_cwd" { try await invalidCwd(); return }
         guard ownedPID > 0 else { throw GateError("missing owned process ID") }
-        report["target"] = ["pid": ownedPID, "window_id": request.windowID ?? 0]
+        guard let title = request.windowTitle, !title.isEmpty else {
+            throw GateError("missing unique terminal window title")
+        }
+        report["target"] = ["pid": ownedPID, "window_id": request.windowID ?? 0, "title": title]
         if request.action == "resize" || request.action == "minimize" || request.action == "restore" {
             let window = try accessibilityWindow()
             if request.action == "resize" {

@@ -156,10 +156,92 @@ type checking passed; it is not native execution. See the
 Apple SDK compilation and the new macOS/Windows native checks still require
 the next actual runner execution.
 
+## Third native run: Linux ARM64 accepted, harness corrections
+
+[Run 44206278093](https://github.com/LIghtJUNction/ztty/actions/runs/44206278093)
+used `05782fc23b23306d61932ad39777407802886548`. It was build-only and
+did not publish a Release.
+
+| Runner | Actual result |
+| --- | --- |
+| Linux x86_64 and ARM64 | Four cwd regressions and all four native GUI suites passed: workspaces 10, daily 14, Sixel 10 and input 27 vectors in eight groups; owned-process cleanup passed |
+| Windows x86_64 | All 30 functional checks, including the five new cwd checks, passed; the gate still failed because it attempted to remove the live process's cwd before shutdown |
+| Windows ARM64 | Native architecture and four early cwd checks passed; all nine attempted positions remained covered by a different full-screen CoreWindow; the same cleanup error then masked the original visibility failure |
+| macOS Intel and ARM64 | Eight original protocol checks, cwd/PWD, relative config, architecture and invalid-cwd checks passed; both permissions were granted; window selection failed before any capture |
+
+Linux ARM64 now verifies both preceding production fixes on the actual
+architecture: the portable cwd handle and the real unwinder's link order.
+The ARM64 workspace and Sixel PNGs were inspected and show intact text,
+padding and image regions. The Windows x86_64 Sixel PNG was also inspected.
+These captures establish the stated software/native window scope; they
+do not measure hardware scanout, IME or input-to-display latency.
+
+### Windows lifecycle and visibility
+
+The former temporary-directory context exited before the outer process
+shutdown. Windows keeps a running process's cwd locked, as documented by
+[SetCurrentDirectory](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setcurrentdirectory).
+The corrected harness closes and waits for its owned process before removing
+the directory. Cleanup errors remain separate from the first failure.
+Five contract tests cover real child-before-directory disposal on success and
+failure, bounded forced shutdown, cleanup errors and failure before launch.
+
+The ARM64 covering window had class `Windows.UI.Core.CoreWindow`, rectangle
+`[0, 0, 1024, 768]`, topmost status and PID 6228; the tested window belonged
+to PID 7288. These facts prove occlusion, not the covering process's purpose.
+The next gate records only executable basenames and read-only desktop names
+or access errors to resolve that remaining question. It does not move,
+close, unlock or switch another window or desktop. Invisible samples retain
+a nonzero blocked result. Independent cwd and protocol checks run before the
+visibility requirement. All 30 existing functional/pixel assertions, their
+color tolerance and the ten-second pixel deadline remain unchanged.
+
+### macOS window identity
+
+Both helpers successfully received `SCShareableContent`, then rejected six
+windows belonging to the same application PID. The last error was
+`expected exactly one owned window ... found 6`; no
+`SCScreenshotManager.captureImage` call or PNG followed. This was a selector
+failure, not evidence of a permission or pixel-rendering failure.
+
+The child now sends a unique OSC 2 title through the actual PTY. The helper
+requires that title, PID, normal window layer and visible state, then pins the
+first accepted WindowID. AX resize/minimize/restore separately require the
+same PID/title and standard-window role. Zero or multiple matching windows
+still fail. Candidate inventories make future failures inspectable. Existing
+colors, geometry, capture method and deadlines remain unchanged.
+
+The original ten Python evidence-contract tests pass. The helper's new pure
+selection vectors and actual window captures still need the next native
+Apple SDK run; they are not counted as completed pixel acceptance.
+
+### Third-run artifacts
+
+GitHub reports the following archive identities. Downloaded Linux ARM64,
+both Windows and both macOS ZIPs and their build-manifest members were
+checked for source, size and SHA-256 before review.
+
+| Artifact | ID | ZIP SHA256 |
+| --- | ---: | --- |
+| Linux x86_64 | 14383752166 | `6c224b66fa80631f0848750a9c01bc61b3e2976b9094c14f4729788dfd0a7e2d` |
+| Linux ARM64 | 14384301394 | `8e2e8f820726f19e7519ebdffa1fb5ec802735a380cc8645cd15beb75fef4845` |
+| Windows x86_64 | 14383244437 | `778280b5cf2b3fc16afe9e8decbe5ba0980d7cd868321e821c8777e6c3928b0b` |
+| Windows ARM64 | 14384425989 | `c93197ffcb1badddda79fb07cfe309b5d04f10b4948fd48dbddd075c9a0b8dec` |
+| macOS Intel | 14384126865 | `546d00bfb2017be157d14d712f7d192c168ac1069d9b9c5efce2376f2e82375d` |
+| macOS ARM64 | 14383398590 | `bb64291c275e18da0122ee019d6cf3f85f4dfdbe25100562edf61d3553356a40` |
+
+[Machine-readable run record](measurements/native-third-run-2026-11-18.json)
+and [local harness checks](measurements/native-gate-repair-2026-11-18.json)
+retain the source and scope. The accepted Linux ARM64 candidate is also
+[available here](https://drive.google.com/file/d/1N_J8iIRLF71ROT_qd5Nh02G_NJe3D_RZ/view);
+the [delivery folder](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa)
+retains separately named failed Windows archives.
+
 ## Remaining release gates
 
-The linker and visible-location corrections need another source-pinned native
-run; re-running either old commit would not test those changes. Native Wayland, real GPU/VRAM, macOS pixels/IME,
+The third run accepted Linux ARM64. Windows cleanup and macOS window selection
+corrections require another source-pinned run; Windows ARM64 visibility remains
+blocked pending the new diagnostics. Native Wayland, real GPU/VRAM, macOS pixels/IME,
 physical input matrices and the macOS/Windows shared-session feature set
 remain incomplete. Apple Developer ID/notarization and Windows signing
 have not been supplied. No full production-release or all-platform
