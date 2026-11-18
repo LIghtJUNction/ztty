@@ -1,0 +1,221 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-19",
+  "timezone": "Asia/Taipei",
+  "status": "experimental draft; final follow-up gates pending",
+  "repository": "https://github.com/LIghtJUNction/ztty",
+  "pull_request": "https://github.com/LIghtJUNction/ztty/pull/11",
+  "core": {
+    "remote_commit": "318a1a41a7667114ce8c913fb3a71a0cb5890858",
+    "local_runtime_commit": "f889d55d9a426073b7eb3baf690349a8449324cb",
+    "tests": {
+      "zterm": 104,
+      "protocol": 13,
+      "doctests": 3
+    },
+    "ordinary_vt_benchmark": {
+      "baseline_source": "19274145e37a591d800f638fe21c2717730b6431",
+      "feature_runtime_source": "f889d55d9a426073b7eb3baf690349a8449324cb",
+      "baseline_binary_sha256": "c2f33287f25aa36da2ab34fcafd0c3dcac39d4292ceccc1865265f81b706d19f",
+      "feature_binary_sha256": "7507199ca751e07ebf25a98bc10bceb01b3ab216ee6a75d61e0587f8f88d193e",
+      "harness_sha256": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+      "cpu_affinity": 23,
+      "paired_runs": 5,
+      "summary": {
+        "ascii_mib_s": {
+          "baseline": {
+            "median": 105.957,
+            "min": 72.947,
+            "max": 118.469
+          },
+          "feature": {
+            "median": 101.288,
+            "min": 76.523,
+            "max": 106.647
+          },
+          "change_percent": -4.407
+        },
+        "ascii_full_history_mib_s": {
+          "baseline": {
+            "median": 69.557,
+            "min": 50.603,
+            "max": 77.616
+          },
+          "feature": {
+            "median": 68.306,
+            "min": 59.781,
+            "max": 76.101
+          },
+          "change_percent": -1.799
+        },
+        "sgr_mib_s": {
+          "baseline": {
+            "median": 54.763,
+            "min": 49.075,
+            "max": 73.686
+          },
+          "feature": {
+            "median": 73.919,
+            "min": 62.446,
+            "max": 80.286
+          },
+          "change_percent": 34.98
+        },
+        "unicode_mib_s": {
+          "baseline": {
+            "median": 50.704,
+            "min": 47.91,
+            "max": 53.898
+          },
+          "feature": {
+            "median": 52.017,
+            "min": 49.579,
+            "max": 61.994
+          },
+          "change_percent": 2.59
+        },
+        "initial_core_heap_bytes": {
+          "baseline": {
+            "median": 107932,
+            "min": 107932,
+            "max": 107932
+          },
+          "feature": {
+            "median": 107932,
+            "min": 107932,
+            "max": 107932
+          },
+          "change_percent": 0
+        },
+        "steady_state_allocations": {
+          "baseline": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "feature": {
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "change_percent": null
+        },
+        "edit_ns": {
+          "p50": {
+            "baseline": 114,
+            "feature": 96
+          },
+          "p95": {
+            "baseline": 128,
+            "feature": 102
+          },
+          "p99": {
+            "baseline": 140,
+            "feature": 104
+          },
+          "allocations": {
+            "baseline": 0,
+            "feature": 0
+          }
+        },
+        "burst_1024_ns": {
+          "p50": {
+            "baseline": 7167,
+            "feature": 6547
+          },
+          "p95": {
+            "baseline": 8759,
+            "feature": 7964
+          },
+          "p99": {
+            "baseline": 10119,
+            "feature": 8546
+          },
+          "allocations": {
+            "baseline": 0,
+            "feature": 0
+          }
+        }
+      },
+      "samples": 10,
+      "seconds": 58.37007689476013,
+      "postprocessing_note": "All 10 raw runs completed; a local Python name-shadowing error in summary calculation was corrected from retained raw runs. No samples were rerun or discarded.",
+      "scope": "Parser and terminal state only. Shared-host variance is high. Does not measure PTY, image decoding, native layout, display latency, or model latency."
+    }
+  },
+  "host": {
+    "remote_commit": "280b1d27034fece7fb308c3f05e97c714fd44e6f",
+    "local_source_commit": "91641ff27fd823e79ba9b8f4abd387e5140a38a4",
+    "library_tests_passed": 9,
+    "first_native_gui_groups_passed": 18,
+    "image_reference_count": 2,
+    "xres_shared_image_pixmap_bytes": 2048,
+    "screenshot_sha256": "3a806b9ae49af76a2e38e5962304cad6bfab297b7dcae65077db1e4a1d0fb8d4",
+    "dsr_barriers": {
+      "samples": 24,
+      "median_ms": 0.177,
+      "max_ms": 2.312,
+      "scope": "PTY/DSR synchronization barrier; not display latency"
+    }
+  },
+  "protocol_baseline": {
+    "samples": 5,
+    "cpu_affinity": 23,
+    "cpu": "Intel Core i9-12900HX",
+    "rustc": "1.100",
+    "binary_sha256": "6fbecfc9cf68fa6d70f229eaa702f0dc3fb73ad366465722221d9df6f441e0f5",
+    "create_and_drop_256_nodes": {
+      "median_us": 83.942,
+      "range_us": [
+        78.657,
+        93.461
+      ],
+      "allocations": 258,
+      "reallocations": 12,
+      "requested_bytes": 138461
+    },
+    "update_one_progress_of_256": {
+      "median_us": 5.918,
+      "range_us": [
+        5.324,
+        6.615
+      ],
+      "allocations": 3,
+      "requested_bytes": 1009
+    },
+    "capabilities_parse": {
+      "median_ns": 118.51,
+      "allocations": 0
+    },
+    "oversized_length_rejection": {
+      "median_ns": 3.07,
+      "allocations": 0
+    },
+    "image_reference_scene": {
+      "median_ns": 634.05,
+      "allocations": 3,
+      "requested_bytes": 999
+    },
+    "warm_fragment_collection": {
+      "median_ns": 850.1
+    },
+    "limits": "Allocator hooks are included. Requested allocation bytes are not live heap or RSS. No full-render or competitor ranking."
+  },
+  "pending": {
+    "numeric_progress_fast_path": {
+      "regressions_passed": 18,
+      "matched_performance_measurement": "not yet observed",
+      "source_published": false
+    },
+    "host_followups": [
+      "strict glyph clipping",
+      "cross-view pointer ownership",
+      "outside-window release recovery",
+      "extended-button motion policy",
+      "producer cleanup"
+    ],
+    "host_final_build_and_gui": "not yet observed",
+    "formal_0_3_1": "separate stable release; ZUI excluded",
+    "environment": "ssmcp code_mode currently reports missing runner; list/collaboration available, last build completion not readable"
+  }
+}
