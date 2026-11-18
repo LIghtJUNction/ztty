@@ -2058,8 +2058,6 @@ impl App {
         } else {
             (0, 0)
         };
-        let mut paint: ffi::PaintStruct = unsafe { core::mem::zeroed() };
-        let dc = unsafe { ffi::BeginPaint(self.hwnd, &mut paint) };
         if self.full_redraw {
             unsafe {
                 ffi::GdiFlush();
@@ -2105,6 +2103,10 @@ impl App {
             }
         }
         self.full_redraw = false;
+        // Prepare the retained frame before acquiring the window DC. Keep its
+        // lifetime limited to presentation and the existing opt-in diagnostics.
+        let mut paint: ffi::PaintStruct = unsafe { core::mem::zeroed() };
+        let dc = unsafe { ffi::BeginPaint(self.hwnd, &mut paint) };
         let diagnostic_sample = (events.paint_diagnostics
             && !dc.is_null()
             && self.surface.width > 0
