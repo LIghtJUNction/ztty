@@ -31,7 +31,7 @@ Linux validation of the test vectors does not establish Win32/ConPTY behavior.
 
 Both Linux jobs run `tests/linux_native.py` against a clean, pinned checkout
 and the freshly built ELF. The gate runs workspace restore, daily workflow,
-Sixel pixel and extended-input suites on owned Xvfb displays; it records the
+Sixel pixels, extended input and bounded-repaint suites on owned Xvfb displays; it records the
 binary, test and helper hashes and checks process cleanup. These are software
 X11 checks, not native Wayland, GPU or physical input-device acceptance.
 The gate's ten failure-path/packaging tests pass locally. Native Linux also

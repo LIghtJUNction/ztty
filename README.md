@@ -26,6 +26,14 @@ recorded pre-graphics eight-window comparison, total ztty PSS fell from 47.021 t
 including the waiting launchers. The single-window case rose by 0.539 MiB.
 See [measurement conditions and graphics-memory accounting](docs/performance.md#multiple-window-memory).
 
+Linux continuous PTY output now uses an 8 ms redraw batching budget while keeping
+parsing and interaction active. A fixed-binary, one-window Xvfb A/B measured
+median logical PTY throughput of 18.88 → 133.01 MiB/s, with identical final
+pixels; the three after samples varied from 130.97 to 278.57 MiB/s. See the
+[raw samples, final-frame checks and limits](docs/benchmarks/repaint-ab-2026-11-18.md).
+This is a scoped scheduling result; hardware display latency and new multi-terminal
+memory/performance comparisons remain unmeasured.
+
 The long-term goal is to exceed Kitty and Ghostty in responsiveness and memory
 efficiency. Current measurements, their scope, and remaining work are documented
 in [the performance report](docs/performance.md). Linux remains the first

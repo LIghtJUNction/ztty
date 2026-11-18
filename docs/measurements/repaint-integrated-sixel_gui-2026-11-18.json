@@ -1,0 +1,167 @@
+{
+  "schema": 1,
+  "ok": true,
+  "timestamp_utc": "2026-11-18T01:34:22.543225+00:00",
+  "platform": "Linux-7.3.4-arch1-1-x86_64-with-glibc2.44",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/repaint-integrated-ztty",
+  "binary_sha256": "e8b64de484350ddd3c879ceac5b82cb5a1f06b7f2ff15e906bb136e15ce897db",
+  "test_sha256": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+  "checks": [
+    {
+      "name": "persistent_pty_observer_without_focus",
+      "passed": true
+    },
+    {
+      "name": "rgb_blocks_320x180",
+      "passed": true,
+      "pixels": 57600,
+      "rgb_sha256": "1e641a1a38bce25498258f6cea6be3c18e8306b02cdeeaeaea9280b5332d8a21"
+    },
+    {
+      "name": "image_preserved_after_operator_resize",
+      "passed": true,
+      "pixels": 57600,
+      "rgb_sha256": "1e641a1a38bce25498258f6cea6be3c18e8306b02cdeeaeaea9280b5332d8a21"
+    },
+    {
+      "name": "transparent_sixel_preserves_underlying_image",
+      "passed": true,
+      "pixels": 2304,
+      "rgb_sha256": "4eb02e3caff1d1d4a993fb1bc3416f229c0be8f2a7d8de854bc589a45a3c3769"
+    },
+    {
+      "name": "opaque_sixel_uses_current_background",
+      "passed": true,
+      "pixels": 2304,
+      "rgb_sha256": "ada6bdf8a53351f48791d10efbd7ed23e655e85a3be969672da31760c9b11890"
+    },
+    {
+      "name": "erase_display_releases_visible_sixels",
+      "passed": true,
+      "pixels": 57600,
+      "rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b"
+    },
+    {
+      "name": "oversized_sixel_rejected_and_text_recovers",
+      "passed": true,
+      "pixels": 57600,
+      "rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b"
+    },
+    {
+      "name": "unterminated_sixel_is_not_presented",
+      "passed": true,
+      "pixels": 57600,
+      "rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b"
+    },
+    {
+      "name": "cancelled_sixel_is_not_presented",
+      "passed": true,
+      "pixels": 57600,
+      "rgb_sha256": "53853188f83a941e2f45ec1383293ae935106c5721918079000dcb2254fc550b"
+    },
+    {
+      "name": "valid_image_after_rejection_and_cancellation",
+      "passed": true,
+      "pixels": 57600,
+      "rgb_sha256": "1e641a1a38bce25498258f6cea6be3c18e8306b02cdeeaeaea9280b5332d8a21"
+    }
+  ],
+  "display_helper_sha256": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+  "source_snapshot_sha256": {
+    "crates/zgraphics/src/lib.rs": "6de28c07f898b929c5fc292ca6c9b86e332d5763afb4ea2746d0e2fd8d7acdae",
+    "crates/zgraphics/src/sixel.rs": "94d893643d8147b3e98f5ad8b4d4c5e23366d106c6ff0077117a18bdd073c41f",
+    "crates/zterm/src/terminal.rs": "5e71d256da42d333a97299336d4ae0119f4df7088ea12bcffe7b54e8b1f966a8",
+    "src/session.rs": "917548323adf009e3ae5f1f8b2959c538f8631539fdd05b2dfd693fcec33d1db",
+    "src/x11.rs": "587410686c51358e759310b69061113c62ed7eb953c01c5195cf5a0e96853825"
+  },
+  "source_snapshot_note": "Checkout hashes at test start; match binary identity to the build log independently.",
+  "input_transport": "MCP stdio operator to real PTY",
+  "attachment": "observe",
+  "screenshot_method": "XGetImage of owned native window",
+  "limitations": [
+    "Xvfb verifies X11 rendering, not native Wayland or GPU scanout.",
+    "Existing-display screenshots capture X11 client pixels, not compositor scanout timing.",
+    "No macOS or Windows execution is claimed."
+  ],
+  "source_git": {
+    "commit": "a790749907362f975702683e72724672eec06811",
+    "tracked_changes": [
+      "M  CHANGELOG.md",
+      "M  README.md",
+      "M  README.zh-CN.md",
+      "M  crates/zterm/src/terminal.rs",
+      "M  crates/zterm/src/tests.rs",
+      "A  docs/benchmarks/repaint-ab-2026-11-18-collector.py",
+      "A  docs/benchmarks/repaint-ab-2026-11-18.json",
+      "AM docs/benchmarks/repaint-ab-2026-11-18.md",
+      "A  docs/benchmarks/repaint-ab-2026-11-18.png",
+      "A  docs/benchmarks/repaint-gui-2026-11-18.json",
+      "A  docs/benchmarks/repaint-linux-native-2026-11-18.json",
+      "A  docs/benchmarks/repaint-x11-diagnostic-2026-11-18.json",
+      "M  src/main.rs",
+      "A  src/repaint.rs",
+      "M  src/session.rs",
+      " M tests/linux_native.py",
+      " M tests/linux_native_test.py",
+      "A  tests/repaint_gui.py",
+      "A  tests/repaint_schedule.rs"
+    ]
+  },
+  "desktop": {
+    "kind": "private Xvfb/X11",
+    "display": ":18248",
+    "pid": 3934685,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X18248",
+        "inode": 76262413,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X18248",
+        "inode": 76262412,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "session": {
+    "uri": "ztty://mcp/stdio/sixel-native-pixels",
+    "broker_pid": 3934693,
+    "pty_pid": 3934694
+  },
+  "cell_pixels": [
+    10,
+    25
+  ],
+  "primary_da": [
+    62,
+    4
+  ],
+  "resize": {
+    "before": [
+      848,
+      798
+    ],
+    "after": [
+      948,
+      848
+    ],
+    "pty": [
+      90,
+      32
+    ]
+  },
+  "screenshot": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/production-worktree/artifacts/repaint-integrated/sixel_gui/screenshot.png",
+    "width": 948,
+    "height": 848,
+    "sha256": "aa64fca868aeca8b1f23b9fe34b39d61addefd77cb3ee7c710c1e5c535435d75"
+  },
+  "stderr_tail": "",
+  "cleanup_errors": []
+}

@@ -1,0 +1,60 @@
+{
+  "base_sha": "a790749907362f975702683e72724672eec06811",
+  "original_repaint_commit": "60c672aa6ee6dc79ba44182f1dd6079feced9a5c",
+  "core_integration_commit": "ce513a27159f424aa7654448f0889610a0040d78",
+  "source_sha256": {
+    "crates/zterm/src/terminal.rs": "5e71d256da42d333a97299336d4ae0119f4df7088ea12bcffe7b54e8b1f966a8",
+    "crates/zterm/src/tests.rs": "45168498254085b0d0674cb7d186583213062dfb694f50f91d7a4776ad5609ca",
+    "src/main.rs": "afd9e43ffa373dd5779e3ae8fc565598dfbe6b3d839917784f659a558c9dd6f5",
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "917548323adf009e3ae5f1f8b2959c538f8631539fdd05b2dfd693fcec33d1db",
+    "tests/linux_native.py": "3ba81816326877026367bc8dba98293e252c82d3cc64227e6dca27a5c352784e",
+    "tests/linux_native_test.py": "b92dec9ff5048eb09e5e5e255cb168cf8cfc9c6b641d38166de0357bf09b47c7",
+    "tests/repaint_gui.py": "b70319eb2eb87ccc9890bde005b1e4bf22af716426c35e77862cebe6daef7050",
+    "tests/repaint_schedule.rs": "c8527716f54c1baadd5ff68588ef82967c2b2d31672529c1e45f71a3caba7cc2"
+  },
+  "binary_sha256": "e8b64de484350ddd3c879ceac5b82cb5a1f06b7f2ff15e906bb136e15ce897db",
+  "binary_bytes": 679784,
+  "full_gate": {
+    "command": "CARGO_BUILD_JOBS=1 ZTTY_BARE_METAL=1 sh tools/check.sh",
+    "exit": 0,
+    "ordinary_rust_tests": 208,
+    "single_thread_real_pty_checks": 8,
+    "sha256": "dd1815a56f59c6a4af9d8cac49a966f8c176cf1219f86a550631ffa1bc5838f5"
+  },
+  "linux_native_contracts": 10,
+  "gui": {
+    "workspaces": {
+      "passed": true,
+      "checks": 10,
+      "report_sha256": "953266c66ed6a248fb2c05932fd33c07761a99b81dcc65ae5565e33829071a39"
+    },
+    "daily_workflow": {
+      "passed": true,
+      "checks": 15,
+      "report_sha256": "66f3453818983a46d3521189d28b7112251af05947b0e95f461009a75f6ae1e6"
+    },
+    "sixel_gui": {
+      "passed": true,
+      "checks": 10,
+      "report_sha256": "8354e8d45d5acf432f4df42432cffdab2bfb10da93a7ba4efcab54554cdee39d"
+    },
+    "input_gui": {
+      "passed": true,
+      "checks": 8,
+      "report_sha256": "0661488b48f8c5b08ff1dbdaa0f49a6deea40c131ab28ffecfeb1a6d57ce1cdc"
+    },
+    "repaint_gui": {
+      "passed": true,
+      "checks": 7,
+      "report_sha256": "52455752e26c0054ecbbcacb4f1c145b8776fbd28fdb5b9ffa2b116b431e72fe"
+    }
+  },
+  "scope": "private Xvfb software pixels; no physical input-to-display or hardware display latency measurement",
+  "bare_metal_warning": "existing zune-png future compatibility warning retained",
+  "ab_archive": {
+    "sha256": "093ab9f08017c374e2e6b6c51fbe35ccdd389ff784a3e4045c5c372d4b3fbf01",
+    "bytes": 1411169,
+    "url": "https://drive.google.com/file/d/1SULsM0Y8e1t-MfV8nb-VKkw1e76-9Uwd/view"
+  }
+}

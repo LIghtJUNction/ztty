@@ -630,6 +630,7 @@ impl Terminal {
     }
     pub fn clear_dirty(&mut self) {
         self.state.screen.dirty.fill(false);
+        self.state.sync_commit_pending = false;
     }
     pub fn mark_all_dirty(&mut self) {
         self.state.screen.mark_all();
@@ -650,9 +651,17 @@ impl Terminal {
             .get(id as usize - 1)
             .map(|link| link.uri.as_str())
     }
+    /// Whether a synchronized frame ended since the frontend last cleared damage.
+    ///
+    /// This remains set when begin/end arrive in the same PTY chunk. Frontends
+    /// still honor an active synchronized-output mode before presenting.
+    pub fn sync_commit_pending(&self) -> bool {
+        self.state.sync_commit_pending
+    }
+
     /// A frontend may end a stalled synchronized frame after a documented timeout.
     pub fn force_end_sync(&mut self) {
-        self.state.modes.synchronized_output = false;
+        self.state.set_mode(true, 2026, false);
     }
 }
 
@@ -691,6 +700,7 @@ struct State {
     shell: crate::shell::ShellIntegration,
     style: Style,
     modes: Modes,
+    sync_commit_pending: bool,
     autowrap: bool,
     insert: bool,
     newline: bool,
@@ -734,6 +744,7 @@ impl State {
             shell: crate::shell::ShellIntegration::default(),
             style: theme.style(),
             modes: Modes::default(),
+            sync_commit_pending: false,
             autowrap: true,
             insert: false,
             newline: false,
@@ -1328,7 +1339,10 @@ impl State {
             1004 => self.modes.focus_events = enabled,
             1006 => self.modes.sgr_mouse = enabled,
             2004 => self.modes.bracketed_paste = enabled,
-            2026 => self.modes.synchronized_output = enabled,
+            2026 => {
+                self.sync_commit_pending |= self.modes.synchronized_output && !enabled;
+                self.modes.synchronized_output = enabled;
+            }
             _ => {}
         }
     }
@@ -1621,7 +1635,10 @@ impl Perform for State {
                 inactive_graphics.clear();
                 let mut shell = mem::take(&mut self.shell);
                 shell.clear();
+                let sync_commit_pending =
+                    self.sync_commit_pending || self.modes.synchronized_output;
                 *self = Self::new(cols, rows, history, self.theme);
+                self.sync_commit_pending = sync_commit_pending;
                 self.shell = shell;
                 self.graphics = graphics;
                 self.inactive_graphics = inactive_graphics;

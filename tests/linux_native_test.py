@@ -92,8 +92,8 @@ class EvidenceArchiveTests(unittest.TestCase):
             stem = "ztty-linux-x86_64"
             evidence = out / (stem + ".native")
             files = {}
-            for case in ("workspaces", "daily_workflow", "sixel_gui", "input_gui"):
-                png = "screenshots/frame.png" if case == "daily_workflow" else "screenshot.png"
+            for case in linux_native.CASES:
+                png = "screenshots/frame.png" if case in ("daily_workflow", "repaint_gui") else "screenshot.png"
                 for name, payload in (("report.json", b'{"ok":true}\n'),
                                       ("stdout.log", b"accepted\n"), ("stderr.log", b""),
                                       (png, b"\x89PNG\r\n\x1a\nsynthetic packaging fixture")):
@@ -106,7 +106,7 @@ class EvidenceArchiveTests(unittest.TestCase):
             (neighbor / "keep").write_text("untouched")
             asset = out / (stem + ".native.tar.gz")
             archived = linux_native.archive_evidence(evidence, asset)
-            self.assertEqual(archived["evidence_files"], 16)
+            self.assertEqual(archived["evidence_files"], len(files))
             self.assertFalse(evidence.exists())
             self.assertEqual((neighbor / "keep").read_text(), "untouched")
             with tarfile.open(asset, "r:gz") as archive:

@@ -269,6 +269,66 @@ fn sync_output_and_mode_queries_report_actual_state() {
 }
 
 #[test]
+fn synchronized_frame_commit_survives_all_chunk_boundaries_until_painted() {
+    let frame = b"\x1b[?2026h\x1b[Hframe\x1b[?2026l";
+    for split in 0..=frame.len() {
+        let mut terminal = Terminal::new(10, 2, 0);
+        terminal.clear_dirty();
+        terminal.feed(&frame[..split]);
+        terminal.feed(&frame[split..]);
+        assert!(!terminal.modes().synchronized_output, "split {split}");
+        assert!(terminal.sync_commit_pending(), "split {split}");
+        assert_eq!(line(&terminal, 0), "frame     ");
+        terminal.feed(b"\x1b[6n");
+        assert!(terminal.sync_commit_pending());
+        assert_eq!(terminal.responses(), b"\x1b[1;6R");
+        terminal.clear_dirty();
+        assert!(!terminal.sync_commit_pending());
+        terminal.feed(b"\x1b[?2026l");
+        assert!(
+            !terminal.sync_commit_pending(),
+            "redundant reset is not a commit"
+        );
+    }
+}
+
+#[test]
+fn synchronized_frame_timeout_and_reset_preserve_pending_commit() {
+    let mut terminal = Terminal::new(10, 2, 0);
+    terminal.clear_dirty();
+    terminal.feed(b"\x1b[?2026hA");
+    assert!(!terminal.sync_commit_pending());
+    terminal.force_end_sync();
+    assert!(!terminal.modes().synchronized_output);
+    assert!(terminal.sync_commit_pending());
+    terminal.clear_dirty();
+    terminal.force_end_sync();
+    assert!(!terminal.sync_commit_pending());
+
+    terminal.feed(b"\x1b[?2026hB\x1bc");
+    assert!(!terminal.modes().synchronized_output);
+    assert!(terminal.sync_commit_pending(), "RIS ends a held frame");
+    terminal.feed(b"\x1bc");
+    assert!(
+        terminal.sync_commit_pending(),
+        "unpainted commit survives RIS"
+    );
+    terminal.feed(b"\x1b[?2026hC");
+    assert!(terminal.modes().synchronized_output);
+    assert!(
+        terminal.sync_commit_pending(),
+        "new held frame does not consume commit"
+    );
+    terminal.force_end_sync();
+    terminal.clear_dirty();
+    terminal.feed(b"\x1bc");
+    assert!(
+        !terminal.sync_commit_pending(),
+        "ordinary RIS does not invent a commit"
+    );
+}
+
+#[test]
 fn kitty_keyboard_flags_and_stacks_are_screen_local() {
     let mut t = Terminal::new(10, 2, 0);
     t.feed(b"\x1b[>1u\x1b[=2;2u\x1b[?u");

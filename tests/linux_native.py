@@ -34,8 +34,8 @@ import time
 
 ELF_MACHINES = {"x86_64": 62, "aarch64": 183}
 RUN_MARKER = "ZTTY_LINUX_NATIVE_RUN"
-HARNESS_FILES = ("tests/workspaces.py", "tests/daily_workflow.py",
-                 "tests/sixel_gui.py", "tests/input_gui.py")
+CASES = ("workspaces", "daily_workflow", "sixel_gui", "input_gui", "repaint_gui")
+HARNESS_FILES = tuple(f"tests/{name}.py" for name in CASES)
 
 
 class NativeGateInterrupted(RuntimeError):
@@ -253,7 +253,7 @@ def png_info(path):
 def case_command(name, root, binary, directory):
     command = [sys.executable, str(root / "tests" / f"{name}.py"),
                "--binary", str(binary), "--output", str(directory / "report.json")]
-    if name == "daily_workflow":
+    if name in ("daily_workflow", "repaint_gui"):
         command.extend(["--screenshots", str(directory / "screenshots")])
     else:
         command.extend(["--screenshot", str(directory / "screenshot.png")])
@@ -422,7 +422,7 @@ def main():
         report["version_check"] = version
         if not version["passed"]:
             raise ValueError("native version/startup check failed")
-        for name in ("workspaces", "daily_workflow", "sixel_gui", "input_gui"):
+        for name in CASES:
             result = run_case(name, root, binary, evidence / name, args.case_timeout, report["binary_sha256"])
             report["cases"].append(result)
             save_report(output, report)
@@ -435,7 +435,7 @@ def main():
         if any(sha256(root / name) != value for name, value in report["source_files_sha256"].items()):
             raise ValueError("acceptance source files changed while tests were running")
         report["binary_sha256_after"] = sha256(binary)
-        report["passed"] = len(report["cases"]) == 4 and all(case["passed"] for case in report["cases"])
+        report["passed"] = len(report["cases"]) == len(CASES) and all(case["passed"] for case in report["cases"])
         if any(case.get("screenshots") for case in report["cases"]):
             report["pixel_readback"] = "Actual XGetImage captures from owned X11 windows in private Xvfb"
     except Exception as error:
