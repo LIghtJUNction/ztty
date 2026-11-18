@@ -59,6 +59,11 @@ python3 tests/linux_native.py --binary target/release/ztty \
   --evidence-dir artifacts/linux-native
 ```
 
+The macOS jobs also run the standalone Darwin threaded-spawn suite before
+AppKit acceptance. A Linux skip, nonzero exit, missing/ambiguous evidence,
+wrong native architecture or failed timeout/cleanup assertion cannot pass
+the separate source-bound spawn report or the candidate build manifest.
+
 ## Scoped native candidate validation
 
 Build-only dispatches accept `candidate_platform=all|linux|macos|windows`.

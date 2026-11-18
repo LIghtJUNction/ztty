@@ -63,6 +63,11 @@ the verified scope and the remaining native runtime work.
 | macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Both native helpers compile; the latest candidate passed 10 protocol/cwd checks per architecture before an activation-policy guard failure; the state correction and pixels await native rerun |
 | Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | Source 7a1d06b passed all 30 functional checks, 19 visible-pixel checks and full process/desktop cleanup on native x64 and ARM64 |
 
+macOS now uses a fresh-exec PTY helper that can create sessions after AppKit
+starts threads. [Implementation and native test scope](docs/darwin-threaded-pty.md)
+record the controlling-terminal, descriptor and error-handling contracts;
+its native acceptance is pending.
+
 The macOS and Windows backends use their native APIs. macOS does not require
 X11, and Windows does not require WSL. Cross-target compilation does not establish
 runtime or visual correctness. See [protocol acceptance](docs/protocols.md#acceptance-coverage)

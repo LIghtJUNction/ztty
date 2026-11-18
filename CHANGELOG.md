@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add no_std Darwin PTY creation through a fresh posix_spawn helper, with controlling-terminal setup, exact argv/environment, close-on-exec descriptor isolation and bounded error handoff; native SDK/concurrent-spawn acceptance is now a mandatory Mac candidate gate.
+
 - Allow build-only native candidates to select Linux, macOS or Windows while keeping both architectures, pinned provenance and mandatory all-platform publication gates.
 
 - Export the common action, JSON, pane-layout and workspace-state modules from the no_std library; Linux and regression tests consume the same implementations.

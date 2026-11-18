@@ -1,0 +1,11 @@
+test_invalid_native_results_cannot_pass (__main__.DarwinSpawnGate.test_invalid_native_results_cannot_pass) ... ok
+test_non_darwin_host_cannot_run_or_pass (__main__.DarwinSpawnGate.test_non_darwin_host_cannot_run_or_pass) ... ok
+test_nonzero_process_cannot_pass (__main__.DarwinSpawnGate.test_nonzero_process_cannot_pass) ... ok
+test_skip_and_ambiguous_output_cannot_pass (__main__.DarwinSpawnGate.test_skip_and_ambiguous_output_cannot_pass) ... ok
+test_timeout_preserves_partial_logs (__main__.DarwinSpawnGate.test_timeout_preserves_partial_logs) ... ok
+test_valid_native_evidence (__main__.DarwinSpawnGate.test_valid_native_evidence) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.046s
+
+OK
