@@ -678,7 +678,9 @@ jobs:
             runuser -u builder -- makepkg --noconfirm
             runuser -u builder -- makepkg --printsrcinfo > /work/aur/.SRCINFO
             pacman -U --noconfirm ztty-*.pkg.tar.zst
-            ztty --version | grep -Fx "ztty $VERSION"
+            /usr/bin/ztty --version | grep -Fx "ztty $VERSION"
+            grep -Fx "Exec=/usr/bin/ztty" /usr/share/applications/ztty.desktop
+            grep -Fx "StartupWMClass=Ztty" /usr/share/applications/ztty.desktop
           '
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:

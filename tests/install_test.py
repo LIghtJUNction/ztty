@@ -179,6 +179,7 @@ class InstallerTests(unittest.TestCase):
         )
         text = self.desktop.read_text()
         self.assertIn(f'Exec="{self.target}"\n', text)
+        self.assertIn('StartupWMClass=Ztty\n', text)
         template = (ROOT / "assets/ztty.desktop").read_text().splitlines()
         self.assertEqual(
             [line for line in text.splitlines() if not line.startswith("Exec=")],
