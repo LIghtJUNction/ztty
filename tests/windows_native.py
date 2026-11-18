@@ -189,7 +189,7 @@ def child(directory):
         raise ctypes.WinError(ctypes.get_last_error())
     directory = Path(directory)
     (directory / "startup.json").write_text(
-        json.dumps({"cwd": os.getcwd(), "parent_pid": os.getppid()}), encoding="utf-8")
+        json.dumps({"cwd": os.getcwd(), "pid": os.getpid(), "parent_pid": os.getppid()}), encoding="utf-8")
     received = bytearray()
 
     def read_input():
@@ -210,7 +210,21 @@ def child(directory):
     sys.stdout.buffer.flush()
     (directory / "ready").write_text("ready", encoding="utf-8")
     sequence = 0
+    size_before = None
+    size_sequence = 0
+    record_geometry = os.environ.get("ZTTY_NATIVE_GEOMETRY") == "1"
     while True:
+        size = os.get_terminal_size(sys.stdout.fileno()) if record_geometry else None
+        if record_geometry and size != size_before:
+            state = {"pid": os.getpid(), "sequence": size_sequence,
+                     "columns": size.columns, "rows": size.lines,
+                     "monotonic_seconds": time.monotonic()}
+            target = directory / f"geometry-{size_sequence}.json"
+            pending = target.with_suffix(".tmp")
+            pending.write_text(json.dumps(state), encoding="utf-8")
+            pending.replace(target)
+            size_before = size
+            size_sequence += 1
         path = directory / f"command-{sequence}.bin"
         if path.exists():
             payload = path.read_bytes()
@@ -369,13 +383,15 @@ def cleanup_owned(process, close_window, temporary_directory, report):
         report["passed"] = False
 
 
-def run(binary, output, expected_arch=None):
+def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=False):
     user = ctypes.WinDLL("user32", use_last_error=True)
     gdi = ctypes.WinDLL("gdi32", use_last_error=True)
     enum_proc = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
     user.EnumWindows.argtypes = [enum_proc, wintypes.LPARAM]
     user.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
     user.GetClientRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
+    user.GetUpdateRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT), wintypes.BOOL]
+    user.GetUpdateRect.restype = wintypes.BOOL
     user.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
     user.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND, ctypes.c_int, ctypes.c_int,
                                  ctypes.c_int, ctypes.c_int, wintypes.UINT]
@@ -412,6 +428,8 @@ def run(binary, output, expected_arch=None):
     user.GetWindowLongPtrW.restype = ctypes.c_ssize_t
     gdi.GetClipBox.argtypes = [wintypes.HDC, ctypes.POINTER(wintypes.RECT)]
     gdi.GetClipBox.restype = ctypes.c_int
+    gdi.GetDCOrgEx.argtypes = [wintypes.HDC, ctypes.POINTER(NativePoint)]
+    gdi.GetDCOrgEx.restype = wintypes.BOOL
     gdi.PtVisible.argtypes = [wintypes.HDC, ctypes.c_int, ctypes.c_int]
     gdi.PtVisible.restype = wintypes.BOOL
     user.SetProcessDPIAware()
@@ -419,8 +437,12 @@ def run(binary, output, expected_arch=None):
     process = None
     hwnd = None
     temporary_directory = None
+    runtime_stream = None
+    runtime_path = output.with_name(output.stem + ".runtime.log")
     report = {"platform": sys.platform, "binary": str(binary.resolve()),
               "transport": "real ConPTY", "renderer": "Win32 retained DIB",
+              "runtime_trace_enabled": trace_runtime,
+              "resize_path": "staged" if staged_resize else "rapid",
               "checks": checks, "passed": False, "status": "running"}
     def window_pid(window):
         pid = wintypes.DWORD()
@@ -448,7 +470,30 @@ def run(binary, output, expected_arch=None):
             raise OSError("ClientToScreen failed")
         return point
 
-    def window_geometry(samples=()):
+    def dwm_state():
+        state = {}
+        try:
+            dwm = ctypes.WinDLL("dwmapi", use_last_error=True)
+            dwm.DwmGetWindowAttribute.argtypes = [wintypes.HWND, wintypes.DWORD,
+                                                ctypes.c_void_p, wintypes.DWORD]
+            dwm.DwmGetWindowAttribute.restype = ctypes.c_int32
+            dwm.DwmIsCompositionEnabled.argtypes = [ctypes.POINTER(wintypes.BOOL)]
+            dwm.DwmIsCompositionEnabled.restype = ctypes.c_int32
+            enabled = wintypes.BOOL()
+            status = dwm.DwmIsCompositionEnabled(ctypes.byref(enabled))
+            state["composition"] = {"hresult": status, "reported_enabled": bool(enabled.value)}
+            for key, attribute, value in (("extended_frame_bounds", 9, wintypes.RECT()),
+                                          ("cloaked", 14, wintypes.DWORD()),
+                                          ("nonclient_rendering", 1, wintypes.BOOL())):
+                status = dwm.DwmGetWindowAttribute(hwnd, attribute, ctypes.byref(value), ctypes.sizeof(value))
+                state[key] = {"hresult": status, "value":
+                              rect_values(value) if isinstance(value, wintypes.RECT) else value.value}
+        except Exception as error:
+            state["error"] = repr(error)
+        return state
+
+    def window_geometry(samples=(), diagnostics=False):
+        diagnostics = diagnostics or trace_runtime
         client, outer, clip = wintypes.RECT(), wintypes.RECT(), wintypes.RECT()
         if not user.GetClientRect(hwnd, ctypes.byref(client)) or not user.GetWindowRect(hwnd, ctypes.byref(outer)):
             raise OSError("cannot read native window geometry")
@@ -462,24 +507,48 @@ def run(binary, output, expected_arch=None):
         dc = user.GetDC(hwnd)
         if not dc:
             raise OSError("cannot inspect native window DC")
+        screen_dc = user.GetDC(None) if diagnostics else None
+        client_origin, screen_origin = NativePoint(), NativePoint()
+        screen_clip = wintypes.RECT()
+        origins = {}
         try:
             clip_type = gdi.GetClipBox(dc, ctypes.byref(clip))
+            if diagnostics and gdi.GetDCOrgEx(dc, ctypes.byref(client_origin)):
+                origins["client_dc_origin"] = [client_origin.x, client_origin.y]
+            if screen_dc:
+                if gdi.GetDCOrgEx(screen_dc, ctypes.byref(screen_origin)):
+                    origins["screen_dc_origin"] = [screen_origin.x, screen_origin.y]
+                origins["screen_clip_type"] = gdi.GetClipBox(screen_dc, ctypes.byref(screen_clip))
+                origins["screen_clip_box"] = rect_values(screen_clip)
             points = []
             for x, y in samples:
                 screen = screen_point(x, y)
                 hit = user.WindowFromPoint(screen)
                 root_window = user.GetAncestor(hit, 2) if hit else None
                 color = int(gdi.GetPixel(dc, int(x), int(y)))
+                owned = root_window == hwnd and window_pid(hit) == process.pid
+                visible = bool(gdi.PtVisible(dc, int(x), int(y)))
+                screen_color = int(gdi.GetPixel(screen_dc, screen.x, screen.y)) if screen_dc and owned and visible else 0xFFFFFFFF
                 points.append({"client": [int(x), int(y)], "screen": [screen.x, screen.y],
-                               "point_visible": bool(gdi.PtVisible(dc, int(x), int(y))),
+                               "point_visible": visible,
                                "window_from_point": int(hit or 0), "root_window": int(root_window or 0),
                                "window_from_point_pid": window_pid(hit),
                                "hit_window": window_identity(hit),
-                               "owned_window_at_point": root_window == hwnd and window_pid(hit) == process.pid,
+                               "owned_window_at_point": owned,
+                               "screen_rgb": None if screen_color == 0xFFFFFFFF else
+                               [screen_color & 255, (screen_color >> 8) & 255, (screen_color >> 16) & 255],
                                "rgb": None if color == 0xFFFFFFFF else
                                [color & 255, (color >> 8) & 255, (color >> 16) & 255]})
         finally:
+            if screen_dc:
+                user.ReleaseDC(None, screen_dc)
             user.ReleaseDC(hwnd, dc)
+        if diagnostics:
+            client_after, update = wintypes.RECT(), wintypes.RECT()
+            client_after_read = user.GetClientRect(hwnd, ctypes.byref(client_after))
+            origins.update({"client_after_samples": rect_values(client_after) if client_after_read else None,
+                            "update_pending": bool(user.GetUpdateRect(hwnd, ctypes.byref(update), False)),
+                            "update_rect": rect_values(update), "dwm": dwm_state()})
         return {"client": rect_values(client), "outer": rect_values(outer),
                 "client_screen": [top_left.x, top_left.y, bottom_right.x, bottom_right.y],
                 "dpi": int(user.GetDpiForWindow(hwnd)), "visible": bool(user.IsWindowVisible(hwnd)),
@@ -489,7 +558,8 @@ def run(binary, output, expected_arch=None):
                 "owned_window": window_identity(hwnd),
                 "monitor": {"rect": rect_values(info.monitor), "work": rect_values(info.work),
                             "primary": bool(info.flags & 1)},
-                "clip_type": clip_type, "clip_box": rect_values(clip), "samples": points}
+                "clip_type": clip_type, "clip_box": rect_values(clip), "samples": points,
+                **origins}
 
     def place_owned_window():
         before = window_geometry()
@@ -597,7 +667,11 @@ def run(binary, output, expected_arch=None):
         command = [str(binary.resolve()), "--config", "appearance.conf",
                    "--cwd", str(working_directory), "--geometry", "20x10",
                    "-e", sys.executable, str(Path(__file__).resolve()), "--child", str(directory)]
-        process = subprocess.Popen(command, cwd=directory)
+        runtime_path.parent.mkdir(parents=True, exist_ok=True)
+        runtime_stream = runtime_path.open("wb")
+        environment = dict(os.environ, ZTTY_NATIVE_TRACE="1" if trace_runtime else "0",
+                           ZTTY_NATIVE_GEOMETRY="1" if trace_runtime or staged_resize else "0")
+        process = subprocess.Popen(command, cwd=directory, env=environment, stderr=runtime_stream)
         report["ztty_process"] = process_architecture(process.pid)
         assert report["ztty_process"] == interpreter, "ztty must run natively on the test machine"
         checks.append({"name": "native_ztty_process_architecture", "passed": True})
@@ -633,7 +707,8 @@ def run(binary, output, expected_arch=None):
         report["client_pixels"] = [rect.right, rect.bottom]
         report["cell_pixels"] = [cw, ch]
         def record_resize(stage):
-            state = {"monotonic_seconds": time.monotonic()}
+            state = report.setdefault("resize_stages", {}).setdefault(stage, {})
+            state["monotonic_seconds"] = time.monotonic()
             try:
                 state.update(window_geometry([(19.5 * cw, 1.5 * ch), (15.5 * cw, 1.5 * ch)]))
                 state["screenshot"] = capture_window(
@@ -641,7 +716,6 @@ def run(binary, output, expected_arch=None):
                     output.with_name(output.stem + f".resize-{stage}.png"))
             except Exception as error:
                 state["diagnostic_error"] = repr(error)
-            report.setdefault("resize_stages", {})[stage] = state
 
         sequence = 0
 
@@ -653,6 +727,25 @@ def run(binary, output, expected_arch=None):
             stage.replace(path)
             wait_for(lambda: (directory / f"done-{sequence}").exists(), "PTY output write")
             sequence += 1
+
+        def resize_ack(stage, columns, query_id):
+            state = report.setdefault("resize_stages", {}).setdefault(stage, {})
+            def child_size_matches():
+                paths = list(directory.glob("geometry-*.json"))
+                if not paths:
+                    return False
+                path = max(paths, key=lambda value: int(value.stem.split("-")[1]))
+                actual = json.loads(path.read_text(encoding="utf-8"))
+                state["child_geometry"] = actual
+                return (actual["pid"] == startup_state["pid"] and
+                        actual["columns"] == columns and actual["rows"] == 10)
+            wait_for(child_size_matches, f"actual ConPTY child resize to {columns} columns")
+            marker = f"i={query_id};OK".encode("ascii")
+            send(kitty(f"a=q,t=d,f=24,s=1,v=1,i={query_id}", bytes([1, 2, 3])))
+            wait_for(lambda: marker in (directory / "keyboard.bin").read_bytes(),
+                     "frontend roundtrip after " + stage + " resize")
+            state["frontend_roundtrip"] = {"query_id": query_id, "passed": True,
+                                             "monotonic_seconds": time.monotonic()}
 
         def pixel_at(x, y):
             dc = user.GetDC(hwnd)
@@ -705,7 +798,7 @@ def run(binary, output, expected_arch=None):
                 failure = {"name": name, "expected": expected, "actual": actual,
                            "client_sample": [int(col * cw), int(row * ch)]}
                 try:
-                    failure["window"] = window_geometry([(col * cw, row * ch)])
+                    failure["window"] = window_geometry([(col * cw, row * ch)], diagnostics=True)
                 except Exception as diagnostic_error:
                     failure["diagnostic_error"] = repr(diagnostic_error)
                 report["failed_pixel"] = failure
@@ -743,6 +836,8 @@ def run(binary, output, expected_arch=None):
         send(kitty("a=d,d=I,i=47,q=2"))
         send(b"\x1b[2;20H" + kitty("a=T,f=32,s=2,v=2,i=42,c=4,r=2,C=1,q=2", rgba))
         expect("right_edge_clips_image", 19.5, 1.5, [255, 0, 0])
+        if staged_resize:
+            resize_ack("before", 20, 9848)
         record_resize("before")
         outer = wintypes.RECT()
         assert user.GetWindowRect(hwnd, ctypes.byref(outer))
@@ -757,12 +852,16 @@ def run(binary, output, expected_arch=None):
 
         try:
             wait_for(lambda: resized(16), "native client resize")
+            if staged_resize:
+                resize_ack("shrunk", 16, 9849)
             expect("resize_clips_without_ghosts", 15.5, 1.5, [16, 24, 32])
         finally:
             record_resize("shrunk")
         assert user.SetWindowPos(hwnd, None, 0, 0, old_width, old_height, 0x16)
         try:
             wait_for(lambda: resized(20), "native client restore to original geometry")
+            if staged_resize:
+                resize_ack("restored", 20, 9850)
             expect("resize_restores_visible_image", 19.5, 1.5, [255, 0, 0])
         finally:
             record_resize("restored")
@@ -862,7 +961,19 @@ def run(binary, output, expected_arch=None):
         def request_close():
             if hwnd and window_pid(hwnd) == process.pid:
                 user.PostMessageW(hwnd, 0x0010, 0, 0)
+        if temporary_directory and (trace_runtime or staged_resize):
+            try:
+                paths = sorted(directory.glob("geometry-*.json"),
+                               key=lambda value: int(value.stem.split("-")[1]))
+                report["child_geometry_history"] = [json.loads(path.read_text(encoding="utf-8"))
+                                                    for path in paths[-64:]]
+            except (OSError, ValueError) as error:
+                report["child_geometry_error"] = repr(error)
         cleanup_owned(process, request_close, temporary_directory, report)
+        if runtime_stream:
+            runtime_stream.close()
+            report["runtime_trace"] = {"path": str(runtime_path), "bytes": runtime_path.stat().st_size,
+                                       "sha256": hashlib.sha256(runtime_path.read_bytes()).hexdigest()}
         report["status"] = "passed" if report["passed"] else ("blocked" if report["status"] == "blocked" else "failed")
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
