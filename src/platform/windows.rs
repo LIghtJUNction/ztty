@@ -37,6 +37,10 @@ const WM_PAINT: u32 = 0x000f;
 const WM_CLOSE: u32 = 0x0010;
 const WM_DESTROY: u32 = 0x0002;
 const WM_SIZE: u32 = 0x0005;
+const WM_WINDOWPOSCHANGING: u32 = 0x0046;
+const SWP_NOSIZE: u32 = 0x0001;
+const SWP_NOREDRAW: u32 = 0x0008;
+const SWP_NOCOPYBITS: u32 = 0x0100;
 const WM_KEYDOWN: u32 = 0x0100;
 const WM_KEYUP: u32 = 0x0101;
 const WM_CHAR: u32 = 0x0102;
@@ -2435,6 +2439,21 @@ unsafe extern "system" fn window_proc(
         return unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
     }
     let state = unsafe { &*pointer };
+    if message == WM_WINDOWPOSCHANGING {
+        // The retained DIB is the source of every resized frame. Do not also
+        // preserve and copy back old window pixels across a size change.
+        // Keep default frame/minimum-size processing and every other flag.
+        let mut current = ffi::Rect::default();
+        if let Some(position) = unsafe { (lparam as *mut ffi::WindowPos).as_mut() }
+            && position.flags & (SWP_NOSIZE | SWP_NOREDRAW) == 0
+            && unsafe { ffi::GetWindowRect(hwnd, &mut current) } != 0
+            && (current.right.saturating_sub(current.left) != position.width
+                || current.bottom.saturating_sub(current.top) != position.height)
+        {
+            position.flags |= SWP_NOCOPYBITS;
+        }
+        return unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
+    }
     if message == WM_NATIVE_SNAPSHOT && wparam == NATIVE_SNAPSHOT_MAGIC {
         let resize_pending = state.dispatch.resize_pending();
         let paint_pending = state.dispatch.paint_pending();
@@ -2798,6 +2817,16 @@ mod ffi {
         pub bottom: i32,
     }
     #[repr(C)]
+    pub struct WindowPos {
+        pub hwnd: Handle,
+        pub insert_after: Handle,
+        pub x: i32,
+        pub y: i32,
+        pub width: i32,
+        pub height: i32,
+        pub flags: u32,
+    }
+    #[repr(C)]
     pub struct WindowClass {
         pub size: u32,
         pub style: u32,
@@ -2918,6 +2947,7 @@ mod ffi {
         pub fn DestroyWindow(hwnd: Handle) -> i32;
         pub fn UpdateWindow(hwnd: Handle) -> i32;
         pub fn GetClientRect(hwnd: Handle, rect: *mut Rect) -> i32;
+        pub fn GetWindowRect(hwnd: Handle, rect: *mut Rect) -> i32;
         pub fn GetUpdateRect(hwnd: Handle, rect: *mut Rect, erase: i32) -> i32;
         pub fn GetDC(hwnd: Handle) -> Handle;
         pub fn ReleaseDC(hwnd: Handle, dc: Handle) -> i32;
