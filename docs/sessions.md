@@ -349,6 +349,15 @@ Send the MCP cancellation notification using the original request ID:
 }
 ```
 
+String IDs match their decoded characters exactly. Numeric IDs match their
+exact integer value, so `42`, `42.0` and `4.2e1` identify the same request,
+and `-0` matches `0`. Strings and numbers stay separate: `"42"` is not `42`.
+Matching never rounds large integers through floating point; replies preserve
+the original request's ID token. Both transports reject a second request whose
+ID matches a currently pending request. Clients must still issue a new ID for
+every request within an MCP session, as required by the
+[base protocol](https://modelcontextprotocol.io/specification/2025-11-25/basic/index).
+
 Cancellation drops that request's broker connection and produces no result for
 the cancelled request. Unknown, malformed and already completed cancellations
 are ignored. On HTTP, cancellation is restricted to the same authenticated MCP

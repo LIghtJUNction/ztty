@@ -47,6 +47,28 @@ def is_error(response):
     return "error" in response or response.get("result", {}).get("isError") is True
 
 
+def numeric_key(token):
+    # Route decimal/exponent response IDs by their original spelling. Parsing
+    # them as floats would collapse distinct large IDs or overflow to infinity.
+    return json.loads(token, parse_float=lambda value: ("number", value))
+
+
+def wire_id(payload):
+    return json.loads(payload, parse_int=lambda value: ("number", value),
+                      parse_float=lambda value: ("number", value))["id"]
+
+
+def numeric_read(identifier, arguments):
+    message = {"jsonrpc": "2.0", "method": "tools/call",
+               "params": {"name": "session_read", "arguments": arguments}}
+    return json.dumps(message)[:-1] + ', "id": ' + identifier + '}'
+
+
+def numeric_cancel(identifier):
+    return ('{"jsonrpc":"2.0","method":"notifications/cancelled",'
+            '"params":{"requestId":' + identifier + '}}')
+
+
 def wait_file(path, timeout=5):
     deadline = time.monotonic() + timeout
     while not path.exists():
@@ -63,6 +85,7 @@ class Stdio:
             stderr=subprocess.PIPE, bufsize=0, env=os.environ)
         self.buffer = bytearray()
         self.responses = {}
+        self.raw_responses = {}
         self.identifier = 100
         if initialize:
             self.send(INIT)
@@ -74,7 +97,10 @@ class Stdio:
         return self.identifier
 
     def send(self, value):
-        data = json.dumps(value, ensure_ascii=False).encode() + b"\n"
+        self.send_raw(json.dumps(value, ensure_ascii=False))
+
+    def send_raw(self, value):
+        data = value.encode() + b"\n"
         while data:
             written = os.write(self.proc.stdin.fileno(), data)
             assert written > 0
@@ -89,20 +115,23 @@ class Stdio:
             self.buffer.extend(data)
         while b"\n" in self.buffer:
             line, _, self.buffer = self.buffer.partition(b"\n")
-            response = json.loads(line)
+            response = json.loads(line, parse_float=lambda value: ("number", value))
             assert "id" in response, response
             identifier = response["id"]
             assert identifier not in self.responses, ("duplicate response", response)
             self.responses[identifier] = response
+            self.raw_responses[identifier] = bytes(line)
         return True
 
-    def receive(self, identifier, timeout=5):
+    def receive(self, identifier, timeout=5, with_wire=False):
         deadline = time.monotonic() + timeout
         while identifier not in self.responses:
             remaining = deadline - time.monotonic()
             assert remaining > 0, ("response timed out", identifier, self.responses)
             self.ingest(remaining)
-        return self.responses.pop(identifier)
+        response = self.responses.pop(identifier)
+        wire = self.raw_responses.pop(identifier)
+        return (response, wire) if with_wire else response
 
     def assert_missing(self, identifiers, duration=.15):
         identifiers = set(identifiers)
@@ -151,16 +180,18 @@ class HttpRead:
             headers["Authorization"] = "Bearer " + server.token
         if authorization is not None:
             headers["Authorization"] = authorization
-        self.connection.request("POST", "/mcp", json.dumps(value).encode(), headers)
+        body = value.encode() if isinstance(value, str) else json.dumps(value).encode()
+        self.connection.request("POST", "/mcp", body, headers)
 
     def assert_pending(self, timeout=.15):
         assert not select.select([self.connection.sock], [], [], timeout)[0], \
             "HTTP wait replied or disconnected before its wake condition"
 
-    def receive(self):
+    def receive(self, with_wire=False):
         response = self.connection.getresponse()
         payload = response.read()
-        return response.status, json.loads(payload) if payload else None
+        value = json.loads(payload) if payload else None
+        return (response.status, value, payload) if with_wire else (response.status, value)
 
     def assert_cancelled(self):
         sock = self.connection.sock
@@ -217,11 +248,16 @@ class Harness:
         self.operator.tool("session_close", {"session": uri})
         self.sessions.discard(uri)
 
-    def start_http(self):
+    def start_http(self, initial_id=None):
         if self.http is None:
             self.http = HttpServer(self.binary, token="owned-wait-operator",
                                    observer_token="owned-wait-observer")
-        sid = self.http.initialize()
+        if initial_id is None:
+            sid = self.http.initialize()
+        else:
+            status, headers, response = self.http.request({**INIT, "id": initial_id})
+            assert status == 200 and response["id"] == initial_id and "result" in response
+            sid = headers["Mcp-Session-Id"]
         assert self.http.request(READY, sid)[0] == 202
         return self.http, sid
 
@@ -505,6 +541,177 @@ def stdio_cancellation_and_limits(h):
             "quota_reused_after_cancel": True, "stdin_eof_ms": round(eof_elapsed * 1000, 3)}
 
 
+def numeric_request_ids(h, transport):
+    """Numeric equality governs matching; the response keeps its original ID."""
+    created, _ = h.create()
+    uri = created["uri"]
+    client = None
+    server = None
+    sid = None
+    connections = {}
+    cancelled_keys = []
+    echoed = []
+    ping_sequence = 0
+    cursor = 0
+    limit = STDIO_WAIT_LIMIT if transport == "stdio" else HTTP_WAIT_LIMIT
+
+    def begin(identifier, numeric=True):
+        key = (numeric, identifier)
+        arguments = {"session": uri, "cursor": cursor, "wait_ms": 30000}
+        wire = (numeric_read(identifier, arguments) if numeric
+                else json.dumps(tool_packet(identifier, "session_read", arguments)))
+        if client is not None:
+            client.send_raw(wire)
+        else:
+            connections[key] = HttpRead(server, sid, wire, timeout=5)
+        return key
+
+    def receive(key):
+        numeric, identifier = key
+        if client is not None:
+            response, wire = client.receive(
+                numeric_key(identifier) if numeric else identifier, with_wire=True)
+        else:
+            request = connections.pop(key)
+            try:
+                status, response, wire = request.receive(with_wire=True)
+                assert status == 200, (status, response)
+            finally:
+                request.close()
+        assert wire_id(wire) == (("number", identifier) if numeric else identifier), wire
+        echoed.append({"type": "number" if numeric else "string", "token": identifier})
+        return response
+
+    def ping():
+        nonlocal ping_sequence
+        if client is not None:
+            client.ping()
+        else:
+            ping_sequence += 1
+            identifier = f"numeric-ping-{ping_sequence}"
+            status, _, response = server.request(packet("ping", identifier), sid)
+            assert status == 200 and response["id"] == identifier and response["result"] == {}
+
+    def pending(keys):
+        # A completed ping ensures the transport has processed the preceding
+        # requests before checking for an early quota or duplicate-ID response.
+        ping()
+        if client is not None:
+            client.assert_missing([numeric_key(value) if numeric else value
+                                   for numeric, value in keys], duration=.05)
+        else:
+            sockets = [connections[key].connection.sock for key in keys]
+            assert not select.select(sockets, [], [], .05)[0], \
+                "numeric-ID request unexpectedly replied or disconnected"
+
+    def cancel(key, alias=None):
+        numeric, identifier = key
+        identifier = alias if alias is not None else identifier
+        wire = numeric_cancel(identifier) if numeric else json.dumps(cancelled(identifier))
+        if client is not None:
+            client.send_raw(wire)
+        else:
+            notification = HttpRead(server, sid, wire, timeout=5)
+            try:
+                status, response = notification.receive()
+                assert status == 202 and response is None, (status, response)
+            finally:
+                notification.close()
+            request = connections.pop(key)
+            try:
+                request.assert_cancelled()
+            finally:
+                request.close()
+        cancelled_keys.append(key)
+
+    def finish(keys, marker):
+        nonlocal cursor
+        h.operator.tool("session_write", {"session": uri, "data": marker})
+        for key in keys:
+            value = tool_result(receive(key))
+            assert value["output"] == marker and value["next_cursor"] == cursor + 1, value
+            assert value["timed_out"] is False, value
+        cursor += 1
+
+    try:
+        # Reserve a string ID for initialization so numeric 1 has never been
+        # used in this MCP session before the intentional duplicate probes.
+        if transport == "stdio":
+            client = Stdio(h.binary, read_only=True, initialize=False)
+            client.send({**INIT, "id": "numeric-init"})
+            assert "result" in client.receive("numeric-init")
+            client.send(READY)
+        else:
+            server, sid = h.start_http(initial_id="numeric-init")
+
+        original = begin("1e0")
+        pending([original])
+        for alias in ["1", "1.0"]:
+            duplicate = begin(alias)
+            response = receive(duplicate)
+            assert response.get("error", {}).get("code") == -32600, response
+            assert "already pending" in response["error"]["message"], response
+        pending([original])
+        finish([original], "A")
+
+        distinct = [begin("7.0"), begin("7", numeric=False),
+                    begin("9007199254740992"), begin("9007199254740993")]
+        pending(distinct)
+        finish(distinct, "B")
+
+        zero = begin("-0")
+        pending([zero])
+        duplicate = begin("0.0")
+        response = receive(duplicate)
+        assert response.get("error", {}).get("code") == -32600, response
+        cancel(zero, "0")
+        ping()
+
+        huge = begin("1e9223372036854775808")
+        pending([huge])
+        huge_alias = "10e9223372036854775807"
+        duplicate = begin(huge_alias)
+        response = receive(duplicate)
+        assert response.get("error", {}).get("code") == -32600, response
+        fillers = [begin(f"numeric-filler-{index}", numeric=False)
+                   for index in range(limit - 1)]
+        pending([huge, *fillers])
+        cancel(huge, huge_alias)
+        # A fresh, mathematically distinct ID can occupy the released slot.
+        # Successful requests never reuse an ID from earlier in this session.
+        replacement = begin("2e9223372036854775808")
+        pending([replacement, *fillers])
+        for key in fillers:
+            cancel(key)
+        ping()
+        finish([replacement], "C")
+        if client is not None:
+            client.assert_missing([numeric_key(value) if numeric else value
+                                   for numeric, value in cancelled_keys])
+        return {"wait_limit": limit, "numeric_aliases_rejected": ["1", "1.0", "0.0", huge_alias],
+                "negative_zero_cancelled_by_zero": True,
+                "string_and_number_ids_distinct": True,
+                "adjacent_large_integer_ids_distinct": ["9007199254740992", "9007199254740993"],
+                "huge_exponent_cancelled_by_alias": True,
+                "fresh_id_used_released_wait_slot": True, "echoed_ids": echoed}
+    finally:
+        for request in connections.values():
+            request.close()
+        if client is not None:
+            client.close()
+        if server is not None and sid is not None:
+            assert server.request(method="DELETE", sid=sid)[0] == 200
+        h.close_session(uri)
+
+
+def stdio_numeric_request_ids(h):
+    return numeric_request_ids(h, "stdio")
+
+
+def http_numeric_request_ids(h):
+    return numeric_request_ids(h, "http")
+
+
 def http_concurrency_and_observers(h):
     created, _ = h.create()
     uri = created["uri"]
@@ -676,8 +883,23 @@ def completed_input_preserves_ordinary_requests(h):
             "http_half_closed_ordinary_requests": 2}
 
 
-def main(binary, output=None):
+CHECKS = (
+    stdio_concurrency, timeouts_and_bounds, fragmented_utf8,
+    retained_output_is_immediate, eof_waits, replacement_identity,
+    stdio_cancellation_and_limits, stdio_numeric_request_ids,
+    http_concurrency_and_observers, http_cancellation_and_disconnect,
+    http_numeric_request_ids, http_long_wait, completed_input_preserves_ordinary_requests,
+)
+
+
+def main(binary, output=None, checks=None):
+    if checks is not None:
+        unknown = set(checks) - {test.__name__ for test in CHECKS}
+        if unknown:
+            raise ValueError(f"Unknown checks: {', '.join(sorted(unknown))}")
+    selected = CHECKS if checks is None else tuple(test for test in CHECKS if test.__name__ in checks)
     report = {"binary_sha256": hashlib.sha256(pathlib.Path(binary).read_bytes()).hexdigest(),
+              "selected_checks": [test.__name__ for test in selected],
               "checks": {}, "cleanup": "pending"}
     original = {key: os.environ.get(key) for key in [
         "ZTTY_SOCKET", "XDG_RUNTIME_DIR", "ZTTY_MCP_TOKEN", "ZTTY_MCP_OBSERVER_TOKEN"]}
@@ -689,11 +911,7 @@ def main(binary, output=None):
             os.environ.pop("ZTTY_MCP_OBSERVER_TOKEN", None)
             harness = Harness(binary, directory)
             try:
-                for test in [stdio_concurrency, timeouts_and_bounds, fragmented_utf8,
-                             retained_output_is_immediate,
-                             eof_waits, replacement_identity, stdio_cancellation_and_limits,
-                             http_concurrency_and_observers, http_cancellation_and_disconnect,
-                             http_long_wait, completed_input_preserves_ordinary_requests]:
+                for test in selected:
                     begin = time.monotonic()
                     try:
                         details = test(harness)
@@ -726,5 +944,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", required=True)
     parser.add_argument("--output")
+    parser.add_argument("--check", dest="checks", action="append",
+                        choices=[test.__name__ for test in CHECKS],
+                        help="Run only this check; repeat to select several (default: all checks)")
     arguments = parser.parse_args()
-    main(os.path.abspath(arguments.binary), arguments.output)
+    main(os.path.abspath(arguments.binary), arguments.output, checks=arguments.checks)
