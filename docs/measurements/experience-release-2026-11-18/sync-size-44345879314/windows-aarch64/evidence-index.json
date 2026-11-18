@@ -1,0 +1,215 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+  "run_id": 44345879314,
+  "job_id": 134948113019,
+  "architecture": "aarch64",
+  "artifact_id": 14446306280,
+  "artifact_zip_sha256": "56ea8e375afcb4de7a55973a38854b5608eaa051eeb603c83ebc7aae9447e3eb",
+  "binary_sha256": "f0caf9814cdb335dfb56305be67c9e3635034acc8620fba292f0cf6425114d0a",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "formal_release_eligible": false,
+  "required_cold_starts": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "completed_cold_starts": 1,
+  "attempted_cold_starts": 2,
+  "resize_control_diagnostic": {
+    "requested": false,
+    "outcome": "skipped"
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-7680-358b478b81e84c6fb672111a83f9c119",
+    "input_after_restore": "Default"
+  },
+  "worker_exit_code": 1,
+  "worker_elapsed_seconds": 12.918,
+  "status": "failed",
+  "native_gate_passed": false,
+  "workspace_entered": false,
+  "failed_cold_start": 2,
+  "failed_gate": "resize_restores_visible_image",
+  "failed_pid": 8808,
+  "failed_hwnd": 524658,
+  "checks_completed_before_failure": 23,
+  "sample": [
+    175,
+    28
+  ],
+  "expected_rgb": [
+    255,
+    0,
+    0
+  ],
+  "actual_rgb": [
+    20,
+    20,
+    20
+  ],
+  "failure_difference_bbox": [
+    152,
+    0,
+    180,
+    190
+  ],
+  "failure_png_equals_after_flush": true,
+  "before_png_equals_after_repaint": true,
+  "dib_resize_changes": {
+    "count": 3,
+    "last_from": [
+      144,
+      190
+    ],
+    "last_to": [
+      180,
+      190
+    ]
+  },
+  "last_paint": {
+    "sequence": 19,
+    "surface": [
+      180,
+      190
+    ],
+    "region": [
+      0,
+      0,
+      180,
+      190
+    ],
+    "blit": 1,
+    "start_event_sequence": 210,
+    "end_event_sequence": 211,
+    "default_message": 0,
+    "default_depth": 0,
+    "target_after_blit": null,
+    "target_after_end_paint": null
+  },
+  "snapshot_event_sequence": 212,
+  "source_after_failure": [
+    255,
+    0,
+    0
+  ],
+  "target_after_failure_flush": [
+    20,
+    20,
+    20
+  ],
+  "full_raw_report_identities": [
+    {
+      "number": 1,
+      "report": "ztty-windows-aarch64.native.cold-01.json",
+      "report_sha256": "ea6a297bdfa22669058aca0d36f232a990cf4c273bded05ccb7da00851b31f4c",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "f0caf9814cdb335dfb56305be67c9e3635034acc8620fba292f0cf6425114d0a",
+      "pid": 7204,
+      "checks": 31,
+      "passed": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.00699430000000234,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    },
+    {
+      "number": 2,
+      "report": "ztty-windows-aarch64.native.cold-02.json",
+      "report_sha256": "cc8c79e847208f5caffc82a66ccafe60929097c2cadc1bd23999d71b28cfddfe",
+      "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+      "binary_sha256": "f0caf9814cdb335dfb56305be67c9e3635034acc8620fba292f0cf6425114d0a",
+      "pid": 8808,
+      "checks": 23,
+      "passed": false,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.00418990000000008,
+          "retry_timeout_seconds": 2.0
+        }
+      }
+    }
+  ],
+  "scope": "Ordinary-mode synchronous WM_SIZE candidate failed. Immediate paint probes are null and cannot be filled by prior diagnostic results. Failure-only snapshot, flush and repaint do not accept the original failure. NC harness intervention was not present at this source.",
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-aarch64/summary.json",
+      "bytes": 21255,
+      "sha256": "a84e24a0a9844721d58e597201da15d4bd9c1586ad47dc34f2c382631a5eb3e9",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 12314,
+      "sha256": "8f7dc125a9679ebbc121f01fc8fd1626ae8e4e51c2abe39f3949b3db64e2f0ce",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 300
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-aarch64/ztty-windows-aarch64.native.cold-02.json",
+      "bytes": 46723,
+      "sha256": "cc8c79e847208f5caffc82a66ccafe60929097c2cadc1bd23999d71b28cfddfe",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2210
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.post-failure.json",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-failure.json",
+      "bytes": 2409,
+      "sha256": "dee2836fed2eddbc9101d73b8e9f15b15f50299d67fa77a7d6738866e6b35c1e",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.resize-restored.png",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-aarch64/ztty-windows-aarch64.native.cold-02.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.post-failure.png",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-failure.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-aarch64.native.cold-02.post-repaint.png",
+      "source_path": "artifacts/release-audit/sync-size-44345879314/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-repaint.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ]
+}

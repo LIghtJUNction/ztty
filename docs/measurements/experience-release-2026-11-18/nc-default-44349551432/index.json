@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+  "run_id": 44349551432,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44349551432",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "version": "0.3.0",
+  "status": "accepted-normal-windows-candidate",
+  "formal_release_eligible": false,
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "nc_rendering_diagnostics_enabled": false,
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "workspace_required_checks": 19,
+  "x86_64": {
+    "native_gate_passed": true,
+    "ordinary_acceptance_credit": true,
+    "completed_cold_starts": 8,
+    "workspace_checks": 19,
+    "all_pngs_verified": 375,
+    "client_pngs_verified": 367,
+    "window_frame_pngs_verified": 8,
+    "native_png_samples_exact": 600,
+    "workspace_live_samples_exact": 34,
+    "workspace_png_samples_exact": 19,
+    "final_nc_disabled_windows": 8,
+    "all_nc_readback_hresult_zero": true,
+    "harness_nc_overrides": 0,
+    "workspace_nc_state_not_recorded": true,
+    "control_requested": false,
+    "control_outcome": "skipped",
+    "worker_elapsed_seconds": 16.262,
+    "worker_exit_code": 0,
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "native_gate_passed": true,
+    "ordinary_acceptance_credit": true,
+    "completed_cold_starts": 8,
+    "workspace_checks": 19,
+    "all_pngs_verified": 375,
+    "client_pngs_verified": 367,
+    "window_frame_pngs_verified": 8,
+    "native_png_samples_exact": 600,
+    "workspace_live_samples_exact": 34,
+    "workspace_png_samples_exact": 19,
+    "final_nc_disabled_windows": 8,
+    "all_nc_readback_hresult_zero": true,
+    "harness_nc_overrides": 0,
+    "workspace_nc_state_not_recorded": true,
+    "control_requested": false,
+    "control_outcome": "skipped",
+    "worker_elapsed_seconds": 16.5,
+    "worker_exit_code": 0,
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "ordinary_acceptance_credit": true,
+  "production_change": {
+    "path": "src/platform/windows.rs",
+    "previous_source": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+    "current_source": "2f2fae44f8e4697759b6061b1f99451f2e0dc3c8",
+    "previous_file_sha256": "5faa18077ad030215ee119147906dad0e23d15dae11d2f9af6664653c90f041d",
+    "current_file_sha256": "c1015ac1490e768e4de772cbd540b298ad5368793a241c868f894a00877dbefd",
+    "byte_identical": false
+  },
+  "change_description": "Set disabled per-window DWM NC rendering policy before ShowWindow while retaining the standard Win32 decorated frame; emit a bounded warning if the setter fails.",
+  "validation_change": "After all existing original31, warm10 and back-to-back10 requirements, read final DWM NC state and require hresult0/value0, then capture an additional full-window PNG. Existing pixel thresholds, sequence and cleanup gates remain.",
+  "final_nc_readbacks": {
+    "owned_native_windows": 16,
+    "all16_hresult_zero": true,
+    "all16_value_zero": true,
+    "harness_override_records": 0,
+    "dwm_composition_reported_enabled": true
+  },
+  "window_frame": {
+    "images": 16,
+    "all_byte_identical": true,
+    "sha256": "d99e1cec48e5eeec93e614778c8a9e31923dbc1a322035198b2b5c6aa29ed7e3",
+    "dimensions": [
+      196,
+      229
+    ],
+    "client_dimensions": [
+      180,
+      190
+    ],
+    "measured_client_offset": [
+      8,
+      31
+    ],
+    "all_client_crops_equal_final_client_png": true,
+    "client_gate_point": [
+      175,
+      28
+    ],
+    "corresponding_frame_point": [
+      183,
+      59
+    ],
+    "appearance": "Standard light-blue Win32 titlebar/frame and standard buttons; dark client content is preserved.",
+    "capture": "Owned GetWindowDC BitBlt/GetDIBits, not a screen-DC screenshot.",
+    "timing": "After all original pixel checks; cannot be substituted as a client-coordinate capture."
+  },
+  "resize_control_requested": false,
+  "inference_limits": [
+    "Both architectures passed the specified ordinary Windows candidate gates with both diagnostic flags and runtime trace disabled.",
+    "No independent C control ran in this ordinary candidate; the prior diagnostic control success is not inherited as a production gate.",
+    "Workspace retains19 functional checks but has no additional final DWM state readback.",
+    "The policy is source-bound evidence of passing this fixed test scope, not proof of a specific internal DWM writer or universal absence of intermittent faults.",
+    "Formal0.3.1 still needs its new immutable tag, Verify and all six native platform gates on the same final source, followed by official-asset readback and device installation validation."
+  ],
+  "cleanup": {
+    "native_window_processes_exited_per_architecture": 9,
+    "workspace_probe_processes_exited_per_architecture": 4,
+    "all_application_temporary_directories_removed": true,
+    "both_jobs_empty_and_desktops_restored": true
+  },
+  "delivery_scope": "Accepted ordinary Windows scoped build-only candidate, binary version0.3.0. Not a published formal0.3.1 release or an update of the installed Linux source19274145 candidate."
+}

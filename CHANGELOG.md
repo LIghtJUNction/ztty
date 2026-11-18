@@ -1,11 +1,74 @@
 # Changelog
 
+## 0.3.1 — 2026-11-19 (Asia/Taipei)
+
+Release preparation: the new tag's Verify job and all six native architecture
+gates have not run yet. Official publication and installation remain pending.
+The failed `v0.3.0` tag stays fixed; this version carries its previously
+unreleased application features together with the following corrections.
+[Preparation status](docs/releasing.md#031-preparation).
+
+### Fixed
+
+- Request disabled DWM nonclient rendering before showing the retained GDI
+  window on Windows. Keep the standard system frame and its minimize, maximize
+  and close buttons; the captured runner theme uses a classic light-blue title
+  bar. This policy avoids the reproduced stale-edge failure in the normal
+  candidate's repeated resize checks below. It does not preserve the modern
+  dark DWM frame; an unavailable policy produces a diagnostic and leaves the
+  window running with the available system behavior.
+- Clear cached alternate-screen text and images when leaving DEC mode 1047,
+  while retaining its distinct entry behavior and preserving the primary screen.
+- Restore both G0/G1 character-set designations and the selected set with the
+  saved cursor, so DEC line drawing does not leak across cursor or screen state.
+- Preserve pending wrap across height-only resize. The next printable character
+  wraps instead of overwriting the rightmost cell when the width is unchanged.
+- Match Linux shifted punctuation shortcuts using the active keyboard layout,
+  while keeping physical-key fallback and existing default bindings.
+- Accept optional `expected_session` guards on MCP write, resize, input-control
+  and close operations. Bind the mutation to the original URI, ID, creation
+  time and broker PID; reject a replacement session before changing it. The
+  existing read guard and callers that omit the optional guard remain supported.
+
+### Included from the unreleased 0.3.0 work
+
+- Linux shared sessions, tabs and splits; soft-wrap-aware search and copy;
+  temporary session switcher, command palette and **Back to live ↓** control.
+- Bounded MCP output paging, nonblocking waits/cancellation, numeric request-ID
+  equivalence and optional POST SSE responses; observer and input-owner rules.
+- Shared no_std session core, native Windows tabs/panes and redirected-ConPTY
+  handling, Darwin threaded-spawn support, shell integration and atomic local
+  installation with rollback. The historical section below retains the detailed
+  changes and their separate verification sources.
+
+### Verification and publication boundaries
+
+- Normal Windows candidate source `2f2fae44` passed
+  [run 44349551432](https://github.com/LIghtJUNction/ztty/actions/runs/44349551432)
+  on x64 and ARM64. Each architecture completed eight fresh processes, each
+  with 31 base checks, 10 warm rapid resizes and 10 back-to-back resize pairs,
+  plus 19 workspace groups. Runtime tracing, painting diagnostics and harness
+  NC-policy diagnostics were disabled; every final NC readback reported disabled
+  rendering, and owned-resource cleanup passed. This is a build-only Windows
+  candidate, not the new version's complete tagged release gate.
+- The four reusable libraries are published independently:
+  `zinput 0.1.1`, `zgraphics 0.1.1`, `zpty 0.2.1`, and `zterm 0.3.0`.
+  [Registry checks](docs/releasing.md#published-packages) do not imply that the
+  `ztty 0.3.1` application is already published.
+- The device already has a separately built Linux candidate from `19274145`,
+  installed as `ztty 0.3.0-1`. Its launcher files and five existing processes
+  were preserved; the installed binary passed 36 input vectors in 10 GUI groups.
+  That local installation does not make the failed formal
+  `v0.3.0` attempt a release, or establish a `0.3.1` installation.
+  [Device record](docs/releasing.md#local-device-candidate).
+
 ## 0.3.0 — 2026-11-18
 
-Unreleased: tag `v0.3.0` is fixed at `9b5497d`. Its formal release attempt failed
-the Windows ARM rapid-resize gate; publication was skipped and no device
-installation was performed. A repaired release will use a new tag. Verification
-entries below retain their separate source checkpoints.
+Historical unreleased application work: tag `v0.3.0` is fixed at `9b5497d`.
+Its formal release attempt failed the Windows ARM rapid-resize gate; publication
+was skipped and no official Release assets were installed. A later local Linux
+candidate was installed separately, as recorded above. Version 0.3.1 will use a
+new tag. Verification entries below retain their separate source checkpoints.
 
 ### Added
 

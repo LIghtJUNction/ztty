@@ -1,14 +1,65 @@
 # Releasing ztty and its reusable libraries
 
-Report date: **2026-11-18, Asia/Taipei**. Tag **v0.3.0** is fixed at
-`9b5497dac5402603ba0f633152fa4b07e6c11c9e`. Its formal release attempt failed the
-Windows ARM rapid-resize gate. Publish was skipped; no 0.3.0 Release was created
-or installed. The earlier verified 0.2.0 application candidate used
-[`7535aa2`](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92).
-The libraries below are published on crates.io. Their source commits and the
-earlier application candidate artifacts remain recorded independently of the
-0.3.0 release preparation. The [experience candidate report](experience-release-2026-11-18.md)
-pins the Linux runtime, revised GUI harness and native retry evidence separately.
+Report date: **2026-11-19, Asia/Taipei**. The application source is prepared as
+**0.3.1**, pending its own formal tagged gates. Library publication, build-only
+candidate acceptance, GitHub Release publication and device installation are
+recorded separately below. The [experience report](experience-release-2026-11-18.md)
+retains source identities, raw evidence and failed attempts.
+
+## 0.3.1 preparation
+
+The next application release will use a new `v0.3.1` tag. Its formal Verify job
+and six native architecture jobs have not run yet; official publication, asset
+readback and installation are pending. The source version change is not a
+published Release. Use the [official Releases page](https://github.com/LIghtJUNction/ztty/releases)
+for available downloads.
+
+The normal Windows candidate
+[`2f2fae44f8e4697759b6061b1f99451f2e0dc3c8`](https://github.com/LIghtJUNction/ztty/commit/2f2fae44f8e4697759b6061b1f99451f2e0dc3c8)
+passed [run 44349551432](https://github.com/LIghtJUNction/ztty/actions/runs/44349551432)
+with `build_only=true` and `candidate_platform=windows`.
+
+| Architecture | Normal candidate result | Scope |
+| --- | --- | --- |
+| Windows x64 | Eight fresh processes, each with 31 base checks, 10 warm rapid resizes and 10 back-to-back resize pairs; 19 workspace groups passed | Runtime tracing, painting diagnostics and harness NC-policy diagnostics disabled; final NC readback disabled; owned processes, Job and desktop cleanup passed |
+| Windows ARM64 | The same complete eight-process and workspace gate passed natively | The same normal-mode flags, policy readback and cleanup requirements |
+
+The application requests `DWMNCRP_DISABLED` before first showing its retained
+GDI window. The harness does not set this policy in a normal run; it reads back
+the final value only after the original base and repeated-resize checks pass.
+The full-window captures show a standard Win32 frame with a classic light-blue
+title bar and complete minimize/maximize/close controls in the runner theme.
+The client image is intact. This presentation uses system nonclient drawing
+rather than the modern dark DWM frame. If the policy request fails, the
+application prints a diagnostic and continues with the available window frame.
+The passing candidate does not establish the exact internal writer responsible
+for earlier stale-edge frames, nor replace the new tag's all-platform gate.
+
+Version 0.3.1 also contains the merged DEC 1047, G0/G1 cursor-state, height-only
+pending-wrap, Linux shifted-punctuation binding and MCP mutation identity-guard
+corrections. The [changelog](../CHANGELOG.md#031--2026-11-19-asiataipei) separates
+these changes from features carried over from the unreleased 0.3.0 work.
+
+## Local device candidate
+
+A Linux candidate from `19274145e37a591d800f638fe21c2717730b6431` was installed
+through pacman as `ztty 0.3.0-1`, independently of GitHub Release publication.
+`/usr/bin/ztty` has SHA-256
+`57a27b7af8464643cd90889e4930c79e8b97691f2b5d231c28e05830cef7d85c`;
+the system executable, user entry and wrapper report `ztty 0.3.0`.
+The user entry points to `/usr/bin/ztty`, custom launcher/desktop hashes were
+unchanged, package integrity recorded nine files with zero changes, and the
+five pre-existing processes retained their PIDs and start ticks after the
+executable was replaced. The installed-binary input regression exited 0 with
+36 input vectors in 10 groups: 34 used XTEST, while two extended-button cases
+used XSendEvent. These are private-Xvfb input checks, not a physical-device
+matrix. [Input scope and results](followup-validation-2026-11-18.zh-CN.md#固定源码验证).
+[Installed readback](measurements/experience-release-2026-11-18/device-candidate-19274145/installed-readback.json)
+and [source-bound scope](measurements/experience-release-2026-11-18/device-candidate-19274145/index.json).
+
+This local candidate is different source from the failed `v0.3.0` tag and is
+not an official `0.3.1` installation. Updating an executable also does not
+restart an existing broker; a running process can retain its old loaded inode.
 
 ## Formal v0.3.0 attempt
 
@@ -37,8 +88,9 @@ cause of the untraced failure.
 [Original failure, screenshot and diagnostic records](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64-summary.json).
 
 At **2026-11-18 21:11:00 Asia/Taipei (13:11:00 UTC)**, the GitHub Release-by-tag API returned **404**.
-There were no official 0.3.0 Release assets to read back or install, and this
-iteration did not perform device installation. The existing `v0.3.0` tag remains
+There were no official 0.3.0 Release assets to read back or install at that
+formal attempt. The later local candidate installation is recorded separately
+above. The existing `v0.3.0` tag remains
 fixed. After a verified repair, publication must use a new version tag and pass
 its own complete gates. Candidate successes below remain historical evidence;
 they cannot override this failed formal attempt.
@@ -196,8 +248,11 @@ the operating system, Python process and tested executable architectures.
 Its functional and visible-pixel checks include Sixel, working-directory and
 owned-window cleanup cases, with PNG captures on success and failure. Each
 architecture must execute these checks on its native Windows runner.
-The current Windows gate requires all 31 base checks and all 19 workspace
-groups; a passing base report cannot hide a workspace failure.
+The current Windows gate requires eight fresh processes, each completing all
+31 base checks, 10 warm rapid resizes and 10 back-to-back resize pairs, followed
+by all 19 workspace groups. After the original checks pass, it also requires
+disabled NC rendering and captures the full owned window for frame review.
+A passing base report cannot hide a repeated-resize or workspace failure.
 
 Both Linux jobs run `tests/linux_native.py` against a clean, pinned checkout
 and the freshly built ELF. Its six suites cover workspace restore, daily
@@ -221,7 +276,7 @@ The flat archive name preserves the existing Release file/checksum contract.
 python3 tests/linux_native_test.py -v
 python3 tests/linux_native.py --binary target/release/ztty \
   --source-root "$PWD" --source-sha "$(git rev-parse HEAD)" \
-  --arch "$(uname -m)" --version 0.3.0 \
+  --arch "$(uname -m)" --version 0.3.1 \
   --output artifacts/linux-native.json \
   --evidence-dir artifacts/linux-native
 ```
@@ -256,6 +311,31 @@ only the version and Git facts, not a replacement implementation of the guard.
 [Validation record](measurements/release-scope-2026-11-18.json).
 
 ## Published packages
+
+The official crates.io version API confirmed these releases and their checksums
+at **2026-11-19 00:29:27 Asia/Taipei (2026-11-18 16:29:27 UTC)**; none was yanked.
+These libraries are published independently of the pending application release.
+
+| Package | Published version | Publication time, Asia/Taipei | Official version API |
+| --- | --- | --- | --- |
+| [zinput](https://crates.io/crates/zinput/0.1.1) | 0.1.1 | 2026-11-18 23:58:46 | [Metadata](https://crates.io/api/v1/crates/zinput/0.1.1) |
+| [zgraphics](https://crates.io/crates/zgraphics/0.1.1) | 0.1.1 | 2026-11-19 00:01:48 | [Metadata](https://crates.io/api/v1/crates/zgraphics/0.1.1) |
+| [zpty](https://crates.io/crates/zpty/0.2.1) | 0.2.1 | 2026-11-19 00:02:05 | [Metadata](https://crates.io/api/v1/crates/zpty/0.2.1) |
+| [zterm](https://crates.io/crates/zterm/0.3.0) | 0.3.0 | 2026-11-19 00:03:51 | [Metadata](https://crates.io/api/v1/crates/zterm/0.3.0) |
+
+The current check establishes registry existence, publication metadata and
+checksums. The independent consumer results below belong to earlier package
+versions; they are not relabeled as tests of these new releases.
+
+```sh
+cargo add zvte@0.1.3 --no-default-features
+cargo add zinput@0.1.1 --no-default-features
+cargo add zgraphics@0.1.1 --no-default-features
+cargo add zpty@0.2.1 --no-default-features
+cargo add zterm@0.3.0 --no-default-features
+```
+
+### Earlier registry and consumer verification
 
 | Package | Version | Embedded source commit | Publication time, Asia/Taipei |
 | --- | --- | --- | --- |

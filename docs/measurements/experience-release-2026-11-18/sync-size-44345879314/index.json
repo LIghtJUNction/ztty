@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "8b14c357589017966747cb326681f853c2ab7ca3",
+  "run_id": 44345879314,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44345879314",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "version": "0.3.0",
+  "status": "failed",
+  "formal_release_eligible": false,
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "nc_rendering_diagnostics_enabled": null,
+  "required_cold_starts_per_architecture": 8,
+  "per_cold_required": {
+    "original_checks": 31,
+    "warm_rapid_repetitions": 10,
+    "back_to_back_resize_repetitions": 10
+  },
+  "workspace_required_checks": 19,
+  "x86_64": {
+    "native_gate_passed": false,
+    "completed_cold_starts": 6,
+    "attempted_cold_starts": 7,
+    "failed_cold_start": 7,
+    "failed_pid": 9292,
+    "original_checks_completed_before_failure": 23,
+    "failed_expected": [
+      255,
+      0,
+      0
+    ],
+    "failed_actual": [
+      0,
+      0,
+      0
+    ],
+    "workspace_entered": false,
+    "pngs_verified": 276,
+    "geometry_samples_verified": 457,
+    "worker_elapsed_seconds": 20.528,
+    "worker_exit_code": 1,
+    "summary": "windows-x86_64/summary.json",
+    "evidence": "windows-x86_64/evidence-index.json"
+  },
+  "aarch64": {
+    "native_gate_passed": false,
+    "completed_cold_starts": 1,
+    "attempted_cold_starts": 2,
+    "failed_cold_start": 2,
+    "failed_pid": 8808,
+    "original_checks_completed_before_failure": 23,
+    "failed_expected": [
+      255,
+      0,
+      0
+    ],
+    "failed_actual": [
+      20,
+      20,
+      20
+    ],
+    "workspace_entered": false,
+    "pngs_verified": 51,
+    "geometry_samples_verified": 82,
+    "worker_elapsed_seconds": 12.918,
+    "worker_exit_code": 1,
+    "summary": "windows-aarch64/summary.json",
+    "evidence": "windows-aarch64/evidence-index.json"
+  },
+  "production_change": {
+    "path": "src/platform/windows.rs",
+    "previous_source": "85779b5cb13c9626df7eeebc728eb648a6c8f366",
+    "current_source": "8b14c357589017966747cb326681f853c2ab7ca3",
+    "previous_file_sha256": "8ca782f9cf91eb30af109ab37c8febb2e96eece5d8b882c04416a8a935e9418a",
+    "current_file_sha256": "5faa18077ad030215ee119147906dad0e23d15dae11d2f9af6664653c90f041d",
+    "byte_identical": false
+  },
+  "change_description": "For non-minimized WM_SIZE, try to apply pending resize immediately when App can be borrowed and panes exist; a busy/reentrant request remains pending for the existing paint/loop path.",
+  "resize_control_requested": false,
+  "inference_limits": [
+    "Synchronous WM_SIZE did not make both architectures pass; the original failure remains failed.",
+    "No extra paint queries ran; target_after_blit and target_after_end_paint are null in the original failure. Earlier diagnostic runs cannot fill these missing samples.",
+    "The count of three committed DIB sizes, including initial allocation and final144x190→180x190, does not establish any internal Window Manager copying or composition order.",
+    "Failure-only flush and ordinary repaint preserve the original verdict; no retry occurred."
+  ],
+  "cleanup": {
+    "native_window_processes_exited": {
+      "x86_64": 7,
+      "aarch64": 2
+    },
+    "all_application_temporary_directories_removed": true,
+    "jobs_empty_and_desktops_restored": true
+  },
+  "delivery_scope": "Failed Windows build-only candidate. Existing local Linux0.3.0 candidate installation is a separate source; formal0.3.1 publication and installation remain pending."
+}

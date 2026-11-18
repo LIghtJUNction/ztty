@@ -1,0 +1,2040 @@
+{
+  "run_id": 44347927037,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44347927037",
+  "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+  "architecture": "x86_64",
+  "job_id": 134955556758,
+  "artifact_id": 14446353232,
+  "diagnostic_only": true,
+  "ordinary_acceptance_credit": false,
+  "nc_rendering_diagnostics_enabled": true,
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "passed": true,
+  "required": 16,
+  "completed": 16,
+  "distinct_control_pids": 16,
+  "control_binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+  "raw_report": "ztty-windows-x86_64.resize-control.json",
+  "raw_report_sha256": "ce086b34fd05d53c1026809cfbe9ea43c4a0d2d684a86857bb7c2be547e53d0d",
+  "raw_c_source_sha256": "2db22a7dc1cb28fae303a26d6408bb149b1e38f45624d5ef61797aa3499e9eb6",
+  "immutable_git_c_sha256": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+  "raw_c_crlf_lines": 155,
+  "reports": [
+    {
+      "number": 1,
+      "report": "ztty-windows-x86_64.resize-control.cold-01.json",
+      "report_sha256": "d3b20807148f2ce4b607605c26766cdcee9a568f83e286d689bbb5569737f826",
+      "passed": true,
+      "pid": 1324,
+      "hwnd": 2621548,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2621548,
+        "pid": 1324,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2621548,
+          "pid": 1324,
+          "foreground": 2621548,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2621548,
+          "pid": 1324,
+          "foreground": 2621548,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 2,
+      "report": "ztty-windows-x86_64.resize-control.cold-02.json",
+      "report_sha256": "0045cdf1523c87a6005888ae40f3536bf69ed6ca9858345b151acb1920cb69a1",
+      "passed": true,
+      "pid": 1068,
+      "hwnd": 2687084,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2687084,
+        "pid": 1068,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2687084,
+          "pid": 1068,
+          "foreground": 2687084,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2687084,
+          "pid": 1068,
+          "foreground": 2687084,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 3,
+      "report": "ztty-windows-x86_64.resize-control.cold-03.json",
+      "report_sha256": "251a52e031339aadc9ed76b7b96c0a9ab450629612fbe994fda1ef7f9ba97853",
+      "passed": true,
+      "pid": 2488,
+      "hwnd": 2752620,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2752620,
+        "pid": 2488,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2752620,
+          "pid": 2488,
+          "foreground": 2752620,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2752620,
+          "pid": 2488,
+          "foreground": 2752620,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -46,
+          -46
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 4,
+      "report": "ztty-windows-x86_64.resize-control.cold-04.json",
+      "report_sha256": "cf6760b763b6819b845dbe1b5c6a6027d568284d4e2758ede6c4cf066c6b98f3",
+      "passed": true,
+      "pid": 1980,
+      "hwnd": 2818156,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2818156,
+        "pid": 1980,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2818156,
+          "pid": 1980,
+          "foreground": 2818156,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2818156,
+          "pid": 1980,
+          "foreground": 2818156,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -72,
+          -72
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 5,
+      "report": "ztty-windows-x86_64.resize-control.cold-05.json",
+      "report_sha256": "e53b2e154d625fbe1ce34752cd2cf3aee44fdc97862993c9b4f5d7d3425a133a",
+      "passed": true,
+      "pid": 2716,
+      "hwnd": 2883692,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2883692,
+        "pid": 2716,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2883692,
+          "pid": 2716,
+          "foreground": 2883692,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2883692,
+          "pid": 2716,
+          "foreground": 2883692,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -98,
+          -98
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 6,
+      "report": "ztty-windows-x86_64.resize-control.cold-06.json",
+      "report_sha256": "a5679ef8b0b65c8f6acf0a249eb25ac57be2855ad20debc83c68a8e58b4c5173",
+      "passed": true,
+      "pid": 1680,
+      "hwnd": 2949228,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2949228,
+        "pid": 1680,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2949228,
+          "pid": 1680,
+          "foreground": 2949228,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2949228,
+          "pid": 1680,
+          "foreground": 2949228,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -124,
+          -124
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 7,
+      "report": "ztty-windows-x86_64.resize-control.cold-07.json",
+      "report_sha256": "22fc0d2989b5a0d3c31f750b3de22cd73299b15d98c9a92898cd5f86361fb15a",
+      "passed": true,
+      "pid": 7720,
+      "hwnd": 3014764,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3014764,
+        "pid": 7720,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3014764,
+          "pid": 7720,
+          "foreground": 3014764,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3014764,
+          "pid": 7720,
+          "foreground": 3014764,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 8,
+      "report": "ztty-windows-x86_64.resize-control.cold-08.json",
+      "report_sha256": "b05723274bb19c2051ca64ef634881dc61ee96648fb2dfeb3289ed4b8e586c46",
+      "passed": true,
+      "pid": 1564,
+      "hwnd": 3080300,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3080300,
+        "pid": 1564,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3080300,
+          "pid": 1564,
+          "foreground": 3080300,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3080300,
+          "pid": 1564,
+          "foreground": 3080300,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 9,
+      "report": "ztty-windows-x86_64.resize-control.cold-09.json",
+      "report_sha256": "263b133242b5c79a211721d0cdf053e80c8186177ec0f4ada9de3c20dbe4abcc",
+      "passed": true,
+      "pid": 5056,
+      "hwnd": 3145836,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3145836,
+        "pid": 5056,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3145836,
+          "pid": 5056,
+          "foreground": 3145836,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3145836,
+          "pid": 5056,
+          "foreground": 3145836,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 10,
+      "report": "ztty-windows-x86_64.resize-control.cold-10.json",
+      "report_sha256": "55b1f69a997829ecb51911d315b537be7623204a45bcb4a1f02e8eb329f1d433",
+      "passed": true,
+      "pid": 2636,
+      "hwnd": 3211372,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3211372,
+        "pid": 2636,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3211372,
+          "pid": 2636,
+          "foreground": 3211372,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3211372,
+          "pid": 2636,
+          "foreground": 3211372,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -46,
+          -46
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 11,
+      "report": "ztty-windows-x86_64.resize-control.cold-11.json",
+      "report_sha256": "4c4401a0e7a60cad1af7e8219faa38981b0840a167bf25d67b29e055980b2e03",
+      "passed": true,
+      "pid": 7760,
+      "hwnd": 3276908,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3276908,
+        "pid": 7760,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3276908,
+          "pid": 7760,
+          "foreground": 3276908,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3276908,
+          "pid": 7760,
+          "foreground": 3276908,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -72,
+          -72
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 12,
+      "report": "ztty-windows-x86_64.resize-control.cold-12.json",
+      "report_sha256": "cd1c55a1cfc8b272aa6734e79168b58215565f7ee30cfa680c62da57a1351f8b",
+      "passed": true,
+      "pid": 9108,
+      "hwnd": 3342444,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3342444,
+        "pid": 9108,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3342444,
+          "pid": 9108,
+          "foreground": 3342444,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3342444,
+          "pid": 9108,
+          "foreground": 3342444,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -98,
+          -98
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 13,
+      "report": "ztty-windows-x86_64.resize-control.cold-13.json",
+      "report_sha256": "1860968b7999f172fb0631690392f0c1a2f855e85363d94f92160234ed152a9f",
+      "passed": true,
+      "pid": 7740,
+      "hwnd": 3407980,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3407980,
+        "pid": 7740,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3407980,
+          "pid": 7740,
+          "foreground": 3407980,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3407980,
+          "pid": 7740,
+          "foreground": 3407980,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -124,
+          -124
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 14,
+      "report": "ztty-windows-x86_64.resize-control.cold-14.json",
+      "report_sha256": "b76bca4aa05cea37f7ae3eb5479580011c7e9027b7d1e7b4661cfee516d895d1",
+      "passed": true,
+      "pid": 2096,
+      "hwnd": 3473516,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3473516,
+        "pid": 2096,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3473516,
+          "pid": 2096,
+          "foreground": 3473516,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3473516,
+          "pid": 2096,
+          "foreground": 3473516,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 15,
+      "report": "ztty-windows-x86_64.resize-control.cold-15.json",
+      "report_sha256": "8ad1dc5329671acd7bbfbfdf6829bf9e717347d6f2df7faf976026bb2aa46726",
+      "passed": true,
+      "pid": 4904,
+      "hwnd": 3539052,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3539052,
+        "pid": 4904,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3539052,
+          "pid": 4904,
+          "foreground": 3539052,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3539052,
+          "pid": 4904,
+          "foreground": 3539052,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 16,
+      "report": "ztty-windows-x86_64.resize-control.cold-16.json",
+      "report_sha256": "73177d8c2a38aba66df4a3ca0d0a5e1e5b685023ff499bd955202bf5df948086",
+      "passed": true,
+      "pid": 1212,
+      "hwnd": 3604588,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3604588,
+        "pid": 1212,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "window_placement": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3604588,
+          "pid": 1212,
+          "foreground": 3604588,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3604588,
+          "pid": 1212,
+          "foreground": 3604588,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      },
+      "checks": [
+        {
+          "name": "before",
+          "passed": true
+        },
+        {
+          "name": "shrunk",
+          "passed": true
+        },
+        {
+          "name": "restored",
+          "passed": true
+        }
+      ],
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    }
+  ],
+  "pngs_verified": 48,
+  "geometry_samples_verified": 144,
+  "unique_png_contents": 2,
+  "startup_contract": {
+    "pid": 1324,
+    "dpi_awareness": -4,
+    "class_style": 3,
+    "window_style": 13565952,
+    "background_brush_null": true,
+    "creation_position": {
+      "x": "CW_USEDEFAULT",
+      "y": "CW_USEDEFAULT"
+    },
+    "resize_policy": "deferred_until_paint",
+    "dark_attribute": 20,
+    "dark_value": 1,
+    "dark_hresult": 0,
+    "valid_rect_policy": "default",
+    "nocopybits_added": false
+  },
+  "all_startup_pid_values_matched_their_process": true,
+  "window_geometry": {
+    "before_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "shrunk_outer": [
+      32,
+      32,
+      192,
+      261
+    ],
+    "restored_outer": [
+      32,
+      32,
+      228,
+      261
+    ],
+    "client_origin": [
+      40,
+      63
+    ],
+    "dpi": 96
+  },
+  "creation_and_placement_scope": {
+    "immutable_c_requests_creation_xy": [
+      "CW_USEDEFAULT",
+      "CW_USEDEFAULT"
+    ],
+    "harness_requests_placement_xy": [
+      32,
+      32
+    ],
+    "actual_pre_placement_outer_was_recorded": true,
+    "all16_moved": true,
+    "observed_creation_positions": [
+      [
+        26,
+        26
+      ],
+      [
+        52,
+        52
+      ],
+      [
+        78,
+        78
+      ],
+      [
+        104,
+        104
+      ],
+      [
+        130,
+        130
+      ],
+      [
+        156,
+        156
+      ],
+      [
+        26,
+        26
+      ],
+      [
+        26,
+        26
+      ],
+      [
+        52,
+        52
+      ],
+      [
+        78,
+        78
+      ],
+      [
+        104,
+        104
+      ],
+      [
+        130,
+        130
+      ],
+      [
+        156,
+        156
+      ],
+      [
+        26,
+        26
+      ],
+      [
+        26,
+        26
+      ],
+      [
+        52,
+        52
+      ]
+    ],
+    "limit": "All16 owned control HWNDs were read as NC-enabled, then changed to disabled with HRESULT0 and read as disabled. Visible placement moves are observed in every control. The C program still defers resize untilWM_PAINT and uses default valid rectangles; the C source is unchanged from the prior failed deferred control. Success is a harness NC-policy intervention, not a production-default fix or proof of internal system causality."
+  },
+  "cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-control-9488-7848918f9ec649678fd5857bb53c9ecf",
+    "input_after_restore": "Default"
+  },
+  "worker_elapsed_seconds": 1.398,
+  "worker_exit_code": 0,
+  "temporary_directory_scope": "Control creates no per-run TemporaryDirectory. Owned process exits and Job/desktop cleanup are verified; the generic cleanup flag does not assert deletion of sixteen nonexistent directories.",
+  "scope": "Independent retained-DIB Win32 control with harness-applied disabled NC rendering. All16 original before/shrunk/restored cycles pass with distinct owned processes, verified NC before/set/after records and exact client pixels. The source retains deferred resize and default valid rectangles. This is diagnostic evidence only and receives no ordinary production or formal release acceptance. ClientDC PNGs do not assess the titlebar/frame appearance. No native process was rerun during audit.",
+  "artifact_verification": "control-artifact-verification.json",
+  "png_analysis": "control-png-analysis.json"
+}
