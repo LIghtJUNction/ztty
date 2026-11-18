@@ -501,6 +501,61 @@ fn repeated_alternate_screen_enable_keeps_primary_saved_state() {
 }
 
 #[test]
+fn height_growth_preserves_pending_wrap_for_ascii_and_wide_cells() {
+    for (input, expected) in [("abcd", "abcd"), ("ab界", "ab界\0")] {
+        let mut t = Terminal::new(4, 2, 8);
+        t.feed(input.as_bytes());
+        t.resize(4, 3);
+        t.feed(b"e");
+        assert_eq!(line(&t, 0), expected);
+        assert_eq!(line(&t, 1), "e   ");
+        assert_eq!(t.cursor(), (1, 1));
+        assert_eq!(t.view_row_wrap(0, 0), Some(4));
+    }
+}
+
+#[test]
+fn height_shrink_preserves_pending_wrap_after_history_transfer() {
+    for (input, expected) in [("abcd", "abcd"), ("ab界", "ab界\0")] {
+        let mut t = Terminal::new(4, 4, 8);
+        t.feed(b"1111\r\n2222\r\n3333\r\n");
+        t.feed(input.as_bytes());
+        t.resize(4, 2);
+        assert_eq!(t.history_len(), 2);
+        t.feed(b"e");
+        assert_eq!(t.history_len(), 3);
+        assert_eq!(t.view_cell(0, 0, 1).ch, '3');
+        assert_eq!(line(&t, 0), expected);
+        assert_eq!(line(&t, 1), "e   ");
+        assert_eq!(t.cursor(), (1, 1));
+        assert_eq!(t.view_row_wrap(0, 0), Some(4));
+    }
+}
+
+#[test]
+fn height_resize_keeps_combining_marks_on_the_right_margin_cell() {
+    let mut t = Terminal::new(4, 2, 8);
+    t.feed(b"abcd");
+    t.resize(4, 3);
+    t.feed("\u{301}e".as_bytes());
+    assert_eq!(line(&t, 0), "abcd");
+    assert_eq!(t.cell(3, 0).combining, ['\u{301}', '\0']);
+    assert_eq!(t.cell(2, 0).combining, ['\0'; 2]);
+    assert_eq!(line(&t, 1), "e   ");
+}
+
+#[test]
+fn unchanged_resize_preserves_pending_wrap() {
+    let mut t = Terminal::new(4, 2, 8);
+    t.feed(b"abcd");
+    t.resize(4, 2);
+    t.feed(b"e");
+    assert_eq!(line(&t, 0), "abcd");
+    assert_eq!(line(&t, 1), "e   ");
+    assert_eq!(t.cursor(), (1, 1));
+}
+
+#[test]
 fn resize_keeps_the_cursor_row_and_moves_discarded_rows_into_history() {
     let mut t = Terminal::new(4, 4, 8);
     t.feed(b"1111\r\n2222\r\n3333\r\n4444");
