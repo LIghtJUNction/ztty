@@ -1,0 +1,44 @@
+{
+  "source": "f2a49ec23a54ed3334d825087e1cd97fd00816af",
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty",
+  "binary_sha256": "a6e1254283d888954698c8e92a61eded6703417e6854d6a16421290a98ccdb6e",
+  "binary_size": 682224,
+  "checks": [
+    {
+      "name": "sessions",
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.972,
+      "log": "mcp-sessions.log"
+    },
+    {
+      "name": "transport",
+      "command": [
+        "python3",
+        "tests/mcp_transport.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.255,
+      "log": "mcp-transport.log"
+    },
+    {
+      "name": "security",
+      "command": [
+        "python3",
+        "tests/mcp_security.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.352,
+      "log": "mcp-security.log"
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "fmt.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "gates.json": {
+    "size": 2983,
+    "sha256": "d871f1526aa76515ccb2feb56ddc4ac9cd6e18d49254aa86200816a29853e9f5"
+  },
+  "rust-tests.log": {
+    "size": 22879,
+    "sha256": "39fa6a70f3a3eed39a2d3f8ccf0b2f66d48796c452c9c626cc4f0e837d0ce705"
+  },
+  "clippy.log": {
+    "size": 173,
+    "sha256": "e1c15f0884ac446ff756cb6ac78ab48f3c8951c2557c7817f639f93ba8914aea"
+  },
+  "release.log": {
+    "size": 163,
+    "sha256": "121c7059c2ee3eee355fd17eeecd926236d38708fe511dcc720e3a171fa87e8d"
+  },
+  "shell-probe.log": {
+    "size": 186,
+    "sha256": "99d3ead0408738edf6118e038b0e667eed24249eb5ab7e1bff93a519ffcfd2cf"
+  },
+  "no-std.log": {
+    "size": 539,
+    "sha256": "177875a4c0166eb270d150e65bf3af4825d470da0ca4f11188773d3337a215be"
+  },
+  "bare-metal.log": {
+    "size": 318,
+    "sha256": "f51feb42fd2b5a3d720f63a6e1d6f1ae65ca6985ee925dd156dc2179f71af400"
+  },
+  "windows-typecheck.log": {
+    "size": 172,
+    "sha256": "f35b4952b1629f8ce94fd51cfda5c5d7440b4d91b722ddcd94250e2ef38c2259"
+  },
+  "macos-intel-typecheck.log": {
+    "size": 172,
+    "sha256": "0b4295c372fdc12d9dc1f27720ebe69a490682141fb1d3289bcaaf24d8f5c8b3"
+  },
+  "macos-arm-typecheck.log": {
+    "size": 172,
+    "sha256": "ab64c60455ce0c647f8e135bcf057f7b66895e46f1f75013af010a8e015c9e83"
+  },
+  "check-script-syntax.log": {
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "binary.json": {
+    "size": 263,
+    "sha256": "83a9cefb66450443984cef5a966bfeb38554aef3d90adcc144b9da228ffa637d"
+  },
+  "embedded-bash.json": {
+    "size": 546,
+    "sha256": "dd78fa40c611d2339e073e906dc7dd76b9954e6fc16f609091281734b8a2fd9c"
+  },
+  "bash.log": {
+    "size": 2165,
+    "sha256": "8fedc18b677a5e3cfaf22b1a674e0205def1fff3f9e7077bc9d18f4f9b041876"
+  },
+  "bash.json": {
+    "size": 2165,
+    "sha256": "8fedc18b677a5e3cfaf22b1a674e0205def1fff3f9e7077bc9d18f4f9b041876"
+  },
+  "acceptance.json": {
+    "size": 1968,
+    "sha256": "f58d4e482f6019484dd6a5f04ae0b3599b92a5e960c7e42c8cd9e0492596d413"
+  },
+  "shells.log": {
+    "size": 1824,
+    "sha256": "0d74330a1b34f3c498a721787c3e69a0d0b8308af606faf0e23ed4a1a83a2650"
+  },
+  "shells.json": {
+    "size": 3821,
+    "sha256": "adb5347fcceb6fc38188aaf401cce0d41d2283b83d712915b12c49210f209bc4"
+  },
+  "workspaces.log": {
+    "size": 7641,
+    "sha256": "e578cc6d532d80dab078a62f7275d9058dfb8cd69a4220a88ea0f964b47fc49e"
+  },
+  "workspaces.png": {
+    "size": 9825,
+    "sha256": "69e1aa7878e1ce4a706061de88af53396ef811b47e006d01e7b3cdbc42b2c194"
+  },
+  "workspace-cwd.png": {
+    "size": 14540,
+    "sha256": "747b77277ddfc08c5bf25234ab12c50790520e855ee2568a3dd11aeed1a531fd"
+  },
+  "workspaces.json": {
+    "size": 7641,
+    "sha256": "e578cc6d532d80dab078a62f7275d9058dfb8cd69a4220a88ea0f964b47fc49e"
+  },
+  "mcp-sessions.log": {
+    "size": 2146,
+    "sha256": "45461d214309a90f6e013270a90d1c5ea9d88287f07f25a42867f12948a6a7b2"
+  },
+  "mcp-gates.json": {
+    "size": 1287,
+    "sha256": "bc3b2cadbaf3c65435945571f4602abc1c501c7a541b6a7631d9e0d713fb4462"
+  },
+  "mcp-transport.log": {
+    "size": 334,
+    "sha256": "68d4e252fd4137b000eaed7f5f816e27b9ad730ef213fae3b781a921b14d8841"
+  },
+  "mcp-security.log": {
+    "size": 375,
+    "sha256": "bc7a39e25d09490a21aeed0c413f23f2d6489514bb49f7c35da613340a8e39de"
+  },
+  "bash-before.json": {
+    "size": 477,
+    "sha256": "d13279ab8255b2f3b4169f7e7401a972093bb4a4be2303190731770a6351a481"
+  },
+  "bash-old-gate.json": {
+    "size": 1373,
+    "sha256": "a9b3fdd6e226f47845c4c44af981d49f1aa560130620a9277d765918d77410d1"
+  },
+  "stale-cursor-before.json": {
+    "size": 1016,
+    "sha256": "c0f80157fc36dae5d3cdafc67854f70d0cff696798b08513743cb40d72bd67b7"
+  },
+  "summary.json": {
+    "size": 8989,
+    "sha256": "c4f88f63ad992f16d86e22caa7f2e2f52c646cdc47b578421eda7d3116ec178e"
+  },
+  "bash-pty/array.pty": {
+    "size": 2376,
+    "sha256": "2cd994ae256c523cb5b2e0fb637e571a5209709b5d6dd8e1841ead5ec630a66a"
+  },
+  "bash-pty/string.pty": {
+    "size": 1239,
+    "sha256": "20b3519b9300c7aebead8eb58a6d332f4c6a4be49a25f3ec62e1fd500aa273bb"
+  },
+  "bash-pty/unset.pty": {
+    "size": 872,
+    "sha256": "c3402c97ba416dcce24b6f2e8ded3194fe511a4af11e01088941091c2bcef063"
+  },
+  "shells/bash.pty": {
+    "size": 2436,
+    "sha256": "8b2f4336a84f388f60f558953c12627d13e0cac509ea191c753962b9239b5428"
+  },
+  "shells/zsh.pty": {
+    "size": 2305,
+    "sha256": "0627b715e0d4c807d70cca801d5846058546aecc84f5f3a6781cc1f5f7ad0d3d"
+  },
+  "shells/fish.pty": {
+    "size": 4472,
+    "sha256": "8bfe47fcc45a53a2eb890ca449166c0c4e590a89ee146850a066e89bf7a156ec"
+  },
+  "shells/nu.pty": {
+    "size": 248795,
+    "sha256": "824300e57df0e0f331437501fd3e830aba6789cf66005e61f669ef2a9dcf9aa1"
+  }
+}

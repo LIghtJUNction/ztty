@@ -1,0 +1,13 @@
+{
+  "source_commit": "7bd5188d0c6386d20de90361a5155545a6acdc9b",
+  "source_path": "shell/ztty.bash",
+  "source_sha256": "bf76374fe6ca0ddafba2fac21949ffaf3e096e2a5d2c6385a3f0279987e3e73b",
+  "command": [
+    "bash",
+    "-n",
+    "shell/ztty.bash"
+  ],
+  "exit_code": 2,
+  "stdout": "",
+  "stderr": "shell/ztty.bash: line 58: syntax error near unexpected token `elif'\nshell/ztty.bash: line 58: `elif [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == 'declare -a '* ]]; then'\n"
+}

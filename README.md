@@ -1,7 +1,5 @@
 # ztty
 
-**2026-11-18 integration checkpoint:** the full workspace branch now includes the main-branch throughput work and a Unicode cell-write optimization. The candidate passed 220 Rust unit/integration tests, 6 doctests and 61 real Linux GUI checks. A fixed-CPU parser/screen microbenchmark observed Unicode throughput of 87.760 → 112.083 MiB/s (+27.7%); end-to-end rendering and native Windows/macOS acceptance remain separate. [Implementation, raw results and screenshots](docs/integration-unicode-2026-11-18.md).
-
 <!-- terminal-benchmark:start -->
 [![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 
@@ -12,6 +10,8 @@ Measured source: `fa2f2017`; immutable binary: `a339a7d2…1b6d4d`. All 18 scena
 Linux software-X11 results: host load1 4.46–10.58 on 24 CPUs, with 17.34–17.96 GiB host swap already in use. RSS, PSS and Swap remain separate. Real GPU memory, first presented frame and input-to-display latency were not measured; the guarded 5/20-window, independent-instance and remaining-workload matrix is still incomplete.
 
 <!-- terminal-benchmark:end -->
+
+**Development checkpoint, 2026-11-18:** Bash loading and prompt hooks are repaired; MCP output reads can validate the original session identity and report reader termination. The current candidate passed 225 Rust tests, 6 doctests, four-shell integration, 11 Bash checks, 17 real Linux workspace checks and three MCP suites. [Implementation and evidence](docs/shell-resume-2026-11-18.md) · [Previous Unicode measurements](docs/integration-unicode-2026-11-18.md).
 
 **Output throughput checkpoint, 2026-11-18:** a separate ten-window run of
 source `dfe949c7` (ztty 0.2.1) measured 227.58 MiB/s. A separate paired old/new run measured

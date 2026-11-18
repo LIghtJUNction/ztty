@@ -1,0 +1,17 @@
+{
+  "schema": "ztty.bash-integration.v1",
+  "ok": false,
+  "platform": "Linux",
+  "source_path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/shell-recovery-20261118/before.bash",
+  "source_sha256": "bf76374fe6ca0ddafba2fac21949ffaf3e096e2a5d2c6385a3f0279987e3e73b",
+  "test_sha256": "2bc4fb80a89b9766e3114acdf8447e00f2242d8691277291a8a215253e99d388",
+  "bash_version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+  "checks": [],
+  "syntax": {
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/shell-recovery-20261118/before.bash: line 58: syntax error near unexpected token `elif'\n/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/shell-recovery-20261118/before.bash: line 58: `elif [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == 'declare -a '* ]]; then'\n"
+  },
+  "error": "AssertionError: /home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/shell-recovery-20261118/before.bash: line 58: syntax error near unexpected token `elif'\n/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/artifacts/shell-recovery-20261118/before.bash: line 58: `elif [[ $(declare -p PROMPT_COMMAND 2>/dev/null) == 'declare -a '* ]]; then'\n",
+  "transcripts": {}
+}

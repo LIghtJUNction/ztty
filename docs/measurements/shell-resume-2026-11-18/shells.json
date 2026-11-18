@@ -1,0 +1,92 @@
+{
+  "schema": "ztty.shell-integration.v1",
+  "platform": "Linux",
+  "source_sha256": {
+    "crates/zterm/src/lib.rs": "29dc98d13fbbcee89ad0463436a46a5710ce0d4981337529643780ea397c9a4c",
+    "crates/zterm/src/screen.rs": "cd001b2dcbe8463038cebf88dd440a9f600ef9cde07a82048e783033308f9549",
+    "crates/zterm/src/shell.rs": "a105b2971057d882f232257081e6f65c6088e6d4921d3521e87aeb8965586c4a",
+    "crates/zterm/src/shell_tests.rs": "8bd20c8f1818dcfb2f57a1841a13674f63d49d02d97ce7e7af57fee9833a2367",
+    "crates/zterm/src/sixel_tests.rs": "ae7537fa8984acb852fb679c434348e0b6456b606960ce6b792ed9cc271356e9",
+    "crates/zterm/src/terminal.rs": "d86bcad159dd2bee987f2c169c2b4a6ea5956299ba30c5c37024ebc876d9d91a",
+    "crates/zterm/src/tests.rs": "300d8d8d4125f00e8f428c41feef176ba279a7d7fc11f75e7e2dadb75b571ee3",
+    "crates/zterm/src/theme_tests.rs": "c390f94a7c020000e0be5416dadf8799ab871f0b7d81a4fadec815193d092c91",
+    "crates/zterm/examples/shell_probe.rs": "2ff60541fd1c3aa561592339345f9d45333ac0e41ce7ad4388d04362e02d30f4",
+    "shell/ztty.bash": "b67a54158f43329ae4d7b5f1f90946415a67aa75d557b1c5a148bf533815514f",
+    "shell/ztty.fish": "7ed1b9a4b84e278b58ed396c70e21612ba4182b128c5109d5cbf860bbfe9193b",
+    "shell/ztty.nu": "edf23776b13e0f1dcd532952486a326c2f916bce8e59e9a182c15f4a51e16896",
+    "shell/ztty.zsh": "199012940a843ceeafa677eaf40a2e7f2aec288e0c7ffd93e5f4bbc979caac96",
+    "tests/shell_integration.py": "2c68289ada254bb8429fa964c7c6350830187d9a5a42dcfe861167379ec74086"
+  },
+  "checks": [
+    {
+      "shell": "bash",
+      "status": "passed",
+      "version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+      "records": 8,
+      "transcript_bytes": 2436,
+      "transcript_sha256": "8b2f4336a84f388f60f558953c12627d13e0cac509ea191c753962b9239b5428",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces",
+        "bash -n syntax gate",
+        "first and repeated source each exit zero"
+      ]
+    },
+    {
+      "shell": "zsh",
+      "status": "passed",
+      "version": "zsh 5.9.2 (x86_64-pc-linux-gnu)",
+      "records": 4,
+      "transcript_bytes": 2305,
+      "transcript_sha256": "0627b715e0d4c807d70cca801d5846058546aecc84f5f3a6781cc1f5f7ad0d3d",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces"
+      ]
+    },
+    {
+      "shell": "fish",
+      "status": "passed",
+      "version": "fish，版本 4.9.3",
+      "records": 5,
+      "transcript_bytes": 4472,
+      "transcript_sha256": "8bfe47fcc45a53a2eb890ca449166c0c4e590a89ee146850a066e89bf7a156ec",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces"
+      ]
+    },
+    {
+      "shell": "nu",
+      "status": "passed",
+      "version": "0.117.0",
+      "records": 5,
+      "transcript_bytes": 248795,
+      "transcript_sha256": "824300e57df0e0f331437501fd3e830aba6789cf66005e61f669ef2a9dcf9aa1",
+      "checks": [
+        "real interactive PTY",
+        "source twice without duplicate execution marks",
+        "existing hooks and prompt preserved",
+        "successful output range",
+        "failure exit status 7",
+        "UTF-8 output",
+        "OSC 7 URI for Unicode and spaces"
+      ]
+    }
+  ]
+}
