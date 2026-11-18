@@ -87,7 +87,9 @@ ztty mcp --transport stdio
 ```
 
 The server reads one JSON-RPC message per input line and writes protocol
-responses to stdout. Diagnostic output uses stderr. A client configuration
+responses to stdout. Tool requests run concurrently; match each response by its
+JSON-RPC ID because completion order can differ from submission order.
+Diagnostic output uses stderr. A client configuration
 using the common `mcpServers` format can launch it with:
 
 ```json
@@ -148,7 +150,7 @@ versions. It supports `2025-11-25`, `2025-06-18` and
 | --- | --- | --- |
 | `session_create` | Optional `name`, `command`, `cwd`, `cols`, `rows`, `history` | URI, child/broker PIDs, dimensions and state |
 | `session_list` | None | All local and MCP sessions |
-| `session_read` | `session`; optional `cursor`, `max_bytes`, `expected_session` | Output page, screen snapshot, next cursor, `output_eof` and state |
+| `session_read` | `session`; optional `cursor`, `max_bytes`, `expected_session`, `wait_ms` | Output page, screen snapshot, next cursor, `output_eof` and state; positive waits also return `timed_out` |
 | `session_commands` | `session` | At most 128 OSC 133 records, exit status and availability |
 | `session_command_read` | `session`, `command_id`; optional `part`, `max_bytes` | Rendered command input/output, `complete` and `truncated` |
 | `session_write` | `session`, `data` | Queued input and session state |
@@ -236,8 +238,15 @@ in the text representation.
 Screen history grows on demand and has its own 8 MiB cell-storage cap. The
 broker allows 128 terminal sessions; close completed sessions to release
 their retained state. Each HTTP server allows 64 transport sessions and 64
-concurrent connections, with a 1 MiB message limit, a 4 MiB aggregate incoming
-and queued-response buffer limit and a ten-second request deadline.
+concurrent connections, with a 1 MiB message limit and a 4 MiB budget for
+in-flight payloads and retained broker buffers. Allocator capacity, parsed JSON,
+session state and operating-system buffers are separate memory costs. HTTP request
+receiving and response sending each have their own ten-second deadline; a pending
+output wait has a separate deadline. At most 32 HTTP connections may wait for
+output, preserving slots for management requests. Each stdio process accepts
+32 concurrent tool requests, including at most 24 positive output waits, and
+bounds its aggregate queued data to 4 MiB. A stdio writer that makes no progress
+for five seconds terminates the transport and releases its pending requests.
 
 ### Guarded resume and output termination
 
@@ -281,9 +290,73 @@ finished. Use `output_eof && !has_more` to identify a drained retained stream,
 and still check `truncated` for expired bytes. This condition does not guarantee
 a successful child exit or lossless transport.
 
-The current transport remains bounded request/response polling. Waiting or SSE
-subscriptions need an asynchronous broker connection integrated with the event
-loop; a blocking wait inside one MCP call would stall unrelated requests.
+### Waiting for output
+
+Set `wait_ms` to a value from 1 to 30,000 to park an empty read until output
+becomes available. Omitting it, or passing zero, keeps immediate-read behavior.
+The same byte cursor, page size, observer permissions and optional identity
+guard apply in either mode:
+
+```json
+{
+  "session": "ztty://mcp/stdio/checks",
+  "cursor": 4096,
+  "max_bytes": 16384,
+  "wait_ms": 30000,
+  "expected_session": {
+    "uri": "ztty://mcp/stdio/checks",
+    "id": 7,
+    "created_at": 1794988800000,
+    "broker_pid": 12345
+  }
+}
+```
+
+A positive wait completes when it can deliver bytes, report an expired cursor,
+or report `output_eof`. These responses have `timed_out: false`. At the deadline,
+an otherwise empty live stream returns `timed_out: true` with its current screen
+and unchanged cursor. An incomplete UTF-8 suffix stays pending until it becomes
+decodable, the reader terminates, or the deadline expires. Direct-child exit
+alone does not end a wait while a descendant still owns the PTY.
+
+Every parked read binds to the PTY instance selected when the request was
+accepted. Closing that PTY produces a tool error, even if a new terminal reuses
+its name before the reply is sent. A rename preserves the instance and URI.
+Keep sending `expected_session` when issuing later requests or reconnecting so
+the identity check also covers the interval between requests.
+
+The broker, stdio transport and HTTP listener drive these reads through their
+existing poll loops. Other clients can list, write, resize and close sessions
+while a read waits. A parked broker read retains only its session ID, cursor,
+page limit and deadline; its screen response is built on completion. The broker
+caps combined window and output waiters at 128 while retaining management
+connection capacity. HTTP continues to use JSON request/response mode; SSE and
+unsolicited output subscriptions are separate remaining work.
+
+### Cancelling a pending request
+
+Send the MCP cancellation notification using the original request ID:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "notifications/cancelled",
+  "params": {"requestId": 42}
+}
+```
+
+Cancellation drops that request's broker connection and produces no result for
+the cancelled request. Unknown, malformed and already completed cancellations
+are ignored. On HTTP, cancellation is restricted to the same authenticated MCP
+transport session; another session using the same request ID has no effect.
+Disconnecting its connection or deleting the HTTP session also releases pending
+reads. Keep the input direction open while a positive wait is pending: input
+EOF cancels it, including HTTP `shutdown(SHUT_WR)`. Accepted ordinary requests
+still complete after input EOF while the response direction remains available.
+These operations leave terminal processes alive. Bytes already sent
+by a write operation remain subject to the existing input-ownership rules and
+cannot be recalled. Clients should ignore responses that raced with a
+[cancellation](https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/cancellation).
 
 ## Verify
 
@@ -291,6 +364,7 @@ loop; a blocking wait inside one MCP call would stall unrelated requests.
 python3 tests/mcp_transport.py --binary ./target/release/ztty
 python3 tests/mcp_sessions.py --binary ./target/release/ztty
 python3 tests/mcp_security.py --binary ./target/release/ztty
+python3 tests/mcp_wait.py --binary ./target/release/ztty --output artifacts/mcp-wait/report.json
 python3 tests/daily_workflow.py --binary ./target/release/ztty
 python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
 ```

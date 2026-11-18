@@ -11,6 +11,7 @@ if [ "$(uname -s)" = Linux ]; then
     python3 tests/mcp_transport.py --binary ./target/release/ztty
     python3 tests/mcp_sessions.py --binary ./target/release/ztty
     python3 tests/mcp_security.py --binary ./target/release/ztty
+    python3 tests/mcp_wait.py --binary ./target/release/ztty --output artifacts/mcp-wait/report.json
 else
     printf '%s\n' 'Shared-session MCP checks: skipped (Linux-only runtime).'
 fi
@@ -23,4 +24,3 @@ if [ "${ZTTY_BARE_METAL:-0}" = 1 ]; then
 else
     printf '%s\n' 'Bare-metal portability check: skipped (set ZTTY_BARE_METAL=1 to require it).'
 fi
-

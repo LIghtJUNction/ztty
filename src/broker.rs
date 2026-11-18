@@ -5,6 +5,7 @@ use crate::{
 };
 use alloc::{ffi::CString, format, string::String, vec::Vec};
 use core::ffi::{c_int, c_void};
+use core::sync::atomic::{AtomicU64, Ordering};
 
 const LIMIT: usize = 1024 * 1024;
 const MAX_PEERS: usize = 192;
@@ -88,27 +89,53 @@ fn same_user(fd: i32) -> bool {
     }
 }
 
-fn connection() -> Result<Fd, String> {
+enum Connection {
+    Ready(Fd),
+    Connecting(Fd),
+    Unavailable,
+    Busy,
+}
+
+fn connection() -> Result<Connection, String> {
     let (address, size) = address()?;
     let fd = Fd(unsafe { socket(1, 1 | CLOEXEC | NONBLOCK, 0) });
     if fd.0 < 0 {
         return Err("cannot create broker connection".into());
     }
     if unsafe { connect(fd.0, &address, size) } < 0 {
-        return Err(format!(
-            "cannot connect to session broker (OS error {})",
-            os::errno()
-        ));
+        return match os::errno() {
+            2 | 111 => Ok(Connection::Unavailable),
+            4 | 11 => Ok(Connection::Busy),
+            114 | 115 => Ok(Connection::Connecting(fd)),
+            error => Err(format!(
+                "cannot connect to session broker (OS error {error})"
+            )),
+        };
     }
     if !same_user(fd.0) {
         return Err("session broker belongs to a different user".into());
     }
-    Ok(fd)
+    Ok(Connection::Ready(fd))
 }
 
 fn start() -> Result<(), String> {
+    // Several MCP calls can observe the same cold socket before the first
+    // child has bound it. Share that launch attempt within this process;
+    // individual requests keep retrying connect without forking again.
+    static NEXT_START: AtomicU64 = AtomicU64::new(0);
+    let now = os::milliseconds();
+    let previous = NEXT_START.load(Ordering::Relaxed);
+    let until = now.saturating_add(250);
+    if now < previous
+        || NEXT_START
+            .compare_exchange(previous, until, Ordering::Relaxed, Ordering::Relaxed)
+            .is_err()
+    {
+        return Ok(());
+    }
     let pid = unsafe { os::fork() };
     if pid < 0 {
+        let _ = NEXT_START.compare_exchange(until, now, Ordering::Relaxed, Ordering::Relaxed);
         return Err("cannot start session broker".into());
     }
     if pid == 0 {
@@ -147,57 +174,6 @@ fn start() -> Result<(), String> {
         }
     }
     Ok(())
-}
-
-fn ensure() -> Result<Fd, String> {
-    if let Ok(fd) = connection() {
-        return Ok(fd);
-    }
-    address()?;
-    start()?;
-    for _ in 0..250 {
-        if let Ok(fd) = connection() {
-            return Ok(fd);
-        }
-        unsafe {
-            os::poll(core::ptr::null_mut(), 0, 20);
-        }
-    }
-    connection()
-}
-
-fn ready(fd: i32, events: i16, deadline: Option<u64>) -> Result<(), String> {
-    loop {
-        let timeout = match deadline {
-            Some(end) => {
-                let now = os::milliseconds();
-                if now >= end {
-                    return Err("session broker request timed out".into());
-                }
-                end.saturating_sub(now).min(i32::MAX as u64) as i32
-            }
-            None => -1,
-        };
-        let mut item = os::PollFd {
-            fd,
-            events,
-            revents: 0,
-        };
-        let count = unsafe { os::poll(&mut item, 1, timeout) };
-        if count < 0 && os::errno() == os::EINTR {
-            continue;
-        }
-        if count < 0 {
-            return Err("session broker poll failed".into());
-        }
-        if count == 0 {
-            return Err("session broker request timed out".into());
-        }
-        if item.revents & (events | os::POLLHUP) != 0 {
-            return Ok(());
-        }
-        return Err("session broker disconnected".into());
-    }
 }
 
 pub fn hex(bytes: &[u8]) -> String {
@@ -258,65 +234,274 @@ fn caller_metadata(value: &mut Value) -> Result<(), String> {
     Ok(())
 }
 
-/// Send one operation. Command metadata travels only over same-user local IPC.
-pub fn request(value: &Value) -> Result<Value, String> {
-    let mut value = value.clone();
-    caller_metadata(&mut value)?;
-    let wait = value.get("op").and_then(Value::as_str) == Some("wait");
-    let fd = ensure()?;
-    let mut wire = json::stringify(&value).into_bytes();
-    if wire.len() >= LIMIT {
-        return Err("session request exceeds 1 MiB".into());
-    }
-    wire.push(b'\n');
-    let end = Some(os::milliseconds() + 5000);
-    let mut offset = 0;
-    while offset < wire.len() {
-        ready(fd.0, os::POLLOUT, end)?;
-        let n = unsafe {
-            send(
-                fd.0,
-                wire[offset..].as_ptr().cast(),
-                wire.len() - offset,
-                NOSIGNAL,
-            )
-        };
-        if n > 0 {
-            offset += n as usize;
-        } else if n < 0 && matches!(os::errno(), 4 | 11) {
-            continue;
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RequestPhase {
+    Connecting,
+    Sending,
+    Receiving,
+    Finished,
+}
+
+/// One nonblocking operation over same-user IPC. Dropping a request closes its
+/// connection; a request that has sent bytes is never reconnected or replayed.
+pub struct PendingRequest {
+    fd: Option<Fd>,
+    phase: RequestPhase,
+    wire: Vec<u8>,
+    sent: usize,
+    reply: Vec<u8>,
+    deadline: Option<u64>,
+    retry_at: Option<u64>,
+    reply_timeout: Option<u64>,
+    started: bool,
+}
+
+impl PendingRequest {
+    pub fn new(value: &Value) -> Result<Self, String> {
+        let mut value = value.clone();
+        caller_metadata(&mut value)?;
+        let operation = value.get("op").and_then(Value::as_str);
+        let reply_timeout = if operation == Some("wait") {
+            None
         } else {
-            return Err("session broker send failed".into());
+            let wait = if operation == Some("read") {
+                match value.get("wait_ms") {
+                    None => 0,
+                    Some(value) => value
+                        .as_u64()
+                        .filter(|&wait| wait <= 30000)
+                        .ok_or("wait_ms must be 0..30000")?,
+                }
+            } else {
+                0
+            };
+            Some(wait + 5000)
+        };
+        let mut wire = json::stringify(&value).into_bytes();
+        if wire.len() >= LIMIT {
+            return Err("session request exceeds 1 MiB".into());
+        }
+        wire.push(b'\n');
+        let mut pending = Self {
+            fd: None,
+            phase: RequestPhase::Sending,
+            wire,
+            sent: 0,
+            reply: Vec::new(),
+            deadline: Some(os::milliseconds().saturating_add(5000)),
+            retry_at: None,
+            reply_timeout,
+            started: false,
+        };
+        pending.connect_once()?;
+        Ok(pending)
+    }
+
+    fn connect_once(&mut self) -> Result<(), String> {
+        match connection()? {
+            Connection::Ready(fd) => {
+                self.fd = Some(fd);
+                self.phase = RequestPhase::Sending;
+                self.retry_at = None;
+            }
+            Connection::Connecting(fd) => {
+                self.fd = Some(fd);
+                self.phase = RequestPhase::Connecting;
+                self.retry_at = None;
+            }
+            unavailable => {
+                // A full listener backlog is not a missing broker. Only a
+                // refused/missing endpoint may start one, once per request.
+                if matches!(unavailable, Connection::Unavailable) && !self.started {
+                    start()?;
+                    self.started = true;
+                }
+                self.retry_at = Some(os::milliseconds().saturating_add(20));
+            }
+        }
+        Ok(())
+    }
+
+    pub fn poll_fd(&self) -> Option<os::PollFd> {
+        self.fd.as_ref().map(|fd| os::PollFd {
+            fd: fd.0,
+            events: if self.phase == RequestPhase::Receiving {
+                os::POLLIN
+            } else {
+                os::POLLOUT
+            },
+            revents: 0,
+        })
+    }
+
+    pub fn next_deadline(&self) -> Option<u64> {
+        match (self.deadline, self.retry_at) {
+            (Some(deadline), Some(retry)) => Some(deadline.min(retry)),
+            (deadline, retry) => deadline.or(retry),
         }
     }
-    let mut reply = Vec::new();
-    let mut buffer = [0u8; 8192];
-    loop {
-        ready(fd.0, os::POLLIN, if wait { None } else { end })?;
-        let n = unsafe { recv(fd.0, buffer.as_mut_ptr().cast(), buffer.len(), 0) };
-        if n < 0 && matches!(os::errno(), 4 | 11) {
-            continue;
+
+    /// Retained allocation, including already-sent bytes until the request has
+    /// been sent completely. Transports can use this for aggregate buffer caps.
+    pub fn buffered_bytes(&self) -> usize {
+        self.wire.capacity().saturating_add(self.reply.capacity())
+    }
+
+    fn finish(&mut self, value: Result<Value, String>) -> Option<Result<Value, String>> {
+        self.fd = None;
+        self.phase = RequestPhase::Finished;
+        self.deadline = None;
+        self.retry_at = None;
+        self.wire = Vec::new();
+        self.reply = Vec::new();
+        Some(value)
+    }
+
+    /// Advance until EAGAIN or a bounded I/O budget is exhausted. Completion is
+    /// yielded once; callers then remove this request from their pending set.
+    pub fn advance(&mut self) -> Option<Result<Value, String>> {
+        if self.phase == RequestPhase::Finished {
+            return None;
         }
-        if n <= 0 {
-            return Err("session broker disconnected before replying".into());
+        let now = os::milliseconds();
+        if self.deadline.is_some_and(|deadline| now >= deadline) {
+            return self.finish(Err("session broker request timed out".into()));
         }
-        if reply.len() + n as usize > LIMIT {
-            return Err("session reply exceeds 1 MiB".into());
-        }
-        reply.extend_from_slice(&buffer[..n as usize]);
-        if let Some(newline) = reply.iter().position(|&b| b == b'\n') {
-            let envelope = json::parse(&reply[..newline]).map_err(String::from)?;
-            if envelope.get("ok").and_then(Value::as_bool) == Some(true) {
-                return envelope
-                    .get("result")
-                    .cloned()
-                    .ok_or_else(|| "missing session result".into());
+        if self.fd.is_none() {
+            if self.retry_at.is_some_and(|retry| now < retry) {
+                return None;
             }
-            return Err(envelope
-                .get("error")
-                .and_then(Value::as_str)
-                .unwrap_or("session request failed")
-                .into());
+            if let Err(error) = self.connect_once() {
+                return self.finish(Err(error));
+            }
+        }
+        let fd = self.fd.as_ref()?.0;
+        if self.phase == RequestPhase::Connecting {
+            let mut item = os::PollFd {
+                fd,
+                events: os::POLLOUT,
+                revents: 0,
+            };
+            let count = unsafe { os::poll(&mut item, 1, 0) };
+            if count == 0 || (count < 0 && os::errno() == os::EINTR) {
+                return None;
+            }
+            if count < 0 {
+                return self.finish(Err("session broker poll failed".into()));
+            }
+            let mut error = 0i32;
+            let mut size = core::mem::size_of_val(&error) as u32;
+            if unsafe { getsockopt(fd, 1, 4, (&mut error as *mut i32).cast(), &mut size) } != 0 {
+                return self.finish(Err("cannot inspect broker connection".into()));
+            }
+            match error {
+                0 => {}
+                4 | 11 | 114 | 115 => return None,
+                2 | 111 => {
+                    self.fd = None;
+                    self.phase = RequestPhase::Sending;
+                    self.retry_at = Some(os::milliseconds().saturating_add(20));
+                    return None;
+                }
+                error => {
+                    return self.finish(Err(format!(
+                        "cannot connect to session broker (OS error {error})"
+                    )));
+                }
+            }
+            if !same_user(fd) {
+                return self.finish(Err("session broker belongs to a different user".into()));
+            }
+            self.phase = RequestPhase::Sending;
+        }
+        if self.phase == RequestPhase::Sending {
+            for _ in 0..32 {
+                if self.sent == self.wire.len() {
+                    break;
+                }
+                let end = self.sent.saturating_add(8192).min(self.wire.len());
+                let bytes = &self.wire[self.sent..end];
+                let count = unsafe { send(fd, bytes.as_ptr().cast(), bytes.len(), NOSIGNAL) };
+                if count > 0 {
+                    self.sent += count as usize;
+                } else if count < 0 && os::errno() == os::EINTR {
+                    continue;
+                } else if count < 0 && os::errno() == 11 {
+                    return None;
+                } else {
+                    return self.finish(Err("session broker send failed".into()));
+                }
+            }
+            if self.sent < self.wire.len() {
+                return None;
+            }
+            self.wire = Vec::new();
+            self.phase = RequestPhase::Receiving;
+            self.deadline = self
+                .reply_timeout
+                .map(|timeout| os::milliseconds().saturating_add(timeout));
+        }
+        let mut buffer = [0u8; 8192];
+        for _ in 0..32 {
+            let count = unsafe { recv(fd, buffer.as_mut_ptr().cast(), buffer.len(), 0) };
+            if count < 0 && os::errno() == os::EINTR {
+                continue;
+            }
+            if count < 0 && os::errno() == 11 {
+                return None;
+            }
+            if count <= 0 {
+                return self.finish(Err("session broker disconnected before replying".into()));
+            }
+            if self.reply.len() + count as usize > LIMIT {
+                return self.finish(Err("session reply exceeds 1 MiB".into()));
+            }
+            let previous = self.reply.len();
+            self.reply.extend_from_slice(&buffer[..count as usize]);
+            if let Some(newline) = buffer[..count as usize].iter().position(|&b| b == b'\n') {
+                let result = json::parse(&self.reply[..previous + newline])
+                    .map_err(String::from)
+                    .and_then(|envelope| {
+                        if envelope.get("ok").and_then(Value::as_bool) == Some(true) {
+                            envelope
+                                .get("result")
+                                .cloned()
+                                .ok_or_else(|| "missing session result".into())
+                        } else {
+                            Err(envelope
+                                .get("error")
+                                .and_then(Value::as_str)
+                                .unwrap_or("session request failed")
+                                .into())
+                        }
+                    });
+                return self.finish(result);
+            }
+        }
+        None
+    }
+}
+
+/// Send one operation synchronously for CLI callers, using the same bounded
+/// transport as the asynchronous MCP frontends.
+pub fn request(value: &Value) -> Result<Value, String> {
+    let mut pending = PendingRequest::new(value)?;
+    loop {
+        if let Some(result) = pending.advance() {
+            return result;
+        }
+        let timeout = pending.next_deadline().map_or(-1, |deadline| {
+            deadline
+                .saturating_sub(os::milliseconds())
+                .min(i32::MAX as u64) as i32
+        });
+        let count = if let Some(mut fd) = pending.poll_fd() {
+            unsafe { os::poll(&mut fd, 1, timeout) }
+        } else {
+            unsafe { os::poll(core::ptr::null_mut(), 0, timeout) }
+        };
+        if count < 0 && os::errno() != os::EINTR {
+            return Err("session broker poll failed".into());
         }
     }
 }
@@ -324,6 +509,16 @@ pub fn request(value: &Value) -> Result<Value, String> {
 pub enum Reply {
     Value(Value),
     Wait(String),
+    ReadWait(ReadWait),
+}
+
+/// A parked read refers to one PTY incarnation in this broker, even when the
+/// caller used a short name and did not supply an explicit identity guard.
+pub struct ReadWait {
+    pub session_id: u64,
+    pub cursor: u64,
+    pub max_bytes: Option<u64>,
+    pub deadline: u64,
 }
 
 struct Peer {
@@ -332,11 +527,16 @@ struct Peer {
     output: Vec<u8>,
     sent: usize,
     wait: Option<String>,
+    read_wait: Option<ReadWait>,
     deadline: u64,
     done: bool,
 }
 
 impl Peer {
+    fn waiting(&self) -> bool {
+        self.wait.is_some() || self.read_wait.is_some()
+    }
+
     fn reply(&mut self, value: Result<Value, String>) {
         let envelope = match value {
             Ok(value) => json::object([("ok", Value::Bool(true)), ("result", value)]),
@@ -346,7 +546,9 @@ impl Peer {
         self.input.shrink_to_fit();
         self.output = json::stringify(&envelope).into_bytes();
         self.output.push(b'\n');
+        self.sent = 0;
         self.wait = None;
+        self.read_wait = None;
         self.deadline = os::milliseconds() + 5000;
     }
 }
@@ -395,6 +597,33 @@ impl Server {
         self.peers.iter().any(|p| p.wait.is_none())
     }
 
+    pub fn next_deadline(&self) -> Option<u64> {
+        self.peers
+            .iter()
+            .filter_map(|peer| {
+                if let Some(wait) = &peer.read_wait {
+                    Some(wait.deadline)
+                } else if peer.wait.is_none() {
+                    Some(peer.deadline)
+                } else {
+                    None
+                }
+            })
+            .min()
+    }
+
+    /// Run after PTY reads and management operations. Only a ready read builds
+    /// its screen snapshot; parked peers retain a fixed-size cursor condition.
+    pub fn wake_reads(&mut self, mut read: impl FnMut(&ReadWait) -> Option<Result<Value, String>>) {
+        for peer in &mut self.peers {
+            if let Some(wait) = &peer.read_wait
+                && let Some(result) = read(wait)
+            {
+                peer.reply(result);
+            }
+        }
+    }
+
     pub fn finish(&mut self, name: &str, status: i32) {
         for peer in &mut self.peers {
             if peer.wait.as_deref() == Some(name) {
@@ -426,15 +655,16 @@ impl Server {
                 output: Vec::new(),
                 sent: 0,
                 wait: None,
+                read_wait: None,
                 deadline: os::milliseconds() + 5000,
                 done: false,
             });
         }
-        let mut waiting = self.peers.iter().filter(|p| p.wait.is_some()).count();
+        let mut waiting = self.peers.iter().filter(|p| p.waiting()).count();
         let mut total_input: usize = self.peers.iter().map(|p| p.input.len()).sum();
         let mut buffer = [0u8; 8192];
         for peer in &mut self.peers {
-            if peer.wait.is_none() && os::milliseconds() > peer.deadline {
+            if !peer.waiting() && os::milliseconds() >= peer.deadline {
                 peer.done = true;
                 continue;
             }
@@ -464,10 +694,14 @@ impl Server {
                     break;
                 }
                 if n <= 0 {
+                    if peer.waiting() {
+                        waiting -= 1;
+                    }
                     peer.done = true;
                     break;
                 }
-                if peer.wait.is_some() {
+                if peer.waiting() {
+                    waiting -= 1;
                     peer.done = true;
                     break;
                 }
@@ -485,10 +719,19 @@ impl Server {
                     match result {
                         Ok(Reply::Wait(name)) => {
                             if waiting >= MAX_WAITERS {
-                                peer.reply(Err("window waiter limit reached (128); management connections remain available".into()));
+                                peer.reply(Err("session waiter limit reached (128); management connections remain available".into()));
                             } else {
                                 waiting += 1;
                                 peer.wait = Some(name);
+                                peer.input = Vec::new();
+                            }
+                        }
+                        Ok(Reply::ReadWait(read)) => {
+                            if waiting >= MAX_WAITERS {
+                                peer.reply(Err("session waiter limit reached (128); management connections remain available".into()));
+                            } else {
+                                waiting += 1;
+                                peer.read_wait = Some(read);
                                 peer.input = Vec::new();
                             }
                         }

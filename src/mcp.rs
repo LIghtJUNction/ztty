@@ -12,12 +12,17 @@ mod http;
 
 pub(super) const VERSIONS: [&str; 3] = ["2025-11-25", "2025-06-18", "2025-03-26"];
 const HELP: &str = "Usage: ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n                [--read-only] [--token TOKEN] [--observer-token TOKEN]\n                [--allow-host AUTHORITY]\n\nDefaults: stdio; HTTP host 127.0.0.1, port 8732, endpoint /mcp.\nUse --port 0 to choose a free port. ZTTY_MCP_TOKEN supplies an operator token;\nZTTY_MCP_OBSERVER_TOKEN supplies an observer token. --read-only limits all\nclients to session and command reads, including operator-token holders.\nNon-loopback HTTP requires a token. --allow-host explicitly permits another\nHTTP Host authority (name:port), for example behind a trusted local proxy.\nHTTP authentication is required whenever either token is configured.\nMCP protocol versions: 2025-11-25, 2025-06-18, 2025-03-26.\nMCP sessions create persistent PTYs; use ztty attach to list and view them.\n";
+const MAX_PENDING: usize = 32;
+const MAX_WAITING: usize = 24;
+const MAX_BUFFERED: usize = 4 * 1024 * 1024;
+const OUTPUT_TIMEOUT: u64 = 5000;
+
 const TOOLS: &str = r#"[
 {"name":"session_create","description":"Create a persistent terminal session in the shared ztty process. Commands are argv; use an explicit shell for shell syntax. Attach the returned URI with ztty attach.","inputSchema":{"type":"object","properties":{"name":{"type":"string","description":"Optional unique name within this MCP transport namespace"},"command":{"type":"array","items":{"type":"string"},"minItems":1,"description":"Executable and arguments; defaults to the configured shell"},"cwd":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256},"history":{"type":"integer","minimum":0,"maximum":100000}},"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":true}},
 {"name":"session_list","description":"List terminal sessions, canonical ztty:// URIs, process state and attached windows.","inputSchema":{"type":"object","properties":{},"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_commands","description":"List up to 128 retained OSC 133 shell command boundaries, exit codes and availability. Requires shell integration; records refer to the retained terminal history.","inputSchema":{"type":"object","properties":{"session":{"type":"string"}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_command_read","description":"Read one shell command input or output from retained terminal cells, bounded to 65536 UTF-8 bytes. This is rendered text, not immutable raw stdout. Check complete and truncated.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"command_id":{"type":"integer","minimum":1},"part":{"type":"string","enum":["input","output"]},"max_bytes":{"type":"integer","minimum":1,"maximum":65536}},"required":["session","command_id"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
-{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. Reuse next_cursor and send expected_session from prior uri/id/created_at/broker_pid fields to reject a replaced session. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish UTF-8. truncated reports expired output. Only output_eof together with has_more=false means the output stream is drained; running=false alone does not.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536},"expected_session":{"type":"object","description":"Optional identity guard copied from a previous create/list/read response; rejects a new PTY that reused the URI. Public identifiers, not credentials.","properties":{"uri":{"type":"string","minLength":1,"maxLength":2048},"id":{"type":"integer","minimum":1},"created_at":{"type":"integer","minimum":1},"broker_pid":{"type":"integer","minimum":1,"maximum":4294967295}},"required":["uri","id","created_at","broker_pid"],"additionalProperties":false}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
+{"name":"session_read","description":"Read terminal output from a byte cursor and the current screen. Reuse next_cursor and send expected_session from prior uri/id/created_at/broker_pid fields to reject a replaced session. max_bytes is at most 65536; a text page may extend by up to 3 bytes to finish UTF-8. truncated reports expired output. wait_ms (0..30000, default 0) waits without blocking other requests until output, truncation or EOF; timed_out marks expiry. Only output_eof together with has_more=false means the output stream is drained; running=false alone does not.","inputSchema":{"type":"object","properties":{"session":{"type":"string","description":"Canonical ztty:// URI or unambiguous short name"},"cursor":{"type":"integer","minimum":0},"max_bytes":{"type":"integer","minimum":1,"maximum":65536},"wait_ms":{"type":"integer","minimum":0,"maximum":30000},"expected_session":{"type":"object","description":"Optional identity guard copied from a previous create/list/read response; rejects a new PTY that reused the URI. Public identifiers, not credentials.","properties":{"uri":{"type":"string","minLength":1,"maxLength":2048},"id":{"type":"integer","minimum":1},"created_at":{"type":"integer","minimum":1},"broker_pid":{"type":"integer","minimum":1,"maximum":4294967295}},"required":["uri","id","created_at","broker_pid"],"additionalProperties":false}},"required":["session"],"additionalProperties":false},"annotations":{"readOnlyHint":true,"openWorldHint":false}},
 {"name":"session_write","description":"Send up to 65536 UTF-8 bytes or terminal control bytes to a session. Include a newline to submit a shell command; use \\u0003 to interrupt.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"data":{"type":"string","maxLength":65536}},"required":["session","data"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":true}},
 {"name":"session_resize","description":"Resize a session PTY and screen; attached windows use the new terminal dimensions.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"cols":{"type":"integer","minimum":2,"maximum":512},"rows":{"type":"integer","minimum":2,"maximum":256}},"required":["session","cols","rows"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":false,"openWorldHint":false}},
 {"name":"session_control","description":"Acquire or release exclusive input control. takeover=true explicitly replaces another operator; observers cannot acquire control.","inputSchema":{"type":"object","properties":{"session":{"type":"string"},"action":{"type":"string","enum":["acquire","release"]},"takeover":{"type":"boolean"}},"required":["session","action"],"additionalProperties":false},"annotations":{"readOnlyHint":false,"destructiveHint":true,"openWorldHint":false}},
@@ -259,7 +264,30 @@ fn observable_tool(name: &str) -> bool {
     )
 }
 
-pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) -> Option<Value> {
+pub(super) enum Action {
+    Tool { id: Value, request: Value },
+    Cancel(Value),
+}
+
+pub(super) struct Dispatch {
+    pub(super) response: Option<Value>,
+    pub(super) action: Option<Action>,
+}
+
+/// Validation and lifecycle transitions do no broker I/O. Transports own the
+/// bounded in-flight requests, so waiting for one PTY never blocks another.
+pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) -> Dispatch {
+    let mut action = None;
+    let response = dispatch_message(message, session, origin, &mut action);
+    Dispatch { response, action }
+}
+
+fn dispatch_message(
+    message: &Value,
+    session: &mut RpcSession,
+    origin: &str,
+    action: &mut Option<Action>,
+) -> Option<Value> {
     let kind = match message_kind(message) {
         Ok(kind) => kind,
         Err(()) => return Some(error(Value::Null, -32600, "Invalid Request")),
@@ -279,6 +307,19 @@ pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) 
         }
         if method == "notifications/initialized" && session.initialized {
             session.ready = true;
+        } else if method == "notifications/cancelled" && session.ready {
+            let params = message.get("params");
+            if params
+                .and_then(|params| params.get("reason"))
+                .is_some_and(|reason| reason.as_str().is_none())
+            {
+                return None;
+            }
+            if let Some(id) = params.and_then(|params| params.get("requestId"))
+                && valid_id(id)
+            {
+                *action = Some(Action::Cancel(id.clone()));
+            }
         }
         return None;
     }
@@ -376,24 +417,8 @@ pub(super) fn dispatch(message: &Value, session: &mut RpcSession, origin: &str) 
                 ));
             }
             request.set("_actor", session.actor.clone().into());
-            let (result, failed) = match crate::broker::request(&request) {
-                Ok(value) => (value, false),
-                Err(message) => (object([("error", message.into())]), true),
-            };
-            Some(success(
-                id,
-                object([
-                    (
-                        "content",
-                        Value::Array(alloc::vec![object([
-                            ("type", "text".into()),
-                            ("text", json::stringify(&result).into())
-                        ])]),
-                    ),
-                    ("structuredContent", result),
-                    ("isError", failed.into()),
-                ]),
-            ))
+            *action = Some(Action::Tool { id, request });
+            None
         }
         _ => Some(error(id, -32601, "Method not found")),
     }
@@ -411,7 +436,13 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         "session_list" => ("list", &[]),
         "session_read" => (
             "read",
-            &["session", "cursor", "max_bytes", "expected_session"],
+            &[
+                "session",
+                "cursor",
+                "max_bytes",
+                "expected_session",
+                "wait_ms",
+            ],
         ),
         "session_commands" => ("commands", &["session"]),
         "session_command_read" => (
@@ -477,6 +508,7 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
         ("history", 0, 100000),
         ("max_bytes", 1, 65536),
         ("cursor", 0, u64::MAX),
+        ("wait_ms", 0, 30000),
         ("command_id", 1, u64::MAX),
     ] {
         if let Some(value) = arguments.get(key) {
@@ -529,63 +561,349 @@ fn tool_request(name: &str, arguments: &Value, origin: &str) -> Result<Value, &'
     Ok(request)
 }
 
+fn valid_id(id: &Value) -> bool {
+    matches!(id, Value::String(_)) || matches!(id, Value::Number(number) if integer_number(number))
+}
+
+pub(super) fn tool_response(id: Value, result: Result<Value, String>) -> Value {
+    let (result, failed) = match result {
+        Ok(value) => (value, false),
+        Err(message) => (object([("error", message.into())]), true),
+    };
+    success(
+        id,
+        object([
+            (
+                "content",
+                Value::Array(alloc::vec![object([
+                    ("type", "text".into()),
+                    ("text", json::stringify(&result).into()),
+                ])]),
+            ),
+            ("structuredContent", result),
+            ("isError", failed.into()),
+        ]),
+    )
+}
+
+pub(super) struct PendingCall {
+    pub(super) id: Value,
+    pub(super) broker: crate::broker::PendingRequest,
+    pub(super) waiting: bool,
+}
+
+impl PendingCall {
+    pub(super) fn new(id: Value, request: &Value) -> Result<Self, Value> {
+        let waiting = request.get("op").and_then(Value::as_str) == Some("read")
+            && request.get("wait_ms").and_then(Value::as_u64).unwrap_or(0) != 0;
+        match crate::broker::PendingRequest::new(request) {
+            Ok(broker) => Ok(Self {
+                id,
+                broker,
+                waiting,
+            }),
+            Err(message) => Err(tool_response(id, Err(message))),
+        }
+    }
+
+    pub(super) fn advance(&mut self) -> Option<Value> {
+        self.broker
+            .advance()
+            .map(|value| tool_response(self.id.clone(), value))
+    }
+
+    pub(super) fn buffered_bytes(&self) -> usize {
+        let id_bytes = match &self.id {
+            Value::String(id) | Value::Number(id) => id.len(),
+            _ => 0,
+        };
+        self.broker.buffered_bytes() + id_bytes
+    }
+}
+
+struct NonblockingStdio {
+    flags: [i32; 2],
+}
+
+impl NonblockingStdio {
+    fn new() -> Result<Self, String> {
+        let flags = [unsafe { os::fcntl(0, 3) }, unsafe { os::fcntl(1, 3) }];
+        if flags.iter().any(|flags| *flags < 0) {
+            return Err("cannot inspect MCP stdio flags".into());
+        }
+        let guard = Self { flags };
+        for fd in 0..2 {
+            if unsafe { os::fcntl(fd, 4, flags[fd as usize] | 0o4000) } < 0 {
+                return Err("cannot configure nonblocking MCP stdio".into());
+            }
+        }
+        Ok(guard)
+    }
+}
+
+impl Drop for NonblockingStdio {
+    fn drop(&mut self) {
+        for fd in 0..2 {
+            unsafe {
+                os::fcntl(fd, 4, self.flags[fd as usize]);
+            }
+        }
+    }
+}
+
+#[derive(Default)]
+struct Output {
+    bytes: Vec<u8>,
+    sent: usize,
+    deadline: Option<u64>,
+}
+
+impl Output {
+    fn len(&self) -> usize {
+        self.bytes.len() - self.sent
+    }
+
+    fn push(&mut self, response: Value) -> Result<(), String> {
+        let text = json::stringify(&response);
+        if self.len().saturating_add(text.len() + 1) > MAX_BUFFERED {
+            return Err("MCP stdout backpressure limit exceeded".into());
+        }
+        if self.sent != 0 {
+            self.bytes.drain(..self.sent);
+            self.sent = 0;
+        }
+        self.bytes.reserve_exact(text.len() + 1);
+        self.bytes.extend_from_slice(text.as_bytes());
+        self.bytes.push(b'\n');
+        self.deadline
+            .get_or_insert(os::milliseconds() + OUTPUT_TIMEOUT);
+        Ok(())
+    }
+
+    fn flush(&mut self) -> Result<(), String> {
+        if self.len() == 0 {
+            return Ok(());
+        }
+        let pending = &self.bytes[self.sent..];
+        let n = unsafe { os::write(1, pending.as_ptr().cast(), pending.len().min(65536)) };
+        if n > 0 {
+            self.sent += n as usize;
+            self.deadline = Some(os::milliseconds() + OUTPUT_TIMEOUT);
+            if self.sent == self.bytes.len() {
+                if self.bytes.capacity() > 65536 {
+                    self.bytes = Vec::new();
+                } else {
+                    self.bytes.clear();
+                }
+                self.sent = 0;
+                self.deadline = None;
+            }
+        } else if n == 0 || !matches!(os::errno(), 4 | 11) {
+            return Err("cannot write MCP stdout".into());
+        }
+        Ok(())
+    }
+}
+
 fn stdio(read_only: bool) -> Result<i32, String> {
     let actor = http::random_id().map_err(|()| "cannot create secure MCP actor identity")?;
     let mut session = RpcSession::new(read_only, format!("mcp:{actor}"));
-    let mut pending = Vec::new();
+    let _nonblocking = NonblockingStdio::new()?;
+    let mut input = Vec::new();
+    let mut output = Output::default();
+    let mut calls: Vec<PendingCall> = Vec::new();
     let mut buffer = [0u8; 8192];
     let mut discard = false;
+    let mut eof = false;
+    let mut fds = Vec::new();
     loop {
-        let count = unsafe { read(0, buffer.as_mut_ptr().cast(), buffer.len()) };
-        if count == 0 {
-            if !pending.is_empty() {
-                emit(error(Value::Null, -32700, "unterminated stdio message"));
+        let mut index = 0;
+        while index < calls.len() {
+            if let Some(response) = calls[index].advance() {
+                calls.swap_remove(index);
+                output.push(response)?;
+            } else {
+                index += 1;
             }
+        }
+        let now = os::milliseconds();
+        if output.deadline.is_some_and(|deadline| now >= deadline) {
+            return Err("MCP stdout reader stopped making progress".into());
+        }
+        if eof && calls.is_empty() && output.len() == 0 {
             return Ok(0);
         }
+        if input.len() + output.len() + calls.iter().map(PendingCall::buffered_bytes).sum::<usize>()
+            > MAX_BUFFERED
+        {
+            return Err("MCP stdio buffer limit exceeded".into());
+        }
+        fds.clear();
+        fds.push(os::PollFd {
+            fd: if eof { -1 } else { 0 },
+            events: os::POLLIN,
+            revents: 0,
+        });
+        fds.push(os::PollFd {
+            fd: 1,
+            events: if output.len() == 0 { 0 } else { os::POLLOUT },
+            revents: 0,
+        });
+        for call in &calls {
+            if let Some(fd) = call.broker.poll_fd() {
+                fds.push(fd);
+            }
+        }
+        let timeout = calls
+            .iter()
+            .filter_map(|call| call.broker.next_deadline())
+            .chain(output.deadline)
+            .min()
+            .map_or(-1, |deadline| {
+                deadline.saturating_sub(now).min(i32::MAX as u64) as i32
+            });
+        let count = unsafe { os::poll(fds.as_mut_ptr(), fds.len(), timeout) };
         if count < 0 {
             if os::errno() == os::EINTR {
                 continue;
             }
-            return Err("cannot read MCP stdin".into());
+            return Err("MCP stdio poll failed".into());
         }
-        for &byte in &buffer[..count as usize] {
-            if byte == b'\n' {
-                if discard {
-                    discard = false;
+        if fds[1].revents & (os::POLLERR | os::POLLHUP | 32) != 0 {
+            return Err("MCP stdout disconnected".into());
+        }
+        if fds[1].revents & os::POLLOUT != 0 {
+            output.flush()?;
+        }
+        if fds[0].revents & (os::POLLIN | os::POLLHUP | os::POLLERR) == 0 {
+            continue;
+        }
+        for _ in 0..8 {
+            let count = unsafe { read(0, buffer.as_mut_ptr().cast(), buffer.len()) };
+            if count == 0 {
+                eof = true;
+                // EOF cancels open-ended observation, while accepted ordinary
+                // requests still run and deliver their responses to stdout.
+                calls.retain(|call| !call.waiting);
+                if !input.is_empty() {
+                    output.push(error(Value::Null, -32700, "unterminated stdio message"))?;
+                    input.clear();
+                }
+                break;
+            }
+            if count < 0 {
+                if os::errno() == os::EINTR {
                     continue;
                 }
-                if pending.last() == Some(&b'\r') {
-                    pending.pop();
+                if os::errno() == 11 {
+                    break;
                 }
-                if !pending.is_empty() {
-                    match json::parse(&pending) {
-                        Ok(request) => {
-                            if let Some(response) = dispatch(&request, &mut session, "mcp/stdio") {
-                                emit(response);
-                            }
-                        }
-                        Err(message) => emit(error(Value::Null, -32700, message)),
+                return Err("cannot read MCP stdin".into());
+            }
+            for &byte in &buffer[..count as usize] {
+                if byte == b'\n' {
+                    if discard {
+                        discard = false;
+                        continue;
                     }
-                }
-                pending.clear();
-            } else if !discard {
-                if pending.len() == json::MAX_MESSAGE {
-                    pending.clear();
-                    discard = true;
-                    emit(error(Value::Null, -32700, "MCP message exceeds 1 MiB"));
-                } else {
-                    pending.push(byte);
+                    if input.last() == Some(&b'\r') {
+                        input.pop();
+                    }
+                    if !input.is_empty() {
+                        match json::parse(&input) {
+                            Ok(message) => {
+                                let duplicate = message_kind(&message) == Ok(MessageKind::Request)
+                                    && message
+                                        .get("id")
+                                        .is_some_and(|id| calls.iter().any(|call| &call.id == id));
+                                if duplicate {
+                                    output.push(error(
+                                        message.get("id").unwrap().clone(),
+                                        -32600,
+                                        "Request ID is already pending",
+                                    ))?;
+                                } else {
+                                    let next = dispatch(&message, &mut session, "mcp/stdio");
+                                    if let Some(response) = next.response {
+                                        output.push(response)?;
+                                    }
+                                    match next.action {
+                                        Some(Action::Cancel(id)) => {
+                                            calls.retain(|call| call.id != id)
+                                        }
+                                        Some(Action::Tool { id, request }) => {
+                                            let waiting = request
+                                                .get("wait_ms")
+                                                .and_then(Value::as_u64)
+                                                .unwrap_or(0)
+                                                != 0;
+                                            if calls.len() >= MAX_PENDING
+                                                || (waiting
+                                                    && calls
+                                                        .iter()
+                                                        .filter(|call| call.waiting)
+                                                        .count()
+                                                        >= MAX_WAITING)
+                                            {
+                                                output.push(error(
+                                                    id,
+                                                    -32000,
+                                                    "Concurrent tool request limit reached",
+                                                ))?;
+                                            } else {
+                                                match PendingCall::new(id, &request) {
+                                                    Ok(call) => {
+                                                        if input.len()
+                                                            + output.len()
+                                                            + call.buffered_bytes()
+                                                            + calls
+                                                                .iter()
+                                                                .map(PendingCall::buffered_bytes)
+                                                                .sum::<usize>()
+                                                            > MAX_BUFFERED
+                                                        {
+                                                            output.push(error(call.id.clone(), -32000, "Concurrent tool buffer limit reached"))?;
+                                                        } else {
+                                                            calls.push(call);
+                                                        }
+                                                    }
+                                                    Err(response) => output.push(response)?,
+                                                }
+                                            }
+                                        }
+                                        None => {}
+                                    }
+                                }
+                            }
+                            Err(message) => output.push(error(Value::Null, -32700, message))?,
+                        }
+                    }
+                    input.clear();
+                } else if !discard {
+                    if input.len() == json::MAX_MESSAGE {
+                        input.clear();
+                        discard = true;
+                        output.push(error(Value::Null, -32700, "MCP message exceeds 1 MiB"))?;
+                    } else {
+                        input.push(byte);
+                    }
                 }
             }
         }
     }
 }
 
-fn emit(response: Value) {
-    let mut bytes = json::stringify(&response);
-    bytes.push('\n');
-    os::print(1, bytes.as_bytes());
+// These unit tests inspect validation and the exact broker request. Real
+// transport scheduling, cancellation and PTY output are tested end to end.
+#[cfg(test)]
+fn test_dispatch(message: &Value, session: &mut RpcSession, origin: &str) -> Option<Value> {
+    let result = dispatch(message, session, origin);
+    match result.action {
+        Some(Action::Tool { id, request }) => {
+            Some(tool_response(id, crate::broker::request(&request)))
+        }
+        _ => result.response,
+    }
 }
 
 #[cfg(test)]
@@ -593,7 +911,7 @@ mod tests {
     use super::*;
 
     fn call(message: &str, session: &mut RpcSession) -> Option<Value> {
-        dispatch(
+        test_dispatch(
             &json::parse(message.as_bytes()).unwrap(),
             session,
             "mcp/stdio",
@@ -678,7 +996,7 @@ mod tests {
         ] {
             let value = json::parse(message.as_bytes()).unwrap();
             assert_eq!(message_kind(&value), Ok(MessageKind::Response));
-            assert!(dispatch(&value, &mut session, "test").is_none());
+            assert!(test_dispatch(&value, &mut session, "test").is_none());
         }
         let value =
             json::parse(br#"{"jsonrpc":"2.0","error":{"code":0.1,"message":"invalid"}}"#).unwrap();
@@ -768,7 +1086,7 @@ mod tests {
                 ),
             ]);
             assert_eq!(
-                code(&dispatch(&message, &mut session, "mcp/stdio").unwrap()),
+                code(&test_dispatch(&message, &mut session, "mcp/stdio").unwrap()),
                 Some(-32001),
                 "{name}"
             );
@@ -880,7 +1198,7 @@ mod tests {
             ),
         ]);
         let mut observer = ready(true);
-        let response = dispatch(&message, &mut observer, "mcp/stdio").unwrap();
+        let response = test_dispatch(&message, &mut observer, "mcp/stdio").unwrap();
         let request = response
             .get("result")
             .unwrap()
@@ -912,6 +1230,69 @@ mod tests {
             )
             .is_err()
         );
+    }
+
+    #[test]
+    fn waiting_reads_are_deferred_and_validate_bounds() {
+        let mut session = ready(true);
+        for wait in [0u64, 1, 30000] {
+            let args = object([("session", "work".into()), ("wait_ms", wait.into())]);
+            let message = object([
+                ("jsonrpc", "2.0".into()),
+                ("id", 7i32.into()),
+                ("method", "tools/call".into()),
+                (
+                    "params",
+                    object([("name", "session_read".into()), ("arguments", args)]),
+                ),
+            ]);
+            let result = dispatch(&message, &mut session, "mcp/stdio");
+            assert!(result.response.is_none());
+            let Some(Action::Tool { id, request }) = result.action else {
+                panic!("expected a deferred read")
+            };
+            assert_eq!(id, 7i32.into());
+            assert_eq!(request.get("wait_ms").and_then(Value::as_u64), Some(wait));
+            assert_eq!(
+                request.get("_actor").and_then(Value::as_str),
+                Some("trusted-test-actor")
+            );
+        }
+        for wait in ["-1", "30001", "1.5", "null", "true", "\"1\""] {
+            let args =
+                json::parse(format!("{{\"session\":\"work\",\"wait_ms\":{wait}}}").as_bytes())
+                    .unwrap();
+            assert!(
+                tool_request("session_read", &args, "mcp/stdio").is_err(),
+                "{wait}"
+            );
+        }
+    }
+
+    #[test]
+    fn cancellation_requires_a_valid_notification_and_id() {
+        let mut session = ready(false);
+        for body in [
+            r#"{"jsonrpc":"2.0","method":"notifications/cancelled","params":{"requestId":7}}"#,
+            r#"{"jsonrpc":"2.0","method":"notifications/cancelled","params":{"requestId":"read","reason":"done"}}"#,
+        ] {
+            let result = dispatch(&json::parse(body.as_bytes()).unwrap(), &mut session, "test");
+            assert!(result.response.is_none());
+            assert!(matches!(result.action, Some(Action::Cancel(_))));
+        }
+        for params in [
+            "null",
+            "{}",
+            r#"{"requestId":null}"#,
+            r#"{"requestId":true}"#,
+            r#"{"requestId":1.5}"#,
+            r#"{"requestId":7,"reason":false}"#,
+        ] {
+            let message = json::parse(format!("{{\"jsonrpc\":\"2.0\",\"method\":\"notifications/cancelled\",\"params\":{params}}}").as_bytes()).unwrap();
+            let result = dispatch(&message, &mut session, "test");
+            assert!(result.response.is_none());
+            assert!(result.action.is_none());
+        }
     }
 
     #[test]
@@ -947,7 +1328,7 @@ mod tests {
                 ),
             ]);
             assert_eq!(
-                code(&dispatch(&message, &mut observer, "mcp/stdio").unwrap()),
+                code(&test_dispatch(&message, &mut observer, "mcp/stdio").unwrap()),
                 Some(-32602)
             );
         }

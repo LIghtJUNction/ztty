@@ -4,6 +4,10 @@
 
 ### Added
 
+- Add bounded `session_read.wait_ms` over stdio and HTTP, with concurrent tool
+  requests, cancellation, explicit timeout results and PTY-instance binding.
+  Parked reads preserve independent byte cursors and incomplete UTF-8 suffixes.
+
 - Add optional MCP session_read identity guards and output_eof, so reconnecting observers can reject a replacement PTY and distinguish child exit from reader termination without new per-session state.
 
 - Add no_std Darwin PTY creation through a fresh posix_spawn helper, with controlling-terminal setup, exact argv/environment, close-on-exec descriptor isolation and bounded error handoff; native SDK/concurrent-spawn acceptance is now a mandatory Mac candidate gate.
