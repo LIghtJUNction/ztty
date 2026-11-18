@@ -1,0 +1,1991 @@
+{
+  "schema": 1,
+  "kind": "derived-audit-index",
+  "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+  "run_id": 44347927037,
+  "job_id": 134955556758,
+  "architecture": "x86_64",
+  "artifact_id": 14446353232,
+  "artifact_zip_sha256": "976a43ef467baa44725f2e347fabe9b01450560c38f22920a00bdb77fc3a3d77",
+  "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+  "build_only": true,
+  "candidate_platform": "windows",
+  "paint_diagnostics_enabled": false,
+  "runtime_trace_enabled": false,
+  "formal_release_eligible": false,
+  "required_cold_starts": 8,
+  "per_cold_required": [
+    31,
+    10,
+    10
+  ],
+  "completed_cold_starts": 8,
+  "attempted_cold_starts": 8,
+  "resize_control_diagnostic": {
+    "requested": true,
+    "outcome": "success"
+  },
+  "desktop_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-6896-86871679df18442cb3caebc27df5b28d",
+    "input_after_restore": "Default"
+  },
+  "worker_exit_code": 0,
+  "worker_elapsed_seconds": 16.054,
+  "status": "diagnostic-passed-no-ordinary-credit",
+  "native_gate_passed": true,
+  "ordinary_acceptance_credit": false,
+  "nc_rendering_diagnostics_enabled": true,
+  "workspace_checks_passed": 19,
+  "workspace_nc_override_record_present": false,
+  "workspace_nc_actual_state_recorded": false,
+  "native_nc_records": [
+    {
+      "number": 1,
+      "raw_report": "ztty-windows-x86_64.native.cold-01.json",
+      "raw_report_sha256": "1025eb94e1bd26bf134f629d89e1c8a586214a7f2de739f82a0b7faa8230b9ca",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 9440,
+      "hwnd": 393562,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 393562,
+        "pid": 9440,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    },
+    {
+      "number": 2,
+      "raw_report": "ztty-windows-x86_64.native.cold-02.json",
+      "raw_report_sha256": "dc8c5767b2fb16aba0936d7bf5c9834c06c6bce195c945f83771a427dbe8c675",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 7372,
+      "hwnd": 655386,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 655386,
+        "pid": 7372,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    },
+    {
+      "number": 3,
+      "raw_report": "ztty-windows-x86_64.native.cold-03.json",
+      "raw_report_sha256": "1bbbe3a8ce546fce5a99cf61e00bd9d547a7a4b902d492e2e20ad3edf342d007",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 8288,
+      "hwnd": 983148,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 983148,
+        "pid": 8288,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    },
+    {
+      "number": 4,
+      "raw_report": "ztty-windows-x86_64.native.cold-04.json",
+      "raw_report_sha256": "f989b50492d5f6e1b24f8d10df1e3ea50151e99d28f5078a2323ad00a447f35e",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 1128,
+      "hwnd": 1441912,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 1441912,
+        "pid": 1128,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    },
+    {
+      "number": 5,
+      "raw_report": "ztty-windows-x86_64.native.cold-05.json",
+      "raw_report_sha256": "506e69e9d2a3b785f8ddfc9d9e807edba05df32faa9965aff734ce465c469715",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 9424,
+      "hwnd": 1573168,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 1573168,
+        "pid": 9424,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    },
+    {
+      "number": 6,
+      "raw_report": "ztty-windows-x86_64.native.cold-06.json",
+      "raw_report_sha256": "76b9537142e49b8ed4fea56b174ff221addbf7dc3e20647654a8ac7ffaaeeb4f",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 6868,
+      "hwnd": 1835366,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 1835366,
+        "pid": 6868,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    },
+    {
+      "number": 7,
+      "raw_report": "ztty-windows-x86_64.native.cold-07.json",
+      "raw_report_sha256": "50618495b1009838fbc33fc79f4e71796945f7fb6301244c1f1867a6b36e8b19",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 7132,
+      "hwnd": 2163034,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2163034,
+        "pid": 7132,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    },
+    {
+      "number": 8,
+      "raw_report": "ztty-windows-x86_64.native.cold-08.json",
+      "raw_report_sha256": "5df47f5116a5ec56eb7e7535006b5bf1be265a0e4ab0bf5c5b955ad537ee7f11",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "980c69cd7159ed0377aff8bdba0cc86b02c62162ed78fd515bf6487758e228c7",
+      "pid": 9740,
+      "hwnd": 2424858,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2424858,
+        "pid": 9740,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      }
+    }
+  ],
+  "all8_raw_sources_binary_and_report_hashes_verified": true,
+  "all8_native_processes_and_workspace_process_exited": true,
+  "all4_workspace_probe_processes_exited": true,
+  "workspace_cleanup": {
+    "process_exited": true,
+    "temporary_directory_removed": true,
+    "returncode": 0,
+    "directory_removal": {
+      "attempts": 1,
+      "elapsed_seconds": 0.013976399999990008,
+      "retry_timeout_seconds": 2.0
+    },
+    "all_probe_processes_exited": true
+  },
+  "control_nc_records": [
+    {
+      "number": 1,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-01.json",
+      "raw_report_sha256": "d3b20807148f2ce4b607605c26766cdcee9a568f83e286d689bbb5569737f826",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 1324,
+      "hwnd": 2621548,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2621548,
+        "pid": 1324,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2621548,
+          "pid": 1324,
+          "foreground": 2621548,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2621548,
+          "pid": 1324,
+          "foreground": 2621548,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 2,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-02.json",
+      "raw_report_sha256": "0045cdf1523c87a6005888ae40f3536bf69ed6ca9858345b151acb1920cb69a1",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 1068,
+      "hwnd": 2687084,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2687084,
+        "pid": 1068,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2687084,
+          "pid": 1068,
+          "foreground": 2687084,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2687084,
+          "pid": 1068,
+          "foreground": 2687084,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 3,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-03.json",
+      "raw_report_sha256": "251a52e031339aadc9ed76b7b96c0a9ab450629612fbe994fda1ef7f9ba97853",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 2488,
+      "hwnd": 2752620,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2752620,
+        "pid": 2488,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2752620,
+          "pid": 2488,
+          "foreground": 2752620,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2752620,
+          "pid": 2488,
+          "foreground": 2752620,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -46,
+          -46
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 4,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-04.json",
+      "raw_report_sha256": "cf6760b763b6819b845dbe1b5c6a6027d568284d4e2758ede6c4cf066c6b98f3",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 1980,
+      "hwnd": 2818156,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2818156,
+        "pid": 1980,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2818156,
+          "pid": 1980,
+          "foreground": 2818156,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2818156,
+          "pid": 1980,
+          "foreground": 2818156,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -72,
+          -72
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 5,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-05.json",
+      "raw_report_sha256": "e53b2e154d625fbe1ce34752cd2cf3aee44fdc97862993c9b4f5d7d3425a133a",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 2716,
+      "hwnd": 2883692,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2883692,
+        "pid": 2716,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2883692,
+          "pid": 2716,
+          "foreground": 2883692,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2883692,
+          "pid": 2716,
+          "foreground": 2883692,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -98,
+          -98
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 6,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-06.json",
+      "raw_report_sha256": "a5679ef8b0b65c8f6acf0a249eb25ac57be2855ad20debc83c68a8e58b4c5173",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 1680,
+      "hwnd": 2949228,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 2949228,
+        "pid": 1680,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2949228,
+          "pid": 1680,
+          "foreground": 2949228,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2949228,
+          "pid": 1680,
+          "foreground": 2949228,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -124,
+          -124
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 7,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-07.json",
+      "raw_report_sha256": "22fc0d2989b5a0d3c31f750b3de22cd73299b15d98c9a92898cd5f86361fb15a",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 7720,
+      "hwnd": 3014764,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3014764,
+        "pid": 7720,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3014764,
+          "pid": 7720,
+          "foreground": 3014764,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3014764,
+          "pid": 7720,
+          "foreground": 3014764,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 8,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-08.json",
+      "raw_report_sha256": "b05723274bb19c2051ca64ef634881dc61ee96648fb2dfeb3289ed4b8e586c46",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 1564,
+      "hwnd": 3080300,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3080300,
+        "pid": 1564,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3080300,
+          "pid": 1564,
+          "foreground": 3080300,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3080300,
+          "pid": 1564,
+          "foreground": 3080300,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 9,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-09.json",
+      "raw_report_sha256": "263b133242b5c79a211721d0cdf053e80c8186177ec0f4ada9de3c20dbe4abcc",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 5056,
+      "hwnd": 3145836,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3145836,
+        "pid": 5056,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3145836,
+          "pid": 5056,
+          "foreground": 3145836,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3145836,
+          "pid": 5056,
+          "foreground": 3145836,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 10,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-10.json",
+      "raw_report_sha256": "55b1f69a997829ecb51911d315b537be7623204a45bcb4a1f02e8eb329f1d433",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 2636,
+      "hwnd": 3211372,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3211372,
+        "pid": 2636,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            78,
+            78,
+            274,
+            307
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3211372,
+          "pid": 2636,
+          "foreground": 3211372,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3211372,
+          "pid": 2636,
+          "foreground": 3211372,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -46,
+          -46
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 11,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-11.json",
+      "raw_report_sha256": "4c4401a0e7a60cad1af7e8219faa38981b0840a167bf25d67b29e055980b2e03",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 7760,
+      "hwnd": 3276908,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3276908,
+        "pid": 7760,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            104,
+            104,
+            300,
+            333
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3276908,
+          "pid": 7760,
+          "foreground": 3276908,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3276908,
+          "pid": 7760,
+          "foreground": 3276908,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -72,
+          -72
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 12,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-12.json",
+      "raw_report_sha256": "cd1c55a1cfc8b272aa6734e79168b58215565f7ee30cfa680c62da57a1351f8b",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 9108,
+      "hwnd": 3342444,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3342444,
+        "pid": 9108,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            130,
+            130,
+            326,
+            359
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3342444,
+          "pid": 9108,
+          "foreground": 3342444,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3342444,
+          "pid": 9108,
+          "foreground": 3342444,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -98,
+          -98
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 13,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-13.json",
+      "raw_report_sha256": "1860968b7999f172fb0631690392f0c1a2f855e85363d94f92160234ed152a9f",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 7740,
+      "hwnd": 3407980,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3407980,
+        "pid": 7740,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            156,
+            156,
+            352,
+            385
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3407980,
+          "pid": 7740,
+          "foreground": 3407980,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3407980,
+          "pid": 7740,
+          "foreground": 3407980,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -124,
+          -124
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 14,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-14.json",
+      "raw_report_sha256": "b76bca4aa05cea37f7ae3eb5479580011c7e9027b7d1e7b4661cfee516d895d1",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 2096,
+      "hwnd": 3473516,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3473516,
+        "pid": 2096,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3473516,
+          "pid": 2096,
+          "foreground": 3473516,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3473516,
+          "pid": 2096,
+          "foreground": 3473516,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 15,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-15.json",
+      "raw_report_sha256": "8ad1dc5329671acd7bbfbfdf6829bf9e717347d6f2df7faf976026bb2aa46726",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 4904,
+      "hwnd": 3539052,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3539052,
+        "pid": 4904,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            26,
+            26,
+            222,
+            255
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3539052,
+          "pid": 4904,
+          "foreground": 3539052,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3539052,
+          "pid": 4904,
+          "foreground": 3539052,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          6,
+          6
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    },
+    {
+      "number": 16,
+      "raw_report": "ztty-windows-x86_64.resize-control.cold-16.json",
+      "raw_report_sha256": "73177d8c2a38aba66df4a3ca0d0a5e1e5b685023ff499bd955202bf5df948086",
+      "source_sha": "ac95cb06620ecb272f7929e1b49b6bcefa2e942d",
+      "binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+      "pid": 1212,
+      "hwnd": 3604588,
+      "nc_rendering_diagnostic": {
+        "diagnostic_only": true,
+        "requested_policy": 1,
+        "attribute": 2,
+        "hwnd": 3604588,
+        "pid": 1212,
+        "before_hresult": 0,
+        "before_enabled": true,
+        "set_hresult": 0,
+        "after_hresult": 0,
+        "after_enabled": false
+      },
+      "actual_move": {
+        "before": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            52,
+            52,
+            248,
+            281
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3604588,
+          "pid": 1212,
+          "foreground": 3604588,
+          "visible": true,
+          "minimized": false
+        },
+        "requested_position": [
+          32,
+          32
+        ],
+        "placement_flags": 1,
+        "requested_topmost": true,
+        "visible_before_required": true,
+        "after": {
+          "client": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "outer": [
+            32,
+            32,
+            228,
+            261
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 3604588,
+          "pid": 1212,
+          "foreground": 3604588,
+          "visible": true,
+          "minimized": false
+        },
+        "moved": true,
+        "position_delta": [
+          -20,
+          -20
+        ]
+      },
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0
+      }
+    }
+  ],
+  "control_completed": 16,
+  "control_binary_sha256": "134d876b67e374fcdfd91b1a29f4d3ff371083b0c580dae1f7f9bef45dfd751e",
+  "control_raw_report_sha256": "ce086b34fd05d53c1026809cfbe9ea43c4a0d2d684a86857bb7c2be547e53d0d",
+  "control_cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-control-9488-7848918f9ec649678fd5857bb53c9ecf",
+    "input_after_restore": "Default"
+  },
+  "control_worker_exit_code": 0,
+  "control_worker_elapsed_seconds": 1.398,
+  "scope": "NC policy was changed only by the diagnostic harness for the eight native and sixteen control owned windows. All24 NC readbacks per architecture show true before, successful set and false after. Workspace has no harness override or NC state readback. ClientDC captures do not establish titlebar/frame appearance. Control uses deferred resizing, default valid rectangles and no per-run TemporaryDirectory. No ordinary production or formal release acceptance.",
+  "files": [
+    {
+      "path": "summary.json",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/summary.json",
+      "bytes": 14080,
+      "sha256": "70209344ae2bb4dba81918da89f02e91c70e156f06acc1caeeaf46d17a5e0366",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.build.json",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/ztty-windows-x86_64.build.json",
+      "bytes": 88229,
+      "sha256": "efa10be7236f7c9cbed80154c6b36b4a95e4a3ec858241fbe8a823d044748583",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 2001
+    },
+    {
+      "path": "ztty-windows-x86_64.native.json",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/ztty-windows-x86_64.native.json",
+      "bytes": 256492,
+      "sha256": "25f333093ca33c0f65cffdc82f511dbe52b6bf9d70103a978a4f1098e743722a",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 9734
+    },
+    {
+      "path": "ztty-windows-x86_64.native.workspace.json",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/ztty-windows-x86_64.native.workspace.json",
+      "bytes": 26231,
+      "sha256": "619a1a9c8fadcf958802d7b13be39ca3cc61a350314b11236398b5f141aa898e",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "control-summary.json",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/control-summary.json",
+      "bytes": 43395,
+      "sha256": "fc384b6ac70c123ef4e21163494c4fcda96350382bc5826653749907d658a471",
+      "kind": "derived-audit-summary-copy",
+      "crlf_lines": 0
+    },
+    {
+      "path": "ztty-windows-x86_64.resize-control.json",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/ztty-windows-x86_64.resize-control.json",
+      "bytes": 6268,
+      "sha256": "ce086b34fd05d53c1026809cfbe9ea43c4a0d2d684a86857bb7c2be547e53d0d",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": 195
+    },
+    {
+      "path": "ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/ztty-windows-x86_64.native.cold-08.back-to-back-10-restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.native.workspace.three-panes.png",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/ztty-windows-x86_64.native.workspace.three-panes.png",
+      "bytes": 2241,
+      "sha256": "ccf7dec33d1f03a0d35abe33556cae7e4fd39bd1e00d9e3c2137324d5e00a357",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    },
+    {
+      "path": "ztty-windows-x86_64.resize-control.cold-16.restored.png",
+      "source_path": "artifacts/release-audit/nc-disabled-44347927037/windows-x86_64/ztty-windows-x86_64.resize-control.cold-16.restored.png",
+      "bytes": 599,
+      "sha256": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117",
+      "kind": "raw-byte-identical-copy",
+      "crlf_lines": null
+    }
+  ]
+}
