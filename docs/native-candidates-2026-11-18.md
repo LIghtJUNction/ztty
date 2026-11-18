@@ -237,12 +237,54 @@ retain the source and scope. The accepted Linux ARM64 candidate is also
 the [delivery folder](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa)
 retains separately named failed Windows archives.
 
+## Fourth native run: Windows x86_64 accepted
+
+[Run 44209439093](https://github.com/LIghtJUNction/ztty/actions/runs/44209439093)
+used `81c1c068c42868d4e1fdfb1e97e9046c4094f361` in build-only mode.
+Linux x86_64 and ARM64 passed the four GUI suites and cwd regressions.
+Windows x86_64 passed all 30 functional checks, five harness contracts and
+owned-process/directory cleanup. The actual Sixel PNG shows the expected
+red, green and blue regions; the Linux ARM64 workspace PNG retains both
+panes, text and padding. This run did not publish a Release.
+
+Windows ARM64 passed ten independent startup/cwd/protocol checks and cleanup.
+Every attempted visible position remained covered by `WWAHost.exe`, PID 9188,
+class `Windows.UI.Core.CoreWindow`, topmost rectangle `[0,0,1024,768]`;
+ztty belonged to PID 11048. Thread and input desktop names were both
+`Default`. The native report preserves `blocked` and exits nonzero;
+the build report remains failed. No foreign window was closed or moved.
+
+Both macOS architectures passed twelve protocol/startup checks and helper
+preflight, including the pure selection vectors. The first Sixel pixel
+probe produced empty stdout and the WindowServer initialization assertion
+`CGS_REQUIRE_INIT` with `did_initialize` false. No PNG was produced.
+The previous harness attempted JSON decoding before recording return status,
+so the helper's actual signal and exact capture stage are unknown.
+
+The helper now initializes `NSApplication.shared` on the main actor, using
+the prohibited activation policy. Apple's [shared documentation](https://developer.apple.com/documentation/appkit/nsapplication/shared)
+states that it establishes the WindowServer connection.
+The [prohibited policy](https://developer.apple.com/documentation/appkit/nsapplication/activationpolicy-swift.enum/prohibited)
+prevents helper windows and activation. Process exit/signal, stderr and capture
+phase checkpoints are retained even when no JSON is returned. The ten Python
+contracts pass, including a real empty-stdout SIGTERM case. This correction
+still needs native execution; it does not establish pixel acceptance.
+
+All six ZIP downloads were checked against GitHub's byte counts and SHA-256.
+Every build-manifest member was checked against its size/hash and pinned
+source before review. The [machine-readable record](measurements/native-fourth-run-2026-11-18.json)
+contains exact artifact IDs, hashes and individual Drive links. The accepted
+Windows x86_64 and both Linux candidates, plus separately named failed or
+blocked evidence, are in the
+[delivery folder](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa).
+
 ## Remaining release gates
 
-The third run accepted Linux ARM64. Windows cleanup and macOS window selection
-corrections require another source-pinned run; Windows ARM64 visibility remains
-blocked pending the new diagnostics. Native Wayland, real GPU/VRAM, macOS pixels/IME,
-physical input matrices and the macOS/Windows shared-session feature set
-remain incomplete. Apple Developer ID/notarization and Windows signing
-have not been supplied. No full production-release or all-platform
-feature-parity claim follows from these candidate gates.
+The fourth run accepted both Linux architectures and Windows x86_64.
+macOS helper initialization still requires a source-pinned native rerun;
+Windows ARM64 needs an unobstructed, owned test desktop while preserving
+real visible-pixel checks. Native Wayland, GPU/VRAM, macOS pixels/IME,
+physical input matrices and macOS/Windows shared sessions remain incomplete.
+Apple Developer ID/notarization and Windows signing have not been supplied.
+No full production-release or all-platform feature-parity claim follows
+from these candidate gates.

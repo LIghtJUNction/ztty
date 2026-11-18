@@ -39,9 +39,9 @@ Kitty 增强键盘和同步输出协议。图片支持内联 PNG、RGB、RGBA，
 
 | 平台 | 原生实现 | 当前验收状态 |
 | --- | --- | --- |
-| Linux | X11/XWayland 窗口、Xft 文字、Xrender 图片合成、Linux PTY | 05782fc 已在 x86_64 与 ARM64 通过四套 guarded Xvfb GUI 及目录回归 |
-| macOS | AppKit 窗口、CoreText/CoreGraphics 渲染、Darwin PTY | 两种架构通过原8项协议及 cwd/配置/架构检查；新像素门槛停在窗口选择，尚未捕获 |
-| Windows | Win32 窗口、GDI 文字、自行合成 RGBA、ConPTY | x86_64 的30项功能检查通过，但测试清理失败；ARM64 可见像素验收仍被遮挡阻断 |
+| Linux | X11/XWayland 窗口、Xft 文字、Xrender 图片合成、Linux PTY | 81c1c06 在 x86_64、ARM64 通过四套 guarded Xvfb GUI 及目录回归 |
+| macOS | AppKit 窗口、CoreText/CoreGraphics 渲染、Darwin PTY | 两种架构通过12项协议及启动检查；首个像素探针触发辅助程序初始化断言 |
+| Windows | Win32 窗口、GDI 文字、自行合成 RGBA、ConPTY | x86_64 的30项功能检查及清理通过；ARM64 通过10项独立检查及清理，可见像素仍被运行器窗口遮挡 |
 
 macOS 后端不要求 X11，Windows 后端不要求 WSL。上述原生检查在
 对应操作系统运行；表中明确区分已检查的项目和仍需补齐的验证。
