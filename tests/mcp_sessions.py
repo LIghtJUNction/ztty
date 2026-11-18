@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify persistent PTYs, cursors and shared namespaces through real MCP calls."""
 import argparse
+import hashlib
 import json
 import os
 import pathlib
@@ -62,6 +63,81 @@ def collect(read, uri, needle=None, cursor=0, byte_limit=7, exited=False):
             time.sleep(0.015)
     raise AssertionError({"wanted": needle, "output": output, "last": last})
 
+
+def queued_input_reacquire(client, directory, sessions):
+    """A full real PTY input queue must survive an idempotent control request."""
+    ready = pathlib.Path(directory) / "queue-ready"
+    start = pathlib.Path(directory) / "queue-start"
+    result = pathlib.Path(directory) / "queue-result.json"
+    child = r'''import hashlib,json,os,pathlib,select,sys,time,tty
+tty.setraw(0)
+pathlib.Path(sys.argv[1]).touch()
+while not pathlib.Path(sys.argv[2]).exists(): time.sleep(.01)
+expected=int(pathlib.Path(sys.argv[2]).read_text())
+received=0
+digest=hashlib.sha256()
+deadline=time.monotonic()+5
+while received<expected and time.monotonic()<deadline:
+    if not select.select([0],[],[],.05)[0]: continue
+    data=os.read(0,min(65536,expected-received))
+    if not data: break
+    received+=len(data)
+    digest.update(data)
+temporary=pathlib.Path(sys.argv[3]+".tmp")
+temporary.write_text(json.dumps({"received":received,"sha256":digest.hexdigest()}))
+temporary.replace(sys.argv[3])
+time.sleep(30)
+'''
+    created = client.tool("session_create", {
+        "name": "queued-input", "history": 0,
+        "command": ["python3", "-c", child, str(ready), str(start), str(result)],
+    })
+    uri = created["uri"]
+    sessions.append(uri)
+    deadline = time.monotonic() + 5
+    while not ready.exists() and time.monotonic() < deadline:
+        time.sleep(.01)
+    assert ready.exists(), "queued-input child did not enter raw mode"
+    data = "0123456789abcdef" * 4096
+    accepted = 0
+    digest = hashlib.sha256()
+    # Stop at an actual broker queue-full response, proving that bytes still
+    # reside in its user-space queue while the child is deliberately not reading.
+    for _ in range(32):
+        client.identifier += 1
+        send(client.proc, packet("tools/call", client.identifier, {
+            "name": "session_write", "arguments": {"session": uri, "data": data},
+        }))
+        response = line(client.proc)
+        assert response["id"] == client.identifier and "result" in response, response
+        if response["result"]["isError"]:
+            assert "session input queue is full" in json.dumps(response), response
+            break
+        assert response["result"]["structuredContent"]["written"] == len(data)
+        accepted += len(data)
+        digest.update(data.encode())
+    else:
+        raise AssertionError("could not establish bounded PTY input backpressure")
+    assert accepted > 0
+    for takeover in [False, True]:
+        acquired = client.tool("session_control", {
+            "session": uri, "action": "acquire", "takeover": takeover,
+        })
+        assert acquired["input_owner"] == created["input_owner"], acquired
+        assert acquired["pid"] == created["pid"], acquired
+    start.write_text(str(accepted))
+    deadline = time.monotonic() + 6
+    while not result.exists() and time.monotonic() < deadline:
+        time.sleep(.01)
+    assert result.exists(), "queued-input child did not finish reading"
+    observed = json.loads(result.read_text())
+    assert observed == {"received": accepted, "sha256": digest.hexdigest()}, observed
+    client.tool("session_close", {"session": uri})
+    sessions.remove(uri)
+    return {"status": "passed", "accepted_bytes": accepted,
+            "received_bytes": observed["received"], "sha256": observed["sha256"],
+            "queue_full_before_reacquire": True}
+
 def main(binary):
     os.environ["ZTTY_SOCKET"] = f"@ztty-mcp-sessions-{os.getpid()}"
     os.environ["ZTTY_MCP_SMOKE"] = f"真实-{os.getpid()}-🛰"
@@ -93,6 +169,8 @@ def main(binary):
             report["stdio_pty"] = "passed"
             report["unicode_cursor_pages"] = "passed"
             report["cwd_environment_resize"] = "passed"
+            report["same_owner_preserves_queued_pty_input"] = queued_input_reacquire(
+                stdio, directory, sessions)
 
             second_directory = str(pathlib.Path(directory) / "second creator")
             pathlib.Path(second_directory).mkdir()

@@ -39,6 +39,8 @@ mod search;
 #[cfg(target_os = "linux")]
 mod session;
 #[cfg(target_os = "linux")]
+mod session_control;
+#[cfg(target_os = "linux")]
 mod working_directory;
 #[cfg(target_os = "linux")]
 mod workspace_state;

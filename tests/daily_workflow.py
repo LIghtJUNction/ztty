@@ -77,7 +77,7 @@ def main():
         "source_sha256": {},
         "screenshots": {},
     }
-    for name in ("src/session.rs", "src/search.rs", "src/actions.rs", "src/config_watch.rs",
+    for name in ("src/session.rs", "src/session_control.rs", "src/search.rs", "src/actions.rs", "src/config_watch.rs",
                  "src/x11.rs", "src/appearance.rs", "src/main.rs", "tests/daily_workflow.py"):
         path = repository / name
         if path.is_file():
@@ -456,6 +456,20 @@ def main():
             wait(lambda: input_bytes() == b"agent-after-closex", "input after explicit takeover")
             assert info()["pid"] == child_pid
             report["checks"].append("observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY")
+
+            # Reacquiring the same local owner is state-idempotent, but must
+            # still leave explicit observation mode and permit GUI input.
+            rpc({"op": "attach", "session": "daily", "observe": True})
+            observed_local = info()
+            assert observed_local["input_owner"] == "local" and observed_local["read_only"]
+            assert observed_local["pid"] == child_pid
+            rpc({"op": "control", "session": "daily", "action": "acquire"})
+            reclaimed_local = info()
+            assert reclaimed_local["input_owner"] == "local" and not reclaimed_local["read_only"]
+            assert reclaimed_local["pid"] == child_pid
+            key("y")
+            wait(lambda: input_bytes() == b"agent-after-closexy", "same-owner acquire restores local input")
+            report["checks"].append("same-owner local acquire leaves observation mode and restores real GUI input without replacing the PTY")
 
 
             # Attaching an observer to an already visible, locally owned view
