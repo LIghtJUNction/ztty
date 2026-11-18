@@ -45,3 +45,4 @@ int (*const zpty_flags_signature)(posix_spawnattr_t *, short) = posix_spawnattr_
 int (*const zpty_open_signature)(posix_spawn_file_actions_t *, int,
     const char *, int, mode_t) = posix_spawn_file_actions_addopen;
 int (*const zpty_path_signature)(int, void *, uint32_t) = proc_pidpath;
+int (*const zpty_child_pids_signature)(pid_t, void *, int) = proc_listchildpids;
