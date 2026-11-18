@@ -5,12 +5,15 @@ use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use core::ffi::{CStr, c_char, c_int, c_void};
 
-use super::{MessageKind, RpcSession, VERSIONS, dispatch, error, message_kind};
+use super::{
+    Action, MessageKind, PendingCall, RpcSession, VERSIONS, dispatch, error, message_kind,
+};
 use crate::json::{self, Value};
 use crate::os;
 
 const MAX_CLIENTS: usize = 64;
 const MAX_SESSIONS: usize = 64;
+const MAX_WAITING: usize = 32;
 const MAX_HEADERS: usize = 16384;
 const MAX_BUFFERED: usize = 4 * 1024 * 1024;
 const REQUEST_TIMEOUT: u64 = 10000;
@@ -68,6 +71,9 @@ struct Client {
     deadline: u64,
     replied: bool,
     closed: bool,
+    input_closed: bool,
+    pending: Option<PendingCall>,
+    session: Option<String>,
 }
 
 impl Client {
@@ -80,10 +86,15 @@ impl Client {
             deadline: os::milliseconds() + REQUEST_TIMEOUT,
             replied: false,
             closed: false,
+            input_closed: false,
+            pending: None,
+            session: None,
         }
     }
 
     fn reply(&mut self, status: u16, body: &[u8], session: Option<&str>) {
+        self.pending = None;
+        self.deadline = os::milliseconds() + REQUEST_TIMEOUT;
         let reason = match status {
             200 => "OK",
             202 => "Accepted",
@@ -140,6 +151,19 @@ struct Settings<'a> {
     read_only: bool,
 }
 
+enum ScopedAction {
+    Tool {
+        session: String,
+        id: Value,
+        request: Value,
+    },
+    Cancel {
+        session: String,
+        id: Value,
+    },
+    Delete(String),
+}
+
 pub(super) fn run(
     host: &str,
     port: u16,
@@ -186,6 +210,7 @@ pub(super) fn run(
     );
     let mut clients: Vec<Client> = Vec::new();
     let mut sessions: Vec<Session> = Vec::new();
+    let mut fds = Vec::new();
     loop {
         let now = os::milliseconds();
         clients.retain(|client| {
@@ -194,7 +219,41 @@ pub(super) fn run(
                 && client.deadline > now
         });
         sessions.retain(|session| now.saturating_sub(session.touched) < SESSION_TIMEOUT);
-        let mut fds = Vec::with_capacity(clients.len() + 1);
+        for index in 0..clients.len() {
+            if clients[index].pending.is_some()
+                && clients[index]
+                    .session
+                    .as_deref()
+                    .is_none_or(|id| !sessions.iter().any(|session| session.id == id))
+            {
+                clients[index].closed = true;
+                clients[index].pending = None;
+                continue;
+            }
+            let response = clients[index]
+                .pending
+                .as_mut()
+                .and_then(PendingCall::advance);
+            if let Some(response) = response {
+                clients[index].pending = None;
+                let body = json::stringify(&response).into_bytes();
+                reply_bounded(&mut clients, index, 200, &body, None);
+            }
+        }
+        if buffered_bytes(&clients) > MAX_BUFFERED {
+            // Pending broker reads can grow between HTTP events. Bound their
+            // combined retention too, retaining room for management clients.
+            for index in 0..clients.len() {
+                if clients[index].pending.is_some() {
+                    clients[index].pending = None;
+                    clients[index].reply(503, &[], None);
+                    if buffered_bytes(&clients) <= MAX_BUFFERED {
+                        break;
+                    }
+                }
+            }
+        }
+        fds.clear();
         fds.push(os::PollFd {
             fd: listener.0,
             events: os::POLLIN,
@@ -202,7 +261,11 @@ pub(super) fn run(
         });
         for client in &clients {
             fds.push(os::PollFd {
-                fd: client.fd.0,
+                fd: if client.closed || (client.input_closed && !client.replied) {
+                    -1
+                } else {
+                    client.fd.0
+                },
                 events: if client.replied {
                     os::POLLOUT
                 } else {
@@ -211,11 +274,26 @@ pub(super) fn run(
                 revents: 0,
             });
         }
+        for client in &clients {
+            if let Some(pending) = &client.pending
+                && let Some(fd) = pending.broker.poll_fd()
+            {
+                fds.push(fd);
+            }
+        }
         let timeout = clients
             .iter()
-            .map(|c| c.deadline.saturating_sub(now).min(30000) as i32)
+            .map(|client| client.deadline)
+            .chain(clients.iter().filter_map(|client| {
+                client
+                    .pending
+                    .as_ref()
+                    .and_then(|pending| pending.broker.next_deadline())
+            }))
             .min()
-            .unwrap_or(30000);
+            .map_or(30000, |deadline| {
+                deadline.saturating_sub(now).min(30000) as i32
+            });
         let count = unsafe { os::poll(fds.as_mut_ptr(), fds.len(), timeout) };
         if count < 0 {
             if os::errno() == os::EINTR {
@@ -225,19 +303,47 @@ pub(super) fn run(
         }
         for index in 0..clients.len() {
             let events = fds[index + 1].revents;
-            if events & os::POLLERR != 0 {
+            if clients[index].closed {
+                continue;
+            }
+            if events & (os::POLLERR | 32) != 0 {
                 clients[index].closed = true;
+                clients[index].pending = None;
                 continue;
             }
             if clients[index].replied && events & os::POLLOUT != 0 {
                 let client = &mut clients[index];
                 let pending = &client.output[client.written..];
-                let count =
-                    unsafe { send(client.fd.0, pending.as_ptr().cast(), pending.len(), 0x4000) };
+                let count = unsafe {
+                    send(
+                        client.fd.0,
+                        pending.as_ptr().cast(),
+                        pending.len().min(65536),
+                        0x4000,
+                    )
+                };
                 if count > 0 {
                     client.written += count as usize;
-                } else if count == 0 || (os::errno() != 11 && os::errno() != os::EINTR) {
+                } else if count == 0 || !matches!(os::errno(), 4 | 11) {
                     client.closed = true;
+                }
+            } else if clients[index].pending.is_some() && events & (os::POLLIN | os::POLLHUP) != 0 {
+                // A complete ordinary POST survives a write-side half-close.
+                // Timed reads require both directions to stay open so closing
+                // an observer promptly releases its broker waiter.
+                let mut byte = 0u8;
+                let count =
+                    unsafe { recv(clients[index].fd.0, (&mut byte as *mut u8).cast(), 1, 0) };
+                let waiting = clients[index]
+                    .pending
+                    .as_ref()
+                    .is_some_and(|call| call.waiting);
+                if count == 0 && !waiting && events & os::POLLHUP == 0 {
+                    clients[index].input_closed = true;
+                } else if count >= 0 || !matches!(os::errno(), 4 | 11) || events & os::POLLHUP != 0
+                {
+                    clients[index].closed = true;
+                    clients[index].pending = None;
                 }
             } else if !clients[index].replied && events & (os::POLLIN | os::POLLHUP) != 0 {
                 for _ in 0..8 {
@@ -263,8 +369,7 @@ pub(super) fn run(
                         }
                         break;
                     }
-                    let buffered = buffered_bytes(&clients);
-                    if buffered + count as usize > MAX_BUFFERED
+                    if buffered_bytes(&clients) + count as usize > MAX_BUFFERED
                         || clients[index].input.len() + count as usize > json::MAX_MESSAGE + 65536
                     {
                         clients[index].reply(413, &[], None);
@@ -275,14 +380,106 @@ pub(super) fn run(
                         .extend_from_slice(&buffer[..count as usize]);
                     match parse_request(&clients[index].input) {
                         Ok(Some(request)) => {
-                            let (status, body, id) = respond(request, &settings, &mut sessions);
-                            // Account for slow readers as well as slow request senders.
-                            let retained =
-                                buffered_bytes(&clients).saturating_sub(clients[index].input.len());
-                            if retained.saturating_add(body.len()) > MAX_BUFFERED {
-                                clients[index].reply(503, &[], None);
-                            } else {
-                                clients[index].reply(status, &body, id.as_deref());
+                            let mut action = None;
+                            let (status, body, id) =
+                                respond(request, &settings, &mut sessions, &clients, &mut action);
+                            match action {
+                                Some(ScopedAction::Tool {
+                                    session,
+                                    id,
+                                    request,
+                                }) => {
+                                    let waiting =
+                                        request.get("wait_ms").and_then(Value::as_u64).unwrap_or(0)
+                                            != 0;
+                                    if waiting
+                                        && clients
+                                            .iter()
+                                            .filter(|client| {
+                                                client
+                                                    .pending
+                                                    .as_ref()
+                                                    .is_some_and(|call| call.waiting)
+                                            })
+                                            .count()
+                                            >= MAX_WAITING
+                                    {
+                                        let response =
+                                            error(id, -32000, "Concurrent read wait limit reached");
+                                        reply_bounded(
+                                            &mut clients,
+                                            index,
+                                            200,
+                                            json::stringify(&response).as_bytes(),
+                                            None,
+                                        );
+                                    } else {
+                                        match PendingCall::new(id, &request) {
+                                            Ok(pending) => {
+                                                let client = &mut clients[index];
+                                                client.input = Vec::new();
+                                                client.pending = Some(pending);
+                                                client.session = Some(session);
+                                                // The broker state owns connect/send/read deadlines;
+                                                // reply() starts an independent delivery deadline.
+                                                client.deadline = u64::MAX;
+                                                if buffered_bytes(&clients) > MAX_BUFFERED {
+                                                    clients[index].reply(503, &[], None);
+                                                }
+                                            }
+                                            Err(response) => reply_bounded(
+                                                &mut clients,
+                                                index,
+                                                200,
+                                                json::stringify(&response).as_bytes(),
+                                                None,
+                                            ),
+                                        }
+                                    }
+                                }
+                                Some(ScopedAction::Cancel {
+                                    session,
+                                    id: request_id,
+                                }) => {
+                                    for client in &mut clients {
+                                        if client.session.as_deref() == Some(&session)
+                                            && client
+                                                .pending
+                                                .as_ref()
+                                                .is_some_and(|pending| pending.id == request_id)
+                                        {
+                                            client.pending = None;
+                                            client.closed = true;
+                                        }
+                                    }
+                                    reply_bounded(
+                                        &mut clients,
+                                        index,
+                                        status,
+                                        &body,
+                                        id.as_deref(),
+                                    );
+                                }
+                                Some(ScopedAction::Delete(session)) => {
+                                    for client in &mut clients {
+                                        if client.session.as_deref() == Some(&session)
+                                            && client.pending.is_some()
+                                        {
+                                            client.pending = None;
+                                            client.closed = true;
+                                        }
+                                    }
+                                    reply_bounded(
+                                        &mut clients,
+                                        index,
+                                        status,
+                                        &body,
+                                        id.as_deref(),
+                                    );
+                                }
+                                None => {
+                                    reply_bounded(&mut clients, index, status, &body, id.as_deref())
+                                }
                             }
                             break;
                         }
@@ -295,6 +492,7 @@ pub(super) fn run(
                 }
             } else if events & os::POLLHUP != 0 {
                 clients[index].closed = true;
+                clients[index].pending = None;
             }
         }
         if fds[0].revents & os::POLLIN != 0 {
@@ -322,10 +520,26 @@ pub(super) fn run(
     }
 }
 
+fn reply_bounded(clients: &mut [Client], index: usize, status: u16, body: &[u8], id: Option<&str>) {
+    let retained = buffered_bytes(clients).saturating_sub(clients[index].input.len());
+    if retained.saturating_add(body.len() + 512) > MAX_BUFFERED {
+        clients[index].reply(503, &[], None);
+    } else {
+        clients[index].reply(status, body, id);
+    }
+}
+
 fn buffered_bytes(clients: &[Client]) -> usize {
     clients
         .iter()
-        .map(|client| client.input.len() + client.output.len())
+        .map(|client| {
+            client.input.len()
+                + client.output.len()
+                + client
+                    .pending
+                    .as_ref()
+                    .map_or(0, PendingCall::buffered_bytes)
+        })
         .sum()
 }
 
@@ -710,6 +924,8 @@ fn respond(
     request: Request,
     settings: &Settings<'_>,
     sessions: &mut Vec<Session>,
+    clients: &[Client],
+    action: &mut Option<ScopedAction>,
 ) -> (u16, Vec<u8>, Option<String>) {
     let read_only = if settings.token.is_some() || settings.observer_token.is_some() {
         let received = request.header("authorization").and_then(|value| {
@@ -792,7 +1008,7 @@ fn respond(
         let Some(index) = existing else {
             return (400, Vec::new(), None);
         };
-        sessions.remove(index);
+        *action = Some(ScopedAction::Delete(sessions.remove(index).id));
         return (200, Vec::new(), None);
     }
     if request.method != "POST" {
@@ -838,6 +1054,24 @@ fn respond(
     {
         return (400, Vec::new(), None);
     }
+    if kind == MessageKind::Request
+        && let Some(index) = existing
+        && let Some(id) = message.get("id")
+        && clients.iter().any(|client| {
+            client.session.as_deref() == Some(&sessions[index].id)
+                && client
+                    .pending
+                    .as_ref()
+                    .is_some_and(|pending| &pending.id == id)
+        })
+    {
+        return (
+            200,
+            json::stringify(&error(id.clone(), -32600, "Request ID is already pending"))
+                .into_bytes(),
+            None,
+        );
+    }
     let is_initialize = kind == MessageKind::Request
         && message.get("method").and_then(Value::as_str) == Some("initialize");
     let (response, session_id) = if let Some(index) = existing {
@@ -872,7 +1106,19 @@ fn respond(
     } else {
         return (400, Vec::new(), None);
     };
-    match response {
+    if let Some(index) = existing {
+        let session = sessions[index].id.clone();
+        *action = match response.action {
+            Some(Action::Tool { id, request }) => Some(ScopedAction::Tool {
+                session,
+                id,
+                request,
+            }),
+            Some(Action::Cancel(id)) => Some(ScopedAction::Cancel { session, id }),
+            None => None,
+        };
+    }
+    match response.response {
         Some(response) => (200, json::stringify(&response).into_bytes(), session_id),
         None => (202, Vec::new(), None),
     }
@@ -904,6 +1150,20 @@ pub(super) fn random_id() -> Result<String, ()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn reply(
+        request: Request,
+        settings: &Settings<'_>,
+        sessions: &mut Vec<Session>,
+    ) -> (u16, Vec<u8>, Option<String>) {
+        let mut action = None;
+        let result = respond(request, settings, sessions, &[], &mut action);
+        assert!(
+            action.is_none(),
+            "this unit helper only validates immediate HTTP responses"
+        );
+        result
+    }
 
     fn settings() -> Settings<'static> {
         Settings {
@@ -995,14 +1255,14 @@ mod tests {
             let mut request = request(INIT);
             request.headers.retain(|(name, _)| name != header);
             request.headers.push((header.into(), value.into()));
-            assert_eq!(respond(request, &settings, &mut sessions).0, 403);
+            assert_eq!(reply(request, &settings, &mut sessions).0, 403);
         }
         assert!(sessions.is_empty());
         let mut request = request(INIT);
         request
             .headers
             .push(("origin".into(), "http://127.0.0.1:8732".into()));
-        assert_eq!(respond(request, &settings, &mut sessions).0, 200);
+        assert_eq!(reply(request, &settings, &mut sessions).0, 200);
     }
 
     #[test]
@@ -1011,11 +1271,11 @@ mod tests {
         settings.token = Some("operator-secret");
         settings.observer_token = Some("observer-secret");
         let mut sessions = Vec::new();
-        assert_eq!(respond(request(INIT), &settings, &mut sessions).0, 401);
+        assert_eq!(reply(request(INIT), &settings, &mut sessions).0, 401);
         let mut init = request(INIT);
         init.headers
             .push(("authorization".into(), "bearer operator-secret".into()));
-        let (status, _, id) = respond(init, &settings, &mut sessions);
+        let (status, _, id) = reply(init, &settings, &mut sessions);
         assert_eq!(status, 200);
         let id = id.unwrap();
         assert_ne!(sessions[0].rpc.actor, format!("mcp:{id}"));
@@ -1025,12 +1285,12 @@ mod tests {
             ("authorization".into(), "Bearer observer-secret".into()),
             ("mcp-session-id".into(), id),
         ]);
-        assert_eq!(respond(borrowed, &settings, &mut sessions).0, 403);
+        assert_eq!(reply(borrowed, &settings, &mut sessions).0, 403);
         let mut observer = request(INIT);
         observer
             .headers
             .push(("authorization".into(), "Bearer observer-secret".into()));
-        assert_eq!(respond(observer, &settings, &mut sessions).0, 200);
+        assert_eq!(reply(observer, &settings, &mut sessions).0, 200);
         assert!(sessions[1].rpc.read_only);
     }
 
@@ -1043,7 +1303,7 @@ mod tests {
             r#"{"jsonrpc":"2.0","method":"initialize","id":1,"result":{}}"#,
             r#"{"jsonrpc":"2.0","method":"initialize","id":false}"#,
         ] {
-            let (status, bytes, _) = respond(request(body), &settings(), &mut sessions);
+            let (status, bytes, _) = reply(request(body), &settings(), &mut sessions);
             assert_eq!(status, 400);
             assert_eq!(
                 json::parse(&bytes)

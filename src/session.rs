@@ -1,7 +1,7 @@
 //! Shared PTYs and desktop windows, driven by one poll loop.
 use crate::{
     Appearance, actions,
-    broker::{self, Reply},
+    broker::{self, ReadWait, Reply},
     config_watch,
     json::{self, Value},
     key, key_modifiers,
@@ -18,6 +18,7 @@ use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String,
 use core::ffi::{CStr, c_int};
 use input::{Key, KeyEvent, MouseEvent};
 use zterm::{CursorShape, Terminal, input};
+use ztty::output_tail::OutputChunk;
 
 struct InputBuffers {
     text: Vec<u8>,
@@ -825,7 +826,7 @@ impl Session {
         let _ = self.core.flush_input();
         let _ = self.core.pty.reap();
     }
-    fn read(&self, request: &Value) -> Result<Value, String> {
+    fn read(&self, request: &Value) -> Result<Reply, String> {
         if let Some(expected) = request.get("expected_session")
             && !crate::session_identity::ExpectedSession::parse(expected)?.matches(
                 &self.uri,
@@ -846,7 +847,38 @@ impl Session {
             None => None,
             Some(v) => Some(v.as_u64().ok_or("max_bytes must be 1..65536")?),
         };
+        let wait_ms = bounded(request, "wait_ms", 0, 0, 30000)? as u64;
         let chunk = self.core.read_output(cursor, max)?;
+        if wait_ms > 0 && !self.output_ready(&chunk) {
+            return Ok(Reply::ReadWait(ReadWait {
+                session_id: self.id,
+                cursor,
+                max_bytes: max,
+                deadline: os::milliseconds() + wait_ms,
+            }));
+        }
+        Ok(Reply::Value(
+            self.read_value(chunk, (wait_ms > 0).then_some(false)),
+        ))
+    }
+
+    fn output_ready(&self, chunk: &OutputChunk) -> bool {
+        // has_more also includes an incomplete UTF-8 suffix. Keep waiting for
+        // its continuation instead of returning an empty page in a busy loop.
+        !chunk.bytes.is_empty() || chunk.truncated || self.core.eof()
+    }
+
+    fn wait_output(&self, wait: &ReadWait) -> Result<Option<Value>, String> {
+        let chunk = self.core.read_output(wait.cursor, wait.max_bytes)?;
+        let ready = self.output_ready(&chunk);
+        if ready || os::milliseconds() >= wait.deadline {
+            Ok(Some(self.read_value(chunk, Some(!ready))))
+        } else {
+            Ok(None)
+        }
+    }
+
+    fn read_value(&self, chunk: OutputChunk, timed_out: Option<bool>) -> Value {
         let mut screen = String::new();
         let mut clipped = false;
         'rows: for y in 0..self.core.terminal.rows() {
@@ -883,7 +915,10 @@ impl Session {
         value.set("has_more", Value::Bool(chunk.has_more));
         value.set("screen", Value::from(screen));
         value.set("screen_truncated", Value::Bool(clipped));
-        Ok(value)
+        if let Some(timed_out) = timed_out {
+            value.set("timed_out", Value::Bool(timed_out));
+        }
+        value
     }
 }
 
@@ -2096,7 +2131,7 @@ impl Pool {
                 )?;
                 Ok(Reply::Value(self.sessions[index].info()))
             }
-            "read" => self.sessions[index].read(request).map(Reply::Value),
+            "read" => self.sessions[index].read(request),
             "write" => {
                 let session = &mut self.sessions[index];
                 if session.core.eof() || session.status().is_some() {
@@ -2519,6 +2554,12 @@ pub fn serve() -> Result<(), String> {
         for (uri, status) in pool.finished.drain(..) {
             server.finish(&uri, status);
         }
+        server.wake_reads(
+            |wait| match pool.sessions.iter().find(|s| s.id == wait.session_id) {
+                Some(session) => session.wait_output(wait).transpose(),
+                None => Some(Err("session closed while waiting for output".into())),
+            },
+        );
         openers.reap();
         if !pool.sessions.is_empty() || server.has_pending() {
             idle_since = os::milliseconds();
@@ -2560,6 +2601,9 @@ pub fn serve() -> Result<(), String> {
             }
         }
         let mut timeout = deadline
+            .into_iter()
+            .chain(server.next_deadline())
+            .min()
             .map(|end| end.saturating_sub(os::milliseconds()).min(5000) as c_int)
             .unwrap_or(5000);
         if pool.sessions.is_empty() {
