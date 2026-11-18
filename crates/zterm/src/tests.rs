@@ -314,6 +314,45 @@ fn origin_mode_coordinates_and_cursor_report_follow_margins() {
 }
 
 #[test]
+fn cursor_restore_recovers_both_character_sets_and_the_active_selection() {
+    for (save, restore) in [
+        (&b"\x1b7"[..], &b"\x1b8"[..]),
+        (&b"\x1b[?1048h"[..], &b"\x1b[?1048l"[..]),
+        (&b"\x1b[?1049h"[..], &b"\x1b[?1049l"[..]),
+    ] {
+        for shifted in [false, true] {
+            let mut t = Terminal::new(8, 2, 0);
+            t.feed(b"\x1b(B\x1b)0");
+            t.feed(if shifted { b"\x0e" } else { b"\x0f" });
+            t.feed(save);
+            t.feed(b"\x1b(0\x1b)B");
+            t.feed(if shifted { b"\x0f" } else { b"\x0e" });
+            t.feed(restore);
+            // The first glyph checks the restored selection before SI/SO can
+            // mask it; the next two check both restored character-set definitions.
+            t.feed(b"q\x0fq\x0eq");
+            assert_eq!(
+                line(&t, 0),
+                if shifted { "─q─     " } else { "qq─     " },
+                "save={save:?}, shifted={shifted}"
+            );
+            assert!(!t.modes().alternate_screen);
+        }
+    }
+}
+
+#[test]
+fn cursor_restore_keeps_character_set_snapshots_local_to_each_screen() {
+    let mut t = Terminal::new(8, 2, 0);
+    t.feed(b"\x1b(B\x1b)0\x0e\x1b7");
+    t.feed(b"\x1b[?47h\x1b(0\x1b)B\x0f\x1b7");
+    t.feed(b"\x1b(B\x1b)B\x0e\x1b8q\x0fq\x0eq");
+    assert_eq!(line(&t, 0), "──q     ");
+    t.feed(b"\x1b[?47l\x1b8q\x0fq\x0eq");
+    assert_eq!(line(&t, 0), "─q─     ");
+}
+
+#[test]
 fn alternate_screen_restores_primary_cursor_style_and_content() {
     let mut t = Terminal::new(8, 2, 4);
     t.feed(b"\x1b[31mmain\x1b[?1049hALT\x1b[32m\x1b[?1049l!");
