@@ -2191,39 +2191,6 @@ fn push_history(
     });
 }
 
-#[cfg(test)]
-mod history_budget_tests {
-    use super::*;
-
-    #[test]
-    fn retained_history_counts_wrap_metadata_spare_slots_and_reused_cell_capacity() {
-        let mut history = VecDeque::new();
-        let mut used = 0;
-        for columns in [1, 1024, 80, 1] {
-            let row = alloc::vec![Cell::BLANK; columns];
-            let iterations =
-                (MAX_HISTORY_BYTES / mem::size_of_val(row.as_slice()) + 100).min(70_000);
-            for index in 0..iterations {
-                let wrapped = if index % 7 == 0 { 0 } else { columns };
-                push_history(&mut history, 65_536, &mut used, &row, wrapped);
-                assert!(
-                    used + history.capacity() * mem::size_of::<HistoryRow>() <= MAX_HISTORY_BYTES
-                );
-                assert!(history.len() <= 65_536);
-                assert_eq!(history.back().unwrap().wrapped, wrapped);
-                assert_eq!(history.back().unwrap().cells.len(), columns);
-            }
-            assert_eq!(
-                used,
-                history
-                    .iter()
-                    .map(|row| row.cells.capacity() * mem::size_of::<Cell>())
-                    .sum()
-            );
-        }
-    }
-}
-
 fn join_text_fields(fields: &[&[u8]], max: usize) -> String {
     let mut text = String::new();
     for (index, field) in fields.iter().enumerate() {
@@ -2314,5 +2281,38 @@ fn dec_graphics(ch: char) -> char {
         '}' => '£',
         '~' => '·',
         _ => ch,
+    }
+}
+
+#[cfg(test)]
+mod history_budget_tests {
+    use super::*;
+
+    #[test]
+    fn retained_history_counts_wrap_metadata_spare_slots_and_reused_cell_capacity() {
+        let mut history = VecDeque::new();
+        let mut used = 0;
+        for columns in [1, 1024, 80, 1] {
+            let row = alloc::vec![Cell::BLANK; columns];
+            let iterations =
+                (MAX_HISTORY_BYTES / mem::size_of_val(row.as_slice()) + 100).min(70_000);
+            for index in 0..iterations {
+                let wrapped = if index % 7 == 0 { 0 } else { columns };
+                push_history(&mut history, 65_536, &mut used, &row, wrapped);
+                assert!(
+                    used + history.capacity() * mem::size_of::<HistoryRow>() <= MAX_HISTORY_BYTES
+                );
+                assert!(history.len() <= 65_536);
+                assert_eq!(history.back().unwrap().wrapped, wrapped);
+                assert_eq!(history.back().unwrap().cells.len(), columns);
+            }
+            assert_eq!(
+                used,
+                history
+                    .iter()
+                    .map(|row| row.cells.capacity() * mem::size_of::<Cell>())
+                    .sum()
+            );
+        }
     }
 }
