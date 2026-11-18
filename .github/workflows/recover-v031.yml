@@ -1,0 +1,56 @@
+name: Recover fixed v0.3.1 publication
+
+on:
+  push:
+    branches: ['release/recover-v031-20261119']
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: ztty-release
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: ${{ github.repository == 'LIghtJUNction/ztty' && github.ref == 'refs/heads/release/recover-v031-20261119' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the reviewed recovery helper
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          path: recovery
+          persist-credentials: false
+      - name: Check out the immutable release source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: cbcd480f861904a2265af52ab5ca8a5e19cebe9d
+          path: release-source
+          persist-credentials: false
+      - name: Check Python syntax without executing the helper
+        run: python3 -c 'import ast,pathlib; ast.parse(pathlib.Path("recovery/tools/recover_release_v031.py").read_text())'
+      - name: Audit the original gates, archives, crate and publication plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python3 recovery/tools/recover_release_v031.py audit
+          --source "$GITHUB_WORKSPACE/release-source"
+          --output "$RUNNER_TEMP/ztty-release-recovery"
+      - name: Restore attachments, read back and publish the fixed tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          python3 recovery/tools/recover_release_v031.py publish
+          --source "$GITHUB_WORKSPACE/release-source"
+          --output "$RUNNER_TEMP/ztty-release-recovery"
+      - name: Retain recovery proof, including interrupted stages
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ztty-v031-publication-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ztty-release-recovery/
+          if-no-files-found: warn
+          retention-days: 14

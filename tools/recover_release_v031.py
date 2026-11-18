@@ -329,15 +329,20 @@ def bundle_bytes(originals, manifest):
 
 
 def inspect_bundle(data, expected_manifest):
+    require(expected_manifest["repository"] == REPO and expected_manifest["release_tag"] == TAG
+            and expected_manifest["source_sha"] == SOURCE and expected_manifest["original_run_id"] == RUN
+            and expected_manifest["original_run_attempt"] == ATTEMPT, "evidence manifest identity mismatch")
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
         expected = {"manifest.json"} | {"artifacts/" + stem + ".zip" for stem in ARTIFACTS}
         require(len(archive.infolist()) == len(expected) and set(archive.namelist()) == expected,
                 "recovery evidence ZIP has unexpected entries")
         require(archive.read("manifest.json") == encoded(expected_manifest), "evidence manifest changed")
-        empty = {}
-        for stem in ARTIFACTS:
-            files, _ = read_original_zip(stem, archive.read("artifacts/" + stem + ".zip"))
+        empty, records = {}, []
+        for stem in sorted(ARTIFACTS):
+            files, record = read_original_zip(stem, archive.read("artifacts/" + stem + ".zip"))
+            records.append(record)
             empty.update({name: digest(payload) for name, payload in files.items() if not payload})
+        require(records == expected_manifest["artifacts"], "evidence artifact records changed")
         require(empty == expected_manifest["empty_top_level_files"], "empty evidence was not preserved")
         return {"passed": True, "bytes": len(data), "sha256": digest(data),
                 "original_archives_verified": len(ARTIFACTS), "empty_files_verified": len(empty)}
@@ -447,7 +452,7 @@ def audit(api, source, out):
     for name in ("ztty-" + VERSION + ".tar.gz", "SHA256SUMS"):
         assets[name] = (out / name).read_bytes()
     assets["install.sh"] = (source / "install.sh").read_bytes()
-    verify_checksums(assets)
+    verify_checksums({**assets, **{name: b"" for name in empty}})
     for name, payload in assets.items():
         flat_name(name)
         require(bool(payload), "an empty file was selected for standalone upload")
@@ -469,6 +474,210 @@ def audit(api, source, out):
     return result
 
 
+def prepared(api, source, out):
+    source_identity(source)
+    audit_result = json.loads((out / "audit.json").read_bytes())
+    plan_data = (out / "plan.json").read_bytes()
+    plan = json.loads(plan_data)
+    require(audit_result["passed"] is True and audit_result["source_sha"] == SOURCE
+            and audit_result["tag"] == TAG and audit_result["plan_sha256"] == digest(plan_data),
+            "audit does not authorize this publication plan")
+    require(plan["repository"] == REPO and plan["source_sha"] == SOURCE and plan["tag"] == TAG
+            and plan["helper_sha256"] == digest(Path(__file__).read_bytes()),
+            "publication helper or plan identity changed")
+    assets = {}
+    for name, expected in plan["assets"].items():
+        flat_name(name)
+        payload = (out / "assets" / name).read_bytes()
+        require(payload and len(payload) == expected["bytes"] and digest(payload) == expected["sha256"],
+                "prepared asset changed: " + name)
+        assets[name] = payload
+    require(BUNDLE in assets and "SHA256SUMS" in assets and "install.sh" in assets
+            and "ztty-" + VERSION + ".tar.gz" in assets, "required release payload is missing")
+    inspect_bundle(assets[BUNDLE], plan["bundle_manifest"])
+    for stem in ARTIFACTS:
+        require(stem + ".build.json" in assets and stem + ".native.json" in assets,
+                "a platform's release provenance is missing")
+    empty = plan["bundle_manifest"]["empty_top_level_files"]
+    verify_checksums({**assets, **{name: b"" for name in empty}})
+    audit_result["original_gates"] = audit_gates(api)
+    return audit_result, plan, assets
+
+
+def release_candidates(api):
+    found = {}
+    try:
+        known = api.get(f"releases/{KNOWN_DRAFT_ID}")
+        require(known["tag_name"] == TAG, "the original partial release was retargeted")
+        found[known["id"]] = known
+    except ApiError as error:
+        if error.status != 404:
+            raise
+    for release in api.pages("releases"):
+        if release["tag_name"] == TAG:
+            found[release["id"]] = release
+    require(len(found) <= 1, "multiple releases refer to the fixed tag")
+    return next(iter(found.values()), None)
+
+
+def release_assets(api, release_id):
+    result = {}
+    for asset in api.pages(f"releases/{release_id}/assets"):
+        require(asset["name"] not in result, "duplicate release asset names")
+        result[asset["name"]] = asset
+    return result
+
+
+def verified_asset(api, asset, expected):
+    require(asset["state"] == "uploaded", "existing asset is unfinished: " + asset["name"])
+    require(asset["size"] == len(expected), "existing asset size differs: " + asset["name"])
+    payload = api.get(f"releases/assets/{asset['id']}", binary=True)
+    require(payload == expected, "existing release asset bytes differ: " + asset["name"])
+    return {"id": asset["id"], "name": asset["name"], "bytes": len(payload), "sha256": digest(payload)}
+
+
+def ensure_asset(api, release_id, name, payload):
+    require(payload, "refusing a standalone zero-byte asset")
+    existing = release_assets(api, release_id).get(name)
+    if existing is not None:
+        return verified_asset(api, existing, payload)
+    path = f"/repos/{REPO}/releases/{release_id}/assets?" + urllib.parse.urlencode({"name": name})
+    try:
+        asset = api.request("POST", path, payload, upload=True)
+    except ApiError as error:
+        if error.status not in (409, 422):
+            raise
+        # Another publisher may have uploaded the same bytes. Never retry POST
+        # or overwrite; verify the existing asset instead.
+        asset = release_assets(api, release_id).get(name)
+        require(asset is not None, "asset creation conflicted without a visible matching asset")
+    require(asset["name"] == name, "upload returned the wrong asset identity")
+    return verified_asset(api, asset, payload)
+
+
+def recovery_notes():
+    return (
+        "<!-- ztty-v031-publication-recovery -->\n"
+        "## Publication recovery\n\n"
+        f"Published from fixed tag {TAG}, source {SOURCE}. The original "
+        f"[run {RUN}](https://github.com/{REPO}/actions/runs/{RUN}) passed all six native "
+        "architecture gates, Verify, and source/Arch package verification. Its final "
+        "attachment upload failed when GitHub rejected a zero-byte stderr log.\n\n"
+        f"{BUNDLE} retains all six original Actions ZIPs byte-for-byte, including "
+        "empty logs and nested evidence. Nonempty release assets are checked against "
+        "their original build ledgers and downloaded again before publication. "
+        "The original failed upload remains recorded in Actions.\n"
+    )
+
+
+def latest_policy(api):
+    try:
+        latest = api.get("releases/latest")
+    except ApiError as error:
+        if error.status == 404:
+            return "true"
+        raise
+    match = re.fullmatch(r"v([0-9]+)\.([0-9]+)\.([0-9]+)", latest["tag_name"])
+    if match and tuple(map(int, match.groups())) <= (0, 3, 1):
+        return "true"
+    return "false"
+
+
+def publish(api, source, out):
+    audit_result, plan, assets = prepared(api, source, out)
+    empty = plan["bundle_manifest"]["empty_top_level_files"]
+    release = release_candidates(api)
+    if release is None:
+        audit_tag(api)
+        try:
+            release = api.request("POST", f"/repos/{REPO}/releases", {
+                "tag_name": TAG, "target_commitish": SOURCE, "name": "ztty " + VERSION,
+                "body": recovery_notes(), "draft": True, "prerelease": False,
+            })
+        except ApiError as error:
+            if error.status not in (409, 422):
+                raise
+            release = release_candidates(api)
+            require(release is not None, "release creation conflicted without a visible matching release")
+    require(release["tag_name"] == TAG and release["prerelease"] is False,
+            "existing release does not have the expected stable identity")
+    release_id = release["id"]
+    state = {"schema": 1, "passed": False, "mode": "publish", "source_sha": SOURCE, "tag": TAG,
+             "original_gates": audit_result["original_gates"],
+             "artifact_audit": audit_result["artifact_audit"], "registry": audit_result["registry"],
+             "evidence_bundle": audit_result["evidence_bundle"],
+             "release": {"id": release_id, "url": release["html_url"], "draft_before": release["draft"]},
+             "removed_empty_starters": [], "asset_readbacks": []}
+    write_json(out / "publication-progress.json", state)
+    existing = release_assets(api, release_id)
+    # Check every existing payload before making the first attachment change.
+    # A mismatched or unfinished nonempty asset requires investigation.
+    for name, payload in assets.items():
+        if name in existing:
+            verified_asset(api, existing[name], payload)
+    for name in empty:
+        if name not in existing:
+            continue
+        item = existing[name]
+        require(item["size"] == 0, "an originally empty log now has different content")
+        if item["state"] == "uploaded":
+            verified_asset(api, item, b"")
+        else:
+            require(item["state"] == "starter", "unexpected empty asset state")
+    # Preserve and read back original ZIPs before removing an empty failed upload
+    # placeholder. Completed assets, including valid empty assets, are retained.
+    ensure_asset(api, release_id, BUNDLE, assets[BUNDLE])
+    for name in sorted(empty):
+        item = release_assets(api, release_id).get(name)
+        if item is not None and item["state"] == "starter":
+            require(item["size"] == 0 and digest(b"") == empty[name], "empty placeholder identity changed")
+            api.request("DELETE", f"/repos/{REPO}/releases/assets/{item['id']}")
+            state["removed_empty_starters"].append({"id": item["id"], "name": name})
+    for name, payload in sorted(assets.items()):
+        ensure_asset(api, release_id, name, payload)
+    current = release_assets(api, release_id)
+    for name, payload in sorted(assets.items()):
+        require(name in current, "release readback is missing an asset: " + name)
+        state["asset_readbacks"].append(verified_asset(api, current[name], payload))
+    read_bundle = api.get(f"releases/assets/{current[BUNDLE]['id']}", binary=True)
+    state["evidence_bundle"] = inspect_bundle(read_bundle, plan["bundle_manifest"])
+    state["release_readback"] = {"passed": True, "nonempty_assets": len(assets),
+                                 "empty_files_preserved": len(empty)}
+    audit_tag(api)
+    source_identity(source)
+    release = api.get(f"releases/{release_id}")
+    require(release["tag_name"] == TAG and release["prerelease"] is False, "release identity changed")
+    if release["draft"]:
+        body = release.get("body") or ""
+        if "<!-- ztty-v031-publication-recovery -->" not in body:
+            body = (body.rstrip() + "\n\n" + recovery_notes()).lstrip()
+        release = api.request("PATCH", f"/repos/{REPO}/releases/{release_id}",
+                              {"draft": False, "body": body, "make_latest": latest_policy(api)})
+    require(release["draft"] is False and release["tag_name"] == TAG, "release was not published")
+    audit_tag(api)
+    published = api.get(f"releases/{release_id}")
+    require(published["draft"] is False and published["tag_name"] == TAG, "published release identity mismatch")
+    current = release_assets(api, release_id)
+    for name, payload in assets.items():
+        require(name in current, "published release lost an asset: " + name)
+        verified_asset(api, current[name], payload)
+    state["release"].update({"draft": False, "url": published["html_url"],
+                            "published_at": published["published_at"]})
+    state["passed"] = True
+    state["recovery_workflow"] = {
+        "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+        "helper_commit": os.environ["GITHUB_SHA"], "helper_sha256": digest(Path(__file__).read_bytes()),
+    }
+    audit_name = f"ztty-{VERSION}-recovery-{os.environ['GITHUB_RUN_ID']}-{os.environ['GITHUB_RUN_ATTEMPT']}.json"
+    flat_name(audit_name)
+    audit_bytes = encoded(state)
+    (out / "publication-audit.json").write_bytes(audit_bytes)
+    audit_asset = ensure_asset(api, release_id, audit_name, audit_bytes)
+    state["audit_asset"] = audit_asset
+    write_json(out / "publication-result.json", state)
+    return state
+
+
 def compact_report(value):
     return {"source_sha": SOURCE, "tag": TAG, "original_run_id": RUN, "original_run_attempt": ATTEMPT,
             "passed": value.get("passed", False), "mode": value.get("mode", "audit"),
@@ -482,7 +691,7 @@ def compact_report(value):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("audit",))
+    parser.add_argument("mode", choices=("audit", "publish"))
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     arguments = parser.parse_args()
@@ -491,9 +700,13 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     result = {"passed": False, "mode": arguments.mode}
     try:
-        result = audit(GitHub(), source, out)
+        api = GitHub()
+        result = audit(api, source, out) if arguments.mode == "audit" else publish(api, source, out)
         result["mode"] = arguments.mode
     except Exception as error:
+        progress = out / "publication-progress.json"
+        if arguments.mode == "publish" and progress.exists():
+            result = json.loads(progress.read_bytes())
         result.update({"passed": False, "error": type(error).__name__ + ": " + str(error)})
         raise
     finally:
