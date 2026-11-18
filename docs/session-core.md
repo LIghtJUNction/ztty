@@ -146,3 +146,37 @@ library checking also passes with the previously recorded zune-png warning.
 
 This step does not yet provide shared runtime, attach or MCP on macOS and
 Windows. Their frontend integration and actual native acceptance follow.
+
+## Native frontend integration
+
+The application package now also exposes a real `no_std` library target.
+`input_queue`, `output_tail`, `session_control` and `session_core` are
+public modules; the three frontends consume the same implementation.
+This introduces no dependency, platform trait or dispatcher. The integration
+tests import that library directly instead of compiling source copies.
+The library needs alloc and zpty's OS ABI; it is not a bare-metal PTY library.
+
+Windows and macOS now hold `SessionCore` in place of separate terminal,
+PTY and pending-write fields. Their existing 8 MiB outer input limits remain;
+Linux keeps 1 MiB. Windows retains its sixteen-read event budget and existing
+ConPTY exit policy. macOS retains its 1 MiB event budget and CFFileDescriptor
+read/write callbacks. Window surfaces, fonts, selection, cursor timing and
+event-loop ownership remain platform concerns.
+
+Both native resize paths commit PTY size before physical cell metrics and the
+terminal grid. macOS backing scale and Windows candidate DPI fonts are
+committed only after that operation succeeds. On failure they retain the old grid, emit a diagnostic and
+request a repaint; subsequent resize events can retry. The Windows frontend
+still exits on its existing child-reap condition: changing this to wait
+unconditionally for pipe EOF would require separately proving ConPTY close
+and output-drain ordering.
+
+The [integration record](measurements/native-core-port-2026-11-18.json)
+contains source and binary hashes. Linux passes 200 regular Rust tests,
+eight real-PTY core checks, strict Clippy, release/no_std and MCP checks,
+plus the fifteen-check daily GUI suite. Windows GNU and both Darwin targets
+pass `cargo check`. Actual execution of these frontend changes remains
+pending on the source-pinned native candidate.
+
+The shared core is groundwork for native shared runtime, tabs/splits,
+attach and MCP. Those features are not implemented by this extraction.

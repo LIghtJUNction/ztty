@@ -18,6 +18,8 @@ use zterm::{
     input::{self, Key, KeyEvent, ModifierKey, Modifiers, MouseEvent},
 };
 
+use ztty::session_core::{ReadStep, SessionCore};
+
 type Id = *mut c_void;
 type Sel = *mut c_void;
 const NIL: Id = ptr::null_mut();
@@ -488,8 +490,7 @@ struct Host {
     window: Id,
     view: Id,
     fd_source: Id,
-    terminal: Terminal,
-    pty: zpty::Pty,
+    core: SessionCore,
     renderer: Renderer,
     appearance: Appearance,
     running: bool,
@@ -500,8 +501,6 @@ struct Host {
     selecting: bool,
     mouse_button: Option<u8>,
     swallowed_buttons: [bool; 3],
-    output: Vec<u8>,
-    output_at: usize,
     read_buffer: Vec<u8>,
     encoded: Vec<u8>,
     marked: String,
@@ -529,39 +528,22 @@ impl Host {
         if bytes.is_empty() {
             return;
         }
-        if self.output_at != 0 {
-            self.output.drain(..self.output_at);
-            self.output_at = 0;
-        }
-        if self.output.len().saturating_add(bytes.len()) <= MAX_INPUT {
-            self.output.extend_from_slice(bytes);
+        if self.core.input.push(bytes) {
             self.flush();
         } else {
             os::print(2, b"ztty: input queue full; paste rejected\n");
         }
     }
     fn flush(&mut self) {
-        while self.output_at < self.output.len() {
-            match self.pty.write(&self.output[self.output_at..]) {
-                Ok(0) => break,
-                Ok(n) => self.output_at += n,
-                Err(e) if e.is_would_block() => break,
-                Err(_) => {
-                    self.running = false;
-                    break;
-                }
-            }
-        }
-        if self.output_at == self.output.len() {
-            self.output.clear();
-            self.output_at = 0;
+        if self.core.flush_input().is_err() {
+            self.running = false;
         }
         if !self.fd_source.is_null() {
             unsafe {
-                if self.output.is_empty() {
-                    CFFileDescriptorDisableCallBacks(self.fd_source, 2);
-                } else {
+                if self.core.input.pending() {
                     CFFileDescriptorEnableCallBacks(self.fd_source, 2);
+                } else {
+                    CFFileDescriptorDisableCallBacks(self.fd_source, 2);
                 }
             }
         }
@@ -573,7 +555,7 @@ impl Host {
             mods,
             event,
             text,
-            &self.terminal.modes().input(),
+            &self.core.terminal.modes().input(),
             &mut self.encoded,
         );
         let encoded = core::mem::take(&mut self.encoded);
@@ -591,7 +573,7 @@ impl Host {
     }
     fn send_text(&mut self, text: &str) {
         self.encoded.clear();
-        input::encode_text_into(text, &self.terminal.modes().input(), &mut self.encoded);
+        input::encode_text_into(text, &self.core.terminal.modes().input(), &mut self.encoded);
         let encoded = core::mem::take(&mut self.encoded);
         self.queue(&encoded);
         self.encoded = encoded;
@@ -604,7 +586,7 @@ impl Host {
         input::encode_mouse_into(
             event,
             mods,
-            &self.terminal.modes().input(),
+            &self.core.terminal.modes().input(),
             &mut self.encoded,
         );
         let encoded = core::mem::take(&mut self.encoded);
@@ -614,36 +596,33 @@ impl Host {
     fn read_ready(&mut self) {
         let mut budget = 1024usize * 1024;
         while budget != 0 {
-            let n = match self.pty.read(&mut self.read_buffer) {
-                Ok(0) => {
+            match self.core.read_once(&mut self.read_buffer, false) {
+                Ok(ReadStep::Data {
+                    bytes,
+                    history_before,
+                    history_after,
+                }) => {
+                    budget = budget.saturating_sub(bytes);
+                    if self.history > 0 {
+                        self.history = self
+                            .history
+                            .saturating_add(history_after.saturating_sub(history_before))
+                            .min(history_after);
+                        self.selection = None;
+                    }
+                    if !self.core.queue_responses() {
+                        os::print(2, b"ztty: input queue full; terminal replies rejected\n");
+                    }
+                    self.flush();
+                }
+                Ok(ReadStep::Pending) => break,
+                Ok(ReadStep::Eof) | Err(_) => {
                     self.running = false;
                     break;
                 }
-                Ok(n) => n,
-                Err(e) if e.is_would_block() => break,
-                Err(_) => {
-                    self.running = false;
-                    break;
-                }
-            };
-            budget = budget.saturating_sub(n);
-            let before = self.terminal.history_len();
-            self.terminal.feed(&self.read_buffer[..n]);
-            if self.history > 0 {
-                self.history = self
-                    .history
-                    .saturating_add(self.terminal.history_len().saturating_sub(before))
-                    .min(self.terminal.history_len());
-                self.selection = None;
             }
-            self.encoded.clear();
-            self.encoded.extend_from_slice(self.terminal.responses());
-            self.terminal.clear_responses();
-            let response = core::mem::take(&mut self.encoded);
-            self.queue(&response);
-            self.encoded = response;
         }
-        let _ = self.pty.reap();
+        let _ = self.core.pty.reap();
     }
     fn position(&self, event: Id) -> CellPosition {
         let point = send!(event, c"locationInWindow", Point);
@@ -663,16 +642,16 @@ impl Host {
         let start = selection.start.min(selection.end);
         let end = selection.start.max(selection.end);
         let mut text = String::new();
-        for row in start.row..=end.row.min(self.terminal.rows().saturating_sub(1)) {
+        for row in start.row..=end.row.min(self.core.terminal.rows().saturating_sub(1)) {
             let begin = if row == start.row { start.col } else { 0 };
             let end_col = if row == end.row {
                 end.col.saturating_add(1)
             } else {
-                self.terminal.cols()
+                self.core.terminal.cols()
             };
             let start_len = text.len();
-            for col in begin..end_col.min(self.terminal.cols()) {
-                let cell = self.terminal.view_cell(col, row, self.history);
+            for col in begin..end_col.min(self.core.terminal.cols()) {
+                let cell = self.core.terminal.view_cell(col, row, self.history);
                 if cell.width != 0 {
                     text.push(cell.ch);
                     for &ch in &cell.combining {
@@ -693,39 +672,42 @@ impl Host {
     }
     fn resize(&mut self) {
         let bounds = rect0(self.view, c"bounds");
-        self.scale = send!(self.window, c"backingScaleFactor", f64).clamp(1.0, 8.0);
+        let scale = send!(self.window, c"backingScaleFactor", f64).clamp(1.0, 8.0);
         let cols = ((bounds.size.width - 2.0 * self.appearance.padding as f64).max(1.0)
             / self.renderer.cell_width) as usize;
         let rows = ((bounds.size.height - 2.0 * self.appearance.padding as f64).max(1.0)
             / self.renderer.cell_height) as usize;
         let cols = cols.clamp(1, 1024);
         let rows = rows.clamp(1, 1024);
-        self.terminal.resize(cols, rows);
-        let cw = (self.renderer.cell_width * self.scale) as u32;
-        let ch = (self.renderer.cell_height * self.scale) as u32;
-        self.terminal.set_cell_size(cw, ch);
+        let cw = (self.renderer.cell_width * scale) as u32;
+        let ch = (self.renderer.cell_height * scale) as u32;
         let mut size = zpty::Size::new(cols as u16, rows as u16);
         size.pixel_width = ((cw as usize * cols).min(u16::MAX as usize)) as u16;
         size.pixel_height = ((ch as usize * rows).min(u16::MAX as usize)) as u16;
-        let _ = self.pty.resize(size);
-        self.history = self.history.min(self.terminal.history_len());
+        if self.core.resize_with_cell_size(size, (cw, ch)).is_err() {
+            os::print(2, b"ztty: PTY resize failed; retaining the terminal grid\n");
+            self.force = true;
+            return;
+        }
+        self.scale = scale;
+        self.history = self.history.min(self.core.terminal.history_len());
         self.selection = None;
         self.force = true;
     }
     fn tick(&mut self) {
         let now = os::milliseconds();
-        let modes = *self.terminal.modes();
+        let modes = *self.core.terminal.modes();
         if modes.synchronized_output {
             let start = self.sync_since.get_or_insert(now);
             if now.saturating_sub(*start) >= 150 {
-                self.terminal.force_end_sync();
+                self.core.terminal.force_end_sync();
                 self.sync_since = None;
                 self.force = true;
             }
         } else {
             self.sync_since = None;
         }
-        let cursor = self.terminal.cursor();
+        let cursor = self.core.terminal.cursor();
         if cursor != self.last_cursor {
             self.last_cursor = cursor;
             self.blink_visible = true;
@@ -741,13 +723,13 @@ impl Host {
             self.blink_at = now + self.appearance.cursor_blink_interval;
             self.force = true;
         }
-        let revision = self.terminal.graphics().revision();
+        let revision = self.core.terminal.graphics().revision();
         if revision != self.last_revision {
             self.last_revision = revision;
             self.force = true;
         }
-        if self.title != self.terminal.title() {
-            self.title = String::from(self.terminal.title());
+        if self.title != self.core.terminal.title() {
+            self.title = String::from(self.core.terminal.title());
             let title = ns_string(if self.title.is_empty() {
                 "ztty"
             } else {
@@ -756,7 +738,9 @@ impl Host {
             send!(self.window, c"setTitle:", (), Id => title);
             release(title);
         }
-        if !self.terminal.modes().synchronized_output && (self.force || self.terminal.dirty()) {
+        if !self.core.terminal.modes().synchronized_output
+            && (self.force || self.core.terminal.dirty())
+        {
             send!(self.view, c"setNeedsDisplay:", (), bool => true);
             self.force = false;
         }
@@ -787,17 +771,17 @@ impl Host {
         );
         let viewport = Rect::new(
             padding,
-            bounds.size.height - padding - height * self.terminal.rows() as f64,
-            width * self.terminal.cols() as f64,
-            height * self.terminal.rows() as f64,
+            bounds.size.height - padding - height * self.core.terminal.rows() as f64,
+            width * self.core.terminal.cols() as f64,
+            height * self.core.terminal.rows() as f64,
         );
         unsafe {
             CGContextClipToRect(context, viewport);
         }
         self.draw_images(context, bounds.size.height, i32::MIN, -1_073_741_824);
-        for row in 0..self.terminal.rows() {
-            for col in 0..self.terminal.cols() {
-                let cell = self.terminal.view_cell(col, row, self.history);
+        for row in 0..self.core.terminal.rows() {
+            for col in 0..self.core.terminal.cols() {
+                let cell = self.core.terminal.view_cell(col, row, self.history);
                 let selected = self.selection.is_some_and(|s| s.contains(row, col));
                 if cell.flags & (EXPLICIT_BG | INVERSE) != 0 || selected {
                     let bg = if selected {
@@ -822,9 +806,9 @@ impl Host {
             }
         }
         self.draw_images(context, bounds.size.height, -1_073_741_824, 0);
-        for row in 0..self.terminal.rows() {
-            for col in 0..self.terminal.cols() {
-                let cell = self.terminal.view_cell(col, row, self.history);
+        for row in 0..self.core.terminal.rows() {
+            for col in 0..self.core.terminal.cols() {
+                let cell = self.core.terminal.view_cell(col, row, self.history);
                 let selected = self.selection.is_some_and(|s| s.contains(row, col));
                 let mut fg = if selected {
                     self.appearance.selection_foreground
@@ -859,7 +843,7 @@ impl Host {
             }
         }
         self.draw_images(context, bounds.size.height, 0, i32::MAX);
-        let (col, row) = self.terminal.cursor();
+        let (col, row) = self.core.terminal.cursor();
         let cx = padding + col as f64 * width;
         let cy = bounds.size.height - padding - (row + 1) as f64 * height;
         if !self.marked.is_empty() {
@@ -903,10 +887,11 @@ impl Host {
                 1.0,
             );
         } else if self.history == 0
-            && self.terminal.modes().cursor_visible
+            && self.core.terminal.modes().cursor_visible
             && (self.blink_visible || !self.focused)
         {
             let shape = self
+                .core
                 .terminal
                 .modes()
                 .cursor_shape
@@ -930,13 +915,13 @@ impl Host {
         unsafe {
             CGContextRestoreGState(context);
         }
-        self.terminal.clear_dirty();
+        self.core.terminal.clear_dirty();
     }
     fn draw_images(&self, context: Id, view_height: f64, min_z: i32, max_z: i32) {
         unsafe {
             CGContextSetInterpolationQuality(context, 1);
         }
-        for draw in self.terminal.graphics_draws(self.history) {
+        for draw in self.core.terminal.graphics_draws(self.history) {
             if draw.z < min_z || (draw.z >= max_z && max_z != i32::MAX) {
                 continue;
             }
@@ -1184,7 +1169,7 @@ unsafe extern "C" fn window_focus(_: Id, selector: Sel, _: Id) {
         host.blink_visible = true;
         host.blink_at = os::milliseconds() + host.appearance.cursor_blink_interval;
         host.force = true;
-        let encoded = input::encode_focus(focus, &host.terminal.modes().input());
+        let encoded = input::encode_focus(focus, &host.core.terminal.modes().input());
         host.queue(&encoded);
     }
     wake();
@@ -1221,7 +1206,7 @@ fn paste_clipboard() {
     }
     unsafe {
         let host = &mut *pointer;
-        let encoded = input::encode_paste(&text, &host.terminal.modes().input());
+        let encoded = input::encode_paste(&text, &host.core.terminal.modes().input());
         host.queue(&encoded);
         host.history = 0;
         host.selection = None;
@@ -1266,11 +1251,11 @@ unsafe extern "C" fn key_down(view: Id, _: Sel, event: Id) {
     if mods.contains(Modifiers::SHIFT) && matches!(key, Key::PageUp | Key::PageDown) {
         unsafe {
             let host = &mut *pointer;
-            let step = host.terminal.rows().saturating_sub(1).max(1);
+            let step = host.core.terminal.rows().saturating_sub(1).max(1);
             host.history = if key == Key::PageUp {
                 host.history
                     .saturating_add(step)
-                    .min(host.terminal.history_len())
+                    .min(host.core.terminal.history_len())
             } else {
                 host.history.saturating_sub(step)
             };
@@ -1495,7 +1480,7 @@ unsafe extern "C" fn first_rect(view: Id, _: Sel, range: Range, actual: *mut Ran
     }
     let (window, rect) = unsafe {
         let host = &*pointer;
-        let (col, row) = host.terminal.cursor();
+        let (col, row) = host.core.terminal.cursor();
         let bounds = rect0(view, c"bounds");
         (
             host.window,
@@ -1546,10 +1531,11 @@ unsafe extern "C" fn mouse(view: Id, _: Sel, event: Id) {
     let uri = if mods.contains(Modifiers::SUPER | Modifiers::CTRL) && pressing && button == 0 {
         unsafe {
             let host = &*pointer;
-            let col = position.col.min(host.terminal.cols() - 1);
-            let row = position.row.min(host.terminal.rows() - 1);
-            let cell = host.terminal.view_cell(col, row, host.history);
-            host.terminal
+            let col = position.col.min(host.core.terminal.cols() - 1);
+            let row = position.row.min(host.core.terminal.rows() - 1);
+            let cell = host.core.terminal.view_cell(col, row, host.history);
+            host.core
+                .terminal
                 .hyperlink(cell.link_id)
                 .filter(|uri| {
                     uri.len() <= 8192
@@ -1576,12 +1562,12 @@ unsafe extern "C" fn mouse(view: Id, _: Sel, event: Id) {
     }
     unsafe {
         let host = &mut *pointer;
-        let col = position.col.min(host.terminal.cols() - 1);
-        let row = position.row.min(host.terminal.rows() - 1);
+        let col = position.col.min(host.core.terminal.cols() - 1);
+        let row = position.row.min(host.core.terminal.rows() - 1);
         if releasing && core::mem::take(&mut host.swallowed_buttons[button as usize]) {
             return;
         }
-        if host.terminal.modes().mouse_tracking != 0
+        if host.core.terminal.modes().mouse_tracking != 0
             && !mods.contains(Modifiers::SHIFT)
             && host.history == 0
         {
@@ -1639,7 +1625,7 @@ unsafe extern "C" fn wheel(_: Id, _: Sel, event: Id) {
         if lines == 0 {
             return;
         }
-        if host.terminal.modes().mouse_tracking != 0
+        if host.core.terminal.modes().mouse_tracking != 0
             && !mods.contains(Modifiers::SHIFT)
             && host.history == 0
         {
@@ -1648,8 +1634,8 @@ unsafe extern "C" fn wheel(_: Id, _: Sel, event: Id) {
                 host.send_mouse(
                     MouseEvent::Scroll {
                         up: lines > 0,
-                        col: position.col.min(host.terminal.cols() - 1),
-                        row: position.row.min(host.terminal.rows() - 1),
+                        col: position.col.min(host.core.terminal.cols() - 1),
+                        row: position.row.min(host.core.terminal.rows() - 1),
                     },
                     mods,
                 );
@@ -1658,7 +1644,7 @@ unsafe extern "C" fn wheel(_: Id, _: Sel, event: Id) {
             host.history = if lines > 0 {
                 host.history
                     .saturating_add(lines as usize * 3)
-                    .min(host.terminal.history_len())
+                    .min(host.core.terminal.history_len())
             } else {
                 host.history
                     .saturating_sub(lines.unsigned_abs() as usize * 3)
@@ -1913,8 +1899,7 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
         window,
         view,
         fd_source: NIL,
-        terminal,
-        pty,
+        core: SessionCore::new(pty, terminal, String::from("local"), MAX_INPUT),
         renderer,
         appearance: cfg.appearance,
         running: true,
@@ -1925,8 +1910,6 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
         selecting: false,
         mouse_button: None,
         swallowed_buttons: [false; 3],
-        output: Vec::new(),
-        output_at: 0,
         read_buffer: vec![0; 65536],
         encoded: Vec::with_capacity(256),
         marked: String::new(),
@@ -1954,7 +1937,7 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
         release: None,
         description: None,
     };
-    let fd = unsafe { CFFileDescriptorCreate(NIL, host.pty.fd(), false, fd_ready, &context) };
+    let fd = unsafe { CFFileDescriptorCreate(NIL, host.core.pty.fd(), false, fd_ready, &context) };
     let source = if fd.is_null() {
         NIL
     } else {
@@ -1987,8 +1970,9 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
         send!(view, c"displayIfNeeded", ());
         let now = os::milliseconds();
         let blink = host.focused
-            && host.terminal.modes().cursor_visible
+            && host.core.terminal.modes().cursor_visible
             && host
+                .core
                 .terminal
                 .modes()
                 .cursor_blink
@@ -2028,9 +2012,10 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
     release(delegate);
     release(view);
     release(window);
-    let _ = host.pty.hangup();
-    let _ = host.pty.wait_timeout(100);
+    let _ = host.core.pty.hangup();
+    let _ = host.core.pty.wait_timeout(100);
     Ok(host
+        .core
         .pty
         .status()
         .map(|s| s.code().unwrap_or(128 + s.signal().unwrap_or(0)))

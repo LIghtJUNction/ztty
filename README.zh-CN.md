@@ -294,4 +294,4 @@ python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 `ztty detach NAME` 保留 PTY；`ztty attach --observe NAME` 打开观察视图。
 [操作、权限与真实验收记录](docs/workspaces.md)。
 
-Linux broker 已使用共享 PTY 核心，统一有界输入、所有权和输出游标；[真实 PTY 验收](docs/session-core.md)覆盖部分写入、尺寸提交顺序和子进程退出后的输出排空。macOS、Windows 前端接入仍在推进。
+三个前端已接入同一 no_std 会话库，统一 PTY 读写、有界输入和终端状态。[核心说明与真实 PTY 验收](docs/session-core.md)覆盖部分写入与尺寸提交顺序。Linux 集成及跨目标类型检查通过；新 macOS、Windows 路径仍需下一轮原生执行，原生共享会话、Attach 和 MCP 尚未补齐。

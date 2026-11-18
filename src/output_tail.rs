@@ -6,6 +6,7 @@ const PERSISTENT_LIMIT: usize = 256 * 1024;
 const DEFAULT_READ: u64 = 16384;
 const MAX_READ: u64 = 65536;
 
+#[derive(Default)]
 pub struct OutputTail {
     bytes: VecDeque<u8>,
     end: u64,
@@ -21,10 +22,7 @@ pub struct OutputChunk {
 
 impl OutputTail {
     pub fn new() -> Self {
-        Self {
-            bytes: VecDeque::new(),
-            end: 0,
-        }
+        Self::default()
     }
 
     /// Changing retention applies to currently retained and newly appended
