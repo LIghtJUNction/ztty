@@ -68,3 +68,73 @@ fn mouse_and_function_keys_are_not_ambiguous() {
     assert_eq!(actions::key_action(&[], 0xff55, 1), Some("scroll-up"));
     assert_eq!(actions::matching("history").next().unwrap().name, "search");
 }
+
+#[test]
+fn multiword_matching_ignores_case_and_word_order_across_fields() {
+    assert_eq!(
+        actions::matching(" HISTORY  terminal ")
+            .next()
+            .unwrap()
+            .name,
+        "search"
+    );
+    assert_eq!(
+        actions::matching("session SWITCH").next().unwrap().name,
+        "sessions"
+    );
+    assert!(actions::matching("history nonexistent").next().is_none());
+    assert!(actions::matching("  \t ").all(|action| action.name != "none"));
+    assert!(actions::matches(
+        "BUILD stdio 中文",
+        &["build", "中文 logs", "ztty://mcp/stdio/run"]
+    ));
+    assert!(!actions::matches(
+        "中文 http",
+        &["build", "中文 logs", "ztty://mcp/stdio/run"]
+    ));
+}
+
+#[test]
+fn session_switcher_has_an_overrideable_default_and_truthful_shortcut_hints() {
+    let mut bindings = Vec::new();
+    assert_eq!(
+        actions::key_action(&bindings, b'S' as u64, 5),
+        Some("sessions")
+    );
+    assert_eq!(actions::key_action(&bindings, b's' as u64, 4), None);
+    assert_eq!(
+        actions::shortcut(&bindings, "sessions").as_deref(),
+        Some("Ctrl+Shift+S")
+    );
+    actions::set(
+        &mut bindings,
+        actions::parse("ctrl+shift+s = none", false).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(actions::key_action(&bindings, b's' as u64, 5), Some("none"));
+    assert_eq!(actions::shortcut(&bindings, "sessions"), None);
+    actions::set(
+        &mut bindings,
+        actions::parse("alt+f12 = sessions", false).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(
+        actions::shortcut(&bindings, "sessions").as_deref(),
+        Some("Alt+F12")
+    );
+    assert_eq!(actions::key_action(&bindings, 0xffc9, 8), Some("sessions"));
+    actions::set(
+        &mut bindings,
+        actions::parse("alt+f12 = copy", false).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(actions::shortcut(&bindings, "sessions"), None);
+    assert_eq!(
+        actions::shortcut(&bindings, "copy").as_deref(),
+        Some("Alt+F12")
+    );
+    assert_eq!(
+        actions::shortcut(&bindings, "palette").as_deref(),
+        Some("Ctrl+Shift+P")
+    );
+}

@@ -372,42 +372,7 @@ impl Selection {
         (a.min(b)..=a.max(b)).contains(&(row * cols + col))
     }
     fn text(self, terminal: &Terminal, history: usize) -> String {
-        let cols = terminal.cols();
-        let mut output = String::new();
-        let a = self.start.1 * cols + self.start.0;
-        let b = self.end.1 * cols + self.end.0;
-        for row in a.min(b) / cols..=(a.max(b) / cols).min(terminal.rows() - 1) {
-            let start = if row == a.min(b) / cols {
-                a.min(b) % cols
-            } else {
-                0
-            };
-            let end = if row == a.max(b) / cols {
-                a.max(b) % cols + 1
-            } else {
-                cols
-            };
-            let line_start = output.len();
-            for col in start..end {
-                let cell = terminal.view_cell(col, row, history);
-                if cell.width == 0 {
-                    continue;
-                }
-                output.push(cell.ch);
-                for ch in cell.combining {
-                    if ch != '\0' {
-                        output.push(ch);
-                    }
-                }
-            }
-            while output.len() > line_start && output.ends_with(' ') {
-                output.pop();
-            }
-            if row != a.max(b) / cols {
-                output.push('\n');
-            }
-        }
-        output
+        ztty::selection::text(terminal, self.start, self.end, history)
     }
 }
 

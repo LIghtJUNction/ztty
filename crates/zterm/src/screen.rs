@@ -134,6 +134,10 @@ pub(crate) struct Screen {
     pub cells: Vec<Cell>,
     pub blank: Cell,
     pub row0: usize,
+    /// Soft-wrap endpoints, indexed by the same physical rows as `cells`.
+    /// Zero is a hard boundary; otherwise only these columns precede the wrap.
+    /// A wide glyph may wrap before the final (padding) column.
+    pub wrapped: Vec<usize>,
     pub x: usize,
     pub y: usize,
     pub wrap: bool,
@@ -156,6 +160,7 @@ impl Screen {
             cells: vec![blank; cols * rows],
             blank,
             row0: 0,
+            wrapped: vec![0; rows],
             x: 0,
             y: 0,
             wrap: false,
@@ -197,12 +202,27 @@ impl Screen {
         &mut self.cells[start..start + self.cols]
     }
 
+    pub fn row_wrap(&self, y: usize) -> usize {
+        self.wrapped[self.index(0, y) / self.cols]
+    }
+
+    pub fn set_row_wrap(&mut self, y: usize, columns: usize) {
+        let row = self.index(0, y) / self.cols;
+        self.wrapped[row] = columns;
+    }
+
+    pub fn clear_row(&mut self, y: usize, blank: Cell) {
+        self.row_mut(y).fill(blank);
+        self.set_row_wrap(y, 0);
+    }
+
     pub fn mark_all(&mut self) {
         self.dirty.fill(true);
     }
 
     pub fn clear(&mut self, blank: Cell) {
         self.cells.fill(blank);
+        self.wrapped.fill(0);
         self.mark_all();
         self.wrap = false;
     }
@@ -223,6 +243,9 @@ impl Screen {
             end += 1;
         }
         row[start..end].fill(blank);
+        if end >= self.row_wrap(y) {
+            self.set_row_wrap(y, 0);
+        }
         self.dirty[y] = true;
     }
 
@@ -237,6 +260,10 @@ impl Screen {
         blank: Cell,
     ) -> &mut [Cell] {
         debug_assert!(start < end && end <= self.cols);
+        let wrapped = self.row_wrap(y);
+        if wrapped != 0 && end > wrapped {
+            self.set_row_wrap(y, 0);
+        }
         let row = self.row_mut(y);
         if start > 0 && row[start].width == 0 {
             row[start - 1] = blank;
@@ -273,11 +300,20 @@ impl Screen {
         // records any discarded primary-screen rows in scrollback first.
         let dropped = self.y.saturating_add(1).saturating_sub(rows);
         let mut cells = vec![self.blank; cols * rows];
-        for y in 0..rows.min(self.rows - dropped) {
+        let copied = rows.min(self.rows - dropped);
+        let mut wrapped = vec![0; rows];
+        for y in 0..copied {
             let count = cols.min(self.cols);
             cells[y * cols..y * cols + count].copy_from_slice(&self.row(y + dropped)[..count]);
+            let endpoint = self.row_wrap(y + dropped);
+            // Narrowing clips text rather than reflowing it. Do not bridge
+            // omitted columns or a successor row discarded by this resize.
+            if endpoint <= cols && y + 1 < copied {
+                wrapped[y] = endpoint;
+            }
         }
         self.cells = cells;
+        self.wrapped = wrapped;
         self.cols = cols;
         self.rows = rows;
         self.row0 = 0;

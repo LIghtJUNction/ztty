@@ -1,14 +1,19 @@
-//! Literal UTF-8 history search. Only one row and its cell mapping are copied;
-//! match counts and next/previous navigation do not retain all history matches.
+//! Literal UTF-8 history search across soft-wrapped rows. The streaming matcher
+//! keeps at most one query's byte positions, never a copy of a logical line or
+//! the history. Match counts and navigation do not retain all matches.
 use alloc::{string::String, vec, vec::Vec};
 use zterm::Terminal;
+
+const MAX_QUERY: usize = 1024;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Hit {
     pub row: usize,
     pub start: usize,
+    pub end_row: usize,
     pub end: usize,
     byte: usize,
+    revision: u64,
 }
 
 pub struct Result {
@@ -17,84 +22,159 @@ pub struct Result {
     pub ordinal: usize,
 }
 
-struct Row {
-    text: String,
-    cells: Vec<(usize, usize, usize)>,
+#[derive(Clone, Copy, Default)]
+struct Position {
+    row: usize,
+    start: usize,
+    end: usize,
+    byte: usize,
 }
 
-impl Row {
-    fn new() -> Self {
+struct Matcher<'a> {
+    query: &'a [u8],
+    prefix: Vec<usize>,
+    positions: Vec<Position>,
+    next: usize,
+    matched: usize,
+    revision: u64,
+}
+
+impl<'a> Matcher<'a> {
+    fn new(query: &'a str, revision: u64) -> Self {
+        let query = query.as_bytes();
+        let mut prefix = vec![0; query.len()];
+        for at in 1..query.len() {
+            let mut length = prefix[at - 1];
+            while length != 0 && query[at] != query[length] {
+                length = prefix[length - 1];
+            }
+            if query[at] == query[length] {
+                length += 1;
+            }
+            prefix[at] = length;
+        }
         Self {
-            text: String::new(),
-            cells: Vec::new(),
+            query,
+            prefix,
+            positions: vec![Position::default(); query.len()],
+            next: 0,
+            matched: 0,
+            revision,
         }
     }
 
-    fn load(&mut self, terminal: &Terminal, absolute: usize) {
-        self.text.clear();
-        self.cells.clear();
-        let history = terminal.history_len();
-        let (y, offset) = if absolute < history {
-            (0, history - absolute)
-        } else {
-            (absolute - history, 0)
-        };
-        for x in 0..terminal.cols() {
-            let cell = terminal.view_cell(x, y, offset);
+    fn push(&mut self, byte: u8, position: Position) -> Option<Hit> {
+        self.positions[self.next] = position;
+        self.next += 1;
+        if self.next == self.positions.len() {
+            self.next = 0;
+        }
+        while self.matched != 0 && byte != self.query[self.matched] {
+            self.matched = self.prefix[self.matched - 1];
+        }
+        if byte == self.query[self.matched] {
+            self.matched += 1;
+        }
+        if self.matched != self.query.len() {
+            return None;
+        }
+        // Retain str::match_indices' non-overlapping match semantics.
+        self.matched = 0;
+        let start = self.positions[self.next];
+        Some(Hit {
+            row: start.row,
+            start: start.start,
+            end_row: position.row,
+            end: position.end,
+            byte: start.byte,
+            revision: self.revision,
+        })
+    }
+}
+
+fn coordinates(terminal: &Terminal, absolute: usize) -> (usize, usize) {
+    let history = terminal.history_len();
+    if absolute < history {
+        (0, history - absolute)
+    } else {
+        (absolute - history, 0)
+    }
+}
+
+fn row_wrap(terminal: &Terminal, absolute: usize) -> Option<usize> {
+    let (row, offset) = coordinates(terminal, absolute);
+    terminal.view_row_wrap(row, offset)
+}
+
+/// Scan whole rows through `end`, then at most query.len()-1 more bytes so
+/// matches ending below a viewport still highlight their visible beginning.
+fn hits(terminal: &Terminal, query: &str, first: usize, end: usize, mut visit: impl FnMut(Hit)) {
+    let mut matcher = Matcher::new(query, terminal.text_revision());
+    let mut suffix = query.len() - 1;
+    for absolute in first..terminal.history_len() + terminal.rows() {
+        let (row, offset) = coordinates(terminal, absolute);
+        let wrapped = terminal.view_row_wrap(row, offset);
+        let columns = wrapped.unwrap_or(terminal.cols());
+        let mut byte = 0;
+        for x in 0..columns {
+            let cell = terminal.view_cell(x, row, offset);
             if cell.width == 0 {
                 continue;
             }
-            self.cells
-                .push((self.text.len(), x, usize::from(cell.width)));
-            self.text.push(if cell.ch == '\0' { ' ' } else { cell.ch });
-            for ch in cell.combining {
-                if ch != '\0' {
-                    self.text.push(ch);
+            for ch in core::iter::once(if cell.ch == '\0' { ' ' } else { cell.ch })
+                .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
+            {
+                let mut encoded = [0; 4];
+                for &value in ch.encode_utf8(&mut encoded).as_bytes() {
+                    if absolute >= end {
+                        if suffix == 0 {
+                            return;
+                        }
+                        suffix -= 1;
+                    }
+                    if let Some(hit) = matcher.push(
+                        value,
+                        Position {
+                            row: absolute,
+                            start: x,
+                            end: x + usize::from(cell.width) - 1,
+                            byte,
+                        },
+                    ) {
+                        visit(hit);
+                    }
+                    byte += 1;
                 }
             }
         }
-    }
-
-    fn hits(&self, query: &str, row: usize, mut visit: impl FnMut(Hit)) {
-        for (byte, _) in self.text.match_indices(query) {
-            let a = self
-                .cells
-                .partition_point(|(offset, _, _)| *offset <= byte)
-                .saturating_sub(1);
-            let b = self
-                .cells
-                .partition_point(|(offset, _, _)| *offset < byte + query.len())
-                .saturating_sub(1);
-            if let (Some(&(_, start, _)), Some(&(_, end, width))) =
-                (self.cells.get(a), self.cells.get(b))
-            {
-                visit(Hit {
-                    row,
-                    start,
-                    end: end + width.saturating_sub(1),
-                    byte,
-                });
+        if wrapped.is_none() {
+            matcher.matched = 0;
+            if absolute + 1 >= end {
+                return;
             }
         }
     }
 }
 
 pub fn find(terminal: &Terminal, query: &str, from: Option<Hit>, forward: bool) -> Result {
-    if query.is_empty() || query.len() > 1024 {
+    if query.is_empty() || query.len() > MAX_QUERY {
         return Result {
             hit: None,
             count: 0,
             ordinal: 0,
         };
     }
-    let mut row = Row::new();
+    let from = from.filter(|hit| hit.revision == terminal.text_revision());
     let mut first = None;
     let mut last = None;
     let mut candidate = None;
     let mut count = 0;
-    for y in 0..terminal.history_len() + terminal.rows() {
-        row.load(terminal, y);
-        row.hits(query, y, |hit| {
+    hits(
+        terminal,
+        query,
+        0,
+        terminal.history_len() + terminal.rows(),
+        |hit| {
             count += 1;
             let record = (hit, count);
             if first.is_none() {
@@ -110,8 +190,8 @@ pub fn find(terminal: &Terminal, query: &str, from: Option<Hit>, forward: bool) 
                     candidate = Some(record);
                 }
             }
-        });
-    }
+        },
+    );
     let selected = candidate.or(if forward { first } else { last });
     Result {
         hit: selected.map(|v| v.0),
@@ -121,7 +201,7 @@ pub fn find(terminal: &Terminal, query: &str, from: Option<Hit>, forward: bool) 
 }
 
 pub fn highlights(terminal: &Terminal, query: &str, history: usize) -> Vec<u64> {
-    if query.is_empty() || query.len() > 1024 {
+    if query.is_empty() || query.len() > MAX_QUERY {
         return Vec::new();
     }
     let cols = terminal.cols();
@@ -130,23 +210,70 @@ pub fn highlights(terminal: &Terminal, query: &str, history: usize) -> Vec<u64> 
     let first = terminal
         .history_len()
         .saturating_sub(history.min(terminal.history_len()));
-    let mut row = Row::new();
-    for y in 0..rows {
-        row.load(terminal, first + y);
-        row.hits(query, y, |hit| {
-            for x in hit.start..=hit.end.min(cols.saturating_sub(1)) {
-                let bit = y * cols + x;
+    // Start at the logical line boundary. This keeps non-overlapping matches
+    // identical to find(), including repeated patterns beginning offscreen.
+    let mut begin = first;
+    while begin != 0 && row_wrap(terminal, begin - 1).is_some() {
+        begin -= 1;
+    }
+    hits(terminal, query, begin, first + rows, |hit| {
+        for absolute in hit.row.max(first)..=hit.end_row.min(first + rows - 1) {
+            let start = if absolute == hit.row { hit.start } else { 0 };
+            let end = if absolute == hit.end_row {
+                hit.end + 1
+            } else {
+                row_wrap(terminal, absolute).unwrap_or(cols)
+            };
+            for x in start..end.min(cols) {
+                let bit = (absolute - first) * cols + x;
                 bits[bit / 64] |= 1 << (bit % 64);
             }
-        });
-    }
+        }
+    });
     bits
 }
 
 pub fn viewport(terminal: &Terminal, hit: Hit) -> (usize, usize) {
-    let first = hit
-        .row
-        .saturating_sub(terminal.rows() / 2)
-        .min(terminal.history_len());
+    let height = hit.end_row - hit.row + 1;
+    let padding = terminal.rows().saturating_sub(height) / 2;
+    let first = hit.row.saturating_sub(padding).min(terminal.history_len());
     (terminal.history_len() - first, hit.row - first)
+}
+
+/// Copy the complete cells touched by a hit, including matches taller than the
+/// viewport. A hit belongs to the same terminal and becomes invalid after any
+/// nonempty input or actual resize, so old history coordinates are never copied.
+pub fn text(terminal: &Terminal, hit: Hit) -> Option<String> {
+    if hit.revision != terminal.text_revision()
+        || hit.end_row >= terminal.history_len() + terminal.rows()
+    {
+        return None;
+    }
+    let mut text = String::new();
+    for absolute in hit.row..=hit.end_row {
+        let (row, offset) = coordinates(terminal, absolute);
+        let start = if absolute == hit.row { hit.start } else { 0 };
+        let end = if absolute == hit.end_row {
+            hit.end + 1
+        } else {
+            terminal.view_row_wrap(row, offset)?
+        };
+        for x in start..end {
+            let cell = terminal.view_cell(x, row, offset);
+            if cell.width == 0 {
+                continue;
+            }
+            for ch in core::iter::once(if cell.ch == '\0' { ' ' } else { cell.ch })
+                .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
+            {
+                // Only the two endpoint cells can add scalars outside the
+                // query; each stores a base scalar and two combining scalars.
+                if text.len() + ch.len_utf8() > MAX_QUERY + 16 {
+                    return None;
+                }
+                text.push(ch);
+            }
+        }
+    }
+    Some(text)
 }

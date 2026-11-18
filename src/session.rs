@@ -35,6 +35,36 @@ struct Search {
 struct Palette {
     query: String,
     selected: usize,
+    sessions: bool,
+    items: Vec<PaletteItem>,
+}
+
+#[derive(Clone, Copy)]
+enum PaletteTarget {
+    Action(&'static str),
+    Session {
+        id: u64,
+        attach: bool,
+        observe: bool,
+    },
+}
+
+struct PaletteItem {
+    target: PaletteTarget,
+    label: String,
+    detail: String,
+}
+
+impl Palette {
+    fn matching(&self) -> impl Iterator<Item = &PaletteItem> {
+        self.items.iter().filter(|item| {
+            let action = match item.target {
+                PaletteTarget::Action(name) => name,
+                PaletteTarget::Session { .. } => "",
+            };
+            actions::matches(&self.query, &[&item.label, &item.detail, action])
+        })
+    }
 }
 
 fn pty_size(cols: usize, rows: usize, window: Option<&Window>) -> zpty::Size {
@@ -63,7 +93,7 @@ struct Ui {
     owns_child: bool,
     search: Option<Search>,
     palette: Option<Palette>,
-    pending_action: Option<&'static str>,
+    pending_action: Option<PaletteTarget>,
     message: Option<(String, u64)>,
     command: Option<u64>,
     attachment: u64,
@@ -162,7 +192,7 @@ impl Ui {
             self.history = history;
             self.selection = Some(Selection {
                 start: (hit.start, row),
-                end: (hit.end, row),
+                end: (hit.end, row + hit.end_row - hit.row),
                 dragging: false,
             });
         } else {
@@ -265,13 +295,17 @@ impl Ui {
                     match symbol {
                         0xff1b => self.palette = None,
                         0xff0d => {
-                            self.pending_action = actions::matching(&palette.query)
+                            let target = palette
+                                .matching()
                                 .nth(palette.selected)
-                                .map(|a| a.name);
-                            self.palette = None;
+                                .map(|item| item.target);
+                            if target.is_some() {
+                                self.pending_action = target;
+                                self.palette = None;
+                            }
                         }
                         0xff52 | 0xff54 => {
-                            let count = actions::matching(&palette.query).count();
+                            let count = palette.matching().count();
                             if count != 0 {
                                 palette.selected = (palette.selected
                                     + if symbol == 0xff54 { 1 } else { count - 1 })
@@ -295,7 +329,7 @@ impl Ui {
                                     .filter(|c| !c.is_control())
                                 {
                                     if palette.query.len() + ch.len_utf8() <= 128 {
-                                        palette.query.push(ch.to_ascii_lowercase());
+                                        palette.query.push(ch);
                                     }
                                 }
                                 palette.selected = 0;
@@ -672,23 +706,53 @@ impl Ui {
                 ));
             }
             if let Some(palette) = &self.palette {
-                let mut lines = alloc::vec![format!("Run: {}", palette.query)];
+                let mut lines = alloc::vec![format!(
+                    "{}: {}",
+                    if palette.sessions { "Sessions" } else { "Run" },
+                    palette.query
+                )];
                 let start = palette.selected.saturating_sub(2);
-                for (index, action) in actions::matching(&palette.query)
-                    .enumerate()
-                    .skip(start)
-                    .take(5)
-                {
+                for (index, item) in palette.matching().enumerate().skip(start).take(5) {
                     lines.push(format!(
-                        "{} {}",
+                        "{} {}{}{}",
                         if index == palette.selected { ">" } else { " " },
-                        action.label
+                        item.label,
+                        if !palette.sessions && !item.detail.is_empty() {
+                            "    "
+                        } else {
+                            ""
+                        },
+                        if palette.sessions { "" } else { &item.detail }
                     ));
                 }
                 if lines.len() == 1 {
-                    lines.push("  No matching action".into());
+                    lines.push(
+                        if palette.sessions {
+                            "  No matching session"
+                        } else {
+                            "  No matching action"
+                        }
+                        .into(),
+                    );
                 }
-                lines.push("↑/↓ select · Enter run · Esc close".into());
+                let selected = palette.matching().nth(palette.selected);
+                if palette.sessions
+                    && let Some(item) = selected
+                {
+                    lines.push(String::new());
+                    lines.push(item.detail.clone());
+                }
+                let verb = match selected.map(|item| item.target) {
+                    Some(PaletteTarget::Session {
+                        attach: true,
+                        observe: true,
+                        ..
+                    }) => "attach read-only",
+                    Some(PaletteTarget::Session { attach: true, .. }) => "attach",
+                    Some(PaletteTarget::Session { .. }) => "focus",
+                    _ => "run",
+                };
+                lines.push(format!("↑/↓ select · Enter {verb} · Esc close"));
                 self.window.overlay_lines(&lines);
             }
             if let Some((message, _)) = &self.message {
@@ -1686,6 +1750,186 @@ impl Pool {
         failure.map_or_else(|| Ok(self.sessions[active].info()), Err)
     }
 
+    fn open_palette(&mut self, index: usize, sessions: bool) -> Result<(), String> {
+        let source = &self.sessions[index];
+        let source_ui = source.ui.as_ref().ok_or("session has no window")?;
+        let source_observing = source_ui.read_only || !source.core.owns("local");
+        let items = if sessions {
+            self.sessions
+                .iter()
+                .filter(|session| {
+                    session
+                        .ui
+                        .as_ref()
+                        .is_none_or(|ui| ui.open && ui.window.id != 0)
+                })
+                .map(|session| {
+                    let attach = session.ui.is_none();
+                    let observe = session
+                        .ui
+                        .as_ref()
+                        .map_or(source_observing || !session.core.owns("local"), |ui| {
+                            ui.read_only || !session.core.owns("local")
+                        });
+                    let scope = if attach {
+                        "Attach"
+                    } else if session.id == source.id {
+                        "Current"
+                    } else if source_ui.workspace.is_some()
+                        && session
+                            .ui
+                            .as_ref()
+                            .is_some_and(|ui| ui.workspace == source_ui.workspace)
+                    {
+                        "Tab/pane"
+                    } else {
+                        "Window"
+                    };
+                    let title: String = session
+                        .core
+                        .terminal
+                        .title()
+                        .chars()
+                        .filter(|ch| !ch.is_control())
+                        .take(80)
+                        .collect();
+                    let label = format!(
+                        "[{scope}{}] {}{}{}",
+                        if observe { " · read-only" } else { "" },
+                        session.name,
+                        if title.is_empty() { "" } else { " — " },
+                        title,
+                    );
+                    PaletteItem {
+                        target: PaletteTarget::Session {
+                            id: session.id,
+                            attach,
+                            observe,
+                        },
+                        label,
+                        detail: session.uri.clone(),
+                    }
+                })
+                .collect()
+        } else {
+            actions::matching("")
+                .map(|action| PaletteItem {
+                    target: PaletteTarget::Action(action.name),
+                    label: action.label.into(),
+                    detail: actions::shortcut(&source.appearance.bindings, action.name)
+                        .unwrap_or_default(),
+                })
+                .collect()
+        };
+        let ui = self.sessions[index].ui.as_mut().unwrap();
+        ui.search = None;
+        ui.window.search_matches(0, Vec::new());
+        ui.palette = Some(Palette {
+            query: String::new(),
+            selected: 0,
+            sessions,
+            items,
+        });
+        ui.force = true;
+        Ok(())
+    }
+
+    fn attach_view(
+        &mut self,
+        index: usize,
+        read_only: bool,
+        connection: &Rc<Connection>,
+        appearance: Option<&Value>,
+    ) -> Result<(), String> {
+        let attachment = self.next_attachment;
+        self.next_attachment += 1;
+        let session = &mut self.sessions[index];
+        let appearance = appearance
+            .map(Appearance::from_json)
+            .transpose()
+            .map_err(String::from)?
+            .unwrap_or_else(|| session.appearance.clone());
+        let observing = read_only || !session.core.owns("local");
+        let window = Window::new_view(
+            session.core.terminal.cols(),
+            session.core.terminal.rows(),
+            &appearance,
+            connection,
+            !observing,
+        )
+        .map_err(String::from)?;
+        if !observing {
+            session
+                .core
+                .resize(pty_size(
+                    session.core.terminal.cols(),
+                    session.core.terminal.rows(),
+                    Some(&window),
+                ))
+                .map_err(|e| format!("cannot update attached PTY size: {e}"))?;
+        }
+        session
+            .core
+            .terminal
+            .set_cell_size(window.cw as u32, window.ch as u32);
+        let mut ui = Ui::new(window, attachment);
+        ui.read_only = read_only;
+        session.appearance = appearance;
+        session.ui = Some(ui);
+        Ok(())
+    }
+
+    fn select_session(
+        &mut self,
+        source: usize,
+        id: u64,
+        attach: bool,
+        observe: bool,
+    ) -> Result<Value, String> {
+        let target = self
+            .sessions
+            .iter()
+            .position(|session| session.id == id)
+            .ok_or("session has closed; reopen the session switcher")?;
+        if self.sessions[target]
+            .ui
+            .as_ref()
+            .is_some_and(|ui| !ui.open || ui.window.id == 0)
+        {
+            return Err("session view is closing; reopen the session switcher".into());
+        }
+        if self.sessions[target].ui.is_none() {
+            if !attach {
+                return Err("session detached; reopen the switcher to attach it".into());
+            }
+            let source = &self.sessions[source];
+            let ui = source.ui.as_ref().ok_or("source view has closed")?;
+            let read_only = observe
+                || ui.read_only
+                || !source.core.owns("local")
+                || !self.sessions[target].core.owns("local");
+            let connection = self
+                .connections
+                .iter()
+                .find(|(_, connection)| connection.display == ui.window.display)
+                .map(|(_, connection)| connection.clone())
+                .ok_or("source display is unavailable")?;
+            self.attach_view(target, read_only, &connection, None)?;
+        }
+        // Focus an existing view in its own workspace. This never reparents a
+        // window, replaces a PTY, changes its observer flag or acquires input.
+        if let Some(workspace) = self.workspace(id) {
+            self.workspaces[workspace].layout.focus(id);
+            self.arrange(workspace, true)?;
+        } else {
+            let ui = self.sessions[target].ui.as_mut().unwrap();
+            ui.visible = true;
+            ui.force = true;
+            ui.window.raise();
+        }
+        Ok(self.sessions[target].info())
+    }
+
     fn action(&mut self, index: usize, action: &str) -> Result<Value, String> {
         let id = self.sessions[index].id;
         match action {
@@ -1707,25 +1951,33 @@ impl Pool {
                     ui.start_search(&session.core.terminal);
                 }
             }
-            "palette" => {
-                if let Some(ui) = &mut self.sessions[index].ui {
-                    ui.search = None;
-                    ui.window.search_matches(0, Vec::new());
-                    ui.palette = Some(Palette {
-                        query: String::new(),
-                        selected: 0,
-                    });
-                    ui.force = true;
-                }
-            }
+            "palette" | "sessions" => self.open_palette(index, action == "sessions")?,
             "none" => {}
             "copy" => {
                 let session = &mut self.sessions[index];
-                if let Some(ui) = &mut session.ui
-                    && let Some(selection) = ui.selection
-                {
-                    ui.window
-                        .copy(selection.text(&session.core.terminal, ui.history), false);
+                if let Some(ui) = &mut session.ui {
+                    let text = if ui.search.is_some() {
+                        let text = ui
+                            .search
+                            .as_ref()
+                            .and_then(|search| search.hit)
+                            .and_then(|hit| search::text(&session.core.terminal, hit));
+                        if text.is_some() {
+                            text
+                        } else {
+                            ui.find(&session.core.terminal, false, true);
+                            ui.search
+                                .as_ref()
+                                .and_then(|search| search.hit)
+                                .and_then(|hit| search::text(&session.core.terminal, hit))
+                        }
+                    } else {
+                        ui.selection
+                            .map(|selection| selection.text(&session.core.terminal, ui.history))
+                    };
+                    if let Some(text) = text {
+                        ui.window.copy(text, false);
+                    }
                 }
             }
             "paste" | "paste-primary" => {
@@ -2203,38 +2455,8 @@ impl Pool {
                 }
                 let env = environment(request)?;
                 let connection = self.connection(&env)?;
-                let attachment = self.next_attachment;
-                self.next_attachment += 1;
-                let session = &mut self.sessions[index];
-                if let Some(value) = request.get("_appearance") {
-                    session.appearance = Appearance::from_json(value).map_err(String::from)?;
-                }
-                let observing = read_only || !session.core.owns("local");
-                let window = Window::new_view(
-                    session.core.terminal.cols(),
-                    session.core.terminal.rows(),
-                    &session.appearance,
-                    &connection,
-                    !observing,
-                )
-                .map_err(String::from)?;
-                if !observing {
-                    session
-                        .core
-                        .resize(pty_size(
-                            session.core.terminal.cols(),
-                            session.core.terminal.rows(),
-                            Some(&window),
-                        ))
-                        .map_err(|e| format!("cannot update attached PTY size: {e}"))?;
-                }
-                session
-                    .core
-                    .terminal
-                    .set_cell_size(window.cw as u32, window.ch as u32);
-                session.ui = Some(Ui::new(window, attachment));
-                session.ui.as_mut().unwrap().read_only = read_only;
-                Ok(Reply::Value(session.info()))
+                self.attach_view(index, read_only, &connection, request.get("_appearance"))?;
+                Ok(Reply::Value(self.sessions[index].info()))
             }
             "wait" => {
                 let session = &self.sessions[index];
@@ -2418,12 +2640,20 @@ impl Pool {
                     {
                         ui.open = false;
                     }
-                    if let Some(action) = ui.pending_action.take()
-                        && let Err(error) = self.action(index, action)
-                    {
-                        os::print(2, format!("ztty: {error}\n").as_bytes());
-                        if let Some(ui) = &mut self.sessions[index].ui {
-                            ui.error(error);
+                    if let Some(action) = ui.pending_action.take() {
+                        let result = match action {
+                            PaletteTarget::Action(action) => self.action(index, action),
+                            PaletteTarget::Session {
+                                id,
+                                attach,
+                                observe,
+                            } => self.select_session(index, id, attach, observe),
+                        };
+                        if let Err(error) = result {
+                            os::print(2, format!("ztty: {error}\n").as_bytes());
+                            if let Some(ui) = &mut self.sessions[index].ui {
+                                ui.error(error);
+                            }
                         }
                     }
                 }

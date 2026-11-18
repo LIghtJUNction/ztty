@@ -176,7 +176,8 @@ unsafe extern "C" {
     fn CGContextSetShouldAntialias(context: Id, value: bool);
     fn CGContextSetInterpolationQuality(context: Id, quality: i32);
     fn CGContextDrawImage(context: Id, rect: Rect, image: Id);
-    fn CGColorSpaceCreateDeviceRGB() -> Id;
+    static kCGColorSpaceSRGB: Id;
+    fn CGColorSpaceCreateWithName(name: Id) -> Id;
     fn CGColorSpaceRelease(space: Id);
     fn CGDataProviderCreateWithData(
         info: Id,
@@ -350,7 +351,9 @@ impl Renderer {
         let ascent = unsafe { CTFontGetAscent(base) };
         let descent = unsafe { CTFontGetDescent(base) };
         let leading = unsafe { CTFontGetLeading(base) };
-        let color_space = unsafe { CGColorSpaceCreateDeviceRGB() };
+        // Kitty and Sixel pixels use sRGB. Device RGB makes their displayed
+        // colors depend on the monitor profile and changes captured pixels.
+        let color_space = unsafe { CGColorSpaceCreateWithName(kCGColorSpaceSRGB) };
         if color_space.is_null() {
             for font in fonts {
                 cf_release(font);
@@ -640,36 +643,12 @@ impl Host {
         let Some(selection) = self.selection else {
             return String::new();
         };
-        let start = selection.start.min(selection.end);
-        let end = selection.start.max(selection.end);
-        let mut text = String::new();
-        for row in start.row..=end.row.min(self.core.terminal.rows().saturating_sub(1)) {
-            let begin = if row == start.row { start.col } else { 0 };
-            let end_col = if row == end.row {
-                end.col.saturating_add(1)
-            } else {
-                self.core.terminal.cols()
-            };
-            let start_len = text.len();
-            for col in begin..end_col.min(self.core.terminal.cols()) {
-                let cell = self.core.terminal.view_cell(col, row, self.history);
-                if cell.width != 0 {
-                    text.push(cell.ch);
-                    for &ch in &cell.combining {
-                        if ch != '\0' {
-                            text.push(ch);
-                        }
-                    }
-                }
-            }
-            while text.len() > start_len && text.ends_with(' ') {
-                text.pop();
-            }
-            if row != end.row {
-                text.push('\n');
-            }
-        }
-        text
+        ztty::selection::text(
+            &self.core.terminal,
+            (selection.start.col, selection.start.row),
+            (selection.end.col, selection.end.row),
+            self.history,
+        )
     }
     fn resize(&mut self) {
         let bounds = rect0(self.view, c"bounds");

@@ -35,3 +35,6 @@ mod theme_tests;
 
 #[cfg(test)]
 mod sixel_tests;
+
+#[cfg(test)]
+mod wrap_tests;

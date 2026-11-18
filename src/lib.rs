@@ -12,6 +12,7 @@ pub mod json;
 pub mod layout;
 pub mod native_resize;
 pub mod output_tail;
+pub mod selection;
 pub mod session_control;
 pub mod session_core;
 pub mod session_identity;
