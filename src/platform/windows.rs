@@ -2,7 +2,7 @@
 //! composites decoded RGBA pixels itself. ConPTY pipe work lives in zpty.
 
 use crate::{Config, appearance::Appearance, os};
-use alloc::{boxed::Box, string::String, vec, vec::Vec};
+use alloc::{boxed::Box, ffi::CString, format, string::String, sync::Arc, vec, vec::Vec};
 use core::{
     cell::{Cell, UnsafeCell},
     ffi::c_void,
@@ -14,9 +14,15 @@ use zterm::{
 };
 
 use ztty::{
-    layout::Rect,
+    actions,
+    layout::{Axis, Layout, Rect},
     session_core::{ReadStep, SessionCore},
 };
+
+#[path = "windows_resize.rs"]
+mod session_resize;
+#[path = "windows_wait.rs"]
+mod session_wait;
 
 type Handle = *mut c_void;
 const NULL: Handle = ptr::null_mut();
@@ -381,6 +387,13 @@ struct PendingKey {
 }
 
 struct Pane {
+    // Drop waits before the handles owned by core. Callbacks never touch App.
+    output_wait: session_wait::Wait,
+    _process_wait: session_wait::Wait,
+    id: u64,
+    visible: bool,
+    pty_size: zpty::Size,
+    title: String,
     rect: Rect,
     core: SessionCore,
     dirty: bool,
@@ -394,10 +407,67 @@ struct Pane {
     last_cursor: (usize, usize),
 }
 
+impl Pane {
+    fn new(
+        id: u64,
+        pty: zpty::Pty,
+        terminal: Terminal,
+        size: zpty::Size,
+        rect: Rect,
+        wake: &Arc<session_wait::Wake>,
+    ) -> Result<Self, &'static str> {
+        let output_wait = session_wait::Wait::new(pty.output_event(), wake)?;
+        let process_wait = session_wait::Wait::new(pty.process_event(), wake)?;
+        Ok(Self {
+            output_wait,
+            _process_wait: process_wait,
+            id,
+            visible: true,
+            pty_size: size,
+            title: String::new(),
+            rect,
+            core: SessionCore::new(pty, terminal, String::from("local"), MAX_INPUT),
+            dirty: true,
+            history: 0,
+            selection: None,
+            dragging: false,
+            graphics_revision: 0,
+            sync_since: None,
+            cursor_on: true,
+            blink_deadline: os::milliseconds() + 500,
+            last_cursor: (0, 0),
+        })
+    }
+
+    fn grid_ready(&self) -> bool {
+        self.core.terminal.cols() == usize::from(self.pty_size.cols)
+            && self.core.terminal.rows() == usize::from(self.pty_size.rows)
+    }
+}
+
+struct Launch {
+    shell: CString,
+    environment: Vec<u16>,
+    history: usize,
+}
+
 struct App {
     hwnd: Handle,
     panes: Vec<Pane>,
     active: usize,
+    layout: Layout,
+    next_id: u64,
+    launch: Launch,
+    wake: Arc<session_wait::Wake>,
+    pump_cursor: usize,
+    pump_again: bool,
+    pending_fonts: Option<Fonts>,
+    resize_pending: bool,
+    resize_retry_at: u64,
+    full_redraw: bool,
+    caption_dirty: bool,
+    notice: Option<(String, u64)>,
+    last_status: i32,
     appearance: Appearance,
     surface: Surface,
     fonts: Fonts,
@@ -413,21 +483,19 @@ struct App {
 }
 
 impl App {
-    fn enqueue(&mut self, bytes: &[u8]) {
-        if !self.panes[self.active].core.input.push(bytes) {
+    fn enqueue(&mut self, index: usize, bytes: &[u8]) {
+        if !self.panes[index].core.input.push(bytes) {
             os::print(2, b"ztty: input queue full; paste was rejected\n");
         }
     }
     fn enqueue_encoded(&mut self) {
+        self.enqueue_encoded_for(self.active);
+    }
+    fn enqueue_encoded_for(&mut self, index: usize) {
         let encoded = core::mem::take(&mut self.encoded);
-        self.enqueue(&encoded);
+        self.enqueue(index, &encoded);
         self.encoded = encoded;
         self.encoded.clear();
-    }
-    fn flush(&mut self) {
-        // The event loop still owns process lifetime and readiness policy.
-        // A failed write keeps its unwritten suffix in the shared queue.
-        let _ = self.panes[self.active].core.flush_input();
     }
     fn input(&mut self, key: Key, modifiers: Modifiers, event: KeyEvent, text: &str) {
         self.encoded.clear();
@@ -450,188 +518,559 @@ impl App {
             os::milliseconds() + self.appearance.cursor_blink_interval;
         self.panes[self.active].dirty = true;
     }
-    fn cell_at(&self, x: i32, y: i32) -> (usize, usize) {
+    fn cell_at(&self, index: usize, x: i32, y: i32) -> (usize, usize) {
         (
-            (((x - self.panes[self.active].rect.x - self.appearance.padding).max(0)
-                / self.fonts.width) as usize)
-                .min(self.panes[self.active].core.terminal.cols() - 1),
-            (((y - self.panes[self.active].rect.y - self.appearance.padding).max(0)
-                / self.fonts.height) as usize)
-                .min(self.panes[self.active].core.terminal.rows() - 1),
+            (((x - self.panes[index].rect.x - self.appearance.padding).max(0) / self.fonts.width)
+                as usize)
+                .min(self.panes[index].core.terminal.cols() - 1),
+            (((y - self.panes[index].rect.y - self.appearance.padding).max(0) / self.fonts.height)
+                as usize)
+                .min(self.panes[index].core.terminal.rows() - 1),
         )
     }
     fn resize(&mut self) {
         self.resize_with_fonts(None);
     }
     fn resize_with_fonts(&mut self, candidate: Option<Fonts>) {
-        let mut rect = ffi::Rect::default();
-        unsafe {
-            ffi::GetClientRect(self.hwnd, &mut rect);
+        if let Some(fonts) = candidate {
+            self.pending_fonts = Some(fonts);
         }
-        if !self.surface.resize(rect.right.max(1), rect.bottom.max(1)) {
-            return;
+        if let Err(error) = self.arrange(self.layout.clone()) {
+            self.message(error);
         }
-        self.panes[self.active].rect = Rect {
-            x: 0,
-            y: 0,
-            width: rect.right.max(1),
-            height: rect.bottom.max(1),
-        };
-        let fonts = candidate.as_ref().unwrap_or(&self.fonts);
-        let cols = ((rect.right - 2 * self.appearance.padding).max(fonts.width) / fonts.width)
-            .clamp(1, 1024) as usize;
-        let rows = ((rect.bottom - 2 * self.appearance.padding).max(fonts.height) / fonts.height)
-            .clamp(1, 1024) as usize;
-        let size = zpty::Size {
+    }
+
+    fn grid_size(cols: usize, rows: usize, fonts: &Fonts) -> zpty::Size {
+        zpty::Size {
             cols: cols as u16,
             rows: rows as u16,
             pixel_width: (cols as i32 * fonts.width).min(u16::MAX as i32) as u16,
             pixel_height: (rows as i32 * fonts.height).min(u16::MAX as i32) as u16,
-        };
-        if self.panes[self.active]
-            .core
-            .resize_with_cell_size(size, (fonts.width as u32, fonts.height as u32))
-            .is_err()
-        {
-            os::print(2, b"ztty: PTY resize failed; retaining the terminal grid\n");
-            self.panes[self.active].dirty = true;
-            unsafe {
-                ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
-            }
-            return;
         }
-        if let Some(fonts) = candidate {
+    }
+
+    fn size_in(rect: Rect, fonts: &Fonts, padding: i32) -> zpty::Size {
+        let cols =
+            ((rect.width - 2 * padding).max(fonts.width) / fonts.width).clamp(1, 1024) as usize;
+        let rows =
+            ((rect.height - 2 * padding).max(fonts.height) / fonts.height).clamp(1, 1024) as usize;
+        Self::grid_size(cols, rows, fonts)
+    }
+
+    /// Coordinate all live PTYs before committing any terminal grid/view/font.
+    /// Failed compensation is tracked by pty_size; that pane's output is held
+    /// in zpty's bounded queue until a retry restores a matching parser grid.
+    fn arrange(&mut self, layout: Layout) -> Result<(), &'static str> {
+        self.resize_pending = true;
+        self.resize_retry_at = os::milliseconds() + 250;
+        let mut client = ffi::Rect::default();
+        if unsafe { ffi::GetClientRect(self.hwnd, &mut client) } == 0 {
+            return Err("cannot query the Windows workspace dimensions");
+        }
+        let width = client.right.max(1);
+        let height = client.bottom.max(1);
+        let changed = self.surface.width != width || self.surface.height != height;
+        if !self.surface.resize(width, height) {
+            return Err("cannot allocate the Windows workspace surface");
+        }
+        self.full_redraw |= changed;
+        let placements = layout.placements(width, height);
+        let fonts = self.pending_fonts.as_ref().unwrap_or(&self.fonts);
+        let mut plan = Vec::with_capacity(self.panes.len());
+        for pane in &self.panes {
+            let rect = placements
+                .iter()
+                .find(|(id, _)| *id == pane.id)
+                .map(|(_, rect)| *rect);
+            let size = rect.map_or_else(
+                || Self::grid_size(pane.core.terminal.cols(), pane.core.terminal.rows(), fonts),
+                |rect| Self::size_in(rect, fonts, self.appearance.padding),
+            );
+            let rollback = Self::grid_size(
+                pane.core.terminal.cols(),
+                pane.core.terminal.rows(),
+                &self.fonts,
+            );
+            plan.push((rect, size, rollback));
+        }
+        let mut sizes: Vec<session_resize::Plan> = self
+            .panes
+            .iter()
+            .zip(&plan)
+            .map(|(pane, (_, desired, committed))| session_resize::Plan {
+                actual: pane.pty_size,
+                desired: *desired,
+                committed: *committed,
+            })
+            .collect();
+        let result =
+            session_resize::coordinate(&mut sizes, self.pending_fonts.is_some(), |index, size| {
+                self.panes[index].core.eof() || self.panes[index].core.pty.resize(size).is_ok()
+            });
+        for (pane, size) in self.panes.iter_mut().zip(sizes) {
+            pane.pty_size = size.actual;
+        }
+        if let Err(error) = result {
+            return Err(if error.rollback_failed {
+                "workspace PTY rollback incomplete; affected output paused for retry"
+            } else {
+                "workspace PTY resize failed; previous layout retained and retry scheduled"
+            });
+        }
+        let old_focus = self.panes.get(self.active).map(|pane| pane.id);
+        if let Some(fonts) = self.pending_fonts.take() {
             self.fonts = fonts;
         }
-        self.panes[self.active].selection = None;
-        self.panes[self.active].history = self.panes[self.active]
-            .history
-            .min(self.panes[self.active].core.terminal.history_len());
-        self.panes[self.active].dirty = true;
+        for (pane, (rect, size, _)) in self.panes.iter_mut().zip(plan) {
+            let grid_changed = pane.core.terminal.cols() != usize::from(size.cols)
+                || pane.core.terminal.rows() != usize::from(size.rows);
+            pane.core
+                .terminal
+                .set_cell_size(self.fonts.width as u32, self.fonts.height as u32);
+            if grid_changed {
+                pane.core
+                    .terminal
+                    .resize(usize::from(size.cols), usize::from(size.rows));
+                pane.selection = None;
+            }
+            pane.pty_size = size;
+            pane.history = pane.history.min(pane.core.terminal.history_len());
+            pane.visible = rect.is_some();
+            if let Some(rect) = rect {
+                pane.rect = rect;
+            }
+            pane.dirty = true;
+        }
+        self.layout = layout;
+        self.active = self
+            .panes
+            .iter()
+            .position(|pane| pane.id == self.layout.focused)
+            .unwrap_or(0);
+        self.resize_pending = false;
+        self.full_redraw = true;
+        self.caption_dirty = true;
+        if old_focus != self.panes.get(self.active).map(|pane| pane.id) {
+            if let Some(old) =
+                old_focus.and_then(|id| self.panes.iter().position(|pane| pane.id == id))
+            {
+                let bytes =
+                    input::encode_focus(false, &self.panes[old].core.terminal.modes().input());
+                self.panes[old].core.input.push(&bytes);
+                self.panes[old].dragging = false;
+            }
+            for (held, intercepted) in self.held.iter_mut().zip(&mut self.intercepted) {
+                if held.take().is_some() {
+                    *intercepted = true;
+                }
+            }
+            self.pending_key = None;
+            self.surrogate = 0;
+            self.suppress_char = true;
+            unsafe {
+                ffi::ReleaseCapture();
+            }
+            let bytes = input::encode_focus(
+                self.focused,
+                &self.panes[self.active].core.terminal.modes().input(),
+            );
+            self.panes[self.active].core.input.push(&bytes);
+            self.reset_cursor();
+            self.ime_position();
+        }
         unsafe {
             ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
         }
+        Ok(())
     }
-    fn tick(&mut self) {
-        self.flush();
-        let mut buffer = [0u8; 65536];
-        for _ in 0..16 {
-            match self.panes[self.active].core.read_once(&mut buffer, false) {
-                Ok(ReadStep::Data {
-                    history_before,
-                    history_after,
-                    ..
-                }) => {
-                    if self.panes[self.active].history != 0 {
-                        self.panes[self.active].history = self.panes[self.active]
-                            .history
-                            .saturating_add(history_after.saturating_sub(history_before))
-                            .min(history_after);
-                    }
-                    self.panes[self.active].dirty = true;
-                }
-                Ok(ReadStep::Pending) => break,
-                Ok(ReadStep::Eof) | Err(_) => {
-                    self.running = false;
-                    break;
-                }
-            }
+
+    fn message(&mut self, message: &str) {
+        os::print(2, b"ztty: ");
+        os::print(2, message.as_bytes());
+        os::print(2, b"\n");
+        self.notice = Some((String::from(message), os::milliseconds() + 3000));
+        self.caption_dirty = true;
+    }
+
+    fn related(&mut self, axis: Option<Axis>) -> Result<(), &'static str> {
+        let id = self.next_id;
+        let next = id.checked_add(1).ok_or("workspace session IDs exhausted")?;
+        let mut layout = self.layout.clone();
+        if let Some(axis) = axis {
+            layout.split(id, axis)?;
+        } else {
+            layout.add_tab(id)?;
         }
-        // Preserve the existing ConPTY exit policy. Reaping alone does not
-        // imply pipe EOF; waiting for it may require closing the pseudoconsole.
-        if self.panes[self.active]
+        let placements = layout.placements(self.surface.width, self.surface.height);
+        let rect = placements
+            .iter()
+            .find(|(pane, _)| *pane == id)
+            .map(|(_, rect)| *rect)
+            .ok_or("new pane has no placement")?;
+        let size = Self::size_in(rect, &self.fonts, self.appearance.padding);
+        let program = os::resolve(&self.launch.shell)?;
+        let arguments: Vec<u16> = self.launch.shell.to_string_lossy().encode_utf16().collect();
+        let pty = zpty::Pty::spawn_utf16(
+            &program,
+            &[&arguments],
+            Some(&self.launch.environment),
+            size,
+        )
+        .map_err(|_| "cannot start the new Windows pseudoconsole")?;
+        let mut terminal = Terminal::with_theme(
+            usize::from(size.cols),
+            usize::from(size.rows),
+            self.launch.history,
+            self.appearance.theme,
+        );
+        terminal.set_cell_size(self.fonts.width as u32, self.fonts.height as u32);
+        let mut pane = Pane::new(id, pty, terminal, size, rect, &self.wake)?;
+        pane.visible = false;
+        self.panes.push(pane);
+        if let Err(error) = self.arrange(layout) {
+            // Only this newly created PTY is discarded. Existing identities stay.
+            self.panes.pop();
+            return Err(error);
+        }
+        self.next_id = next;
+        Ok(())
+    }
+
+    fn close_pane(&mut self, index: usize) {
+        if index >= self.panes.len() {
+            return;
+        }
+        let old_focus = self.panes.get(self.active).map(|pane| pane.id);
+        let id = self.panes[index].id;
+        self.last_status = self.panes[index]
             .core
             .pty
-            .reap()
-            .ok()
-            .flatten()
-            .is_some()
-        {
+            .status()
+            .and_then(|status| status.code())
+            .unwrap_or(0);
+        self.layout.remove(id);
+        let pane = self.panes.remove(index);
+        if pane.dragging {
+            unsafe {
+                ffi::ReleaseCapture();
+            }
+        }
+        drop(pane); // Waits cancel/join before its PTY closes its own process tree.
+        if self.panes.is_empty() {
+            self.active = 0;
             self.running = false;
+            return;
         }
-        if !self.panes[self.active].core.queue_responses() {
-            os::print(
-                2,
-                b"ztty: input queue full; terminal replies were rejected\n",
+        self.active = self
+            .panes
+            .iter()
+            .position(|pane| pane.id == self.layout.focused)
+            .unwrap_or(0);
+        let focus_changed = old_focus != Some(self.panes[self.active].id);
+        if focus_changed {
+            self.pending_key = None;
+            self.surrogate = 0;
+            self.suppress_char = true;
+            for (held, intercepted) in self.held.iter_mut().zip(&mut self.intercepted) {
+                if held.take().is_some() {
+                    *intercepted = true;
+                }
+            }
+            let bytes = input::encode_focus(
+                self.focused,
+                &self.panes[self.active].core.terminal.modes().input(),
             );
+            self.panes[self.active].core.input.push(&bytes);
         }
-        self.flush();
-        if self.title != self.panes[self.active].core.terminal.title() {
-            self.title = String::from(self.panes[self.active].core.terminal.title());
-            let title = wide(if self.title.is_empty() {
+        self.full_redraw = true;
+        self.resize_with_fonts(None);
+        if focus_changed {
+            self.reset_cursor();
+        }
+        self.ime_position();
+    }
+
+    fn action(&mut self, action: &str) -> bool {
+        let result = match action {
+            "new-tab" => self.related(None),
+            "split-right" => self.related(Some(Axis::Vertical)),
+            "split-down" => self.related(Some(Axis::Horizontal)),
+            "close" => {
+                self.close_pane(self.active);
+                Ok(())
+            }
+            "copy" => {
+                self.copy();
+                Ok(())
+            }
+            "paste" => {
+                self.paste();
+                Ok(())
+            }
+            "scroll-up" | "scroll-down" => {
+                let pane = &mut self.panes[self.active];
+                let step = pane.core.terminal.rows().saturating_sub(1).max(1);
+                pane.history = if action == "scroll-up" {
+                    pane.history
+                        .saturating_add(step)
+                        .min(pane.core.terminal.history_len())
+                } else {
+                    pane.history.saturating_sub(step)
+                };
+                pane.selection = None;
+                pane.dirty = true;
+                Ok(())
+            }
+            "next-tab" | "previous-tab" | "next-pane" | "previous-pane" | "swap-next"
+            | "swap-previous" | "maximize" | "grow" | "shrink" => {
+                let mut layout = self.layout.clone();
+                match action {
+                    "next-tab" => layout.cycle_tab(true),
+                    "previous-tab" => layout.cycle_tab(false),
+                    "next-pane" => layout.cycle_pane(true, false),
+                    "previous-pane" => layout.cycle_pane(false, false),
+                    "swap-next" => layout.cycle_pane(true, true),
+                    "swap-previous" => layout.cycle_pane(false, true),
+                    "maximize" => layout.maximized = !layout.maximized,
+                    "grow" => {
+                        layout.adjust(50);
+                    }
+                    "shrink" => {
+                        layout.adjust(-50);
+                    }
+                    _ => {}
+                }
+                self.arrange(layout)
+            }
+            "none" => Ok(()),
+            _ => return false,
+        };
+        if let Err(error) = result {
+            self.message(error);
+        }
+        true
+    }
+
+    fn caption(&mut self, now: u64) {
+        if self.notice.as_ref().is_some_and(|(_, until)| now >= *until) {
+            self.notice = None;
+            self.caption_dirty = true;
+        }
+        let pane = &mut self.panes[self.active];
+        if pane.title != pane.core.terminal.title() {
+            pane.title = String::from(pane.core.terminal.title());
+            self.caption_dirty = true;
+        }
+        if !self.caption_dirty {
+            return;
+        }
+        let caption = if let Some((message, _)) = &self.notice {
+            format!("ztty — {message}")
+        } else {
+            let title = if pane.title.is_empty() {
                 "ztty"
             } else {
-                &self.title
-            });
+                &pane.title
+            };
+            if self.layout.tabs.len() > 1 {
+                format!(
+                    "[{} / {}] {title}",
+                    self.layout.active_tab + 1,
+                    self.layout.tabs.len()
+                )
+            } else {
+                String::from(title)
+            }
+        };
+        if caption != self.title {
+            self.title = caption;
+            let title = wide(&self.title);
             unsafe {
                 ffi::SetWindowTextW(self.hwnd, title.as_ptr());
             }
         }
+        self.caption_dirty = false;
+    }
+    fn tick(&mut self) {
+        if self.panes.is_empty() {
+            self.running = false;
+            return;
+        }
         let now = os::milliseconds();
-        let cursor = self.panes[self.active].core.terminal.cursor();
-        if cursor != self.panes[self.active].last_cursor {
-            self.panes[self.active].last_cursor = cursor;
-            self.reset_cursor();
+        if self.resize_pending && now >= self.resize_retry_at {
+            let _ = self.arrange(self.layout.clone());
+        }
+        let mut buffer = [0u8; 65536];
+        let count = self.panes.len();
+        // At most 1 MiB per tick, rotating the first pane so a busy hidden tab
+        // cannot starve foreground input or another PTY's responses.
+        let mut data = 0;
+        let first = self.pump_cursor;
+        for offset in 0..count {
+            let index = (first + offset) % count;
+            let pane = &mut self.panes[index];
+            let _ = pane.core.flush_input();
+            if pane.grid_ready() {
+                for _ in 0..(16 / count).max(1) {
+                    match pane.core.read_once(&mut buffer, false) {
+                        Ok(ReadStep::Data {
+                            history_before,
+                            history_after,
+                            ..
+                        }) => {
+                            if pane.history != 0 {
+                                pane.history = pane
+                                    .history
+                                    .saturating_add(history_after.saturating_sub(history_before))
+                                    .min(history_after);
+                            }
+                            pane.dirty = true;
+                            data += 1;
+                        }
+                        Ok(ReadStep::Pending | ReadStep::Eof) | Err(_) => break,
+                    }
+                    if data >= 16 {
+                        break;
+                    }
+                }
+            }
+            if !pane.core.queue_responses() {
+                os::print(
+                    2,
+                    b"ztty: input queue full; terminal replies were rejected\n",
+                );
+            }
+            let _ = pane.core.flush_input();
+            let _ = pane.core.pty.reap();
+            if pane.grid_ready() {
+                pane.output_wait.rearm();
+            }
+            self.pump_cursor = (index + 1) % count;
+            if data >= 16 {
+                break;
+            }
+        }
+        self.pump_again = data >= 16;
+        for index in (0..self.panes.len()).rev() {
+            if self.panes[index].core.eof() || self.panes[index].core.pty.status().is_some() {
+                self.close_pane(index);
+            }
+        }
+        if self.panes.is_empty() {
+            return;
+        }
+        let mut position_ime = false;
+        for (index, pane) in self.panes.iter_mut().enumerate() {
+            let cursor = pane.core.terminal.cursor();
+            if cursor != pane.last_cursor {
+                pane.last_cursor = cursor;
+                pane.cursor_on = true;
+                pane.blink_deadline = now + self.appearance.cursor_blink_interval;
+                pane.dirty = true;
+                position_ime |= index == self.active;
+            }
+            if pane.core.terminal.modes().synchronized_output {
+                let start = *pane.sync_since.get_or_insert(now);
+                if now.saturating_sub(start) >= 150 {
+                    pane.core.terminal.force_end_sync();
+                    pane.sync_since = None;
+                }
+            } else {
+                pane.sync_since = None;
+            }
+            if pane.visible
+                && index == self.active
+                && self.focused
+                && pane
+                    .core
+                    .terminal
+                    .modes()
+                    .cursor_blink
+                    .unwrap_or(self.appearance.cursor_blink)
+                && now >= pane.blink_deadline
+            {
+                pane.cursor_on = !pane.cursor_on;
+                pane.blink_deadline = now + self.appearance.cursor_blink_interval;
+                pane.dirty = true;
+            }
+            let revision = pane.core.terminal.graphics().revision();
+            if revision != pane.graphics_revision {
+                pane.graphics_revision = revision;
+                pane.dirty = true;
+            }
+        }
+        if position_ime {
             self.ime_position();
         }
-        if self.panes[self.active]
-            .core
-            .terminal
-            .modes()
-            .synchronized_output
+        self.caption(now);
+        if self.full_redraw
+            || self.panes.iter().any(|pane| {
+                pane.visible
+                    && !pane.core.terminal.modes().synchronized_output
+                    && (pane.dirty || pane.core.terminal.dirty())
+            })
         {
-            let start = *self.panes[self.active].sync_since.get_or_insert(now);
-            if now.saturating_sub(start) < 150 {
-                return;
-            }
-            self.panes[self.active].core.terminal.force_end_sync();
-        }
-        self.panes[self.active].sync_since = None;
-        if self.panes[self.active]
-            .core
-            .terminal
-            .modes()
-            .cursor_blink
-            .unwrap_or(self.appearance.cursor_blink)
-            && self.focused
-            && now >= self.panes[self.active].blink_deadline
-        {
-            self.panes[self.active].cursor_on = !self.panes[self.active].cursor_on;
-            self.panes[self.active].blink_deadline = now + self.appearance.cursor_blink_interval;
-            self.panes[self.active].dirty = true;
-        }
-        let revision = self.panes[self.active].core.terminal.graphics().revision();
-        if revision != self.panes[self.active].graphics_revision {
-            self.panes[self.active].graphics_revision = revision;
-            self.panes[self.active].dirty = true;
-        }
-        if self.panes[self.active].dirty || self.panes[self.active].core.terminal.dirty() {
             unsafe {
                 ffi::InvalidateRect(self.hwnd, ptr::null(), 0);
             }
         }
     }
-    fn images(&mut self, range: core::ops::Range<i64>) {
-        for draw in self.panes[self.active]
+
+    fn wait_timeout(&self) -> u32 {
+        if self.pump_again {
+            return 0;
+        }
+        let now = os::milliseconds();
+        let mut timeout = 1000;
+        for (index, pane) in self.panes.iter().enumerate() {
+            if pane.visible
+                && index == self.active
+                && self.focused
+                && pane
+                    .core
+                    .terminal
+                    .modes()
+                    .cursor_blink
+                    .unwrap_or(self.appearance.cursor_blink)
+            {
+                timeout = timeout.min(pane.blink_deadline.saturating_sub(now).min(1000) as u32);
+            }
+            if pane.core.input.pending() {
+                timeout = timeout.min(8);
+            }
+            if let Some(start) = pane.sync_since {
+                timeout = timeout.min((start + 150).saturating_sub(now).min(1000) as u32);
+            }
+        }
+        if self.resize_pending {
+            timeout = timeout.min(self.resize_retry_at.saturating_sub(now).min(1000) as u32);
+        }
+        if let Some((_, until)) = self.notice.as_ref() {
+            timeout = timeout.min(until.saturating_sub(now).min(1000) as u32);
+        }
+        timeout
+    }
+    fn images(&mut self, index: usize, range: core::ops::Range<i64>) {
+        for draw in self.panes[index]
             .core
             .terminal
-            .graphics_draws(self.panes[self.active].history)
+            .graphics_draws(self.panes[index].history)
         {
             if range.contains(&i64::from(draw.z)) {
                 self.surface.image(
                     &draw,
-                    self.panes[self.active].rect,
+                    self.panes[index].rect,
                     self.appearance.padding,
                     (
-                        self.panes[self.active].core.terminal.cols(),
-                        self.panes[self.active].core.terminal.rows(),
+                        self.panes[index].core.terminal.cols(),
+                        self.panes[index].core.terminal.rows(),
                     ),
                     (self.fonts.width, self.fonts.height),
                 );
             }
         }
     }
-    fn draw(&mut self) {
+    fn draw_pane(&mut self, index: usize) {
         if self.surface.pixels.is_null() {
             return;
         }
@@ -639,7 +1078,8 @@ impl App {
         unsafe {
             ffi::GdiFlush();
         }
-        let rect = self.panes[self.active].rect;
+        let focused = self.focused && index == self.active;
+        let rect = self.panes[index].rect;
         self.surface.clip = rect;
         let px = rect.x + self.appearance.padding;
         let py = rect.y + self.appearance.padding;
@@ -671,13 +1111,13 @@ impl App {
             rect.height,
             self.appearance.theme.background,
         );
-        for row in 0..self.panes[self.active].core.terminal.rows() {
-            for col in 0..self.panes[self.active].core.terminal.cols() {
-                let cell = self.panes[self.active].core.terminal.view_cell(
-                    col,
-                    row,
-                    self.panes[self.active].history,
-                );
+        for row in 0..self.panes[index].core.terminal.rows() {
+            for col in 0..self.panes[index].core.terminal.cols() {
+                let cell =
+                    self.panes[index]
+                        .core
+                        .terminal
+                        .view_cell(col, row, self.panes[index].history);
                 let bg = if cell.flags & zterm::INVERSE != 0 {
                     cell.fg
                 } else {
@@ -687,14 +1127,14 @@ impl App {
                     .fill(px + col as i32 * cw, py + row as i32 * ch, cw, ch, bg);
             }
         }
-        self.images(i32::MIN as i64..-1073741824);
-        for row in 0..self.panes[self.active].core.terminal.rows() {
-            for col in 0..self.panes[self.active].core.terminal.cols() {
-                let cell = self.panes[self.active].core.terminal.view_cell(
-                    col,
-                    row,
-                    self.panes[self.active].history,
-                );
+        self.images(index, i32::MIN as i64..-1073741824);
+        for row in 0..self.panes[index].core.terminal.rows() {
+            for col in 0..self.panes[index].core.terminal.cols() {
+                let cell =
+                    self.panes[index]
+                        .core
+                        .terminal
+                        .view_cell(col, row, self.panes[index].history);
                 if cell.flags & (zterm::EXPLICIT_BG | zterm::INVERSE) != 0 {
                     self.surface.fill(
                         px + col as i32 * cw,
@@ -710,12 +1150,13 @@ impl App {
                 }
             }
         }
-        self.images(-1073741824..0);
-        for row in 0..self.panes[self.active].core.terminal.rows() {
-            for col in 0..self.panes[self.active].core.terminal.cols() {
-                if self.panes[self.active].selection.is_some_and(|s| {
-                    s.contains(col, row, self.panes[self.active].core.terminal.cols())
-                }) {
+        self.images(index, -1073741824..0);
+        for row in 0..self.panes[index].core.terminal.rows() {
+            for col in 0..self.panes[index].core.terminal.cols() {
+                if self.panes[index]
+                    .selection
+                    .is_some_and(|s| s.contains(col, row, self.panes[index].core.terminal.cols()))
+                {
                     self.surface.fill(
                         px + col as i32 * cw,
                         py + row as i32 * ch,
@@ -730,13 +1171,13 @@ impl App {
             ffi::SetBkMode(self.surface.dc, 1);
         }
         let previous_font = unsafe { ffi::SelectObject(self.surface.dc, self.fonts.normal) };
-        for row in 0..self.panes[self.active].core.terminal.rows() {
-            for col in 0..self.panes[self.active].core.terminal.cols() {
-                let cell = self.panes[self.active].core.terminal.view_cell(
-                    col,
-                    row,
-                    self.panes[self.active].history,
-                );
+        for row in 0..self.panes[index].core.terminal.rows() {
+            for col in 0..self.panes[index].core.terminal.cols() {
+                let cell =
+                    self.panes[index]
+                        .core
+                        .terminal
+                        .view_cell(col, row, self.panes[index].history);
                 if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 {
                     continue;
                 }
@@ -748,9 +1189,10 @@ impl App {
                 if cell.flags & zterm::DIM != 0 {
                     fg = ((fg & 0xfefefe) >> 1) & 0x7f7f7f;
                 }
-                if self.panes[self.active].selection.is_some_and(|s| {
-                    s.contains(col, row, self.panes[self.active].core.terminal.cols())
-                }) {
+                if self.panes[index]
+                    .selection
+                    .is_some_and(|s| s.contains(col, row, self.panes[index].core.terminal.cols()))
+                {
                     fg = self.appearance.selection_foreground;
                 }
                 let x = px + col as i32 * cw;
@@ -759,7 +1201,7 @@ impl App {
                     left: x,
                     top: y,
                     right: (x + cw * cell.width as i32)
-                        .min(px + self.panes[self.active].core.terminal.cols() as i32 * cw),
+                        .min(px + self.panes[index].core.terminal.cols() as i32 * cw),
                     bottom: y + ch,
                 };
                 let mut text = [0u16; 6];
@@ -793,13 +1235,13 @@ impl App {
             ffi::SelectObject(self.surface.dc, previous_font);
             ffi::GdiFlush();
         }
-        for row in 0..self.panes[self.active].core.terminal.rows() {
-            for col in 0..self.panes[self.active].core.terminal.cols() {
-                let cell = self.panes[self.active].core.terminal.view_cell(
-                    col,
-                    row,
-                    self.panes[self.active].history,
-                );
+        for row in 0..self.panes[index].core.terminal.rows() {
+            for col in 0..self.panes[index].core.terminal.cols() {
+                let cell =
+                    self.panes[index]
+                        .core
+                        .terminal
+                        .view_cell(col, row, self.panes[index].history);
                 if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 {
                     continue;
                 }
@@ -820,23 +1262,23 @@ impl App {
                 }
             }
         }
-        self.images(0..i32::MAX as i64 + 1);
-        if self.panes[self.active].history == 0
-            && self.panes[self.active].core.terminal.modes().cursor_visible
-            && (self.panes[self.active].cursor_on
-                || !self.focused
-                || !self.panes[self.active]
+        self.images(index, 0..i32::MAX as i64 + 1);
+        if self.panes[index].history == 0
+            && self.panes[index].core.terminal.modes().cursor_visible
+            && (self.panes[index].cursor_on
+                || !focused
+                || !self.panes[index]
                     .core
                     .terminal
                     .modes()
                     .cursor_blink
                     .unwrap_or(self.appearance.cursor_blink))
         {
-            let (col, row) = self.panes[self.active].core.terminal.cursor();
+            let (col, row) = self.panes[index].core.terminal.cursor();
             let x = px + col as i32 * cw;
             let y = py + row as i32 * ch;
             let color = self.appearance.cursor_color;
-            match self.panes[self.active]
+            match self.panes[index]
                 .core
                 .terminal
                 .modes()
@@ -846,13 +1288,13 @@ impl App {
                 CursorShape::Underline => self.surface.fill(x, y + ch - 2, cw, 2, color),
                 CursorShape::Bar => self.surface.fill(x, y, 2, ch, color),
                 CursorShape::Block => {
-                    if !self.focused {
+                    if !focused {
                         self.surface.fill(x, y, cw, 1, color);
                         self.surface.fill(x, y + ch - 1, cw, 1, color);
                         self.surface.fill(x, y, 1, ch, color);
                         self.surface.fill(x + cw - 1, y, 1, ch, color);
                     } else {
-                        let cell = self.panes[self.active].core.terminal.cell(col, row);
+                        let cell = self.panes[index].core.terminal.cell(col, row);
                         let width = cw * i32::from(cell.width.max(1));
                         self.surface.fill(x, y, width, ch, color);
                         if cell.width != 0 && cell.flags & zterm::HIDDEN == 0 {
@@ -878,9 +1320,8 @@ impl App {
                             let clip = ffi::Rect {
                                 left: x,
                                 top: y,
-                                right: (x + width).min(
-                                    px + self.panes[self.active].core.terminal.cols() as i32 * cw,
-                                ),
+                                right: (x + width)
+                                    .min(px + self.panes[index].core.terminal.cols() as i32 * cw),
                                 bottom: y + ch,
                             };
                             unsafe {
@@ -908,21 +1349,40 @@ impl App {
         unsafe {
             ffi::RestoreDC(self.surface.dc, saved);
         }
-        self.panes[self.active].dirty = false;
-        self.panes[self.active].core.terminal.clear_dirty();
+        self.panes[index].dirty = false;
+        self.panes[index].core.terminal.clear_dirty();
     }
     fn paint(&mut self) {
         let mut paint: ffi::PaintStruct = unsafe { core::mem::zeroed() };
         let dc = unsafe { ffi::BeginPaint(self.hwnd, &mut paint) };
-        if !self.panes[self.active]
-            .core
-            .terminal
-            .modes()
-            .synchronized_output
-            && (self.panes[self.active].dirty || self.panes[self.active].core.terminal.dirty())
-        {
-            self.draw();
+        if self.full_redraw {
+            unsafe {
+                ffi::GdiFlush();
+            }
+            self.surface.clip = Rect {
+                x: 0,
+                y: 0,
+                width: self.surface.width,
+                height: self.surface.height,
+            };
+            self.surface.fill(
+                0,
+                0,
+                self.surface.width,
+                self.surface.height,
+                self.appearance.theme.background,
+            );
         }
+        for index in 0..self.panes.len() {
+            let pane = &self.panes[index];
+            if pane.visible
+                && !pane.core.terminal.modes().synchronized_output
+                && (self.full_redraw || pane.dirty || pane.core.terminal.dirty())
+            {
+                self.draw_pane(index);
+            }
+        }
+        self.full_redraw = false;
         if !self.surface.bitmap.is_null() {
             unsafe {
                 ffi::BitBlt(
@@ -1049,36 +1509,13 @@ impl App {
         if pressed {
             self.suppress_char = false;
             self.pending_key = None;
-            if mods.contains(Modifiers::CTRL)
-                && mods.contains(Modifiers::SHIFT)
-                && (vk == b'C' as usize || vk == b'V' as usize)
+            let logical = virtual_key(vk as u32, flags);
+            if let Some(action) = actions::key_action(
+                &self.appearance.bindings,
+                binding_symbol(logical),
+                binding_state(mods),
+            ) && self.action(action)
             {
-                if vk == b'C' as usize {
-                    self.copy();
-                } else {
-                    self.paste();
-                }
-                self.intercepted[vk] = true;
-                self.suppress_char = true;
-                return true;
-            }
-            if mods.contains(Modifiers::SHIFT) && (vk == 0x21 || vk == 0x22) {
-                let step = self.panes[self.active]
-                    .core
-                    .terminal
-                    .rows()
-                    .saturating_sub(1)
-                    .max(1);
-                self.panes[self.active].history = if vk == 0x21 {
-                    self.panes[self.active]
-                        .history
-                        .saturating_add(step)
-                        .min(self.panes[self.active].core.terminal.history_len())
-                } else {
-                    self.panes[self.active].history.saturating_sub(step)
-                };
-                self.panes[self.active].selection = None;
-                self.panes[self.active].dirty = true;
                 self.intercepted[vk] = true;
                 self.suppress_char = true;
                 return true;
@@ -1161,9 +1598,44 @@ impl App {
                 ffi::ScreenToClient(self.hwnd, &mut point);
             }
         }
-        let (col, row) = self.cell_at(point.x, point.y);
+        let hit = self.panes.iter().position(|pane| {
+            pane.visible
+                && point.x >= pane.rect.x
+                && point.y >= pane.rect.y
+                && point.x < pane.rect.x.saturating_add(pane.rect.width)
+                && point.y < pane.rect.y.saturating_add(pane.rect.height)
+        });
+        let index = if self.panes[self.active].dragging {
+            self.active
+        } else if let Some(index) = hit {
+            index
+        } else {
+            return;
+        };
+        if matches!(message, 0x0201 | 0x0204 | 0x0207) && index != self.active {
+            let mut layout = self.layout.clone();
+            layout.focus(self.panes[index].id);
+            if let Err(error) = self.arrange(layout) {
+                self.message(error);
+                return;
+            }
+        }
+        self.mouse_at(index, message, wparam, lparam);
+    }
+
+    fn mouse_at(&mut self, index: usize, message: u32, wparam: usize, lparam: isize) {
+        let mut point = ffi::Point {
+            x: lparam as i16 as i32,
+            y: (lparam >> 16) as i16 as i32,
+        };
+        if message == 0x020a {
+            unsafe {
+                ffi::ScreenToClient(self.hwnd, &mut point);
+            }
+        }
+        let (col, row) = self.cell_at(index, point.x, point.y);
         let mods = modifiers();
-        let app_tracking = self.panes[self.active].core.terminal.modes().mouse_tracking != 0
+        let app_tracking = self.panes[index].core.terminal.modes().mouse_tracking != 0
             && !mods.contains(Modifiers::SHIFT);
         let event = match message {
             0x0201 => Some(MouseEvent::Press {
@@ -1222,10 +1694,10 @@ impl App {
                 input::encode_mouse_into(
                     event,
                     mods,
-                    &self.panes[self.active].core.terminal.modes().input(),
+                    &self.panes[index].core.terminal.modes().input(),
                     &mut self.encoded,
                 );
-                self.enqueue_encoded();
+                self.enqueue_encoded_for(index);
             }
             return;
         }
@@ -1235,24 +1707,24 @@ impl App {
                     self.open_link(col, row);
                     return;
                 }
-                self.panes[self.active].selection = Some(Selection {
+                self.panes[index].selection = Some(Selection {
                     start: (col, row),
                     end: (col, row),
                 });
-                self.panes[self.active].dragging = true;
-                self.panes[self.active].dirty = true;
+                self.panes[index].dragging = true;
+                self.panes[index].dirty = true;
                 unsafe {
                     ffi::SetCapture(self.hwnd);
                 }
             }
-            0x0200 if self.panes[self.active].dragging => {
-                if let Some(selection) = self.panes[self.active].selection.as_mut() {
+            0x0200 if self.panes[index].dragging => {
+                if let Some(selection) = self.panes[index].selection.as_mut() {
                     selection.end = (col, row);
-                    self.panes[self.active].dirty = true;
+                    self.panes[index].dirty = true;
                 }
             }
-            0x0202 if self.panes[self.active].dragging => {
-                self.panes[self.active].dragging = false;
+            0x0202 if self.panes[index].dragging => {
+                self.panes[index].dragging = false;
                 unsafe {
                     ffi::ReleaseCapture();
                 }
@@ -1261,16 +1733,16 @@ impl App {
             0x020a => {
                 let delta = (wparam >> 16) as i16 as i32;
                 let lines = (delta.unsigned_abs() as usize / 120).max(1) * 3;
-                self.panes[self.active].history = if delta > 0 {
-                    self.panes[self.active]
+                self.panes[index].history = if delta > 0 {
+                    self.panes[index]
                         .history
                         .saturating_add(lines)
-                        .min(self.panes[self.active].core.terminal.history_len())
+                        .min(self.panes[index].core.terminal.history_len())
                 } else {
-                    self.panes[self.active].history.saturating_sub(lines)
+                    self.panes[index].history.saturating_sub(lines)
                 };
-                self.panes[self.active].selection = None;
-                self.panes[self.active].dirty = true;
+                self.panes[index].selection = None;
+                self.panes[index].dirty = true;
             }
             _ => {}
         }
@@ -1302,6 +1774,57 @@ impl App {
                 1,
             );
         }
+    }
+}
+
+pub(crate) fn action_supported(action: &str) -> bool {
+    matches!(
+        action,
+        "new-tab"
+            | "split-right"
+            | "split-down"
+            | "next-tab"
+            | "previous-tab"
+            | "next-pane"
+            | "previous-pane"
+            | "swap-next"
+            | "swap-previous"
+            | "maximize"
+            | "grow"
+            | "shrink"
+            | "close"
+            | "copy"
+            | "paste"
+            | "scroll-up"
+            | "scroll-down"
+            | "none"
+    )
+}
+
+fn binding_state(modifiers: Modifiers) -> u32 {
+    u32::from(modifiers.contains(Modifiers::SHIFT))
+        | (u32::from(modifiers.contains(Modifiers::CTRL)) << 2)
+        | (u32::from(modifiers.contains(Modifiers::ALT)) << 3)
+        | (u32::from(modifiers.contains(Modifiers::SUPER)) << 6)
+}
+
+fn binding_symbol(key: Key) -> u64 {
+    match key {
+        Key::Character(ch) => u64::from(ch as u32),
+        Key::Escape => 0xff1b,
+        Key::Enter | Key::KeypadEnter => 0xff0d,
+        Key::Tab => 0xff09,
+        Key::Backspace => 0xff08,
+        Key::Left => 0xff51,
+        Key::Right => 0xff53,
+        Key::Up => 0xff52,
+        Key::Down => 0xff54,
+        Key::PageUp => 0xff55,
+        Key::PageDown => 0xff56,
+        Key::Home => 0xff50,
+        Key::End => 0xff57,
+        Key::Function(number) => 0xffbd + u64::from(number),
+        _ => 0,
     }
 }
 
@@ -1412,6 +1935,9 @@ unsafe extern "system" fn window_proc(
     }
     let state = unsafe { &*pointer };
     let handled = state.with(|app| {
+        if app.panes.is_empty() && !matches!(message, WM_PAINT | WM_CLOSE | WM_DESTROY | 0x0082) {
+            return Some(0);
+        }
         match message {
             WM_PAINT => app.paint(),
             0x0014 => return Some(1),
@@ -1459,7 +1985,11 @@ unsafe extern "system" fn window_proc(
                 }
             }
             0x0200..=0x020a => app.mouse(message, wparam, lparam),
-            0x0215 => app.panes[app.active].dragging = false,
+            0x0215 => {
+                for pane in &mut app.panes {
+                    pane.dragging = false;
+                }
+            }
             0x02e0 => {
                 let dpi = wparam as u16 as u32;
                 let candidate = Fonts::new(app.surface.dc, &app.appearance.font, dpi).ok();
@@ -1519,28 +2049,41 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
     let height = cfg.rows as i32 * fonts.height + cfg.appearance.padding * 2;
     let mut terminal = Terminal::with_theme(cfg.cols, cfg.rows, cfg.history, cfg.appearance.theme);
     terminal.set_cell_size(fonts.width as u32, fonts.height as u32);
+    let wake = session_wait::Wake::new()?;
     let state = Box::new(WindowState {
         app: UnsafeCell::new(App {
             hwnd: NULL,
-            panes: vec![Pane {
-                rect: Rect {
+            panes: vec![Pane::new(
+                1,
+                pty,
+                terminal,
+                zpty::Size::new(cfg.cols as u16, cfg.rows as u16),
+                Rect {
                     x: 0,
                     y: 0,
                     width,
                     height,
                 },
-                core: SessionCore::new(pty, terminal, String::from("local"), MAX_INPUT),
-                dirty: true,
-                history: 0,
-                selection: None,
-                dragging: false,
-                graphics_revision: 0,
-                sync_since: None,
-                cursor_on: true,
-                blink_deadline: os::milliseconds() + 500,
-                last_cursor: (0, 0),
-            }],
+                &wake,
+            )?],
             active: 0,
+            layout: Layout::new(1),
+            next_id: 2,
+            launch: Launch {
+                shell: os::default_shell(),
+                environment,
+                history: cfg.history,
+            },
+            wake: Arc::clone(&wake),
+            pump_cursor: 0,
+            pump_again: false,
+            pending_fonts: None,
+            resize_pending: false,
+            resize_retry_at: 0,
+            full_redraw: true,
+            caption_dirty: true,
+            notice: None,
+            last_status: 0,
             appearance: cfg.appearance,
             surface,
             fonts,
@@ -1643,52 +2186,24 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
         unsafe {
             ffi::UpdateWindow(hwnd);
         }
-        let (events, timeout) = state
-            .with(|app| {
-                let now = os::milliseconds();
-                let mut timeout = if app.focused
-                    && app.panes[app.active]
-                        .core
-                        .terminal
-                        .modes()
-                        .cursor_blink
-                        .unwrap_or(app.appearance.cursor_blink)
-                {
-                    app.panes[app.active]
-                        .blink_deadline
-                        .saturating_sub(now)
-                        .min(500) as u32
-                } else {
-                    1000
-                };
-                if app.panes[app.active].core.input.pending() {
-                    timeout = timeout.min(8);
-                }
-                if app.panes[app.active].sync_since.is_some() {
-                    timeout = timeout.min(8);
-                }
-                (
-                    [
-                        app.panes[app.active].core.pty.output_event(),
-                        app.panes[app.active].core.pty.process_event(),
-                    ],
-                    timeout,
-                )
-            })
-            .unwrap_or(([NULL, NULL], 8));
-        unsafe {
-            ffi::MsgWaitForMultipleObjectsEx(2, events.as_ptr(), timeout, 0x04ff, 4);
+        let timeout = state.with(|app| app.wait_timeout()).unwrap_or(8);
+        if let Err(error) = wake.wait(timeout) {
+            state.with(|app| app.message(error));
+            break;
         }
     }
     let status = state
         .with(|app| {
-            let _ = app.panes[app.active].core.pty.wait_timeout(20);
-            app.panes[app.active]
-                .core
-                .pty
-                .status()
-                .and_then(|s| s.code())
-                .unwrap_or(0)
+            if let Some(pane) = app.panes.get_mut(app.active) {
+                let _ = pane.core.pty.wait_timeout(20);
+                pane.core
+                    .pty
+                    .status()
+                    .and_then(|status| status.code())
+                    .unwrap_or(app.last_status)
+            } else {
+                app.last_status
+            }
         })
         .unwrap_or(0);
     unsafe {
@@ -1849,13 +2364,6 @@ mod ffi {
         pub fn TranslateMessage(message: *const Message) -> i32;
         pub fn DispatchMessageW(message: *const Message) -> isize;
         pub fn PostQuitMessage(code: i32);
-        pub fn MsgWaitForMultipleObjectsEx(
-            count: u32,
-            handles: *const Handle,
-            timeout: u32,
-            wake: u32,
-            flags: u32,
-        ) -> u32;
         pub fn GetKeyState(vk: i32) -> i16;
         pub fn MapVirtualKeyW(code: u32, map: u32) -> u32;
         pub fn SetCapture(hwnd: Handle) -> Handle;
