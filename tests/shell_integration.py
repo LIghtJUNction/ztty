@@ -108,8 +108,12 @@ def run_shell(name, root, probe, artifact_dir):
         "fish": [binary, "--no-config", "--private", "--interactive"],
         "nu": [binary, "--no-config-file", "--no-history", "--interactive"],
     }[name]
-    source = shlex.quote(str(root / "shell" / ("ztty." + name)))
+    script = root / "shell" / ("ztty." + name)
+    source = shlex.quote(str(script))
     if name == "bash":
+        syntax = subprocess.run([binary, "-n", str(script)], capture_output=True, text=True, timeout=3)
+        if syntax.returncode:
+            raise RuntimeError("Bash integration syntax failed: " + syntax.stderr)
         setup = "_ztty_test_hook(){ printf '__ZTTY_EXISTING_HOOK__\\n'; PS1='ZT> '; }; PROMPT_COMMAND=(_ztty_test_hook); trap 'true # ztty-existing-trap' DEBUG; "
     elif name == "zsh":
         setup = "_ztty_test_hook(){ printf '__ZTTY_EXISTING_HOOK__\\n'; PS1='ZT> '; }; precmd_functions=(_ztty_test_hook); RPROMPT=''; "
@@ -123,7 +127,17 @@ def run_shell(name, root, probe, artifact_dir):
         destination.mkdir()
         try:
             session.settle()
-            session.command(setup + f"source {source}; source {source}")
+            if name == "bash":
+                loaded = session.command(
+                    setup + f"source {source}; _ztty_source_status=$?; "
+                    "printf '__ZTTY_FIRST_SOURCE__:%s\\n' \"$_ztty_source_status\"; "
+                    f"source {source}; _ztty_source_status=$?; "
+                    "printf '__ZTTY_REPEAT_SOURCE__:%s\\n' \"$_ztty_source_status\""
+                )
+                assert b"__ZTTY_FIRST_SOURCE__:0\r\n" in loaded, loaded
+                assert b"__ZTTY_REPEAT_SOURCE__:0\r\n" in loaded, loaded
+            else:
+                session.command(setup + f"source {source}; source {source}")
             start = len(session.transcript)
             success = "print '__ZTTY_SUCCESS__'" if name == "nu" else "printf '__ZTTY_SUCCESS__\\n'"
             segment = session.command(success)
@@ -160,7 +174,7 @@ def run_shell(name, root, probe, artifact_dir):
                 assert any("__ZTTY_NESTED__" in record["output"] and record["exit_status"] == 0 for record in records), parsed
             artifact_dir.mkdir(parents=True, exist_ok=True)
             (artifact_dir / (name + ".pty")).write_bytes(transcript)
-            return {"shell": name, "status": "passed", "version": subprocess.run([binary, "--version"], capture_output=True, text=True, check=True).stdout.splitlines()[0], "records": len(records), "transcript_bytes": len(transcript), "transcript_sha256": hashlib.sha256(transcript).hexdigest(), "checks": ["real interactive PTY", "source twice without duplicate execution marks", "existing hooks and prompt preserved", "successful output range", "failure exit status 7", "UTF-8 output", "OSC 7 URI for Unicode and spaces"]}
+            return {"shell": name, "status": "passed", "version": subprocess.run([binary, "--version"], capture_output=True, text=True, check=True).stdout.splitlines()[0], "records": len(records), "transcript_bytes": len(transcript), "transcript_sha256": hashlib.sha256(transcript).hexdigest(), "checks": ["real interactive PTY", "source twice without duplicate execution marks", "existing hooks and prompt preserved", "successful output range", "failure exit status 7", "UTF-8 output", "OSC 7 URI for Unicode and spaces"] + (["bash -n syntax gate", "first and repeated source each exit zero"] if name == "bash" else [])}
         finally:
             artifact_dir.mkdir(parents=True, exist_ok=True)
             (artifact_dir / (name + ".pty")).write_bytes(session.transcript)
