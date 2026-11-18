@@ -30,7 +30,7 @@ test = false
 bench = false
 
 [dependencies]
-zterm = { path = "crates/zterm", version = "0.2.0", default-features = false }
+zterm = { path = "crates/zterm", version = "0.2.1", default-features = false }
 zpty = { path = "crates/zpty", version = "0.2.0", default-features = false }
 
 [profile.dev]
