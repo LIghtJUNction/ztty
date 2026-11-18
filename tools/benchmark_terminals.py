@@ -96,6 +96,8 @@ BARRIER = b"\x1b[H\x1b[6n"
 BARRIER_REPLY = b"\x1b[1;1R"
 LATENCY_COMMAND = b"\x1b[Hq\x1b[6n"
 LATENCY_REPLY = b"\x1b[1;2R"
+OUTPUT_CHECK = b"\x1b[6n"
+OUTPUT_CHECK_REPLY = f"\x1b[{ROWS};{COLS}R".encode("ascii")
 
 
 def send_json(connection, value):
@@ -159,6 +161,45 @@ def output_payload():
     return b"".join(blocks)
 
 
+def output_screen(payload):
+    """Expected last frame from the fixed workload, outside timed sections."""
+    frame = payload.rsplit(b"\x1b[0m", 2)[-2]
+    rows = re.findall(rb"\x1b\[(\d+);1H\x1b\[3[1-7]m([ -~]+)", frame)
+    if [int(row) for row, _ in rows] != list(range(1, ROWS + 1)):
+        raise ValueError("output payload has no complete final screen")
+    if any(len(text) != COLS - 1 for _, text in rows):
+        raise ValueError("output payload has an unexpected row width")
+    return "".join(text.decode("ascii") + "\n" for _, text in rows)
+
+
+def broker_value(address, request):
+    """Read only the private ztty broker created by this run."""
+    if not address.startswith("@") or not 2 <= len(address) <= 107:
+        raise ValueError("benchmark broker must use its private abstract socket")
+    with socket.socket(socket.AF_UNIX) as connection:
+        connection.settimeout(5)
+        connection.connect("\0" + address[1:])
+        send_json(connection, request)
+        response = receive_json(connection)
+    if response.get("ok") is not True:
+        raise AssertionError("benchmark broker read failed: " + repr(response))
+    return response["result"]
+
+
+def verify_ztty_screen(address, title, expected):
+    sessions = broker_value(address, {"op": "list"})["sessions"]
+    matches = [session for session in sessions if session["title"] == title]
+    if len(matches) != 1:
+        raise AssertionError("cannot identify the benchmark session by its unique title")
+    value = broker_value(address, {"op": "read", "session": matches[0]["uri"], "max_bytes": 1})
+    if (value["cols"], value["rows"]) != (COLS, ROWS) or value["screen_truncated"]:
+        raise AssertionError("benchmark screen geometry differs or screen was clipped")
+    if value["screen"] != expected:
+        raise AssertionError("output final screen differs from the complete workload")
+    return {"all_text_cells_checked": True, "rows": ROWS, "columns": COLS,
+            "screen_utf8_sha256": hashlib.sha256(expected.encode()).hexdigest()}
+
+
 def percentile(values, percent):
     ordered = sorted(values)
     return ordered[min(len(ordered) - 1, int((len(ordered) - 1) * percent / 100))]
@@ -189,6 +230,10 @@ def probe(path):
                 exchange(BARRIER, BARRIER_REPLY)
                 size = os.get_terminal_size(0)
                 send_json(connection, {"cols": size.columns, "rows": size.lines})
+            elif request["op"] == "restore":
+                write_all(FRAME)
+                exchange(BARRIER, BARRIER_REPLY)
+                send_json(connection, {"restored": True})
             elif request["op"] == "performance":
                 latency = []
                 for index in range(LATENCY_WARMUP + LATENCY_SAMPLES):
@@ -209,9 +254,19 @@ def probe(path):
                             "seconds": elapsed, "bytes": len(payload),
                             "mib_per_second": len(payload) / (1024 * 1024) / elapsed,
                         })
-                write_all(FRAME)
-                exchange(BARRIER, BARRIER_REPLY)
+                # Keep the original timed payload and HOME/DSR barrier exactly
+                # unchanged. This separate, untimed replay checks the cursor
+                # before any HOME reset can hide dropped print operations.
+                write_all(payload)
+                exchange(OUTPUT_CHECK, OUTPUT_CHECK_REPLY)
                 send_json(connection, {
+                    "output_integrity": {
+                        "untimed": True, "final_cursor_checked": True,
+                        "command_hex": OUTPUT_CHECK.hex(),
+                        "expected_reply_hex": OUTPUT_CHECK_REPLY.hex(),
+                        "payload_bytes": len(payload),
+                        "payload_sha256": hashlib.sha256(payload).hexdigest(),
+                    },
                     "latency_us": latency,
                     "latency_p50_us": statistics.median(latency),
                     "latency_p95_us": percentile(latency, 95),
@@ -516,6 +571,7 @@ def measure(app, binary, repetition, settle):
                         if all(row["available"] for row in graphics) else None,
                 )
                 performance = []
+                expected_screen = output_screen(output_payload())
                 for index, channel in enumerate(connections):
                     window = windows[prefix + str(index + 1)]["window"]
                     window.configure(stack_mode=X.Above)
@@ -523,6 +579,14 @@ def measure(app, binary, repetition, settle):
                     xconnection.sync()
                     send_json(channel, {"op": "performance"})
                     values = receive_json(channel)
+                    if values.get("output_integrity", {}).get("final_cursor_checked") is not True:
+                        raise AssertionError("output completion check was not performed")
+                    if app == "ztty":
+                        values["output_integrity"]["screen"] = verify_ztty_screen(
+                            environment["ZTTY_SOCKET"], prefix + str(index + 1), expected_screen)
+                    send_json(channel, {"op": "restore"})
+                    if receive_json(channel) != {"restored": True}:
+                        raise AssertionError("probe failed to restore the idle frame")
                     performance.append({"index": index + 1, **values})
                 latency = [value for row in performance for value in row["latency_us"]]
                 result["performance"] = performance
@@ -857,12 +921,15 @@ def main():
             "latency_warmup_per_window": LATENCY_WARMUP, "latency_samples_per_window": LATENCY_SAMPLES,
             "output_bytes_per_sample": len(payload), "output_sha256": hashlib.sha256(payload).hexdigest(),
             "output_warmup_per_window": OUTPUT_WARMUP, "output_samples_per_window": OUTPUT_SAMPLES,
+            "untimed_output_check_command_hex": OUTPUT_CHECK.hex(),
+            "untimed_output_check_reply_hex": OUTPUT_CHECK_REPLY.hex(),
         },
         "method": {
             "application_memory": "sum smaps_rollup PSS and Private_Clean+Private_Dirty for every marked terminal process and helper, excluding known probe subtrees and isolated infrastructure",
             "memory_aggregation": "median of three process snapshots per run; median of three fresh-process runs per app",
             "latency_aggregation": "per-run p50/p95 across 10 x 300 measured DSR round trips; median of three run statistics",
             "output_aggregation": "median of three 1 MiB output bursts per window, then median of ten windows, then median of three runs",
+            "output_integrity": "after timed samples, replay the same payload outside timing and require direct CPR at row 32 column 120; ztty also checks all final screen text through its private broker; this is not a physical frame fence",
             "performance_scope": "one focused window at a time, other nine idle; raw PTY write-to-DSR response; logical processing completion, not a physical rendering/scanout fence",
             "cold_warm": "fresh terminal processes and isolated config per run; memory sampled after fixed frame and font warm-up; OS page/font caches are not flushed",
             "graphics_scope": "Xvfb software rendering only; X-server PSS delta and XRes client pixmaps recorded separately; does not quantify native GPU/VRAM or desktop compositor behavior",
