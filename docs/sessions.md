@@ -130,14 +130,38 @@ Clients send `Authorization: Bearer <token>`. `--token TOKEN`
 is also supported. The listener implements plain HTTP; use a TLS terminator or
 secure tunnel across an untrusted network.
 
-The implementation uses the JSON response form of
+The default is the JSON response form of
 [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports).
-POST requests return JSON, accepted notifications return HTTP 202, and GET
-returns HTTP 405 because there is no unsolicited SSE stream. Initialization
+Select SSE responses for POST requests with:
+
+```sh
+ztty mcp --transport http --host 127.0.0.1 --port 8732 --http-response sse
+```
+
+`--http-response json` explicitly selects the default. Both modes require clients
+to accept `application/json` and `text/event-stream`. Accepted notifications
+return HTTP 202 with no body. GET returns HTTP 405. Initialization
 returns an `Mcp-Session-Id`; subsequent requests include that ID and
 the negotiated `Mcp-Protocol-Version`. DELETE removes that HTTP
 transport session while leaving its terminal sessions available. Idle HTTP
 transport sessions expire after 30 minutes; retained terminals remain available.
+
+In SSE mode, an accepted tool request sends its response headers and an initial
+comment before waiting for the broker. While it waits, the connection sends a
+comment every five seconds. Completion sends one `event: message` containing
+the complete JSON-RPC response, finishes the HTTP chunked body and closes the
+connection. This lets clients observe a live connection while `session_read`
+waits for output. Each request still delivers one bounded output page, including
+its cursor and timeout status. JSON-RPC request errors use the same response
+stream; HTTP errors retain ordinary HTTP status codes and JSON error bodies
+where applicable.
+
+These streams are scoped to a POST request. GET subscriptions, event IDs and
+`Last-Event-ID` replay are not implemented. After an interrupted read, start a
+new request with a fresh request ID, the last confirmed `next_cursor`, and
+`expected_session`. The terminal's retained output remains available. A
+cancelled or overloaded stream may end without a final event or terminating
+HTTP chunk; treat it as an interrupted request.
 
 The server validates Origin, Host headers on every bind address, content types and protocol
 versions. It supports `2025-11-25`, `2025-06-18` and
@@ -182,7 +206,7 @@ normal terminal protocol replies such as DSR while observed or detached.
 
 `--allow-host name:port` adds an explicit HTTP authority, for example behind a
 trusted reverse proxy. An Origin header must agree with the request Host. The
-transport implements the 2025-11-25 JSON response lifecycle; it does not claim
+transport implements the 2025-11-25 JSON and POST SSE response lifecycle; it does not claim
 conformance with newer MCP revisions or provide an unsolicited SSE subscription.
 
 Command reads use the terminal's retained physical cells. They are bounded text
@@ -251,6 +275,12 @@ output, preserving slots for management requests. Each stdio process accepts
 32 concurrent tool requests, including at most 24 positive output waits, and
 bounds its aggregate queued data to 4 MiB. A stdio writer that makes no progress
 for five seconds terminates the transport and releases its pending requests.
+
+SSE framing and queued comments count against the same HTTP payload budget.
+Only one heartbeat can be queued at a time, and its send deadline is not
+extended by further heartbeats. A slow consumer therefore cannot accumulate
+comments without limit. If the payload budget is exhausted after SSE headers
+have been sent, the connection closes; no second HTTP response is inserted.
 
 ### Guarded resume and output termination
 
@@ -334,8 +364,8 @@ existing poll loops. Other clients can list, write, resize and close sessions
 while a read waits. A parked broker read retains only its session ID, cursor,
 page limit and deadline; its screen response is built on completion. The broker
 caps combined window and output waiters at 128 while retaining management
-connection capacity. HTTP continues to use JSON request/response mode; SSE and
-unsolicited output subscriptions are separate remaining work.
+connection capacity. HTTP supports JSON or opt-in POST SSE responses;
+unsolicited output subscriptions remain separate work.
 
 ### Cancelling a pending request
 
@@ -375,6 +405,7 @@ cannot be recalled. Clients should ignore responses that raced with a
 
 ```sh
 python3 tests/mcp_transport.py --binary ./target/release/ztty
+python3 tests/mcp_sse.py --binary ./target/release/ztty --output artifacts/mcp-sse/report.json
 python3 tests/mcp_sessions.py --binary ./target/release/ztty
 python3 tests/mcp_security.py --binary ./target/release/ztty
 python3 tests/mcp_wait.py --binary ./target/release/ztty --output artifacts/mcp-wait/report.json

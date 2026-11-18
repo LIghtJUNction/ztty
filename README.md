@@ -187,6 +187,9 @@ ztty mcp
 # Streamable HTTP at http://127.0.0.1:8732/mcp
 ztty mcp --transport http --host 127.0.0.1 --port 8732
 
+# Optional SSE replies with keepalive comments while output waits
+ztty mcp --transport http --http-response sse
+
 # View a session created by an MCP client
 ztty attach ztty://mcp/stdio/checks
 ztty attach ztty://mcp/http/127.0.0.1:8732/checks
@@ -199,7 +202,7 @@ window detaches it. Ordinary local windows keep the usual close-to-exit
 behavior. HTTP listeners outside loopback require a bearer token.
 
 See [sessions and MCP](docs/sessions.md) for naming, lifecycle, HTTP tokens,
-client setup and bounded UTF-8 output cursors.
+client setup, JSON/SSE response modes and bounded UTF-8 output cursors.
 
 ## Appearance
 
