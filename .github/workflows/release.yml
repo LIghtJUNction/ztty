@@ -497,19 +497,24 @@ jobs:
           report["contract_tests"] = {"passed": False, "log": contract_log.name}
           try:
               with contract_log.open("w", encoding="utf-8") as stream:
-                  contract = subprocess.run([sys.executable, "tests/windows_native_test.py"],
+                  contract = subprocess.run([sys.executable, "-m", "unittest", "discover",
+                                            "-s", "tests", "-p", "windows_*_test.py"],
                                             stdout=stream, stderr=subprocess.STDOUT, timeout=30)
               report["contract_tests"].update({"passed": contract.returncode == 0,
                                                "exit_code": contract.returncode})
-              assert contract.returncode == 0, f"Windows cleanup contract tests failed; see {contract_log}"
+              assert contract.returncode == 0, f"Windows gate contract tests failed; see {contract_log}"
               environment = dict(os.environ)
               compiler = os.path.normcase(os.path.normpath(environment["LLVM_MINGW_BIN"]))
               environment["PATH"] = os.pathsep.join(path for path in environment["PATH"].split(os.pathsep)
                   if os.path.normcase(os.path.normpath(path)) != compiler)
               version = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=30, check=True, env=environment)
               assert version.stdout.strip() == "ztty " + os.environ["VERSION"], version.stdout
-              result = subprocess.run([sys.executable, "tests/windows_native.py", "--binary", str(binary), "--output", str(report_path), "--arch", os.environ["WINDOWS_ARCH"]],
-                                      capture_output=True, text=True, timeout=180, env=environment)
+              # Explicit CI opt-in: only our temporary desktop and suspended Job tree.
+              # Individual native pixel waits remain unchanged; the outer budget
+              # includes bounded Job cleanup and restoration of the input desktop.
+              result = subprocess.run([sys.executable, "tests/windows_desktop.py", "--isolated-desktop",
+                  "--binary", str(binary), "--output", str(report_path), "--arch", os.environ["WINDOWS_ARCH"]],
+                  capture_output=True, text=True, timeout=225, env=environment)
               stdout, stderr = result.stdout, result.stderr
               report.update(json.loads(report_path.read_text(encoding="utf-8")))
               report["exit_code"] = result.returncode

@@ -301,3 +301,5 @@ python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 [操作、权限与真实验收记录](docs/workspaces.md)。
 
 三个前端已接入同一 no_std 会话库，统一 PTY 读写、有界输入和终端状态。[核心说明与真实 PTY 验收](docs/session-core.md)覆盖部分写入与尺寸提交顺序。Linux 集成及跨目标类型检查通过；新 macOS、Windows 路径仍需下一轮原生执行，原生共享会话、Attach 和 MCP 尚未补齐。
+
+下一轮 Windows 候选将在测试自有的可见桌面运行原有像素检查，并强制核验进程清理与桌面恢复。[原生验收机制](docs/native-candidates-2026-11-18.md#owned-windows-ci-desktop)。

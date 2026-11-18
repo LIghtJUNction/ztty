@@ -384,3 +384,5 @@ preserves its live PTY. External tools using `TERMINAL -e COMMAND`, including
 MIT © LIghtJUNction
 
 All three frontends now consume the same no_std session library for PTY pumping, bounded input and terminal state. [Core behavior and real PTY regressions](docs/session-core.md) document resize ordering and partial writes. Linux integration and native cross-target checks pass; execution of the newly integrated macOS/Windows paths awaits the next native candidate. Their shared-session, attach and MCP features remain unfinished.
+
+The next Windows candidate uses an owned visible CI desktop with verified worker cleanup and desktop restoration; the original pixel checks remain mandatory. [Native gate details](docs/native-candidates-2026-11-18.md#owned-windows-ci-desktop).

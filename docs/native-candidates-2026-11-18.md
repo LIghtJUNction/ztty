@@ -278,6 +278,39 @@ Windows x86_64 and both Linux candidates, plus separately named failed or
 blocked evidence, are in the
 [delivery folder](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa).
 
+## Owned Windows CI desktop
+
+The next candidate runs the unchanged Windows native gate on a uniquely named,
+temporary desktop owned by the test. This is an explicit CI-only path, limited
+to the named Windows runners with a visible WinSta0 station and Default
+thread/input desktop. Secure, noninteractive or inaccessible contexts remain
+blocked.
+
+The controller creates the worker suspended, passes only its three stdio
+handles, and verifies membership in an owned kill-on-close Job before starting
+it. It makes the owned desktop visible, then the worker independently verifies
+its actual thread/input desktop before running the original 30 checks.
+WindowFromPoint, PtVisible, pixel colors and per-pixel deadlines are unchanged.
+Foreign windows are not moved, hidden or closed.
+
+The controller monitors input-desktop identity during the run. A change to an
+unrelated or secure desktop aborts the test and only its owned Job is cleaned
+up. Success additionally requires the worker to exit, its Job to become empty,
+the original desktop to be restored, and owned handles/desktops to close.
+The worker keeps its 180-second limit; the outer 225-second budget includes
+bounded cleanup and restoration. Cleanup failure cannot pass the candidate.
+
+The [source and contract record](measurements/windows-desktop-gate-2026-11-18.json)
+and [fourteen passing failure contracts](measurements/windows-desktop-gate-2026-11-18.log)
+document local verification. These fixtures do not establish actual native
+desktop switching or pixels. The next source-pinned x64 and ARM64 jobs must
+supply those results and preserve the independent worker/desktop reports.
+
+This follows the documented [SwitchDesktop](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-switchdesktop),
+[explicit handle inheritance](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-updateprocthreadattribute)
+and [Job lifecycle](https://learn.microsoft.com/en-us/windows/win32/procthread/job-objects)
+contracts. No security settings or permissions are modified.
+
 ## Remaining release gates
 
 The fourth run accepted both Linux architectures and Windows x86_64.

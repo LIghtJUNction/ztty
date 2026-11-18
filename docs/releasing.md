@@ -17,6 +17,9 @@ The [source-bound record](native-candidates-2026-11-18.md) preserves exact
 results, verified artifact hashes and durable download links. The next
 candidate initializes the macOS helper's WindowServer connection and retains
 real exit/signal evidence before attempting JSON decoding.
+The next Windows gate explicitly isolates its worker and children in an owned
+visible CI desktop and kill-on-close Job; all original pixel assertions remain.
+Desktop restoration and empty-Job evidence are mandatory.
 These are not accepted six-platform production releases.
 
 The newer roadmap branch is not covered by run 44165748395. Its Release
