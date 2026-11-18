@@ -35,6 +35,11 @@ and PTY grid within the existing pixel-sized window. Ctrl+0 restores the latest
 successfully loaded configuration font. With Num Lock off, keypad 0 keeps its
 Insert behavior. Split resizing uses Ctrl+Alt+Shift+Equal / Minus.
 
+The native Windows reset shortcut is Ctrl+0. Windows can reserve Ctrl+Shift+0
+when multiple keyboard layouts are active; that alias works only if delivered.
+[Microsoft's shortcut guidance](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size)
+describes the system setting. The Linux shortcuts in the table remain available.
+
 Custom bindings are checked before these defaults. For example,
 `keybind = ctrl+shift+plus = none` disables that shifted zoom chord, while
 `keybind = ctrl+kp-add = font-decrease` changes only Ctrl+keypad Add.

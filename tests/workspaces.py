@@ -2,6 +2,7 @@
 """Exercise real X11 panes, PTYs, detach and input arbitration in an owned display."""
 import argparse
 import ctypes
+import errno
 import fcntl
 import hashlib
 import json
@@ -31,6 +32,16 @@ while True:
  out.write(data)
  os.write(1,data)
 '''
+
+
+def closed_identity_gone(pid, started, read_start):
+    """Only an already-closed process may disappear during its identity read."""
+    try:
+        return read_start(pid) != started
+    except OSError as error:
+        if error.errno in (errno.ENOENT, errno.ESRCH):
+            return True
+        raise
 
 
 def main():
@@ -382,8 +393,8 @@ def main():
             wait(lambda: not any(s["name"] == "incarnation" for s in rpc({"op": "list"})["sessions"]),
                  "old incarnation removed")
             previous_waiter.wait(timeout=5)
-            wait(lambda: not Path(f"/proc/{previous['pid']}").exists()
-                 or start_ticks(previous["pid"]) != previous_started, "old incarnation PTY reaped")
+            wait(lambda: closed_identity_gone(previous["pid"], previous_started, start_ticks),
+                 "old incarnation PTY reaped")
             replacement = start("incarnation")
             assert replacement["uri"] == previous["uri"], (previous, replacement)
             assert replacement["pid"] != previous["pid"] and replacement["id"] != previous["id"]

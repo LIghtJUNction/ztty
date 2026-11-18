@@ -826,7 +826,7 @@ def run(binary, output, expected_arch=None):
               trials=[decreased, smaller, keypad_add, keypad_subtract], pixels=keypad_subtract["pixels"])
 
         # The configured size is 12, deliberately different from the default 11.
-        reset = font_trial("configured-reset", 0x30, lambda value: value == cell)
+        reset = font_trial("configured-reset", 0x30, lambda value: value == cell, shift=False)
         raised_again = font_trial("keypad-increase-before-reset", 0x6B, lambda value: value == enlarged, shift=False)
         # Inject the logical VK_NUMPAD0, not a hardware scan code. This tests
         # that dispatch branch without changing or claiming NumLock state.
@@ -838,6 +838,7 @@ def run(binary, output, expected_arch=None):
         assert 0 < final_gdi <= initial_gdi + 2, (initial_gdi, final_gdi)
         window.capture(output, "font-reset")
         check("font_reset_restores_configured_metrics", configured_size=12, original_cell=list(cell),
+              reset_shortcut="Ctrl+0", ctrl_shift_zero_native_verified=False,
               trials=[reset, raised_again, keypad_reset], input_kind="virtual-key", numlock_changed=False,
               physical_numlock_state_verified=False,
               shortcut_input_bytes={name: without_probe_replies(tail).hex() for name, tail in tails.items()},

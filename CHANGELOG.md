@@ -11,10 +11,13 @@ unreleased application features together with the following corrections.
 ### Added
 
 - Font zoom and reset shortcuts on Linux and Windows: Ctrl+Plus/Equal,
-  Ctrl+Minus and Ctrl+0, their Ctrl+Shift variants, and Ctrl+keypad
+  Ctrl+Minus and Ctrl+0, Ctrl+Shift+Equal/Minus, and Ctrl+keypad
   Add/Subtract/0. Keypad 0 requires Num Lock; ordinary Num-Lock-off Insert
   behavior remains available. Font changes keep the window and PTY processes;
   Windows coordinates the new metrics across all panes in the workspace.
+  Linux also accepts Ctrl+Shift+0. Windows accepts that alias when the OS
+  delivers it; [Windows can reserve it for keyboard layouts](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size),
+  so Ctrl+0 is the primary Windows reset shortcut.
 - Ctrl+Tab and Ctrl+Shift+Tab cycle workspace tabs alongside the existing
   Ctrl+Shift+PageDown/PageUp bindings. Move split grow/shrink to
   Ctrl+Alt+Shift+Equal/Minus so Ctrl+Shift+Plus/Minus changes font size.
@@ -67,6 +70,12 @@ unreleased application features together with the following corrections.
 - That candidate predates the additional zoom and tab-shortcut changes. Their
   keyboard checks require a new source-bound run; the earlier 19 workspace
   groups are not evidence for the added font actions.
+- Unified candidate `735ca927` in
+  [run 44355360532](https://github.com/LIghtJUNction/ztty/actions/runs/44355360532)
+  failed the Windows Ctrl+Shift+0 reset check. This is consistent with the
+  documented system reservation; key delivery was not instrumented. Native
+  acceptance now exercises Ctrl+0 and still requires the configured font
+  metrics, all PTY identities, grid sizes and pixels to match.
 - The four reusable libraries are published independently:
   `zinput 0.1.1`, `zgraphics 0.1.1`, `zpty 0.2.1`, and `zterm 0.3.0`.
   [Registry checks](docs/releasing.md#published-packages) do not imply that the
