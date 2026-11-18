@@ -3051,9 +3051,7 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
         {
             state.dispatch.retry_paint();
         }
-        unsafe {
-            ffi::UpdateWindow(hwnd);
-        }
+        // The wake mask includes existing paint work; PeekMessage dispatches it.
         let timeout = state.with(|app| app.wait_timeout()).unwrap_or(8);
         let timeout = if state.dispatch.resize_pending() || state.dispatch.paint_pending() {
             0
@@ -3232,7 +3230,6 @@ mod ffi {
         pub fn LoadCursorW(instance: Handle, name: *const u16) -> Handle;
         pub fn ShowWindow(hwnd: Handle, show: i32) -> i32;
         pub fn DestroyWindow(hwnd: Handle) -> i32;
-        pub fn UpdateWindow(hwnd: Handle) -> i32;
         pub fn GetClientRect(hwnd: Handle, rect: *mut Rect) -> i32;
         pub fn GetWindowRect(hwnd: Handle, rect: *mut Rect) -> i32;
         pub fn GetUpdateRect(hwnd: Handle, rect: *mut Rect, erase: i32) -> i32;
