@@ -1,0 +1,13 @@
+COMMAND ["python3", "tests/mcp_transport.py", "--binary", "/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/target/release/ztty"]
+STDOUT
+{
+  "stdio": "passed",
+  "tool_count": 9,
+  "http": "passed",
+  "concurrent_requests": 16,
+  "chunked": "passed",
+  "authentication": "passed",
+  "ipv6": "passed"
+}
+
+STDERR

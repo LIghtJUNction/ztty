@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add optional MCP session_read identity guards and output_eof, so reconnecting observers can reject a replacement PTY and distinguish child exit from reader termination without new per-session state.
+
 - Add no_std Darwin PTY creation through a fresh posix_spawn helper, with controlling-terminal setup, exact argv/environment, close-on-exec descriptor isolation and bounded error handoff; native SDK/concurrent-spawn acceptance is now a mandatory Mac candidate gate.
 
 - Allow build-only native candidates to select Linux, macOS or Windows while keeping both architectures, pinned provenance and mandatory all-platform publication gates.
@@ -34,6 +36,8 @@
 - Reproducible independent/shared 1/5/10/20 benchmark tooling, workload checks, retained raw measurements and SVG generation.
 
 ### Fixed
+
+- Repair Bash integration syntax, preserve complete PROMPT_COMMAND strings/arrays and avoid duplicate PS0 execution markers in nested shells. Check syntax and each source result independently.
 
 - Avoid clearing Unicode target cells immediately before overwriting them; preserve wide-cell boundary repair, insertion, metadata and wrapping, with five new core regressions.
 - Integrate main-branch throughput optimizations with production workspaces, palette provenance and X11 overlays; fix independent benchmark broker selection and runtime A/B window counts.
@@ -71,6 +75,8 @@
 - Large JSON object duplicate-key validation avoids quadratic work.
 
 ### Verification
+
+- Validate the shell/resume candidate with 225 Rust tests, 6 doctests, four real Shell integrations, 11 Bash PTY checks, 17 workspace GUI checks and three MCP suites. The Linux local gate now runs Bash PTY acceptance; see [the source-bound report](docs/shell-resume-2026-11-18.md).
 
 - Record the 2026-11-18 integrated candidate: 220 Rust unit/integration tests, 6 doctests, 61 real Linux GUI checks, 3 MCP suites and 38 Python benchmark regressions; retain fixed-CPU and unpinned Unicode microbenchmarks with all samples and scope limits. See [the integration report](docs/integration-unicode-2026-11-18.md).
 

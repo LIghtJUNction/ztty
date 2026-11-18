@@ -1,0 +1,24 @@
+[?2004hZT> _ztty_test_hook(){ printf '__ZTTY_EXISTING_HOOK__\n'; PS1='ZT> '; }; PROMPT_COMMAND=(_ztty_test_hook); trap 'true # ztty-existing-trap' DEBUG; source /home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/shell/ztty.bash; _ztty_source_status=$?; printf '__ZTTY_FIRST_SOURCE__:%s\n' "$_ztty_source_status"; source /home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/shell/ztty.bash; _ztty_source_status=$?; printf '__ZTTY_REPEAT_SOURCE__:%s\n' "$_ztty_source_status"
+[?2004l__ZTTY_FIRST_SOURCE__:0
+__ZTTY_REPEAT_SOURCE__:0
+]133;D;0]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[?2004h]133;AZT> ]133;Bprintf '__ZTTY_SUCCESS__\n'
+[?2004l]133;C__ZTTY_SUCCESS__
+]133;D;0]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[?2004h]133;AZT> ]133;B/bin/sh -c 'exit 7'
+[?2004l]133;C]133;D;7]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[?2004h]133;AZT> ]133;Bprintf '__ZTTY_UTF8_界__\n'
+[?2004l]133;C__ZTTY_UTF8_界__
+]133;D;0]7;file://light/home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118__ZTTY_EXISTING_HOOK__
+[?2004h]133;AZT> ]133;Bcd '/tmp/ztty-shell-3vkv3ymj/with space-界'
+[?2004l]133;C]133;D;0]7;file://light/tmp/ztty-shell-3vkv3ymj/with%20space-%E7%95%8C__ZTTY_EXISTING_HOOK__
+[?2004h]133;AZT> ]133;Btrap -p DEBUG
+[?2004l]133;Ctrap -- 'true # ztty-existing-trap' DEBUG
+]133;D;0]7;file://light/tmp/ztty-shell-3vkv3ymj/with%20space-%E7%95%8C__ZTTY_EXISTING_HOOK__
+[?2004h]133;AZT> ]133;B/usr/bin/bash --noprofile --rcfile /home/lightjunction/Documents/GITHUB/ztty/artifacts/integration-20261118/shell/ztty.bash -i
+[?2004l]133;C]133;D;0]7;file://light/tmp/ztty-shell-3vkv3ymj/with%20space-%E7%95%8C]0;lightjunction@light:/tmp/ztty-shell-3vkv3ymj/with space-界[?2004h]133;AZT> ]133;Bprintf '__ZTTY_NESTED__\n'
+[?2004l]133;C__ZTTY_NESTED__
+]133;D;0]7;file://light/tmp/ztty-shell-3vkv3ymj/with%20space-%E7%95%8C]0;lightjunction@light:/tmp/ztty-shell-3vkv3ymj/with space-界[?2004h]133;AZT> ]133;Bexit 0
+[?2004l]133;Cexit
+]133;D;0]7;file://light/tmp/ztty-shell-3vkv3ymj/with%20space-%E7%95%8C__ZTTY_EXISTING_HOOK__
+[?2004h]133;AZT> ]133;B

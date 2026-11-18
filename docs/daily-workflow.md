@@ -63,6 +63,10 @@ Overwriting/erasing text, changing the width of a live region or exhausting
 history can invalidate a region. Navigation skips unavailable records. Already
 retained, intact historical commands remain usable after a font change.
 
+## Bash hook acceptance
+
+The Bash integration preserves existing PROMPT_COMMAND strings or array entries, their exit-status behavior, and an inherited PS0 suffix. Repeated sourcing and nested shells must not duplicate execution marks. The dedicated PTY gate is part of the local Linux check; the four-shell gate also checks Bash syntax and the first source result independently of the second. [Bash regression, old-script failure and exact versions](shell-resume-2026-11-18.md) record the current evidence. Bash before 5.1 has not been executed in this acceptance run.
+
 ## Custom keys and mouse buttons
 
 Bindings are lines in the same configuration file as fonts and colors:

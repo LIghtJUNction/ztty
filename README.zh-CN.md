@@ -1,7 +1,5 @@
 # ztty
 
-**2026-11-18 整合进展：** 完整工作区分支已纳入主分支吞吐优化，并减少 Unicode 单元格重复写入。候选版本通过 220 项 Rust 单元／集成测试、6 项文档测试和 61 项实际 Linux GUI 检查。固定 CPU 的解析器／屏幕微基准中，Unicode 吞吐为 87.760 → 112.083 MiB/s（+27.7%）；端到端绘制与 Windows／macOS 原生验收分别记录。[实现、原始结果与截图](docs/integration-unicode-2026-11-18.md)。
-
 <!-- terminal-benchmark:start -->
 [![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 
@@ -13,10 +11,12 @@
 
 <!-- terminal-benchmark:end -->
 
+**2026-11-18 开发进展：** 已修复 Bash 加载与提示符钩子，MCP 输出读取新增原会话身份校验和读取终止标记。当前候选通过 225 项 Rust 测试、6 项文档测试、四种 Shell 集成、11 组 Bash 检查、17 项实际 Linux 工作区检查及三套 MCP 检查。[实现与证据](docs/shell-resume-2026-11-18.md) · [上一轮 Unicode 测量](docs/integration-unicode-2026-11-18.md)。
+
 **2026-11-18 输出吞吐记录：** 源码 `dfe949c7`（ztty 0.2.1）的另一批十窗口测试测得 **227.58 MiB/s**。
 独立的旧／新配对测试为 19.48 → 200.52 MiB/s，提升 **10.29 倍**，应用 PSS 基本持平。
 负载为 Xvfb 软件渲染下的 ASCII／颜色原地更新；源码和批次与上方 guarded 图表分开记录。
-整合后的工作区候选版本另行验证。
+整合后的工作区候选版本见上方开发进展，其测量与验收记录单独保存。
 [实测、实现与正确性证据](docs/benchmarks/throughput-2026-11-18.md)。
 
 ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。

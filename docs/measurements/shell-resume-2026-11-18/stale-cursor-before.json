@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "scope": "Reproduction transcribed from the completed real MCP command, without rerunning it",
+  "source": "3c5b8e28a0c9baccd0dca1f24e1d3c3d558c449d",
+  "worktree_head": "7bd5188d0c6386d20de90361a5155545a6acdc9b",
+  "ssmcp_job_id": "446b3ca370af8421a1dd286abda7ac55-102",
+  "exit_code": 0,
+  "binary_sha256": "ef2e86087c4dd326df911281dd516bc074328eebd10987632144adee3cf3d6f8",
+  "old": {
+    "uri": "ztty://mcp/stdio/resume-reuse",
+    "id": 1,
+    "created_at": 1794987901160,
+    "broker_pid": 3241594
+  },
+  "old_output": "OLD",
+  "old_cursor": 3,
+  "new": {
+    "uri": "ztty://mcp/stdio/resume-reuse",
+    "id": 2,
+    "created_at": 1794987901177,
+    "broker_pid": 3241594
+  },
+  "new_output": "REPLACEMENT",
+  "resumed_old_cursor": {
+    "uri": "ztty://mcp/stdio/resume-reuse",
+    "id": 2,
+    "output": "LACEMENT",
+    "next_cursor": 11,
+    "truncated": false,
+    "has_more": false
+  },
+  "demonstrates_stale_cursor_accepted": true,
+  "remaining_sessions": [],
+  "broker_exited": true
+}

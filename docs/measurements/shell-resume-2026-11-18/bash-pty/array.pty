@@ -1,0 +1,29 @@
+__ZTTY_TEST_PROMPT__ __ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+__ZTTY_TEST_PROMPT__ __ZTTY_OLD_PS0____ZTTY_HOOK_ONE__:7
+__ZTTY_HOOK_TWO__:7
+__ZTTY_TEST_PROMPT__ __ZTTY_OLD_PS0____ZTTY_SOURCE_FIRST__:0
+]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0____ZTTY_SOURCE_REPEAT__:0
+]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;7]7;file://light/tmp/ztty-bash-noj8xuso__ZTTY_HOOK_ONE__:7
+__ZTTY_HOOK_TWO__:7
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__trap -- ': # ztty-existing-debug-trap' DEBUG
+]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso/with%20space-%E7%95%8C%23%25%3F%3B%24__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso/with%20space-%E7%95%8C%23%25%3F%3B%24__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso/with%20space-%E7%95%8C%23%25%3F%3B%24]0;@light:~/with space-界#%?;$]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0____ZTTY_NESTED__
+]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso/with%20space-%E7%95%8C%23%25%3F%3B%24]0;@light:~/with space-界#%?;$]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0____ZTTY_SOURCE_REPEAT__:0
+]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso/with%20space-%E7%95%8C%23%25%3F%3B%24]0;@light:~/with space-界#%?;$]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__exit
+]133;D;0]7;file://light/tmp/ztty-bash-noj8xuso/with%20space-%E7%95%8C%23%25%3F%3B%24__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:0
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;7]7;file://light/tmp/ztty-bash-noj8xuso/with%20space-%E7%95%8C%23%25%3F%3B%24__ZTTY_HOOK_ONE__:7
+__ZTTY_HOOK_TWO__:7
+]133;A__ZTTY_TEST_PROMPT__ ]133;B

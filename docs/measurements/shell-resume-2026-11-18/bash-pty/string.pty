@@ -1,0 +1,20 @@
+__ZTTY_TEST_PROMPT__ __ZTTY_TEST_CONTINUE__ __ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:17
+__ZTTY_TEST_PROMPT__ __ZTTY_OLD_PS0____ZTTY_HOOK_ONE__:7
+__ZTTY_HOOK_TWO__:17
+__ZTTY_TEST_PROMPT__ __ZTTY_OLD_PS0____ZTTY_SOURCE_FIRST__:0
+]133;D;0]7;file://light/tmp/ztty-bash-shv6f_t7__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:17
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0____ZTTY_SOURCE_REPEAT__:0
+]133;D;0]7;file://light/tmp/ztty-bash-shv6f_t7__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:17
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;0]7;file://light/tmp/ztty-bash-shv6f_t7__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:17
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;7]7;file://light/tmp/ztty-bash-shv6f_t7__ZTTY_HOOK_ONE__:7
+__ZTTY_HOOK_TWO__:17
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__trap -- ': # ztty-existing-debug-trap' DEBUG
+]133;D;0]7;file://light/tmp/ztty-bash-shv6f_t7__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:17
+]133;A__ZTTY_TEST_PROMPT__ ]133;B]133;C__ZTTY_OLD_PS0__]133;D;0]7;file://light/tmp/ztty-bash-shv6f_t7/with%20space-%E7%95%8C%23%25%3F%3B%24__ZTTY_HOOK_ONE__:0
+__ZTTY_HOOK_TWO__:17
+]133;A__ZTTY_TEST_PROMPT__ ]133;B
