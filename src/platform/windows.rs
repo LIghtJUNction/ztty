@@ -660,6 +660,12 @@ impl App {
             &self.panes[self.active].core.terminal.modes().input(),
             &mut self.encoded,
         );
+        // Silent modifier/release events must not undo a scroll or selection
+        // action from the same shortcut. Negotiated keyboard events still
+        // return to live output when the encoder actually sends them.
+        if self.encoded.is_empty() {
+            return;
+        }
         self.enqueue_encoded();
         self.panes[self.active].history = 0;
         self.panes[self.active].selection = None;

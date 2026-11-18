@@ -49,6 +49,9 @@ class WorkspaceContract(unittest.TestCase):
         window.chord(0x0D, control=False, shift=False)
         self.assertEqual(calls, [(0x0D, 0, 0), (0x0D, 0, 2)])
         calls.clear()
+        window.chord(0x21, control=False)
+        self.assertEqual(calls, [(0x10, 0, 0), (0x21, 0, 0), (0x21, 0, 2), (0x10, 0, 2)])
+        calls.clear()
         window.chord(0x45)
         self.assertEqual(calls, [(0x11, 0, 0), (0x10, 0, 0), (0x45, 0, 0),
                                  (0x45, 0, 2), (0x10, 0, 2), (0x11, 0, 2)])
