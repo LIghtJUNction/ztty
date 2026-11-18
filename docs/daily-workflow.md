@@ -57,6 +57,26 @@ Match counts refresh when editing, navigating or copying the query. Full history
 reflow remains separate work. Native macOS and Windows share the selection-copy
 rules, while their search and command palette interfaces remain unimplemented.
 
+## Returning to live output
+
+Scrolling into history shows a small **Back to live ↓** control near the lower
+right corner. Clicking it returns to the newest output and hides the control.
+The terminal keeps its full row count; there is no permanent toolbar at the live
+screen. Shift+PageUp/PageDown and the existing scroll actions remain available.
+
+When the child produces more output while you are reading history, the visible
+rows stay anchored and the control changes to **New output · Back to live ↓**
+with a blue border. The indicator remains until the view returns to the bottom.
+Scrolling up again starts with the ordinary label, so an earlier output arrival
+does not appear as a new notification.
+
+The control sits above an open search row or command palette. Clicking it keeps
+that interface open and preserves its input mode. It also works in an observing
+view without acquiring control or resizing the child. Its mouse press, drag and
+release stay within the view controls, including when the application requests
+mouse reports. In narrow views the label becomes **Live ↓** or **↓**; the control
+is hidden if a complete target cannot fit above the active interface.
+
 ## Shell command regions
 
 Enable the appropriate script using [shell/README.md](../shell/README.md).
@@ -160,6 +180,13 @@ PTY, actual clipboard transfers and pixel captures. It records binary/source
 hashes and cleans only its own processes. Its coverage is Linux X11; hardware
 GPU, native Wayland, macOS/Windows feature parity and IME accessibility are
 independent acceptance gates.
+
+The current harness also exercises the scrollback return control with real
+mouse input and additional PTY output. It checks history anchoring, clearing the
+new-output indication, search/palette coexistence and read-only ownership. Its
+screenshots include `scrollback-return`, `scrollback-new-output`,
+`scrollback-live`, `scrollback-search`, `scrollback-palette` and
+`scrollback-observer`. The archived run below predates these additional checks.
 
 The 2026-11-18 run passed all 12 daily GUI scenarios and the existing workspace
 GUI regression. [GUI evidence](measurements/daily-workflow-x11-2026-11-18.json),

@@ -23,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from isolated_xvfb import start_xvfb
 
 
-CHILD = r'''import os,sys,tty
+CHILD = r'''import os,sys,threading,time,tty
 tty.setraw(0)
 out=open(sys.argv[1],"wb",buffering=0)
 def emit(text): os.write(1,text.encode())
@@ -36,6 +36,20 @@ emit("\x1b]133;D;0\x07\x1b]133;A\x07$ \x1b]133;B\x07")
 emit("\x1b[38;2;255;0;255mtruecolor-sentinel\x1b[0m default-sentinel\r\nREADY\r\n")
 # Enable application mouse reporting to catch leaked bound button events.
 emit("\x1b[?1000h\x1b[?1006h")
+# A private file requests output without introducing application input. The
+# daemon exits with this fixture's PTY process; it owns no additional process.
+def updates():
+    previous=""
+    while True:
+        try:
+            with open(sys.argv[2]) as request: current=request.read().strip()
+        except FileNotFoundError:
+            current=""
+        if current and current != previous:
+            previous=current
+            emit("\r\nlive-update-" + current + "\r\n")
+        time.sleep(0.02)
+threading.Thread(target=updates,daemon=True).start()
 while True:
     data=os.read(0,4096)
     if not data: break
@@ -79,7 +93,7 @@ def main():
     }
     for name in ("src/session.rs", "src/session_control.rs", "src/output_tail.rs",
                  "src/session_core.rs", "src/input_queue.rs",
-                 "src/search.rs", "src/actions.rs", "src/config_watch.rs",
+                 "src/search.rs", "src/scroll_prompt.rs", "src/actions.rs", "src/config_watch.rs",
                  "src/x11.rs", "src/appearance.rs", "src/main.rs", "tests/daily_workflow.py"):
         path = repository / name
         if path.is_file():
@@ -123,6 +137,7 @@ def main():
             default_config.parent.mkdir(parents=True)
             default_config.write_text(BASE_CONFIG)
             input_path = root / "input.bin"
+            output_request = root / "output-request.txt"
 
             def rpc(request, success=True):
                 with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as channel:
@@ -187,6 +202,49 @@ def main():
                     "path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                 }
 
+            def prompt_box(new_output=False):
+                # The one-pixel border is an exact solid RGB color, independent
+                # of font rasterization. Locate the actual painted target.
+                color = (137, 180, 250) if new_output else (100, 116, 139)
+                channels = image().split()
+                masks = [channel.point(lambda value, target=target: 255 if value == target else 0)
+                         for channel, target in zip(channels, color)]
+                return ImageChops.multiply(ImageChops.multiply(masks[0], masks[1]), masks[2]).getbbox()
+
+            def no_prompt():
+                return prompt_box() is None and prompt_box(True) is None
+
+            def click_prompt(new_output=False):
+                bounds = wait(lambda: prompt_box(new_output), "painted scrollback return target")
+                before = info()
+                before_input = input_bytes()
+                x, y = (bounds[0] + bounds[2]) // 2, (bounds[1] + bounds[3]) // 2
+                view = window()
+                view.warp_pointer(x, y)
+                connection.sync()
+                xtest.fake_input(connection, X.ButtonPress, 1)
+                connection.sync()
+                # The button disappears on press. Its later drag/release must
+                # remain UI input even though the live terminal is now below it.
+                view.warp_pointer(x + 2, y)
+                xtest.fake_input(connection, X.ButtonRelease, 1)
+                connection.sync()
+                wait(no_prompt, "scrollback prompt disappears after returning live")
+                after = info()
+                for field in ("pid", "input_owner", "read_only", "cols", "rows"):
+                    assert after[field] == before[field], (field, before, after)
+                time.sleep(0.05)
+                assert input_bytes() == before_input, (before_input, input_bytes())
+                return bounds
+
+            def new_output(token):
+                marker = "live-update-" + token
+                output_request.write_text(token)
+                wait(lambda: marker in rpc({"op": "read", "session": "daily"})["screen"],
+                     "new PTY output reaches the terminal model")
+                wait(lambda: prompt_box(True), "new-output scrollback prompt")
+                return marker
+
             clipboard_window = connection.screen().root.create_window(
                 0, 0, 1, 1, 0, X.CopyFromParent, X.InputOutput, X.CopyFromParent,
                 event_mask=X.PropertyChangeMask,
@@ -222,7 +280,8 @@ def main():
 
             launcher = subprocess.Popen(
                 [str(binary), "--name", "daily", "--config", str(config), "--geometry", "100x26",
-                 "--scrollback", "300", "-e", "/usr/bin/python3", "-c", CHILD, str(input_path)],
+                 "--scrollback", "300", "-e", "/usr/bin/python3", "-c", CHILD, str(input_path),
+                 str(output_request)],
                 env=env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True,
             )
             owned.append(launcher)
@@ -383,6 +442,63 @@ def main():
             wait(lambda: (info()["cols"], info()["rows"]) == initial_geometry, "font after directory recovery")
             report["checks"].append("config watching recovers after the containing directory is renamed or deleted and recreated")
 
+            # The return control is temporary, pins the inspected rows while
+            # output arrives, and withholds its full mouse gesture from the PTY.
+            wait(no_prompt, "no permanent return control at the live screen")
+            key("Shift_L", "Page_Up")
+            normal_box = wait(lambda: prompt_box(), "return control while browsing history")
+            assert prompt_box(True) is None
+            capture("scrollback-return")
+            retained = image()
+            marker = new_output("1")
+            updated = image()
+            top = (0, 0, retained.width, retained.height // 2)
+            assert ImageChops.difference(retained.crop(top), updated.crop(top)).getbbox() is None
+            unread_box = prompt_box(True)
+            capture("scrollback-new-output")
+            click_prompt(True)
+            capture("scrollback-live")
+            key("Shift_L", "Page_Up")
+            wait(lambda: prompt_box(), "returning live clears the old new-output indication")
+            assert prompt_box(True) is None
+            click_prompt()
+            report["scroll_prompt"] = {"normal_bounds": normal_box, "new_output_bounds": unread_box}
+            report["checks"].append("history shows a temporary return control; new PTY output preserves the inspected rows and marks new output; clicking returns live, clears the indication and sends no application mouse bytes")
+
+            # Search and the full command palette keep their query/input modes
+            # when the return control above them is clicked.
+            key("Shift_L", "Page_Up")
+            wait(lambda: prompt_box(), "history before search coexistence")
+            key("Control_L", "Shift_L", "f")
+            key("Control_L", "u")
+            text("needle")
+            search_box = wait(lambda: (box if (box := prompt_box()) and box[1] < normal_box[1] else None),
+                              "return control above the search row")
+            capture("scrollback-search")
+            click_prompt()
+            key("Control_L", "u")
+            text(marker)
+            key("Control_L", "Shift_L", "c")
+            expect_clipboard(marker)
+            key("Escape")
+            key("Shift_L", "Page_Up")
+            wait(lambda: prompt_box(), "history before palette coexistence")
+            key("Control_L", "Shift_L", "p")
+            palette_box = wait(lambda: (box if (box := prompt_box()) and box[1] < search_box[1] else None),
+                               "return control above the full palette")
+            capture("scrollback-palette")
+            click_prompt()
+            text("search")
+            key("Return")
+            key("Control_L", "u")
+            text(marker)
+            key("Control_L", "Shift_L", "c")
+            expect_clipboard(marker)
+            key("Escape")
+            assert input_bytes() == b"", input_bytes()
+            report["scroll_prompt"].update(search_bounds=search_box, palette_bounds=palette_box)
+            report["checks"].append("the return control avoids search and palette rows; clicking preserves both modal input flows, clipboard search and the unchanged PTY grid")
+
             # A separate trusted transport identity owns input. The GUI remains
             # useful for observation/search/copy, but keys and paste cannot write.
             rpc({"op": "control", "session": "daily", "action": "acquire", "takeover": True, "_actor": "workflow-owner"})
@@ -441,6 +557,19 @@ def main():
                 assert info()["running"] and info()["pid"] == child_pid
 
             observe_attach()
+            observing = info()
+            assert observing["read_only"] and observing["input_owner"] == "workflow-owner", observing
+            key("Shift_L", "Page_Up")
+            wait(lambda: prompt_box(), "return control in a read-only observing view")
+            new_output("2")
+            capture("scrollback-observer")
+            click_prompt(True)
+            assert input_bytes() == b"agent-after-close", input_bytes()
+            report["scroll_prompt"]["observer"] = {
+                "input_owner": info()["input_owner"], "read_only": info()["read_only"],
+                "pid_preserved": info()["pid"] == child_pid,
+            }
+            report["checks"].append("a read-only observer can return live after new output without acquiring input, resizing or replacing the PTY, or sending mouse input")
             close_message = protocol.event.ClientMessage(
                 window=window(), client_type=connection.intern_atom("WM_PROTOCOLS"),
                 data=(32, [connection.intern_atom("WM_DELETE_WINDOW"), X.CurrentTime, 0, 0, 0]),
