@@ -84,3 +84,30 @@ The Linux development host checked this implementation with the inherited serial
 | Native AppKit application acceptance with this helper | **Pending** on each real macOS architecture. |
 
 No native runtime success or throughput improvement is inferred from these compiler results. The source is ready for the next macOS candidate gate; this document's pending rows must be replaced with its actual evidence before the feature is marked accepted.
+
+
+## Integration and release gate
+
+The shared-layout branch integrates the production implementation at
+`6566943a188813fc1c7fcabaac009e63025951d4`. Its Linux full gate passes
+202 unit/integration tests, six doctests and eight single-threaded real-PTY
+checks, with strict Clippy, release/no_std, MCP and the explicit bare-metal
+component gate. The existing zune-png warning remains. The Linux executable
+is byte-identical to the previously verified shared-layout executable; a
+Darwin test skipped on Linux is explicitly excluded from native acceptance.
+
+The macOS candidate now runs the standalone SDK/PTY suite before its AppKit
+pixel suite. It preserves stdout/stderr and source hashes, rejects skipped or
+ambiguous results, and requires the actual native architecture, all eight
+check groups, active worker iterations and the measured handshake timeout.
+Its outcome participates in the build manifest acceptance decision. Six
+local gate contracts exercise 16 success/failure inputs against the actual
+workflow code, including false/ambiguous evidence, wrong architecture,
+non-native hosts and partial timeout output. These contracts do not replace
+execution on macOS.
+
+[Integration record](measurements/darwin-integrated-2026-11-18.json),
+[full Linux log](measurements/darwin-integrated-2026-11-18.log), and
+[gate contracts](measurements/darwin-spawn-gate-contracts-2026-11-18.log)
+retain the scope. The original source bundle and complete cross-target logs
+are available in the [review archive](https://drive.google.com/file/d/10QSHeEYrKgWOThy3geCMBvyPBrcJPrCb/view?usp=drivesdk).
