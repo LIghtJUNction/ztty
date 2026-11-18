@@ -81,6 +81,8 @@ def configure_nc_rendering_diagnostic(user, hwnd, process, report):
     """Opt-in control for this owned HWND; never part of release acceptance."""
     if os.environ.get("ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS") != "1":
         return
+    user.IsWindow.argtypes = [wintypes.HWND]
+    user.IsWindow.restype = wintypes.BOOL
     record = report["nc_rendering_diagnostic"] = {
         "diagnostic_only": True, "requested_policy": 1, "attribute": 2,
         "hwnd": int(hwnd), "pid": process.pid}
