@@ -4,6 +4,8 @@
 
 ### Added
 
+- Shared no_std PTY pump and bounded input queue, now used by the Linux broker, with per-read history anchors and PTY-first resize commits.
+
 - Portable alloc-only input ownership state, used by the Linux broker, with same-owner queue preservation and explicit local observer recovery covered by real PTY and GUI regressions.
 - Native macOS and Windows startup `--cwd`, with Unicode paths, command lookup in the selected directory and preserved relative config semantics; Darwin child PWD follows the physical directory.
 - macOS WindowServer capture and owned-window resize/minimize acceptance, retaining existing PTY checks and recording Screen Recording/Accessibility blockers explicitly.
@@ -51,6 +53,8 @@
 - Large JSON object duplicate-key validation avoids quadratic work.
 
 ### Verification
+
+- Shared core passes eight single-threaded real-PTY checks, the integrated Rust/Clippy/MCP/no_std gates, daily GUI 15 and workspace GUI 10.
 
 - Fourth source-pinned native run accepts Linux x86_64/ARM64 and Windows x86_64 (30 checks plus cleanup); preserves Windows ARM64 occlusion and both macOS helper initialization failures with all artifact hashes.
 

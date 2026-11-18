@@ -110,3 +110,39 @@ gated MCP regression failed on the old binary and passed after integration.
 - [Original real-MCP failure](measurements/output-tail-before-fix-2026-11-18.log)
 - [Original reproduction identity](measurements/output-tail-origin-2026-11-18.json)
 - [Integrated daily GUI evidence](measurements/output-tail-daily-2026-11-18.json)
+
+
+## Shared PTY pump and bounded input
+
+The next extracted state is `SessionCore`: one real `zpty::Pty`, its
+`zterm::Terminal`, bounded pending input, ownership, retained output and EOF.
+The Linux broker now consumes this implementation. A read feeds exactly one
+block and returns history lengths before and after that block; the frontend
+keeps its own work budget and scroll anchor. Child exit and output EOF remain
+separate so bytes already buffered in the PTY can drain after reaping.
+
+Input writes are accepted in full or rejected unchanged. Partial OS writes
+retain the unwritten suffix. Revoking ownership clears only bytes not yet
+accepted by `Pty::write`; it cannot retract bytes already queued in the
+Windows writer thread. Reply generation uses the same bounded queue and
+clears rejected replies, preserving the existing overflow policy.
+
+A successful resize now orders the operations as PTY size, cell metrics when
+needed, then terminal grid. A native PTY error leaves the terminal state
+unchanged, allowing the frontend to retry. EOF-only screen resize remains
+an explicit frontend policy.
+
+[Source hashes and commands](measurements/session-core-2026-11-18.json),
+[full gate](measurements/session-core-2026-11-18.log),
+[daily GUI](measurements/session-core-daily-2026-11-18.json), and
+[workspace GUI](measurements/session-core-workspaces-2026-11-18.json)
+record the integrated Linux candidate. Eight single-threaded real-PTY checks
+cover bounded input/ownership, reply overflow, UTF-8/EOF, history reset,
+kernel size readback, draining after reap, fatal read/write errors and failed
+resize. The dedicated test executable forks before any test worker threads;
+it restores owned descriptors and child/fd counts. The regular Rust tests,
+strict Clippy, release/no_std audit and MCP gates pass. Bare-metal portable
+library checking also passes with the previously recorded zune-png warning.
+
+This step does not yet provide shared runtime, attach or MCP on macOS and
+Windows. Their frontend integration and actual native acceptance follow.

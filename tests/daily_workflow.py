@@ -78,6 +78,7 @@ def main():
         "screenshots": {},
     }
     for name in ("src/session.rs", "src/session_control.rs", "src/output_tail.rs",
+                 "src/session_core.rs", "src/input_queue.rs",
                  "src/search.rs", "src/actions.rs", "src/config_watch.rs",
                  "src/x11.rs", "src/appearance.rs", "src/main.rs", "tests/daily_workflow.py"):
         path = repository / name

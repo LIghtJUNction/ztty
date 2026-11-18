@@ -12,6 +12,8 @@ mod broker;
 #[cfg(target_os = "linux")]
 mod config_watch;
 #[cfg(target_os = "linux")]
+mod input_queue;
+#[cfg(target_os = "linux")]
 mod json;
 #[cfg(target_os = "linux")]
 mod layout;
@@ -43,6 +45,8 @@ mod session;
 #[cfg(target_os = "linux")]
 mod session_control;
 #[cfg(target_os = "linux")]
+mod session_core;
+#[cfg(target_os = "linux")]
 mod working_directory;
 #[cfg(target_os = "linux")]
 mod workspace_state;
@@ -58,6 +62,8 @@ use appearance::Appearance;
 use core::ffi::{CStr, c_char, c_int};
 #[cfg(target_os = "linux")]
 use input::{Key, ModifierKey, Modifiers};
+#[cfg(target_os = "linux")]
+use input_queue::InputQueue;
 #[cfg(target_os = "linux")]
 use zterm::{Terminal, input};
 
@@ -310,48 +316,9 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
 }
 
 #[cfg(target_os = "linux")]
-struct Queue {
-    bytes: Vec<u8>,
-    offset: usize,
-}
-#[cfg(target_os = "linux")]
-impl Queue {
-    fn new() -> Self {
-        Self {
-            bytes: Vec::new(),
-            offset: 0,
-        }
-    }
-    fn push(&mut self, bytes: &[u8]) {
-        if bytes.is_empty() {
-            return;
-        }
-        if self.offset != 0 {
-            self.bytes.drain(..self.offset);
-            self.offset = 0;
-        }
-        if self.bytes.len().saturating_add(bytes.len()) <= 1024 * 1024 {
-            self.bytes.extend_from_slice(bytes);
-        } else {
-            os::print(2, b"ztty: input queue full; paste was rejected\n");
-        }
-    }
-    fn pending(&self) -> bool {
-        self.offset < self.bytes.len()
-    }
-    fn flush(&mut self, pty: &zpty::Pty) {
-        while self.pending() {
-            let bytes = &self.bytes[self.offset..];
-            match pty.write(bytes) {
-                Ok(0) => break,
-                Ok(n) => self.offset += n,
-                Err(_) => break,
-            }
-        }
-        if !self.pending() {
-            self.bytes.clear();
-            self.offset = 0;
-        }
+fn queue_input(queue: &mut InputQueue, bytes: &[u8]) {
+    if !queue.push(bytes) {
+        os::print(2, b"ztty: input queue full; paste was rejected\n");
     }
 }
 
@@ -464,9 +431,12 @@ fn key_modifiers(state: u32, symbol: u64, pressed: bool, held: &[u64; 256]) -> M
 }
 
 #[cfg(target_os = "linux")]
-fn paste(bytes: Vec<u8>, terminal: &Terminal, queue: &mut Queue) {
+fn paste(bytes: Vec<u8>, terminal: &Terminal, queue: &mut InputQueue) {
     let text = String::from_utf8_lossy(&bytes);
-    queue.push(&input::encode_paste(&text, &terminal.modes().input()));
+    queue_input(
+        queue,
+        &input::encode_paste(&text, &terminal.modes().input()),
+    );
 }
 
 fn launch(args: &[&CStr]) -> Result<i32, String> {

@@ -374,3 +374,5 @@ preserves its live PTY. External tools using `TERMINAL -e COMMAND`, including
 [Real integration, lifecycle and remaining platform boundaries](docs/ssmcp-observer.md).
 
 MIT © LIghtJUNction
+
+The Linux broker now uses a common PTY pump with bounded input, ownership and output cursors. [Core behavior and real PTY regressions](docs/session-core.md) document resize ordering, partial writes and draining output after child exit. Native frontend integration remains in progress.

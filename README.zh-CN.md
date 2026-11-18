@@ -293,3 +293,5 @@ python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
 使用 `ztty --split-right NAME`、`ztty --tab NAME`，或 Ctrl+Shift+E/T。
 `ztty detach NAME` 保留 PTY；`ztty attach --observe NAME` 打开观察视图。
 [操作、权限与真实验收记录](docs/workspaces.md)。
+
+Linux broker 已使用共享 PTY 核心，统一有界输入、所有权和输出游标；[真实 PTY 验收](docs/session-core.md)覆盖部分写入、尺寸提交顺序和子进程退出后的输出排空。macOS、Windows 前端接入仍在推进。
