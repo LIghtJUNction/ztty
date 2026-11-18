@@ -1,0 +1,54 @@
+name: Validate release evidence packaging
+
+on:
+  push:
+    branches: ['validate/release-evidence-20261119']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ztty-release-evidence-validation
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: ${{ github.repository == 'LIghtJUNction/ztty' && github.ref == 'refs/heads/validate/release-evidence-20261119' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the exact review commit
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Parse Python sources without running publication code
+        run: |
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          for name in ('tools/release_assets.py', 'tests/release_assets_test.py'):
+              ast.parse(Path(name).read_text(encoding='utf-8'), filename=name)
+              print('Python syntax accepted:', name)
+          PY
+      - name: Check evidence preservation and readback contracts
+        run: python3 -m unittest discover -s tests -p 'release_assets_test.py' -v
+      - name: Parse workflows and check publication shell syntax
+        run: |
+          ruby - <<'RUBY'
+          require 'yaml'
+          paths = ['.github/workflows/release.yml', '.github/workflows/validate-release-evidence.yml']
+          documents = paths.map do |path|
+            value = YAML.safe_load(File.read(path), permitted_classes: [], permitted_symbols: [], aliases: false)
+            raise 'Workflow is not a mapping: ' + path unless value.is_a?(Hash)
+            puts 'YAML syntax accepted: ' + path
+            value
+          end
+          publish = documents[0].fetch('jobs').fetch('publish').fetch('steps')
+            .find { |step| step['name'] == 'Publish or verify GitHub Release' }
+          raise 'Publication shell step missing' unless publish
+          shell = File.join(ENV.fetch('RUNNER_TEMP'), 'ztty-release-publication-syntax.sh')
+          File.write(shell, publish.fetch('run'))
+          abort 'Publication shell syntax rejected' unless system('bash', '-n', shell)
+          puts 'Publication shell syntax accepted; publication commands were not executed'
+          RUBY
