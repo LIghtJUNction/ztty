@@ -611,3 +611,176 @@ fn large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding
         assert_eq!(&line(&t, 1)[..2], "OK");
     }
 }
+
+#[test]
+fn synchronized_frame_commit_survives_all_chunk_boundaries_until_painted() {
+    let frame = b"\x1b[?2026h\x1b[Hframe\x1b[?2026l";
+    for split in 0..=frame.len() {
+        let mut terminal = Terminal::new(10, 2, 0);
+        terminal.clear_dirty();
+        terminal.feed(&frame[..split]);
+        terminal.feed(&frame[split..]);
+        assert!(!terminal.modes().synchronized_output, "split {split}");
+        assert!(terminal.sync_commit_pending(), "split {split}");
+        assert_eq!(line(&terminal, 0), "frame     ");
+        terminal.feed(b"\x1b[6n");
+        assert!(terminal.sync_commit_pending());
+        assert_eq!(terminal.responses(), b"\x1b[1;6R");
+        terminal.clear_dirty();
+        assert!(!terminal.sync_commit_pending());
+        terminal.feed(b"\x1b[?2026l");
+        assert!(
+            !terminal.sync_commit_pending(),
+            "redundant reset is not a commit"
+        );
+    }
+}
+
+#[test]
+fn synchronized_frame_timeout_and_reset_preserve_pending_commit() {
+    let mut terminal = Terminal::new(10, 2, 0);
+    terminal.clear_dirty();
+    terminal.feed(b"\x1b[?2026hA");
+    assert!(!terminal.sync_commit_pending());
+    terminal.force_end_sync();
+    assert!(!terminal.modes().synchronized_output);
+    assert!(terminal.sync_commit_pending());
+    terminal.clear_dirty();
+    terminal.force_end_sync();
+    assert!(!terminal.sync_commit_pending());
+
+    terminal.feed(b"\x1b[?2026hB\x1bc");
+    assert!(!terminal.modes().synchronized_output);
+    assert!(terminal.sync_commit_pending(), "RIS ends a held frame");
+    terminal.feed(b"\x1bc");
+    assert!(
+        terminal.sync_commit_pending(),
+        "unpainted commit survives RIS"
+    );
+    terminal.feed(b"\x1b[?2026hC");
+    assert!(terminal.modes().synchronized_output);
+    assert!(
+        terminal.sync_commit_pending(),
+        "new held frame does not consume commit"
+    );
+    terminal.force_end_sync();
+    terminal.clear_dirty();
+    terminal.feed(b"\x1bc");
+    assert!(
+        !terminal.sync_commit_pending(),
+        "ordinary RIS does not invent a commit"
+    );
+}
+
+#[test]
+fn sgr_streaming_preserves_missing_invalid_and_mixed_parameter_groups() {
+    let cases: &[(&[u8], u32, u32, u16)] = &[
+        (b"\x1b[38;5mA", DEFAULT_FG, DEFAULT_BG, 0),
+        (b"\x1b[38;2;1;2mA", DEFAULT_FG, DEFAULT_BG, 0),
+        (b"\x1b[38;9;1mA", DEFAULT_FG, DEFAULT_BG, STRIKE | BOLD),
+        (b"\x1b[38;5;256;1mA", DEFAULT_FG, DEFAULT_BG, BOLD),
+        (b"\x1b[48;2;999;2;3;4mA", DEFAULT_FG, DEFAULT_BG, UNDERLINE),
+        (
+            b"\x1b[38:2::1:2:3;48;5;24;1mA",
+            0x010203,
+            0x005f87,
+            EXPLICIT_BG | BOLD,
+        ),
+        (
+            b"\x1b[38;2;3;4;5;48:2::6:7:8;4mA",
+            0x030405,
+            0x060708,
+            EXPLICIT_BG | UNDERLINE,
+        ),
+        (b"\x1b[?31mA", DEFAULT_FG, DEFAULT_BG, 0),
+    ];
+    for &(bytes, fg, bg, flags) in cases {
+        for chunk_size in [1, 2, 7, bytes.len()] {
+            let mut terminal = Terminal::new(12, 3, 0);
+            for chunk in bytes.chunks(chunk_size) {
+                terminal.feed(chunk);
+            }
+            let cell = terminal.cell(0, 0);
+            assert_eq!(
+                (cell.ch, cell.fg, cell.bg, cell.flags),
+                ('A', fg, bg, flags)
+            );
+        }
+    }
+}
+
+#[test]
+fn ascii_batch_uses_only_the_selected_character_set() {
+    let mut terminal = Terminal::new(12, 3, 0);
+    terminal.feed(b"\x1b)0lqk\x0elqk\x0flqk");
+    assert_eq!(line(&terminal, 0), "lqk┌─┐lqk   ");
+    terminal.feed(b"\x1b(B\x1b)B\x1b(0\x0elqk\x0flqk");
+    assert_eq!(line(&terminal, 0), "lqk┌─┐lqklqk");
+    assert_eq!(&line(&terminal, 1)[..9], "┌─┐");
+}
+
+#[test]
+fn repeated_ring_wraps_keep_history_partial_margins_and_reverse_index_ordered() {
+    for rows in [1, 2, 3, 7, 32] {
+        let mut terminal = Terminal::new(4, rows, 9);
+        for index in 0..100 {
+            terminal.feed(format!("{index:04}\r\n").as_bytes());
+        }
+        assert_eq!(terminal.history_len(), 9);
+        for row in 0..rows - 1 {
+            assert_eq!(
+                line(&terminal, row),
+                format!("{:04}", 100 - (rows - 1) + row)
+            );
+        }
+        assert_eq!(line(&terminal, rows - 1), "    ");
+        for row in 0..9 {
+            let text: String = (0..4)
+                .map(|x| terminal.view_cell(x, 0, 9 - row).ch)
+                .collect();
+            assert_eq!(text, format!("{:04}", 100 - (rows - 1) - 9 + row));
+        }
+        if rows > 2 {
+            terminal.feed(b"\x1b[2;3r\x1b[2;1H\x1bM");
+            assert_eq!(line(&terminal, 1), "    ");
+            assert_eq!(terminal.history_len(), 9);
+        }
+        terminal.feed(b"\x1b[r\x1b[H\x1bM");
+        assert_eq!(line(&terminal, 0), "    ");
+        assert_eq!(terminal.history_len(), 9);
+    }
+}
+
+#[test]
+fn bulk_and_bytewise_feeds_agree_through_scroll_styles_and_charset_switches() {
+    let pattern = b"plain_under_score 0123456789\r\n\
+                    \x1b[38:2::3:7:11mRGB\x1b[48;5;24m BG\x1b[0m\r\n\
+                    \x1b)0ascii\x0elqk\x0f ascii\x1b)B\r\n\
+                    \x1b[2;4r\x1b[4;1Hregion\r\n\x1b[r\x1b[5;1H";
+    let input = pattern.repeat(100);
+    for chunk_size in [1, 2, 7, 31, 4096, input.len()] {
+        let mut actual = Terminal::new(17, 5, 11);
+        let mut reference = Terminal::new(17, 5, 11);
+        for byte in &input {
+            reference.feed(core::slice::from_ref(byte));
+        }
+        for chunk in input.chunks(chunk_size) {
+            actual.feed(chunk);
+        }
+        assert_eq!(actual.cursor(), reference.cursor());
+        assert_eq!(actual.modes(), reference.modes());
+        assert_eq!(actual.history_len(), reference.history_len());
+        assert_eq!(actual.responses(), reference.responses());
+        for offset in 0..=actual.history_len() {
+            for y in 0..actual.rows() {
+                for x in 0..actual.cols() {
+                    assert_eq!(
+                        actual.view_cell(x, y, offset),
+                        reference.view_cell(x, y, offset),
+                        "chunk={chunk_size}, offset={offset}, x={x}, y={y}"
+                    );
+                }
+            }
+        }
+    }
+}

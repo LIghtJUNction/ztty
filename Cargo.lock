@@ -33,7 +33,7 @@ version = "0.2.0"
 
 [[package]]
 name = "zterm"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "unicode-width",
  "zgraphics",
@@ -43,7 +43,7 @@ dependencies = [
 
 [[package]]
 name = "ztty"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "zpty",
  "zterm",

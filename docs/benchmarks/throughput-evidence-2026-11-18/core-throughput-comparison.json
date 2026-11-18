@@ -1,0 +1,321 @@
+{
+  "schema": 1,
+  "scope": "parser plus screen model; no PTY, renderer or display",
+  "timestamp_utc": "2026-11-18T04:51:26.560990+00:00",
+  "baseline_commit": "f9de339a48f999817fd7492191c9676eabcbf109",
+  "candidate_source_sha256": {
+    "crates/zterm/src/screen.rs": "6d200b8924820af4260320c81622b65ad700c4c0a0101a4410c80a2094d1d643",
+    "crates/zterm/src/terminal.rs": "baa9b1d0cf2fe7ede063e7e074f01161410fb0700b0f0df08ac93733a273d378",
+    "crates/zterm/src/tests.rs": "5c082f77d5247df3b7727d668d63d10fa1d407b9142d6a15cd69f0ccbb5a9b29"
+  },
+  "binaries": {
+    "baseline": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/artifacts/core-benchmark-baseline-f9de339",
+      "sha256": "d9d6f8ce2bab1e1fa2a14f2b29d3265027a25db6054a5256d89f06601012b6d8"
+    },
+    "candidate": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/throughput-worktree/artifacts/core-benchmark-candidate",
+      "sha256": "e3ff068c3396991ced654d1bbdba280c0a37e07d1bfe22d97316b3ab2400d0e4"
+    }
+  },
+  "protocol": "Unmodified crates/zterm/examples/benchmark.rs; seven internal samples per workload; three independent process runs per binary, interleaved ABBAAB. No page cache flush or CPU affinity/governor changes. All samples retained.",
+  "cpu_affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "runs": [
+    {
+      "order": 1,
+      "variant": "baseline",
+      "load_before": [
+        6.57568359375,
+        5.1220703125,
+        4.8251953125
+      ],
+      "load_after": [
+        6.208984375,
+        5.06982421875,
+        4.8095703125
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 206.052,
+        "ascii_full_history_mib_s": 147.492,
+        "sgr_mib_s": 175.323,
+        "unicode_mib_s": 103.221,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 30,
+          "p95": 32,
+          "p99": 33,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3889,
+          "p95": 4903,
+          "p99": 6309,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 2,
+      "variant": "candidate",
+      "load_before": [
+        6.208984375,
+        5.06982421875,
+        4.8095703125
+      ],
+      "load_after": [
+        6.208984375,
+        5.06982421875,
+        4.8095703125
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 261.575,
+        "ascii_full_history_mib_s": 173.506,
+        "sgr_mib_s": 214.112,
+        "unicode_mib_s": 118.196,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 32,
+          "p95": 34,
+          "p99": 41,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2289,
+          "p95": 2688,
+          "p99": 2860,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 3,
+      "variant": "candidate",
+      "load_before": [
+        6.208984375,
+        5.06982421875,
+        4.8095703125
+      ],
+      "load_after": [
+        6.4326171875,
+        5.13525390625,
+        4.83251953125
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 320.463,
+        "ascii_full_history_mib_s": 187.609,
+        "sgr_mib_s": 208.134,
+        "unicode_mib_s": 95.612,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 42,
+          "p95": 46,
+          "p99": 48,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3067,
+          "p95": 3854,
+          "p99": 4423,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 4,
+      "variant": "baseline",
+      "load_before": [
+        6.4326171875,
+        5.13525390625,
+        4.83251953125
+      ],
+      "load_after": [
+        6.4326171875,
+        5.13525390625,
+        4.83251953125
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 227.198,
+        "ascii_full_history_mib_s": 194.121,
+        "sgr_mib_s": 179.763,
+        "unicode_mib_s": 101.694,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 36,
+          "p95": 93,
+          "p99": 95,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2873,
+          "p95": 3675,
+          "p99": 4124,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 5,
+      "variant": "baseline",
+      "load_before": [
+        6.4326171875,
+        5.13525390625,
+        4.83251953125
+      ],
+      "load_after": [
+        6.07763671875,
+        5.0830078125,
+        4.81689453125
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 270.802,
+        "ascii_full_history_mib_s": 130.774,
+        "sgr_mib_s": 130.442,
+        "unicode_mib_s": 108.867,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 36,
+          "p95": 38,
+          "p99": 39,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2892,
+          "p95": 3435,
+          "p99": 3587,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "order": 6,
+      "variant": "candidate",
+      "load_before": [
+        6.07763671875,
+        5.0830078125,
+        4.81689453125
+      ],
+      "load_after": [
+        6.07763671875,
+        5.0830078125,
+        4.81689453125
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107676,
+        "ascii_mib_s": 228.928,
+        "ascii_full_history_mib_s": 172.83,
+        "sgr_mib_s": 187.583,
+        "unicode_mib_s": 71.71,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 42,
+          "p95": 51,
+          "p99": 79,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2634,
+          "p95": 3661,
+          "p99": 4092,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "medians": {
+    "baseline": {
+      "ascii_mib_s": 227.198,
+      "ascii_full_history_mib_s": 147.492,
+      "sgr_mib_s": 175.323,
+      "unicode_mib_s": 103.221,
+      "steady_state_allocations": 0,
+      "initial_core_heap_bytes": 107676
+    },
+    "candidate": {
+      "ascii_mib_s": 261.575,
+      "ascii_full_history_mib_s": 173.506,
+      "sgr_mib_s": 208.134,
+      "unicode_mib_s": 95.612,
+      "steady_state_allocations": 0,
+      "initial_core_heap_bytes": 107676
+    }
+  },
+  "ratios": {
+    "ascii_mib_s": 1.1513085502513225,
+    "ascii_full_history_mib_s": 1.1763756678328317,
+    "sgr_mib_s": 1.1871460105063225,
+    "unicode_mib_s": 0.9262843801164491,
+    "initial_core_heap_bytes": 1.0
+  }
+}

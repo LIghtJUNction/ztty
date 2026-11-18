@@ -4,6 +4,7 @@ use crate::{
     broker::{self, Reply},
     json::{self, Value},
     key, key_modifiers, modifiers, os, paste,
+    repaint::{Plan, Repaint},
     x11::{self, Connection, Selection, Window},
 };
 use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
@@ -39,6 +40,7 @@ struct Ui {
     selection: Option<Selection>,
     history: usize,
     force: bool,
+    repaint: Repaint,
     open: bool,
     title: String,
     held: [u64; 256],
@@ -59,6 +61,7 @@ impl Ui {
             selection: None,
             history: 0,
             force: true,
+            repaint: Repaint::default(),
             open: true,
             title: String::new(),
             held: [0; 256],
@@ -191,6 +194,7 @@ impl Ui {
                         self.selection = None;
                         self.force = true;
                     }
+                    self.repaint.input_sent();
                     queue.push(encoded);
                 }
             }
@@ -278,6 +282,9 @@ impl Ui {
                     };
                     encoded.clear();
                     input::encode_mouse_into(mouse, mods, &terminal.modes().input(), encoded);
+                    if !encoded.is_empty() {
+                        self.repaint.input_sent();
+                    }
                     queue.push(encoded);
                 }
             }
@@ -309,6 +316,9 @@ impl Ui {
                     &terminal.modes().input(),
                     encoded,
                 );
+                if !encoded.is_empty() {
+                    self.repaint.input_sent();
+                }
                 queue.push(encoded);
             }
             x11::CONFIGURE_NOTIFY => {
@@ -329,10 +339,15 @@ impl Ui {
                 self.reset_blink = true;
                 self.force = true;
                 if !focused {
+                    self.repaint.cancel_input();
                     self.held.fill(0);
                     self.intercepted.fill(false);
                 }
-                queue.push(&input::encode_focus(focused, &terminal.modes().input()));
+                let encoded_focus = input::encode_focus(focused, &terminal.modes().input());
+                if !encoded_focus.is_empty() {
+                    self.repaint.input_sent();
+                }
+                queue.push(&encoded_focus);
             }
             x11::EXPOSE => {
                 self.window.present();
@@ -352,11 +367,17 @@ impl Ui {
             }
             x11::SELECTION_NOTIFY => {
                 if let Some(data) = self.window.selection_notify(unsafe { event.selection }) {
+                    if !data.is_empty() {
+                        self.repaint.input_sent();
+                    }
                     paste(data, terminal, queue);
                 }
             }
             x11::PROPERTY_NOTIFY => {
                 if let Some(data) = self.window.property(unsafe { event.property }) {
+                    if !data.is_empty() {
+                        self.repaint.input_sent();
+                    }
                     paste(data, terminal, queue);
                 }
             }
@@ -405,21 +426,37 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
-        if !synchronized
-            && (self.force
+        let plan = self.repaint.plan(
+            now,
+            self.force
                 || terminal.dirty()
+                || terminal.sync_commit_pending()
                 || self.window.cursor_changed(cursor)
-                || self.window.graphics_changed(terminal))
-        {
+                || self.window.graphics_changed(terminal),
+            self.force || terminal.sync_commit_pending(),
+            synchronized,
+        );
+        let repaint_deadline = match plan {
+            Plan::WaitUntil(deadline) => Some(deadline),
+            Plan::Idle | Plan::Render => None,
+        };
+        if plan == Plan::Render {
             self.window
                 .render(terminal, self.history, self.selection, self.force, cursor);
             self.force = false;
+            self.repaint.painted(os::milliseconds());
         }
 
-        match (self.sync_since.map(|s| s + 150), self.blink_deadline) {
-            (Some(a), Some(b)) => Some(a.min(b)),
-            (a, b) => a.or(b),
-        }
+        // Quiet output still publishes its final damage. A held synchronized
+        // frame keeps only its safety deadline, never an expired repaint timer.
+        [
+            self.sync_since.map(|s| s + 150),
+            self.blink_deadline,
+            repaint_deadline,
+        ]
+        .into_iter()
+        .flatten()
+        .min()
     }
 }
 
@@ -489,14 +526,17 @@ impl Session {
                 };
                 let before = self.terminal.history_len();
                 self.terminal.feed(&buffer[..n]);
-                if let Some(ui) = &mut self.ui
-                    && ui.history != 0
-                {
-                    ui.history = ui
-                        .history
-                        .saturating_add(self.terminal.history_len().saturating_sub(before))
-                        .min(self.terminal.history_len());
-                    ui.force = true;
+                if let Some(ui) = &mut self.ui {
+                    // An old-frame expose must not consume priority for the
+                    // subsequent actual output responding to user/MCP input.
+                    ui.repaint.output_received();
+                    if ui.history != 0 {
+                        ui.history = ui
+                            .history
+                            .saturating_add(self.terminal.history_len().saturating_sub(before))
+                            .min(self.terminal.history_len());
+                        ui.force = true;
+                    }
                 }
                 let cap = if self.persistent {
                     256 * 1024
@@ -959,6 +999,11 @@ impl Pool {
                     > 1024 * 1024
                 {
                     return Err("session input queue is full".into());
+                }
+                if !data.is_empty()
+                    && let Some(ui) = &mut session.ui
+                {
+                    ui.repaint.input_sent();
                 }
                 session.queue.push(data.as_bytes());
                 session.queue.flush(&session.pty);

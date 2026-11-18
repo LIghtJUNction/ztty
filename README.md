@@ -8,6 +8,12 @@ Ten windows per terminal, shared instances, three real runs. [Method and rerun c
 Rerun from current source: `make benchmark-terminals`.
 <!-- terminal-benchmark:end -->
 
+**Output throughput update, 2026-11-18:** ztty 0.2.1 reached 227.58 MiB/s in
+the ten-window comparison above. A separate paired old/new run measured
+19.48 → 200.52 MiB/s (**10.29×**) with nearly unchanged application PSS.
+These are ASCII/color screen updates under Xvfb software rendering.
+[Results, implementation, and correctness evidence](docs/benchmarks/throughput-2026-11-18.md).
+
 A lean native terminal, written in Rust without the Rust standard library.
 
 ztty runs shells and terminal applications through the operating system's
@@ -226,7 +232,7 @@ can be used without the graphical application.
 | --- | --- | --- | --- |
 | [zinput](crates/zinput) | 0.1.0 | Legacy / Kitty keyboard, mouse, focus, and paste encoding | None |
 | [zpty](crates/zpty) | 0.2.0 | Linux/macOS PTY, Windows ConPTY, explicit child lifecycle | None |
-| [zterm](crates/zterm) | 0.2.0 | Screen, scrollback, VT state, image anchoring, queries, damage | zinput, zvte, zgraphics, unicode-width |
+| [zterm](crates/zterm) | 0.2.1 | Screen, scrollback, VT state, image anchoring, queries, damage | zinput, zvte, zgraphics, unicode-width |
 | [zgraphics](crates/zgraphics) | 0.1.0 | Bounded Kitty graphics, PNG/RGB/RGBA decoding, image storage and placement | zune-core, zune-png, zune-inflate |
 | [zvte](https://github.com/LIghtJUNction/zvte) | 0.1.3 | Allocation-free streaming ANSI/VT parser | None |
 
@@ -248,6 +254,8 @@ cargo add zvte@0.1.3 --no-default-features
 All four packages passed individual and combined consumers using exact
 registry versions outside this workspace, including a real PTY session.
 See [the release record](docs/releasing.md) for the verified publication state.
+The source tree contains zterm 0.2.1; that version has not been published to
+crates.io in this update.
 
 Production Rust compiles without `std`. The Project Z crates use `#![no_std]`;
 the PNG, DEFLATE, checksum, and Unicode-width dependencies are selected with
@@ -310,6 +318,8 @@ cargo run -p zpty --example capture
 cargo run --release -p zterm --example benchmark
 python3 tests/gui_smoke.py --binary ./target/release/ztty
 python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
+python3 tests/repaint_gui.py --binary ./target/release/ztty
+python3 tests/test_throughput_benchmark.py
 python3 tests/mcp_transport.py --binary ./target/release/ztty
 python3 tests/mcp_sessions.py --binary ./target/release/ztty
 python3 tests/graphics_smoke.py --binary ./target/release/ztty
