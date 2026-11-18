@@ -1031,7 +1031,9 @@ impl State {
             y: self.screen.y,
             style: self.style,
             origin: self.screen.origin,
-            charset: if self.use_g1 { self.g1 } else { self.g0 },
+            g0: self.g0,
+            g1: self.g1,
+            use_g1: self.use_g1,
             wrap: self.screen.wrap,
         };
     }
@@ -1042,11 +1044,9 @@ impl State {
         self.style = saved.style;
         self.screen.origin = saved.origin;
         self.screen.wrap = saved.wrap;
-        if self.use_g1 {
-            self.g1 = saved.charset;
-        } else {
-            self.g0 = saved.charset;
-        }
+        self.g0 = saved.g0;
+        self.g1 = saved.g1;
+        self.use_g1 = saved.use_g1;
     }
 
     fn record_history_row(&mut self, row: usize) {
@@ -1409,7 +1409,15 @@ impl State {
                 self.modes.cursor_visible = enabled;
                 self.screen.dirty[self.screen.y] = true;
             }
-            47 | 1047 => self.alternate(enabled, false, mode == 1047),
+            47 => self.alternate(enabled, false, false),
+            1047 => {
+                // DEC 1047 clears the alternate screen on exit, before it is cached.
+                if !enabled && self.modes.alternate_screen {
+                    self.screen.clear(self.style.blank());
+                    self.graphics.clear();
+                }
+                self.alternate(enabled, false, false);
+            }
             80 => self.sixel_display = enabled,
             1070 => self.sixel_private = enabled,
             8452 => self.sixel_right = enabled,

@@ -70,6 +70,8 @@ background-blur = false
 cursor-blink = false
 window-padding = 0
 keybind = ctrl+shift+x = search
+keybind = ctrl+shift+? = palette
+keybind = ctrl+shift+: = palette
 mousebind = ctrl+button3 = palette
 mousebind = ctrl+button8 = palette
 """
@@ -164,6 +166,12 @@ def main():
             connection.sync()
             assert connection.get_keyboard_mapping(tilde_code, 1)[0][0] == ord("~")
             report["tilde_keycode"] = tilde_code
+            punctuation_code = tilde_code - 1
+            connection.change_keyboard_mapping(
+                punctuation_code, [(ord(";"), ord("?"))])
+            connection.sync()
+            assert tuple(connection.get_keyboard_mapping(punctuation_code, 1)[0][:2]) == (ord(";"), ord("?"))
+            report["punctuation_keycode"] = punctuation_code
             env = dict(os.environ, DISPLAY=xvfb.display, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
                        XDG_RUNTIME_DIR=temporary, XDG_CONFIG_HOME=str(root / "xdg-config"),
                        ZTTY_SOCKET="@ztty-input-gui-" + root.name)
@@ -447,6 +455,19 @@ def main():
             key("Escape")
             assert_input("custom extra-button binding and palette input never leak to PTY", b"")
             report["checks"].append("custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled")
+
+            for keycode, label in [
+                ("slash", "US question mark"),
+                ("semicolon", "US colon"),
+                (punctuation_code, "question mark on a non-US key"),
+            ]:
+                begin(RESET + "\x1b[=3u")
+                key("Control_L", "Shift_L", keycode)
+                type_text("palette")
+                key("Escape")
+                assert_input(f"shifted punctuation binding: {label}", b"")
+            report["checks"].append("shifted punctuation bindings consume their press, release and palette input using the active XKB layout")
+            begin(RESET)
 
             assert info()["pid"] == session["pid"] and info()["running"]
             control(RESET + "\r\n  Keyboard, wheel, extra-button and mode tests passed.\r\n  Coverage details are recorded in input-gui.json.\r\n")
