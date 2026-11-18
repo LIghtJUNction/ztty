@@ -11,6 +11,7 @@ pub mod input_queue;
 pub mod json;
 pub mod layout;
 pub mod native_resize;
+pub mod native_ui;
 pub mod output_tail;
 pub mod scroll_prompt;
 pub mod selection;
