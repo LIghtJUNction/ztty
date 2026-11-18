@@ -1,12 +1,14 @@
 # ztty 体验迭代与发布验收记录
 
-日期：2026-11-18。初始主体验收检查点：[`0563554b95dc6321f6e45bdd53659b6c85f90850`](https://github.com/LIghtJUNction/ztty/commit/0563554b95dc6321f6e45bdd53659b6c85f90850)；返回底部的追加验收绑定运行时 `3730b28` 和脚本 `aef55d9`。本记录覆盖逻辑行搜索与复制、会话切换、历史滚动、锁定键输入和安装升级，并按源码独立记录原生平台候选。正式 Release 与用户设备安装尚待完成，见文末状态表。
+日期：2026-11-18。初始主体验收检查点：[`0563554b95dc6321f6e45bdd53659b6c85f90850`](https://github.com/LIghtJUNction/ztty/commit/0563554b95dc6321f6e45bdd53659b6c85f90850)；返回底部的追加验收绑定运行时 `3730b28` 和脚本 `aef55d9`。本记录覆盖逻辑行搜索与复制、会话切换、历史滚动、锁定键输入和安装升级，并按源码独立记录原生平台候选。
+
+**当前发布状态：正式 `v0.3.0` 门禁失败，未发布、未安装。** tag 已固定在 `9b5497dac5402603ba0f633152fa4b07e6c11c9e`。同源运行的 Verify、Linux 两种架构、macOS 两种架构和 Windows x64 通过；Windows ARM 在原快速缩放恢复检查失败，Publish 被跳过，Release-by-tag API 返回 404。失败后的两个带 trace 诊断进程通过，不改变正式失败结论；修复后使用新 tag，旧 tag 保持不动。[正式运行与状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
 
 本轮让终端里已经存在的内容和会话更容易继续使用。搜索可以跨屏幕自动折行，复制保留真正的文本边界；会话切换能找到其他窗口和隐藏标签里的既有 PTY，并保留输入所有权。Linux 本地工作区测试通过，开发机上的五套既有 GUI 检查通过，新增会话切换脚本修正后通过六组检查。新增行元数据曾导致核心微基准回退，定位并修正热路径后保留了全部对照样本；这些结果只用于评价该核心负载。[验收索引](measurements/experience-release-2026-11-18/summary.json) · [文件校验清单](measurements/experience-release-2026-11-18/manifest.json)
 
 追加的 Linux 返回底部入口通过全部 18 组日常 GUI 检查，包含新输出到达、搜索／命令面板并存和只读观察视图。后续 `2ac46e2` 的 macOS 两种架构通过原生候选；Windows 的 `dc43870` 缩放恢复失败与 `8a2f4be` 子进程启动失败分别保留，均未记作通过。[追加源码与文件身份](measurements/experience-release-2026-11-18/scroll-prompt/source-binding.json) · [18 组原始记录](measurements/experience-release-2026-11-18/scroll-prompt/daily-workflow.json)
 
-发布前复验进一步通过 Linux 六套 GUI 的 67 组检查，以及 Windows `3418b82` 双架构各 31 项基础、19 项工作区检查。Linux wrapper 的 `source_sha` 是测试检出的 `8a2f4be`，运行文件仍为 `3730b28` 构建、哈希为 `2a50377…` 的二进制；Windows 结果来自独立的原生候选。各平台尚未共同验收最终 tag，正式发布和设备安装保持待完成。[发布前证据索引](measurements/experience-release-2026-11-18/pre-release/index.json)
+发布前复验进一步通过 Linux 六套 GUI 的 67 组检查，以及 Windows `3418b82` 双架构各 31 项基础、19 项工作区检查。Linux wrapper 的 `source_sha` 是测试检出的 `8a2f4be`，运行文件仍为 `3730b28` 构建、哈希为 `2a50377…` 的二进制；Windows 结果来自独立的原生候选。这些发布前记录与后续正式 tag 运行分别保留，不能用候选通过替换正式失败。[发布前证据索引](measurements/experience-release-2026-11-18/pre-release/index.json)
 
 ## 1. 固定源码与验收对象
 
@@ -26,6 +28,7 @@
 | 返回底部测试二进制 | SHA-256 `2a50377a0aea0e53498f0e76c71d969f8dbe7f2585e15b24bc2530063ad4fada` | 本报告追加 GUI 结果所使用的文件，独立于前述 `cfc7ae8` 候选 |
 | 完整 Linux GUI 测试检出 | `8a2f4bee22324685f2193e91a16744dda21d0df9` | 六套 wrapper 的源码身份；运行文件继续使用上一行的 `3730b28` 二进制 |
 | Windows 完整原生候选 | [`3418b82dcfa1b9323379e36aec0f3926371b0eb6`](https://github.com/LIghtJUNction/ztty/commit/3418b82dcfa1b9323379e36aec0f3926371b0eb6) | 两个原生架构分别构建、运行和验收；各自二进制哈希保存在发布前索引与原始 JSON |
+| 正式 `v0.3.0` tag | [`9b5497dac5402603ba0f633152fa4b07e6c11c9e`](https://github.com/LIghtJUNction/ztty/commit/9b5497dac5402603ba0f633152fa4b07e6c11c9e) | 运行 44309412482，`build_only=false`、`candidate_platform=all`；Windows ARM 失败导致整轮正式发布被阻止 |
 
 Linux 候选的构建与运行环境记录在[二进制身份](measurements/experience-release-2026-11-18/linux/candidate-builder.json)和[原始 GUI 汇总](measurements/experience-release-2026-11-18/linux/linux-native.json)中。后者保留了首次执行的失败状态；会话切换的通过结论来自另存的[复验记录](measurements/experience-release-2026-11-18/linux/session-switcher-recheck.json)。
 
@@ -187,19 +190,37 @@ Windows 的以下三轮均为 `build_only=true`、`candidate_platform=windows`�
 
 基础门禁使用原来的快速缩小／恢复路径，没有启用运行时 trace，也没有增加逐阶段 ACK。`e334` 和 `3418` 在两种架构上各连续通过该路径，保存的恢复前后图像相同，红色采样为 `[255,0,0]`。这些是候选的实际通过结果；`dc43870` 历史黑带的最初机制尚未经过独立复现并确定，因此不把本轮通过写成该历史问题的因果闭环或所有调度时序的保证。正式发布仍需最终 tag 自身的六个原生架构门禁。[原 rapid 结果和边界](measurements/experience-release-2026-11-18/pre-release/index.json)
 
+### 5.4 正式 v0.3.0 门禁失败
+
+正式 tag `v0.3.0` 指向 `9b5497dac5402603ba0f633152fa4b07e6c11c9e`，annotated tag 对象为 `9317806ac9b098c772f1a05514d222942268d2d5`。[运行 44309412482](https://github.com/LIghtJUNction/ztty/actions/runs/44309412482)由 tag push 触发，使用 `build_only=false`、`candidate_platform=all`，这是 attempt 1。GitHub 最终记录整轮 `failure`、Publish `skipped`；这些状态与各平台子任务的通过结果同时保留。[API 读回记录](measurements/experience-release-2026-11-18/formal-v0.3.0/github-status.json)
+
+| 正式门禁 | 固定 tag 的实际结果 | 直接证据 |
+| --- | --- | --- |
+| Verify | 通过：271 项普通 Rust、6 个独立 doctest、8 项独立 SessionCore、17 项安装器、11 项 Bash、MCP 各套及 12 组 GUI smoke；格式、严格 Clippy、release build 和 no_std 检查通过 | [审计摘要](measurements/experience-release-2026-11-18/formal-v0.3.0/verify-summary.json) |
+| Linux x86_64、ARM64 | 各通过六套 GUI、67 组检查、27 张 PNG；前后检出干净，运行文件与打包文件身份相符，清理完成 | [x86_64](measurements/experience-release-2026-11-18/formal-v0.3.0/linux-x86_64-summary.json) · [ARM64](measurements/experience-release-2026-11-18/formal-v0.3.0/linux-aarch64-summary.json) |
+| macOS Intel、Apple Silicon | 各通过 8 项 spawn、24 项 native、13 阶段，记录 10 张 PNG；无残留自有进程，ad-hoc 签名通过，未 notarize | [Intel](measurements/experience-release-2026-11-18/formal-v0.3.0/macos-x86_64-summary.json) · [Apple Silicon](measurements/experience-release-2026-11-18/formal-v0.3.0/macos-aarch64-summary.json) |
+| Windows x64 | 原 rapid 路径关闭 trace，31 项基础及 19 项工作区全部通过；进程、Job 和桌面清理通过 | [x64 摘要](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-x86_64-summary.json) |
+| Windows ARM64 | 原 rapid 路径关闭 trace，23 项基础通过后在缩放恢复检查失败；工作区未进入；清理通过 | [ARM64 摘要](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64-summary.json) |
+
+Verify 中同一组六个 doctest 执行了两遍，按六个独立用例计数；Darwin 的 Linux 本地跳过项不算通过。Verify 没有上传独立 artifact，其摘要来自任务日志，不能声称 GUI smoke 另有独立的二进制哈希记录。正式 Linux 的六套检查分别为 17、18、6、10、9、7 组，各架构 47 个原始证据文件及 27 张 PNG 已核对大小与哈希。正式 x86_64 可执行文件 SHA-256 为 `4b9e2f354dc09cc32641b75bcd0238f14a2886074bfa66e091b992103ea38586`，ARM64 为 `700b154987505b2a44b8e98805f5debb212f64e5d890e149a0ab6b54074097e5`，均由当前 tag 构建；第 3.3 节使用的 `3730b28` 开发机文件保持独立身份。[Verify 范围](measurements/experience-release-2026-11-18/formal-v0.3.0/verify-summary.json) · [正式平台索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
+
+Windows ARM 的失败检查为 `resize_restores_visible_image`。窗口已恢复到 180×190 client 像素，但 `(175, 28)` 的实际采样在 10 秒等待结束时仍为 `[20,20,20]`，期望值为红色 `[255,0,0]`。原始记录的 `runtime_trace_enabled=false`、`resize_path=rapid`，23 项基础检查已经通过，后续基础检查与全部工作区检查未完成。应用退出、临时目录删除、Job 清空和桌面恢复均成功。保留的 621 字节 PNG 是该原始失败的恢复帧，未修改图像内容。[原始 native JSON](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.json)
+
+![Windows ARM 原始快速缩放恢复失败帧，采样位置未恢复为预期红色](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-restored.png)
+
+原进程 PID 为 8344。失败后分别新建 PID 5644 和 7884，启用运行时 trace，运行 rapid 与 staged 诊断；两者各通过 31 项基础检查并清理自身资源。诊断 JSON 自身未重复写入 source SHA 或二进制哈希，其来源由正式原始报告的 `diagnostic_retries`、同一个已校验 artifact 和相同可执行路径绑定。这两个进程不是对原失败进程的恢复，也没有使正式门禁转为通过；启用 trace 后的成功不足以确定未启用 trace 时的失败原因。原 rapid 历史问题的因果边界继续保留，不在本报告推断根因。[rapid 原始诊断](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.json) · [rapid trace](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.runtime.log) · [staged 原始诊断](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.json) · [staged trace](measurements/experience-release-2026-11-18/formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.runtime.log)
+
 ## 6. 发布与设备安装状态
 
-本节为后续实际动作保留可更新位置。主体报告和原始失败证据按固定检查点保留；完成后应增加具体源码、tag、资产校验和安装记录，不把“候选测试通过”改写成“已发布／已安装”。
+本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
 
-| 交付项 | 当前状态 | 完成时需要补入的记录 |
+| 交付项 | 当前状态 | 后续完成所需记录 |
 | --- | --- | --- |
-| 返回底部追加验收 | 所列 Linux 候选 18/18 组通过 | 已保留运行时、脚本与二进制身份及六张新图；最终发行文件仍需其自身门禁 |
-| 完整 Linux GUI | 六套 67/67 组通过，记录 27 张 PNG | 测试检出 `8a2f4be`，运行时构建 `3730b28`；身份分别保留 |
-| 后续 macOS 修正与复验 | `2ac46e2` 两种架构候选通过 | 已保留 44298970562 的分架构结果；最终 tag 的全平台验收仍待完成 |
-| Windows 原生复验 | `3418b82` 双架构各 31+19 项通过，候选接受 | 三轮历史失败保留；原 rapid 历史根因边界和最终 tag 验收仍独立记录 |
-| 正式 Release | 待完成 | tag、发行源码、Release URL、最终平台门禁与资产校验记录 |
-| 用户设备安装 | 待完成 | 安装绝对路径、实际 `--version`、二进制 SHA-256、启动器目标 |
-| 回滚与既有会话 | 待完成设备实测记录 | `ztty.previous` 身份与校验、既有进程／会话的保留情况 |
+| `v0.3.0` tag | 已创建，固定到 `9b5497d`，保持不动 | 新修复另建版本 tag；不重指旧 tag |
+| 正式平台验收 | Verify、Linux 双架构、macOS 双架构和 Windows x64 通过；Windows ARM 失败 | 修复后新 tag 的全套同源门禁及原始证据 |
+| 正式 Release | 未创建；Publish 被跳过；2026-11-18 21:11:00 Asia/Taipei (13:11:00 UTC) 的 by-tag API 返回 404 | 新 tag 的 Release URL、正式资产和校验记录 |
+| 用户设备安装 | 未执行本次正式版本安装 | 安装绝对路径、实际 `--version`、二进制 SHA-256、启动器目标 |
+| 回滚与既有会话 | 未执行本次正式版本的设备验收 | `ztty.previous` 身份与校验、既有进程／会话的保留情况 |
 
 ## 7. 仍然存在的范围限制
 
@@ -219,7 +240,7 @@ Linux 会话切换、返回底部和多工作区体验的实测结论限于本�
 | Linux 六套 GUI 全部执行，Windows 两项具体修复完成原生回归 | Linux 67 组 wrapper；Windows 双架构 31 项基础、19 项工作区记录 | 分别支持所列测试检出／运行文件及 Windows 固定候选 |
 | 新元数据的明显热路径回退得到缓解 | 原始对照、中间版本、最终配对、汇编与源码身份 | 仅支持所测核心负载，不支持普遍加速 |
 | 安装路径先校验再替换并保留回滚 | 安装回归源码和开发机退出状态 | 支持脚本验收；设备实际安装待记录 |
-| 原生候选和正式交付已分开 | macOS 分架构结果、Windows 三轮历史失败与后续完整通过、交付状态表 | 最终同源 tag 门禁、正式 Release／设备安装待完成 |
+| 原生候选和正式交付已分开 | 历史候选、正式 tag 全平台摘要、ARM 原始失败与两个独立诊断、API 状态 | `v0.3.0` 正式门禁失败，Publish 跳过，Release 404，未安装；旧 tag 保持不动 |
 
 ### 五项自审
 
@@ -228,5 +249,5 @@ Linux 会话切换、返回底部和多工作区体验的实测结论限于本�
 | 改进价值 | 是否对应用户可见的问题？已用跨折行文本、既有会话聚焦、返回最新输出、锁定键和运行中升级说明具体行为。 |
 | 表达清晰 | 是否混淆物理行与逻辑行、候选与发布、脚本与运行时修复？各自定义并固定源码，首轮失败单独说明。 |
 | 实验证据 | 是否把波动当作加速？保留全部外层样本、比值范围、变异系数和最初回退，限制结论到同一核心负载。 |
-| 验收完整性 | 是否遗漏失败或平台缺口？保留早期 macOS 的架构差异、三轮 Windows 失败及原 rapid 根因边界、首次 Linux 脚本失败、Darwin 本地跳过和未完成门禁。 |
+| 验收完整性 | 是否遗漏失败或平台缺口？保留早期 macOS 的架构差异、Windows 历史失败及原 rapid 根因边界、首次 Linux 脚本失败、Darwin 本地跳过；追加正式 ARM 失败，不用后续 trace 成功替换。 |
 | 设计边界 | 是否把有界内存理解为无成本，或把单文件原子替换理解为多文件事务？明确历史预算、查询上限、扫描代价和安装原子性的范围。 |

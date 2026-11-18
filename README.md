@@ -1,5 +1,10 @@
 # ztty
 
+**0.3.0 release status:** tag `v0.3.0` is fixed at `9b5497d`, but its formal
+release gate failed on Windows ARM rapid resize. Publication was skipped; no
+0.3.0 Release or device installation was completed. The fix will use a new tag.
+[Formal results and retained failure evidence](docs/releasing.md#formal-v030-attempt).
+
 <!-- terminal-benchmark:start -->
 [![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
 
@@ -73,31 +78,35 @@ The shared-session UI, attach and MCP runtime remain Linux features.
 
 | Platform | Native implementation | Source-bound verification record |
 | --- | --- | --- |
-| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 2ac46e2 passed all six GUI suites on native x86_64 and ARM64 under guarded Xvfb |
-| macOS Apple Silicon | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Source 2ac46e2 passed 8 threaded-spawn checks and 24 native checks, with 13 gate stages, 10 PNG captures and no remaining owned processes |
-| macOS Intel | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Source 2ac46e2 passed the same 8 spawn and 24 native checks, with 13 gate stages, 10 PNG captures and no remaining owned processes |
-| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | Source 3418b82 passed all 31 base checks and 19 workspace groups on native x64 and ARM64, including rapid shrink/restore, redirected-host startup, pane history and selection; owned-process and desktop cleanup passed |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Formal source 9b5497d passed six GUI suites, 67 groups and 27 PNG captures on each native x86_64 and ARM64 runner under guarded Xvfb; source, binary identity and cleanup verified |
+| macOS Apple Silicon | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Formal source 9b5497d passed 8 threaded-spawn checks and 24 native checks, with 13 stages, 10 PNG captures and no remaining owned processes |
+| macOS Intel | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Formal source 9b5497d passed the same 8 spawn and 24 native checks, with 13 stages, 10 PNG captures and no remaining owned processes |
+| Windows x64 | Win32 window, GDI text, own RGBA compositing, ConPTY | Formal source 9b5497d passed all 31 base checks and 19 workspace groups; owned-process and desktop cleanup passed |
+| Windows ARM64 | The same native Win32 / ConPTY backend | Formal source 9b5497d failed rapid image resize/restore after 23 of 31 base checks; workspace checks were not reached. Cleanup passed; the architecture was not accepted |
 
 macOS now uses a fresh-exec PTY helper that can create sessions after AppKit
 starts threads. [Implementation and native test scope](docs/darwin-threaded-pty.md)
 record the controlling-terminal, descriptor and error-handling contracts.
-[Candidate run 44298970562](https://github.com/LIghtJUNction/ztty/actions/runs/44298970562)
-contains the accepted Linux and macOS results and earlier Windows failures.
-[Windows candidate 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420)
-records the later acceptance of both Windows architectures at `3418b82`.
+[Formal tag run 44309412482](https://github.com/LIghtJUNction/ztty/actions/runs/44309412482)
+contains these results and a passing Verify job: 271 ordinary Rust tests,
+6 distinct doctests, 8 separate SessionCore checks and 12 GUI smoke groups.
 The [release record](docs/releasing.md) retains earlier successes and failures
 by source. macOS IME/keyboard input and physical display latency remain outside
 these native window checks.
-These records cover their named candidate sources; the release gate requires
-all six native architecture jobs to accept the final tagged source.
-The 0.3.0 release and device installation remain pending.
+The Windows ARM failure kept the full release gate failed. Two fresh processes
+subsequently passed traced rapid/staged diagnostics; they do not replace the
+original untraced result. Publish was skipped, the by-tag Release API returned
+404, and 0.3.0 was not installed. The fixed tag will remain unchanged.
+[Source, failure and status evidence](docs/measurements/experience-release-2026-11-18/formal-v0.3.0/index.json).
 
 Windows preserves pane history and selection when silent modifier keys are
 pressed or released, so releasing Shift after Shift+PageUp keeps the scrolled
 view. Actual terminal input returns to the newest output. ConPTY children also
 retain their console input/output when ztty's own standard streams are
 redirected. These fixes entered at `3418b82` and `e334cf7`, respectively;
-the Windows candidate above exercises both.
+the earlier [Windows candidate 44306719420](https://github.com/LIghtJUNction/ztty/actions/runs/44306719420)
+exercised both on x64 and ARM64. That source's acceptance remains separate from
+the later formal ARM resize failure.
 
 The macOS and Windows backends use their native APIs. macOS does not require
 X11, and Windows does not require WSL. Cross-target compilation does not establish

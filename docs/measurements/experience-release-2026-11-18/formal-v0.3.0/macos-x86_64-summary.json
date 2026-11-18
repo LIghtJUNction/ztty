@@ -1,0 +1,740 @@
+{
+  "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "run_id": 44309412482,
+  "version": "0.3.0",
+  "source_ref": "refs/tags/v0.3.0",
+  "build_only": false,
+  "candidate_platform": "all",
+  "architecture": "x86_64",
+  "build_passed": true,
+  "spawn_passed": true,
+  "spawn_checks": [
+    "Apple SDK ABI constants, layout and prototypes",
+    "worker-active spawn: controlling tty, session/group, exact argv/env/cwd, input and resize",
+    "nine concurrent PTY spawns drain READY/DONE through EOF, exit, and exclude peer handshakes and a non-CLOEXEC sentinel",
+    "missing/non-executable helper and target errors preserve ENOENT/EACCES without descriptors or owned children",
+    "empty/partial readiness and early helper death cannot report successful handoff",
+    "stalled helper reaches the bounded handshake failure and is reaped",
+    "hangup targets the owned session and wait/drop release its child and master",
+    "seven isolated closed-stdio masks preserve control stdio and cannot collide with helper fd sources"
+  ],
+  "spawn_worker_iterations": 5248,
+  "spawn_timeout_seconds": 5.011302678,
+  "spawn_duration_seconds": 9.762536478,
+  "native_passed": true,
+  "native_checks": {
+    "native_pty_and_pixel_geometry": true,
+    "cursor_reply": true,
+    "kitty_capability_query": true,
+    "chunked_rgba": true,
+    "png": true,
+    "alternate_screen_image_isolation": true,
+    "malformed_image_text_recovery": true,
+    "image_deletion": true,
+    "unicode_cwd_reaches_native_pty_child": true,
+    "relative_config_resolves_before_cwd": true,
+    "native_helper_and_binary_architecture": true,
+    "invalid_cwd_fails_before_window": true,
+    "sixel_rgb_native_pixels": true,
+    "sixel_transparent_preserves_underlying_image": true,
+    "sixel_opaque_uses_current_background": true,
+    "sixel_erase_display_repaints": true,
+    "sixel_cancel_and_pty_recovery": true,
+    "sixel_recovers_after_oversized_raster": true,
+    "sixel_before_resize": true,
+    "sixel_resize_clips_without_ghosts": true,
+    "sixel_resize_restores_visible_image": true,
+    "window_minimized": true,
+    "sixel_minimize_restore_visible_image": true,
+    "pty_recovers_after_window_restore": true
+  },
+  "native_stages": 13,
+  "png_count": 10,
+  "independent_png_samples": 20,
+  "maximum_channel_error": 0,
+  "pixel_readback": "WindowServer window via ScreenCaptureKit",
+  "binary_sha256": "e1cb6d1e8ab50dfd02d39f33007336bf8d5efe30ee8e2cf06a71c42c989e0891",
+  "packaged_signed_binary_sha256": "de2f1ff079d6184a71dd1f604aa3d3d94cd56172a41600c94d66f4a3857023c3",
+  "signature": "ad-hoc-verified",
+  "notarized": false,
+  "remaining_owned_processes": [],
+  "application_exit": 0,
+  "application_pid": 2593,
+  "child_pid": 2594,
+  "window_id": 27,
+  "png_stages": [
+    {
+      "name": "sixel_rgb_native_pixels",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_rgb_native_pixels.png",
+        "bytes": 6479,
+        "sha256": "2dee101cd779927f57202137e423ac87e2532b0c86baaa3c86a7e44760eefdf1",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_transparent_preserves_underlying_image",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_transparent_preserves_underlying_image.png",
+        "bytes": 6486,
+        "sha256": "a8dab0e9312c44aba58684ee18c6098e35fe2b251de312437e8c9510949f458a",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_opaque_uses_current_background",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_opaque_uses_current_background.png",
+        "bytes": 6501,
+        "sha256": "27fad2b4a506dcc0e5d43c5cabd780b158b5c065c72b4ff070fdfeaa9b51bf22",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_erase_display_repaints",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_erase_display_repaints.png",
+        "bytes": 6159,
+        "sha256": "d00baacb198af0a7bca638772c277893b9a1b683eacb6996c04effbb79db0703",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_cancel_and_pty_recovery",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_cancel_and_pty_recovery.png",
+        "bytes": 6159,
+        "sha256": "d00baacb198af0a7bca638772c277893b9a1b683eacb6996c04effbb79db0703",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_recovers_after_oversized_raster",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_recovers_after_oversized_raster.png",
+        "bytes": 6479,
+        "sha256": "2dee101cd779927f57202137e423ac87e2532b0c86baaa3c86a7e44760eefdf1",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_before_resize",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_before_resize.png",
+        "bytes": 6514,
+        "sha256": "d46f98b74853f9ed39ff254d1dc6dae714b99bcc034c1820fa6c8cf5b56779e4",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_resize_clips_without_ghosts",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_resize_clips_without_ghosts.png",
+        "bytes": 5408,
+        "sha256": "85ee56f54be7d06dcdd7d6a0218aa5aef9dc7441735b47e481fcbdf20d3ea60b",
+        "width": 256,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1024,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 256
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          256,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          256,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          256,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          256,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_resize_restores_visible_image",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_resize_restores_visible_image.png",
+        "bytes": 6514,
+        "sha256": "d46f98b74853f9ed39ff254d1dc6dae714b99bcc034c1820fa6c8cf5b56779e4",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    },
+    {
+      "name": "sixel_minimize_restore_visible_image",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_minimize_restore_visible_image.png",
+        "bytes": 6514,
+        "sha256": "d46f98b74853f9ed39ff254d1dc6dae714b99bcc034c1820fa6c8cf5b56779e4",
+        "width": 320,
+        "height": 208
+      },
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 2593,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-pt2iv814",
+        "window_id": 27
+      },
+      "attempts": 1
+    }
+  ],
+  "ime_keyboard": "not_performed",
+  "physical_display_latency": "not_measured",
+  "official_release_asset_readback": "not_performed; publish was skipped after Windows ARM gate failure"
+}

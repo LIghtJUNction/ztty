@@ -464,6 +464,112 @@
       "source_path": "derived from the copied Linux wrapper, Windows source-bound audit/native records and preserved runtime binding",
       "bytes": 4436,
       "sha256": "389fd3da6ffe5ca5add04d0f336df1a18d036411cf870ce2024110372df58b57"
+    },
+    {
+      "path": "formal-v0.3.0/github-status.json",
+      "source_path": "derived: read-only GitHub API run/jobs/tag/Release observations at 2026-11-18 13:11:00 UTC",
+      "bytes": 3853,
+      "sha256": "12ba634482062dd94ac30a03933fc00bcdb65d66ae052c0a836357d895f87ac1",
+      "kind": "derived"
+    },
+    {
+      "path": "formal-v0.3.0/index.json",
+      "source_path": "derived: formal run 44309412482 verified platform reports and artifact metadata",
+      "bytes": 4408,
+      "sha256": "73c76a9c8e92fa218c699e6d3e5eebd2b1d7ae5033a3547e945a83fe84d530aa",
+      "kind": "derived"
+    },
+    {
+      "path": "formal-v0.3.0/linux-aarch64-summary.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/linux-aarch64/audit-summary.json",
+      "bytes": 2910,
+      "sha256": "89f05a50f997a8890f25853e9ddf8cf3254313db0a6021bfd5f732ffde8e7751"
+    },
+    {
+      "path": "formal-v0.3.0/linux-x86_64-summary.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/linux-x86_64/audit-summary.json",
+      "bytes": 2909,
+      "sha256": "4abe52afb685b7c0b1bcfc3230bcc3027e683e4ecbacfe4c70f9f489f2765719"
+    },
+    {
+      "path": "formal-v0.3.0/macos-aarch64-summary.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/macos-aarch64/summary.json",
+      "bytes": 18314,
+      "sha256": "bc09bdb333806aaa4245243d068bd9e447a28ead26c29cfa3b403eced8aae707"
+    },
+    {
+      "path": "formal-v0.3.0/macos-index.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/macos-index.json",
+      "bytes": 3307,
+      "sha256": "56c94b471c3602ec3aa8ac0ec7f0c632f697d872abb54444f7f387be0debc57d"
+    },
+    {
+      "path": "formal-v0.3.0/macos-x86_64-summary.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/macos-x86_64/summary.json",
+      "bytes": 18376,
+      "sha256": "8a00e497d24a1827aae962a1236e1c6ae1b19e2e892ecc4912077a95e059c7f5"
+    },
+    {
+      "path": "formal-v0.3.0/verify-summary.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/verify/audit-summary.json",
+      "bytes": 3805,
+      "sha256": "a10c1bed5898b741b699d9659a6cdef031d002d707eb9402163779883532b878"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.build.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.build.json",
+      "bytes": 6119,
+      "sha256": "f285a0233e3415c1769463042b13543ffd592546046793ab88f615bca463e4f9"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.native.json",
+      "bytes": 31030,
+      "sha256": "650ee424fe2c82860e7917672332d770bc32b684b86260742f51e7e8ea9fcd26"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.json",
+      "bytes": 33554,
+      "sha256": "cbec3384ec7f7e5cc792d2a497b61d192822f365228c3692c928f672926c9217"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.runtime.log",
+      "source_path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.native.resize-rapid-diagnostic.runtime.log",
+      "bytes": 28669,
+      "sha256": "4074d2829bd4b4dae2ac0c3a7fdc76023db41c913e62b78636b9b09c35e8b1ba"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-restored.png",
+      "source_path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.native.resize-restored.png",
+      "bytes": 621,
+      "sha256": "2606a4b1f883d60be01f79666898e31e910dff334bb55c81c851c977a6da7e61"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.json",
+      "source_path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.json",
+      "bytes": 34485,
+      "sha256": "84c485cb4cbab9b75e94a7398a4c4aac49cc01757d2dc8bfc46c81b987ec1192"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.runtime.log",
+      "source_path": "artifacts/release-audit/formal-44309412482/windows-aarch64/ztty-windows-aarch64.native.resize-staged-diagnostic.runtime.log",
+      "bytes": 28654,
+      "sha256": "b6d3f2ffd9d63f34bac45cf4d1453e558ebaee5179eb26ac8ae80777550d3253"
+    },
+    {
+      "path": "formal-v0.3.0/windows-aarch64-summary.json",
+      "source_path": "derived: formal run 44309412482 verified platform reports and artifact metadata",
+      "bytes": 5220,
+      "sha256": "062fc3275530346e20755fb92168d7b2c9cde07b7628e321a2e948dc1e1027bc",
+      "kind": "derived"
+    },
+    {
+      "path": "formal-v0.3.0/windows-x86_64-summary.json",
+      "source_path": "derived: formal run 44309412482 verified platform reports and artifact metadata",
+      "bytes": 2666,
+      "sha256": "bad227647e00c70ea4e5db3fa43973991edd32cc9a1a04998be08e4eff6a5820",
+      "kind": "derived"
     }
   ],
   "notes": [
@@ -471,7 +577,8 @@
     "summary.json, scroll-prompt/source-binding.json and scroll-prompt/pixel-review.json are derived indexes or analyses; all other entries are byte-identical copies from the recorded source paths.",
     "The performance executables are development-only std benchmark programs, separate from the no_std terminal runtime.",
     "The six added PNGs are original scrollback captures. No image was modified, and the source tar archive and four older screenshots were not duplicated.",
-    "pre-release/index.json is an additional derived index; all other pre-release entries preserve the source bytes, including CRLF in native JSON records."
+    "pre-release/index.json is an additional derived index; all other pre-release entries preserve the source bytes, including CRLF in native JSON records.",
+    "formal-v0.3.0/index.json, github-status.json and windows-*-summary.json are derived audit records. Other formal-v0.3.0 files preserve source bytes, including CRLF. This formal run failed on Windows ARM; diagnostic successes do not override it. The v0.3.0 tag remains fixed, Publish was skipped, the Release API returned 404, and installation was not performed."
   ],
   "appended_checkpoints": [
     {
@@ -504,6 +611,19 @@
       "linux_runtime_source_sha": "3730b28a16f48b15809581213bccab284f6f4f22",
       "windows_accepted_source_sha": "3418b82dcfa1b9323379e36aec0f3926371b0eb6",
       "windows_run_id": 44306719420
+    },
+    {
+      "name": "formal-v0.3.0-attempt",
+      "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+      "tag": "v0.3.0",
+      "tag_object_sha": "9317806ac9b098c772f1a05514d222942268d2d5",
+      "run_id": 44309412482,
+      "index": "formal-v0.3.0/index.json",
+      "status": "failed",
+      "failed_gate": "Windows ARM resize_restores_visible_image",
+      "publish": "skipped",
+      "release_by_tag_http_status": 404,
+      "installation": "not_performed"
     }
   ]
 }
