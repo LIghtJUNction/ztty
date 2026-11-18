@@ -56,6 +56,187 @@ struct PaintRecord {
     surface: [i32; 2],
     region: [i32; 4],
     blit: i32,
+    start_event_sequence: u64,
+    end_event_sequence: u64,
+    default_message: u32,
+    default_depth: u32,
+    target: Option<PaintTarget>,
+}
+
+struct PaintTarget {
+    clip_type: i32,
+    clip: [i32; 4],
+    origin_ok: bool,
+    origin: [i32; 2],
+}
+
+const POSITION_MESSAGES: [u32; 6] = [
+    WM_WINDOWPOSCHANGING,
+    0x0047,
+    0x0088,
+    0x0085,
+    0x0014,
+    WM_SIZE,
+];
+
+#[derive(Clone, Copy, Default)]
+struct MessagePhase {
+    received: u64,
+    default_enter: u64,
+    default_exit: u64,
+}
+
+#[derive(Clone, Copy, Default)]
+struct PositionEvent {
+    sequence: u64,
+    flags_in: u32,
+    flags_submitted: u32,
+    position: [i32; 4],
+    current_outer: Option<[i32; 4]>,
+}
+impl PositionEvent {
+    fn json(self) -> String {
+        let outer = self.current_outer.map_or_else(
+            || String::from("null"),
+            |rect| format!("[{},{},{},{}]", rect[0], rect[1], rect[2], rect[3]),
+        );
+        format!(
+            concat!(
+                "{{\"sequence\":{},\"flags_in\":{},\"flags_submitted\":{},",
+                "\"position\":[{},{},{},{}],\"current_outer\":{}}}"
+            ),
+            self.sequence,
+            self.flags_in,
+            self.flags_submitted,
+            self.position[0],
+            self.position[1],
+            self.position[2],
+            self.position[3],
+            outer
+        )
+    }
+}
+
+#[derive(Clone, Copy, Default)]
+struct NativeEventRecord {
+    messages: [MessagePhase; 6],
+    changing: PositionEvent,
+    changed: PositionEvent,
+    size: [u32; 3],
+    default_message: u32,
+    default_depth: u32,
+}
+
+/// Memory-only ordering evidence. Every Cell update finishes before a native
+/// call can reenter; formatting happens only for the failure snapshot.
+struct NativeEvents {
+    enabled: bool,
+    paint_diagnostics: bool,
+    sequence: Cell<u64>,
+    record: Cell<NativeEventRecord>,
+}
+impl NativeEvents {
+    fn new(enabled: bool, paint_diagnostics: bool) -> Self {
+        Self {
+            enabled,
+            paint_diagnostics,
+            sequence: Cell::new(0),
+            record: Cell::new(NativeEventRecord::default()),
+        }
+    }
+    fn next(&self) -> u64 {
+        if !self.enabled {
+            return 0;
+        }
+        let sequence = self.sequence.get().saturating_add(1);
+        self.sequence.set(sequence);
+        sequence
+    }
+    fn update(&self, update: impl FnOnce(&mut NativeEventRecord)) {
+        if self.enabled {
+            let mut record = self.record.get();
+            update(&mut record);
+            self.record.set(record);
+        }
+    }
+    fn received(&self, message: u32) -> u64 {
+        if !self.enabled {
+            return 0;
+        }
+        let sequence = self.next();
+        if let Some(index) = POSITION_MESSAGES.iter().position(|value| *value == message) {
+            self.update(|record| record.messages[index].received = sequence);
+        }
+        sequence
+    }
+    fn enter_default(&self, message: u32) -> u32 {
+        if !self.enabled {
+            return 0;
+        }
+        let previous = self.record.get().default_message;
+        let sequence = self.next();
+        self.update(|record| {
+            record.default_depth = record.default_depth.saturating_add(1);
+            record.default_message = message;
+            if let Some(index) = POSITION_MESSAGES.iter().position(|value| *value == message) {
+                record.messages[index].default_enter = sequence;
+            }
+        });
+        previous
+    }
+    fn exit_default(&self, message: u32, previous: u32) {
+        if !self.enabled {
+            return;
+        }
+        let sequence = self.next();
+        self.update(|record| {
+            record.default_depth = record.default_depth.saturating_sub(1);
+            record.default_message = previous;
+            if let Some(index) = POSITION_MESSAGES.iter().position(|value| *value == message) {
+                record.messages[index].default_exit = sequence;
+            }
+        });
+    }
+    fn json(&self) -> String {
+        let record = self.record.get();
+        let mut messages = String::new();
+        for (index, message) in POSITION_MESSAGES.iter().enumerate() {
+            if index != 0 {
+                messages.push(',');
+            }
+            let phase = record.messages[index];
+            messages.push_str(&format!(
+                "{{\"message\":{},\"received\":{},\"default_enter\":{},\"default_exit\":{}}}",
+                message, phase.received, phase.default_enter, phase.default_exit
+            ));
+        }
+        let changed = record.changed;
+        let changed = format!(
+            "{{\"sequence\":{},\"flags_reported\":{},\"position\":[{},{},{},{}]}}",
+            changed.sequence,
+            changed.flags_in,
+            changed.position[0],
+            changed.position[1],
+            changed.position[2],
+            changed.position[3]
+        );
+        format!(
+            concat!(
+                "{{\"enabled\":{},\"sequence\":{},\"default_message\":{},\"default_depth\":{},",
+                "\"messages\":[{}],\"changing\":{},\"changed\":{},\"last_size\":{{\"kind\":{},\"size\":[{},{}]}}}}"
+            ),
+            self.enabled,
+            self.sequence.get(),
+            record.default_message,
+            record.default_depth,
+            messages,
+            record.changing.json(),
+            changed,
+            record.size[0],
+            record.size[1],
+            record.size[2]
+        )
+    }
 }
 
 struct NativeTrace {
@@ -558,6 +739,7 @@ impl App {
         dispatch_resize_pending: bool,
         dispatch_paint_pending: bool,
         deferred_paints: u64,
+        events: &NativeEvents,
     ) -> isize {
         // Only an explicitly configured test process may write this one-shot
         // record. No path or pointer is accepted from a window message.
@@ -578,6 +760,11 @@ impl App {
             )
         };
         let cpu = self.diagnostic_cpu_pixel(x, y);
+        let target = self.last_paint.target.as_ref().map_or_else(|| String::from("null"), |target| {
+            format!(concat!("{{\"clip_type\":{},\"clip\":[{},{},{},{}],\"origin_ok\":{},\"origin\":[{},{}]}}"),
+                target.clip_type, target.clip[0], target.clip[1], target.clip[2], target.clip[3],
+                target.origin_ok, target.origin[0], target.origin[1])
+        });
         let pane = self.panes.get(self.active).map_or_else(|| String::from("null"), |pane| {
             format!(concat!("{{\"rect\":[{},{},{},{}],\"grid\":[{},{}],\"pty\":[{},{}],\"images\":{},\"placements\":{},",
                             "\"dirty\":{},\"terminal_dirty\":{},\"grid_ready\":{},\"synchronized_output\":{}}}"),
@@ -591,7 +778,9 @@ impl App {
                 "{{\"surface\":{{\"size\":[{},{}],\"clip\":[{},{},{},{}]}},\"cpu_rgb\":{},\"dispatch_resize_pending\":{},",
                 "\"dispatch_paint_pending\":{},\"deferred_paints\":{},",
                 "\"app_resize_pending\":{},\"full_redraw\":{},\"pane\":{},\"last_paint\":{{\"sequence\":{},",
-                "\"surface\":[{},{}],\"region\":[{},{},{},{}],\"blit\":{}}}}}"
+                "\"surface\":[{},{}],\"region\":[{},{},{},{}],\"blit\":{},",
+                "\"start_event_sequence\":{},\"end_event_sequence\":{},\"default_message\":{},\"default_depth\":{},\"target_after_blit\":{}}},",
+                "\"events\":{}}}"
             ),
             self.surface.width,
             self.surface.height,
@@ -613,7 +802,13 @@ impl App {
             self.last_paint.region[1],
             self.last_paint.region[2],
             self.last_paint.region[3],
-            self.last_paint.blit
+            self.last_paint.blit,
+            self.last_paint.start_event_sequence,
+            self.last_paint.end_event_sequence,
+            self.last_paint.default_message,
+            self.last_paint.default_depth,
+            target,
+            events.json()
         );
         // All App/CPU fields above are captured before these native queries.
         let mut client = ffi::Rect::default();
@@ -656,13 +851,14 @@ impl App {
         }
         let record = format!(
             concat!(
-                "{{\"schema\":1,\"pid\":{},\"hwnd\":{},\"sample\":[{},{}],\"before\":{},",
+                "{{\"schema\":1,\"paint_diagnostics_enabled\":{},\"pid\":{},\"hwnd\":{},\"sample\":[{},{}],\"before\":{},",
                 "\"client_ok\":{},\"client\":[{},{}],\"update_pending\":{},\"update_rect\":[{},{},{},{}],",
                 "\"after_flush\":{{\"flush\":{},\"cpu_rgb\":{},\"bitmap_read\":{},\"bitmap\":[{},{}],",
                 "\"bitmap_matches\":{},\"source_rgb\":{},\"target_rgb\":{},",
                 "\"source_clip_type\":{},\"source_clip\":[{},{},{},{}],",
                 "\"target_clip_type\":{},\"target_clip\":[{},{},{},{}]}}}}\n"
             ),
+            events.paint_diagnostics,
             unsafe { ffi::GetCurrentProcessId() },
             self.hwnd as usize,
             x,
@@ -1766,7 +1962,14 @@ impl App {
         self.panes[index].dirty = false;
         self.panes[index].core.terminal.clear_dirty();
     }
-    fn paint(&mut self) {
+    fn paint(&mut self, events: &NativeEvents) {
+        let start_event_sequence = events.next();
+        let (default_message, default_depth) = if events.enabled {
+            let context = events.record.get();
+            (context.default_message, context.default_depth)
+        } else {
+            (0, 0)
+        };
         let mut paint: ffi::PaintStruct = unsafe { core::mem::zeroed() };
         let dc = unsafe { ffi::BeginPaint(self.hwnd, &mut paint) };
         if self.full_redraw {
@@ -1830,6 +2033,22 @@ impl App {
                 );
             }
         }
+        // These queries can change GDI batching. They are explicitly opt-in
+        // diagnostics, after the blit, and never an acceptance-path flush.
+        let target = if events.paint_diagnostics && !dc.is_null() {
+            let mut clip = ffi::Rect::default();
+            let mut origin = ffi::Point::default();
+            let clip_type = unsafe { ffi::GetClipBox(dc, &mut clip) };
+            let origin_ok = unsafe { ffi::GetDCOrgEx(dc, &mut origin) } != 0;
+            Some(PaintTarget {
+                clip_type,
+                clip: [clip.left, clip.top, clip.right, clip.bottom],
+                origin_ok,
+                origin: [origin.x, origin.y],
+            })
+        } else {
+            None
+        };
         if self.native_snapshot_path.is_some() {
             self.last_paint = PaintRecord {
                 sequence: self.last_paint.sequence.saturating_add(1),
@@ -1841,11 +2060,20 @@ impl App {
                     paint.paint.bottom,
                 ],
                 blit,
+                start_event_sequence,
+                end_event_sequence: 0,
+                default_message,
+                default_depth,
+                target,
             };
         }
         self.trace_frame("paint", dc, &paint.paint, blit);
         unsafe {
             ffi::EndPaint(self.hwnd, &paint);
+        }
+        let end_event_sequence = events.next();
+        if self.native_snapshot_path.is_some() {
+            self.last_paint.end_event_sequence = end_event_sequence;
         }
     }
     fn ime_position(&self) {
@@ -2412,12 +2640,26 @@ struct WindowState {
     app: UnsafeCell<App>,
     dispatch: session_dispatch::Dispatch,
     native_trace: NativeTrace,
+    native_events: NativeEvents,
 }
 impl WindowState {
     fn with<R>(&self, operation: impl FnOnce(&mut App) -> R) -> Option<R> {
         self.dispatch
             .with(|| operation(unsafe { &mut *self.app.get() }))
     }
+}
+
+unsafe fn default_window_proc(
+    state: &WindowState,
+    hwnd: Handle,
+    message: u32,
+    wparam: usize,
+    lparam: isize,
+) -> isize {
+    let previous = state.native_events.enter_default(message);
+    let result = unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
+    state.native_events.exit_default(message, previous);
+    result
 }
 
 unsafe extern "system" fn window_proc(
@@ -2439,20 +2681,52 @@ unsafe extern "system" fn window_proc(
         return unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
     }
     let state = unsafe { &*pointer };
+    let event_sequence = state.native_events.received(message);
+    if state.native_events.enabled
+        && message == 0x0047
+        && let Some(position) = unsafe { (lparam as *const ffi::WindowPos).as_ref() }
+    {
+        state.native_events.update(|record| {
+            record.changed = PositionEvent {
+                sequence: event_sequence,
+                flags_in: position.flags,
+                flags_submitted: position.flags,
+                position: [position.x, position.y, position.width, position.height],
+                current_outer: None,
+            }
+        });
+    }
     if message == WM_WINDOWPOSCHANGING {
         // The retained DIB is the source of every resized frame. Do not also
         // preserve and copy back old window pixels across a size change.
         // Keep default frame/minimum-size processing and every other flag.
         let mut current = ffi::Rect::default();
-        if let Some(position) = unsafe { (lparam as *mut ffi::WindowPos).as_mut() }
-            && position.flags & (SWP_NOSIZE | SWP_NOREDRAW) == 0
-            && unsafe { ffi::GetWindowRect(hwnd, &mut current) } != 0
-            && (current.right.saturating_sub(current.left) != position.width
-                || current.bottom.saturating_sub(current.top) != position.height)
-        {
-            position.flags |= SWP_NOCOPYBITS;
+        if let Some(position) = unsafe { (lparam as *mut ffi::WindowPos).as_mut() } {
+            let flags_in = position.flags;
+            let mut current_outer = None;
+            if position.flags & (SWP_NOSIZE | SWP_NOREDRAW) == 0
+                && unsafe { ffi::GetWindowRect(hwnd, &mut current) } != 0
+            {
+                current_outer = Some([current.left, current.top, current.right, current.bottom]);
+                if current.right.saturating_sub(current.left) != position.width
+                    || current.bottom.saturating_sub(current.top) != position.height
+                {
+                    position.flags |= SWP_NOCOPYBITS;
+                }
+            }
+            state.native_events.update(|record| {
+                if event_sequence >= record.changing.sequence {
+                    record.changing = PositionEvent {
+                        sequence: event_sequence,
+                        flags_in,
+                        flags_submitted: position.flags,
+                        position: [position.x, position.y, position.width, position.height],
+                        current_outer,
+                    };
+                }
+            });
         }
-        return unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
+        return unsafe { default_window_proc(state, hwnd, message, wparam, lparam) };
     }
     if message == WM_NATIVE_SNAPSHOT && wparam == NATIVE_SNAPSHOT_MAGIC {
         let resize_pending = state.dispatch.resize_pending();
@@ -2466,6 +2740,7 @@ unsafe extern "system" fn window_proc(
                     resize_pending,
                     paint_pending,
                     deferred_paints,
+                    &state.native_events,
                 )
             })
             .unwrap_or(0);
@@ -2474,6 +2749,13 @@ unsafe extern "system" fn window_proc(
         // Sent WM_SIZE can arrive while another callback owns App. Retain it
         // without borrowing App; the outer loop reads the latest client size.
         state.dispatch.resize_event(wparam == 1);
+        state.native_events.update(|record| {
+            record.size = [
+                wparam as u32,
+                lparam as u16 as u32,
+                (lparam >> 16) as u16 as u32,
+            ];
+        });
         if state.native_trace.enabled() {
             let mut client = ffi::Rect::default();
             unsafe {
@@ -2497,7 +2779,7 @@ unsafe extern "system" fn window_proc(
                 if state.dispatch.take_resize() && !app.panes.is_empty() {
                     app.resize();
                 }
-                app.paint();
+                app.paint(&state.native_events);
             }
             0x0014 => return Some(1),
             WM_CLOSE => {
@@ -2580,7 +2862,7 @@ unsafe extern "system" fn window_proc(
     }
     handled
         .flatten()
-        .unwrap_or_else(|| unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) })
+        .unwrap_or_else(|| unsafe { default_window_proc(state, hwnd, message, wparam, lparam) })
 }
 
 pub fn run(cfg: Config) -> Result<i32, &'static str> {
@@ -2589,6 +2871,13 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
     }
     let native_trace =
         os::environment_value("ZTTY_NATIVE_TRACE").is_some_and(|value| value == [u16::from(b'1')]);
+    let paint_diagnostics = os::environment_value("ZTTY_NATIVE_PAINT_DIAGNOSTICS")
+        .is_some_and(|value| value == [u16::from(b'1')]);
+    let native_snapshot_path = os::environment_value("ZTTY_NATIVE_SNAPSHOT").map(|mut path| {
+        path.push(0);
+        path
+    });
+    let native_events = NativeEvents::new(native_snapshot_path.is_some(), paint_diagnostics);
     let program = os::resolve(&cfg.command[0])?;
     let arguments: Vec<Vec<u16>> = cfg
         .command
@@ -2662,14 +2951,12 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             title: String::new(),
             focused: false,
             native_trace: NativeTrace::new(native_trace),
-            native_snapshot_path: os::environment_value("ZTTY_NATIVE_SNAPSHOT").map(|mut path| {
-                path.push(0);
-                path
-            }),
+            native_snapshot_path,
             last_paint: PaintRecord::default(),
         }),
         dispatch: session_dispatch::Dispatch::default(),
         native_trace: NativeTrace::new(native_trace),
+        native_events,
     });
     let class_name = wide("ztty.NativeWindow");
     let instance = unsafe { ffi::GetModuleHandleW(ptr::null()) };
@@ -3044,6 +3331,7 @@ mod ffi {
         pub fn GetObjectW(object: Handle, bytes: i32, result: *mut c_void) -> i32;
         pub fn GetPixel(dc: Handle, x: i32, y: i32) -> u32;
         pub fn GetClipBox(dc: Handle, rect: *mut Rect) -> i32;
+        pub fn GetDCOrgEx(dc: Handle, point: *mut Point) -> i32;
         pub fn SaveDC(dc: Handle) -> i32;
         pub fn RestoreDC(dc: Handle, saved: i32) -> i32;
         pub fn IntersectClipRect(dc: Handle, left: i32, top: i32, right: i32, bottom: i32) -> i32;
