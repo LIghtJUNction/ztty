@@ -138,3 +138,70 @@ fn session_switcher_has_an_overrideable_default_and_truthful_shortcut_hints() {
         Some("Ctrl+Shift+P")
     );
 }
+
+#[test]
+fn shifted_punctuation_bindings_follow_the_active_layout() {
+    let bindings = [
+        actions::parse("ctrl+shift+? = search", false).unwrap(),
+        actions::parse("ctrl+shift+: = palette", false).unwrap(),
+        actions::parse("ctrl+shift+{ = sessions", false).unwrap(),
+    ];
+    for (base, shifted, expected) in [
+        ('/', '?', "search"),
+        (';', ':', "palette"),
+        ('[', '{', "sessions"),
+        // The key that produces '?' need not be '/' on another layout.
+        (';', '?', "search"),
+    ] {
+        assert_eq!(
+            actions::key_action_with_shifted(&bindings, base as u64, Some(shifted as u64), 5),
+            Some(expected)
+        );
+        assert_eq!(
+            actions::key_action_with_shifted(
+                &bindings,
+                base as u64,
+                Some(shifted as u64),
+                5 | 2 | 16
+            ),
+            Some(expected)
+        );
+        assert_eq!(
+            actions::key_action_with_shifted(&bindings, base as u64, Some(shifted as u64), 4),
+            None
+        );
+        assert_eq!(
+            actions::key_action_with_shifted(&bindings, base as u64, Some(shifted as u64), 5 | 8),
+            None
+        );
+    }
+}
+
+#[test]
+fn shifted_custom_binding_wins_and_unshifted_defaults_remain_available() {
+    let mut bindings = vec![
+        actions::parse("ctrl+shift+/ = palette", false).unwrap(),
+        actions::parse("ctrl+shift+? = none", false).unwrap(),
+    ];
+    assert_eq!(
+        actions::key_action_with_shifted(&bindings, b'/' as u64, Some(b'?' as u64), 5),
+        Some("none")
+    );
+    bindings.pop();
+    assert_eq!(
+        actions::key_action_with_shifted(&bindings, b'/' as u64, Some(b'?' as u64), 5),
+        Some("palette")
+    );
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'f' as u64, Some(b'F' as u64), 5),
+        Some("search")
+    );
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'=' as u64, None, 4),
+        Some("font-increase")
+    );
+    assert_eq!(
+        actions::key_action_with_shifted(&[], b'+' as u64, None, 4),
+        Some("font-increase")
+    );
+}

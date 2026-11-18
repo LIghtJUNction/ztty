@@ -345,6 +345,20 @@ pub fn lookup(bindings: &[Binding], symbol: u64, state: u32) -> Option<&'static 
         .map(|b| b.action)
 }
 
+/// Prefer an explicitly bound shifted symbol, then retain physical-key
+/// bindings and defaults. The frontend supplies its active layout's symbol.
+pub fn key_action_with_shifted(
+    bindings: &[Binding],
+    symbol: u64,
+    shifted: Option<u64>,
+    state: u32,
+) -> Option<&'static str> {
+    shifted
+        .filter(|_| state & 1 != 0)
+        .and_then(|symbol| lookup(bindings, symbol, state))
+        .or_else(|| key_action(bindings, symbol, state))
+}
+
 pub fn key_action(bindings: &[Binding], symbol: u64, state: u32) -> Option<&'static str> {
     if let Some(action) = lookup(bindings, symbol, state) {
         return Some(action);
