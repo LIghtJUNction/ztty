@@ -144,7 +144,16 @@ impl Screen {
 
     #[inline]
     pub fn index(&self, x: usize, y: usize) -> usize {
-        ((self.row0 + y) % self.rows) * self.cols + x
+        debug_assert!(y < self.rows);
+        // Both terms are below rows, so a single subtraction wraps the ring.
+        // Avoid a dynamic integer division for every cell or row lookup.
+        let row = self.row0 + y;
+        let row = if row >= self.rows {
+            row - self.rows
+        } else {
+            row
+        };
+        row * self.cols + x
     }
 
     pub fn row(&self, y: usize) -> &[Cell] {
