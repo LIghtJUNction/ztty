@@ -8,6 +8,8 @@ extern crate alloc;
 pub use zgraphics as graphics;
 /// Platform-independent terminal input encoders.
 pub use zinput as input;
+/// Bounded native ZUI/1 scenes, component catalog and action intents.
+pub use ztty_ui as ui;
 mod screen;
 mod shell;
 mod terminal;
@@ -38,3 +40,6 @@ mod sixel_tests;
 
 #[cfg(test)]
 mod wrap_tests;
+
+#[cfg(test)]
+mod ui_tests;
