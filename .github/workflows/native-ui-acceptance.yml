@@ -43,7 +43,6 @@ jobs:
     timeout-minutes: 60
     env:
       RUST_TOOLCHAIN: '1.100.0'
-      RUSTUP_HOME: ${{ runner.temp }}/ztty-native-ui-rustup
       CARGO_TERM_COLOR: never
       PYTHONDONTWRITEBYTECODE: '1'
       PYTHONUNBUFFERED: '1'
@@ -71,6 +70,8 @@ jobs:
         id: dependencies
         run: |
           exec > >(tee artifacts/native-ui-acceptance/dependencies.log) 2>&1
+          export RUSTUP_HOME="$RUNNER_TEMP/ztty-native-ui-rustup"
+          printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
           sudo apt-get update
           sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev libxtst6 libxres1 \
             xvfb x11-xkb-utils fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
