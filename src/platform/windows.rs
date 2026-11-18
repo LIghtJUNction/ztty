@@ -3,11 +3,7 @@
 
 use crate::{Config, appearance::Appearance, os};
 use alloc::{boxed::Box, ffi::CString, format, string::String, sync::Arc, vec, vec::Vec};
-use core::{
-    cell::{Cell, UnsafeCell},
-    ffi::c_void,
-    ptr,
-};
+use core::{cell::UnsafeCell, ffi::c_void, ptr};
 use zterm::{
     CursorShape, Terminal,
     input::{self, Key, KeyEvent, ModifierKey, Modifiers, MouseEvent},
@@ -20,6 +16,8 @@ use ztty::{
     session_core::{ReadStep, SessionCore},
 };
 
+#[path = "windows_dispatch.rs"]
+mod session_dispatch;
 #[path = "windows_frame.rs"]
 mod session_frame;
 #[path = "windows_wait.rs"]
@@ -2026,16 +2024,12 @@ fn virtual_key(vk: u32, flags: isize) -> Key {
 /// same App never acquires overlapping mutable references on those callbacks.
 struct WindowState {
     app: UnsafeCell<App>,
-    dispatching: Cell<bool>,
+    dispatch: session_dispatch::Dispatch,
 }
 impl WindowState {
     fn with<R>(&self, operation: impl FnOnce(&mut App) -> R) -> Option<R> {
-        if self.dispatching.replace(true) {
-            return None;
-        }
-        let result = operation(unsafe { &mut *self.app.get() });
-        self.dispatching.set(false);
-        Some(result)
+        self.dispatch
+            .with(|| operation(unsafe { &mut *self.app.get() }))
     }
 }
 
@@ -2058,6 +2052,12 @@ unsafe extern "system" fn window_proc(
         return unsafe { ffi::DefWindowProcW(hwnd, message, wparam, lparam) };
     }
     let state = unsafe { &*pointer };
+    if message == WM_SIZE {
+        // Sent WM_SIZE can arrive while another callback owns App. Retain it
+        // without borrowing App; the outer loop reads the latest client size.
+        state.dispatch.resize_event(wparam == 1);
+        return 0;
+    }
     let handled = state.with(|app| {
         if app.panes.is_empty() && !matches!(message, WM_PAINT | WM_CLOSE | WM_DESTROY | 0x0082) {
             return Some(0);
@@ -2065,7 +2065,6 @@ unsafe extern "system" fn window_proc(
         match message {
             WM_PAINT => app.paint(),
             0x0014 => return Some(1),
-            WM_SIZE if wparam != 1 => app.resize(),
             WM_CLOSE => {
                 app.running = false;
                 return Some(0);
@@ -2221,7 +2220,7 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             title: String::new(),
             focused: false,
         }),
-        dispatching: Cell::new(false),
+        dispatch: session_dispatch::Dispatch::default(),
     });
     let class_name = wide("ztty.NativeWindow");
     let instance = unsafe { ffi::GetModuleHandleW(ptr::null()) };
@@ -2300,6 +2299,9 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
         }
         let running = state
             .with(|app| {
+                if state.dispatch.take_resize() && !app.panes.is_empty() {
+                    app.resize();
+                }
                 app.tick();
                 app.running
             })
@@ -2311,6 +2313,11 @@ pub fn run(cfg: Config) -> Result<i32, &'static str> {
             ffi::UpdateWindow(hwnd);
         }
         let timeout = state.with(|app| app.wait_timeout()).unwrap_or(8);
+        let timeout = if state.dispatch.resize_pending() {
+            0
+        } else {
+            timeout
+        };
         if let Err(error) = wake.wait(timeout) {
             state.with(|app| app.message(error));
             break;

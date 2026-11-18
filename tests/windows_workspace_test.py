@@ -43,8 +43,11 @@ class WorkspaceContract(unittest.TestCase):
             return count
         window.user = types.SimpleNamespace(GetForegroundWindow=lambda: 123, SendInput=send,
                                            GetAsyncKeyState=lambda key: 0)
-        window.text("A🦀\r")
-        self.assertEqual(calls, [(0, unit, flag) for unit in (65, 0xD83E, 0xDD80, 13) for flag in (4, 6)])
+        window.text("A🦀")
+        self.assertEqual(calls, [(0, unit, flag) for unit in (65, 0xD83E, 0xDD80) for flag in (4, 6)])
+        calls.clear()
+        window.chord(0x0D, control=False, shift=False)
+        self.assertEqual(calls, [(0x0D, 0, 0), (0x0D, 0, 2)])
         calls.clear()
         window.chord(0x45)
         self.assertEqual(calls, [(0x11, 0, 0), (0x10, 0, 0), (0x45, 0, 0),
