@@ -966,16 +966,6 @@ impl Session {
         let _ = self.core.pty.reap();
     }
     fn read(&self, request: &Value) -> Result<Reply, String> {
-        if let Some(expected) = request.get("expected_session")
-            && !crate::session_identity::ExpectedSession::parse(expected)?.matches(
-                &self.uri,
-                self.id,
-                self.created_at,
-                unsafe { os::getpid() } as u32,
-            )
-        {
-            return Err("session identity changed; start a new read".into());
-        }
         let cursor = match request.get("cursor") {
             None => 0,
             Some(v) => v
@@ -2349,6 +2339,22 @@ impl Pool {
             }
         }
         let index = self.selector(request)?;
+        let session = &self.sessions[index];
+        if let Some(expected) = request.get("expected_session")
+            && !crate::session_identity::ExpectedSession::parse(expected)?.matches(
+                &session.uri,
+                session.id,
+                session.created_at,
+                unsafe { os::getpid() } as u32,
+            )
+        {
+            return Err(if op == "read" {
+                "session identity changed; start a new read"
+            } else {
+                "session identity changed; refresh session metadata"
+            }
+            .into());
+        }
         if matches!(op, "write" | "resize" | "close" | "rename")
             && !self.sessions[index].core.owns(actor(request)?)
         {
@@ -2662,17 +2668,14 @@ impl Pool {
                     }
                     if kind == x11::KEY_PRESS {
                         let mut e = unsafe { event.key };
-                        let symbol = self.sessions[index]
-                            .ui
-                            .as_ref()
-                            .unwrap()
-                            .window
-                            .key_symbol(&mut e, false);
-                        if let Some(action) = actions::key_action(
-                            &self.sessions[index].appearance.bindings,
-                            symbol,
-                            e.state,
-                        ) {
+                        let window = &self.sessions[index].ui.as_ref().unwrap().window;
+                        let symbol = window.key_symbol(&mut e, false);
+                        let bindings = &self.sessions[index].appearance.bindings;
+                        let shifted = (e.state & 1 != 0 && !bindings.is_empty())
+                            .then(|| window.key_symbol(&mut e, true));
+                        if let Some(action) =
+                            actions::key_action_with_shifted(bindings, symbol, shifted, e.state)
+                        {
                             self.shortcuts[(e.keycode as usize).min(255)] = true;
                             if let Err(error) = self.action(index, action) {
                                 os::print(2, format!("ztty: {error}\n").as_bytes());

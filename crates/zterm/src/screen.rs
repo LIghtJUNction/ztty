@@ -124,7 +124,9 @@ pub(crate) struct SavedCursor {
     pub y: usize,
     pub style: Style,
     pub origin: bool,
-    pub charset: bool,
+    pub g0: bool,
+    pub g1: bool,
+    pub use_g1: bool,
     pub wrap: bool,
 }
 
@@ -300,6 +302,9 @@ impl Screen {
         if self.cols == cols && self.rows == rows {
             return;
         }
+        // A height-only resize leaves the right margin unchanged. Keep a
+        // deferred wrap so the next glyph cannot overwrite its final cell.
+        let wrap = self.wrap && cols == self.cols;
         // Keep the cursor's row visible when shrinking vertically. The owner
         // records any discarded primary-screen rows in scrollback first.
         let dropped = self.y.saturating_add(1).saturating_sub(rows);
@@ -325,7 +330,7 @@ impl Screen {
         self.y = self.y.saturating_sub(dropped).min(rows - 1);
         self.saved.x = self.saved.x.min(cols - 1);
         self.saved.y = self.saved.y.saturating_sub(dropped).min(rows - 1);
-        self.wrap = false;
+        self.wrap = wrap;
         self.top = 0;
         self.bottom = rows - 1;
         self.dirty = vec![true; rows];
