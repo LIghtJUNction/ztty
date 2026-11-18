@@ -11,7 +11,7 @@ Linux software-X11 results: host load1 4.46–10.58 on 24 CPUs, with 17.34–17.
 
 <!-- terminal-benchmark:end -->
 
-**Development checkpoint, 2026-11-18:** Bash loading and prompt hooks are repaired; MCP output reads can validate the original session identity and report reader termination. The current candidate passed 225 Rust tests, 6 doctests, four-shell integration, 11 Bash checks, 17 real Linux workspace checks and three MCP suites. [Implementation and evidence](docs/shell-resume-2026-11-18.md) · [Previous Unicode measurements](docs/integration-unicode-2026-11-18.md).
+**Earlier shell/resume checkpoint, 2026-11-18:** Bash loading and prompt hooks are repaired; MCP output reads can validate the original session identity and report reader termination. That candidate passed 225 Rust tests, 6 doctests, four-shell integration, 11 Bash checks, 17 real Linux workspace checks and three MCP suites. [Implementation and evidence](docs/shell-resume-2026-11-18.md) · [Previous Unicode measurements](docs/integration-unicode-2026-11-18.md).
 
 **Output throughput checkpoint, 2026-11-18:** a separate ten-window run of
 source `dfe949c7` (ztty 0.2.1) measured 227.58 MiB/s. A separate paired old/new run measured
@@ -52,10 +52,12 @@ acceptance target; the platform table records what has actually been exercised.
 [中文介绍](README.zh-CN.md)
 
 Linux provides history search across soft-wrapped text, a temporary session
-switcher and command palette, configurable key/mouse bindings, live configuration
-reload and OSC 133 command navigation.
+switcher and command palette, a **Back to live ↓** control while browsing
+history, configurable key/mouse bindings, live configuration reload and OSC 133
+command navigation.
 The shell scripts support opt-in Bash, Zsh, Fish and Nushell integration.
-[Daily workflow and limits](docs/daily-workflow.md) · [Shell setup](shell/README.md)
+[Experience candidate and evidence](docs/experience-release-2026-11-18.md)
+· [Daily workflow and limits](docs/daily-workflow.md) · [Shell setup](shell/README.md)
 · [MCP permissions and command reads](docs/sessions.md).
 
 ![Actual ztty window displaying a photo and transparent PNG in Hyprland/XWayland](docs/assets/kitty-graphics-hyprland.png)
@@ -63,30 +65,42 @@ The shell scripts support opt-in Bash, Zsh, Fish and Nushell integration.
 ## Platforms and verification
 
 Shared sessions, attach, and MCP currently use the Linux broker. Native macOS
-and Windows terminals remain available through their platform backends. The shared
-no_std library now exposes the PTY session core, action decoding, pane layout
-and workspace state; [integration evidence](docs/session-core.md) records
-the verified scope and the remaining native runtime work.
+and Windows terminals remain available through their platform backends. All
+three frontends use the shared no_std core for PTY reads, bounded input and
+terminal state. The library also exposes action decoding, pane layout and
+workspace state; [integration evidence](docs/session-core.md) records the scope.
+The shared-session UI, attach and MCP runtime remain Linux features.
 
-| Platform | Native implementation | Current acceptance status |
+| Platform | Native implementation | Source-bound verification record |
 | --- | --- | --- |
-| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 7a1d06b passed five GUI suites and cwd regressions on both native x86_64 and ARM64 under guarded Xvfb |
-| macOS | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Both native helpers compile; the latest candidate passed 10 protocol/cwd checks per architecture before an activation-policy guard failure; the state correction and pixels await native rerun |
-| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | Source 7a1d06b passed all 30 functional checks, 19 visible-pixel checks and full process/desktop cleanup on native x64 and ARM64 |
+| Linux | X11/XWayland, Xft text, Xrender image compositing, Linux PTY | Source 2ac46e2 passed all six GUI suites on native x86_64 and ARM64 under guarded Xvfb |
+| macOS Apple Silicon | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Source 2ac46e2 passed 8 threaded-spawn checks and 24 native checks, with 13 gate stages, 10 PNG captures and no remaining owned processes |
+| macOS Intel | AppKit window, CoreText/CoreGraphics rendering, Darwin PTY | Source 2ac46e2 passed the same 8 spawn and 24 native checks, with 13 gate stages, 10 PNG captures and no remaining owned processes |
+| Windows | Win32 window, GDI text, own RGBA compositing, ConPTY | The Windows-only retry at source dc43870 failed rapid shrink/restore on both native x64 and ARM64 after 22 of 30 base checks; workspace checks were not reached; owned-process and desktop cleanup passed |
 
 macOS now uses a fresh-exec PTY helper that can create sessions after AppKit
 starts threads. [Implementation and native test scope](docs/darwin-threaded-pty.md)
-record the controlling-terminal, descriptor and error-handling contracts;
-its native acceptance is pending.
+record the controlling-terminal, descriptor and error-handling contracts.
+[Candidate run 44298970562](https://github.com/LIghtJUNction/ztty/actions/runs/44298970562)
+contains the accepted Linux and macOS results and earlier Windows failures.
+[Windows retry 44300272576](https://github.com/LIghtJUNction/ztty/actions/runs/44300272576)
+records the remaining resize failure on both architectures.
+The [release record](docs/releasing.md) retains earlier successes and failures
+by source. macOS IME/keyboard input and physical display latency remain outside
+these native window checks.
+These records cover their named candidate sources; the release gate requires
+all six native architecture jobs to accept the final tagged source.
+The 0.3.0 release and device installation remain pending.
 
 The macOS and Windows backends use their native APIs. macOS does not require
 X11, and Windows does not require WSL. Cross-target compilation does not establish
 runtime or visual correctness. See [protocol acceptance](docs/protocols.md#acceptance-coverage)
 and [the release record](docs/releasing.md) for the verified scope and available
-artifacts. The [current candidate record](docs/native-candidates-2026-11-18.md)
-retains both ARM64 failures and their subsequent fixes. Earlier Hyprland images
-remain historical evidence; the current development desktop has no usable
-standard Xwayland endpoint.
+artifacts. The [earlier candidate record](docs/native-candidates-2026-11-18.md)
+retains previous ARM64 failures and their subsequent fixes. Earlier Hyprland
+images remain historical evidence. The Linux native gate uses private Xvfb
+displays; live desktop interaction and physical display latency have separate
+acceptance scopes.
 
 ## Install on Linux
 
@@ -290,11 +304,19 @@ GDI surface. Appearance parity across the three backends has not been validated.
 | Paste clipboard | Ctrl + Shift + V |
 | Paste primary selection | Middle mouse button |
 | Browse history | Mouse wheel or Shift + PageUp / PageDown |
+| Return to newest output | Click **Back to live ↓** while browsing history |
 | Open an OSC 8 link | Ctrl + click |
 | Switch or attach a session | Ctrl + Shift + S (`sessions`) |
 | Search retained text | Ctrl + Shift + F |
 | Open the command palette | Ctrl + Shift + P |
 | Reload configuration | Ctrl + Shift + R |
+
+The return control appears only while the view is above the newest output.
+If more output arrives, it changes to **New output · Back to live ↓** with a
+blue border while the rows being read stay anchored. Clicking returns to the
+bottom, clears the indication and hides the control. Search and the command
+palette stay open; observing views keep their input ownership and PTY size.
+[Scrollback behavior and narrow-window limits](docs/daily-workflow.md#returning-to-live-output).
 
 The session switcher filters by name, terminal title and session URI. Type words
 in any order, use Up/Down to choose, and press Enter to focus the selected view.
@@ -437,6 +459,7 @@ cargo run -p zpty --example capture
 cargo run --release -p zterm --example benchmark
 python3 tests/gui_smoke.py --binary ./target/release/ztty
 python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
+python3 tests/session_switcher.py --binary ./target/release/ztty
 python3 tests/repaint_gui.py --binary ./target/release/ztty
 python3 tests/test_throughput_benchmark.py
 python3 tests/mcp_transport.py --binary ./target/release/ztty
@@ -483,7 +506,3 @@ preserves its live PTY. External tools using `TERMINAL -e COMMAND`, including
 [Real integration, lifecycle and remaining platform boundaries](docs/ssmcp-observer.md).
 
 MIT © LIghtJUNction
-
-All three frontends now consume the same no_std session library for PTY pumping, bounded input and terminal state. [Core behavior and real PTY regressions](docs/session-core.md) document resize ordering and partial writes. Linux integration and native cross-target checks pass; execution of the newly integrated macOS/Windows paths awaits the next native candidate. Their shared-session, attach and MCP features remain unfinished.
-
-The next Windows candidate uses an owned visible CI desktop with verified worker cleanup and desktop restoration; the original pixel checks remain mandatory. [Native gate details](docs/native-candidates-2026-11-18.md#owned-windows-ci-desktop).
