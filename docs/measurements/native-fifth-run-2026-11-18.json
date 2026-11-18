@@ -210,15 +210,75 @@
         "ztty-windows-aarch64.native.resize-before.png": "4f571099e8c15af56fda714c76e912ec6136a962d858cc182d917210522cc117"
       },
       "drive_url": "https://drive.google.com/file/d/1_xVjlfo7L0xE6XbepBVbLfNc3SOhC9qI/view?usp=drivesdk"
+    },
+    {
+      "id": 14389343696,
+      "name": "ztty-linux-x86_64",
+      "bytes": 631070,
+      "sha256": "c3f70d18550800e0831c8deaf7a5c365470d186917f826d843b5d8e9fe995453",
+      "source_sha": "7a1d06b6e32fc196f7c7ea6a2605b1bf66a95610",
+      "manifest_sha256": "962c6b5508cc8362dbcb3d7e58a6d21a5a290eb337429ebf319bf2fd403ff388",
+      "verified_members": 6,
+      "build_passed": true,
+      "build_status": "accepted",
+      "native_passed": true,
+      "native_status": "passed",
+      "suites": [
+        {
+          "name": "workspaces",
+          "passed": true,
+          "checks_completed": 10,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "daily_workflow",
+          "passed": true,
+          "checks_completed": 15,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "sixel_gui",
+          "passed": true,
+          "checks_completed": 10,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "input_gui",
+          "passed": true,
+          "checks_completed": 8,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        },
+        {
+          "name": "repaint_gui",
+          "passed": true,
+          "checks_completed": 7,
+          "cleanup": {
+            "leftover_owned_pids": [],
+            "remaining_owned_pids": [],
+            "removed_owned_leases": []
+          }
+        }
+      ],
+      "evidence_files": 30,
+      "drive_url": "https://drive.google.com/file/d/1qT02MblJYkjptemGuPUMnjvfu8ENM8rE/view?usp=drivesdk"
     }
   ],
-  "pending": {
-    "linux_x86_64": {
-      "job_id": 134510213037,
-      "status": "in_progress",
-      "step": "Install native Linux build and GUI acceptance dependencies"
-    }
-  },
   "macos_failures": [
     {
       "job_id": 134510212933,
@@ -253,5 +313,13 @@
     "local_contract_exit": 0,
     "native_swift_compilation": "not_executed_locally; requires subsequent native candidate",
     "pixels": "not accepted by this correction alone"
+  },
+  "status": "completed; four native platform/architecture jobs accepted, two macOS helper compilation failures",
+  "macos_rerun": {
+    "run_id": 44220056623,
+    "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44220056623",
+    "source_sha": "ef3c2fc187a74aa6ce4eb7963b4d7d564f4dc969",
+    "build_only": true,
+    "status": "requested; acceptance pending"
   }
 }
