@@ -1031,7 +1031,9 @@ impl State {
             y: self.screen.y,
             style: self.style,
             origin: self.screen.origin,
-            charset: if self.use_g1 { self.g1 } else { self.g0 },
+            g0: self.g0,
+            g1: self.g1,
+            use_g1: self.use_g1,
             wrap: self.screen.wrap,
         };
     }
@@ -1042,11 +1044,9 @@ impl State {
         self.style = saved.style;
         self.screen.origin = saved.origin;
         self.screen.wrap = saved.wrap;
-        if self.use_g1 {
-            self.g1 = saved.charset;
-        } else {
-            self.g0 = saved.charset;
-        }
+        self.g0 = saved.g0;
+        self.g1 = saved.g1;
+        self.use_g1 = saved.use_g1;
     }
 
     fn record_history_row(&mut self, row: usize) {

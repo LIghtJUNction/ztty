@@ -124,7 +124,9 @@ pub(crate) struct SavedCursor {
     pub y: usize,
     pub style: Style,
     pub origin: bool,
-    pub charset: bool,
+    pub g0: bool,
+    pub g1: bool,
+    pub use_g1: bool,
     pub wrap: bool,
 }
 
