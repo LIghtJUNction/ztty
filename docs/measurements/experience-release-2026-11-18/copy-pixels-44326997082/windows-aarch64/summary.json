@@ -1,0 +1,396 @@
+{
+  "run_id": 44326997082,
+  "run_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44326997082",
+  "job_id": 134881047902,
+  "artifact_id": 14436494438,
+  "source_sha": "7e16300df2d13647c2307873790695668f34f2dd",
+  "source_ref": "refs/heads/fix/windows-resize-release-20261118",
+  "run_attempt": 1,
+  "build_only": true,
+  "candidate_platform": "windows",
+  "architecture": "aarch64",
+  "status": "failed",
+  "accepted": false,
+  "paint_diagnostics_enabled": true,
+  "runtime_trace_enabled": false,
+  "binary_sha256": "7cdca1e078f1034d683294dcfe5acb6e67f9a8b60036ef384e5d22f8125e8475",
+  "artifact_zip_sha256": "e668c78abb92a5ce090fa7b10f32fe38aa0807bf0cf8dd6a90b31cb9b5cb719f",
+  "build_files_verified": 66,
+  "checksum_sidecars_verified": 3,
+  "package_manifest_files_verified": 5,
+  "contract_tests": 29,
+  "cold_required": 8,
+  "cold_completed": 1,
+  "cold_attempted": 2,
+  "workspace_entered": false,
+  "reports": [
+    {
+      "report": "ztty-windows-aarch64.native.cold-01.json",
+      "report_sha256": "d5a39366953720cf3e3ced15739e04ec34d29996bc6141e97bd3547ab8428096",
+      "passed": true,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 31,
+      "warm_completed": 10,
+      "back_to_back_completed": 10,
+      "window_pid": 10428,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 1,
+          "elapsed_seconds": 0.0068456999999853,
+          "retry_timeout_seconds": 2.0
+        }
+      },
+      "error": null
+    },
+    {
+      "report": "ztty-windows-aarch64.native.cold-02.json",
+      "report_sha256": "fb33d7213b7aadd1ffc637c4b1dbd7a6697ecb19f7a09b726d22809df950da29",
+      "passed": false,
+      "source_binding": "source/binary-bound cold entry, immutable raw report SHA and build.files",
+      "base_checks": 23,
+      "warm_completed": 0,
+      "back_to_back_completed": 0,
+      "window_pid": 10888,
+      "runtime_trace_enabled": false,
+      "paint_diagnostics_enabled": true,
+      "cleanup": {
+        "process_exited": true,
+        "temporary_directory_removed": true,
+        "returncode": 0,
+        "directory_removal": {
+          "attempts": 2,
+          "elapsed_seconds": 0.05665870000001405,
+          "retry_timeout_seconds": 2.0,
+          "first_error": {
+            "type": "PermissionError",
+            "repr": "PermissionError(13, 'The process cannot access the file because it is being used by another process')",
+            "errno": 13,
+            "winerror": 32
+          }
+        }
+      },
+      "error": "resize_restores_visible_image: expected [255, 0, 0], last RGB [20, 20, 20]; timeout: resize_restores_visible_image; last error: None"
+    }
+  ],
+  "pngs_verified": 51,
+  "geometry_samples_verified": 82,
+  "failed_sample": [
+    175,
+    28
+  ],
+  "failed_expected": [
+    255,
+    0,
+    0
+  ],
+  "failed_actual": [
+    20,
+    20,
+    20
+  ],
+  "snapshot": {
+    "schema": 1,
+    "paint_diagnostics_enabled": true,
+    "pid": 10888,
+    "hwnd": 655384,
+    "sample": [
+      175,
+      28
+    ],
+    "before": {
+      "surface": {
+        "size": [
+          180,
+          190
+        ],
+        "clip": [
+          0,
+          0,
+          180,
+          190
+        ]
+      },
+      "cpu_rgb": [
+        255,
+        0,
+        0
+      ],
+      "dispatch_resize_pending": false,
+      "dispatch_paint_pending": false,
+      "deferred_paints": 0,
+      "app_resize_pending": false,
+      "full_redraw": false,
+      "pane": {
+        "rect": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "grid": [
+          20,
+          10
+        ],
+        "pty": [
+          20,
+          10
+        ],
+        "images": 1,
+        "placements": 1,
+        "dirty": false,
+        "terminal_dirty": false,
+        "grid_ready": true,
+        "synchronized_output": false
+      },
+      "last_paint": {
+        "sequence": 19,
+        "surface": [
+          180,
+          190
+        ],
+        "region": [
+          0,
+          0,
+          180,
+          190
+        ],
+        "blit": 1,
+        "start_event_sequence": 210,
+        "end_event_sequence": 211,
+        "default_message": 0,
+        "default_depth": 0,
+        "target_after_blit": {
+          "sample": [
+            178,
+            95
+          ],
+          "cpu_before_blit_rgb": [
+            16,
+            24,
+            32
+          ],
+          "gdi_flush_after_blit_return": 1,
+          "target_after_flush_rgb": [
+            16,
+            24,
+            32
+          ],
+          "source_after_target_read_rgb": [
+            16,
+            24,
+            32
+          ],
+          "clip_type": 2,
+          "clip": [
+            0,
+            0,
+            180,
+            190
+          ],
+          "origin_ok": true,
+          "origin": [
+            40,
+            63
+          ]
+        }
+      },
+      "events": {
+        "enabled": true,
+        "sequence": 212,
+        "default_message": 0,
+        "default_depth": 0,
+        "messages": [
+          {
+            "message": 70,
+            "received": 186,
+            "default_enter": 187,
+            "default_exit": 191
+          },
+          {
+            "message": 71,
+            "received": 202,
+            "default_enter": 203,
+            "default_exit": 205
+          },
+          {
+            "message": 136,
+            "received": 195,
+            "default_enter": 196,
+            "default_exit": 201
+          },
+          {
+            "message": 133,
+            "received": 197,
+            "default_enter": 198,
+            "default_exit": 199
+          },
+          {
+            "message": 20,
+            "received": 200,
+            "default_enter": 0,
+            "default_exit": 0
+          },
+          {
+            "message": 5,
+            "received": 204,
+            "default_enter": 0,
+            "default_exit": 0
+          }
+        ],
+        "changing": {
+          "sequence": 186,
+          "flags_in": 22,
+          "flags_submitted": 278,
+          "position": [
+            0,
+            0,
+            196,
+            229
+          ],
+          "current_outer": [
+            32,
+            32,
+            192,
+            261
+          ]
+        },
+        "changed": {
+          "sequence": 202,
+          "flags_reported": 4374,
+          "position": [
+            32,
+            32,
+            196,
+            229
+          ]
+        },
+        "last_size": {
+          "kind": 0,
+          "size": [
+            180,
+            190
+          ]
+        }
+      }
+    },
+    "client_ok": true,
+    "client": [
+      180,
+      190
+    ],
+    "update_pending": false,
+    "update_rect": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "after_flush": {
+      "flush": 1,
+      "cpu_rgb": [
+        255,
+        0,
+        0
+      ],
+      "bitmap_read": 32,
+      "bitmap": [
+        180,
+        190
+      ],
+      "bitmap_matches": true,
+      "source_rgb": [
+        255,
+        0,
+        0
+      ],
+      "target_rgb": [
+        20,
+        20,
+        20
+      ],
+      "source_clip_type": 2,
+      "source_clip": [
+        0,
+        0,
+        180,
+        190
+      ],
+      "target_clip_type": 2,
+      "target_clip": [
+        0,
+        0,
+        180,
+        190
+      ]
+    }
+  },
+  "phase_pixels": {
+    "resize-before": {
+      "diagnostic_point_178_95": [
+        16,
+        24,
+        32
+      ],
+      "gate_point_175_28": [
+        255,
+        0,
+        0
+      ]
+    },
+    "resize-restored": {
+      "diagnostic_point_178_95": [
+        20,
+        20,
+        20
+      ],
+      "gate_point_175_28": [
+        20,
+        20,
+        20
+      ]
+    },
+    "post-failure": {
+      "diagnostic_point_178_95": [
+        20,
+        20,
+        20
+      ],
+      "gate_point_175_28": [
+        20,
+        20,
+        20
+      ]
+    },
+    "post-repaint": {
+      "diagnostic_point_178_95": [
+        16,
+        24,
+        32
+      ],
+      "gate_point_175_28": [
+        255,
+        0,
+        0
+      ]
+    }
+  },
+  "cleanup": {
+    "errors": [],
+    "job_empty": true,
+    "worker_exited": true,
+    "input_restored": true,
+    "thread_restored": true,
+    "owned_desktop_closed": true,
+    "handles_closed": true,
+    "job_pids_after": [],
+    "input_before_restore": "ztty-native-9000-40300864183943948d221ec08c5bde25",
+    "input_after_restore": "Default"
+  },
+  "desktop_elapsed_seconds": 13.393,
+  "scope": "Opt-in diagnostic candidate only. Cold2 failed the original restore pixel gate after cold1 completed 31+10+10. The before-EndPaint target pixel at [178,95] matched CPU/source, while later failed PNG at the same point was gray. This observes a subsequent pixel change but does not identify the underlying cause. No retry, extra binary execution or CI dispatch was performed during audit."
+}

@@ -288,6 +288,25 @@ ARM64 的 staged 诊断必须按阶段解释。它的基础缩放确实取得缩
 
 本轮已核对 x64 的 96 张 PNG、157 个窗口采样，以及 ARM64 的 61 张 PNG、94 个窗口采样；采样计数包含独立诊断和失败后观察，不等于通过的检查数。两个原验收进程及四个独立诊断进程均退出，六个临时目录均首试实际删除，外层 Job 清空且桌面恢复；worker 分别在 19.127 秒和 26.636 秒以退出码 1 结束。精简归档的原始字节、artifact、源码和二进制哈希已绑定。本轮依然没有取得发布或设备安装资格，正式 `v0.3.0` 失败记录保持不变。[本轮身份、清理与交付边界](measurements/experience-release-2026-11-18/queued-paint-44324788860/index.json)
 
+### 5.10 复制阶段诊断区分了两架构的像素变化
+
+源码 `7e16300df2d13647c2307873790695668f34f2dd` 的 [Windows 诊断运行 44326997082](https://github.com/LIghtJUNction/ztty/actions/runs/44326997082)仍在双架构失败，新增采样只在 ARM64 的指定背景点直接观察到了后续颜色改变。本轮 `paint_diagnostics_enabled=true`、`runtime_trace_enabled=false`；两侧第一次冷启动各完成 `31+10+10`，第二次均通过 23 项后在原恢复红色点失败，该次 warm／背靠背未开始，第三至八次和工作区未执行。本轮显式增加了查询与 flush，其通过部分和恢复画面均不计入普通发布验收。[本轮范围与结果](measurements/experience-release-2026-11-18/copy-pixels-44326997082/index.json)
+
+新增采样观察的是 `(178,95)` 背景点，原验收观察的是 `(175,28)` 红色点，两者必须分开解释。在本轮 `180×190` 客户端中，代码先通过 kernel 读取前一点的 CPU 像素，再执行 `BitBlt`；紧接着记录 GdiFlush 返回值，按目标 DC、source DC 的顺序读取该点，随后查询 clip／原点，最后执行 `EndPaint`。两侧记录均为 CPU `[16,24,32]`、flush 返回 1、目标 `[16,24,32]`、source `[16,24,32]`，目标 clip 为完整 `180×190`，原点为 `[40,63]`。这直接记录了该背景点在绘制中的状态，没有测量原红色点在复制当时的值。[固定诊断顺序](https://github.com/LIghtJUNction/ztty/blob/7e16300df2d13647c2307873790695668f34f2dd/src/platform/windows.rs) · [x64 原始快照](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-x86_64/ztty-windows-x86_64.native.cold-02.post-failure.json) · [ARM64 原始快照](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.native.cold-02.post-failure.json)
+
+| 架构 | `EndPaint` 前目标 DC 的背景点 `(178,95)` | 后续失败 PNG 的同一点 | 失败 PNG 的原红色验收点 `(175,28)` |
+| --- | --- | --- | --- |
+| Windows x64 | `[16,24,32]`，符合背景 | `[16,24,32]`，该点没有观察到变化 | `[16,24,32]`，应为 `[255,0,0]`，原检查失败。[摘要](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-x86_64/summary.json) |
+| Windows ARM64 | `[16,24,32]`，符合背景 | `[20,20,20]`，同一位置后来变灰 | `[20,20,20]`，应为 `[255,0,0]`，原检查失败。[摘要](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-aarch64/summary.json) |
+
+ARM64 的证据支持“同一背景位置从绘制中正确变为稍后错误”，结论范围仅限该架构、该窗口和 `(178,95)`。它没有证明整个客户端在 `EndPaint` 前都正确，也没有证明 `(175,28)` 的红色已经正确复制；记录同样不能确定另一个线程的 `SetWindowPos` 返回时刻、系统 backing surface、合成或内部复制步骤。失败后的 source 红色仍属于稍后的快照，不能补齐缺失的复制时刻测量。[ARM64 原始失败报告](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-aarch64/ztty-windows-aarch64.native.cold-02.json) · [架构与点位边界](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-aarch64/evidence-index.json)
+
+x64 的画面表现不同，不能套用 ARM64 的同点变灰结论。它的背景探针位置保持正确，但原红色验收点已经变成背景；失败 PNG 中可见蓝色片段的纵向范围由 `38–55` 变为 `6–23`，右界由 `179` 变为 `178`，红色仅残留在顶部 `0–5`。这些可见片段与向上 32 像素并发生裁剪相符，仍不足以指认哪一次系统操作造成了变化。精简归档保留了原失败 PNG，完整色块计数与边界保存在摘要中。[x64 原失败画面](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-x86_64/ztty-windows-x86_64.native.cold-02.resize-restored.png) · [色块计数与边界](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-x86_64/summary.json)
+
+失败后的显式 flush 仍未恢复原验收点，正常消息泵补画后才恢复红色。每侧原失败 PNG 与 flush 后 PNG 字节相同，补画 PNG 与缩放前正确 PNG 字节相同；诊断恢复没有接受原失败。两侧各 51 张 PNG、82 个窗口采样已核对，原始报告与 artifact、源码及二进制身份均有哈希绑定。[x64 文件身份](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-x86_64/evidence-index.json) · [ARM64 文件身份](measurements/experience-release-2026-11-18/copy-pixels-44326997082/windows-aarch64/evidence-index.json)
+
+本轮四个应用进程均退出、临时目录均实际删除，外层 Job 清空且桌面恢复。ARM64 第二个目录首次删除遇到 `winerror=32`，在原有两秒期限内第二次删除成功，总耗时约 0.0567 秒，原像素失败保持不变；其余目录均首试删除。x64 和 ARM64 worker 分别在 12.381 秒、13.393 秒以退出码 1 结束。本轮没有取得发布或设备安装资格，后续生产策略的结果须按其自身源码和验收记录另行判断。[本轮清理与交付范围](measurements/experience-release-2026-11-18/copy-pixels-44326997082/index.json)
+
 ## 6. 发布与设备安装状态
 
 本节按正式失败后的实际状态更新。`v0.3.0` tag 保持固定，源码和历史失败证据继续可追溯；修复后的发布使用新 tag，并重新通过该 tag 的完整门禁。下列未执行动作不能用已有候选或单个平台通过替代。[正式状态索引](measurements/experience-release-2026-11-18/formal-v0.3.0/index.json)
