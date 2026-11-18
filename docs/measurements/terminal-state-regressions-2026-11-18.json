@@ -1,0 +1,137 @@
+{
+  "schema_version": 2,
+  "baseline_source": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+  "core_candidate_source": "91ae4e8961e5f97d4366e162ab638695b1b1144b",
+  "mcp_candidate_source": "0971198a1e6e7a7526b5d3d6774cd6281bd16f25",
+  "record_kind": "observed_result_summary",
+  "baseline_run": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "zterm",
+      "alternate_1047",
+      "--",
+      "--nocapture"
+    ],
+    "exit_code": 101,
+    "passed": 1,
+    "failed": 2,
+    "filtered_out": 88,
+    "tests": [
+      {
+        "name": "alternate_1047_preserves_retained_content_on_entry",
+        "status": "failed",
+        "observed": "!       ",
+        "expected": "ALT!    "
+      },
+      {
+        "name": "alternate_1047_clears_text_and_images_on_exit",
+        "status": "failed",
+        "observed": "ALT     ",
+        "expected": "        "
+      },
+      {
+        "name": "alternate_1047_reset_on_primary_preserves_both_screens",
+        "status": "passed"
+      }
+    ]
+  },
+  "post_fix_execution": {
+    "status": "passed",
+    "host": "light",
+    "source_base": "10ab35342634fb8e95a1af684bc09e32a782012b",
+    "source_changes": "Only rustfmt expanded the if expression in crates/zterm/src/tests.rs; production sources unchanged from the candidate.",
+    "file_sha256": {
+      "crates/zterm/src/tests.rs": "5330db36b6d57e87ebb34d99fc9e90d13e25436d0b2d5a28f8c268d15ff1d8df",
+      "crates/zterm/src/terminal.rs": "0fabe405bf16ec1e1a40e9ea6d15ca73413b47a32e3218e1f2d0873ec47a925c",
+      "crates/zterm/src/screen.rs": "c72cd780c4f78dd5856ef315b6a2ae7aa738d823d08196cc6ab4e166664c0793"
+    },
+    "checks": [
+      {
+        "command": [
+          "cargo",
+          "fmt",
+          "-p",
+          "zterm",
+          "--",
+          "--check"
+        ],
+        "exit_code": 0
+      },
+      {
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "zterm"
+        ],
+        "exit_code": 0,
+        "unit_tests_passed": 93,
+        "unit_tests_failed": 0,
+        "doc_tests_passed": 3,
+        "doc_tests_failed": 0
+      },
+      {
+        "command": [
+          "cargo",
+          "clippy",
+          "--locked",
+          "-p",
+          "zterm",
+          "--all-targets",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "local_logs": "artifacts/core-validation in the alternate-screen-state worktree"
+  },
+  "static_review": {
+    "core": "completed",
+    "mcp": "completed",
+    "mcp_python_ast": "passed for both modified test files"
+  },
+  "specifications": [
+    "https://invisible-island.net/xterm/ctlseqs/ctlseqs.html",
+    "https://www.zx.net.nz/computers/dec/vt220/doc/vt220-rm/chapter4.html"
+  ],
+  "character_set_baseline_run": {
+    "command": [
+      "cargo",
+      "test",
+      "-p",
+      "zterm",
+      "cursor_restore",
+      "--",
+      "--nocapture"
+    ],
+    "source_sha": "9b5497dac5402603ba0f633152fa4b07e6c11c9e",
+    "exit_code": 101,
+    "passed": 0,
+    "failed": 2,
+    "filtered_out": 91,
+    "tests": [
+      {
+        "name": "cursor_restore_recovers_both_character_sets_and_the_active_selection",
+        "status": "failed",
+        "save": [
+          27,
+          55
+        ],
+        "shifted": false,
+        "observed": "q─q     ",
+        "expected": "qq─     "
+      },
+      {
+        "name": "cursor_restore_keeps_character_set_snapshots_local_to_each_screen",
+        "status": "failed",
+        "observed": "─q─     ",
+        "expected": "──q     "
+      }
+    ]
+  }
+}
