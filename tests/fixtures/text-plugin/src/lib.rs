@@ -52,6 +52,17 @@ impl TextAction for Fixture {
             "cpu" => loop {
                 std::hint::spin_loop();
             },
+            "closed-channel-child" => {
+                let child = std::process::Command::new("/bin/sleep")
+                    .arg("30")
+                    .stdin(std::process::Stdio::null())
+                    .stdout(std::process::Stdio::null())
+                    .stderr(std::process::Stdio::null())
+                    .spawn()
+                    .unwrap();
+                marker(&format!("child {}", child.id()));
+                "child"
+            }
             "child-timeout" | "leaked-channel" => {
                 // Deliberately violate cooperative cleanup to test the host's
                 // process-group fallback; this is not an example for authors.

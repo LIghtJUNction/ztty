@@ -72,7 +72,7 @@ def main():
                         state = stat(pid)
                         assert state["parent"] == os.getpid(), (pid, state)
                         owned[pid] = state["start"]
-                        assert state["state"] == "Z", ("fixture descendant survived", pid, state)
+                        wait(lambda: stat(pid)["state"] == "Z", "fixture descendant survived", 1)
                         waited, _ = os.waitpid(pid, 0)
                         assert waited == pid
                     except FileNotFoundError:
@@ -116,6 +116,7 @@ def main():
             check("cpu-limit", valid, data=b"cpu", error="exited abnormally")
             check("child-timeout-process-group", valid, data=b"child-timeout", error="timed out")
             check("leaked-channel-process-group", valid, data=b"leaked-channel", error="timed out")
+            check("closed-channel-process-group", valid, data=b"closed-channel-child", expected=b"child")
             check("unsolicited-stdout-rejected", valid, data=b"stdout-junk", error="invalid extension")
             check("interface-version-mismatch", libraries["wrong-interface"], mode="check", error="interface rejected")
             check("noncooperative-library-rejected", libraries["pinned"], mode="check", error="cannot load extension")
