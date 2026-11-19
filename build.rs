@@ -1,3 +1,6 @@
+#[path = "build/wayland.rs"]
+mod wayland_build;
+
 use std::{env, path::PathBuf, process::Command};
 
 fn main() {
@@ -10,6 +13,9 @@ fn main() {
     // after Rust archives so --as-needed does not discard it.
     println!("cargo::rustc-link-arg-bin=ztty=-lgcc_s");
     let out = PathBuf::from(env::var_os("OUT_DIR").expect("OUT_DIR"));
+    if env::var_os("CARGO_FEATURE_WAYLAND").is_some() {
+        wayland_build::build(&out);
+    }
     let object = out.join("font_bridge.o");
     let flags = Command::new("pkg-config")
         .args(["--cflags", "fontconfig", "freetype2", "harfbuzz"])
