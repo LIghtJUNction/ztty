@@ -128,8 +128,8 @@ fn semantic_resize_clear_and_reset_never_return_reassigned_ranges() {
     assert!(!terminal.command_output(id, 100).unwrap().truncated);
     terminal.resize(10, 2);
     let output = terminal.command_output(id, 100).unwrap();
-    assert!(output.truncated);
-    assert!(output.text.is_empty());
+    assert!(!output.truncated);
+    assert_eq!(output.text, "alpha\nbeta\n");
     terminal.feed(b"\x1bc");
     assert_eq!(terminal.commands().len(), 0);
     let next = command(&mut terminal, b"new");

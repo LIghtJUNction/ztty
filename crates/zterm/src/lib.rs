@@ -23,7 +23,7 @@ pub use screen::{
 pub use shell::{
     CommandRecord, CommandText, MAX_COMMAND_TEXT, MAX_COMMANDS, ShellPhase, TextPosition,
 };
-pub use terminal::{CursorShape, Modes, Terminal, Theme};
+pub use terminal::{CursorShape, Modes, ResizeAnchor, Terminal, Theme};
 
 #[cfg(test)]
 extern crate std;
@@ -51,3 +51,6 @@ mod grapheme_tests;
 
 #[cfg(test)]
 mod blink_tests;
+
+#[cfg(test)]
+mod reflow_tests;
