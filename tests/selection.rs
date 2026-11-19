@@ -55,3 +55,85 @@ fn invalid_or_outside_selection_coordinates_are_bounded() {
         "abcd\nef"
     );
 }
+
+fn selected_unit(terminal: &Terminal, point: (usize, usize), unit: selection::Unit) -> String {
+    let (start, end) = selection::unit(terminal, point, 0, unit);
+    selection::text(terminal, start, end, 0)
+}
+
+#[test]
+fn word_selection_keeps_paths_and_stops_at_punctuation_and_spaces() {
+    let mut terminal = Terminal::new(40, 3, 20);
+    terminal.feed(b"(src/main.rs), next_word");
+    assert_eq!(
+        selected_unit(&terminal, (5, 0), selection::Unit::Word),
+        "src/main.rs"
+    );
+    assert_eq!(
+        selected_unit(&terminal, (19, 0), selection::Unit::Word),
+        "next_word"
+    );
+}
+
+#[test]
+fn word_selection_handles_wide_continuations_and_combining_marks() {
+    let mut terminal = Terminal::new(20, 3, 20);
+    terminal.feed("A 中e\u{301}文 Z".as_bytes());
+    assert_eq!(
+        selected_unit(&terminal, (3, 0), selection::Unit::Cell),
+        "中"
+    );
+    assert_eq!(
+        selected_unit(&terminal, (3, 0), selection::Unit::Word),
+        "中e\u{301}文"
+    );
+    assert_eq!(
+        selected_unit(&terminal, (6, 0), selection::Unit::Word),
+        "中e\u{301}文"
+    );
+}
+
+#[test]
+fn word_and_line_selection_cross_soft_wraps_but_not_hard_newlines() {
+    let mut terminal = Terminal::new(6, 5, 20);
+    terminal.feed(b"abcdefghij\r\nnext");
+    assert_eq!(
+        selected_unit(&terminal, (1, 1), selection::Unit::Word),
+        "abcdefghij"
+    );
+    assert_eq!(
+        selected_unit(&terminal, (1, 1), selection::Unit::Line),
+        "abcdefghij"
+    );
+    assert_eq!(
+        selected_unit(&terminal, (1, 2), selection::Unit::Line),
+        "next"
+    );
+}
+
+#[test]
+fn word_selection_skips_wide_character_wrap_padding() {
+    let mut terminal = Terminal::new(5, 4, 20);
+    terminal.feed("abcd中e\u{301}".as_bytes());
+    assert_eq!(
+        selected_unit(&terminal, (1, 1), selection::Unit::Word),
+        "abcd中e\u{301}"
+    );
+}
+
+#[test]
+fn selection_units_read_the_scrolled_view_and_clamp_pointer_coordinates() {
+    let mut terminal = Terminal::new(6, 2, 20);
+    terminal.feed(b"abcdefghi\r\nnext\r\nlast");
+    let offset = terminal.history_len();
+    let (start, end) = selection::unit(&terminal, (1, 1), offset, selection::Unit::Line);
+    assert_eq!(selection::text(&terminal, start, end, offset), "abcdefghi");
+    let (start, end) = selection::unit(
+        &terminal,
+        (usize::MAX, usize::MAX),
+        0,
+        selection::Unit::Cell,
+    );
+    assert_eq!(start, (5, 1));
+    assert_eq!(end, (5, 1));
+}
