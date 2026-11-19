@@ -12,7 +12,7 @@ python3 tests/registry_versions_test.py
 python3 tests/source_archive_test.py
 cargo fmt --all -- --check
 # Independent reusable crates keep their own workspace and validation scope.
-for package in zgpui zinput zpty zgraphics; do
+for package in zgpui zinput zpty zgraphics zterm; do
     cargo fmt --manifest-path "crates/$package/Cargo.toml" --all -- --check
     cargo test --locked --manifest-path "crates/$package/Cargo.toml"
     cargo clippy --locked --manifest-path "crates/$package/Cargo.toml" --all-targets -- -D warnings
@@ -37,7 +37,7 @@ fi
 # that the portable libraries do not acquire operating-system dependencies.
 # Opt in after installing the target; never silently label a skipped gate passed.
 if [ "${ZTTY_BARE_METAL:-0}" = 1 ]; then
-    cargo check --locked -p zterm --target x86_64-unknown-none
+    cargo check --locked --manifest-path crates/zterm/Cargo.toml --lib --target x86_64-unknown-none
 else
     printf '%s\n' 'Bare-metal portability check: skipped (set ZTTY_BARE_METAL=1 to require it).'
 fi

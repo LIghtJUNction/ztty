@@ -10,3 +10,6 @@
 [submodule "crates/zgraphics"]
 	path = crates/zgraphics
 	url = https://github.com/LIghtJUNction/zgraphics.git
+[submodule "crates/zterm"]
+	path = crates/zterm
+	url = https://github.com/LIghtJUNction/zterm.git
