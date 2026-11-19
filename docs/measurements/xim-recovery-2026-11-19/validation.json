@@ -1,0 +1,355 @@
+{
+  "production_commit": "6c44eb9bbece75594701e51cc9b439c31efb53c0",
+  "production_source_sha256": {
+    "src/x11.rs": "9f21c041d47608380dc8695362f9743a32bb4472e6042ca2f62d57ee3c95c8fe"
+  },
+  "source_binding": "The tested worktree source hash equals the committed production file; later changes only extend the test fixture and documentation.",
+  "candidate_binary_sha256": "5ab07a927c84861332a37b12e9918677aab0968e7c3e450cec861bed3de214a8",
+  "baseline_binary_sha256": "8f35b08477877a798cc2d44ff4431731bdddd418c9c3c72097493c68cc3d2d0c",
+  "candidate": {
+    "ok": true,
+    "scope": "Owned Xvfb, private D-Bus/fcitx5, XTEST and raw PTY",
+    "test_sha256": "427c68a18b6fbf0de70090d06bbc8847489605c159835c1bebcc3bfea3372a27",
+    "checks": [
+      {
+        "name": "restart initial XIM context",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "restart initial Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "restart ASCII without server",
+        "ok": true,
+        "actual": "616263",
+        "expected": "616263"
+      },
+      {
+        "name": "restart existing context reconnects",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "restart existing Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "restart same broker",
+        "ok": true,
+        "actual": 3824555,
+        "expected": 3824555
+      },
+      {
+        "name": "restart second window Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "restart focus returns Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "restart restart excludes closed context",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "restart repeated restart Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "delayed ASCII without server",
+        "ok": true,
+        "actual": "616263",
+        "expected": "616263"
+      },
+      {
+        "name": "delayed existing context reconnects",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "delayed existing Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "delayed same broker",
+        "ok": true,
+        "actual": 3825335,
+        "expected": 3825335
+      },
+      {
+        "name": "delayed second window Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "delayed focus returns Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "delayed restart excludes closed context",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "delayed repeated restart Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "callback initial XIM context",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "callback initial Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "callback ASCII without server",
+        "ok": true,
+        "actual": "616263",
+        "expected": "616263"
+      },
+      {
+        "name": "callback existing context reconnects",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "callback existing Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "callback same broker",
+        "ok": true,
+        "actual": 3826207,
+        "expected": 3826207
+      },
+      {
+        "name": "callback second window Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "callback focus returns Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "callback restart excludes closed context",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "callback repeated restart Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "creation destroy handled before IC returned",
+        "ok": true,
+        "actual": "1",
+        "expected": "1"
+      },
+      {
+        "name": "creation ASCII without server",
+        "ok": true,
+        "actual": "616263",
+        "expected": "616263"
+      },
+      {
+        "name": "creation existing context reconnects",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "creation existing Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "creation same broker",
+        "ok": true,
+        "actual": 3827009,
+        "expected": 3827009
+      },
+      {
+        "name": "creation second window Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "creation focus returns Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "creation restart excludes closed context",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "creation repeated restart Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      }
+    ],
+    "cleanup": {
+      "owned_processes_remaining": []
+    }
+  },
+  "baseline_restart": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "initial XIM context",
+        "ok": true,
+        "actual": true,
+        "expected": true
+      },
+      {
+        "name": "initial Chinese commit",
+        "ok": true,
+        "actual": "e4bda0e5a5bd",
+        "expected": "e4bda0e5a5bd"
+      }
+    ],
+    "error": "[Errno 111] Connection refused",
+    "broker_exit_before_cleanup": {
+      "pid": 3787846,
+      "reaped": 3787846,
+      "status": 139,
+      "signal": 11
+    },
+    "cleanup": {
+      "owned_processes_remaining": []
+    },
+    "test_sha256": "88f082b626f64018e2baff016d215e611897e84a8563adde596f5388fea75225"
+  },
+  "baseline_delayed": {
+    "ok": false,
+    "checks": [
+      {
+        "name": "delayed ASCII without server",
+        "ok": true,
+        "actual": "616263",
+        "expected": "616263"
+      },
+      {
+        "name": "delayed existing context reconnects",
+        "ok": false,
+        "actual": false,
+        "expected": true
+      },
+      {
+        "name": "delayed existing Chinese commit",
+        "ok": false,
+        "actual": "6e6968616f20",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "delayed same broker",
+        "ok": true,
+        "actual": 3776281,
+        "expected": 3776281
+      },
+      {
+        "name": "delayed second window Chinese commit",
+        "ok": false,
+        "actual": "6e6968616f20",
+        "expected": "e4bda0e5a5bd"
+      },
+      {
+        "name": "delayed focus returns Chinese commit",
+        "ok": false,
+        "actual": "6e6968616f20",
+        "expected": "e4bda0e5a5bd"
+      }
+    ],
+    "cleanup": {
+      "owned_processes_remaining": []
+    },
+    "test_sha256": "135c34c0499757ccbfd90cea5342eca099726499a9a9f404cb3d29ce0b4413e2"
+  },
+  "input_regression": {
+    "ok": true,
+    "vectors": 198,
+    "grouped_checks": 14,
+    "test_sha256": "8588fb9c9324f48a449b9fafde8e1fc0abf093c7134dc828b83c895cafc7fda8",
+    "cleanup": {
+      "owned_processes_remaining": []
+    }
+  },
+  "release_build": {
+    "ok": true,
+    "log": "archived xim-build.log",
+    "binary_sha256": "5ab07a927c84861332a37b12e9918677aab0968e7c3e450cec861bed3de214a8"
+  },
+  "format_check": {
+    "command": [
+      "cargo",
+      "fmt",
+      "--all",
+      "--",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "live_observed_summary": {
+    "kind": "Summary of read-only process/environment, journal, D-Bus and fresh XOpenIM observations; not a reconstructed raw trace.",
+    "installed_package": "ztty 0.4.1-5",
+    "ztty_process_count": 6,
+    "ztty_process_start_range_local": [
+      "2026-11-20T01:16:04+08:00",
+      "2026-11-20T01:17:04+08:00"
+    ],
+    "fcitx_start_local": "2026-11-20T01:18:04+08:00",
+    "display": ":0",
+    "xmodifiers": "@im=fcitx",
+    "current_x11_xim_contexts": 0,
+    "fresh_xopenim_succeeded": true,
+    "production_sessions_modified": false
+  },
+  "platform": "Linux X11/XWayland; other input method backends were not exercised.",
+  "raw_archive": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/xim-recovery-20261119-evidence"
+}

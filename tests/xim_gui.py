@@ -79,7 +79,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--scenario", choices=("restart", "delayed", "callback", "all"), default="all")
+    parser.add_argument("--scenario", choices=("restart", "delayed", "callback", "creation", "all"), default="all")
     args = parser.parse_args()
     binary = args.binary.resolve()
     source = Path(__file__).resolve().parents[1]
@@ -126,14 +126,62 @@ def main():
             # ztty process loads this shim; the real private fcitx is unchanged.
             shim = root / "first-open.so"
             shim_source = r"""
+#include <X11/Xlib.h>
+#include <X11/Xresource.h>
 #include <dlfcn.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <stdarg.h>
 #include <stdlib.h>
-typedef void *(*Open)(void *, void *, char *, char *);
-void *XOpenIM(void *display, void *db, char *name, char *class_name) {
+#include <string.h>
+#include <unistd.h>
+typedef XIM (*Open)(Display *, XrmDatabase, char *, char *);
+typedef XIC (*Create)(XIM, ...);
+XIM XOpenIM(Display *display, XrmDatabase db, char *name, char *class_name) {
     static int first = 1;
     Open next = (Open)dlsym(RTLD_NEXT, "XOpenIM");
-    if (first) { first = 0; return 0; }
+    if (first && getenv("ZTTY_XIM_TEST_DEFER_OPEN")) { first = 0; return 0; }
     return next(display, db, name, class_name);
+}
+XIC XCreateIC(XIM im, ...) {
+    static int first = 1;
+    va_list args;
+    va_start(args, im);
+    const char *style_name = va_arg(args, const char *);
+    XIMStyle style = va_arg(args, XIMStyle);
+    const char *client_name = va_arg(args, const char *);
+    Window client = va_arg(args, Window);
+    const char *focus_name = va_arg(args, const char *);
+    Window focus = va_arg(args, Window);
+    const char *end = va_arg(args, const char *);
+    va_end(args);
+    // This fixture intentionally understands only ztty's fixed IC arguments.
+    if (strcmp(style_name, XNInputStyle) || strcmp(client_name, XNClientWindow)
+        || strcmp(focus_name, XNFocusWindow) || end) abort();
+    Create next = (Create)dlsym(RTLD_NEXT, "XCreateIC");
+    XIC ic = next(im, style_name, style, client_name, client, focus_name, focus, NULL);
+    const char *pid_text = getenv("ZTTY_XIM_TEST_STOP_PID");
+    if (first && ic && pid_text) {
+        first = 0;
+        Display *display = XDisplayOfIM(im);
+        pid_t pid = (pid_t)strtol(pid_text, NULL, 10);
+        if (pid <= 1 || kill(pid, SIGTERM)) abort();
+        int filtered = 0;
+        // Process only the test server's destroy event before returning its
+        // now invalid IC. Ordinary focus/map/key events remain in the queue.
+        for (int i = 0; i < 3000 && !filtered; ++i) {
+            XEvent event;
+            XSync(display, False);
+            while (XCheckTypedEvent(display, DestroyNotify, &event))
+                filtered += XFilterEvent(&event, None) != 0;
+            if (!filtered) usleep(1000);
+        }
+        const char *marker = getenv("ZTTY_XIM_TEST_MARKER");
+        int fd = marker ? open(marker, O_WRONLY | O_CREAT | O_EXCL, 0600) : -1;
+        if (fd < 0 || write(fd, filtered ? "1" : "0", 1) != 1) abort();
+        close(fd);
+    }
+    return ic;
 }
 """
             subprocess.run(["cc", "-shared", "-fPIC", "-x", "c", "-", "-ldl", "-o", str(shim)],
@@ -179,8 +227,13 @@ void *XOpenIM(void *display, void *db, char *name, char *class_name) {
             def launch(name):
                 record, control = root / (name + ".bin"), root / (name + ".sock")
                 launch_env = env.copy()
-                if scenario == "callback":
+                if scenario in ("callback", "creation"):
                     launch_env["LD_PRELOAD"] = str(shim)
+                if scenario == "callback":
+                    launch_env["ZTTY_XIM_TEST_DEFER_OPEN"] = "1"
+                if scenario == "creation" and name.endswith("-first"):
+                    launch_env["ZTTY_XIM_TEST_STOP_PID"] = str(fcitx.pid)
+                    launch_env["ZTTY_XIM_TEST_MARKER"] = str(root / "create-marker")
                 subprocess.Popen([str(binary), "--name", name, "--config", str(config), "--geometry", "80x24",
                                   "-e", "/usr/bin/python3", "-c", CHILD, str(record), str(control)],
                                  env=launch_env, stdout=subprocess.DEVNULL, stderr=log, start_new_session=True)
@@ -219,13 +272,17 @@ void *XOpenIM(void *display, void *db, char *name, char *class_name) {
                 barrier(window)
                 check(name, window["record"].read_bytes().hex(), expected.encode().hex())
 
-            scenarios = ("restart", "delayed", "callback") if args.scenario == "all" else (args.scenario,)
+            scenarios = ("restart", "delayed", "callback", "creation") if args.scenario == "all" else (args.scenario,)
             for scenario in scenarios:
                 env["ZTTY_SOCKET"] = "@ztty-xim-" + root.name + "-" + scenario
-                if scenario in ("restart", "callback"):
+                if scenario in ("restart", "callback", "creation"):
                     start_im()
                 first = launch(scenario + "-first")
                 focus(first)
+                if scenario == "creation":
+                    fcitx.wait(timeout=5)
+                    fcitx = None
+                    check("creation destroy handled before IC returned", (root / "create-marker").read_text(), "1")
                 if scenario in ("restart", "callback"):
                     check(scenario + " initial XIM context", bool(wait(lambda: contexts() == 1)), True)
                     input_check(scenario + " initial Chinese commit", first, "nihao ", "你好", True)
