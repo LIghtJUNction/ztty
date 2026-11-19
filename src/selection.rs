@@ -141,23 +141,12 @@ pub fn text(
             if cell.width == 0 {
                 continue;
             }
-            let ch = if cell.ch == '\0' { ' ' } else { cell.ch };
-            let bytes = ch.len_utf8()
-                + cell
-                    .combining
-                    .iter()
-                    .filter(|ch| **ch != '\0')
-                    .map(|ch| ch.len_utf8())
-                    .sum::<usize>();
+            let chars = terminal.cell_chars(cell);
+            let bytes = chars.clone().map(char::len_utf8).sum::<usize>();
             if output.len() + bytes > MAX_BYTES {
                 return output;
             }
-            output.push(ch);
-            for ch in cell.combining {
-                if ch != '\0' {
-                    output.push(ch);
-                }
-            }
+            output.extend(chars);
         }
         // Soft-wrap metadata distinguishes meaningful line-end spaces from
         // untouched padding. Preserve them when joining the following row.

@@ -10,8 +10,8 @@ fn changed_theme() -> Theme {
 }
 
 #[test]
-fn provenance_fits_existing_cell_and_style_storage() {
-    assert_eq!(core::mem::size_of::<Cell>(), 28);
+fn provenance_and_complete_cluster_id_fit_compact_copy_storage() {
+    assert_eq!(core::mem::size_of::<Cell>(), 32);
     assert_eq!(core::mem::size_of::<crate::screen::Style>(), 16);
 }
 
