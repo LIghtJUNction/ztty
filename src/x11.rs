@@ -994,6 +994,8 @@ struct ImageUpload {
     used: u64,
 }
 
+const MAX_SELECTION_BYTES: usize = 4 * 1024 * 1024;
+
 pub struct Window {
     pub display: *mut Display,
     pub id: Xid,
@@ -1027,8 +1029,11 @@ pub struct Window {
     clipboard_text: String,
     primary_text: String,
     incoming: Vec<u8>,
+    incoming_type: Atom,
     receiving: bool,
     paste_selection: Atom,
+    paste_target: Atom,
+    paste_error: Option<&'static str>,
     last_cursor: Option<DrawnCursor>,
     padding: i32,
     background: u32,
@@ -1214,8 +1219,11 @@ impl Window {
                 clipboard_text: String::new(),
                 primary_text: String::new(),
                 incoming: Vec::new(),
+                incoming_type: 0,
                 receiving: false,
                 paste_selection: 0,
+                paste_target: 0,
+                paste_error: None,
                 last_cursor: None,
                 padding,
                 background,
@@ -2724,7 +2732,10 @@ impl Window {
     pub fn cancel_paste(&mut self) {
         self.receiving = false;
         self.incoming.clear();
+        self.incoming_type = 0;
         self.paste_selection = 0;
+        self.paste_target = 0;
+        self.paste_error = None;
         if self.id != 0 {
             unsafe {
                 XDeleteProperty(self.display, self.id, self.transfer);
@@ -2733,9 +2744,9 @@ impl Window {
     }
 
     pub fn paste(&mut self, primary: bool) {
-        self.receiving = false;
-        self.incoming.clear();
+        self.cancel_paste();
         self.paste_selection = if primary { 1 } else { self.clipboard };
+        self.paste_target = self.utf8;
         unsafe {
             XConvertSelection(
                 self.display,
@@ -2824,20 +2835,45 @@ impl Window {
             XFlush(self.display);
         }
     }
-    fn read_property(&self) -> (Atom, Vec<u8>) {
+    pub fn take_paste_error(&mut self) -> Option<&'static str> {
+        self.paste_error.take()
+    }
+
+    fn reject_paste(&mut self, error: &'static str) -> Option<Vec<u8>> {
+        self.cancel_paste();
+        self.paste_error = Some(error);
+        None
+    }
+
+    fn finish_paste(&mut self, data: Vec<u8>, kind: Atom) -> Option<Vec<u8>> {
+        self.receiving = false;
+        self.incoming_type = 0;
+        self.paste_selection = 0;
+        self.paste_target = 0;
+        Some(if kind == 31 {
+            data.into_iter()
+                .map(char::from)
+                .collect::<String>()
+                .into_bytes()
+        } else {
+            data
+        })
+    }
+
+    fn read_property(&self) -> Result<(Atom, Vec<u8>), &'static str> {
         let mut kind = 0;
         let mut format = 0;
         let mut count = 0;
         let mut remaining = 0;
         let mut data = core::ptr::null_mut();
-        let mut bytes = Vec::new();
+        let result;
         unsafe {
             let code = XGetWindowProperty(
                 self.display,
                 self.id,
                 self.transfer,
                 0,
-                1024 * 1024,
+                (MAX_SELECTION_BYTES / 4) as c_long,
                 1,
                 0,
                 &mut kind,
@@ -2846,14 +2882,28 @@ impl Window {
                 &mut remaining,
                 &mut data,
             );
-            if code == 0
-                && !data.is_null()
-                && format == 8
-                && remaining == 0
-                && count <= 4 * 1024 * 1024
-            {
-                bytes.extend_from_slice(core::slice::from_raw_parts(data, count as usize));
-            }
+            result = if code != 0 || kind == 0 || (count != 0 && data.is_null()) {
+                Err("Could not read clipboard")
+            } else if remaining != 0 || count > MAX_SELECTION_BYTES as c_ulong {
+                Err("Paste exceeds the 4 MiB clipboard limit")
+            } else if kind == self.incr {
+                if format != 32 || count != 1 {
+                    Err("Invalid clipboard transfer")
+                } else if *data.cast::<c_ulong>() > MAX_SELECTION_BYTES as c_ulong {
+                    Err("Paste exceeds the 4 MiB clipboard limit")
+                } else {
+                    Ok((kind, Vec::new()))
+                }
+            } else if format != 8 || (kind != self.utf8 && kind != 31) {
+                Err("Clipboard did not provide text")
+            } else {
+                let bytes = if count == 0 {
+                    Vec::new()
+                } else {
+                    core::slice::from_raw_parts(data, count as usize).to_vec()
+                };
+                Ok((kind, bytes))
+            };
             if !data.is_null() {
                 XFree(data.cast());
             }
@@ -2861,17 +2911,19 @@ impl Window {
                 XDeleteProperty(self.display, self.id, self.transfer);
             }
         }
-        (kind, bytes)
+        result
     }
     pub fn selection_notify(&mut self, event: SelectionEvent) -> Option<Vec<u8>> {
         if self.paste_selection == 0
             || event.requestor != self.id
             || event.selection != self.paste_selection
+            || event.target != self.paste_target
         {
             return None;
         }
         if event.property == 0 {
             if event.target == self.utf8 {
+                self.paste_target = 31;
                 unsafe {
                     XConvertSelection(
                         self.display,
@@ -2883,13 +2935,18 @@ impl Window {
                     );
                     XFlush(self.display);
                 }
+            } else {
+                return self.reject_paste("No text in clipboard");
             }
             return None;
         }
         if event.property != self.transfer {
             return None;
         }
-        let (kind, data) = self.read_property();
+        let (kind, data) = match self.read_property() {
+            Ok(value) => value,
+            Err(error) => return self.reject_paste(error),
+        };
         if kind == self.incr {
             self.receiving = true;
             self.incoming.clear();
@@ -2898,13 +2955,8 @@ impl Window {
                 XFlush(self.display);
             }
             None
-        } else if kind == 31 {
-            self.paste_selection = 0;
-            let text: String = data.into_iter().map(char::from).collect();
-            Some(text.into_bytes())
         } else {
-            self.paste_selection = 0;
-            Some(data)
+            self.finish_paste(data, kind)
         }
     }
     pub fn property(&mut self, event: PropertyEvent) -> Option<Vec<u8>> {
@@ -2915,17 +2967,20 @@ impl Window {
         {
             return None;
         }
-        let (_, data) = self.read_property();
-        if data.is_empty() {
-            self.receiving = false;
-            self.paste_selection = 0;
-            return Some(core::mem::take(&mut self.incoming));
+        let (kind, data) = match self.read_property() {
+            Ok(value) => value,
+            Err(error) => return self.reject_paste(error),
+        };
+        if kind == self.incr || (self.incoming_type != 0 && kind != self.incoming_type) {
+            return self.reject_paste("Clipboard text format changed");
         }
-        if self.incoming.len().saturating_add(data.len()) > 4 * 1024 * 1024 {
-            self.receiving = false;
-            self.paste_selection = 0;
-            self.incoming.clear();
-            return None;
+        self.incoming_type = kind;
+        if data.is_empty() {
+            let complete = core::mem::take(&mut self.incoming);
+            return self.finish_paste(complete, kind);
+        }
+        if self.incoming.len().saturating_add(data.len()) > MAX_SELECTION_BYTES {
+            return self.reject_paste("Paste exceeds the 4 MiB clipboard limit");
         }
         self.incoming.extend_from_slice(&data);
         unsafe {
