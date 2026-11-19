@@ -67,7 +67,7 @@ cargo add zinput@0.1.0 --no-default-features
 
 生产应用和依赖图保持 Rust `no_std`，动态存储使用 `alloc`。11 个生产 crate 的启用特性与源属性审计通过，Linux release 二进制没有 Rust `std::` 符号，`zinput/zgraphics/zterm` 在没有标准库的 `x86_64-unknown-none` 目标上通过检查。PNG 使用第三方 `zune-png/zune-core/zune-inflate` 的无标准库配置；这些不是用户自行编写的库。系统窗口、字体和 C ABI 仍属于运行时成本。证据见 [依赖审计](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/no-std-graphics-2026-11-18.txt)。
 
-默认每个场景最多保存 128 张图片、512 个放置，保留像素容量最多 32 MiB；单图最多 16 MiB，待完成传输最多 16 MiB。宽或高最多 8192 像素，同时必须满足字节限制。APC 暂存只需要 512 字节头部和 4096 字节编码数据。主备屏各自有配额，解码临时缓冲和平台显示缓存另行计入，因此这些数字不是整个进程的总内存上限。
+默认每个场景最多保存 128 张图片、512 个放置，保留像素容量最多 32 MiB；单图最多 32 MiB，待完成传输最多 16 MiB。宽或高最多 8192 像素，同时必须满足字节限制。APC 暂存只需要 512 字节头部和 4096 字节编码数据。主备屏各自有配额，解码临时缓冲和平台显示缓存另行计入，因此这些数字不是整个进程的总内存上限。
 
 ## 性能与测试
 

@@ -34,7 +34,7 @@ impl Default for Limits {
     fn default() -> Self {
         Self {
             max_dimension: 8192,
-            max_image_bytes: 16 * 1024 * 1024,
+            max_image_bytes: 32 * 1024 * 1024,
             max_total_bytes: 32 * 1024 * 1024,
             max_transfer_bytes: 16 * 1024 * 1024,
             max_images: 128,
