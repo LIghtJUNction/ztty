@@ -1,0 +1,17 @@
+[package]
+name = "ztty-dedent-plugin"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.100"
+license = "MIT"
+publish = false
+
+# Keep the guest's std feature separate from ztty's no_std host dependency graph.
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ztty-plugin-api = { path = "../../crates/ztty-plugin-api" }
+zplugin = { version = "=0.3.0", default-features = false, features = ["std", "macros"] }

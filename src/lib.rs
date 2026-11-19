@@ -19,3 +19,5 @@ pub mod session_control;
 pub mod session_core;
 pub mod session_identity;
 pub mod workspace_state;
+
+pub mod text_plugins;
