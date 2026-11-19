@@ -1,0 +1,14 @@
+    Checking simd-adler32 v0.3.10
+    Checking zune-core v0.5.3
+    Checking zvte v0.1.3
+    Checking zinput v0.1.2 ($WORKTREE/crates/zinput)
+    Checking unicode-width v0.2.3
+    Checking zune-inflate v0.2.54
+    Checking ztty-ui v0.1.0 ($WORKTREE/crates/ztty-ui)
+    Checking unicode-segmentation v1.13.3
+    Checking zune-png v0.5.2
+    Checking zgraphics v0.1.1 ($WORKTREE/crates/zgraphics)
+    Checking zterm v0.4.0 ($WORKTREE/crates/zterm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.46s
+warning: the following packages contain code that will be rejected by a future version of Rust: zune-png v0.5.2
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`

@@ -815,8 +815,8 @@ fn icat_probe_finishes_on_da1_and_advertises_only_sixel() {
         assert_eq!(
             t.responses(),
             b"\x1b_Gi=1;OK\x1b\\\
-              \x1b_Gi=2;ENOTSUP:only direct transmission is supported\x1b\\\
-              \x1b_Gi=3;ENOTSUP:only direct transmission is supported\x1b\\\x1b[?62;4c"
+              \x1b_Gi=2;ENOTSUP:host image I/O unavailable\x1b\\\
+              \x1b_Gi=3;ENOTSUP:host image I/O unavailable\x1b\\\x1b[?62;4c"
         );
         let start = t
             .responses()
