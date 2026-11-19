@@ -1,0 +1,8 @@
+    Checking ztty-ui v0.1.0 ($WORKTREE/crates/ztty-ui)
+   Compiling ztty v0.4.1 ($WORKTREE)
+    Checking zgraphics v0.1.1 ($WORKTREE/crates/zgraphics)
+    Checking zinput v0.1.2 ($WORKTREE/crates/zinput)
+    Checking zpty v0.2.1 ($WORKTREE/crates/zpty)
+    Checking ztty-plugin-api v0.1.0 ($WORKTREE/crates/ztty-plugin-api)
+    Checking zterm v0.4.0 ($WORKTREE/crates/zterm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.57s
