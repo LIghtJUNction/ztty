@@ -59,7 +59,7 @@ preserves running sessions; see [broker upgrades](docs/sessions.md#upgrading-a-r
 - VT sequences, true color, mouse reports, bracketed paste and Kitty keyboard input.
 - Unicode grapheme storage, history reflow and copy across wrapped lines.
 - Kitty images and Sixel; Linux adds animation, Unicode placeholders and relative placement.
-- Linux Kitty file/shared-memory transport and bounded OSC 52 clipboard access.
+- Linux X11 Kitty file/shared-memory transport and bounded OSC 52 clipboard access.
 - Linux tabs, splits, shared sessions, history search and a command palette.
 - Linux GPU text shaping with Xft fallback, live configuration and XIM recovery.
 - Optional [shell integration](shell/README.md) and [trusted text actions](docs/text-plugins.zh-CN.md).
@@ -160,9 +160,17 @@ retain their original conditions.
 <!-- terminal-benchmark:end -->
 
 Run `sh tools/check.sh` for the local development checks.
-The UI core, [zgpui 0.1.0](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0),
-is published independently. This application candidate uses `zterm 0.5.0` and
-`zgraphics 0.2.0`; publication of those versions is still pending.
+
+## Reusable libraries
+
+| Library | Role in ztty | Status |
+| --- | --- | --- |
+| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI scenes and layout | Published [0.1.0](https://crates.io/crates/zgpui/0.1.0) |
+| [zinput](https://github.com/LIghtJUNction/zinput) | Keyboard, mouse and paste encoding | Published [0.1.3](https://crates.io/crates/zinput/0.1.3) |
+| [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY process ownership | Published [0.2.2](https://crates.io/crates/zpty/0.2.2) |
+| [zgraphics](https://github.com/LIghtJUNction/zgraphics) | Image protocol and placement | Published [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
+| [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | 0.5.0 candidate |
+
 The [architecture](docs/architecture.md) describes the reusable Project Z libraries;
 the [documentation index](docs/README.md) links usage guides and verification records.
 

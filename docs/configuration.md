@@ -131,6 +131,11 @@ See [binding names and input rules](daily-workflow.md#custom-keys-and-mouse-butt
 
 ## Text actions on Linux X11
 
+`ztty-plugin-api` defines the text-action contract. The host and shared API both
+use [zplugin 0.3.1](https://crates.io/crates/zplugin/0.3.1); the locked dependency
+graph includes [zsys 0.1.1](https://crates.io/crates/zsys/0.1.1).
+These library releases are separate from the ztty application release.
+
 Register a trusted native library with:
 
 ```ini
