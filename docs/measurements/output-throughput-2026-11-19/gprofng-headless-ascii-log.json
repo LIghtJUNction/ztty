@@ -1,0 +1,142 @@
+[
+  {
+    "exclusive_seconds": 2.011,
+    "exclusive_percent": 100.0,
+    "inclusive_seconds": 2.011,
+    "inclusive_percent": 100.0,
+    "name": "<Total>"
+  },
+  {
+    "exclusive_seconds": 0.576,
+    "exclusive_percent": 28.64,
+    "inclusive_seconds": 0.576,
+    "inclusive_percent": 28.64,
+    "name": "<static>@0x1b1923 (<libc.so.6>)"
+  },
+  {
+    "exclusive_seconds": 0.535,
+    "exclusive_percent": 26.6,
+    "inclusive_seconds": 0.909,
+    "inclusive_percent": 45.2,
+    "name": "<zterm::terminal::State>::scroll_up"
+  },
+  {
+    "exclusive_seconds": 0.389,
+    "exclusive_percent": 19.34,
+    "inclusive_seconds": 1.331,
+    "inclusive_percent": 66.19,
+    "name": "<zvte::Parser<4096>>::advance::<zterm::terminal::State>"
+  },
+  {
+    "exclusive_seconds": 0.335,
+    "exclusive_percent": 16.66,
+    "inclusive_seconds": 0.335,
+    "inclusive_percent": 16.66,
+    "name": "read"
+  },
+  {
+    "exclusive_seconds": 0.051,
+    "exclusive_percent": 2.54,
+    "inclusive_seconds": 1.713,
+    "inclusive_percent": 85.18,
+    "name": "<ztty::session_core::SessionCore>::read_once"
+  },
+  {
+    "exclusive_seconds": 0.043,
+    "exclusive_percent": 2.14,
+    "inclusive_seconds": 0.373,
+    "inclusive_percent": 18.55,
+    "name": "zterm::terminal::push_history"
+  },
+  {
+    "exclusive_seconds": 0.026,
+    "exclusive_percent": 1.29,
+    "inclusive_seconds": 0.026,
+    "inclusive_percent": 1.29,
+    "name": "accept4"
+  },
+  {
+    "exclusive_seconds": 0.018,
+    "exclusive_percent": 0.9,
+    "inclusive_seconds": 0.929,
+    "inclusive_percent": 46.2,
+    "name": "<zterm::terminal::State>::advance_line"
+  },
+  {
+    "exclusive_seconds": 0.014,
+    "exclusive_percent": 0.7,
+    "inclusive_seconds": 0.014,
+    "inclusive_percent": 0.7,
+    "name": "poll"
+  },
+  {
+    "exclusive_seconds": 0.013,
+    "exclusive_percent": 0.65,
+    "inclusive_seconds": 0.013,
+    "inclusive_percent": 0.65,
+    "name": "<zterm::terminal::State as zvte::Perform>::execute"
+  },
+  {
+    "exclusive_seconds": 0.005,
+    "exclusive_percent": 0.25,
+    "inclusive_seconds": 0.005,
+    "inclusive_percent": 0.25,
+    "name": "wait4"
+  },
+  {
+    "exclusive_seconds": 0.003,
+    "exclusive_percent": 0.15,
+    "inclusive_seconds": 0.003,
+    "inclusive_percent": 0.15,
+    "name": "<static>@0xbb98b (<libc.so.6>)"
+  },
+  {
+    "exclusive_seconds": 0.001,
+    "exclusive_percent": 0.05,
+    "inclusive_seconds": 0.001,
+    "inclusive_percent": 0.05,
+    "name": "<zgraphics::Graphics>::scroll"
+  },
+  {
+    "exclusive_seconds": 0.001,
+    "exclusive_percent": 0.05,
+    "inclusive_seconds": 0.001,
+    "inclusive_percent": 0.05,
+    "name": "__vdso_clock_gettime"
+  },
+  {
+    "exclusive_seconds": 0.001,
+    "exclusive_percent": 0.05,
+    "inclusive_seconds": 0.001,
+    "inclusive_percent": 0.05,
+    "name": "ztty::json::encode"
+  },
+  {
+    "exclusive_seconds": 0.0,
+    "exclusive_percent": 0.0,
+    "inclusive_seconds": 0.003,
+    "inclusive_percent": 0.15,
+    "name": "<alloc::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc::alloc::Global>"
+  },
+  {
+    "exclusive_seconds": 0.0,
+    "exclusive_percent": 0.0,
+    "inclusive_seconds": 0.003,
+    "inclusive_percent": 0.15,
+    "name": "<alloc::raw_vec::RawVecInner>::finish_grow"
+  },
+  {
+    "exclusive_seconds": 0.0,
+    "exclusive_percent": 0.0,
+    "inclusive_seconds": 0.001,
+    "inclusive_percent": 0.05,
+    "name": "<ztty::broker::Peer>::reply"
+  },
+  {
+    "exclusive_seconds": 0.0,
+    "exclusive_percent": 0.0,
+    "inclusive_seconds": 0.001,
+    "inclusive_percent": 0.05,
+    "name": "<ztty::broker::PendingRequest>::connect_once"
+  }
+]

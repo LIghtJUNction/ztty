@@ -1,0 +1,102 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "command": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "crates/zterm/src/screen.rs"
+      ],
+      "exit_code": 0,
+      "seconds": 0.09332077799990657
+    },
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.49027842299983604
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "zterm"
+      ],
+      "exit_code": 0,
+      "log": "zterm-tests.log",
+      "seconds": 5.119895744999667
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--test",
+        "session_core"
+      ],
+      "exit_code": 0,
+      "log": "session-core-tests.log",
+      "seconds": 6.180836062001617
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "-p",
+        "zterm",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "log": "clippy.log",
+      "seconds": 2.4677935789986805
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "ztty"
+      ],
+      "exit_code": 0,
+      "log": "release-build.log",
+      "seconds": 10.330756604998896
+    }
+  ],
+  "interrupted_attempt": {
+    "reason": "Cancelled own cargo tree after 190 seconds waiting behind the global compiler queue; no test had run. Prior log retained.",
+    "log": "retained in the local evidence archive"
+  },
+  "environment_overrides": {
+    "CARGO_BUILD_JOBS": "1",
+    "RUSTC_WRAPPER": ""
+  },
+  "binary_sha256": "8f35b08477877a798cc2d44ff4431731bdddd418c9c3c72097493c68cc3d2d0c",
+  "source_commit": "94aa9b55709af44cf61ea4b362b06cd37ac20f51",
+  "production_source_sha256": {
+    "crates/zterm/src/screen.rs": "553b149f51602125c3bbb73b4f644c56d141e2a6aa9020fdf6ba3c46423b47ee"
+  },
+  "gui": [
+    {
+      "version": "baseline",
+      "checks": 11,
+      "binary_sha256": "2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7",
+      "report": "repaint-baseline.json"
+    },
+    {
+      "version": "candidate",
+      "checks": 11,
+      "binary_sha256": "8f35b08477877a798cc2d44ff4431731bdddd418c9c3c72097493c68cc3d2d0c",
+      "report": "repaint-candidate.json"
+    }
+  ]
+}

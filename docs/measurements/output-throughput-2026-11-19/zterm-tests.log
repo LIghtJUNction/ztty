@@ -1,0 +1,136 @@
+   Compiling zinput v0.1.2 (ztty/crates/zinput)
+   Compiling zvte v0.1.3
+   Compiling unicode-width v0.2.3
+   Compiling ztty-ui v0.1.0 (ztty/crates/ztty-ui)
+   Compiling zterm v0.4.0 (ztty/crates/zterm)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.65s
+     Running unittests src/lib.rs (target/debug/build/zterm/92d08646992b2e03/out/zterm-92d08646992b2e03)
+
+running 114 tests
+test shell_tests::semantic_invalid_exit_status_and_unknown_marks_do_not_end_command ... ok
+test shell_tests::semantic_boundaries_extract_input_and_output_and_status ... ok
+test shell_tests::semantic_history_clear_marks_evicted_output_truncated ... ok
+test shell_tests::semantic_byte_limit_never_splits_utf8 ... ok
+test shell_tests::semantic_alt_screen_marks_are_ignored_and_primary_output_survives ... ok
+test shell_tests::semantic_output_anchors_survive_scroll_and_history_eviction ... ok
+test shell_tests::semantic_next_prompt_closes_output_without_inventing_exit_status ... ok
+test shell_tests::semantic_resize_clear_and_reset_never_return_reassigned_ranges ... ok
+test sixel_tests::sixel_cancellation_and_truncation_never_display_partial_images ... ok
+test shell_tests::semantic_prompt_redraw_secondary_prompt_and_duplicate_marks_are_bounded ... ok
+test sixel_tests::sixel_combining_mark_redraw_erases_the_existing_base_cell ... ok
+test sixel_tests::sixel_erase_keeps_pixels_in_scrollback ... ok
+test sixel_tests::sixel_palette_scope_background_and_mode_queries_are_explicit ... ok
+test sixel_tests::sixel_interoperates_with_kitty_dcs_queries_and_alternate_screen ... ok
+test sixel_tests::sixel_scaled_erasure_rounds_out_to_source_pixels ... ok
+test sixel_tests::sixel_erasure_preserves_kitty_and_nonintersecting_sixel ... ok
+test sixel_tests::sixel_scrolls_with_history_and_respects_display_and_right_modes ... ok
+test sixel_tests::sixel_text_overwrite_erases_only_the_intersecting_cells ... ok
+test tests::alternate_1047_preserves_retained_content_on_entry ... ok
+test shell_tests::semantic_markers_are_independent_of_chunk_boundaries ... ok
+test sixel_tests::sixel_local_erase_and_spaces_release_complete_previews ... ok
+test tests::alternate_1047_clears_text_and_images_on_exit ... ok
+test tests::alternate_screen_restores_primary_cursor_style_and_content ... ok
+test tests::ascii_batch_overwrites_complete_wide_glyphs_and_handles_the_last_column ... ok
+test tests::alternate_1047_reset_on_primary_preserves_both_screens ... ok
+test tests::ascii_batch_repairs_both_wide_boundaries_without_touching_other_glyphs ... ok
+test tests::ascii_batch_uses_only_the_selected_character_set ... ok
+test tests::ascii_delayed_wrap_and_carriage_return ... ok
+test tests::cursor_restore_keeps_character_set_snapshots_local_to_each_screen ... ok
+test tests::cursor_restore_recovers_both_character_sets_and_the_active_selection ... ok
+test tests::damage_tracking_marks_changed_rows_and_cursor_rows ... ok
+test tests::cell_storage_has_no_heap_pointer_and_is_compact ... ok
+test tests::erase_half_of_wide_character_clears_both_halves ... ok
+test sixel_tests::sixel_every_chunk_boundary_has_identical_pixels_and_cursor ... ok
+test sixel_tests::sixel_c1_terminator_and_large_scrolling_region_are_bounded ... ok
+test tests::hyperlink_survives_closure_sgr_reset_and_scroll ... ok
+test tests::insert_delete_characters_and_lines_are_bounded ... ok
+test tests::graphics_dispatch_cancels_previous_osc_and_dcs_without_text_leakage ... ok
+test tests::graphics_follow_scroll_resize_alternate_screen_and_deletion ... ok
+test tests::incomplete_graphics_transfers_do_not_consume_following_text ... ok
+test tests::kitty_keyboard_flags_and_stacks_are_screen_local ... ok
+test tests::graphics_query_precedes_device_attributes_and_reports_actual_cell_size ... ok
+test tests::height_growth_preserves_pending_wrap_for_ascii_and_wide_cells ... ok
+test tests::missing_st_unknown_apc_and_oversize_apc_recover_on_cancellation ... ok
+test tests::graphics_cursor_policy_and_reset_generation_are_stable ... ok
+test tests::mouse_encoding_and_tracking_modes_are_independent ... ok
+test tests::origin_mode_coordinates_and_cursor_report_follow_margins ... ok
+test tests::height_shrink_preserves_pending_wrap_after_history_transfer ... ok
+test tests::height_resize_keeps_combining_marks_on_the_right_margin_cell ... ok
+test tests::osc_color_queries_reply_with_resolved_rgb_and_valid_indices ... ok
+test tests::icat_probe_finishes_on_da1_and_advertises_only_sixel ... ok
+test tests::history_is_bounded_and_view_orders_oldest_to_newest ... ok
+test tests::repeated_alternate_screen_enable_keeps_primary_saved_state ... ok
+test tests::overflowing_osc_is_rejected_as_a_whole ... ok
+test tests::resize_keeps_the_cursor_row_and_moves_discarded_rows_into_history ... ok
+test tests::resize_in_alternate_screen_preserves_primary_cursor_and_history ... ok
+test tests::resize_preserves_cells_and_removes_split_wide_glyph ... ok
+test tests::scroll_region_preserves_outside_rows_and_does_not_enter_history ... ok
+test tests::semicolons_in_osc_metadata_are_preserved ... ok
+test tests::sgr_supports_indexed_rgb_and_colon_forms ... ok
+test tests::sgr_streaming_preserves_missing_invalid_and_mixed_parameter_groups ... ok
+test tests::sync_output_and_mode_queries_report_actual_state ... ok
+test tests::tabs_and_dec_line_drawing_work_without_allocated_glyphs ... ok
+test tests::synchronized_frame_timeout_and_reset_preserve_pending_commit ... ok
+test tests::terminal_capability_queries_reject_unknown_names ... ok
+test tests::unchanged_resize_preserves_pending_wrap ... ok
+test sixel_tests::repeated_sixel_preview_replacement_reclaims_image_budget ... ok
+test tests::unicode_insert_preserves_shifted_glyphs_and_repairs_split_glyphs ... ok
+test tests::synchronized_frame_commit_survives_all_chunk_boundaries_until_painted ... ok
+test tests::unicode_narrow_overwrite_repairs_either_wide_half_and_replaces_metadata ... ok
+test tests::unicode_overwrite_handles_narrow_screens_and_wrap_boundaries ... ok
+test tests::unicode_wide_overwrite_repairs_both_outside_halves ... ok
+test tests::repeated_ring_wraps_keep_history_partial_margins_and_reverse_index_ordered ... ok
+test tests::wide_character_wraps_before_last_column ... ok
+test tests::wide_glyphs_and_combining_marks_occupy_correct_cells ... ok
+test tests::x10_mouse_mode_negotiation_preserves_other_tracking_modes ... ok
+test tests::kitty_graphics_framing_is_independent_of_every_pty_chunk_boundary ... ok
+test theme_tests::color_resets_clear_only_the_corresponding_provenance ... ok
+test theme_tests::defaults_change_but_identical_explicit_rgb_does_not ... ok
+test theme_tests::erased_cells_keep_color_sources_and_resized_blanks_use_current_defaults ... ok
+test tests::utf8_and_sequences_are_independent_of_chunk_boundaries ... ok
+test theme_tests::every_ansi_index_follows_the_palette_for_all_sgr_encodings ... ok
+test theme_tests::history_and_rotated_screen_rows_update_without_losing_text ... ok
+test theme_tests::invalid_color_sequences_preserve_the_previous_source ... ok
+test theme_tests::no_op_does_not_dirty_rows_and_shell_metadata_survives_theme_change ... ok
+test theme_tests::osc_queries_report_current_colors_with_unchanged_terminators ... ok
+test theme_tests::provenance_fits_existing_cell_and_style_storage ... ok
+test theme_tests::saved_styles_update_in_both_primary_and_cached_alternate_screens ... ok
+test theme_tests::truecolor_and_extended_indices_never_become_palette_references ... ok
+test theme_tests::wide_cells_combining_marks_hyperlinks_and_rendition_survive ... ok
+test ui_tests::capabilities_reply_is_explicit_and_actions_are_never_auto_written ... ok
+test ui_tests::cancelled_ui_and_unrecognized_namespaces_do_not_leak_or_mutate ... ok
+test ui_tests::interleaved_ui_does_not_cancel_chunked_kgp_transfer ... ok
+test ui_tests::ris_and_real_screen_transitions_clear_ui_without_revision_reuse ... ok
+test wrap_tests::alternate_screens_keep_independent_wrap_metadata_through_resize_and_clear ... ok
+test ui_tests::unsupported_host_never_claims_renderer_or_accepts_hidden_actions ... ok
+test wrap_tests::erasure_and_character_shifts_invalidate_the_affected_wrap_endpoint ... ok
+test wrap_tests::insert_delete_and_manual_scroll_sever_only_changed_row_adjacencies ... ok
+test wrap_tests::resize_retains_complete_wraps_and_severs_clipped_successors ... ok
+test wrap_tests::soft_wrap_is_recorded_only_after_automatic_row_advance ... ok
+test wrap_tests::replacing_screen_rows_breaks_history_links_without_mutating_inactive_history ... ok
+test ui_tests::oversized_frame_is_discarded_until_st_then_normal_text_recovers ... ok
+test wrap_tests::wrapped_rows_follow_ring_rotation_history_and_eviction ... ok
+test tests::unicode_overwrites_are_independent_of_pty_chunk_sizes ... ok
+test wrap_tests::soft_wrap_metadata_is_independent_of_pty_chunk_boundaries ... ok
+test screen::clear_row_tests::cleared_rows_preserve_exact_blank_attributes_and_neighbouring_ring_rows ... ok
+test tests::malformed_input_cannot_escape_grid_bounds ... ok
+test screen::row_copy_tests::logical_row_copy_handles_all_small_ring_overlap_boundaries ... ok
+test ui_tests::ui_every_split_is_transactional_and_preserves_text_and_kgp ... ok
+test tests::large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding ... ok
+test tests::query_reply_storage_is_bounded ... ok
+test tests::bulk_and_bytewise_feeds_agree_through_scroll_styles_and_charset_switches ... ok
+test tests::counted_scroll_and_line_edits_match_single_row_operations ... ok
+test terminal::history_budget_tests::retained_history_counts_wrap_metadata_spare_slots_and_reused_cell_capacity ... ok
+
+test result: ok. 114 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+   Doc-tests zterm
+
+running 3 tests
+test crates/zterm/src/../README.md - (line 71) ... ok
+test crates/zterm/src/../README.md - (line 105) ... ok
+test crates/zterm/src/../README.md - (line 23) ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.28s; merged doctests compilation took 0.27s
