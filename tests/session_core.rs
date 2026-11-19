@@ -252,12 +252,18 @@ fn resize_commits_only_after_pty_accepts() {
     assert!(!empty.truncated && !empty.has_more);
     fixture.core.flush_input().unwrap();
     fixture.core.terminal.set_cell_size(7, 13);
+    fixture.core.terminal.feed(&[b'a'; 50]);
+    let mut anchors = [zterm::ResizeAnchor::cell(
+        fixture.core.terminal.view_position(6, 1, 0),
+    )];
+    let original = anchors;
     fixture.core.terminal.clear_dirty();
     let error = fixture
         .core
-        .resize_with_cell_size(Size::new(0, 24), (11, 19))
+        .resize_with_cell_size_anchored(Size::new(0, 24), (11, 19), &mut anchors)
         .unwrap_err();
     assert_eq!(error.operation, zpty::Operation::Resize);
+    assert_eq!(anchors, original);
     assert_eq!(
         (fixture.core.terminal.cols(), fixture.core.terminal.rows()),
         (40, 6)
@@ -266,7 +272,17 @@ fn resize_commits_only_after_pty_accepts() {
     fixture.core.terminal.feed(b"\x1b[16t");
     assert_eq!(fixture.core.terminal.responses(), b"\x1b[6;13;7t");
     fixture.core.terminal.clear_responses();
-    fixture.core.resize(Size::new(83, 29)).unwrap();
+    fixture
+        .core
+        .resize_anchored(Size::new(83, 29), &mut anchors)
+        .unwrap();
+    assert_eq!(
+        anchors[0].position,
+        Some(zterm::TextPosition {
+            line: 0,
+            column: 46
+        })
+    );
     assert_eq!(
         (fixture.core.terminal.cols(), fixture.core.terminal.rows()),
         (83, 29)
