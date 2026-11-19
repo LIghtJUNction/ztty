@@ -524,7 +524,7 @@ mod tests {
     }
 
     #[test]
-    fn reused_scene_ids_do_not_revive_stale_input() {
+    fn reset_rejects_replayed_scene_and_stale_input() {
         let mut terminal = Terminal::new(100, 24, 0);
         scene(&mut terminal, 1);
         let mut view = View::default();
@@ -533,10 +533,17 @@ mod tests {
         let (x, y) = first(&view);
         view.pointer(&mut terminal, x, y, 1, true, true);
         terminal.feed(b"\x1bc");
-        scene(&mut terminal, 1);
-        assert_ne!(terminal.ui_revision(), original.change);
+        assert!(terminal.ui_scene().is_none());
+        let reset_change = terminal.ui_revision();
+        assert!(reset_change > original.change);
+        // RIS retains the revision floor, so replay cannot recreate the old scene.
+        scene(&mut terminal, original.revision);
+        assert!(terminal.ui_scene().is_none());
+        assert_eq!(terminal.ui_revision(), reset_change);
+        scene(&mut terminal, original.revision + 1);
         assert_eq!(terminal.ui_scene().unwrap().surface, original.surface);
-        assert_eq!(terminal.ui_scene().unwrap().revision, original.revision);
+        assert_eq!(terminal.ui_scene().unwrap().revision, original.revision + 1);
+        assert!(terminal.ui_revision() > reset_change);
         let (handled, action) = view.pointer(&mut terminal, x, y, 1, false, true);
         assert!(handled);
         assert!(action.is_none());
