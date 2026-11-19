@@ -434,12 +434,27 @@ fn key_modifiers(state: u32, symbol: u64, pressed: bool, held: &[u64; 256]) -> M
 }
 
 #[cfg(target_os = "linux")]
-fn paste(bytes: Vec<u8>, terminal: &Terminal, queue: &mut InputQueue) {
+fn paste(
+    bytes: Vec<u8>,
+    terminal: &Terminal,
+    queue: &mut InputQueue,
+) -> Result<usize, &'static str> {
     let text = String::from_utf8_lossy(&bytes);
-    queue_input(
-        queue,
-        &input::encode_paste(&text, &terminal.modes().input()),
-    );
+    let encoded = input::encode_paste(&text, &terminal.modes().input());
+    let payload_len = encoded.len()
+        - if terminal.modes().bracketed_paste {
+            12
+        } else {
+            0
+        };
+    if payload_len == 0 {
+        return Ok(0);
+    }
+    if queue.push(&encoded) {
+        Ok(payload_len)
+    } else {
+        Err("Input queue is full; paste was not sent")
+    }
 }
 
 fn launch(args: &[&CStr]) -> Result<i32, String> {

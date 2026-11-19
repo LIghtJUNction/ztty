@@ -1723,7 +1723,7 @@ impl Pool {
             origin: origin.into(),
             base_font: appearance.font.clone(),
             appearance,
-            core: SessionCore::new(pty, terminal, input_owner, 1024 * 1024),
+            core: SessionCore::new(pty, terminal, input_owner, 8 * 1024 * 1024),
             ui,
             persistent: origin != "local",
             launch_env: env,
