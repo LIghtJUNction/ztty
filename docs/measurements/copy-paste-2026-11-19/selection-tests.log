@@ -1,0 +1,28 @@
+   Compiling simd-adler32 v0.3.10
+   Compiling zune-inflate v0.2.54
+   Compiling zune-core v0.5.3
+   Compiling zune-png v0.5.2
+   Compiling ztty v0.4.1 (<checkout>)
+   Compiling zgraphics v0.1.1 (<checkout>/crates/zgraphics)
+   Compiling unicode-width v0.2.3
+   Compiling zinput v0.1.2 (<checkout>/crates/zinput)
+   Compiling ztty-ui v0.1.0 (<checkout>/crates/ztty-ui)
+   Compiling zvte v0.1.3
+   Compiling zterm v0.4.0 (<checkout>/crates/zterm)
+   Compiling zpty v0.2.1 (<checkout>/crates/zpty)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 03s
+     Running tests/selection.rs (target/debug/build/ztty/8452943597126dde/out/selection-8452943597126dde)
+
+running 10 tests
+test selection_units_read_the_scrolled_view_and_clamp_pointer_coordinates ... ok
+test invalid_or_outside_selection_coordinates_are_bounded ... ok
+test autowrapped_text_copies_as_one_logical_line_in_either_direction ... ok
+test explicit_newlines_stay_separate_and_only_hard_line_padding_is_trimmed ... ok
+test selection_can_span_retained_history_and_more_than_one_viewport ... ok
+test wide_wrap_padding_is_omitted_and_partial_glyphs_copy_whole_cells ... ok
+test word_selection_skips_wide_character_wrap_padding ... ok
+test word_and_line_selection_cross_soft_wraps_but_not_hard_newlines ... ok
+test word_selection_handles_wide_continuations_and_combining_marks ... ok
+test word_selection_keeps_paths_and_stops_at_punctuation_and_spaces ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
