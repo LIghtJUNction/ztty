@@ -1,6 +1,6 @@
 # ztty 复制粘贴改进与验收（2026-11-19）
 
-本轮补齐了双击选词、三击选行、右键复制粘贴菜单和短暂反馈，并修复了大段粘贴丢失、旧式文本编码乱码、异常分块粘贴半截内容的问题。最终候选在隔离 X11 窗口中通过 13 项交互检查、25 项剪贴板传输检查和 19 项相关日常流程检查；安装回读尚待补齐。[验收记录](measurements/copy-paste-2026-11-19/validation.json)
+本轮补齐了双击选词、三击选行、右键复制粘贴菜单和短暂反馈，并修复了大段粘贴丢失、旧式文本编码乱码、异常分块粘贴半截内容的问题。最终候选在隔离 X11 窗口中通过 13 项交互检查、25 项剪贴板传输检查和 19 项相关日常流程检查；已安装为本机包 `ztty 0.4.1-4`，实际入口和新窗口均已回读核验。[验收记录](measurements/copy-paste-2026-11-19/validation.json)
 
 本报告对应的代码提交是 [`db4253054dfad84fb1d5af64efd3d9efc4e048d1`](https://github.com/LIghtJUNction/ztty/commit/db4253054dfad84fb1d5af64efd3d9efc4e048d1)。三组最终 GUI 检查使用同一份 release ELF，其 SHA-256 为 `2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7`。后续文档提交不改变这份已测代码。[证据索引](measurements/copy-paste-2026-11-19/index.json)
 
@@ -83,4 +83,8 @@ python3 docs/measurements/copy-paste-2026-11-19/run_validation.py
 
 ## 安装状态
 
-本节等待本机安装步骤补齐包版本、实际入口二进制散列和现有会话保留结果。当前报告记录的是已提交、已验证的候选代码，不把候选验收等同于系统包已更新；正式 tag 或 Release 不在本轮操作范围内。
+本机已从本报告对应的 release ELF 构建并安装 `ztty 0.4.1-4`。系统入口 `/usr/bin/ztty` 与 Cargo 入口 `~/.cargo/bin/ztty` 的 SHA-256 均为 `2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7`；包管理器校验 9 个文件，0 个变化。用户原有启动器、桌面入口及符号链接目标保持一致。[安装回读](measurements/copy-paste-2026-11-19/installation.json)
+
+安装前记录的 7 个 ztty 进程在安装后仍具有相同启动标识和已加载二进制，没有重启这些会话。另通过原有启动器打开 `copy-paste-db4253` 窗口，核验实际 Unix socket 对端进程使用上述 ELF、X11 窗口已映射、会话可写且仍在运行、子进程继承正确的会话地址。这是安装时的回读结果；已有窗口继续原会话，新窗口采用新版本。[新窗口及进程证据](measurements/copy-paste-2026-11-19/installation.json)
+
+本机包 SHA-256 为 `11dcd145feb64131ac28a63e7ad627de30cca6b0e09e7a0879e735c643122236`。前一版本 `ztty-0.4.1-3-x86_64.pkg.tar.zst` 和 Cargo 入口旧文件保存在 `~/Backups/ztty/2026-11-19-copy-paste/`，可用于回退；原始安装日志和当前包一并加入证据归档。本次为本机开发安装，没有创建正式 tag 或 GitHub Release。

@@ -28,6 +28,13 @@
       "file": "daily-workflow.json",
       "raw_artifact": "copy-usability/final/daily-workflow.json",
       "raw_sha256": "714951dc6ee5ab1ead205012612b470f5ce5e473381e51f89fabb4e035f4bf08"
+    },
+    {
+      "file": "installation.json",
+      "raw_artifact": "installation/after.json",
+      "raw_sha256": "0fa8a7f81016c7ee44d89921316a3fb35dc07fac75092723918ad9c589dd1db8",
+      "raw_new_window_artifact": "installation/new-window.json",
+      "raw_new_window_sha256": "f991fb4befaa4d985a10d79ccba456cf14536ab79f921d3c42ea0ce3946cb9c2"
     }
   ],
   "files": [
@@ -60,6 +67,11 @@
       "path": "daily-workflow.json",
       "bytes": 2627,
       "sha256": "b18766ba5e4fd149a0cf1ce33178484c6d04eaf14e663e6060187d6c6a65885f"
+    },
+    {
+      "path": "installation.json",
+      "bytes": 996,
+      "sha256": "6688cf55a7fb2495189accd11cb883d1890d6094ad9e9139afc94f8547ea246f"
     },
     {
       "path": "paste-error.png",
