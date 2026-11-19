@@ -1,5 +1,5 @@
 //! Bounded raw PTY output with independent, absolute byte cursors.
-use alloc::{collections::VecDeque, vec::Vec};
+use alloc::{collections::VecDeque, string::String, vec::Vec};
 
 const LOCAL_LIMIT: usize = 64 * 1024;
 const PERSISTENT_LIMIT: usize = 256 * 1024;
@@ -18,6 +18,34 @@ pub struct OutputChunk {
     pub first_cursor: u64,
     pub truncated: bool,
     pub has_more: bool,
+}
+
+impl OutputChunk {
+    /// Lossless standard Base64 for this page's original PTY bytes. Encoding is
+    /// performed only on an explicit read, never while retaining PTY output.
+    pub fn output_base64(&self) -> String {
+        const ALPHABET: &[u8; 64] =
+            b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let mut encoded = String::with_capacity(self.bytes.len().div_ceil(3) * 4);
+        for chunk in self.bytes.chunks(3) {
+            let word = ((chunk[0] as u32) << 16)
+                | ((chunk.get(1).copied().unwrap_or(0) as u32) << 8)
+                | chunk.get(2).copied().unwrap_or(0) as u32;
+            encoded.push(ALPHABET[(word >> 18) as usize] as char);
+            encoded.push(ALPHABET[((word >> 12) & 63) as usize] as char);
+            encoded.push(if chunk.len() > 1 {
+                ALPHABET[((word >> 6) & 63) as usize] as char
+            } else {
+                '='
+            });
+            encoded.push(if chunk.len() > 2 {
+                ALPHABET[(word & 63) as usize] as char
+            } else {
+                '='
+            });
+        }
+        encoded
+    }
 }
 
 impl OutputTail {
