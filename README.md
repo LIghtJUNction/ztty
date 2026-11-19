@@ -6,8 +6,10 @@ ztty is a native terminal for Linux, macOS and Windows. Its terminal core is
 written in Rust without the standard library. On Linux, the same live session
 can be used from a window, the CLI or an MCP client.
 
-Published ztty downloads remain **0.4.1**. This page describes the **0.5.0 source
-candidate**; its application release and device installation are still pending.
+Published ztty downloads remain **0.4.1**. This page covers the **0.5.0 candidate**
+on `iter/resume-20261120`, with platform scope at
+[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a).
+Application release and device installation remain pending.
 
 ## Install on Linux
 
@@ -169,7 +171,7 @@ Run `sh tools/check.sh` for the local development checks.
 | [zinput](https://github.com/LIghtJUNction/zinput) | Keyboard, mouse and paste encoding | Published [0.1.3](https://crates.io/crates/zinput/0.1.3) |
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY process ownership | Published [0.2.2](https://crates.io/crates/zpty/0.2.2) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | Image protocol and placement | Published [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
-| [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | 0.5.0 candidate |
+| [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.0](https://crates.io/crates/zterm/0.5.0) |
 
 The [architecture](docs/architecture.md) describes the reusable Project Z libraries;
 the [documentation index](docs/README.md) links usage guides and verification records.

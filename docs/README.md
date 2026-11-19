@@ -24,6 +24,7 @@ The READMEs cover installation and common controls:
 | Reference | Contents |
 | --- | --- |
 | [Architecture](architecture.md) | Terminal model, libraries and resource ownership |
+| [Dependency propagation](dependency-propagation.md) | Consumer ownership, source pins and open integration handoffs |
 | [Reusable libraries](../README.md#reusable-libraries) | Independent repositories, component responsibilities and release status |
 | [Protocols](protocols.md) | Implemented sequences, graphics and platform acceptance |
 | [Session core](session-core.md) | PTY reads, input queues, sizing and ownership |
