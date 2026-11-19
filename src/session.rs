@@ -3,6 +3,7 @@ use crate::{
     Appearance, actions,
     broker::{self, ReadWait, Reply},
     config_watch,
+    display::{Connection, Window},
     json::{self, Value},
     key, key_modifiers,
     layout::{Axis, Layout},
@@ -12,7 +13,7 @@ use crate::{
     session_core::{ReadStep, SessionCore},
     working_directory::WorkingDirectory,
     workspace_state,
-    x11::{self, Connection, Selection, Window},
+    x11::{self, Selection},
 };
 use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
 use core::ffi::{CStr, c_int};
@@ -1278,6 +1279,12 @@ impl Session {
             ("rows", Value::from(self.core.terminal.rows())),
             ("attached", Value::Bool(self.ui.is_some())),
             (
+                "backend",
+                self.ui
+                    .as_ref()
+                    .map_or(Value::Null, |ui| Value::from(ui.window.backend())),
+            ),
+            (
                 "read_only",
                 Value::Bool(self.ui.as_ref().is_some_and(|ui| ui.read_only)),
             ),
@@ -1577,10 +1584,22 @@ impl Pool {
         }
     }
 
-    fn connection(&mut self, env: &[CString]) -> Result<Rc<Connection>, String> {
-        let display = env
-            .iter()
-            .find_map(|e| e.to_bytes().strip_prefix(b"DISPLAY="));
+    fn connection(&mut self, env: &[CString], wayland: bool) -> Result<Rc<Connection>, String> {
+        let value = |prefix: &[u8]| env.iter().find_map(|e| e.to_bytes().strip_prefix(prefix));
+        if wayland {
+            let key = format!(
+                "wayland:{}:{}",
+                String::from_utf8_lossy(value(b"XDG_RUNTIME_DIR=").unwrap_or_default()),
+                String::from_utf8_lossy(value(b"WAYLAND_DISPLAY=").unwrap_or(b"wayland-0"))
+            );
+            if let Some((_, c)) = self.connections.iter().find(|(name, _)| *name == key) {
+                return Ok(c.clone());
+            }
+            let c = Connection::wayland(env).map_err(String::from)?;
+            self.connections.push((key, c.clone()));
+            return Ok(c);
+        }
+        let display = value(b"DISPLAY=");
         let key = display
             .map(|s| String::from_utf8_lossy(s).into_owned())
             .unwrap_or_default();
@@ -1626,6 +1645,13 @@ impl Pool {
     }
 
     fn create(&mut self, request: &Value) -> Result<Value, String> {
+        if request.get("_backend").and_then(Value::as_str) == Some("wayland")
+            && request.get("target").is_some()
+        {
+            return Err(
+                "Wayland workspaces are not available; use independent session windows".into(),
+            );
+        }
         let input_owner = actor(request)?.into();
         let observe = match request.get("observe") {
             None => false,
@@ -1753,7 +1779,10 @@ impl Pool {
         let ui = if headless {
             None
         } else {
-            let c = self.connection(&env)?;
+            let c = self.connection(
+                &env,
+                request.get("_backend").and_then(Value::as_str) == Some("wayland"),
+            )?;
             let attachment = self.next_attachment;
             self.next_attachment += 1;
             let window = if observe {
@@ -1783,7 +1812,11 @@ impl Pool {
         let (program, env) = os::child_setup_with_env(&command[0], env).map_err(String::from)?;
         let argv: Vec<&CStr> = command.iter().map(CString::as_c_str).collect();
         let child_env: Vec<&CStr> = env.iter().map(CString::as_c_str).collect();
-        let close: Vec<i32> = self.connections.iter().map(|(_, c)| c.fd).collect();
+        let mut display_fds = Vec::new();
+        for (_, c) in &self.connections {
+            c.descriptors(&mut display_fds);
+        }
+        let close: Vec<i32> = display_fds.iter().map(|p| p.fd).collect();
         let pty = unsafe {
             zpty::Pty::spawn(
                 &program,
@@ -1850,7 +1883,9 @@ impl Pool {
         result.set("closed", Value::Bool(true));
         result.set("running", Value::Bool(false));
         result.set("attached", Value::Bool(false));
-        let status = session.status().unwrap_or(0);
+        let status = session
+            .status()
+            .unwrap_or_else(|| i32::from(session.ui.as_ref().is_some_and(|ui| ui.window.failed())));
         if let Some(ui) = &session.ui {
             let token = format!("attachment:{}", ui.attachment);
             self.finished.push((token.clone(), status));
@@ -1899,7 +1934,7 @@ impl Pool {
             .ui
             .as_mut()
             .ok_or("attach the session before arranging its window")?;
-        let window = x11::Container::new(&ui.window);
+        let window = x11::Container::new(ui.window.x11()?);
         ui.window.parent(Some(window.id));
         ui.workspace = Some(window.id);
         self.workspaces.push(Workspace {
@@ -2072,7 +2107,9 @@ impl Pool {
         let id = session.id;
         if let Some(ui) = session.ui.take() {
             let token = format!("attachment:{}", ui.attachment);
-            let status = session.status().unwrap_or(0);
+            let status = session
+                .status()
+                .unwrap_or_else(|| i32::from(ui.window.failed()));
             self.finished.push((token.clone(), status));
             self.completed.push_back((token, status));
             while self.completed.len() > 128 {
@@ -2090,6 +2127,10 @@ impl Pool {
             ("op", Value::from("create")),
             ("origin", Value::from("local")),
             ("headless", Value::Bool(false)),
+            (
+                "_backend",
+                Value::from(session.ui.as_ref().map_or("x11", |ui| ui.window.backend())),
+            ),
             ("cols", Value::from(session.core.terminal.cols())),
             ("rows", Value::from(session.core.terminal.rows())),
             ("_appearance", session.appearance.to_json()),
@@ -2198,7 +2239,8 @@ impl Pool {
                 return Err("layout sessions must use the same display".into());
             }
         }
-        let mut window = x11::Container::new(&self.sessions[active].ui.as_ref().unwrap().window);
+        let mut window =
+            x11::Container::new(self.sessions[active].ui.as_ref().unwrap().window.x11()?);
         window.resize(snapshot.width, snapshot.height);
         let parent = window.id;
         for session in &mut self.sessions {
@@ -3082,6 +3124,14 @@ impl Pool {
                 Ok(Reply::Value(session.info()))
             }
             "attach" => {
+                if let Some(requested) = request.get("_backend").and_then(Value::as_str)
+                    && self.sessions[index]
+                        .ui
+                        .as_ref()
+                        .is_some_and(|ui| ui.window.backend() != requested)
+                {
+                    return Err("session already has a window on another backend; detach it before attaching a different backend".into());
+                }
                 let read_only = request
                     .get("observe")
                     .and_then(Value::as_bool)
@@ -3106,7 +3156,10 @@ impl Pool {
                     return Ok(Reply::Value(self.sessions[index].info()));
                 }
                 let env = environment(request)?;
-                let connection = self.connection(&env)?;
+                let connection = self.connection(
+                    &env,
+                    request.get("_backend").and_then(Value::as_str) == Some("wayland"),
+                )?;
                 self.attach_view(index, read_only, &connection, request.get("_appearance"))?;
                 Ok(Reply::Value(self.sessions[index].info()))
             }
@@ -3143,16 +3196,9 @@ impl Pool {
         for connection_index in 0..self.connections.len() {
             let connection = self.connections[connection_index].1.clone();
             for _ in 0..512 {
-                if unsafe { x11::XPending(connection.display) } == 0 {
+                let Some(mut event) = connection.next_event() else {
                     break;
-                }
-                let mut event = x11::Event { pad: [0; 24] };
-                unsafe {
-                    x11::XNextEvent(connection.display, &mut event);
-                }
-                if unsafe { x11::XFilterEvent(&mut event, 0) } != 0 {
-                    continue;
-                }
+                };
                 let id = event.window();
                 let kind = unsafe { event.kind };
                 if matches!(kind, x11::BUTTON_PRESS | x11::BUTTON_RELEASE) {
@@ -3204,7 +3250,7 @@ impl Pool {
                     }
                 }
                 if matches!(kind, x11::FOCUS_IN | x11::FOCUS_OUT)
-                    && (kind == x11::FOCUS_IN) != (x11::input_focus(connection.display) == id)
+                    && (kind == x11::FOCUS_IN) != (connection.input_focus() == id)
                 {
                     continue;
                 }
@@ -3616,11 +3662,7 @@ pub fn serve() -> Result<(), String> {
             });
         }
         for (_, connection) in &pool.connections {
-            fds.push(os::PollFd {
-                fd: connection.fd,
-                events: os::POLLIN,
-                revents: 0,
-            });
+            connection.descriptors(&mut fds);
         }
         for session in &pool.sessions {
             if !session.core.eof() {
@@ -3639,6 +3681,7 @@ pub fn serve() -> Result<(), String> {
         let mut timeout = deadline
             .into_iter()
             .chain(server.next_deadline())
+            .chain(pool.connections.iter().filter_map(|(_, c)| c.deadline()))
             .min()
             .map(|end| end.saturating_sub(os::milliseconds()).min(5000) as c_int)
             .unwrap_or(5000);
@@ -3648,11 +3691,7 @@ pub fn serve() -> Result<(), String> {
         if openers.pending() {
             timeout = timeout.min(50);
         }
-        if pool
-            .connections
-            .iter()
-            .any(|(_, c)| unsafe { x11::XPending(c.display) } != 0)
-        {
+        if pool.connections.iter().any(|(_, c)| c.pending()) {
             timeout = 0;
         }
         if unsafe { os::poll(fds.as_mut_ptr(), fds.len(), timeout) } < 0 && os::errno() != os::EINTR

@@ -1,0 +1,49 @@
+{
+  "source": "4d9027099d76fd7a80414496e09fea531cd8849e",
+  "header_package": "https://mirrors.jlu.edu.cn/ubuntu/pool/main/w/wayland/libwayland-dev_1.22.0-2.1build1_amd64.deb",
+  "package_sha256": "7e03d8f017d364c7e08d3e294f53ec993e9ffd71e4975cbad11ad07f55047ebe",
+  "scope": "Compile bridge and generated protocol against Ubuntu 24.04 libwayland 1.22 headers on Arch; not an Ubuntu runtime test",
+  "commands": [
+    {
+      "command": [
+        "cc",
+        "-std=c11",
+        "-O2",
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Iartifacts/wayland-validation/ubuntu-1.22/extracted/usr/include",
+        "-Iartifacts/wayland-validation/ubuntu-1.22",
+        "-c",
+        "native/wayland_bridge.c",
+        "-o",
+        "artifacts/wayland-validation/ubuntu-1.22/wayland_bridge.o"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cc",
+        "-std=c11",
+        "-O2",
+        "-fPIC",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Iartifacts/wayland-validation/ubuntu-1.22/extracted/usr/include",
+        "-Iartifacts/wayland-validation/ubuntu-1.22",
+        "-c",
+        "artifacts/wayland-validation/ubuntu-1.22/xdg-shell-protocol.c",
+        "-o",
+        "artifacts/wayland-validation/ubuntu-1.22/xdg-shell-protocol.o"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "passed": true
+}

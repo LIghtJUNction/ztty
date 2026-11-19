@@ -10,6 +10,8 @@ mod broker;
 #[cfg(target_os = "linux")]
 mod config_watch;
 #[cfg(target_os = "linux")]
+mod display;
+#[cfg(target_os = "linux")]
 mod mcp;
 #[cfg(target_os = "linux")]
 mod os;
@@ -36,6 +38,9 @@ mod repaint;
 mod search;
 #[cfg(target_os = "linux")]
 mod session;
+#[cfg(all(target_os = "linux", feature = "wayland"))]
+#[path = "platform/wayland.rs"]
+mod wayland;
 #[cfg(target_os = "linux")]
 mod working_directory;
 #[cfg(target_os = "linux")]
@@ -94,6 +99,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty save-layout NAME > workspace.json\n\
        ztty restore-layout workspace.json\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
+  --backend x11|wayland Select Linux host (default: x11; Wayland is experimental)\n\
   --name NAME          Name this local session\n\
   --observe            Open a standalone read-only view without requesting focus\n\
   --tab NAME           Open a new tab in NAME's window\n\
@@ -158,6 +164,8 @@ struct Config {
     #[cfg(target_os = "linux")]
     name: Option<String>,
     #[cfg(target_os = "linux")]
+    wayland: bool,
+    #[cfg(target_os = "linux")]
     observe: bool,
     #[cfg(target_os = "linux")]
     target: Option<(String, &'static str)>,
@@ -183,6 +191,8 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         command: Vec::new(),
         #[cfg(target_os = "linux")]
         name: None,
+        #[cfg(target_os = "linux")]
+        wayland: false,
         #[cfg(target_os = "linux")]
         observe: false,
         #[cfg(target_os = "linux")]
@@ -229,6 +239,19 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
             }
             #[cfg(target_os = "linux")]
             b"--observe" => cfg.observe = true,
+            #[cfg(target_os = "linux")]
+            b"--backend" => {
+                i += 1;
+                cfg.wayland = match args
+                    .get(i)
+                    .ok_or("--backend needs x11 or wayland")?
+                    .to_bytes()
+                {
+                    b"x11" => false,
+                    b"wayland" => true,
+                    _ => return Err("--backend must be x11 or wayland".into()),
+                };
+            }
             #[cfg(target_os = "linux")]
             b"--tab" | b"--split-right" | b"--split-down" => {
                 let mode = match args[i].to_bytes() {
@@ -483,6 +506,14 @@ fn launch(args: &[&CStr]) -> Result<i32, String> {
         if let Some(cfg) = cfg {
             #[cfg(target_os = "linux")]
             {
+                if cfg.wayland {
+                    #[cfg(not(feature = "wayland"))]
+                    {
+                        return Err(
+                            "native Wayland is optional; build with --features wayland".into()
+                        );
+                    }
+                }
                 platform::run(cfg)
             }
             #[cfg(not(target_os = "linux"))]
