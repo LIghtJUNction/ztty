@@ -6,6 +6,8 @@ ztty 是面向 Linux、macOS 和 Windows 的原生终端，核心用不依赖标
 Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令行或 MCP 客户端使用。
 
 ztty 当前正式下载版本仍为 **0.4.1**。本页描述 **0.5.0 源码候选版**，
+平台范围对应 `iter/resume-20261120` 的
+[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a) 检查点。
 应用正式发布和设备安装尚未完成。
 
 ## Linux 安装
@@ -163,7 +165,7 @@ cargo build --locked --release --features wayland
 | [zinput](https://github.com/LIghtJUNction/zinput) | 键盘、鼠标与粘贴编码 | 已发布 [0.1.3](https://crates.io/crates/zinput/0.1.3) |
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY 进程管理 | 已发布 [0.2.2](https://crates.io/crates/zpty/0.2.2) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | 图片协议与放置 | 已发布 [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
-| [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 0.5.0 候选 |
+| [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.0](https://crates.io/crates/zterm/0.5.0) |
 
 可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；
 使用指南与验收记录集中在[文档索引](docs/README.md)。

@@ -79,6 +79,9 @@ for tested text and frame behavior.
 
 ## Native Wayland (experimental)
 
+This section covers `iter/resume-20261120` at
+[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a).
+
 Native Wayland is an explicit single-window path using xdg-shell, EGL/GLES and
 XKB. Enable the Cargo feature when building from source. The official Linux
 package build enables it, while runtime startup continues to select X11.

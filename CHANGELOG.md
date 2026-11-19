@@ -2,10 +2,15 @@
 
 ## 0.5.0 candidate — 2026-11-20 (Asia/Taipei)
 
+This entry covers `iter/resume-20261120` at
+[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a).
+
 This is a source candidate. The ztty application release and device installation
 are pending; published application downloads remain 0.4.1.
-[zterm 0.5.0](https://github.com/LIghtJUNction/zterm) now has an independent
-repository and is awaiting publication.
+[zterm 0.5.0](https://github.com/LIghtJUNction/zterm/releases/tag/v0.5.0) is published
+from [13d5e2c](https://github.com/LIghtJUNction/zterm/commit/13d5e2c74571d35cccd920b1204798211b70c79f).
+Its application integration and remaining release gates are tracked in
+[dependency propagation](docs/dependency-propagation.md).
 
 ### Added
 
