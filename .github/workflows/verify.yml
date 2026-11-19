@@ -15,7 +15,7 @@ jobs:
           export RUSTUP_HOME="$RUNNER_TEMP/ztty-verify-rustup"
           printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
           sudo apt-get update
-          sudo apt-get install -y libx11-dev libxft-dev libxrender-dev fonts-dejavu-core xvfb python3-pil python3-xlib
+          sudo apt-get install -y libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev fonts-dejavu-core xvfb python3-pil python3-xlib
           rustup target add x86_64-unknown-none
       - name: Check source and GUI
         run: |

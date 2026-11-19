@@ -48,7 +48,7 @@ fn external_failure_is_opaque_and_preserves_previous_image() {
     image(&mut g, 1);
     let before = Arc::clone(&g.image(1).unwrap().pixels);
     g.set_external_reader(Some(|_| Err(ReadError)));
-    for transport in [b'f', b't', b's'] {
+    for transport in *b"fts" {
         assert_eq!(
             send(
                 &mut g,

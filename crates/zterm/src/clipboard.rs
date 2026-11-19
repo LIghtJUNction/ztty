@@ -196,7 +196,7 @@ fn decode(bytes: &[u8]) -> Result<Vec<u8>, DecodeError> {
         return Err(DecodeError::Limit);
     }
     let mut out = Vec::with_capacity(size);
-    for (i, group) in bytes.chunks_exact(4).enumerate() {
+    for (i, group) in bytes.as_chunks::<4>().0.iter().enumerate() {
         let a = digit(group[0]).ok_or(DecodeError::Invalid)?;
         let b = digit(group[1]).ok_or(DecodeError::Invalid)?;
         let last = i + 1 == bytes.len() / 4;

@@ -160,6 +160,7 @@ struct Ui {
     cursor_visible: bool,
     last_cursor: Option<((usize, usize), CursorShape)>,
     reset_blink: bool,
+    text_blink: ztty::text_blink::TextBlink,
 }
 impl Ui {
     fn new(window: Window, attachment: u64) -> Self {
@@ -200,6 +201,7 @@ impl Ui {
             cursor_visible: true,
             last_cursor: None,
             reset_blink: false,
+            text_blink: ztty::text_blink::TextBlink::default(),
         }
     }
     fn error(&mut self, message: String) {
@@ -1017,6 +1019,9 @@ impl Ui {
         observing: bool,
         alive: bool,
     ) -> Option<u64> {
+        if let Some(message) = self.window.take_renderer_notice() {
+            self.error(message);
+        }
         if self
             .message
             .as_ref()
@@ -1080,6 +1085,16 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
+        let text_blink = self.text_blink.update(
+            terminal,
+            self.history,
+            self.force,
+            self.window.focused,
+            synchronized,
+            now,
+        );
+        self.force |= text_blink.changed;
+        self.window.set_text_blink_visible(text_blink.visible);
         let native_interactive =
             alive && !observing && terminal.ui_scene().is_some_and(|scene| scene.events);
         if self.native_ui.refresh(
@@ -1203,16 +1218,18 @@ impl Ui {
                 );
             }
             self.window.finish_frame();
-            self.force = false;
+            self.force = self.window.needs_repaint();
             self.repaint.painted(os::milliseconds());
         }
 
         // A synchronized frame only uses its existing 150 ms safety deadline;
         // returning an expired ordinary deadline here would busy-poll.
         let deadline = [
+            (self.window.needs_repaint() && !synchronized).then_some(now),
             self.sync_since.map(|s| s + 150),
             self.blink_deadline,
             animation_deadline,
+            text_blink.deadline,
             repaint_deadline,
         ]
         .into_iter()

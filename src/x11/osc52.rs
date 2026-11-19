@@ -2,14 +2,14 @@
 //! cannot be confused with a later ordinary paste or a new clipboard query.
 use super::*;
 impl Window {
-    fn selection_requestor(&self) -> Xid {
+    pub(super) fn selection_requestor(&self) -> Xid {
         if self.osc_requestor != 0 {
             self.osc_requestor
         } else {
             self.id
         }
     }
-    fn close_osc_requestor(&mut self) {
+    pub(super) fn close_osc_requestor(&mut self) {
         if self.osc_requestor != 0 {
             unsafe {
                 XDestroyWindow(self.display, self.osc_requestor);

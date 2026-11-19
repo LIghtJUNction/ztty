@@ -18,6 +18,7 @@ import tty
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 from isolated_xvfb import start_xvfb
+from gui_renderer import record_renderer
 from measure_runtime import process_stat, same_process
 from measure_multiwindow import cleanup
 from benchmark_terminals import output_payload
@@ -174,6 +175,7 @@ def main():
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("artifacts/repaint-gui.json"))
     parser.add_argument("--screenshots", type=Path, default=Path("artifacts/repaint-gui"))
+    parser.add_argument("--renderer", choices=("auto", "gpu", "software"))
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
     report = {
@@ -182,6 +184,8 @@ def main():
         "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
         "source_sha256": {name: digest(ROOT / name) for name in (
             "src/repaint.rs", "src/session.rs", "src/x11.rs", "crates/zterm/src/terminal.rs",
+            "tests/egl_present_trace.c", "tools/gui_renderer.py",
+            "src/x11/gpu.rs", "src/gpu/mod.rs", "src/gpu/font.rs", "src/gpu/grid.rs", "src/text_blink.rs", "src/appearance.rs",
             "tests/x11_present_trace.c",
             "tests/repaint_gui.py", "tools/isolated_xvfb.py", "tools/benchmark_terminals.py",
             "tools/measure_runtime.py", "tools/measure_multiwindow.py")},
@@ -203,14 +207,15 @@ def main():
                 config = directory / "ztty.conf"
                 config.write_text("font = monospace:size=11\nbackground = #000000\n"
                                   "background-opacity = 100\nbackground-blur = false\n"
-                                  "cursor-blink = false\nwindow-padding = 16\n")
+                                  "cursor-blink = false\nwindow-padding = 16\n"
+                                  + (f"renderer = {args.renderer}\n" if args.renderer else ""))
                 env = dict(os.environ, DISPLAY=xserver.display, XMODIFIERS="@im=none",
                            LC_ALL="C.UTF-8", XDG_RUNTIME_DIR=temporary,
                            XDG_CONFIG_HOME=str(directory / "config"), XDG_CACHE_HOME=str(directory / "cache"),
                            XDG_STATE_HOME=str(directory / "state"), XDG_DATA_HOME=str(directory / "data"),
                            ZTTY_SOCKET="@ztty-repaint-" + directory.name,
                            ZTTY_REPAINT_TEST=directory.name)
-                for key in ("WAYLAND_DISPLAY", "LD_PRELOAD", "ZTTY_X11_DIAGNOSTIC_CONTROL"):
+                for key in ("WAYLAND_DISPLAY", "LD_PRELOAD", "ZTTY_X11_DIAGNOSTIC_CONTROL", "ZTTY_EGL_PIXEL_TRACE"):
                     env.pop(key, None)
                 # Trace the real Xlib copy calls in this owned broker. A complete
                 # application frame must not publish disjoint rows or overlays
@@ -219,10 +224,13 @@ def main():
                 trace.write_text("")
                 tracer = directory / "present-trace.so"
                 subprocess.run(["cc", "-shared", "-fPIC", "-O2",
-                                str(ROOT / "tests/x11_present_trace.c"),
+                                str(ROOT / ("tests/egl_present_trace.c" if args.renderer == "gpu" else "tests/x11_present_trace.c")),
                                 "-o", str(tracer), "-ldl"], check=True)
                 env["LD_PRELOAD"] = str(tracer)
                 env["ZTTY_X11_PRESENT_TRACE"] = str(trace)
+                pixel_trace = directory / "gpu-pixels.log"
+                if os.environ.get("ZTTY_REPAINT_DIAGNOSE"):
+                    env["ZTTY_EGL_PIXEL_TRACE"] = str(pixel_trace)
                 socket_path = directory / "control.sock"
                 listener = socket.socket(socket.AF_UNIX)
                 listener.bind(str(socket_path))
@@ -250,6 +258,7 @@ def main():
                                 return window
                         return None
                     window, _ = wait(find_window, "new owned window")
+                    report.setdefault("renderers_before", []).append(record_renderer(connection, window, args.renderer))
                     broker = int(window.get_full_property(pid_atom, 0).value[0])
                     marker = ("ZTTY_REPAINT_TEST=" + directory.name).encode()
                     if marker not in Path(f"/proc/{broker}/environ").read_bytes().split(b"\0"):
@@ -318,6 +327,23 @@ def main():
 
                 visible(a, BASE, "initial-a")
                 visible(b, BASE, "initial-b")
+                # Native map/configure/expose events can still publish an older
+                # initial frame after both first frames become visible. The GPU
+                # trace confirms those pixels are BASE, not a partial test frame.
+                # Require a quiet startup before measuring the next transaction;
+                # the strict one-publication assertions below remain unchanged.
+                quiet_since = started = time.monotonic()
+                previous_size = trace.stat().st_size
+                while time.monotonic() - quiet_since < 0.04:
+                    connection.sync()
+                    current_size = trace.stat().st_size
+                    if current_size != previous_size:
+                        previous_size = current_size
+                        quiet_since = time.monotonic()
+                    if time.monotonic() - started > 1:
+                        raise TimeoutError("startup frame publication did not become idle")
+                    time.sleep(0.005)
+                report["startup_quiet_ms"] = (time.monotonic() - started) * 1000
                 def copies_since(offset, view):
                     with trace.open() as stream:
                         stream.seek(offset)
@@ -338,6 +364,7 @@ def main():
                 # later rows were still being painted into its backing pixmap.
                 color = (83, 139, 191)
                 offset = trace.stat().st_size
+                report["nonadjacent_start_ns"] = time.monotonic_ns()
                 rows = (0, ROWS // 2, ROWS - 1)
                 text = "\x1b[?2026h\x1b[48;2;83;139;191m"
                 text += "".join(f"\x1b[{row+1};1H\x1b[2K" for row in rows)
@@ -347,7 +374,10 @@ def main():
                 copies = copies_since(offset, a)
                 report["nonadjacent_frame_copies"] = copies
                 assert len(copies) == 1, f"one logical frame published {len(copies)} regions: {copies}"
-                assert copies[0][3] == PADDING and copies[0][5] == ROWS * ch, copies
+                if args.renderer == "gpu":
+                    assert copies[0][3] == 0 and copies[0][5] == geometry.height, copies
+                else:
+                    assert copies[0][3] == PADDING and copies[0][5] == ROWS * ch, copies
                 report["checks"].append("nonadjacent dirty rows publish once after the complete frame is painted")
                 capture(a, "nonadjacent-frame")
 
@@ -358,8 +388,13 @@ def main():
                 wait(lambda: row_pixel(ROWS - 1) == (91, 53, 117), "single row committed")
                 copies = copies_since(offset, a)
                 report["single_row_frame_copies"] = copies
-                assert len(copies) == 1 and copies[0][5] == ch, copies
-                report["checks"].append("one-row updates still copy only one row")
+                assert len(copies) == 1, copies
+                if args.renderer == "gpu":
+                    assert copies[0][5] == geometry.height, copies
+                    report["checks"].append("one-row GPU updates publish one complete surface swap")
+                else:
+                    assert copies[0][5] == ch, copies
+                    report["checks"].append("one-row software updates still copy only one row")
 
                 a["window"].set_input_focus(X.RevertToParent, X.CurrentTime)
                 connection.sync()
@@ -511,6 +546,7 @@ def main():
                 report["checks"].append("scrollback and its return-to-live prompt share one visible copy")
                 capture(a, "single-publish-scroll")
                 assert digest(binary) == report["binary_sha256"]
+                report["renderers_after"] = [record_renderer(connection, view["window"], args.renderer) for view in views]
                 report["ok"] = True
             except Exception as error:
                 report["error"] = repr(error)
@@ -521,6 +557,8 @@ def main():
                         with contextlib.suppress(Exception):
                             capture(view, "failure-" + view["name"])
             finally:
+                if "pixel_trace" in locals() and pixel_trace.exists():
+                    report["gpu_pixel_trace"] = pixel_trace.read_text().splitlines()
                 for view in views:
                     with contextlib.suppress(Exception):
                         send(view["channel"], {"op": "quit"})
