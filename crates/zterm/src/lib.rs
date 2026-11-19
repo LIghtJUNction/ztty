@@ -4,12 +4,12 @@
 
 extern crate alloc;
 
+/// Bounded native ZUI/1 scenes, component catalog and action intents.
+pub use zgpui as ui;
 /// Platform-independent Kitty and Sixel graphics decoding, storage and placement.
 pub use zgraphics as graphics;
 /// Platform-independent terminal input encoders.
 pub use zinput as input;
-/// Bounded native ZUI/1 scenes, component catalog and action intents.
-pub use zgpui as ui;
 mod grapheme;
 mod screen;
 mod shell;
