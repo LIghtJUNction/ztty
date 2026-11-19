@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage nonempty release assets while preserving every evidence file in a ZIP."""
+"""Stage bounded release downloads while preserving every evidence file in a ZIP."""
 from __future__ import annotations
 
 import argparse
@@ -11,6 +11,9 @@ import stat
 import zipfile
 
 MAX_TOTAL = 512 * 1024 * 1024
+MAX_STANDALONE_ASSETS = 64
+# The workflow adds the source tarball and SHA256SUMS to this script's list.
+SOURCE_ASSET_COUNT = 2
 
 
 def require(condition, message):
@@ -48,6 +51,34 @@ def identity(version, source_sha):
             "expected full source SHA")
 
 
+
+def standalone_names(files):
+    """Select distribution packages and provenance; raw evidence stays archived."""
+    allowed = {"install.sh"}
+    for platform in ("linux", "macos", "windows"):
+        for arch in ("x86_64", "aarch64"):
+            stem = f"ztty-{platform}-{arch}"
+            allowed.update((stem + ".build.json", stem + ".build.json.sha256",
+                            stem + ".native.json"))
+            formats = ("tar.gz",) if platform == "linux" else (
+                ("zip", "tar.gz") if platform == "macos" else ("zip",))
+            for suffix in formats:
+                allowed.update((stem + "." + suffix, stem + "." + suffix + ".sha256"))
+            if platform in ("macos", "windows"):
+                allowed.update((stem + ".manifest.json", stem + ".manifest.json.sha256"))
+    selected = []
+    for name, payload in files.items():
+        if len(relative_name(name).parts) == 1:
+            flat_name(name)
+            if name in allowed:
+                require(payload, "standalone release asset is empty: " + name)
+                selected.append(name)
+    # Include the generated evidence ZIP/checksum and the workflow's source
+    # assets. Future allowlist growth must fail before an unbounded upload.
+    require(len(selected) + 2 + SOURCE_ASSET_COUNT <= MAX_STANDALONE_ASSETS,
+            "standalone release asset count exceeds its bound")
+    return selected
+
 def prepare(folder, archive_path, asset_list, version, source_sha):
     identity(version, source_sha)
     folder, archive_path, asset_list = (Path(path).resolve() for path in (folder, archive_path, asset_list))
@@ -67,6 +98,7 @@ def prepare(folder, archive_path, asset_list, version, source_sha):
         total += len(payload)
         require(total <= MAX_TOTAL, "evidence exceeds its size bound")
         files[relative] = payload
+    selected = standalone_names(files)
     manifest = {
         "schema": 1, "format": "ztty-evidence-files-v1", "source_sha": source_sha, "version": version,
         "files": {name: {"bytes": len(payload), "sha256": sha256(payload)}
@@ -85,12 +117,7 @@ def prepare(folder, archive_path, asset_list, version, source_sha):
     checksum = archive_path.with_name(archive_path.name + ".sha256")
     flat_name(archive_path.name)
     checksum.write_text(sha256(archive_path.read_bytes()) + "  " + archive_path.name + "\n", encoding="ascii")
-    uploads = []
-    for name, payload in files.items():
-        if len(relative_name(name).parts) == 1:
-            flat_name(name)
-            if payload:
-                uploads.append(folder / name)
+    uploads = [folder / name for name in selected]
     uploads.extend((archive_path, checksum))
     asset_list.parent.mkdir(parents=True, exist_ok=True)
     asset_list.write_bytes(b"".join(str(path).encode("utf-8") + b"\x00" for path in uploads))
@@ -131,27 +158,31 @@ def verify_and_restore_empty(archive_path, folder, version, source_sha, expected
                     "evidence payload mismatch: " + name)
             if len(path.parts) == 1:
                 flat_name(name)
-                target = folder / name
-                require(not target.is_symlink(), "release readback cannot follow symlinks")
-                if payload:
-                    require(target.is_file() and target.read_bytes() == payload,
-                            "standalone release asset missing or changed: " + name)
-                elif target.exists():
-                    require(target.is_file() and target.read_bytes() == b"",
-                            "empty evidence conflicts with an existing asset: " + name)
                 verified[name] = payload
-        # Validate all downloaded nonempty assets before materializing any
-        # omitted zero-byte files. The original platform ledgers can then check
-        # their complete file set without treating an empty file as missing.
+        standalone = set(standalone_names(verified))
+        # Validate the full archive and every required standalone download
+        # before restoring archive-only evidence for the platform ledgers.
+        # A missing distribution package must never be replaced from the ZIP.
+        for name, payload in verified.items():
+            target = folder / name
+            require(not target.is_symlink(), "release readback cannot follow symlinks")
+            if name in standalone:
+                require(target.is_file() and target.read_bytes() == payload,
+                        "standalone release asset missing or changed: " + name)
+            elif target.exists():
+                require(target.is_file() and target.read_bytes() == payload,
+                        ("empty evidence conflicts" if not payload else "archived evidence conflicts")
+                        + " with an existing asset: " + name)
         restored = []
         for name, payload in verified.items():
             target = folder / name
-            if not payload and not target.exists():
-                with target.open("xb"):
-                    pass
+            if name not in standalone and not target.exists():
+                with target.open("xb") as stream:
+                    stream.write(payload)
                 restored.append(name)
     return {"passed": True, "source_sha": source_sha, "version": version,
-            "files_verified": len(files), "empty_files_restored": restored,
+            "files_verified": len(files), "restored_files": restored,
+            "empty_files_restored": [name for name in restored if not verified[name]],
             "archive_sha256": sha256(archive_path.read_bytes())}
 
 
