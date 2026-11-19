@@ -161,6 +161,50 @@ def main():
             assert connection.has_extension("XTEST"), "XTEST extension is required"
             pointer_mapping = list(connection.get_pointer_mapping())
             report["pointer_mapping"] = pointer_mapping
+            # Resolve the physical dual-purpose keypad keys, not a preferred
+            # keysym alias: Xvfb also has an always-decimal key at another code.
+            minimum = connection.display.info.min_keycode
+            maximum = connection.display.info.max_keycode
+            keyboard_mapping = dict(enumerate(
+                connection.get_keyboard_mapping(minimum, maximum - minimum + 1), minimum))
+            # Num Lock off uses legacy navigation, or dedicated keypad identity
+            # after Kitty disambiguation (functional-key table):
+            # https://sw.kovidgoyal.net/kitty/keyboard-protocol/#functional-key-definitions
+            keypad_cases = [
+                ("KP_0", "KP_Insert", b"\x1b[2~", b"\x1b[57425u"),
+                ("KP_1", "KP_End", b"\x1b[F", b"\x1b[57424u"),
+                ("KP_2", "KP_Down", b"\x1b[B", b"\x1b[57420u"),
+                ("KP_3", "KP_Next", b"\x1b[6~", b"\x1b[57422u"),
+                ("KP_4", "KP_Left", b"\x1b[D", b"\x1b[57417u"),
+                ("KP_5", "KP_Begin", b"\x1b[1E", b"\x1b[E"),
+                ("KP_6", "KP_Right", b"\x1b[C", b"\x1b[57418u"),
+                ("KP_7", "KP_Home", b"\x1b[H", b"\x1b[57423u"),
+                ("KP_8", "KP_Up", b"\x1b[A", b"\x1b[57419u"),
+                ("KP_9", "KP_Prior", b"\x1b[5~", b"\x1b[57421u"),
+                ("KP_Decimal", "KP_Delete", b"\x1b[3~", b"\x1b[57426u"),
+            ]
+            physical_keypad = {}
+            report["physical_keypad"] = {}
+            for numeric, navigation, _, _ in keypad_cases:
+                pair = (XK.string_to_keysym(navigation), XK.string_to_keysym(numeric))
+                matches = [code for code, symbols in keyboard_mapping.items()
+                           if tuple(symbols[:2]) == pair]
+                assert len(matches) == 1, (numeric, navigation, matches)
+                physical_keypad[numeric] = matches[0]
+                report["physical_keypad"][numeric] = {
+                    "keycode": matches[0], "num_lock_off": navigation,
+                    "symbols": list(keyboard_mapping[matches[0]]),
+                    "keysym_lookup_keycode": connection.keysym_to_keycode(pair[1]),
+                }
+            num_lock_codes = [code for code, symbols in keyboard_mapping.items()
+                              if symbols[0] == XK.string_to_keysym("Num_Lock")]
+            assert len(num_lock_codes) == 1, num_lock_codes
+            num_lock_code = num_lock_codes[0]
+            num_lock_masks = [1 << index for index, row in enumerate(connection.get_modifier_mapping())
+                              if num_lock_code in row]
+            assert len(num_lock_masks) == 1, num_lock_masks
+            num_lock_mask = num_lock_masks[0]
+            report["num_lock_mapping"] = {"keycode": num_lock_code, "modifier_mask": num_lock_mask}
             # A non-US layout can have tilde as an unshifted key. Configure an
             # otherwise unused key in the private display before ztty connects.
             tilde_code = connection.display.info.max_keycode
@@ -246,7 +290,11 @@ def main():
             report["grid"] = {"cols": cols, "rows": rows, "cell_width": cell_width, "cell_height": cell_height}
 
             def codes(keys):
-                values = [key if isinstance(key, int) else connection.keysym_to_keycode(XK.string_to_keysym(key)) for key in keys]
+                values = [
+                    key if isinstance(key, int) else physical_keypad.get(key)
+                    or connection.keysym_to_keycode(XK.string_to_keysym(key))
+                    for key in keys
+                ]
                 assert all(values), keys
                 return values
 
@@ -328,9 +376,9 @@ def main():
             # Read the real X server modifier state. This display is private,
             # so toggling locks cannot change the user's physical keyboard.
             def num_lock(enabled):
-                if bool(connection.screen().root.query_pointer().mask & X.Mod2Mask) != enabled:
-                    key("Num_Lock")
-                wait(lambda: bool(connection.screen().root.query_pointer().mask & X.Mod2Mask) == enabled,
+                if bool(connection.screen().root.query_pointer().mask & num_lock_mask) != enabled:
+                    key(num_lock_code)
+                wait(lambda: bool(connection.screen().root.query_pointer().mask & num_lock_mask) == enabled,
                      "private X server Num Lock state", 2)
 
             begin(RESET)
@@ -365,16 +413,19 @@ def main():
             begin(RESET + "\x1b>")
             num_lock(False)
             assert_input("Num Lock off emits no legacy input", b"")
-            begin()
-            key("KP_0")
-            assert_input("Num Lock off: keypad zero retains the standard Insert key", b"\x1b[2~")
+            for flags in (0, 1):
+                for numeric, navigation, legacy, enhanced in keypad_cases:
+                    begin(RESET + "\x1b>\x1b[?1l" + f"\x1b[={flags}u")
+                    key(physical_keypad[numeric])
+                    assert_input(f"Num Lock off, Kitty flags {flags}: physical {numeric} sends {navigation}",
+                                 enhanced if flags else legacy)
             begin(RESET + "\x1b[=1u")
             num_lock(True)
             assert_input("explicit Kitty opt-in still reports Num Lock and its state", b"\x1b[57360;129u")
             begin(RESET)
             num_lock(False)
             assert_input("return to legacy mode stops reporting lock keys", b"")
-            report["checks"].append("Num Lock stays silent in legacy mode; real keypad digits, Insert semantics and explicit enhanced lock reporting are verified")
+            report["checks"].append("Num Lock stays silent in legacy mode; verified physical keypad digits/decimal use text while all eleven navigation keys retain legacy or requested Kitty identity, including Begin; lock reporting stays explicit")
 
             begin(RESET + "\x1b[?1000h\x1b[?1006h")
             move()
