@@ -13,7 +13,7 @@ if [[ ${GITHUB_REF:-} == refs/tags/* && ${GITHUB_REF_NAME:-} != "v$version" ]]; 
 fi
 name=ztty-$version
 mkdir -p "$out/aur"
-git archive --format=tar --prefix="$name/" HEAD | gzip -n > "$out/$name.tar.gz"
+python3 tools/source_archive.py --prefix "$name" --output "$out/$name.tar.gz"
 digest=$(sha256sum "$out/$name.tar.gz" | cut -d ' ' -f 1)
 sed -e "s/@VERSION@/$version/g" -e "s/@SHA256@/$digest/g" \
     packaging/aur/PKGBUILD.in > "$out/aur/PKGBUILD"
