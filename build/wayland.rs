@@ -24,18 +24,34 @@ pub fn build(out: &Path) {
         "pkg-config",
         &["--variable=pkgdatadir", "wayland-protocols"],
     );
-    let xml = Path::new(protocols.trim()).join("stable/xdg-shell/xdg-shell.xml");
-    println!("cargo:rerun-if-changed={}", xml.display());
-    let header = out.join("xdg-shell-client-protocol.h");
-    let protocol = out.join("xdg-shell-protocol.c");
-    run(Command::new("wayland-scanner")
-        .arg("client-header")
-        .arg(&xml)
-        .arg(&header));
-    run(Command::new("wayland-scanner")
-        .arg("private-code")
-        .arg(&xml)
-        .arg(&protocol));
+    let mut generated = Vec::new();
+    for (name, relative) in [
+        ("xdg-shell", "stable/xdg-shell/xdg-shell.xml"),
+        (
+            "primary-selection",
+            "unstable/primary-selection/primary-selection-unstable-v1.xml",
+        ),
+        (
+            "text-input",
+            "unstable/text-input/text-input-unstable-v3.xml",
+        ),
+    ] {
+        let xml = Path::new(protocols.trim()).join(relative);
+        println!("cargo:rerun-if-changed={}", xml.display());
+        let header = out.join(format!("{name}-client-protocol.h"));
+        let protocol = out.join(format!("{name}-protocol.c"));
+        run(Command::new("wayland-scanner")
+            .arg("client-header")
+            .arg(&xml)
+            .arg(&header));
+        run(Command::new("wayland-scanner")
+            .arg("private-code")
+            .arg(&xml)
+            .arg(&protocol));
+        generated.push(protocol);
+    }
+    println!("cargo:rerun-if-changed=native/wayland_services.h");
+    println!("cargo:rerun-if-changed=native/wayland_services.c");
     let flags = output(
         "pkg-config",
         &[
@@ -48,11 +64,13 @@ pub fn build(out: &Path) {
     );
     let compiler = env::var_os("CC").unwrap_or_else(|| "cc".into());
     let mut objects = Vec::new();
-    for (source, object) in [
-        (Path::new("native/wayland_bridge.c"), "wayland_bridge.o"),
-        (protocol.as_path(), "xdg-shell-protocol.o"),
-    ] {
-        let object = out.join(object);
+    let mut sources = vec![
+        Path::new("native/wayland_bridge.c").to_path_buf(),
+        Path::new("native/wayland_services.c").to_path_buf(),
+    ];
+    sources.extend(generated);
+    for source in sources {
+        let object = out.join(source.file_name().unwrap()).with_extension("o");
         run(Command::new(&compiler)
             .args(["-std=c11", "-O2", "-fPIC", "-Wall", "-Wextra", "-Werror"])
             .args(flags.split_whitespace())

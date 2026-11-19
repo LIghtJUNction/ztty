@@ -123,15 +123,7 @@ struct ImageUpload {
 const MAX_SELECTION_BYTES: usize = 4 * 1024 * 1024;
 
 pub struct Window {
-    pub display: *mut Display,
-    pub id: Xid,
-    pub fd: i32,
-    pub cw: i32,
-    pub ch: i32,
-    pub width: i32,
-    pub height: i32,
-    pub wm_delete: Atom,
-    pub configure_serial: core::cell::Cell<c_ulong>,
+    pub state: crate::display::WindowState,
     depth: u32,
     visual: *mut c_void,
     colormap: c_ulong,
@@ -180,7 +172,6 @@ pub struct Window {
     image_clock: u64,
     graphics_revision: u64,
     graphics_alternate: bool,
-    pub focused: bool,
     suspended: bool,
     search_cols: usize,
     search_bits: Vec<u64>,

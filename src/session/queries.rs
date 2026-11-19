@@ -22,6 +22,12 @@ impl Session {
             ("rows", Value::from(self.core.terminal.rows())),
             ("attached", Value::Bool(self.ui.is_some())),
             (
+                "backend",
+                self.ui
+                    .as_ref()
+                    .map_or(Value::Null, |ui| Value::from(ui.window.backend())),
+            ),
+            (
                 "read_only",
                 Value::Bool(self.ui.as_ref().is_some_and(|ui| ui.read_only)),
             ),

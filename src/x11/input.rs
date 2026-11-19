@@ -214,7 +214,7 @@ impl Drop for InputContext {
 
 impl Window {
     pub fn focus(&mut self, focused: bool) {
-        self.focused = focused;
+        self.state.focused = focused;
         self.ic.focus(focused);
     }
     /// Keep character identity unshifted, but let XKB choose the keypad layer.
@@ -237,7 +237,7 @@ impl Window {
         let mut consumed = 0;
         if unsafe {
             XkbLookupKeySym(
-                self.display,
+                self.state.display,
                 event.keycode as u8,
                 state,
                 &mut consumed,

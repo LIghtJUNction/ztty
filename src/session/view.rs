@@ -1,11 +1,13 @@
 //! View state, selection, search and complete-frame painting.
 use super::{ClipboardMenu, Palette, PaletteItem, PaletteTarget, Search, Ui};
 use crate::{
-    Appearance, actions, os, paste, queue_input,
+    Appearance, actions,
+    display::Window,
+    os, paste, queue_input,
     repaint::{Plan, Repaint},
     search,
     session_core::SessionCore,
-    x11::{self, Selection, Window},
+    x11::{self, Selection},
 };
 use alloc::{format, string::String, vec::Vec};
 use zterm::Terminal;

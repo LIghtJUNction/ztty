@@ -22,6 +22,10 @@ cargo clippy --locked --workspace --all-targets "$@" -- -D warnings
 cargo build --locked --release "$@"
 python3 tools/check_no_std.py
 if [ "$(uname -s)" = Linux ]; then
+    if [ "${ZTTY_WAYLAND:-0}" = 1 ]; then
+        python3 tests/wayland_services.py --sanitize --output artifacts/wayland-services
+        python3 tests/build_wayland_ime_peer.py --output artifacts/wayland-ime-peer
+    fi
     python3 tests/install_test.py
     python3 tests/bash_integration.py --output artifacts/bash-integration/report.json
     python3 tests/mcp_transport.py --binary ./target/release/ztty

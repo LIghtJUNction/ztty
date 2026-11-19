@@ -39,7 +39,7 @@ impl Pool {
             .ui
             .as_mut()
             .ok_or("attach the session before arranging its window")?;
-        let window = x11::Container::new(&ui.window);
+        let window = x11::Container::new(ui.window.x11()?);
         ui.window.parent(Some(window.id));
         ui.workspace = Some(window.id);
         self.workspaces.push(Workspace {
@@ -212,7 +212,9 @@ impl Pool {
         let id = session.id;
         if let Some(ui) = session.ui.take() {
             let token = format!("attachment:{}", ui.attachment);
-            let status = session.status().unwrap_or(0);
+            let status = session
+                .status()
+                .unwrap_or_else(|| i32::from(ui.window.failed()));
             self.finished.push((token.clone(), status));
             self.completed.push_back((token, status));
             while self.completed.len() > 128 {
@@ -230,6 +232,10 @@ impl Pool {
             ("op", Value::from("create")),
             ("origin", Value::from("local")),
             ("headless", Value::Bool(false)),
+            (
+                "_backend",
+                Value::from(session.ui.as_ref().map_or("x11", |ui| ui.window.backend())),
+            ),
             ("cols", Value::from(session.core.terminal.cols())),
             ("rows", Value::from(session.core.terminal.rows())),
             ("_appearance", session.appearance.to_json()),
@@ -338,7 +344,8 @@ impl Pool {
                 return Err("layout sessions must use the same display".into());
             }
         }
-        let mut window = x11::Container::new(&self.sessions[active].ui.as_ref().unwrap().window);
+        let mut window =
+            x11::Container::new(self.sessions[active].ui.as_ref().unwrap().window.x11()?);
         window.resize(snapshot.width, snapshot.height);
         let parent = window.id;
         for session in &mut self.sessions {

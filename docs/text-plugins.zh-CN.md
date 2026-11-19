@@ -41,7 +41,7 @@ printf '    first\n      second\n' | ./target/release/ztty plugin run "$plugin_p
 
 ## 接口与工作方式
 
-[共享接口 crate](../crates/ztty-plugin-api/src/lib.rs) 使用真实的 `zplugin = 0.3.0`，保持 `#![no_std]`。接口标识是 `dev.project-z.ztty.text`，版本为 `1`：
+[共享接口 crate](../crates/ztty-plugin-api/src/lib.rs)、当前宿主和示例统一使用 `zplugin = "=0.3.1"`，接口保持 `#![no_std]`。`ztty-plugin-api 0.1.0` 尚待首次发布，示例通过本仓库的路径依赖构建。接口标识是 `dev.project-z.ztty.text`，版本为 `1`：
 
 ```rust
 fn transform(
@@ -96,7 +96,7 @@ python3 tests/plugin_gui.py --binary target/release/ztty --example artifacts/zpl
 
 GUI 检查使用新建的私有 Xvfb、独立 broker socket 和合成文本，不操作用户桌面、剪贴板或现有会话。故障库覆盖接口版本不匹配、拒绝合作卸载、错误长度、非法 UTF-8、panic、原生崩溃、超时、CPU 限额、异常 stdout、遗留子进程通道以及母进程退出。它只用于测试，不应安装成日常扩展。
 
-## 本轮验证记录
+## 历史验证记录（zplugin 0.3.0）
 
 验证源码为 `68030066cb18e97fa5677a77881d54188fdc93f3`，Linux ELF SHA-256 为 `ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51`。同一 ELF 上的 CLI 22 项、私有 Xvfb GUI 10 项、日常工作流 19 项与重绘 11 项全部通过。Clippy 以 `-D warnings` 通过；Windows GNU 前端通过 `cargo check`，这不代表 Windows 已接入插件宿主。注册规则 2 项、SessionCore 真实 PTY 9 项与 Dedent 2 项测试通过，对应源码未被后续 worker 收尾修复修改。macOS 未测试。
 

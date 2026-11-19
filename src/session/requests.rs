@@ -3,11 +3,11 @@ use super::{Pool, Session, Ui, pty_size};
 use crate::{
     Appearance,
     broker::{self, Reply},
+    display::Window,
     json::{self, Value},
     os, session_control,
     session_core::SessionCore,
     working_directory::WorkingDirectory,
-    x11::Window,
 };
 use alloc::{ffi::CString, format, string::String, vec::Vec};
 use core::ffi::CStr;
@@ -44,6 +44,13 @@ impl Pool {
     }
 
     pub(super) fn create(&mut self, request: &Value) -> Result<Value, String> {
+        if request.get("_backend").and_then(Value::as_str) == Some("wayland")
+            && request.get("target").is_some()
+        {
+            return Err(
+                "Wayland workspaces are not available; use independent session windows".into(),
+            );
+        }
         let input_owner = actor(request)?.into();
         let observe = match request.get("observe") {
             None => false,
@@ -171,7 +178,10 @@ impl Pool {
         let ui = if headless {
             None
         } else {
-            let c = self.connection(&env)?;
+            let c = self.connection(
+                &env,
+                request.get("_backend").and_then(Value::as_str) == Some("wayland"),
+            )?;
             let attachment = self.next_attachment;
             self.next_attachment += 1;
             let window = if observe {
@@ -201,7 +211,11 @@ impl Pool {
         let (program, env) = os::child_setup_with_env(&command[0], env).map_err(String::from)?;
         let argv: Vec<&CStr> = command.iter().map(CString::as_c_str).collect();
         let child_env: Vec<&CStr> = env.iter().map(CString::as_c_str).collect();
-        let close: Vec<i32> = self.connections.iter().map(|(_, c)| c.fd).collect();
+        let mut display_fds = Vec::new();
+        for (_, c) in &self.connections {
+            c.descriptors(&mut display_fds);
+        }
+        let close: Vec<i32> = display_fds.iter().map(|p| p.fd).collect();
         let pty = unsafe {
             zpty::Pty::spawn(
                 &program,
@@ -268,7 +282,9 @@ impl Pool {
         result.set("closed", Value::Bool(true));
         result.set("running", Value::Bool(false));
         result.set("attached", Value::Bool(false));
-        let status = session.status().unwrap_or(0);
+        let status = session
+            .status()
+            .unwrap_or_else(|| i32::from(session.ui.as_ref().is_some_and(|ui| ui.window.failed())));
         if let Some(ui) = &session.ui {
             let token = format!("attachment:{}", ui.attachment);
             self.finished.push((token.clone(), status));
@@ -559,6 +575,14 @@ impl Pool {
                 Ok(Reply::Value(session.info()))
             }
             "attach" => {
+                if let Some(requested) = request.get("_backend").and_then(Value::as_str)
+                    && self.sessions[index]
+                        .ui
+                        .as_ref()
+                        .is_some_and(|ui| ui.window.backend() != requested)
+                {
+                    return Err("session already has a window on another backend; detach it before attaching a different backend".into());
+                }
                 let read_only = request
                     .get("observe")
                     .and_then(Value::as_bool)
@@ -583,7 +607,10 @@ impl Pool {
                     return Ok(Reply::Value(self.sessions[index].info()));
                 }
                 let env = environment(request)?;
-                let connection = self.connection(&env)?;
+                let connection = self.connection(
+                    &env,
+                    request.get("_backend").and_then(Value::as_str) == Some("wayland"),
+                )?;
                 self.attach_view(index, read_only, &connection, request.get("_appearance"))?;
                 Ok(Reply::Value(self.sessions[index].info()))
             }

@@ -11,8 +11,8 @@ impl Window {
         let upload = self.images.swap_remove(index);
         self.image_bytes = self.image_bytes.saturating_sub(upload.bytes);
         unsafe {
-            XRenderFreePicture(self.display, upload.picture);
-            XFreePixmap(self.display, upload.pixmap);
+            XRenderFreePicture(self.state.display, upload.picture);
+            XFreePixmap(self.state.display, upload.pixmap);
         }
     }
 
@@ -64,7 +64,7 @@ impl Window {
                 );
             }
             let ximage = XCreateImage(
-                self.display,
+                self.state.display,
                 self.visual,
                 32,
                 2,
@@ -79,25 +79,31 @@ impl Window {
                 free(data.cast());
                 return None;
             }
-            let format = XRenderFindStandardFormat(self.display, 0); // PictStandardARGB32
+            let format = XRenderFindStandardFormat(self.state.display, 0); // PictStandardARGB32
             if format.is_null() {
                 XDestroyImage(ximage);
                 return None;
             }
-            let pixmap = XCreatePixmap(self.display, self.id, image.width, image.height, 32);
-            let gc = XCreateGC(self.display, pixmap, 0, core::ptr::null_mut());
+            let pixmap = XCreatePixmap(
+                self.state.display,
+                self.state.id,
+                image.width,
+                image.height,
+                32,
+            );
+            let gc = XCreateGC(self.state.display, pixmap, 0, core::ptr::null_mut());
             if pixmap == 0 || gc.is_null() {
                 if !gc.is_null() {
-                    XFreeGC(self.display, gc);
+                    XFreeGC(self.state.display, gc);
                 }
                 if pixmap != 0 {
-                    XFreePixmap(self.display, pixmap);
+                    XFreePixmap(self.state.display, pixmap);
                 }
                 XDestroyImage(ximage);
                 return None;
             }
             XPutImage(
-                self.display,
+                self.state.display,
                 pixmap,
                 gc,
                 ximage,
@@ -108,15 +114,16 @@ impl Window {
                 image.width,
                 image.height,
             );
-            XFreeGC(self.display, gc);
+            XFreeGC(self.state.display, gc);
             XDestroyImage(ximage);
-            let picture = XRenderCreatePicture(self.display, pixmap, format, 0, core::ptr::null());
+            let picture =
+                XRenderCreatePicture(self.state.display, pixmap, format, 0, core::ptr::null());
             if picture == 0 {
-                XFreePixmap(self.display, pixmap);
+                XFreePixmap(self.state.display, pixmap);
                 return None;
             }
             XRenderSetPictureFilter(
-                self.display,
+                self.state.display,
                 picture,
                 c"nearest".as_ptr(),
                 core::ptr::null(),
@@ -144,8 +151,8 @@ impl Window {
         row: usize,
         layer: u8,
     ) {
-        let width = terminal.cols() as i64 * i64::from(self.cw);
-        let row_top = row as i64 * i64::from(self.ch);
+        let width = terminal.cols() as i64 * i64::from(self.state.cw);
+        let row_top = row as i64 * i64::from(self.state.ch);
         for placement in terminal.graphics_draws(offset) {
             let wanted_layer = if placement.z < -1_073_741_824 {
                 0
@@ -168,7 +175,7 @@ impl Window {
                 .min(width)
                 .min(clip.map_or(i64::MAX, |c| i64::from(c.x) + i64::from(c.width)));
             let bottom = (dy + i64::from(placement.dest.height))
-                .min(row_top + i64::from(self.ch))
+                .min(row_top + i64::from(self.state.ch))
                 .min(clip.map_or(i64::MAX, |c| i64::from(c.y) + i64::from(c.height)));
             if left >= right || top >= bottom {
                 continue;
@@ -195,9 +202,9 @@ impl Window {
                 ],
             };
             unsafe {
-                XRenderSetPictureTransform(self.display, picture, &transform);
+                XRenderSetPictureTransform(self.state.display, picture, &transform);
                 XRenderComposite(
-                    self.display,
+                    self.state.display,
                     3,
                     picture,
                     0,

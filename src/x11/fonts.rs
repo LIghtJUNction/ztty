@@ -113,14 +113,25 @@ impl Window {
             value,
         };
         unsafe {
-            XftColorAllocValue(self.display, self.visual, self.colormap, &value, &mut color);
+            XftColorAllocValue(
+                self.state.display,
+                self.visual,
+                self.colormap,
+                &value,
+                &mut color,
+            );
         }
         if self.colors.len() < 256 {
             self.colors.push(ColorEntry { rgb, color });
         } else {
             let entry = &mut self.colors[self.next_color];
             unsafe {
-                XftColorFree(self.display, self.visual, self.colormap, &mut entry.color);
+                XftColorFree(
+                    self.state.display,
+                    self.visual,
+                    self.colormap,
+                    &mut entry.color,
+                );
             }
             *entry = ColorEntry { rgb, color };
             self.next_color = (self.next_color + 1) % 256;
