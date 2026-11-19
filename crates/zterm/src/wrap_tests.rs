@@ -50,19 +50,19 @@ fn wrapped_rows_follow_ring_rotation_history_and_eviction() {
 }
 
 #[test]
-fn resize_retains_complete_wraps_and_severs_clipped_successors() {
+fn resize_reflows_soft_wraps_and_severs_clipped_successors() {
     let mut terminal = Terminal::new(4, 3, 10);
     terminal.feed(b"abcdefghij");
     terminal.resize(6, 2);
-    assert_eq!(terminal.history_len(), 1);
-    assert_eq!(terminal.view_row_wrap(0, 1), Some(4));
-    assert_eq!(wraps(&terminal, 0), [Some(4), None]);
+    assert_eq!(terminal.history_len(), 0);
+    assert_eq!(wraps(&terminal, 0), [Some(6), None]);
     terminal.resize(3, 2);
-    assert_eq!(terminal.view_row_wrap(0, 1), None);
-    assert_eq!(wraps(&terminal, 0), [None, None]);
+    assert_eq!(terminal.history_len(), 2);
+    assert_eq!(terminal.view_row_wrap(0, 2), Some(3));
+    assert_eq!(wraps(&terminal, 0), [Some(3), None]);
     terminal.resize(6, 2);
-    assert_eq!(terminal.view_row_wrap(0, 1), Some(4));
-    assert_eq!(wraps(&terminal, 0), [None, None]);
+    assert_eq!(terminal.history_len(), 0);
+    assert_eq!(wraps(&terminal, 0), [Some(6), None]);
 
     let mut clipped = Terminal::new(4, 4, 10);
     clipped.feed(b"abcdefghijklmn\x1b[H");
@@ -132,9 +132,8 @@ fn alternate_screens_keep_independent_wrap_metadata_through_resize_and_clear() {
     assert_eq!(wraps(&terminal, 0), [Some(4), None]);
     terminal.resize(6, 2);
     terminal.feed(b"\x1b[?1049l");
-    assert_eq!(terminal.history_len(), 1);
-    assert_eq!(terminal.view_row_wrap(0, 1), Some(4));
-    assert_eq!(wraps(&terminal, 0), [Some(4), None]);
+    assert_eq!(terminal.history_len(), 0);
+    assert_eq!(wraps(&terminal, 0), [Some(6), None]);
     terminal.feed(b"\x1b[?1049h");
     assert_eq!(wraps(&terminal, 0), [None, None]);
 }

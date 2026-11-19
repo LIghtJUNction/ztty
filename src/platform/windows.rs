@@ -1430,10 +1430,23 @@ impl App {
                 .terminal
                 .set_cell_size(self.fonts.width as u32, self.fonts.height as u32);
             if grid_changed {
-                pane.core
-                    .terminal
-                    .resize(usize::from(size.cols), usize::from(size.rows));
-                pane.selection = None;
+                let mut anchor = ztty::selection::ViewAnchor::capture(
+                    &pane.core.terminal,
+                    pane.history,
+                    pane.selection
+                        .map(|selection| (selection.start, selection.end)),
+                );
+                pane.core.terminal.resize_anchored(
+                    usize::from(size.cols),
+                    usize::from(size.rows),
+                    anchor.anchors_mut(),
+                );
+                let restored = anchor.restore(&pane.core.terminal);
+                pane.history = restored.history;
+                pane.selection = restored
+                    .selection
+                    .map(|(start, end)| Selection { start, end });
+                pane.dragging = false;
             }
             pane.pty_size = size;
             pane.history = pane.history.min(pane.core.terminal.history_len());
