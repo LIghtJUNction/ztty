@@ -1,5 +1,74 @@
 # ztty
 
+## Linux 安装与运行
+
+本文命令对应当前源码。安装脚本下载最新已发布的
+[GitHub Release](https://github.com/LIghtJUNction/ztty/releases)，并非任意已有 tag；
+尚未发布的改动请通过源码构建使用。
+
+Arch Linux 可使用 `yay -S ztty`。其他 Linux 发行版可用一键安装脚本，
+自动选择 x86_64 或 ARM64 预编译包并校验 SHA256。
+
+```sh
+curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/install.sh
+sh install.sh
+```
+
+脚本安装最新已发布版本，默认位置为 `~/.local/bin`。Linux 预编译版需要
+glibc、X11、Xft 和 Xrender 运行库。当前源码中的新功能可能尚未进入
+最新发布包。
+
+安装 Rust 1.100.0、X11/Xft/Xrender 开发库和等宽字体后：
+
+```sh
+cargo build --locked --release
+./target/release/ztty
+./target/release/ztty --font 'monospace:size=12' --geometry 100x28
+```
+
+`make install` 通过安装器安装到当前用户的 `~/.local`；也可用
+`sh install.sh --from-binary ./target/release/ztty` 安装本地构建。
+安装器先暂存、校验再原子替换，保留一份旧文件供回滚；正在运行的共享 broker
+继续使用已加载的版本，不会因文件更新自动重启。
+未设置 `ZTTY_SOCKET` 时，新开的独立窗口会选择当前构建；旧窗口中的
+标签页、分屏和显式指定的会话地址仍保留原有路由。
+[升级期间的会话规则](docs/sessions.md#upgrading-a-running-broker)说明如何访问新旧会话。
+Linux 下 Ctrl+Shift+C 复制，
+Ctrl+Shift+V 粘贴，Shift+拖拽在捕获鼠标的应用中选择文字，
+Shift+PageUp/PageDown 或滚轮浏览历史，历史中的 **Back to live ↓** 入口回到底部，
+Ctrl+点击打开链接。
+应用捕获鼠标时，按住 Shift 可使用本地选择、滚轮历史和中键粘贴。
+
+Linux 和 Windows 的字体、标签页与分屏快捷键如下；macOS 尚未实现这组窗口操作，
+其复制、粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
+
+| 操作 | 快捷键 |
+| --- | --- |
+| 放大字体 | Ctrl+Plus 或 Ctrl+Equal；也可使用 Ctrl+Shift+Equal |
+| 缩小字体 | Ctrl+Minus 或 Ctrl+Shift+Minus |
+| 恢复配置中的字体 | Ctrl+0；Linux 也支持 Ctrl+Shift+0 |
+| 小键盘放大、缩小、恢复 | Ctrl+小键盘 Add / Subtract / 0；小键盘 0 需开启 Num Lock |
+| 下一个、上一个标签页 | Ctrl+Tab / Ctrl+Shift+Tab |
+| 增大、缩小当前分屏 | Ctrl+Alt+Shift+Equal / Minus |
+
+字体缩放保留窗口和正在运行的 PTY；Windows 会协调同一工作区的所有窗格。
+恢复字体时，Linux 使用最近成功加载的配置，Windows 使用启动时的配置。
+Windows 在多键盘布局下可能保留 Ctrl+Shift+0，因此优先使用 Ctrl+0；
+带 Shift 的别名仅在系统把按键交给 ztty 时生效。
+[微软对这一系统快捷键的说明](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size)。
+Linux 按当前键盘布局识别加号，包括通过 Shift 产生加号的按键。
+自定义绑定优先于默认绑定；Num Lock 关闭时，小键盘 0 仍按 Insert 处理。
+
+Linux/macOS 默认使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用
+`COMSPEC`，缺省为 `cmd.exe`。用 `-e` 指定其他命令、`--cwd PATH` 指定初始目录；
+相对命令使用目标目录，相对配置路径仍使用启动器原目录。
+[目录行为与原生验收](docs/startup-directory.md)说明实现范围。macOS 与 Windows
+的打包和原生验收入口见 [发布工作流](.github/workflows/release.yml)。
+Windows 包携带固定版本的 Microsoft ConPTY 运行组件，库也支持回退到
+系统自带 API，细节见 [`zpty` 文档](crates/zpty/README.md)。
+
+## 项目概览
+
 **ztty 0.4.1** 已修复增强键盘协议下的小数字键盘输入，并整合 Linux 原生 UI。
 下载入口为 [官方 Releases](https://github.com/LIghtJUNction/ztty/releases)，
 [发布与安装记录](docs/numpad-release-0.4.1-2026-11-19.zh-CN.md)列出对应源码和验收结果。
@@ -9,6 +78,9 @@
 同时修复 NumLock／Shift 状态下的小键盘路由和文字覆盖后的 Sixel 残留，
 让新开的独立 Linux 窗口使用当前安装版本，保留已有会话。
 [本轮性能与功能记录](docs/performance-function-2026-11-19.zh-CN.md)给出实测、验证和使用方法。
+
+当前 Linux 源码还支持双击选词、三击选行、临时右键复制粘贴菜单和可见反馈，
+并修复大段及分块剪贴板传输。[复制粘贴使用方法与验收](docs/copy-paste-2026-11-19.zh-CN.md)记录具体操作和已测范围。
 
 <!-- terminal-benchmark:start -->
 [![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
@@ -125,72 +197,6 @@ cargo add zterm@0.3.0 --no-default-features
 cargo add zvte@0.1.3 --no-default-features
 ```
 
-## Linux 安装与运行
-
-本文命令对应当前源码。安装脚本下载最新已发布的
-[GitHub Release](https://github.com/LIghtJUNction/ztty/releases)，并非任意已有 tag；
-尚未发布的改动请通过源码构建使用。
-
-Arch Linux 可使用 `yay -S ztty`。其他 Linux 发行版可用一键安装脚本，
-自动选择 x86_64 或 ARM64 预编译包并校验 SHA256。
-
-```sh
-curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/install.sh
-sh install.sh
-```
-
-脚本安装最新已发布版本，默认位置为 `~/.local/bin`。Linux 预编译版需要
-glibc、X11、Xft 和 Xrender 运行库。当前源码中的新功能可能尚未进入
-最新发布包。
-
-安装 Rust 1.100.0、X11/Xft/Xrender 开发库和等宽字体后：
-
-```sh
-cargo build --locked --release
-./target/release/ztty
-./target/release/ztty --font 'monospace:size=12' --geometry 100x28
-```
-
-`make install` 通过安装器安装到当前用户的 `~/.local`；也可用
-`sh install.sh --from-binary ./target/release/ztty` 安装本地构建。
-安装器先暂存、校验再原子替换，保留一份旧文件供回滚；正在运行的共享 broker
-继续使用已加载的版本，不会因文件更新自动重启。
-未设置 `ZTTY_SOCKET` 时，新开的独立窗口会选择当前构建；旧窗口中的
-标签页、分屏和显式指定的会话地址仍保留原有路由。
-[升级期间的会话规则](docs/sessions.md#upgrading-a-running-broker)说明如何访问新旧会话。
-Linux 下 Ctrl+Shift+C 复制，
-Ctrl+Shift+V 粘贴，Shift+拖拽在捕获鼠标的应用中选择文字，
-Shift+PageUp/PageDown 或滚轮浏览历史，历史中的 **Back to live ↓** 入口回到底部，
-Ctrl+点击打开链接。
-应用捕获鼠标时，按住 Shift 可使用本地选择、滚轮历史和中键粘贴。
-
-Linux 和 Windows 的字体、标签页与分屏快捷键如下；macOS 尚未实现这组窗口操作，
-其复制、粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
-
-| 操作 | 快捷键 |
-| --- | --- |
-| 放大字体 | Ctrl+Plus 或 Ctrl+Equal；也可使用 Ctrl+Shift+Equal |
-| 缩小字体 | Ctrl+Minus 或 Ctrl+Shift+Minus |
-| 恢复配置中的字体 | Ctrl+0；Linux 也支持 Ctrl+Shift+0 |
-| 小键盘放大、缩小、恢复 | Ctrl+小键盘 Add / Subtract / 0；小键盘 0 需开启 Num Lock |
-| 下一个、上一个标签页 | Ctrl+Tab / Ctrl+Shift+Tab |
-| 增大、缩小当前分屏 | Ctrl+Alt+Shift+Equal / Minus |
-
-字体缩放保留窗口和正在运行的 PTY；Windows 会协调同一工作区的所有窗格。
-恢复字体时，Linux 使用最近成功加载的配置，Windows 使用启动时的配置。
-Windows 在多键盘布局下可能保留 Ctrl+Shift+0，因此优先使用 Ctrl+0；
-带 Shift 的别名仅在系统把按键交给 ztty 时生效。
-[微软对这一系统快捷键的说明](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size)。
-Linux 按当前键盘布局识别加号，包括通过 Shift 产生加号的按键。
-自定义绑定优先于默认绑定；Num Lock 关闭时，小键盘 0 仍按 Insert 处理。
-
-Linux/macOS 默认使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用
-`COMSPEC`，缺省为 `cmd.exe`。用 `-e` 指定其他命令、`--cwd PATH` 指定初始目录；
-相对命令使用目标目录，相对配置路径仍使用启动器原目录。
-[目录行为与原生验收](docs/startup-directory.md)说明实现范围。macOS 与 Windows
-的打包和原生验收入口见 [发布工作流](.github/workflows/release.yml)。
-Windows 包携带固定版本的 Microsoft ConPTY 运行组件，库也支持回退到
-系统自带 API，细节见 [`zpty` 文档](crates/zpty/README.md)。
 
 ## 多窗口、会话与 MCP（Linux）
 
