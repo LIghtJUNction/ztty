@@ -89,11 +89,14 @@ def main():
                         help="source tree used to build the supplied binary; recorded for evidence")
     parser.add_argument("--output", type=Path, default=Path("artifacts/input-gui.json"))
     parser.add_argument("--screenshot", type=Path, default=Path("artifacts/input-gui.png"))
+    parser.add_argument("--renderer", choices=("auto", "gpu", "software"))
     args = parser.parse_args()
+    config_body = CONFIG + (f"\nrenderer = {args.renderer}\n" if args.renderer else "")
     binary = args.binary.resolve(strict=True)
     source = args.source_root.resolve(strict=True)
     sys.path.insert(0, str(source / "tools"))
     from isolated_xvfb import start_xvfb
+    from gui_renderer import record_renderer
     with binary.open("rb") as file:
         binary_sha = hashlib.file_digest(file, "sha256").hexdigest()
     report = {
@@ -103,7 +106,7 @@ def main():
         "source_changes": subprocess.check_output(["git", "status", "--short"], cwd=source, text=True, timeout=5).splitlines(),
         "checks": [], "vectors": [], "button_injection": {},
     }
-    for name in ("src/session.rs", "src/x11.rs", "src/main.rs", "src/actions.rs", "crates/zinput/src/lib.rs", "crates/zterm/src/lib.rs", "tools/isolated_xvfb.py"):
+    for name in ("src/x11/gpu.rs", "src/gpu/mod.rs", "src/gpu/font.rs", "src/gpu/grid.rs", "src/text_blink.rs", "src/appearance.rs", "tools/gui_renderer.py", "src/session.rs", "src/x11.rs", "src/main.rs", "src/actions.rs", "crates/zinput/src/lib.rs", "crates/zterm/src/lib.rs", "tools/isolated_xvfb.py"):
         path = source / name
         if path.is_file():
             report["source_sha256"][name] = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -242,7 +245,7 @@ def main():
                        ZTTY_SOCKET="@ztty-input-gui-" + root.name)
             env.pop("WAYLAND_DISPLAY", None)
             config = root / "config"
-            config.write_text(CONFIG)
+            config.write_text(config_body)
             input_path = root / "input.bin"
             control_path = root / "control.sock"
 
@@ -292,6 +295,7 @@ def main():
                 owned_pids[pid] = birth(pid)
             wait(lambda: control_path.exists() and "READY" in rpc({"op": "read", "session": "input-probe"})["screen"], "raw PTY ready")
             view = connection.create_resource_object("window", session["window_id"])
+            report["renderer_before"] = record_renderer(connection, view, args.renderer)
             view.set_input_focus(X.RevertToParent, X.CurrentTime)
             connection.sync()
             geometry = view.get_geometry()
@@ -674,7 +678,7 @@ def main():
             begin(RESET)
 
             # Default lookup must work without a custom binding table.
-            base_config = "\n".join(line for line in CONFIG.splitlines()
+            base_config = "\n".join(line for line in config_body.splitlines()
                                     if line.split("=", 1)[0].strip() not in ("keybind", "mousebind")) + "\n"
 
             def reload_config(text):
@@ -764,7 +768,7 @@ def main():
             key("Control_L", "Shift_L", plus_code)
             assert_input("custom base-key none wins over shifted default plus", b"")
             assert font_metrics() == base_metrics
-            reload_config(CONFIG)
+            reload_config(config_body)
             assert font_metrics() == base_metrics
             report["font_restored"] = True
             report["checks"].append("real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered")
@@ -938,6 +942,7 @@ def main():
             args.screenshot.parent.mkdir(parents=True, exist_ok=True)
             screenshot.save(args.screenshot)
             report["screenshot"] = {"path": str(args.screenshot), "sha256": hashlib.sha256(args.screenshot.read_bytes()).hexdigest()}
+            report["renderer_after"] = record_renderer(connection, view, args.renderer)
             rpc({"op": "close", "session": "input-probe"})
             wait(lambda: not rpc({"op": "list"})["sessions"], "input session cleanup")
             launcher.wait(timeout=5)
@@ -958,7 +963,7 @@ def main():
             if connection is not None:
                 if "reload_config" in locals() and not report.get("font_restored"):
                     try:
-                        reload_config(CONFIG)
+                        reload_config(config_body)
                         report["font_restored"] = True
                     except Exception as error:
                         report["font_restore_error"] = str(error)

@@ -20,4 +20,8 @@ pub mod session_core;
 pub mod session_identity;
 pub mod workspace_state;
 
+pub mod text_blink;
 pub mod text_plugins;
+
+#[cfg(target_os = "linux")]
+pub mod gpu;

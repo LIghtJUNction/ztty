@@ -1,0 +1,221 @@
+{
+  "old": {
+    "binary_sha256": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704",
+    "poisoned": false,
+    "invalid_publications": 11,
+    "raw_sha256": "51dd05ad242c133a4722f675d016e36aa21904cd96993835b4b51b5b1a5b8998",
+    "stages": [
+      {
+        "name": "resize",
+        "iterations": 12,
+        "copies": 25,
+        "invalid": 11,
+        "background_alpha_sequence": [
+          0,
+          179,
+          179,
+          179,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179,
+          0,
+          179
+        ]
+      },
+      {
+        "name": "offscreen_return",
+        "iterations": 6,
+        "copies": 12,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      },
+      {
+        "name": "external_unmap_map",
+        "iterations": 6,
+        "copies": 13,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      }
+    ]
+  },
+  "new": {
+    "binary_sha256": "3170f71b0535b2e7920ba035080b3a7ab43d98fff8407e9ad52d3b39e170a0e6",
+    "poisoned": false,
+    "invalid_publications": 0,
+    "raw_sha256": "b6e2f1c294a54a0f39890b087a263338b01c4f978b991fc6e582aa3da7a03121",
+    "stages": [
+      {
+        "name": "resize",
+        "iterations": 12,
+        "copies": 12,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      },
+      {
+        "name": "offscreen_return",
+        "iterations": 6,
+        "copies": 12,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      },
+      {
+        "name": "external_unmap_map",
+        "iterations": 6,
+        "copies": 13,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      }
+    ]
+  },
+  "new_poisoned": {
+    "binary_sha256": "3170f71b0535b2e7920ba035080b3a7ab43d98fff8407e9ad52d3b39e170a0e6",
+    "poisoned": true,
+    "invalid_publications": 0,
+    "raw_sha256": "fe956cbd1db6c52261a58d3d53468423b648d32a3c098cd333f43b14b44ca43e",
+    "stages": [
+      {
+        "name": "resize",
+        "iterations": 12,
+        "copies": 12,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      },
+      {
+        "name": "offscreen_return",
+        "iterations": 6,
+        "copies": 12,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      },
+      {
+        "name": "external_unmap_map",
+        "iterations": 6,
+        "copies": 12,
+        "invalid": 0,
+        "background_alpha_sequence": [
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179,
+          179
+        ]
+      }
+    ]
+  }
+}

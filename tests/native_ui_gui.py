@@ -62,11 +62,13 @@ def main():
     parser.add_argument("--source-root", required=True, type=Path)
     parser.add_argument("--output", type=Path, default=Path("artifacts/native-ui-gui.json"))
     parser.add_argument("--screenshot", type=Path, default=Path("artifacts/native-ui-gui.png"))
+    parser.add_argument("--renderer", choices=("auto", "gpu", "software"))
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
     source = args.source_root.resolve(strict=True)
     sys.path.insert(0, str(source / "tools"))
     from isolated_xvfb import start_xvfb
+    from gui_renderer import record_renderer
     report = {
         "ok": False, "platform": "Linux X11 / private Xvfb",
         "binary": str(binary), "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
@@ -75,7 +77,7 @@ def main():
         "source_changes": subprocess.check_output(["git", "status", "--short"], cwd=source, text=True).splitlines(),
         "source_sha256": {}, "checks": [], "actions": [],
     }
-    for filename in ("src/native_ui.rs", "src/session.rs", "src/session_core.rs", "src/x11.rs",
+    for filename in ("src/x11/gpu.rs", "src/gpu/mod.rs", "src/gpu/font.rs", "src/gpu/grid.rs", "src/text_blink.rs", "src/appearance.rs", "tools/gui_renderer.py", "src/native_ui.rs", "src/session.rs", "src/session_core.rs", "src/x11.rs",
                      "crates/ztty-ui/src/lib.rs", "crates/ztty-ui/src/wire.rs", "crates/zterm/src/terminal.rs",
                      "Cargo.toml", "Cargo.lock",
                      "tests/input_gui.py", "tests/native_ui_gui.py", "examples/native_ui.py", "tools/isolated_xvfb.py"):
@@ -163,7 +165,7 @@ def main():
                        ZTTY_SOCKET="@ztty-native-ui-" + root.name)
             env.pop("WAYLAND_DISPLAY", None)
             config = root / "config"
-            config.write_text(CONFIG)
+            config.write_text(CONFIG + (f"\nrenderer = {args.renderer}\n" if args.renderer else ""))
             input_path, control_path = root / "input.bin", root / "control.sock"
             child = CHILD.replace("len(request)>65536", "len(request)>262144")
             child = child.replace("command=json.loads(request)", 'command=json.loads(request)\n        if command.get("exit"):\n            connection.sendall(b\'{"ok":true}\\n\');raise SystemExit(0)')
@@ -210,6 +212,7 @@ def main():
                 owned[pid] = birth(pid)
             wait(lambda: control_path.exists() and "READY" in rpc({"op": "read", "session": "ui-probe"})["screen"], "raw PTY ready")
             view = connection.create_resource_object("window", session["window_id"])
+            report["renderer_before"] = record_renderer(connection, view, args.renderer)
             view.set_input_focus(X.RevertToParent, X.CurrentTime)
             connection.sync()
             geometry = view.get_geometry()
@@ -309,8 +312,13 @@ def main():
                 "references": 2,
             }
             if pixmaps_before is not None:
-                assert pixmaps_after - pixmaps_before == 32 * 16 * 4, report["image_server_pixmap_bytes"]
-                report["checks"].append("XRes measures one 2048-byte server pixmap for two image references")
+                gpu = report["renderer_before"]["actual"] == "gpu"
+                expected_bytes = 0 if gpu else 32 * 16 * 4
+                assert pixmaps_after - pixmaps_before == expected_bytes, report["image_server_pixmap_bytes"]
+                report["checks"].append(
+                    "GPU images allocate no X server pixmaps for either reference"
+                    if gpu else "XRes measures one 2048-byte server pixmap for two image references"
+                )
 
 
             click()
@@ -635,6 +643,7 @@ def main():
             report["demo_screenshot"] = {"path": str(demo_shot), "sha256": hashlib.sha256(demo_shot.read_bytes()).hexdigest()}
             report["checks"].append("real click -> producer action decoder -> revision update reaches 100% native progress pixels")
             key("Escape")
+            report["renderer_after"] = record_renderer(connection, view, args.renderer)
             key("q")
             wait(lambda: not rpc({"op": "list"})["sessions"], "demo clean exit")
             assert launcher.wait(timeout=5) == 0
