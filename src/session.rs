@@ -359,10 +359,10 @@ impl Ui {
                     return Ok(());
                 }
                 self.reset_blink |= press;
-                let symbol = if !press && self.held[code] != 0 {
+                let symbol = if self.held[code] != 0 {
                     self.held[code]
                 } else {
-                    self.window.key_symbol(&mut e, false)
+                    self.window.input_symbol(&mut e)
                 };
                 let repeated = self.held[code] != 0;
                 self.held[code] = if press { symbol } else { 0 };
@@ -382,7 +382,9 @@ impl Ui {
                             self.window.search_matches(0, Vec::new());
                             self.force = true;
                         }
-                        0xff0d | 0xffc0 => self.find(&core.terminal, mods.0 & 1 == 0, false),
+                        0xff0d | 0xff8d | 0xffc0 => {
+                            self.find(&core.terminal, mods.0 & 1 == 0, false)
+                        }
                         0x63 | 0x43
                             if mods.0
                                 & !(input::Modifiers::CAPS_LOCK | input::Modifiers::NUM_LOCK)
@@ -432,7 +434,7 @@ impl Ui {
                     self.intercepted[code] = true;
                     match symbol {
                         0xff1b => self.palette = None,
-                        0xff0d => {
+                        0xff0d | 0xff8d => {
                             let target = palette
                                 .matching()
                                 .nth(palette.selected)
@@ -442,11 +444,15 @@ impl Ui {
                                 self.palette = None;
                             }
                         }
-                        0xff52 | 0xff54 => {
+                        0xff52 | 0xff54 | 0xff97 | 0xff99 => {
                             let count = palette.matching().count();
                             if count != 0 {
                                 palette.selected = (palette.selected
-                                    + if symbol == 0xff54 { 1 } else { count - 1 })
+                                    + if matches!(symbol, 0xff54 | 0xff99) {
+                                        1
+                                    } else {
+                                        count - 1
+                                    })
                                     % count;
                             }
                         }
@@ -461,6 +467,7 @@ impl Ui {
                         _ => {
                             let lookup = self.window.lookup(&mut e, text_buffer);
                             if !lookup.ignored {
+                                let previous_len = palette.query.len();
                                 for ch in core::str::from_utf8(&text_buffer[..lookup.len])
                                     .unwrap_or("")
                                     .chars()
@@ -470,7 +477,9 @@ impl Ui {
                                         palette.query.push(ch);
                                     }
                                 }
-                                palette.selected = 0;
+                                if palette.query.len() != previous_len {
+                                    palette.selected = 0;
+                                }
                             }
                         }
                     }
@@ -2893,7 +2902,7 @@ impl Pool {
                     if kind == x11::KEY_PRESS {
                         let mut e = unsafe { event.key };
                         let window = &self.sessions[index].ui.as_ref().unwrap().window;
-                        let symbol = window.key_symbol(&mut e, false);
+                        let symbol = window.input_symbol(&mut e);
                         let bindings = &self.sessions[index].appearance.bindings;
                         let shifted = (e.state & 1 != 0
                             && (!bindings.is_empty() || e.state & 4 != 0))

@@ -63,7 +63,7 @@ while True:
         if not reply: raise TimeoutError("cursor-position barrier")
 '''
 
-RESET = "\x1b[?9l\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l\x1b[?1004l\x1b[=0u"
+RESET = "\x1b>\x1b[?1l\x1b[?9l\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l\x1b[?1004l\x1b[=0u"
 CONFIG = """font = monospace:size=11
 background = #000000
 background-opacity = 100
@@ -159,6 +159,16 @@ def main():
             report["xvfb"] = xvfb.evidence
             connection = display.Display(xvfb.display)
             assert connection.has_extension("XTEST"), "XTEST extension is required"
+            # Keep a client connected so Xvfb does not reset this private keymap.
+            # The PC option exercises Num Lock/Shift layer inversion; kpdl:dot
+            # gives the physical decimal key its normal Delete/decimal pair.
+            subprocess.run(
+                ["setxkbmap", "-display", xvfb.display, "-layout", "us",
+                 "-option", "", "-option", "numpad:pc", "-option", "kpdl:dot"],
+                check=True, capture_output=True, timeout=10,
+            )
+            connection.sync()
+            report["keyboard_layout"] = {"layout": "us", "options": ["numpad:pc", "kpdl:dot"]}
             pointer_mapping = list(connection.get_pointer_mapping())
             report["pointer_mapping"] = pointer_mapping
             # Resolve the physical dual-purpose keypad keys, not a preferred
@@ -191,6 +201,7 @@ def main():
                            if tuple(symbols[:2]) == pair]
                 assert len(matches) == 1, (numeric, navigation, matches)
                 physical_keypad[numeric] = matches[0]
+                physical_keypad[navigation] = matches[0]
                 report["physical_keypad"][numeric] = {
                     "keycode": matches[0], "num_lock_off": navigation,
                     "symbols": list(keyboard_mapping[matches[0]]),
@@ -403,19 +414,42 @@ def main():
             begin(RESET + "\x1b[=24u")
             key("KP_1")
             assert_input("Kitty report-all includes requested keypad text", b"\x1b[57400;129;49u")
+            # Applications can enable DECKPAM without Kitty reporting.
+            # Num Lock must still make the whole numeric keypad usable.
+            numeric_keys = [(f"KP_{digit}", str(digit).encode()) for digit in range(10)] + [
+                ("KP_Decimal", b"."), ("KP_Add", b"+"), ("KP_Subtract", b"-"),
+                ("KP_Multiply", b"*"), ("KP_Divide", b"/"), ("KP_Enter", b"\r"),
+            ]
+            for symbol, expected in numeric_keys:
+                begin(RESET + "\x1b=")
+                key(symbol)
+                assert_input(f"Num Lock overrides application keypad: {symbol}", expected)
+            for flags in range(1, 8):
+                begin(RESET + f"\x1b=\x1b[={flags}u")
+                for symbol, _ in numeric_keys[:-1]:
+                    key(symbol)
+                assert_input(f"Kitty flags {flags}: Num Lock overrides application keypad text",
+                             b"0123456789.+-*/")
+            begin(RESET + "\x1b=")
+            key("Alt_L", "KP_Enter")
+            assert_input("Num Lock and application keypad: Alt+KP_Enter", b"\x1b\r")
+
+            begin(RESET)
+            num_lock(False)
             begin(RESET + "\x1b=\x1b[=1u")
-            key("KP_1")
-            assert_input("Application keypad keeps disambiguated identity", b"\x1b[57400u")
-            begin(RESET + "\x1b[=3u")
-            key("KP_1")
-            assert_input("Application keypad keeps press and release events",
-                         b"\x1b[57400;1:1u\x1b[57400;1:3u")
-            begin(RESET + "\x1b>")
+            key("KP_Enter")
+            assert_input("Num Lock off: application keypad keeps disambiguated identity",
+                         b"\x1b[57414u")
+            begin(RESET + "\x1b=\x1b[=3u")
+            key("KP_Enter")
+            assert_input("Num Lock off: application keypad keeps press and release events",
+                         b"\x1b[57414;1:1u\x1b[57414;1:3u")
+            begin(RESET)
             num_lock(False)
             assert_input("Num Lock off emits no legacy input", b"")
             for flags in (0, 1):
                 for numeric, navigation, legacy, enhanced in keypad_cases:
-                    begin(RESET + "\x1b>\x1b[?1l" + f"\x1b[={flags}u")
+                    begin(RESET + f"\x1b[={flags}u")
                     key(physical_keypad[numeric])
                     assert_input(f"Num Lock off, Kitty flags {flags}: physical {numeric} sends {navigation}",
                                  enhanced if flags else legacy)
@@ -426,6 +460,93 @@ def main():
             num_lock(False)
             assert_input("return to legacy mode stops reporting lock keys", b"")
             report["checks"].append("Num Lock stays silent in legacy mode; verified physical keypad digits/decimal use text while all eleven navigation keys retain legacy or requested Kitty identity, including Begin; lock reporting stays explicit")
+
+            navigation_keys = [
+                ("KP_0", b"\x1b[2~", b"\x1b[2;2~"),
+                ("KP_1", b"\x1b[F", b"\x1b[1;2F"),
+                ("KP_2", b"\x1b[B", b"\x1b[1;2B"),
+                ("KP_3", b"\x1b[6~", b"\x1b[6;2~"),
+                ("KP_4", b"\x1b[D", b"\x1b[1;2D"),
+                ("KP_5", b"\x1b[1E", b"\x1b[1;2E"),
+                ("KP_6", b"\x1b[C", b"\x1b[1;2C"),
+                ("KP_7", b"\x1b[H", b"\x1b[1;2H"),
+                ("KP_8", b"\x1b[A", b"\x1b[1;2A"),
+                ("KP_9", b"\x1b[5~", b"\x1b[5;2~"),
+                ("KP_Decimal", b"\x1b[3~", b"\x1b[3;2~"),
+            ]
+            for enabled in (False, True):
+                begin(RESET)
+                num_lock(enabled)
+                for index, (symbol, navigation, shifted_navigation) in enumerate(navigation_keys):
+                    for shifted in (False, True):
+                        numeric = enabled != shifted  # the private numpad:pc map
+                        expected = (b"." if index == 10 else str(index).encode()) if numeric else (
+                            shifted_navigation if shifted else navigation)
+                        begin(RESET)
+                        key(*( ("Shift_L", symbol) if shifted else (symbol,) ))
+                        assert_input(f"PC keypad NumLock={enabled} Shift={shifted}: {symbol}", expected)
+
+            begin(RESET)
+            num_lock(False)
+            for symbol, suffix in [
+                ("KP_1", b"F"), ("KP_2", b"B"), ("KP_4", b"D"),
+                ("KP_6", b"C"), ("KP_7", b"H"), ("KP_8", b"A"),
+            ]:
+                begin(RESET + "\x1b[?1h")
+                key(symbol)
+                assert_input(f"Application cursor mode routes keypad navigation: {symbol}",
+                             b"\x1bO" + suffix)
+            application_keys = [(f"KP_{digit}", bytes([ord("p") + digit])) for digit in range(10)] + [
+                ("KP_Decimal", b"n"), ("KP_Add", b"k"), ("KP_Subtract", b"m"),
+                ("KP_Multiply", b"j"), ("KP_Divide", b"o"), ("KP_Enter", b"M"),
+            ]
+            for symbol, suffix in application_keys:
+                begin(RESET + "\x1b=")
+                key(symbol)
+                assert_input(f"Num Lock off keeps application keypad: {symbol}", b"\x1bO" + suffix)
+
+            begin(RESET)
+            num_lock(True)
+            begin(RESET + "\x1b[=3u")
+            shift_code, end_code = codes(("Shift_L", "KP_1"))
+            xtest.fake_input(connection, X.KeyPress, shift_code)
+            xtest.fake_input(connection, X.KeyPress, end_code)
+            xtest.fake_input(connection, X.KeyRelease, shift_code)
+            xtest.fake_input(connection, X.KeyRelease, end_code)
+            connection.sync()
+            assert_input("Keypad release retains the pressed identity after Shift is released",
+                         b"\x1b[57424;130:1u\x1b[57424;129:3u")
+
+            begin(RESET + "\x1b[=3u")
+            pressed = b"\x1b[57424;130:1u"
+            repeated = b"\x1b[57424;129:2u"
+            released = b"\x1b[57424;129:3u"
+            try:
+                xtest.fake_input(connection, X.KeyPress, shift_code)
+                xtest.fake_input(connection, X.KeyPress, end_code)
+                connection.sync()
+                wait(lambda: input_path.read_bytes() == pressed, "held keypad press", 2)
+                xtest.fake_input(connection, X.KeyRelease, shift_code)
+                connection.sync()
+                wait(lambda: repeated in input_path.read_bytes(),
+                     "server keypad autorepeat retains the pressed identity", 3)
+            finally:
+                xtest.fake_input(connection, X.KeyRelease, end_code)
+                xtest.fake_input(connection, X.KeyRelease, shift_code)
+                connection.sync()
+            wait(lambda: input_path.read_bytes().endswith(released),
+                 "autorepeated keypad release", 2)
+            repeat_count = input_path.read_bytes().count(repeated)
+            assert repeat_count > 0
+            assert_input("Keypad autorepeat and release retain identity after Shift is released",
+                         pressed + repeated * repeat_count + released)
+            report["keypad_autorepeat_count"] = repeat_count
+            begin(RESET)
+            num_lock(False)
+            begin(RESET)
+            report["checks"].append(
+                "every physical keypad digit/decimal follows the XKB NumLock/Shift layer; "
+                "application cursor/keypad modes, NumLock override and held-key release identity are verified")
 
             begin(RESET + "\x1b[?1000h\x1b[?1006h")
             move()
@@ -647,6 +768,121 @@ def main():
             assert font_metrics() == base_metrics
             report["font_restored"] = True
             report["checks"].append("real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered")
+
+
+            # Compare real search selection rendering with the main Enter key,
+            # so an ignored keypad event cannot pass a no-PTY-output assertion.
+            report["keypad_overlays"] = []
+
+            def window_pixels():
+                current = view.get_geometry()
+                return view.get_image(0, 0, current.width, current.height,
+                                      X.ZPixmap, 0xffffffff).data
+
+            begin(RESET)
+            num_lock(False)
+
+            def search_selection(label, chord, expected=None):
+                begin(RESET + "\x1b[=3u\x1b[2J\x1b[H"
+                      "keypadprobe first\r\n\r\nkeypadprobe second\r\n\r\n"
+                      "keypadprobe third\r\n")
+                rpc({"op": "action", "session": "input-probe", "actor": "local",
+                     "action": "search"})
+                key("Control_L", "u")
+                type_text("keypadprobe")
+                # The PTY barrier emits DSR, which older terminal cores count
+                # as a content revision and invalidate the search anchor.
+                # Wait for the local search frame without writing PTY output.
+                initial = window_pixels()
+                unchanged_since = time.monotonic()
+                deadline = unchanged_since + 3
+                while time.monotonic() < deadline:
+                    pixels = window_pixels()
+                    if pixels != initial:
+                        initial = pixels
+                        unchanged_since = time.monotonic()
+                    elif time.monotonic() - unchanged_since >= 0.12:
+                        break
+                    time.sleep(0.01)
+                else:
+                    raise TimeoutError(label + ": search frame did not settle")
+                key(*chord)
+                assert_input(label + ": navigation press/release stays local", b"")
+                def selected_pixels():
+                    pixels = window_pixels()
+                    matches = pixels == expected if expected is not None else pixels != initial
+                    return pixels if matches else None
+
+                selected = wait(selected_pixels, label + " selects the expected search match", 3)
+                assert selected != initial, label
+                key("Shift_L")
+                assert_input(label + ": bare Shift press/release stays local", b"")
+                wait(lambda: window_pixels() == selected,
+                     label + ": bare Shift preserves the selected search match", 3)
+                key("Escape")
+                assert_input(label + ": search exit stays local", b"")
+                return selected
+
+            next_match = search_selection("main Enter", ("Return",))
+            previous_match = search_selection("main Shift+Enter", ("Shift_L", "Return"))
+            assert next_match != previous_match, "forward and reverse search must select different matches"
+            search_selection("search keypad Enter", ("KP_Enter",), next_match)
+            search_selection("search Shift+keypad Enter", ("Shift_L", "KP_Enter"), previous_match)
+            report["keypad_overlays"].append({
+                "name": "keypad Enter and Shift+Enter navigate search matches",
+                "injection": "XTEST", "num_lock": False, "kitty_flags": 3,
+                "reference": "independently reopened main Enter and Shift+Enter searches",
+                "fixture_matches": 3, "next_match_equal": True,
+                "previous_match_equal": True, "directions_distinct": True,
+                "modifier_preserves_selection": True, "ok": True,
+            })
+
+            def palette_font(label, navigation, expected):
+                before = font_metrics()
+                begin(RESET + "\x1b[=3u")
+                key("Control_L", "Shift_L", "slash")
+                type_text("font")
+                for symbol in navigation:
+                    key(symbol)
+                key("KP_Enter")
+                target = (base_metrics["cols"], base_metrics["rows"])
+                wait(lambda: (grid() == target if expected == "reset" else
+                              grid() != (before["cols"], before["rows"])),
+                     label + " changes the PTY font grid", 3)
+                after = font_metrics()
+                if expected == "reset":
+                    ok = all(after[field] == base_metrics[field]
+                             for field in ("cols", "rows", "cell_width", "cell_height"))
+                elif expected == "increase":
+                    ok = after["cell_width"] > before["cell_width"] or after["cell_height"] > before["cell_height"]
+                else:
+                    ok = after["cell_width"] < before["cell_width"] or after["cell_height"] < before["cell_height"]
+                item = {"name": label, "injection": "XTEST", "num_lock": False,
+                        "kitty_flags": 3, "keys": [*navigation, "KP_Enter"],
+                        "expected": expected, "before": before, "after": after, "ok": ok}
+                report["keypad_overlays"].append(item)
+                assert_input(label + ": press/release stay out of PTY", b"")
+                assert after["window_pixels"] == before["window_pixels"], item
+                assert ok, item
+
+            def reset_palette_font():
+                rpc({"op": "action", "session": "input-probe", "actor": "local",
+                     "action": "font-reset"})
+                wait(lambda: grid() == (base_metrics["cols"], base_metrics["rows"]),
+                     "restore font after keypad palette command", 3)
+                assert font_metrics() == base_metrics
+
+            palette_font("palette keypad Enter executes font increase", (), "increase")
+            reset_palette_font()
+            palette_font("palette keypad Down selects font decrease", ("KP_Down",), "decrease")
+            reset_palette_font()
+            rpc({"op": "action", "session": "input-probe", "actor": "local",
+                 "action": "font-increase"})
+            wait(lambda: grid() != (base_metrics["cols"], base_metrics["rows"]),
+                 "prepare enlarged font for keypad Up selection", 3)
+            palette_font("palette keypad Up wraps to font reset", ("KP_Up",), "reset")
+            assert font_metrics() == base_metrics
+            report["checks"].append("keypad Enter and Shift+Enter reproduce search selection; keypad Up/Down choose and execute distinct palette actions without leaking press/release bytes")
 
             # Release after the press has already moved focus to another tab.
             peer_input = root / "peer-input.bin"
