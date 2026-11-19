@@ -166,6 +166,9 @@ pub struct Terminal {
     // DCS headers; framing distinguishes ST from cancellation for image data.
     framing: u8,
     apc: zgraphics::CommandStream,
+    apc_route: u8,
+    ui_frame: ztty_ui::Frame,
+    ui_host_enabled: bool,
     text_revision: u64,
 }
 
@@ -185,6 +188,9 @@ impl Terminal {
             state: State::new(cols, rows, history_limit, theme),
             framing: 0,
             apc: zgraphics::CommandStream::new(),
+            apc_route: 0,
+            ui_frame: ztty_ui::Frame::new(),
+            ui_host_enabled: false,
             text_revision: 0,
         }
     }
@@ -284,13 +290,7 @@ impl Terminal {
                         .map(|i| offset + i)
                         .unwrap_or(bytes.len());
                     if end != offset {
-                        let context = self.state.graphics_context();
-                        self.apc.push(
-                            &mut self.state.graphics,
-                            &bytes[offset..end],
-                            context,
-                            &mut self.state.responses,
-                        );
+                        self.push_apc(&bytes[offset..end]);
                         offset = end;
                     }
                     if offset == bytes.len() {
@@ -301,7 +301,7 @@ impl Terminal {
                     match byte {
                         0x1b => self.framing = 3,
                         0x18 | 0x1a => {
-                            self.apc.abort(&mut self.state.graphics);
+                            self.abort_apc();
                             self.framing = 0;
                         }
                         _ => unreachable!(),
@@ -311,19 +311,12 @@ impl Terminal {
                     let byte = bytes[offset];
                     if byte == b'\\' {
                         offset += 1;
-                        let previous = self.state.graphics.revision();
-                        let context = self.state.graphics_context();
-                        let outcome = self.apc.finish(
-                            &mut self.state.graphics,
-                            context,
-                            &mut self.state.responses,
-                        );
-                        self.state.graphics_result(previous, outcome);
+                        self.finish_apc();
                         self.framing = 0;
                     } else {
                         // A new ESC sequence cancels an unterminated APC. The
                         // current byte is processed again as an ESC continuation.
-                        self.apc.abort(&mut self.state.graphics);
+                        self.abort_apc();
                         self.parser.advance(b"\x1b", &mut self.state);
                         self.framing = 1;
                     }
@@ -390,7 +383,121 @@ impl Terminal {
     fn begin_apc(&mut self) {
         self.parser.reset();
         self.apc.begin();
+        self.apc_route = 0;
+        self.ui_frame.begin();
         self.framing = 2;
+    }
+
+    fn push_apc(&mut self, bytes: &[u8]) {
+        if self.apc_route == 0 {
+            self.apc_route = match bytes.first() {
+                Some(b'G') => 1,
+                Some(b'Z') => 2,
+                _ => 3,
+            };
+        }
+        match self.apc_route {
+            1 => {
+                let context = self.state.graphics_context();
+                self.apc.push(
+                    &mut self.state.graphics,
+                    bytes,
+                    context,
+                    &mut self.state.responses,
+                );
+            }
+            2 => self.ui_frame.push(bytes),
+            _ => {}
+        }
+    }
+
+    fn abort_apc(&mut self) {
+        match self.apc_route {
+            1 => self.apc.abort(&mut self.state.graphics),
+            2 => self.ui_frame.abort(),
+            _ => {}
+        }
+    }
+
+    fn finish_apc(&mut self) {
+        match self.apc_route {
+            1 => {
+                let previous = self.state.graphics.revision();
+                let context = self.state.graphics_context();
+                let outcome =
+                    self.apc
+                        .finish(&mut self.state.graphics, context, &mut self.state.responses);
+                self.state.graphics_result(previous, outcome);
+            }
+            2 => {
+                let Some(payload) = self.ui_frame.payload() else {
+                    return;
+                };
+                if !self.ui_host_enabled {
+                    if ztty_ui::is_capabilities_request(payload) {
+                        self.state.reply("\x1b_ZUI;1;{\"v\":1,\"type\":\"capabilities\",\"supported\":false,\"events\":false,\"components\":[]}\x1b\\");
+                    }
+                    return;
+                }
+                match self.state.ui.apply(payload) {
+                    Ok(ztty_ui::Change::Updated) => self.state.screen.mark_all(),
+                    Ok(ztty_ui::Change::Capabilities) => {
+                        let mut reply = String::from("\x1b_ZUI;1;");
+                        if self.state.ui.write_capabilities(&mut reply).is_ok() {
+                            reply.push_str("\x1b\\");
+                            self.state.reply(&reply);
+                        }
+                    }
+                    Err(_) => {}
+                }
+            }
+            _ => {}
+        }
+    }
+
+    /// A frontend opts in only after attaching a native renderer and event router.
+    /// Generic/headless terminals default to unsupported capability replies.
+    pub fn set_ui_host_enabled(&mut self, enabled: bool) {
+        self.ui_host_enabled = enabled;
+        if !enabled {
+            self.reset_ui();
+            self.ui_frame.abort();
+        }
+    }
+
+    /// Native host panel scene, separate from terminal cells and scrollback.
+    pub fn ui_scene(&self) -> Option<&ztty_ui::Scene> {
+        self.state.ui.scene()
+    }
+
+    /// Invalidation token for painted native UI geometry and captured gestures.
+    pub fn ui_revision(&self) -> u64 {
+        self.state.ui.revision()
+    }
+
+    /// Produces an opted-in intent only for a button in the expected scene.
+    /// The host must check its current input owner, live session and painted hit.
+    pub fn ui_action(
+        &mut self,
+        node_id: u32,
+        expected_surface: u64,
+        expected_revision: u64,
+    ) -> Option<ztty_ui::Action> {
+        if !self.ui_host_enabled {
+            return None;
+        }
+
+        self.state
+            .ui
+            .action(node_id, expected_surface, expected_revision)
+    }
+
+    /// Host lifecycle hook for PTY exit/close. Never resets revision identity.
+    pub fn reset_ui(&mut self) {
+        if self.state.ui.scene().is_some() {
+            self.state.ui.reset();
+            self.state.screen.mark_all();
+        }
     }
 
     /// Set physical text-cell dimensions for graphics and CSI pixel-size replies.
@@ -765,6 +872,7 @@ struct State {
     last_char: char,
     graphics: zgraphics::Graphics,
     inactive_graphics: zgraphics::Graphics,
+    ui: ztty_ui::State,
     cell_width: u32,
     cell_height: u32,
 }
@@ -809,6 +917,7 @@ impl State {
             last_char: ' ',
             graphics: zgraphics::Graphics::default(),
             inactive_graphics: zgraphics::Graphics::default(),
+            ui: ztty_ui::State::new(),
             cell_width: 8,
             cell_height: 16,
         }
@@ -1351,6 +1460,7 @@ impl State {
         if enabled == self.modes.alternate_screen {
             return;
         }
+        self.ui.reset();
         if enabled {
             if save {
                 self.save_cursor();
@@ -1741,11 +1851,14 @@ impl Perform for State {
                 inactive_graphics.clear();
                 let mut shell = mem::take(&mut self.shell);
                 shell.clear();
+                let mut ui = mem::take(&mut self.ui);
+                ui.reset();
                 let sync_commit_pending =
                     self.sync_commit_pending || self.modes.synchronized_output;
                 *self = Self::new(cols, rows, history, self.theme);
                 self.sync_commit_pending = sync_commit_pending;
                 self.shell = shell;
+                self.ui = ui;
                 self.graphics = graphics;
                 self.inactive_graphics = inactive_graphics;
                 self.cell_width = width;
