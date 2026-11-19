@@ -82,6 +82,19 @@ class ArchitectureTests(unittest.TestCase):
             self.inspect(self.header(62)[:20], "x86_64")
 
 
+class CaseContractTests(unittest.TestCase):
+    def test_native_ui_is_required_and_receives_the_pinned_source_tree(self):
+        self.assertIn("native_ui_gui", linux_native.CASES)
+        self.assertIn("tests/native_ui_gui.py", linux_native.HARNESS_FILES)
+        root, binary, evidence = Path("/source"), Path("/build/ztty"), Path("/evidence/native-ui")
+        self.assertEqual(
+            linux_native.case_command("native_ui_gui", root, binary, evidence),
+            [sys.executable, str(root / "tests/native_ui_gui.py"),
+             "--binary", str(binary), "--output", str(evidence / "report.json"),
+             "--screenshot", str(evidence / "screenshot.png"), "--source-root", str(root)],
+        )
+
+
 class SourceTests(unittest.TestCase):
     def test_pinned_checkout_rejects_wrong_commit_and_both_dirty_states(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -34,7 +34,7 @@ import time
 
 ELF_MACHINES = {"x86_64": 62, "aarch64": 183}
 RUN_MARKER = "ZTTY_LINUX_NATIVE_RUN"
-CASES = ("workspaces", "daily_workflow", "session_switcher", "sixel_gui", "input_gui", "repaint_gui")
+CASES = ("workspaces", "daily_workflow", "session_switcher", "sixel_gui", "input_gui", "repaint_gui", "native_ui_gui")
 HARNESS_FILES = tuple(f"tests/{name}.py" for name in CASES)
 
 
@@ -257,7 +257,7 @@ def case_command(name, root, binary, directory):
         command.extend(["--screenshots", str(directory / "screenshots")])
     else:
         command.extend(["--screenshot", str(directory / "screenshot.png")])
-    if name in ("sixel_gui", "input_gui"):
+    if name in ("sixel_gui", "input_gui", "native_ui_gui"):
         command.extend(["--source-root", str(root)])
     return command
 
