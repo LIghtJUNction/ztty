@@ -1,0 +1,184 @@
+{
+  "ok": true,
+  "production_commit": "68030066cb18e97fa5677a77881d54188fdc93f3",
+  "binary_sha256": "ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51",
+  "checks": {
+    "cli.json": 22,
+    "gui.json": 10,
+    "daily.json": 19,
+    "repaint.json": 11
+  },
+  "source_hashes_verified_against_committed_tree": {
+    "src/plugin_host.rs": "73b9bc9ad09c8cbb1de4c952cf2984334ec7f8f14b94c00bd4c898bb234ad950",
+    "crates/ztty-plugin-api/src/lib.rs": "edf7482a3af57c379f6f3e9bc7ddcf2326ac030da858fb4fbbbddab78552371e",
+    "tests/fixtures/text-plugin/src/lib.rs": "7e6f6967d2e24bca80b77967b0b2867074c567f39867047a5d68328cf47a378b",
+    "tests/plugin_cli.py": "b23c4be83c90e7ef6d5c05fc76f2c94bfb0fd06a0d792eab0385c3b2412df024",
+    "src/main.rs": "f8e9c9250a85d63f6591d8a17f9eb6cc35245f72d2a95b439099dee813c08dc6",
+    "src/session.rs": "d7acd5c4702b691fd370d4366f192fd1c22ca2106c32ba7d5ae60c826b1059aa",
+    "src/appearance.rs": "ea4211887800e8a466a3d7452a6b9d5642f871e86a0ac9e79bc94bfddd77f0b7",
+    "src/text_plugins.rs": "dc998a3a14176d2a5e4384fe5c2ba8efb7fc4ec3206df8c391304097d6db23bf",
+    "tests/plugin_gui.py": "670abfe443071e5404329bbc55c16251e2b598ef2e235a791c0830ce4943196b",
+    "tests/copy_paste_gui.py": "6d0c268174c76b61efae46a57d57ae099cc90446626763fb14d90979afa4ccbd"
+  },
+  "worker_build_and_checks": {
+    "ok": true,
+    "steps": [
+      {
+        "name": "fmt",
+        "command": [
+          "cargo",
+          "fmt",
+          "--all"
+        ],
+        "exit_code": 0,
+        "duration_ms": 616.2012109998614
+      },
+      {
+        "name": "fixture-fmt",
+        "command": [
+          "cargo",
+          "fmt",
+          "--manifest-path",
+          "tests/fixtures/text-plugin/Cargo.toml"
+        ],
+        "exit_code": 0,
+        "duration_ms": 64.60666099883383
+      },
+      {
+        "name": "clippy",
+        "command": [
+          "cargo",
+          "clippy",
+          "--release",
+          "-p",
+          "ztty",
+          "--",
+          "-D",
+          "warnings"
+        ],
+        "exit_code": 0,
+        "duration_ms": 966.5012969999225
+      },
+      {
+        "name": "build",
+        "command": [
+          "cargo",
+          "build",
+          "--release",
+          "-p",
+          "ztty"
+        ],
+        "exit_code": 0,
+        "duration_ms": 10036.647239001468
+      },
+      {
+        "name": "libraries",
+        "command": [
+          "python3",
+          "tests/build_text_plugins.py",
+          "--output",
+          "$REPO/artifacts/zplugin/group-cleanup"
+        ],
+        "exit_code": 0,
+        "duration_ms": 2070.391621993622
+      },
+      {
+        "name": "cli",
+        "command": [
+          "python3",
+          "tests/plugin_cli.py",
+          "--binary",
+          "target/release/ztty",
+          "--example",
+          "$REPO/artifacts/zplugin/group-cleanup/example.so",
+          "--fixtures",
+          "$REPO/artifacts/zplugin/group-cleanup",
+          "--output",
+          "$REPO/artifacts/zplugin/group-cleanup/cli.json"
+        ],
+        "exit_code": 0,
+        "duration_ms": 7580.078535997018
+      },
+      {
+        "name": "gui",
+        "command": [
+          "python3",
+          "tests/plugin_gui.py",
+          "--binary",
+          "target/release/ztty",
+          "--example",
+          "$REPO/artifacts/zplugin/group-cleanup/example.so",
+          "--fixture",
+          "$REPO/artifacts/zplugin/group-cleanup/fixture-valid.so",
+          "--artifacts",
+          "$REPO/artifacts/zplugin/group-cleanup/gui"
+        ],
+        "exit_code": 0,
+        "duration_ms": 4775.649565999629
+      }
+    ]
+  },
+  "followup": {
+    "source_commit": "68030066cb18e97fa5677a77881d54188fdc93f3",
+    "binary_sha256": "ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51",
+    "steps": [
+      {
+        "name": "daily",
+        "command": [
+          "python3",
+          "tests/daily_workflow.py",
+          "--binary",
+          "target/release/ztty",
+          "--output",
+          "$REPO/artifacts/zplugin/group-cleanup/daily.json",
+          "--screenshots",
+          "$REPO/artifacts/zplugin/group-cleanup/daily"
+        ],
+        "exit_code": 0,
+        "duration_ms": 2420.757482002955
+      },
+      {
+        "name": "repaint",
+        "command": [
+          "python3",
+          "tests/repaint_gui.py",
+          "--binary",
+          "target/release/ztty",
+          "--output",
+          "$REPO/artifacts/zplugin/group-cleanup/repaint.json",
+          "--screenshots",
+          "$REPO/artifacts/zplugin/group-cleanup/repaint"
+        ],
+        "exit_code": 0,
+        "duration_ms": 1617.5696849968517
+      },
+      {
+        "name": "windows-check",
+        "command": [
+          "cargo",
+          "check",
+          "--target",
+          "x86_64-pc-windows-gnu",
+          "-p",
+          "ztty"
+        ],
+        "exit_code": 0,
+        "duration_ms": 2017.7708039991558
+      }
+    ],
+    "ok": true
+  },
+  "earlier_unchanged_core_checks": {
+    "text_plugins": 2,
+    "session_core_pty": 9,
+    "dedent_example": 2,
+    "explanation": "Later production changes only modify plugin_host.rs; these tested source files are unchanged."
+  },
+  "platforms": {
+    "linux_native_and_private_xvfb": true,
+    "windows_gnu_cargo_check": true,
+    "windows_plugin_host": false,
+    "macos_tested": false
+  },
+  "evidence_note": "Paths sanitized; runtime and library byte hashes retained. CLI/GUI runners executed before the production commit; their recorded source hashes were verified against that commit."
+}
