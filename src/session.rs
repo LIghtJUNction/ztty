@@ -27,6 +27,7 @@ struct InputBuffers {
 
 struct Search {
     query: String,
+    case: search::Case,
     hit: Option<search::Hit>,
     count: usize,
     ordinal: usize,
@@ -241,6 +242,7 @@ impl Ui {
         let result = search::find(
             terminal,
             &search.query,
+            search.case,
             if restart { None } else { search.hit },
             forward,
         );
@@ -269,6 +271,7 @@ impl Ui {
             .unwrap_or_default();
         self.search = Some(Search {
             query,
+            case: search::Case::Sensitive,
             hit: None,
             count: 0,
             ordinal: 0,
@@ -380,6 +383,20 @@ impl Ui {
                             self.force = true;
                         }
                         0xff0d | 0xffc0 => self.find(&core.terminal, mods.0 & 1 == 0, false),
+                        0x63 | 0x43
+                            if mods.0
+                                & !(input::Modifiers::CAPS_LOCK | input::Modifiers::NUM_LOCK)
+                                == input::Modifiers::ALT =>
+                        {
+                            if !repeated {
+                                let search = self.search.as_mut().unwrap();
+                                search.case = match search.case {
+                                    search::Case::Sensitive => search::Case::Insensitive,
+                                    search::Case::Insensitive => search::Case::Sensitive,
+                                };
+                                self.find(&core.terminal, false, true);
+                            }
+                        }
                         0xff08 => {
                             self.search.as_mut().unwrap().query.pop();
                             self.find(&core.terminal, false, true);
@@ -394,12 +411,15 @@ impl Ui {
                                 let text =
                                     core::str::from_utf8(&text_buffer[..lookup.len]).unwrap_or("");
                                 let query = &mut self.search.as_mut().unwrap().query;
+                                let previous_len = query.len();
                                 for ch in text.chars().filter(|ch| !ch.is_control()) {
                                     if query.len() + ch.len_utf8() <= 1024 {
                                         query.push(ch);
                                     }
                                 }
-                                self.find(&core.terminal, false, true);
+                                if query.len() != previous_len {
+                                    self.find(&core.terminal, false, true);
+                                }
                             }
                         }
                     }
@@ -856,7 +876,7 @@ impl Ui {
             {
                 self.window.search_matches(
                     terminal.cols(),
-                    search::highlights(terminal, &search.query, self.history),
+                    search::highlights(terminal, &search.query, search.case, self.history),
                 );
             }
             self.window
@@ -866,8 +886,14 @@ impl Ui {
             let mut overlay_rows = 0;
             if let Some(search) = &self.search {
                 self.window.overlay(&format!(
-                    "Find: {}   {}/{}   Enter / Shift+Enter · Esc",
-                    search.query, search.ordinal, search.count
+                    "Find: {}   {}/{}   {} · Alt+C   Enter / Shift+Enter · Esc",
+                    search.query,
+                    search.ordinal,
+                    search.count,
+                    match search.case {
+                        search::Case::Sensitive => "Case",
+                        search::Case::Insensitive => "Ignore case",
+                    }
                 ));
                 overlay_rows = 1;
             }
