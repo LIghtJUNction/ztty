@@ -1,0 +1,12 @@
+[package]
+name = "ztty-plugin-api"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Versioned no_std text action interface for ztty extensions"
+publish = false
+
+[dependencies]
+zplugin = { version = "=0.3.0", default-features = false, features = ["macros"] }
