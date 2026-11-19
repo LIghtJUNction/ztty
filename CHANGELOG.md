@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.4.0 — 2026-11-19 (Asia/Taipei)
+
+### Fixed
+
+- Keep numeric-keypad digits, decimal separators and arithmetic operators as
+  text when applications enable Kitty keyboard disambiguation without
+  requesting report-all. This restores ordinary number input in applications
+  using progressive flags 1–7.
+- Preserve Ctrl/Alt/Super/Hyper/Meta keypad shortcuts, explicit
+  application-keypad mode, and requested keypad identity, repeat/release and
+  associated-text events. Num Lock off retains navigation behavior.
+
+### Added
+
+- Merge the experimental ZUI/1 protocol and Linux X11 component host from
+  PR #11. Producers can present structured text, progress, buttons and
+  references to existing Kitty graphics; actions return bounded, versioned
+  events tied to the displayed scene and input owner.
+- Add the independent no_std + alloc package ztty-ui 0.1.0.
+  Publish the input correction as zinput 0.1.2 and the integrated terminal
+  core as zterm 0.4.0; the application requires those corrected versions.
+
+ZUI/1 remains experimental. Native components are available on Linux X11;
+Windows and macOS negotiate no native UI capability. Numeric-keypad encoding
+is shared by all platforms. Local and official publication evidence is recorded
+separately in the release report.
+
 ## 0.3.1 — 2026-11-19 (Asia/Taipei)
 
 Version 0.3.1 uses a new immutable tag. Publication requires its own Verify job
