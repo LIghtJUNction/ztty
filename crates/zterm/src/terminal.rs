@@ -10,6 +10,8 @@ use zvte::{Params, Parser, Perform};
 
 use crate::screen::*;
 
+mod grapheme;
+
 const MAX_HISTORY_BYTES: usize = 8 * 1024 * 1024;
 const MAX_LINKS: usize = 1024;
 const MAX_RESPONSES: usize = 65536;
@@ -539,6 +541,7 @@ impl Terminal {
         if self.cols() == cols && self.rows() == rows {
             return;
         }
+        let last_grapheme = self.state.last_grapheme.map(|(x, y)| *self.cell(x, y));
         self.text_revision = self.text_revision.wrapping_add(1);
         if cols != self.cols() {
             self.state.shell.invalidate_screen(self.state.line_base);
@@ -599,6 +602,10 @@ impl Terminal {
             rows,
         );
         self.state.graphics.trim_history(self.state.history.len());
+        self.state.last_grapheme = self
+            .state
+            .previous_cell()
+            .filter(|(x, y)| last_grapheme == Some(*self.cell(*x, *y)));
         let previous_cols = self.state.tabs.len();
         self.state.tabs.resize(cols, false);
         for (x, tab) in self.state.tabs.iter_mut().enumerate().skip(previous_cols) {
@@ -629,6 +636,18 @@ impl Terminal {
             return &self.state.screen.blank;
         }
         &self.state.screen.cells[self.state.screen.index(col, row)]
+    }
+
+    /// Complete original extended cluster for this Terminal-owned cell.
+    /// None denotes ordinary inline scalar content. IDs are scoped to this
+    /// Terminal and may be reclaimed after no retained cell references them.
+    pub fn grapheme(&self, cell: &Cell) -> Option<&str> {
+        self.state.graphemes.get(cell.grapheme_id)
+    }
+
+    /// Iterate the original cluster without normalization or allocation.
+    pub fn cell_chars(&self, cell: &Cell) -> crate::CellChars<'_> {
+        self.state.graphemes.chars(cell)
     }
 
     /// View the visible screen, moved `offset` lines into primary-screen history.
@@ -876,6 +895,11 @@ struct State {
     sixel_private: bool,
     sixel_palette: Option<Box<zgraphics::SixelPalette>>,
     last_char: char,
+    graphemes: crate::grapheme::Graphemes,
+    last_grapheme: Option<(usize, usize)>,
+    grapheme_overflow: bool,
+    grapheme_writes: usize,
+    grapheme_collect_after: usize,
     graphics: zgraphics::Graphics,
     inactive_graphics: zgraphics::Graphics,
     ui: ztty_ui::State,
@@ -921,6 +945,11 @@ impl State {
             sixel_private: true,
             sixel_palette: None,
             last_char: ' ',
+            graphemes: crate::grapheme::Graphemes::default(),
+            last_grapheme: None,
+            grapheme_overflow: false,
+            grapheme_writes: 0,
+            grapheme_collect_after: 0,
             graphics: zgraphics::Graphics::default(),
             inactive_graphics: zgraphics::Graphics::default(),
             ui: ztty_ui::State::new(),
@@ -992,15 +1021,13 @@ impl State {
                 if cell.width == 0 {
                     continue;
                 }
-                for ch in core::iter::once(cell.ch)
-                    .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
-                {
-                    if result.text.len() + ch.len_utf8() > limit {
-                        result.truncated = true;
-                        return result;
-                    }
-                    result.text.push(ch);
+                let chars = self.graphemes.chars(cell);
+                let bytes = chars.clone().map(char::len_utf8).sum::<usize>();
+                if result.text.len() + bytes > limit {
+                    result.truncated = true;
+                    return result;
                 }
+                result.text.extend(chars);
             }
             if line < end.line {
                 if result.text.len() == limit {
@@ -1328,31 +1355,11 @@ impl State {
         if if self.use_g1 { self.g1 } else { self.g0 } {
             ch = dec_graphics(ch);
         }
+        if self.extend_grapheme(ch) {
+            return;
+        }
         let width = UnicodeWidthChar::width(ch).unwrap_or(0).min(2);
         if width == 0 {
-            let mut x = if self.screen.wrap {
-                self.screen.x
-            } else {
-                self.screen.x.saturating_sub(1)
-            };
-            if self.screen.x == 0 && !self.screen.wrap {
-                return;
-            }
-            let y = self.screen.y;
-            if self.screen.cells[self.screen.index(x, y)].width == 0 && x > 0 {
-                x -= 1;
-            }
-            let index = self.screen.index(x, y);
-            let width = usize::from(self.screen.cells[index].width.max(1));
-            if let Some(slot) = self.screen.cells[index]
-                .combining
-                .iter_mut()
-                .find(|v| **v == '\0')
-            {
-                *slot = ch;
-                self.screen.dirty[y] = true;
-                self.erase_sixel_span(y, x, x + width);
-            }
             return;
         }
         if self.screen.wrap && self.autowrap {
@@ -1369,7 +1376,11 @@ impl State {
                 );
                 self.soft_wrap(self.screen.cols - 1);
             } else {
-                ch = '\u{fffd}';
+                // A one-column viewport clips presentation, not stored text.
+                // With autowrap disabled retain the existing margin fallback.
+                if !self.autowrap {
+                    ch = '\u{fffd}';
+                }
                 width = 1;
             }
         }
@@ -1394,6 +1405,7 @@ impl State {
             self.screen.x += width;
             self.screen.wrap = false;
         }
+        self.remember_grapheme(x, y, 1);
     }
 
     fn ascii(&mut self, mut bytes: &[u8]) {
@@ -1403,6 +1415,11 @@ impl State {
                 self.put_char(byte as char);
             }
             return;
+        }
+        if let Some(&first) = bytes.first()
+            && self.extend_grapheme(first as char)
+        {
+            bytes = &bytes[1..];
         }
         while !bytes.is_empty() {
             if self.screen.wrap {
@@ -1429,6 +1446,7 @@ impl State {
             } else {
                 self.screen.x += count;
             }
+            self.remember_grapheme(x + count - 1, y, count);
             bytes = &bytes[count..];
         }
     }
@@ -1825,6 +1843,7 @@ impl Perform for State {
     }
 
     fn execute(&mut self, byte: u8) {
+        self.last_grapheme = None;
         match byte {
             0x08 => self.cursor_to(self.screen.x.saturating_sub(1), self.screen.y),
             0x09 => {
@@ -1848,6 +1867,7 @@ impl Perform for State {
     }
 
     fn esc_dispatch(&mut self, intermediates: &[u8], ignore: bool, byte: u8) {
+        self.last_grapheme = None;
         if ignore {
             return;
         }
@@ -1902,6 +1922,9 @@ impl Perform for State {
     }
 
     fn csi_dispatch(&mut self, params: &Params, intermediates: &[u8], ignore: bool, action: char) {
+        if action != 'm' {
+            self.last_grapheme = None;
+        }
         if ignore {
             return;
         }
@@ -2101,6 +2124,7 @@ impl Perform for State {
     }
 
     fn osc_dispatch(&mut self, params: &[&[u8]], bell_terminated: bool) {
+        self.last_grapheme = None;
         if mem::take(&mut self.osc_overflow) {
             return;
         }
@@ -2192,6 +2216,7 @@ impl Perform for State {
     }
 
     fn hook(&mut self, params: &Params, intermediates: &[u8], ignore: bool, action: char) {
+        self.last_grapheme = None;
         self.dcs.clear();
         self.dcs_overflow = false;
         self.dcs_query = !ignore && intermediates == b"+" && action == 'q';

@@ -1351,12 +1351,7 @@ impl Session {
                 if cell.width == 0 {
                     continue;
                 }
-                row.push(cell.ch);
-                for c in cell.combining {
-                    if c != '\0' {
-                        row.push(c);
-                    }
-                }
+                row.extend(self.core.terminal.cell_chars(cell));
             }
             let row = row.trim_end();
             if screen.len() + row.len() + 1 > 65536 {
