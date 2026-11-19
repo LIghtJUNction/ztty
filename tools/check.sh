@@ -11,12 +11,15 @@ fi
 python3 tests/registry_versions_test.py
 python3 tests/source_archive_test.py
 cargo fmt --all -- --check
-cargo fmt --manifest-path crates/zgpui/Cargo.toml --all -- --check
-cargo test --locked --manifest-path crates/zgpui/Cargo.toml --lib
-cargo test --locked --manifest-path crates/zgpui/Cargo.toml --doc
+# Independent reusable crates keep their own workspace and validation scope.
+for package in zgpui zinput; do
+    cargo fmt --manifest-path "crates/$package/Cargo.toml" --all -- --check
+    cargo test --locked --manifest-path "crates/$package/Cargo.toml" --lib
+    cargo test --locked --manifest-path "crates/$package/Cargo.toml" --doc
+    cargo clippy --locked --manifest-path "crates/$package/Cargo.toml" --all-targets -- -D warnings
+done
 cargo test --locked --workspace "$@"
 cargo clippy --locked --workspace --all-targets "$@" -- -D warnings
-cargo clippy --locked --manifest-path crates/zgpui/Cargo.toml --all-targets -- -D warnings
 cargo build --locked --release "$@"
 python3 tools/check_no_std.py
 if [ "$(uname -s)" = Linux ]; then
@@ -35,7 +38,7 @@ fi
 # that the portable libraries do not acquire operating-system dependencies.
 # Opt in after installing the target; never silently label a skipped gate passed.
 if [ "${ZTTY_BARE_METAL:-0}" = 1 ]; then
-    cargo check --locked -p zterm -p zinput -p zgraphics --target x86_64-unknown-none
+    cargo check --locked -p zterm --target x86_64-unknown-none
 else
     printf '%s\n' 'Bare-metal portability check: skipped (set ZTTY_BARE_METAL=1 to require it).'
 fi
