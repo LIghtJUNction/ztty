@@ -6,7 +6,10 @@ pub const MAX_COMMANDS: usize = 128;
 /// Maximum UTF-8 bytes returned by one command-text request.
 pub const MAX_COMMAND_TEXT: usize = 65536;
 
-/// A position in primary-screen history. Lines do not change when history scrolls.
+/// A position in retained text. Lines do not change when primary history scrolls.
+/// Width changes reflow coordinates: use Terminal::resize_anchored to retain
+/// external positions across resize; an evicted or clipped anchor becomes None.
+/// Active alternate-screen positions use zero-based grid rows.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TextPosition {
     pub line: u64,

@@ -273,7 +273,7 @@ fn copied_matches_reject_stale_history_and_resized_coordinates() {
 }
 
 #[test]
-fn clipped_history_does_not_invent_a_contiguous_match() {
+fn reflowed_history_preserves_text_without_inventing_a_contiguous_match() {
     let mut terminal = Terminal::new(5, 2, 10);
     terminal.feed(b"abcdefghijk");
     assert_eq!(terminal.history_len(), 1);
@@ -288,7 +288,7 @@ fn clipped_history_does_not_invent_a_contiguous_match() {
     );
     assert_eq!(
         search::find(&terminal, "defg", Sensitive, None, true).count,
-        0
+        1
     );
     terminal.resize(6, 2);
     assert_eq!(
