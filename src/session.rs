@@ -1371,6 +1371,7 @@ impl Session {
             "output",
             Value::from(String::from_utf8_lossy(&chunk.bytes).into_owned()),
         );
+        value.set("output_base64", Value::from(chunk.output_base64()));
         value.set("cursor", Value::from(chunk.next_cursor));
         value.set("next_cursor", Value::from(chunk.next_cursor));
         value.set("first_cursor", Value::from(chunk.first_cursor));

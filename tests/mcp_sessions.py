@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify persistent PTYs, cursors and shared namespaces through real MCP calls."""
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -55,6 +56,9 @@ def collect(read, uri, needle=None, cursor=0, byte_limit=7, exited=False):
         value = read("session_read", {"session": uri, "cursor": cursor, "max_bytes": byte_limit})
         assert value["next_cursor"] >= cursor
         assert not value["truncated"], value
+        raw = base64.b64decode(value["output_base64"], validate=True)
+        assert raw.decode("utf-8", "replace") == value["output"], value
+        assert value["next_cursor"] == cursor + len(raw), value
         cursor = value["next_cursor"]
         output += value["output"]
         last = value
@@ -167,6 +171,7 @@ os.write(1,b"\x9a\x80END")
         time.sleep(.01)
     assert partial is not None and partial["running"], partial
     assert partial["output"] == "\ufffd" and partial["next_cursor"] == 1, partial
+    assert base64.b64decode(partial["output_base64"], validate=True) == b"\xff"
     assert partial["has_more"] and not partial["truncated"], partial
     pending = client.tool("session_read", {"session": uri, "cursor": 1, "max_bytes": 1})
     assert pending["output"] == "" and pending["next_cursor"] == 1 and pending["has_more"], pending
@@ -213,6 +218,7 @@ os.write(1,bytes.fromhex(sys.argv[3]))
             time.sleep(.01)
         assert value is not None and value["next_cursor"] == len(expected), value
         assert value["output"] == expected.decode("utf-8", "replace"), value
+        assert base64.b64decode(value["output_base64"], validate=True) == expected
         assert not value["truncated"] and not value["has_more"], value
         assert value["output_eof"] is eof and value["running"] is not eof, value
         if eof:
@@ -230,6 +236,7 @@ os.write(1,bytes.fromhex(sys.argv[3]))
             next_cursor = value["next_cursor"]
             assert cursor < next_cursor <= min(len(source), cursor + maximum + 3), value
             assert value["output"] == source[cursor:next_cursor].decode("utf-8", "replace"), value
+            assert base64.b64decode(value["output_base64"], validate=True) == source[cursor:next_cursor]
             assert value["output_eof"] is eof and value["running"] is not eof, value
             assert not value["truncated"] and value["has_more"] is (next_cursor < len(source)), value
             output += value["output"]

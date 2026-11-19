@@ -385,3 +385,26 @@ fn an_explicit_cursor_inside_a_codepoint_keeps_existing_raw_byte_semantics() {
     assert_eq!(page.next_cursor, 4);
     assert!(!page.truncated && !page.has_more);
 }
+
+#[test]
+fn base64_preserves_binary_and_standard_padding() {
+    for (input, expected) in [
+        (&b""[..], ""),
+        (&b"f"[..], "Zg=="),
+        (&b"fo"[..], "Zm8="),
+        (&b"foo"[..], "Zm9v"),
+        (&b"foob"[..], "Zm9vYg=="),
+        (&b"fooba"[..], "Zm9vYmE="),
+        (&b"foobar"[..], "Zm9vYmFy"),
+    ] {
+        let mut tail = OutputTail::new();
+        tail.append(input, false);
+        assert_eq!(tail.read(0, None, true).unwrap().output_base64(), expected);
+    }
+    let mut tail = OutputTail::new();
+    tail.append(&(0u8..=255).collect::<Vec<_>>(), false);
+    assert_eq!(
+        tail.read(0, None, true).unwrap().output_base64(),
+        "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
+    );
+}
