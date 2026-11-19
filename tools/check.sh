@@ -2,6 +2,7 @@
 set -eu
 
 python3 tests/registry_versions_test.py
+python3 tests/source_archive_test.py
 cargo fmt --all -- --check
 cargo test --locked --workspace
 cargo clippy --locked --workspace --all-targets -- -D warnings
