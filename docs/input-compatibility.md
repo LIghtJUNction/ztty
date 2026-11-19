@@ -10,7 +10,7 @@ to an actual raw PTY, including terminal mode negotiation.
 | Case | Previous behavior | Implemented behavior | Primary reference |
 |---|---|---|---|
 | Ctrl+Shift character shortcuts in legacy mode | Shift collapsed into the Control mapping | CSI-u preserves the Shift bit; Space retains its NUL exception | [Kitty legacy text keys](https://sw.kovidgoyal.net/kitty/keyboard-protocol/#legacy-text-keys), [Ghostty keyboard encoder](https://github.com/ghostty-org/ghostty/blob/main/src/input/key_encode.zig) |
-| Printable keypad keys in normal keypad mode with Kitty flags 1–7 | Digits and operators became private-use key events when disambiguation was enabled | Digits, decimal and operators remain UTF-8 text; report-all retains keypad identity and associated text; explicit application-keypad mode keeps functional events | [Kitty disambiguation](https://sw.kovidgoyal.net/kitty/keyboard-protocol/#disambiguate-escape-codes), [report-all](https://sw.kovidgoyal.net/kitty/keyboard-protocol/#report-all-keys-as-escape-codes) |
+| Printable keypad keys in normal keypad mode with Kitty flags 1–7 | Digits and operators became private-use key events when disambiguation was enabled | Digits, decimal and operators remain UTF-8 text; report-all retains keypad identity and associated text; Num Lock overrides application-keypad mode; with Num Lock off, application-keypad mode keeps functional events | [Kitty disambiguation](https://sw.kovidgoyal.net/kitty/keyboard-protocol/#disambiguate-escape-codes), [report-all](https://sw.kovidgoyal.net/kitty/keyboard-protocol/#report-all-keys-as-escape-codes) |
 | Ctrl+tilde | Literal tilde | Control byte 30 | [Kitty legacy Control mapping](https://sw.kovidgoyal.net/kitty/keyboard-protocol/#legacy-ctrl-mapping-of-ascii-keys) |
 | X10 tracking mode 9 | No report | Left, middle and right presses, with no modifier bits; no releases, motion or wheel events | [XTerm mouse tracking](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Mouse-Tracking), [Ghostty mouse encoder](https://github.com/ghostty-org/ghostty/blob/main/src/input/mouse_encode.zig) |
 | Wheel buttons 4–7 and extra buttons 8–11 | Only vertical `Scroll` events could be encoded | Distinct button codes, horizontal wheel presses, extra-button releases and dragging | [XTerm other buttons and extended coordinates](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Other-buttons) |
@@ -107,3 +107,12 @@ UTF-8 mouse coordinates, URXVT encoding and SGR pixel coordinates require their
 own acceptance tests. Complete Kitty/Ghostty equivalence is not established by
 these vectors. Ghostty separates mode-aware encoding from the frontend event
 source in its [input guide](https://lib.ghostty.org/vt/guide-input.html).
+
+## Numeric keypad routing acceptance (2026-11-19)
+
+The [keypad report](keypad-input-2026-11-19.zh-CN.md) records 177 X11/PTY
+input vectors, 14 font scenarios and 4 keypad overlay scenarios. The GUI gate
+requires `setxkbmap` in addition to Xvfb, Python Xlib and Pillow. It configures
+`numpad:pc` and `kpdl:dot` only on its private server to exercise the actual
+Num Lock/Shift layer and physical decimal/Delete key. The codec retains
+explicit Kitty identity and event negotiation when Num Lock overrides DECKPAM.
