@@ -1218,17 +1218,8 @@ impl State {
                 self.screen.clear_row(bottom, blank);
             }
         } else {
-            // Move each surviving row once, including its soft-wrap endpoint.
-            // Logical row order is safe even when the backing ring wraps.
-            for y in top..bottom + 1 - count {
-                let wrapped = self.screen.row_wrap(y + count);
-                let source = self.screen.index(0, y + count);
-                let target = self.screen.index(0, y);
-                self.screen
-                    .cells
-                    .copy_within(source..source + self.screen.cols, target);
-                self.screen.set_row_wrap(y, wrapped);
-            }
+            self.screen
+                .copy_rows(top + count, top, bottom - top + 1 - count);
             for y in bottom + 1 - count..=bottom {
                 self.screen.clear_row(y, blank);
             }
@@ -1263,15 +1254,8 @@ impl State {
                 self.screen.clear_row(top, blank);
             }
         } else {
-            for y in (top + count..=bottom).rev() {
-                let wrapped = self.screen.row_wrap(y - count);
-                let source = self.screen.index(0, y - count);
-                let target = self.screen.index(0, y);
-                self.screen
-                    .cells
-                    .copy_within(source..source + self.screen.cols, target);
-                self.screen.set_row_wrap(y, wrapped);
-            }
+            self.screen
+                .copy_rows(top, top + count, bottom - top + 1 - count);
             for y in top..top + count {
                 self.screen.clear_row(y, blank);
             }
