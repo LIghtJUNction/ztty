@@ -6,6 +6,11 @@
       "sha256": "b9eea558cfdba437d6dedbd9919b536073410c0ac64fef48962f1196a00f740f"
     },
     {
+      "file": "assembly-review.json",
+      "bytes": 3529,
+      "sha256": "bc0b0d8917f3cb1d36447aa8590b09e5745f29c2fe69e46813e6cff819d91496"
+    },
+    {
       "file": "build.log",
       "bytes": 883,
       "sha256": "8b899658d82c2895cb8e39b7bbe769ccbbb41494ab7ccd7daa4d5cbf58fc4a61"

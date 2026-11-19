@@ -57,3 +57,9 @@ python3 tests/mcp_raw_output.py --binary target/release/ztty --output artifacts/
 计时终点是 PTY 的逻辑光标回复，包含并行软件绘制的争用，但不等于物理显示完成。全部 40 个场景检查了完整可见文本与自有进程清理，其中 20 个窗口场景另确认实际映射。短样本仅用于发现意外回归，负值如实保留，不能据此证明所有机器或工作负载都没有性能变化。
 
 [逐样本数据](measurements/native-output-2026-11-19/risk-raw.json)、[汇总与范围](measurements/native-output-2026-11-19/risk-summary.json)、[顺序编排脚本](measurements/native-output-2026-11-19/run_risk_ab.py)。本记录验证 Linux 原生路径；不声称 Windows/macOS 已运行这些 MCP 或插件验收。
+
+### 负向信号的只读核查
+
+比较基线与候选实际 ELF 后，put_char、scroll_up、SessionCore::read_once/read_output 的指令在去除地址和重定位差异后相同；对应源码、X11 绘制与重绘调度源码未改变。Ui::paint 机器码长度相同，但其地址/字段布局等差异不能据此当作逐字节相同；事件循环因插件生命周期支持而变大。空插件队列不读取时钟、不创建工作进程或定时器，菜单仅显式打开时构造。Base64 编码只在显式读取结果时执行，吞吐计时段内没有该读取 RPC。
+
+以上排除了新增逐行插件处理等直接路径，尚不足以解释或排除彩色窗口的负值；本轮没有为消除负数而更换候选、修改基准或重复采样。[实际 ELF 汇编核对与限定](measurements/native-output-2026-11-19/assembly-review.json)。
