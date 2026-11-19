@@ -1510,11 +1510,24 @@ impl Window {
             XFlush(self.display);
         }
     }
+    /// Keep character identity unshifted, but let XKB choose the keypad layer.
+    pub fn input_symbol(&self, event: &mut KeyEvent) -> c_ulong {
+        let symbol = self.key_symbol(event, false);
+        if (0xff80..=0xffbd).contains(&symbol) {
+            let state = event.state;
+            self.key_symbol_with_state(event, state)
+        } else {
+            symbol
+        }
+    }
     /// Resolve the current keyboard group, preserving AltGr/layout selection.
     pub fn key_symbol(&self, event: &mut KeyEvent, shifted: bool) -> c_ulong {
+        let state = (event.state & !3) | u32::from(shifted);
+        self.key_symbol_with_state(event, state)
+    }
+    fn key_symbol_with_state(&self, event: &mut KeyEvent, state: u32) -> c_ulong {
         let mut symbol = 0;
         let mut consumed = 0;
-        let state = (event.state & !3) | u32::from(shifted);
         if unsafe {
             XkbLookupKeySym(
                 self.display,
@@ -1527,7 +1540,7 @@ impl Window {
         {
             symbol
         } else {
-            unsafe { XLookupKeysym(event, i32::from(shifted)) }
+            unsafe { XLookupKeysym(event, i32::from(state & 1 != 0)) }
         }
     }
     pub fn lookup(&self, event: &mut KeyEvent, buffer: &mut Vec<u8>) -> Lookup {
