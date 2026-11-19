@@ -42,10 +42,11 @@ fn osc52_large_text_uses_the_full_documented_byte_budget() {
     );
     assert!(t.next_clipboard_request().is_none());
     // The fixed title/OSC parser retains its old overflow behavior.
+    t.feed(b"\x1b]2;before-limit\x07");
     t.feed(b"\x1b]2;");
     t.feed(&vec![b'z'; 5000]);
     t.feed(b"\x07");
-    assert_eq!(t.title(), "");
+    assert_eq!(t.title(), "before-limit");
 }
 #[test]
 fn aborted_or_overlimit_requests_never_clear_or_replace_clipboard() {
