@@ -1,28 +1,36 @@
-# ztty 性能与功能迭代阶段记录
+# ztty 性能与功能迭代记录
 
-日期：2026-11-19。源码已保存到 [GitHub 恢复分支](https://github.com/LIghtJUNction/ztty/tree/iter/performance-function-recovery-20261119)，固定代码提交为 [`dfe363f`](https://github.com/LIghtJUNction/ztty/commit/dfe363f3a16bf4b410185679638832c5df52b2e8)。它合并了本轮迭代与并行小键盘修改，并保留双方历史；GitHub 中的文件树与本地审核版本完全一致。
+日期：2026-11-19。
 
-**前半轮改进已安装，后续修复已分别验收，最终整合验收与安装尚未完成。** 开发机 ssmcp 连接中断，最后一次综合检查只读回格式检查成功；本记录保存已取得的结果，恢复连接后继续原任务。
+**滚动、搜索、小键盘、Sixel 残留和新窗口换代已完成整合，15 项综合验收步骤全部成功。** 源码已合入主分支 [`70f9be5`](https://github.com/LIghtJUNction/ztty/commit/70f9be5e5f80d9c9c7a92a5020ce91ff86130cf3)，保留本轮与并行 PR #17 的修改历史。本轮未启动正式发布。
 
-## 当前完成到哪里
+## 交付与执行文件身份
 
-| 阶段 | 已确认结果 |
-| --- | --- |
-| 前半版本 `11a74a5` | 本轮失联前已安装为本机包 `0.4.1-2`，同步 `/usr/bin/ztty` 与 `/home/lightjunction/.cargo/bin/ztty`；通过 331 项 Rust 单元／集成测试、6 项文档测试，以及独立的 9 项 SessionCore 真实 PTY 检查；另通过 70 项输入向量、10 项历史滚动 GUI、19 项日常操作、11 项重绘检查 |
-| 后续小键盘整合 | 198 项真实 PTY 输入向量、4 组本地界面检查通过 |
-| Sixel 修复 | 8 组 GUI 检查、8 项新增核心测试通过；共享快照容量记账补丁也完成独立测试 |
-| 新窗口 broker 换代 | 10 项真实 GUI／PTY／IPC 检查通过 |
-| 最终整合 | 开发机 `3ba09ad` 版本综合任务 `-143` 仅确认 `fmt` 成功，其余结果因离线未知；已推送的恢复分支尚待重新整体验证，最终新包未由本轮安装 |
+已安装本机开发包 **`ztty 0.4.1-3`**。`/usr/bin/ztty` 与 `/home/lightjunction/.cargo/bin/ztty` 的 SHA-256 均与下方验收 ELF 一致；`pacman -Qkk` 检查 9 个文件，0 个变化。用户原有 `ztty-launch` 与 desktop 文件字节未变；安装前记录的 6 个 ztty 进程均保持原启动时刻与执行映像。
 
-远端主分支另有并行任务通过 PR #17 合入的小键盘修复，提交为 `5d66749`。恢复分支已保留这些修改；该并行任务的发布或安装不计作本轮完成。源码可查：[前半版本](https://github.com/LIghtJUNction/ztty/tree/11a74a51f0f6c52471c006582d46439cd713ce26)、[已推送迭代分支](https://github.com/LIghtJUNction/ztty/tree/iter/performance-function-20261119)、[主分支小键盘提交](https://github.com/LIghtJUNction/ztty/commit/5d66749805e73c41ca252e297bddabc67efd1ff5)。
+通过现有 `ztty-launch` 正常启动了新窗口 **`iteration-70f9be5`**。仅在这次启动的子进程环境中移除继承的旧 `ZTTY_SOCKET`，由新版自动选择 broker。现场核对原生 X11 窗口已经映射，session 为运行、可见、已连接且可写；`SO_PEERCRED` 对应 broker 的 `/proc/PID/exe` 与验收 ELF 哈希一致，PTY 子进程继承的 socket 也与所选地址一致。新窗口已留给用户，现有会话继续保留。
 
-## 历史阅读与局部滚动
+可回滚的 `0.4.1-2` 包保存在 `/home/lightjunction/Backups/ztty/2026-11-19-performance-function/ztty-0.4.1-2-x86_64.pkg.tar.zst`，原 `0.4.1-1` 包也继续保留。本轮只更新本机开发包，未新建 tag、Release 或启动 CI。
 
-历史缓冲满后，新行进入、旧行淘汰，总行数不变。旧实现用总行数差补偿阅读位置，因而得到零，画面随新输出滑动。修复改用终端模型记录的历史前进量，并同步到 Linux、Windows、macOS 视图：目标行仍保留时固定位置，被淘汰后夹紧到最早保留行。
+综合验收实际使用源码 `3ba09ad0e1759796293e1e0c18ecda2f17ad922d` 构建的 Linux ELF，SHA-256 为：
 
-私有 Xvfb 复现使用 8 行历史、真实 PTY 和不同颜色的行：旧版追加两行后，顶部像素由 `[100,30,50]` 变成 `[110,30,50]`；修复后保持 `[100,30,50]`。继续输出到目标行被淘汰时正确夹紧。10 项检查还覆盖输入回到实时底部、ED3 清历史及主备屏切换。[回归脚本](https://github.com/LIghtJUNction/ztty/blob/11a74a51f0f6c52471c006582d46439cd713ce26/tests/scrollback_gui.py)。
+```text
+9cfa87530c3bbbf21950e0828ff9ecf9973a699551fabc034a6a3a01d264b468
+```
 
-局部滚动 N 行原先重复移动单行，同一批单元格会复制多次。现在一次移动保留行，再清空空出的区域；环形缓冲按连续片段搬运，保留字符、样式和软换行信息。整屏滚动沿用原有环形历史路径。正确性检查包括 300 组批量／逐行等价用例及 5,106 组环形边界组合。
+上述代码合并提交 `70f9be5` 与该测试提交的已提交差异仅为 5 个文档／证据路径，程序、测试和构建源码完全一致。[源码等价核对](measurements/performance-function-2026-11-19/equivalence.json)保留比较范围，[安装核对](measurements/performance-function-2026-11-19/installation.json)记录包、入口文件、新窗口及现有会话。这些记录将“源码已提交”“文件已安装”和“窗口实际运行新版”分别核对。
+
+## 满历史时，正在阅读的内容保持原位
+
+历史缓冲满后，新行进入与旧行淘汰同时发生，总行数保持不变。旧实现用总行数差补偿阅读位置，结果为零，画面便随新输出滑动。现在终端模型记录历史前进量，SessionCore 将本次前进量交给 Linux、Windows、macOS 视图：目标行仍在历史范围内时保持位置，被淘汰后夹紧到最早保留行。
+
+私有 Xvfb 用 8 行历史、真实 PTY 和不同颜色的行复现：旧版追加两行后，顶部像素由 `[100,30,50]` 变成 `[110,30,50]`；修复版保持 `[100,30,50]`。10 项 GUI 检查还覆盖被淘汰后的边界、输入回到底部、ED3 清历史及主备屏切换。[最终 GUI 记录](measurements/performance-function-2026-11-19/scrollback-gui.json)、[回归脚本](../tests/scrollback_gui.py)。
+
+## 局部批量滚动：保留行只移动一次
+
+滚动区域要求移动 N 行时，旧实现把移动单行重复 N 次，同一批单元格会被复制多次。现在一次移动保留行，再清空空出的区域；底层环形缓冲按连续片段搬运，字符、样式和软换行信息一起移动，重叠区域按正确方向处理。整屏滚动仍沿用原来的环形历史路径。
+
+正确性检查包括 300 组批量／逐行等价用例及 5,106 组环形边界组合，覆盖宽字符、组合字符、链接、样式、光标与脏标记。
 
 ### 固定提交的滚动测量
 
@@ -47,31 +55,51 @@
 
 8 行批量滚动为 6.55–7.48 倍，24 行为 16.34–18.42 倍；单行上滚基本持平。稳态分配均为零，初始核心堆均为 107,932 B。通用核心基准未出现一致提升：ASCII 为 214.161→206.979 MiB/s，SGR 为 134.551→129.629 MiB/s；1 KiB 分块输入 p50 为 3.878→3.436 µs。加速结论限定于表中的局部批量滚动。
 
-## 搜索：Alt+C 切换大小写
+完整五组观测、源码身份与统计见 [原始数据](measurements/performance-function-2026-11-19/scroll-raw.json)及[汇总](measurements/performance-function-2026-11-19/scroll-summary.json)。
 
-Linux 按 `Ctrl+Shift+F` 打开历史搜索，搜索栏中按 `Alt+C` 切换 `Case`／`Ignore case`，`Enter`／`Shift+Enter` 前后选择命中；默认仍区分大小写。忽略大小写使用 Unicode 字符小写映射，`error` 可匹配 `ERROR`、`Error`、`error`；它不提供完整 case folding、重音归一化或正则，`ß` 与 `SS` 不视为等价。复制保留原文。
+## 搜索：Alt+C 切换大小写并保留当前命中
 
-同时修复单独按修饰键导致当前命中重置的问题：查询实际改变才重新搜索，准备按 Ctrl+Shift 复制时保留当前选中项。真实 GUI 检查核对了剪贴板和子 PTY 无输入泄漏。[搜索实现](https://github.com/LIghtJUNction/ztty/blob/11a74a51f0f6c52471c006582d46439cd713ce26/src/search.rs)、[操作回归](https://github.com/LIghtJUNction/ztty/blob/11a74a51f0f6c52471c006582d46439cd713ce26/tests/daily_workflow.py)。
+Linux 按 `Ctrl+Shift+F` 打开历史搜索，在搜索栏内按 `Alt+C` 切换 `Case`／`Ignore case`，`Enter`／`Shift+Enter` 前后选择命中；默认仍区分大小写。忽略大小写采用 Unicode 字符小写映射，查询 `error` 可匹配 `ERROR`、`Error`、`error`。这不包含完整 case folding、重音归一化或正则表达式，例如 `ß` 与 `SS` 不作等价匹配。选中位置保留原文坐标，复制得到原始文本。
 
-## 小键盘与旧 broker
+另修复单独按 Ctrl／Shift 导致当前命中重置的问题：查询实际改变才重新搜索，准备复制时保留当前选中项。真实 GUI 检查核对剪贴板，并确认搜索操作没有泄漏到子 PTY。[搜索实现](../src/search.rs)、[日常操作验收](measurements/performance-function-2026-11-19/daily-workflow.json)。
 
-新版也存在独立遗漏：Num Lock 开启时，应用键盘模式（DECKPAM）仍可能把数字键编码为 `ESC Op` 等特殊序列。修复让 Num Lock 的数字语义优先；Kitty 明确请求完整事件报告时仍保留对应键身份。X11 同时保留小键盘实际的 Shift／Num Lock 层，按住按键后松开 Shift 时，自动重复与释放事件延续首次按下的身份。搜索补齐 KP_Enter／Shift+KP_Enter，命令面板补齐 KP_Up／KP_Down／KP_Enter，并避免单独的修饰键重置选中项。[整合后的输入回归](https://github.com/LIghtJUNction/ztty/blob/dfe363f3a16bf4b410185679638832c5df52b2e8/tests/input_gui.py)保留动态解析的物理小数点键 91，避免只测始终为小数点的别名键 129。
+## 小键盘：修正模式优先级与实际键位
 
-这组整合源码在独立二进制上通过 198 项真实 XTEST→PTY 字节向量及 4 组本地界面检查，包括前后搜索命中与实际字体／PTY 网格变化。恢复分支的输入测试、session、X11、zinput 四个文件与该已验收源码逐字相同；这不代替整个恢复版本的最终运行检查。Num Lock 优先级参考 [xterm 官方控制序列文档](https://invisible-island.net/xterm/ctlseqs/ctlseqs.pdf)中的应用小键盘说明。
+本次处理了两个独立问题：新版仍有应用键盘模式与 Num Lock 的优先级遗漏；现场部分窗口则仍运行更早的 broker。
 
-现场只读核对还发现，7 个现有窗口仍属于旧 `0.3.1-2` broker，运行映像已标记为 deleted；磁盘文件更新不会改写存活进程。从该进程读取旧 ELF，在私有 Xvfb 中复现：Num Lock 开启、Kitty keyboard flags 为 1 时，数字和运算符会被编码为 `CSI 57399u` 等特殊键序列，当前 ssmcp 输入解析器不能还原为普通数字。新版在同一回归输出普通文本。现场使用 fcitx，但没有读取用户按键或会话模式，因此不把全部现场症状归因于这一种模式。
+程序用 DECKPAM 进入应用键盘模式后，旧实现即使开启 Num Lock，也可能将小键盘 `0` 编码为 `ESC O p`，而非字符 `0`。修复让 Num Lock 的数字语义覆盖传统应用键盘模式；应用显式协商的 Kitty 功能键身份、事件类型与关联文本继续保留。[编码器](../crates/zinput/src/lib.rs)。
 
-新窗口换代针对这个已观察到的问题：仅当**没有显式 `ZTTY_SOCKET`、没有目标窗口／标签／分屏**时，启动端用 `SO_PEERCRED` 确认 broker 进程，再比较 `/proc/PID/exe` 与当前执行文件的内容指纹；新建独立窗口优先复用当前构建的备用池，否则在默认池映像不同时选择备用 socket。相同字节的 `/usr/bin`、Cargo 副本共享 broker。选择在创建 PTY 前写入环境，使子终端继承正确地址；指纹只在启动选路时计算，不进入事件循环，也不承担安全认证。
+X11 路径保留小键盘实际 Shift／Num Lock 层，而不是按普通字符键的规则去掉修饰层。按住小键盘键、再松开 Shift 时，自动重复和释放沿用首次按下的键身份。搜索支持 `KP_Enter`／`Shift+KP_Enter`；命令面板支持 `KP_Up`／`KP_Down`／`KP_Enter`，无文本的修饰键不会重置当前选项。
 
-显式 socket、attach、tab、split、MCP 继续使用既定目标；现有窗口保留原 broker，**不会热升级**。10 项隔离检查覆盖已删除旧映像、同内容不同路径、PTY 继承、旧池保留及旧池退出后的重复启动。[实现](https://github.com/LIghtJUNction/ztty/blob/e6ceb1959a688214981b75fc0f6d0051ccb8fea7/src/broker.rs)、[回归脚本](https://github.com/LIghtJUNction/ztty/blob/e6ceb1959a688214981b75fc0f6d0051ccb8fea7/tests/broker_upgrade.py)。
+测试根据 XKB 映射动态定位物理键和 Num Lock 掩码。本次私有布局中的物理小数点／Delete 键是 keycode 91；直接查 `KP_Decimal` 会得到另一个别名键 129，无法覆盖同一个物理键的数字／导航切换。新增矩阵覆盖 0–9 和小数点、Num Lock／Shift、应用键盘与光标模式、重复和释放事件。
 
-## Sixel 图片转文字后的残留
+最终统一 ELF 通过 **198 项 XTEST→真实 PTY 字节向量、14 项字号／网格检查、4 组小键盘本地界面检查**。界面检查比较搜索前后命中，以及实际字体、窗口网格和 PTY 尺寸，确认操作确实生效。[输入结果](measurements/performance-function-2026-11-19/input-gui.json)、[测试脚本](../tests/input_gui.py)。
 
-这个问题在本轮已安装新版中也能复现：文字、空格、ECH、EL、ED0、ED1 更新了字符，却没有清除对应 Sixel 像素，下一帧图片又覆盖回来。修复让文字覆盖与局部擦除清除相交源像素，并更新图像修订号；未覆盖部分、其它 Sixel 和 Kitty 图片继续保留，图片全部擦完后回收存储。共享快照复制时的容量记账也已补齐。
+## 新窗口使用当前构建，现有会话继续保留
 
-擦除单位是**源像素**。纵向缩放后，一个源像素跨越擦除边界时会整体清除，最多多清除 `scale_y - 1` 行显示像素；默认 2 倍缩放与奇数行高已有回归。1∶1 图像的范围外像素逐边界核对通过。8 组 GUI 使用合成图片；新增 8 项核心测试覆盖宽字符、组合字符、历史、缩放、隔离、反复替换回收及共享快照。[修复源码](https://github.com/LIghtJUNction/ztty/commit/e6ceb1959a688214981b75fc0f6d0051ccb8fea7)、[GUI 脚本](https://github.com/LIghtJUNction/ztty/blob/e6ceb1959a688214981b75fc0f6d0051ccb8fea7/tests/sixel_preview_gui.py)。
+现场只读核对发现，7 个现有窗口仍属于旧 `0.3.1-2` broker，运行映像已标记为 deleted；替换磁盘文件不会改写存活进程。从该进程读取旧 ELF，在私有 Xvfb 中复现：Num Lock 开启且 Kitty keyboard flags 为 1 时，数字和运算符被编码为 `CSI 57399u` 等特殊键序列，当前 ssmcp 输入解析器不能还原为普通数字。新版在相同回归输出普通文本。[旧映像复现](measurements/performance-function-2026-11-19/keypad-old.json)。
 
-无图路径额外比较 `11a74a5` 与主修复 `eaddb76`，固定 CPU 23，三组交替配对；共享快照容量补丁在该次测量之后单独验证。
+现场使用 fcitx，但没有读取用户按键或会话模式，因此该复现证明的是一条明确的失败路径，不代表已经穷尽现场所有输入模式。
+
+新增换代仅作用于**无显式 `ZTTY_SOCKET` 且无指定目标的新建独立 GUI 窗口**。启动端通过 `SO_PEERCRED` 获得 broker 的进程身份，读取 `/proc/PID/exe` 比较实际内容；优先复用当前构建的备用池，否则在默认池映像不同时选择备用 socket。内容相同的 `/usr/bin` 与 Cargo 副本共享 broker。
+
+选定 socket 在创建 PTY 前写入环境，子终端继承同一目标。内容指纹只在启动选路时计算，不进入事件循环，也不充当安全认证。显式 socket、attach、tab、split、MCP 继续使用既定目标；**现有窗口保留原进程，不会热升级**。
+
+10 项隔离检查覆盖旧 ELF 被删除后仍可识别、同内容不同路径共享、PTY 继承、旧池保留以及旧池退出后的重复启动。[最终验收](measurements/performance-function-2026-11-19/broker-upgrade.json)、[实现](../src/broker.rs)。
+
+## Sixel：文字覆盖与局部清除不再留下旧图片
+
+这个问题在本轮前半版本中也能复现。空格、ECH、EL、ED0、ED1 更新了字符，却没有清除相交的 Sixel 像素；下一帧图片又被叠回。ED2 全屏擦除与 Kitty 显式删除原本正常，作为对照保留。[失败复现](measurements/performance-function-2026-11-19/sixel-baseline.json)。
+
+修复让文字覆盖和局部擦除清除相交源像素，并更新图像修订号；未覆盖部分、其它 Sixel 与 Kitty 图片继续保留。图片全部擦完后，放置记录与存储一并回收；没有图片放置时直接返回。共享快照发生写时复制时，也同步实际容量记账，原快照像素不变。
+
+擦除以**源像素**为单位。若纵向缩放后的一个源像素跨越擦除边界，会完整清除该源像素，最多额外清除 `scale_y - 1` 行显示像素。默认 2 倍缩放与奇数单元格行高已有回归；1∶1 图像逐边界核对了范围外像素保持不变。
+
+新增 8 项核心测试覆盖宽字符、组合字符、历史、缩放、图像隔离、反复预览替换回收和共享快照。最终 ELF 的 8 组预览 GUI 检查全部通过，同时通过原有 Sixel 协议 10 项、Kitty 图形 7 项，包含图像格式、分块传输、裁剪、滚动、窗口尺寸变化与删除等检查。[预览结果](measurements/performance-function-2026-11-19/sixel-preview.json)、[Sixel 协议](measurements/performance-function-2026-11-19/sixel-gui.json)、[Kitty 图形](measurements/performance-function-2026-11-19/kitty-graphics.json)。
+
+### 无图路径性能复查
+
+以 `11a74a5` 为基线，与 Sixel 主修复 `eaddb76` 做三组交替配对，固定 CPU 23，计时期间暂停本轮其他构建。下表为配对结果的中位数；共享快照容量补丁在此次测量后单独验证。
 
 | 指标 | 基线 | Sixel 主修复 |
 | --- | ---: | ---: |
@@ -82,29 +110,27 @@ Linux 按 `Ctrl+Shift+F` 打开历史搜索，搜索栏中按 `Alt+C` 切换 `Ca
 | 初始核心堆，B | 107,932 | 107,932 |
 | 稳态分配次数 | 0 | 0 |
 
-ASCII 中位差约 −0.5%，满历史滚动基本持平；SGR 与 Unicode 差异一并保留。共享机器的三组样本不足以确定微小差异，最终整合仍需复核。
+ASCII 中位差约 −0.5%，满历史滚动基本持平；SGR 与 Unicode 差异一并保留。共享主机的有限样本不用于判定微小差异。[三组原始结果](measurements/performance-function-2026-11-19/no-image-raw.json)、[汇总](measurements/performance-function-2026-11-19/no-image-summary.json)。两组性能测量绑定各自固定提交，局部核心加速倍数不代表整个终端、任意应用或物理输入到显示的加速。
 
-## 原始材料与恢复步骤
+## 最终综合验收与平台范围
 
-以下开发机文件已生成，但尚未取回归档。本记录保留精确绝对路径，不将它们伪装成公开下载链接：
+综合任务的 **15 个步骤退出码均为 0**。各步骤的实际命令、执行文件 SHA-256 和结果见 [validation.json](measurements/performance-function-2026-11-19/validation.json)；GUI 与协议检查按该任务顺序使用同一 release 文件。Kitty 原始 JSON 记录文件路径，执行文件身份由综合记录绑定。
 
-```text
-/home/lightjunction/Documents/GITHUB/ztty/.worktrees/core-perf-20261119/artifacts/core-scroll/raw-ab-final.json
-/home/lightjunction/Documents/GITHUB/ztty/.worktrees/core-perf-20261119/artifacts/core-scroll/summary-ab-final.json
-/home/lightjunction/Documents/GITHUB/ztty/.worktrees/core-perf-20261119/artifacts/core-scroll/run_ab.py
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/performance-function-20261119/docs/measurements/performance-function-2026-11-19/scrollback-baseline.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/performance-function-20261119/docs/measurements/performance-function-2026-11-19/scrollback-gui.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/performance-function-20261119/artifacts/initial-validation/summary.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/performance-function-20261119/artifacts/final-validation/summary.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/keypad-review-20261119/artifacts/input.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/preview-audit-20261119/result.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/preview-fix-20261119/artifacts/preview-fix/gui/sixel-preview.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/preview-fix-20261119/artifacts/preview-fix/no-image-ab.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/preview-fix-20261119/artifacts/preview-fix/no-image-summary.json
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/preview-fix-20261119/artifacts/preview-fix/run_no_image_ab.py
-/home/lightjunction/Documents/GITHUB/ztty/artifacts/broker-upgrade-20261119/artifacts/broker-upgrade/acceptance.json
-```
+| 验收内容 | 结果 |
+| --- | --- |
+| Rust 单元／集成测试 | 341 项通过 |
+| Rust 文档测试 | 6 项通过 |
+| SessionCore 自有真实 PTY 检查 | 另外 9 项通过；所有测试子进程均已回收 |
+| 格式、严格 Clippy、release 构建 | 全部通过 |
+| no_std 与裸机目标 | 检查通过，裸机目标为 `x86_64-unknown-none` |
+| Windows 目标 | `x86_64-pc-windows-gnu` 的 `cargo check` 通过 |
+| 输入 | 198 字节向量、14 字号／网格、4 小键盘界面检查通过 |
+| 历史滚动／日常操作／重绘 | 分别 10／19／11 项通过 |
+| Sixel 预览／Sixel 协议／Kitty 图形 | 分别 8／10／7 项通过 |
+| broker 换代 | 10 项通过 |
 
-上述自动化 GUI 检查均使用私有 Xvfb、真实 PTY 和自有测试进程，未接管用户窗口。Windows 只做过交叉编译，macOS 未做新增原生验收；物理键盘、完整 fcitx 输入法组合和输入到显示延迟也未完成测量。
+SessionCore 的 9 项独立检查包含有界原子输入、控制与队列取消、有界终端响应、事务式 PTY resize、子进程退出后的输出排空、分段 UTF-8 与 EOF、逐次输入的历史前进量、满历史阅读位置，以及原生错误和描述符清理。它们不是文档测试。
 
-**请在开发机的 ztty 项目目录重新运行 ssmcp，恢复访问。** 随后继续读回综合任务结果、归档原始数据与截图、验收本地恢复分支，再制作并安装统一候选，核对新窗口实际执行文件，同时保留现有会话。这份报告是连接中断时的阶段保存，不是最终验收完成记录。
+Linux 自动化验收使用真实原生 X11 窗口、PTY、XTEST 与像素读取，运行在私有 Xvfb 中；测试只清理自身创建并核验身份的进程。重绘回归另核对交互、输出洪流、同步更新及帧提交。[重绘结果](measurements/performance-function-2026-11-19/repaint-gui.json)。这些检查不测物理显示器延迟，也未覆盖完整 fcitx 输入法组合。
+
+Windows 本轮仅做交叉编译检查，没有原生 GUI 运行验收；macOS 没有新增原生运行验收。所有合成输入、图片和截图均来自测试夹具，不包含用户预览文件内容。正式版本发布流程未启动，安装状态以本记录开头的现场核对为准。

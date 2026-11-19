@@ -1,0 +1,243 @@
+{
+  "scope": "text-only parser and screen; excludes PTY and rendering",
+  "baseline_commit": "11a74a51f0f6c52471c006582d46439cd713ce26",
+  "candidate_commit": "eaddb76183bd1a1efb04c34633ae021720f4dda5",
+  "cpu_affinity": 23,
+  "kernel": "7.3.4-arch1-1",
+  "runs": [
+    {
+      "pair": 0,
+      "label": "baseline",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/preview-fix/core-baseline"
+      ],
+      "started_unix": 1795085049.7485747,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 215.421,
+        "ascii_full_history_mib_s": 135.384,
+        "sgr_mib_s": 133.687,
+        "unicode_mib_s": 103.361,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 53,
+          "p95": 54,
+          "p99": 54,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3433,
+          "p95": 3752,
+          "p99": 4068,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 0,
+      "label": "candidate",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/preview-fix/core-candidate"
+      ],
+      "started_unix": 1795085052.648997,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 213.741,
+        "ascii_full_history_mib_s": 139.362,
+        "sgr_mib_s": 129.212,
+        "unicode_mib_s": 73.634,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 68,
+          "p95": 71,
+          "p99": 72,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 4040,
+          "p95": 5047,
+          "p99": 5447,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "label": "candidate",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/preview-fix/core-candidate"
+      ],
+      "started_unix": 1795085055.865567,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 214.983,
+        "ascii_full_history_mib_s": 139.237,
+        "sgr_mib_s": 119.706,
+        "unicode_mib_s": 98.279,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 54,
+          "p95": 56,
+          "p99": 60,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3435,
+          "p95": 3587,
+          "p99": 3741,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "label": "baseline",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/preview-fix/core-baseline"
+      ],
+      "started_unix": 1795085058.8215778,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 214.845,
+        "ascii_full_history_mib_s": 139.138,
+        "sgr_mib_s": 133.358,
+        "unicode_mib_s": 88.534,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 58,
+          "p95": 60,
+          "p99": 60,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3431,
+          "p95": 4020,
+          "p99": 4751,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "label": "baseline",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/preview-fix/core-baseline"
+      ],
+      "started_unix": 1795085061.8020225,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 214.13,
+        "ascii_full_history_mib_s": 140.02,
+        "sgr_mib_s": 133.802,
+        "unicode_mib_s": 86.287,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 76,
+          "p95": 77,
+          "p99": 78,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 4393,
+          "p95": 5393,
+          "p99": 5646,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "label": "candidate",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/preview-fix/core-candidate"
+      ],
+      "started_unix": 1795085064.8999984,
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 196.661,
+        "ascii_full_history_mib_s": 130.006,
+        "sgr_mib_s": 139.416,
+        "unicode_mib_s": 98.268,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 56,
+          "p95": 62,
+          "p99": 64,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3559,
+          "p95": 4450,
+          "p99": 5213,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "benchmark_binary_sha256": {
+    "baseline": "0d0acc5fa1857f606504cea70255d4cca7e9a6f3f2636477358750ddf3d93ece",
+    "candidate": "20bb0da50d07d45f0d0873b581018e3e0cf40ace7916b19d0df3629bf7a28720"
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "cpu_governor": "powersave"
+}

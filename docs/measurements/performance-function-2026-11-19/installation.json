@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "source_commit": "70f9be5e5f80d9c9c7a92a5020ce91ff86130cf3",
+  "tested_source_commit": "3ba09ad0e1759796293e1e0c18ecda2f17ad922d",
+  "binary_sha256": "9cfa87530c3bbbf21950e0828ff9ecf9973a699551fabc034a6a3a01d264b468",
+  "package": "ztty 0.4.1-3",
+  "package_integrity": "ztty: 9 全部文件，0 变化的文件\n",
+  "protected_launchers_unchanged": true,
+  "formal_release_changed": false,
+  "existing_processes_preserved": 6,
+  "existing_processes_no_longer_running": 0,
+  "matching_entrypoints": [
+    "/usr/bin/ztty",
+    "$HOME/.cargo/bin/ztty"
+  ],
+  "rollback_package": "$HOME/Backups/ztty/2026-11-19-performance-function/ztty-0.4.1-2-x86_64.pkg.tar.zst",
+  "new_window": {
+    "name": "iteration-70f9be5",
+    "uri": "ztty://local/iteration-70f9be5",
+    "running": true,
+    "visible": true,
+    "read_only": false,
+    "broker_binary_matches": true,
+    "native_window_mapped": true,
+    "child_inherits_selected_socket": true,
+    "automatic_broker_selection": true
+  }
+}

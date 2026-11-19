@@ -1,0 +1,194 @@
+{
+  "ok": true,
+  "binary": "$CHECKOUT/target/release/ztty",
+  "binary_sha256": "9cfa87530c3bbbf21950e0828ff9ecf9973a699551fabc034a6a3a01d264b468",
+  "scope": "Real PTY output and XTEST with private Xvfb; no physical-display latency measurement",
+  "grid": [
+    20,
+    6
+  ],
+  "history_limit": 8,
+  "checks": [
+    "full-history-live",
+    "browse-three-rows-back",
+    "retained-anchor-stays-fixed",
+    "evicted-anchor-clamps-to-oldest",
+    "typing-returns-to-live",
+    "browse-before-clear",
+    "clear-history-returns-to-live",
+    "browse-before-alternate",
+    "alternate-screen-starts-live",
+    "alternate-exit-restores-primary-live"
+  ],
+  "pixels": {
+    "full-history-live": {
+      "expected": [
+        115,
+        30,
+        50
+      ],
+      "actual": [
+        115,
+        30,
+        50
+      ]
+    },
+    "browse-three-rows-back": {
+      "expected": [
+        100,
+        30,
+        50
+      ],
+      "actual": [
+        100,
+        30,
+        50
+      ]
+    },
+    "retained-anchor-stays-fixed": {
+      "expected": [
+        100,
+        30,
+        50
+      ],
+      "actual": [
+        100,
+        30,
+        50
+      ]
+    },
+    "evicted-anchor-clamps-to-oldest": {
+      "expected": [
+        135,
+        30,
+        50
+      ],
+      "actual": [
+        135,
+        30,
+        50
+      ]
+    },
+    "typing-returns-to-live": {
+      "expected": [
+        175,
+        30,
+        50
+      ],
+      "actual": [
+        175,
+        30,
+        50
+      ]
+    },
+    "browse-before-clear": {
+      "expected": [
+        160,
+        30,
+        50
+      ],
+      "actual": [
+        160,
+        30,
+        50
+      ]
+    },
+    "clear-history-returns-to-live": {
+      "expected": [
+        175,
+        30,
+        50
+      ],
+      "actual": [
+        175,
+        30,
+        50
+      ]
+    },
+    "browse-before-alternate": {
+      "expected": [
+        180,
+        30,
+        50
+      ],
+      "actual": [
+        180,
+        30,
+        50
+      ]
+    },
+    "alternate-screen-starts-live": {
+      "expected": [
+        55,
+        120,
+        90
+      ],
+      "actual": [
+        55,
+        120,
+        90
+      ]
+    },
+    "alternate-exit-restores-primary-live": {
+      "expected": [
+        195,
+        30,
+        50
+      ],
+      "actual": [
+        195,
+        30,
+        50
+      ]
+    }
+  },
+  "screenshots": {
+    "full-history-live": "$CHECKOUT/artifacts/final-validation/scrollback/full-history-live.png",
+    "browse-three-rows-back": "$CHECKOUT/artifacts/final-validation/scrollback/browse-three-rows-back.png",
+    "retained-anchor-stays-fixed": "$CHECKOUT/artifacts/final-validation/scrollback/retained-anchor-stays-fixed.png",
+    "evicted-anchor-clamps-to-oldest": "$CHECKOUT/artifacts/final-validation/scrollback/evicted-anchor-clamps-to-oldest.png",
+    "typing-returns-to-live": "$CHECKOUT/artifacts/final-validation/scrollback/typing-returns-to-live.png",
+    "browse-before-clear": "$CHECKOUT/artifacts/final-validation/scrollback/browse-before-clear.png",
+    "clear-history-returns-to-live": "$CHECKOUT/artifacts/final-validation/scrollback/clear-history-returns-to-live.png",
+    "browse-before-alternate": "$CHECKOUT/artifacts/final-validation/scrollback/browse-before-alternate.png",
+    "alternate-screen-starts-live": "$CHECKOUT/artifacts/final-validation/scrollback/alternate-screen-starts-live.png",
+    "alternate-exit-restores-primary-live": "$CHECKOUT/artifacts/final-validation/scrollback/alternate-exit-restores-primary-live.png"
+  },
+  "source_sha256": {
+    "src/session.rs": "248f44937e3c868d5f3a8e7b27916fc29be0f4b13cdedea21bb6d958741f17b8",
+    "src/session_core.rs": "60ef2756b84c391fbbac0713cda6cacf25d35582d441651b984356d9e9217823",
+    "crates/zterm/src/terminal.rs": "df1726244bc03194efd630dd2ab085fab67a1a8ed85462e3fc2de00bd2836c9b",
+    "tests/scrollback_gui.py": "dbceba5c7990d22f856da80b4b955a8c03eea72461f3b7b633261700e2dfa237",
+    "tests/repaint_gui.py": "d39cf19451295df18068d0f8c811c76581ede764be926ce346619e12486e28a7",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+  },
+  "display_ownership": {
+    "display": ":979",
+    "pid": 2168734,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X979",
+        "inode": 14431999,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X979",
+        "inode": 14431998,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "remaining_owned_pids": [],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "stderr_tail": ""
+}

@@ -1,0 +1,22 @@
+{
+  "source": "5ce8a1d",
+  "binary_sha256": "d1276d06108a8f23bc2b088078ebdbf6a72d50505fb2c5b43aeff342b9c12335",
+  "scenario": "full 8-row history, browse 3 rows back, receive 2 more lines",
+  "top_row_before": [
+    100,
+    30,
+    50
+  ],
+  "top_row_after": [
+    110,
+    30,
+    50
+  ],
+  "stable": false,
+  "expected": "same retained line stays visible",
+  "observed_line_shift": 2,
+  "remaining_owned_pids": [],
+  "xvfb_socket_removed": true,
+  "screenshots": [],
+  "capture_note": "Baseline captured pixel samples only; no baseline screenshot was taken."
+}

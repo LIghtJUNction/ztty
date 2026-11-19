@@ -1,0 +1,396 @@
+{
+  "scope": "VT parser and retained screen only; excludes PTY and rendering",
+  "cpu_affinity": 23,
+  "scroll": [
+    {
+      "cols": 120,
+      "rows": 48,
+      "count": 1,
+      "command": "S",
+      "baseline": {
+        "median_ns": 4566,
+        "run_medians_ns": [
+          5248,
+          4543,
+          4923,
+          4566,
+          4533
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 4568,
+        "run_medians_ns": [
+          4639,
+          4512,
+          7415,
+          4523,
+          4568
+        ],
+        "allocations": 0
+      },
+      "speedup": 0.9995621716287215
+    },
+    {
+      "cols": 120,
+      "rows": 48,
+      "count": 1,
+      "command": "T",
+      "baseline": {
+        "median_ns": 4958,
+        "run_medians_ns": [
+          5452,
+          4784,
+          4958,
+          4964,
+          4787
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 4450,
+        "run_medians_ns": [
+          4450,
+          4404,
+          6095,
+          4453,
+          4401
+        ],
+        "allocations": 0
+      },
+      "speedup": 1.1141573033707866
+    },
+    {
+      "cols": 120,
+      "rows": 48,
+      "count": 8,
+      "command": "S",
+      "baseline": {
+        "median_ns": 37373,
+        "run_medians_ns": [
+          37700,
+          36445,
+          39354,
+          37373,
+          36009
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 5703,
+        "run_medians_ns": [
+          5678,
+          5797,
+          6840,
+          5703,
+          5671
+        ],
+        "allocations": 0
+      },
+      "speedup": 6.5532176047694195
+    },
+    {
+      "cols": 120,
+      "rows": 48,
+      "count": 8,
+      "command": "T",
+      "baseline": {
+        "median_ns": 42747,
+        "run_medians_ns": [
+          48548,
+          38322,
+          41392,
+          47771,
+          42747
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 5988,
+        "run_medians_ns": [
+          5988,
+          6346,
+          7966,
+          5966,
+          5944
+        ],
+        "allocations": 0
+      },
+      "speedup": 7.13877755511022
+    },
+    {
+      "cols": 120,
+      "rows": 48,
+      "count": 24,
+      "command": "S",
+      "baseline": {
+        "median_ns": 116438,
+        "run_medians_ns": [
+          124693,
+          115027,
+          116438,
+          107896,
+          144030
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 7124,
+        "run_medians_ns": [
+          7120,
+          7477,
+          7359,
+          7124,
+          7123
+        ],
+        "allocations": 0
+      },
+      "speedup": 16.344469399213924
+    },
+    {
+      "cols": 120,
+      "rows": 48,
+      "count": 24,
+      "command": "T",
+      "baseline": {
+        "median_ns": 125258,
+        "run_medians_ns": [
+          125655,
+          121536,
+          125852,
+          116289,
+          125258
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 7253,
+        "run_medians_ns": [
+          7137,
+          7579,
+          8432,
+          7058,
+          7253
+        ],
+        "allocations": 0
+      },
+      "speedup": 17.269819385082034
+    },
+    {
+      "cols": 240,
+      "rows": 80,
+      "count": 1,
+      "command": "S",
+      "baseline": {
+        "median_ns": 14627,
+        "run_medians_ns": [
+          21840,
+          14627,
+          20480,
+          14180,
+          14611
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 14591,
+        "run_medians_ns": [
+          14479,
+          14591,
+          18551,
+          14139,
+          16170
+        ],
+        "allocations": 0
+      },
+      "speedup": 1.0024672743472003
+    },
+    {
+      "cols": 240,
+      "rows": 80,
+      "count": 1,
+      "command": "T",
+      "baseline": {
+        "median_ns": 18864,
+        "run_medians_ns": [
+          23474,
+          18864,
+          19153,
+          14368,
+          14719
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 16180,
+        "run_medians_ns": [
+          16180,
+          14054,
+          20002,
+          14325,
+          17050
+        ],
+        "allocations": 0
+      },
+      "speedup": 1.165883807169345
+    },
+    {
+      "cols": 240,
+      "rows": 80,
+      "count": 8,
+      "command": "S",
+      "baseline": {
+        "median_ns": 119991,
+        "run_medians_ns": [
+          127693,
+          115658,
+          197717,
+          119991,
+          113887
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 17888,
+        "run_medians_ns": [
+          22909,
+          17888,
+          21168,
+          17872,
+          17839
+        ],
+        "allocations": 0
+      },
+      "speedup": 6.707904740608229
+    },
+    {
+      "cols": 240,
+      "rows": 80,
+      "count": 8,
+      "command": "T",
+      "baseline": {
+        "median_ns": 129907,
+        "run_medians_ns": [
+          181156,
+          124302,
+          129907,
+          119112,
+          163921
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 17371,
+        "run_medians_ns": [
+          24851,
+          17494,
+          17352,
+          17330,
+          17371
+        ],
+        "allocations": 0
+      },
+      "speedup": 7.478383512751137
+    },
+    {
+      "cols": 240,
+      "rows": 80,
+      "count": 24,
+      "command": "S",
+      "baseline": {
+        "median_ns": 363066,
+        "run_medians_ns": [
+          376947,
+          363066,
+          355343,
+          371620,
+          348878
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 19963,
+        "run_medians_ns": [
+          20029,
+          33718,
+          19944,
+          19963,
+          19939
+        ],
+        "allocations": 0
+      },
+      "speedup": 18.18694584982217
+    },
+    {
+      "cols": 240,
+      "rows": 80,
+      "count": 24,
+      "command": "T",
+      "baseline": {
+        "median_ns": 395913,
+        "run_medians_ns": [
+          395913,
+          397557,
+          364470,
+          364132,
+          427563
+        ],
+        "allocations": 0
+      },
+      "candidate": {
+        "median_ns": 21496,
+        "run_medians_ns": [
+          22223,
+          21496,
+          20863,
+          21931,
+          20738
+        ],
+        "allocations": 0
+      },
+      "speedup": 18.417984741347226
+    }
+  ],
+  "core": {
+    "baseline": {
+      "ascii_mib_s": 214.161,
+      "ascii_full_history_mib_s": 137.674,
+      "sgr_mib_s": 134.551,
+      "unicode_mib_s": 103.296,
+      "initial_core_heap_bytes": 107932,
+      "steady_state_allocations": 0,
+      "burst_1024_ns": {
+        "p50": 3878,
+        "p95": 4770,
+        "p99": 4964,
+        "allocations": 0
+      },
+      "edit_ns": {
+        "p50": 55,
+        "p95": 60,
+        "p99": 60,
+        "allocations": 0
+      }
+    },
+    "candidate": {
+      "ascii_mib_s": 206.979,
+      "ascii_full_history_mib_s": 137.187,
+      "sgr_mib_s": 129.629,
+      "unicode_mib_s": 102.483,
+      "initial_core_heap_bytes": 107932,
+      "steady_state_allocations": 0,
+      "burst_1024_ns": {
+        "p50": 3436,
+        "p95": 4559,
+        "p99": 4921,
+        "allocations": 0
+      },
+      "edit_ns": {
+        "p50": 53,
+        "p95": 54,
+        "p99": 58,
+        "allocations": 0
+      }
+    }
+  }
+}

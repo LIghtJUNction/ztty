@@ -444,3 +444,25 @@ arrive, including when earlier bytes are malformed. A returned cursor counts
 raw bytes. A nonadvancing cursor with has_more=true can mean an incomplete
 character, so wait before retrying it. Independent observers do not consume one
 another's cursor. See [the bounded output contract and real PTY regression](session-core.md#bounded-output-and-independent-byte-cursors).
+
+## Upgrading a running broker
+
+Replacing an installed executable does not replace the code already running in
+an existing broker. On Linux, a new standalone window launched without an
+explicit `ZTTY_SOCKET` compares the running executable with the current build.
+If the default broker belongs to an older build, the new window uses a separate
+broker for the current build. Later independent windows from the same build
+reuse that broker, including when identical binaries are installed at different
+paths or the old default broker exits.
+
+Existing windows and their children continue running. Tab/split operations with
+a target, explicit `ZTTY_SOCKET` addresses, and attach/control/MCP operations keep
+their existing routing. Sessions are not moved between brokers during an update.
+
+The selected address is inherited by the new window's child environment, so
+`ztty attach`, `ztty list`, and related commands started inside that window
+address its own broker. To address that pool from another shell, read
+`printf '%s\n' "$ZTTY_SOCKET"` inside the new window and set that value explicitly
+for the external command. Without an explicit address, non-GUI control commands
+continue to address the default broker. Finish work in older windows normally;
+closing them is not required to open a new independent window on the new build.
