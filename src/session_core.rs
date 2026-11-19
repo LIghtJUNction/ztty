@@ -13,6 +13,8 @@ pub enum ReadStep {
         bytes: usize,
         history_before: usize,
         history_after: usize,
+        /// Primary-screen rows moved into history, including evicted rows.
+        history_scrolled: usize,
     },
     Pending,
     Eof,
@@ -96,12 +98,19 @@ impl SessionCore {
             }
         };
         let history_before = self.terminal.history_len();
+        let history_position = self.terminal.history_position();
         self.terminal.feed(&buffer[..bytes]);
         self.output.append(&buffer[..bytes], persistent);
         Ok(ReadStep::Data {
             bytes,
             history_before,
             history_after: self.terminal.history_len(),
+            history_scrolled: usize::try_from(
+                self.terminal
+                    .history_position()
+                    .saturating_sub(history_position),
+            )
+            .unwrap_or(usize::MAX),
         })
     }
 

@@ -789,6 +789,12 @@ impl Terminal {
             self.state.history.len()
         }
     }
+    /// Absolute row at the top of the primary screen. Unlike history_len(),
+    /// this advances when a full history ring evicts its oldest rows. A full
+    /// terminal reset restarts the position at zero.
+    pub fn history_position(&self) -> u64 {
+        self.state.line_base
+    }
     pub fn hyperlink(&self, id: u32) -> Option<&str> {
         if id == 0 {
             return None;
