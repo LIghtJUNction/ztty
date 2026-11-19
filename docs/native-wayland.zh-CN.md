@@ -77,3 +77,5 @@ python3 tests/wayland_gui.py \
 测试保留窗口截图、合成器日志、子进程输入字节、PTY 尺寸和 `validation.json`。结果绑定二进制 SHA-256；失败或异常不会写成通过。测试使用软件 Mesa EGL，不能证明物理显示器的延迟、显卡驱动兼容性、输入法完成度或比其他终端更快。
 
 协议和事件循环依据：[Wayland Client API](https://wayland.freedesktop.org/docs/html/apb.html)；构建使用系统 `wayland-protocols/stable/xdg-shell/xdg-shell.xml`。
+
+本轮已保存的源码绑定结果与截图：[2026-11-19 原生 Wayland 验收](measurements/native-wayland-2026-11-19/README.md)。

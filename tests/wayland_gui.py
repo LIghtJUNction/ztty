@@ -39,6 +39,11 @@ report = {"schema": 1, "binary_sha256": hashlib.sha256(binary.read_bytes()).hexd
           "scope": "Linux headless Sway, software Mesa EGL; no physical display or IME acceptance",
           "checks": checks}
 started = time.monotonic()
+def pixels(image):
+    # Pillow 10.x (Ubuntu 24.04) exposes getdata; newer Pillow replaces it.
+    flattened = getattr(image, "get_flattened_data", None)
+    return flattened() if flattened else image.getdata()
+
 def check(name, passed, **details):
     checks.append({"name": name, "passed": bool(passed), **details})
     if not passed:
@@ -165,7 +170,7 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
               and state["program"] == "ztty", state={k:state[k] for k in ("cols","rows","term","program","pwd_matches_cwd")})
         time.sleep(0.15)
         image = screenshot("initial")
-        red = sum(1 for p in image.get_flattened_data() if p == (192,32,48))
+        red = sum(1 for p in pixels(image) if p == (192,32,48))
         check("actual_egl_pixels", red > 300, red_pixels=red)
         keyboard(root, ["-d","8","Hello ztty!"], b"Hello ztty!", "ascii_keyboard")
         keyboard(root, ["中文"], "中文".encode(), "unicode_keyboard")
@@ -196,7 +201,7 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
         check("configure_resizes_real_pty", len({(s[2],s[3]) for s in sizes}) == 4, sizes=sizes)
         time.sleep(0.08)
         image = screenshot("resized")
-        check("text_survives_resize", sum(1 for p in image.get_flattened_data() if p == (192,32,48)) > 300)
+        check("text_survives_resize", sum(1 for p in pixels(image) if p == (192,32,48)) > 300)
         command(root, b"\x1b[2J\x1b[H" + b"".join(f"history-{i:04d}\r\n".encode() for i in range(100)))
         time.sleep(0.08)
         live = screenshot("history-live")
@@ -220,7 +225,7 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
         after = screenshot("sync-after")
         check("synchronized_full_frame", elapsed < .25 and before.tobytes() == during.tobytes()
               and after.tobytes() != before.tobytes(), capture_seconds=elapsed)
-        check("green_frame_visible", sum(1 for p in after.get_flattened_data() if p == (32,192,48)) > 300)
+        check("green_frame_visible", sum(1 for p in pixels(after) if p == (32,192,48)) > 300)
         # A long-lived child is closed through xdg_toplevel.close, not a process kill.
         ipc(f"[con_id={con_id}] kill")
         check("compositor_close_exits_cleanly", proc.wait(timeout=5) == 0)
