@@ -1,0 +1,18 @@
+[package]
+name = "ztty-text-plugin-fixture"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+wrong-interface = []
+pinned = []
+
+[dependencies]
+ztty-plugin-api = { path = "../../../crates/ztty-plugin-api" }
+zplugin = { version = "=0.3.0", default-features = false, features = ["std", "macros"] }

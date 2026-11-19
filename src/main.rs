@@ -29,6 +29,8 @@ mod platform;
 #[path = "platform/macos.rs"]
 mod platform;
 #[cfg(target_os = "linux")]
+mod plugin_host;
+#[cfg(target_os = "linux")]
 mod repaint;
 #[cfg(target_os = "linux")]
 mod search;
@@ -88,6 +90,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty control NAME acquire|release [--takeover]\n\
        ztty commands NAME | command-output NAME COMMAND_ID\n\
        ztty shell-integration bash|zsh|fish|nu\n\
+       ztty plugin check|run /absolute/library.so\n\
        ztty save-layout NAME > workspace.json\n\
        ztty restore-layout workspace.json\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
@@ -98,6 +101,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
   --split-down NAME    Open a pane below NAME\n\
   --cwd PATH           Start the command in PATH\n\
   --config PATH        Load an appearance file\n\
+  --text-plugin NAME=PATH Register a trusted text extension (repeatable, Linux)\n\
   --font NAME          Fontconfig name (default: monospace:size=11)\n\
   --geometry COLSxROWS Initial character dimensions (default: 120x32)\n\
   --scrollback LINES   Maximum retained lines (default: 2000; 0 disables)\n\
@@ -118,6 +122,7 @@ Switching preserves the PTY and input owner; observing attaches stay read-only.\
 Ctrl+Shift+F searches across soft-wrapped text; Alt+C toggles case, Enter/Shift+Enter navigates.\n\
 Copy joins soft-wrapped rows and preserves explicit line breaks.\n\
 Ctrl+Shift+P opens actions: filter with multiple words and see effective bindings.\n\
+Registered plugins add Copy using NAME actions for a selection or visible text.\n\
 Ctrl+U clears an overlay query; Esc closes it. Ctrl+Shift+R reloads configuration.\n\
 Ctrl+Shift+K/J browses shell commands; Y copies the selected command output.\n\
 Ctrl+Plus/Equal or Ctrl+Shift+Equal increases font size; Ctrl+Minus decreases it.\n\
@@ -168,6 +173,8 @@ fn number(bytes: &[u8]) -> Option<usize> {
 fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
     let mut config_path = None;
     let mut font = None;
+    #[cfg(target_os = "linux")]
+    let mut text_plugins = Vec::new();
     let mut cfg = Config {
         appearance: Appearance::default(),
         cols: 120,
@@ -209,6 +216,16 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
             b"--config" => {
                 i += 1;
                 config_path = Some(*args.get(i).ok_or("--config needs a path")?);
+            }
+            #[cfg(target_os = "linux")]
+            b"--text-plugin" => {
+                i += 1;
+                text_plugins.push(
+                    args.get(i)
+                        .ok_or("--text-plugin needs NAME=/absolute/library.so")?
+                        .to_str()
+                        .map_err(|_| "text plugin registration must be UTF-8")?,
+                );
             }
             #[cfg(target_os = "linux")]
             b"--observe" => cfg.observe = true,
@@ -306,6 +323,10 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         cfg.command.push(os::default_shell());
     }
     cfg.appearance = Appearance::load(config_path)?;
+    #[cfg(target_os = "linux")]
+    for plugin in text_plugins {
+        cfg.appearance.set_text_plugin(plugin)?;
+    }
     #[cfg(target_os = "linux")]
     {
         cfg.config_path = config_path
@@ -525,6 +546,8 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
     #[cfg(target_os = "linux")]
     let result = match args.get(1).map(|s| s.to_bytes()) {
         Some(b"mcp") => mcp::run(&args[2..]),
+        Some(b"plugin") => plugin_host::command(&args[2..]),
+        Some(b"__plugin-worker") => plugin_host::worker(&args[2..]),
         Some(b"shell-integration") => shell_integration(&args[2..]),
         Some(b"attach") => platform::attach(&args[2..]),
         Some(

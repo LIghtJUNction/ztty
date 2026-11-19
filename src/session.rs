@@ -6,7 +6,7 @@ use crate::{
     json::{self, Value},
     key, key_modifiers,
     layout::{Axis, Layout},
-    modifiers, os, paste, queue_input,
+    modifiers, os, paste, plugin_host, queue_input,
     repaint::{Plan, Repaint},
     search, session_control,
     session_core::{ReadStep, SessionCore},
@@ -72,6 +72,8 @@ struct Palette {
 #[derive(Clone, Copy)]
 enum PaletteTarget {
     Action(&'static str),
+    Plugin(usize),
+    CancelPlugin,
     Session {
         id: u64,
         attach: bool,
@@ -90,7 +92,9 @@ impl Palette {
         self.items.iter().filter(|item| {
             let action = match item.target {
                 PaletteTarget::Action(name) => name,
-                PaletteTarget::Session { .. } => "",
+                PaletteTarget::Session { .. }
+                | PaletteTarget::Plugin(_)
+                | PaletteTarget::CancelPlugin => "",
             };
             actions::matches(&self.query, &[&item.label, &item.detail, action])
         })
@@ -125,6 +129,7 @@ struct Ui {
     palette: Option<Palette>,
     clipboard_menu: Option<ClipboardMenu>,
     pending_action: Option<PaletteTarget>,
+    plugin_running: bool,
     message: Option<(String, u64)>,
     command: Option<u64>,
     attachment: u64,
@@ -165,6 +170,7 @@ impl Ui {
             palette: None,
             clipboard_menu: None,
             pending_action: None,
+            plugin_running: false,
             message: None,
             command: None,
             attachment,
@@ -628,6 +634,11 @@ impl Ui {
                         }
                     }
                     self.force = true;
+                    return Ok(());
+                }
+                if press && symbol == 0xff1b && self.plugin_running {
+                    self.intercepted[code] = true;
+                    self.pending_action = Some(PaletteTarget::CancelPlugin);
                     return Ok(());
                 }
                 if press {
@@ -1127,6 +1138,7 @@ impl Ui {
                     }) => "attach read-only",
                     Some(PaletteTarget::Session { attach: true, .. }) => "attach",
                     Some(PaletteTarget::Session { .. }) => "focus",
+                    Some(PaletteTarget::Plugin(_)) => "transform and copy",
                     _ => "run",
                 };
                 lines.push(format!("↑/↓ select · Enter {verb} · Esc close"));
@@ -1396,10 +1408,21 @@ struct Pool {
     completed: VecDeque<(String, i32)>,
     finished: Vec<(String, i32)>,
     reaping: Vec<(i32, u64)>,
+    plugins: Vec<PluginRun>,
     shortcuts: [bool; 256],
     mouse_shortcuts: [bool; 12],
     native_gestures: Vec<NativeGesture>,
     watcher: config_watch::Watcher,
+}
+
+// Jobs outlive a disappearing view until their direct worker has been reaped.
+// Session and attachment identities prevent an old result reaching a new view.
+struct PluginRun {
+    session: u64,
+    attachment: u64,
+    window: x11::Xid,
+    registration: ztty::text_plugins::Registration,
+    job: plugin_host::Job,
 }
 
 fn bounded(
@@ -1494,6 +1517,7 @@ impl Pool {
             completed: VecDeque::new(),
             finished: Vec::new(),
             reaping: Vec::new(),
+            plugins: Vec::new(),
             shortcuts: [false; 256],
             mouse_shortcuts: [false; 12],
             native_gestures: Vec::new(),
@@ -2155,7 +2179,7 @@ impl Pool {
         let source = &self.sessions[index];
         let source_ui = source.ui.as_ref().ok_or("session has no window")?;
         let source_observing = source_ui.read_only || !source.core.owns("local");
-        let items = if sessions {
+        let mut items: Vec<PaletteItem> = if sessions {
             self.sessions
                 .iter()
                 .filter(|session| {
@@ -2222,6 +2246,22 @@ impl Pool {
                 })
                 .collect()
         };
+        if !sessions {
+            for (index, plugin) in source.appearance.text_plugins.iter().enumerate() {
+                items.push(PaletteItem {
+                    target: PaletteTarget::Plugin(index),
+                    label: format!("Copy using {}", plugin.name),
+                    detail: "Plugin · selection or visible text".into(),
+                });
+            }
+            if source_ui.plugin_running {
+                items.push(PaletteItem {
+                    target: PaletteTarget::CancelPlugin,
+                    label: "Cancel running plugin".into(),
+                    detail: "Esc".into(),
+                });
+            }
+        }
         let ui = self.sessions[index].ui.as_mut().unwrap();
         ui.search = None;
         ui.clipboard_menu = None;
@@ -2544,6 +2584,112 @@ impl Pool {
         self.apply_appearance(index, appearance, true)
     }
 
+    fn start_plugin(&mut self, index: usize, plugin: usize) -> Result<Value, String> {
+        if self.plugins.len() >= ztty::text_plugins::MAX_PLUGINS {
+            return Err("too many running extensions; wait for one to finish".into());
+        }
+        let session = &mut self.sessions[index];
+        let ui = session.ui.as_mut().ok_or("session has no window")?;
+        if ui.plugin_running {
+            return Err("an extension is already running; Esc cancels it".into());
+        }
+        let registration = session
+            .appearance
+            .text_plugins
+            .get(plugin)
+            .ok_or("extension is no longer registered")?
+            .clone();
+        let terminal = &session.core.terminal;
+        let text = ui
+            .selection
+            .unwrap_or(Selection {
+                start: (0, 0),
+                end: (terminal.cols() - 1, terminal.rows() - 1),
+                dragging: false,
+            })
+            .text(terminal, ui.history);
+        if text.is_empty() {
+            return Err("no text to send to the extension".into());
+        }
+        let job = plugin_host::Job::start(&registration.path, plugin_host::Mode::Run, &text)?;
+        ui.plugin_running = true;
+        ui.message = Some((
+            format!("Running {} · Esc cancels", registration.name),
+            os::milliseconds() + 2500,
+        ));
+        ui.force = true;
+        self.plugins.push(PluginRun {
+            session: session.id,
+            attachment: ui.attachment,
+            window: ui.window.id,
+            registration,
+            job,
+        });
+        Ok(session.info())
+    }
+
+    fn cancel_plugin(&mut self, index: usize) -> Result<Value, String> {
+        let session = &mut self.sessions[index];
+        if let Some(ui) = &mut session.ui {
+            for run in &mut self.plugins {
+                if run.session == session.id && run.attachment == ui.attachment {
+                    run.job.cancel("extension cancelled");
+                }
+            }
+            ui.notice("Cancelling extension");
+        }
+        Ok(session.info())
+    }
+
+    fn poll_plugins(&mut self) -> Option<u64> {
+        if self.plugins.is_empty() {
+            return None;
+        }
+        let now = os::milliseconds();
+        let mut deadline: Option<u64> = None;
+        for index in (0..self.plugins.len()).rev() {
+            let run = &mut self.plugins[index];
+            let owner = self.sessions.iter_mut().find(|session| {
+                session.id == run.session
+                    && session.ui.as_ref().is_some_and(|ui| {
+                        ui.attachment == run.attachment && ui.window.id == run.window
+                    })
+            });
+            let active = owner.as_ref().is_some_and(|session| {
+                session
+                    .ui
+                    .as_ref()
+                    .is_some_and(|ui| ui.open && ui.visible && ui.window.id != 0)
+                    && session.appearance.text_plugins.contains(&run.registration)
+            });
+            if !active {
+                run.job
+                    .cancel("extension cancelled: its view or registration changed");
+            }
+            if let Some(result) = run.job.step(now) {
+                if let Some(session) = owner {
+                    let ui = session.ui.as_mut().unwrap();
+                    ui.plugin_running = false;
+                    if active {
+                        match result {
+                            Ok(text) if !text.is_empty() => {
+                                ui.window.copy(text, false);
+                                ui.notice(&format!("Copied using {}", run.registration.name));
+                            }
+                            Ok(_) => ui.notice("Extension returned no text; clipboard unchanged"),
+                            Err(error) => ui.error(error),
+                        }
+                    }
+                }
+                self.plugins.swap_remove(index);
+            } else {
+                let next = run.job.next_deadline(now);
+                deadline = Some(deadline.map_or(next, |old| old.min(next)));
+            }
+        }
+        deadline
+    }
+
     fn apply_appearance(
         &mut self,
         index: usize,
@@ -2552,6 +2698,10 @@ impl Pool {
     ) -> Result<Value, String> {
         let session = &mut self.sessions[index];
         if let Some(ui) = &mut session.ui {
+            if session.appearance.text_plugins != appearance.text_plugins {
+                // A palette index belongs to its current registry snapshot.
+                ui.palette = None;
+            }
             let allow_resize = session.core.owns("local") && !ui.read_only;
             let (cols, rows) = ui.window.reconfigure(&appearance, |cols, rows, cw, ch| {
                 if allow_resize && !session.core.eof() {
@@ -3204,6 +3354,8 @@ impl Pool {
                     if let Some(action) = ui.pending_action.take() {
                         let result = match action {
                             PaletteTarget::Action(action) => self.action(index, action),
+                            PaletteTarget::Plugin(plugin) => self.start_plugin(index, plugin),
+                            PaletteTarget::CancelPlugin => self.cancel_plugin(index),
                             PaletteTarget::Session {
                                 id,
                                 attach,
@@ -3239,7 +3391,7 @@ impl Pool {
                 }
             }
         }
-        let mut deadline = None;
+        let mut deadline = self.poll_plugins();
         for session in &mut self.sessions {
             session.pump(buffer);
             let local_owner = session.core.owns("local");
@@ -3359,12 +3511,18 @@ pub fn serve() -> Result<(), String> {
         }
         if pool.sessions.is_empty()
             && pool.reaping.is_empty()
+            && pool.plugins.is_empty()
             && os::milliseconds().saturating_sub(idle_since) > 3000
         {
             return Ok(());
         }
         fds.clear();
         server.descriptors(&mut fds);
+        for run in &pool.plugins {
+            if let Some(fd) = run.job.descriptor() {
+                fds.push(fd);
+            }
+        }
         if pool.watcher.fd() >= 0 {
             fds.push(os::PollFd {
                 fd: pool.watcher.fd(),
