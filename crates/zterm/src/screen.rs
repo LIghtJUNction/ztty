@@ -34,6 +34,7 @@ pub struct Cell {
     /// Each index is meaningful only when its `PALETTE_FG`/`PALETTE_BG` flag is set.
     /// The Copy cell, including its complete-cluster ID, occupies 32 bytes.
     pub palette_indices: u8,
+    /// OSC 8 ID for text; U+10EEEE uses this slot for its Kitty placement ID.
     pub link_id: u32,
     /// Terminal-owned full cluster ID; zero uses ch and combining inline.
     pub grapheme_id: u32,
@@ -66,6 +67,9 @@ pub(crate) struct Style {
     pub flags: u16,
     pub palette_indices: u8,
     pub link_id: u32,
+    /// Preserve indexed IDs before theme/palette resolution for placeholders.
+    pub graphics_fg: u32,
+    pub underline_color: u32,
 }
 
 impl Default for Style {
@@ -76,13 +80,15 @@ impl Default for Style {
             flags: 0,
             palette_indices: 0,
             link_id: 0,
+            graphics_fg: 0,
+            underline_color: 0,
         }
     }
 }
 
 impl Style {
     pub fn cell(self, ch: char, width: u8) -> Cell {
-        Cell {
+        let mut cell = Cell {
             ch,
             combining: ['\0'; 2],
             fg: self.fg,
@@ -92,7 +98,15 @@ impl Style {
             palette_indices: self.palette_indices,
             link_id: self.link_id,
             grapheme_id: 0,
+        };
+        if ch == '\u{10eeee}' {
+            // Placeholder attributes are protocol data. They do not produce a
+            // text glyph or hyperlink, and theme changes must not alter IDs.
+            cell.fg = self.graphics_fg;
+            cell.link_id = self.underline_color;
+            cell.flags = (cell.flags | EXPLICIT_FG) & !PALETTE_FG;
         }
+        cell
     }
 
     pub fn blank(self) -> Cell {
@@ -107,6 +121,9 @@ impl Style {
     }
 
     pub fn set_color(&mut self, foreground: bool, color: u32, palette: Option<u16>) {
+        if foreground {
+            self.graphics_fg = palette.map_or(color, u32::from);
+        }
         let (target, explicit, indexed, shift) = if foreground {
             (&mut self.fg, EXPLICIT_FG, PALETTE_FG, 0)
         } else {
@@ -473,6 +490,7 @@ mod clear_row_tests {
             flags: u16::MAX,
             palette_indices: 0x35,
             link_id: 99,
+            ..Style::default()
         }
         .blank();
         for cols in 1..=257 {

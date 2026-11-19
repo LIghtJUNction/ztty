@@ -11,6 +11,7 @@ use zvte::{Params, Parser, Perform};
 use crate::screen::*;
 
 mod grapheme;
+mod image_cells;
 
 const MAX_HISTORY_BYTES: usize = 8 * 1024 * 1024;
 const MAX_LINKS: usize = 1024;
@@ -172,6 +173,7 @@ pub struct Terminal {
     ui_frame: ztty_ui::Frame,
     ui_host_enabled: bool,
     text_revision: u64,
+    image_cache: core::cell::RefCell<Option<Box<image_cells::Cache>>>,
 }
 
 fn dimensions(cols: usize, rows: usize) -> (usize, usize) {
@@ -194,6 +196,7 @@ impl Terminal {
             ui_frame: ztty_ui::Frame::new(),
             ui_host_enabled: false,
             text_revision: 0,
+            image_cache: core::cell::RefCell::new(None),
         }
     }
 
@@ -522,18 +525,12 @@ impl Terminal {
         &self.state.graphics
     }
 
-    /// Borrow visible image placements in z-order; this iterator allocates nothing.
+    /// Visible image draws, with bounded cached text-backed geometry.
     pub fn graphics_draws(
         &self,
         history_offset: usize,
     ) -> impl Iterator<Item = zgraphics::Draw<'_>> {
-        self.state
-            .graphics
-            .draws(if self.state.modes.alternate_screen {
-                0
-            } else {
-                history_offset.min(self.history_len())
-            })
+        self.image_draws(history_offset)
     }
 
     pub fn resize(&mut self, cols: usize, rows: usize) {
@@ -823,6 +820,15 @@ impl Terminal {
             .get(id as usize - 1)
             .map(|link| link.uri.as_str())
     }
+    /// Placeholder link_id is a graphics placement ID, never an OSC 8 link.
+    pub fn cell_hyperlink(&self, cell: &Cell) -> Option<&str> {
+        if cell.ch == '\u{10eeee}' {
+            None
+        } else {
+            self.hyperlink(cell.link_id)
+        }
+    }
+
     /// Whether a synchronized frame ended since the frontend last cleared damage.
     ///
     /// This remains set when begin/end arrive in the same PTY chunk. Frontends
@@ -1721,6 +1727,7 @@ impl State {
                 }
                 39 => {
                     self.style.fg = self.theme.foreground;
+                    self.style.graphics_fg = 0;
                     self.style.flags &= !(EXPLICIT_FG | PALETTE_FG);
                     self.style.palette_indices &= 0xf0;
                 }
@@ -1729,7 +1736,8 @@ impl State {
                     self.style.flags &= !(EXPLICIT_BG | PALETTE_BG);
                     self.style.palette_indices &= 0x0f;
                 }
-                38 | 48 => {
+                59 => self.style.underline_color = 0,
+                38 | 48 | 58 => {
                     let mut palette = None;
                     let color = if group.len() > 1 {
                         match group.get(1) {
@@ -1773,7 +1781,11 @@ impl State {
                         }
                     };
                     if let Some(color) = color {
-                        self.style.set_color(value == 38, color, palette);
+                        if value == 58 {
+                            self.style.underline_color = palette.map_or(color, u32::from);
+                        } else {
+                            self.style.set_color(value == 38, color, palette);
+                        }
                     }
                 }
                 _ => {}
