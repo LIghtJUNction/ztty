@@ -30,7 +30,7 @@
 | 小键盘搜索／命令面板场景 | 4 通过 |
 | 测试结束后仍存活的自有进程 | 0 |
 
-完整预期值与实际字节见 [JSON 验收记录](measurements/keypad-routing-2026-11-19.json)。[窗口截图](assets/keypad-routing-2026-11-19.png) 已检查，文字清晰，覆盖层退出后没有残留。
+完整预期值与实际字节见 [JSON 验收记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/keypad-routing-2026-11-19.json)。[窗口截图](https://github.com/LIghtJUNction/ztty/blob/main/docs/assets/keypad-routing-2026-11-19.png) 已检查，文字清晰，覆盖层退出后没有残留。
 
 测试使用独立 Xvfb、私有 broker、原始 PTY 和真实 XTEST 按键。物理小数点键根据 `KP_Delete` 所在键位定位，避免测试误用键盘映射中的另一个 `KP_Decimal` 别名。输入重置同时恢复应用键盘和光标模式，防止用例之间继承模式。
 
@@ -55,7 +55,11 @@ python3 tests/input_gui.py \
 
 更新安装文件后，已有 broker 及其窗口仍可能运行旧二进制。本次现场检查确认过 0.3.1 旧进程与 0.4.1 安装文件同时存在。保留这些会话，检查新窗口所属 broker 实际运行的文件，才能确认修复已作用于该窗口。
 
-开发机同时进行滚动、搜索和图像修复；安装应使用包含这些改进与本次小键盘提交的统一版本。此记录证明上面的源码和测试结果，实际安装状态以开发机最终读回为准。
+小键盘专项修复已通过上表验证，并经 PR #17 合并到 main。包含另一轮滚动、搜索、Sixel 与新版 broker 入口的统一源码，也已在开发机独立分支 `fix/keypad-integrated-20261119` 合并为本地提交 `6a1bc30`，格式和脚本语法检查通过。
+
+统一构建开始后，ssmcp 在线客户端列表持续为空，连接恢复前无法完成该合并版本的编译验收和安装。最后读回的开发机安装包为 `ztty 0.4.1-2`。因此，上表是已经通过的小键盘专项构建结果；统一版本尚未安装，原有窗口和会话保留。
+
+恢复入口为开发机仓库中的 `artifacts/keypad-integrated-worktree`。先检查 `artifacts/integration-20261119/` 下的构建结果和日志，再继续完整输入回归、broker 升级验证与本地安装。
 
 ## 证据自检
 
