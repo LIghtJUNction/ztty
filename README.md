@@ -1,10 +1,18 @@
 # ztty
 
-**ztty 0.3.1** adds familiar font zoom and tab switching on Linux and Windows,
-repairs Windows resize presentation, and strengthens terminal state and MCP
-session guards. Download published assets from the
+**ztty 0.4.1** fixes numeric-keypad input under enhanced keyboard protocols
+and includes the bounded Linux native UI. Download published assets from the
 [official Releases](https://github.com/LIghtJUNction/ztty/releases).
-[Release gate and source-bound history](docs/releasing.md#031-release-gate).
+[Release and installation record](docs/numpad-release-0.4.1-2026-11-19.zh-CN.md).
+
+The current source adds an Alt+C case toggle in history search, preserves the
+selected match when copying, and keeps the viewport anchored when history is
+full. Counted scrolling within a terminal region moves retained rows in batches.
+It also fixes keypad routing across NumLock and Shift modes, clears Sixel pixels
+when text overwrites them, and selects the installed build for new independent
+Linux windows while preserving existing sessions.
+See the [iteration measurements and verification](docs/performance-function-2026-11-19.zh-CN.md)
+for the tested source and workload.
 
 <!-- terminal-benchmark:start -->
 [![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
@@ -157,7 +165,10 @@ Set `ZTTY_INSTALL_DIR` to choose the binary directory and `ZTTY_DESKTOP_DIR` to
 choose the launcher directory. The latter defaults to
 `${XDG_DATA_HOME:-$HOME/.local/share}/applications`. Replacing the executable does
 not restart an existing shared broker; it keeps running its loaded version
-until it exits.
+until it exits. A new independent Linux window without `ZTTY_SOCKET`
+selects the currently installed build, while explicit addresses and targeted
+tab/split operations keep their existing routing. See
+[upgrading a running broker](docs/sessions.md#upgrading-a-running-broker).
 
 ## Build and run
 
@@ -386,7 +397,10 @@ with `ztty action NAME ACTION` and the `keybind` / `mousebind` settings. For exa
 `keybind = ctrl+shift+s = none` disables its default. Both overlays appear only
 when requested and keep their query keystrokes out of the child process.
 
-Search is case-sensitive, literal UTF-8 matching across retained text. Automatic
+Search uses literal UTF-8 matching across retained text. It starts case-sensitive;
+Alt+C toggles Unicode lowercase comparison, with the current mode shown in the
+search bar. Matching preserves original spelling for copying and does not
+normalize accents or perform full Unicode case folding. Automatic
 wrapping at the window edge keeps a logical line together; an explicit line
 break ends it. Enter / Shift+Enter moves to the next / previous match, Ctrl+U
 clears the query, and Ctrl+Shift+C copies the selected match. Copying joins

@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "ascii_mib_s": 214.845,
+    "ascii_full_history_mib_s": 139.138,
+    "sgr_mib_s": 133.687,
+    "unicode_mib_s": 88.534,
+    "initial_core_heap_bytes": 107932,
+    "steady_state_allocations": 0
+  },
+  "candidate": {
+    "ascii_mib_s": 213.741,
+    "ascii_full_history_mib_s": 139.237,
+    "sgr_mib_s": 129.212,
+    "unicode_mib_s": 98.268,
+    "initial_core_heap_bytes": 107932,
+    "steady_state_allocations": 0
+  }
+}

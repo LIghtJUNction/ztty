@@ -1,0 +1,2533 @@
+{
+  "scope": "VT parser and retained screen only; excludes PTY and rendering",
+  "base_commit": "5ce8a1dea01c38d10cbfc7a7ab9c4d3b0cdb5107",
+  "candidate_commit": "e13c19731dacc1bd40f16f8419f3fdeba49757b7",
+  "cpu_affinity": 23,
+  "cpu_model": "12th Gen Intel(R) Core(TM) i9-12900HX",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "kernel": "7.3.4-arch1-1",
+  "started_unix": 1795083285.8305953,
+  "runs": [
+    {
+      "pair": 0,
+      "variant": "baseline",
+      "kind": "scroll",
+      "started_unix": 1795083285.8307261,
+      "elapsed_seconds": 13.560498476028442,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              5435,
+              5248,
+              5167,
+              5298,
+              5257,
+              5114,
+              5180
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              5599,
+              5409,
+              5512,
+              5486,
+              5296,
+              5452,
+              5393
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              39200,
+              37343,
+              37098,
+              37327,
+              37700,
+              37916,
+              38669
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              39393,
+              39252,
+              39502,
+              48548,
+              58444,
+              50696,
+              52541
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              167283,
+              203125,
+              152471,
+              124693,
+              110321,
+              116124,
+              118223
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              125655,
+              120898,
+              123433,
+              132726,
+              130254,
+              122767,
+              129100
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              16408,
+              16664,
+              18951,
+              22591,
+              21840,
+              23337,
+              25201
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              30632,
+              27785,
+              25708,
+              23474,
+              22694,
+              22490,
+              22807
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              134643,
+              133267,
+              127693,
+              134615,
+              122452,
+              118298,
+              123012
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              175301,
+              213373,
+              237780,
+              223119,
+              181156,
+              159096,
+              141805
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              376947,
+              475098,
+              1410389,
+              437513,
+              360109,
+              352887,
+              351171
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              395913,
+              425983,
+              439497,
+              383986,
+              358847,
+              432516,
+              381866
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 0,
+      "variant": "baseline",
+      "kind": "core",
+      "started_unix": 1795083299.391542,
+      "elapsed_seconds": 3.072688102722168,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 215.421,
+        "ascii_full_history_mib_s": 139.607,
+        "sgr_mib_s": 117.698,
+        "unicode_mib_s": 102.802,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 54,
+          "p95": 60,
+          "p99": 60,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3878,
+          "p95": 6068,
+          "p99": 6875,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 0,
+      "variant": "candidate",
+      "kind": "scroll",
+      "started_unix": 1795083302.4645736,
+      "elapsed_seconds": 1.2944464683532715,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4516,
+              4691,
+              4627,
+              4639,
+              4580,
+              4729,
+              4689
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              4678,
+              4649,
+              4459,
+              4424,
+              4450,
+              4421,
+              4439
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              5676,
+              5679,
+              5669,
+              5678,
+              5671,
+              5690,
+              5682
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              6008,
+              5974,
+              6038,
+              5956,
+              6002,
+              5954,
+              5988
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              7153,
+              7119,
+              7120,
+              7114,
+              7145,
+              7126,
+              7114
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              7137,
+              7050,
+              7108,
+              8311,
+              7756,
+              7438,
+              7087
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              14175,
+              14171,
+              14436,
+              14694,
+              14479,
+              14493,
+              14778
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              17673,
+              16180,
+              14879,
+              15397,
+              15145,
+              18619,
+              17572
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              18250,
+              18432,
+              20791,
+              23123,
+              26535,
+              28135,
+              22909
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              27645,
+              26296,
+              28014,
+              24851,
+              22775,
+              20646,
+              22048
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              21147,
+              20031,
+              20053,
+              20008,
+              19937,
+              20029,
+              19979
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              20891,
+              22454,
+              24472,
+              22071,
+              22122,
+              22223,
+              23831
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 0,
+      "variant": "candidate",
+      "kind": "core",
+      "started_unix": 1795083303.7595775,
+      "elapsed_seconds": 2.988823413848877,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 211.217,
+        "ascii_full_history_mib_s": 135.069,
+        "sgr_mib_s": 129.581,
+        "unicode_mib_s": 93.126,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 53,
+          "p95": 54,
+          "p99": 55,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3436,
+          "p95": 4559,
+          "p99": 4921,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "variant": "candidate",
+      "kind": "scroll",
+      "started_unix": 1795083306.7488317,
+      "elapsed_seconds": 1.2883481979370117,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4554,
+              4521,
+              4506,
+              4512,
+              4507,
+              4532,
+              4507
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              4398,
+              4400,
+              4484,
+              4399,
+              4416,
+              4443,
+              4404
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              5666,
+              5729,
+              5699,
+              5797,
+              5807,
+              5836,
+              5851
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              6130,
+              6200,
+              6346,
+              6297,
+              6367,
+              6557,
+              6814
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              7757,
+              7777,
+              7599,
+              7441,
+              7373,
+              7399,
+              7477
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              7551,
+              7579,
+              7567,
+              7589,
+              7681,
+              7610,
+              7274
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              14219,
+              14591,
+              17060,
+              17888,
+              16184,
+              14270,
+              14105
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              14047,
+              14054,
+              14044,
+              14085,
+              14071,
+              14058,
+              14046
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              17856,
+              17867,
+              17920,
+              17915,
+              17860,
+              17888,
+              17910
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              17301,
+              17395,
+              17494,
+              17483,
+              18009,
+              17911,
+              20205
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              33718,
+              33019,
+              35139,
+              35400,
+              35009,
+              29909,
+              24369
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              21917,
+              21302,
+              21291,
+              21817,
+              21951,
+              21496,
+              21279
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 1,
+      "variant": "candidate",
+      "kind": "core",
+      "started_unix": 1795083308.0376582,
+      "elapsed_seconds": 3.2861013412475586,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 127.455,
+        "ascii_full_history_mib_s": 136.841,
+        "sgr_mib_s": 129.629,
+        "unicode_mib_s": 99.971,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 53,
+          "p95": 54,
+          "p99": 54,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3549,
+          "p95": 4763,
+          "p99": 5128,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 1,
+      "variant": "baseline",
+      "kind": "scroll",
+      "started_unix": 1795083311.3242302,
+      "elapsed_seconds": 11.321400880813599,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4564,
+              4542,
+              4538,
+              4543,
+              4537,
+              4571,
+              4564
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              4610,
+              4602,
+              4815,
+              4812,
+              4800,
+              4784,
+              4779
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              36445,
+              36546,
+              39293,
+              36386,
+              36069,
+              36179,
+              36525
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              38304,
+              38905,
+              38169,
+              37888,
+              39099,
+              38322,
+              46384
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              111164,
+              109298,
+              115027,
+              120222,
+              116903,
+              115738,
+              112508
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              121536,
+              133969,
+              157218,
+              142341,
+              113118,
+              120303,
+              116287
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              14589,
+              14627,
+              14631,
+              14223,
+              14481,
+              16510,
+              19337
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              16618,
+              19404,
+              19816,
+              18956,
+              18675,
+              18864,
+              18768
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              113272,
+              112928,
+              119502,
+              114436,
+              116397,
+              115658,
+              121377
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              133293,
+              117005,
+              116876,
+              124302,
+              126403,
+              127568,
+              117797
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              401546,
+              341544,
+              359657,
+              363066,
+              360435,
+              450553,
+              373980
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              411307,
+              379053,
+              399979,
+              354554,
+              397557,
+              457814,
+              384440
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 1,
+      "variant": "baseline",
+      "kind": "core",
+      "started_unix": 1795083322.6461046,
+      "elapsed_seconds": 3.022564649581909,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 214.161,
+        "ascii_full_history_mib_s": 130.903,
+        "sgr_mib_s": 134.615,
+        "unicode_mib_s": 103.564,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 71,
+          "p95": 71,
+          "p99": 73,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 4408,
+          "p95": 5938,
+          "p99": 6370,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "variant": "baseline",
+      "kind": "scroll",
+      "started_unix": 1795083325.669263,
+      "elapsed_seconds": 12.302953004837036,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4951,
+              4935,
+              4928,
+              4912,
+              4923,
+              4921,
+              4919
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              5109,
+              5053,
+              4958,
+              4983,
+              4912,
+              4908,
+              4898
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              39468,
+              39760,
+              39321,
+              39310,
+              39341,
+              39354,
+              39903
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              41392,
+              41264,
+              41311,
+              41588,
+              41278,
+              41422,
+              42007
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              126414,
+              116438,
+              108989,
+              111261,
+              109519,
+              125100,
+              140276
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              123797,
+              124877,
+              123973,
+              127786,
+              125852,
+              149996,
+              196422
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              22423,
+              22450,
+              21650,
+              19861,
+              20331,
+              20480,
+              20279
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              23989,
+              25981,
+              24361,
+              19153,
+              15968,
+              16775,
+              17032
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              113694,
+              197717,
+              508034,
+              437869,
+              213298,
+              157398,
+              156427
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              129907,
+              126851,
+              132248,
+              122962,
+              146311,
+              147724,
+              115952
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              339021,
+              355343,
+              376000,
+              412103,
+              342205,
+              352099,
+              367857
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              354323,
+              348349,
+              348745,
+              367605,
+              460753,
+              385883,
+              364470
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "variant": "baseline",
+      "kind": "core",
+      "started_unix": 1795083337.972725,
+      "elapsed_seconds": 3.0776662826538086,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 136.646,
+        "ascii_full_history_mib_s": 125.211,
+        "sgr_mib_s": 134.551,
+        "unicode_mib_s": 103.296,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 55,
+          "p95": 60,
+          "p99": 60,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3434,
+          "p95": 4414,
+          "p99": 4723,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 2,
+      "variant": "candidate",
+      "kind": "scroll",
+      "started_unix": 1795083341.0511084,
+      "elapsed_seconds": 1.3365824222564697,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              7554,
+              8025,
+              6964,
+              7519,
+              7132,
+              7228,
+              7415
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              6225,
+              6111,
+              6095,
+              6144,
+              6034,
+              5911,
+              5909
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              7071,
+              6771,
+              6689,
+              6840,
+              7252,
+              7106,
+              6802
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              7815,
+              8089,
+              8168,
+              7966,
+              8014,
+              7847,
+              7952
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              9277,
+              9013,
+              7999,
+              7359,
+              7157,
+              7218,
+              7239
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              7243,
+              7344,
+              8662,
+              8862,
+              8927,
+              8432,
+              8162
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              15175,
+              16578,
+              19066,
+              18713,
+              18502,
+              18551,
+              19834
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              20002,
+              17326,
+              21398,
+              21796,
+              21010,
+              17088,
+              15838
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              22002,
+              19936,
+              18974,
+              21168,
+              20567,
+              22169,
+              22739
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              18038,
+              17317,
+              17350,
+              17352,
+              17356,
+              17320,
+              18185
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              19912,
+              19908,
+              19944,
+              19933,
+              20192,
+              20040,
+              19992
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              20863,
+              20720,
+              21052,
+              20881,
+              20770,
+              20926,
+              20773
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 2,
+      "variant": "candidate",
+      "kind": "core",
+      "started_unix": 1795083342.3883727,
+      "elapsed_seconds": 3.045119047164917,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 215.144,
+        "ascii_full_history_mib_s": 138.705,
+        "sgr_mib_s": 121.189,
+        "unicode_mib_s": 102.483,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 68,
+          "p95": 72,
+          "p99": 75,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 4135,
+          "p95": 4763,
+          "p99": 4952,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 3,
+      "variant": "candidate",
+      "kind": "scroll",
+      "started_unix": 1795083345.434209,
+      "elapsed_seconds": 1.160841941833496,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4528,
+              4597,
+              4523,
+              4511,
+              4500,
+              4507,
+              4538
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              4425,
+              4453,
+              4472,
+              4424,
+              4458,
+              4463,
+              4436
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              5661,
+              5758,
+              5678,
+              5706,
+              5703,
+              5712,
+              5677
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              5989,
+              5950,
+              5953,
+              5961,
+              6001,
+              6013,
+              5966
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              7103,
+              7115,
+              7114,
+              7265,
+              7154,
+              7175,
+              7124
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              7177,
+              7067,
+              7048,
+              7058,
+              7064,
+              7050,
+              7042
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              14139,
+              14132,
+              14216,
+              14067,
+              14101,
+              15027,
+              14798
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              15573,
+              14440,
+              14325,
+              14352,
+              14143,
+              14077,
+              14107
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              17880,
+              17859,
+              17861,
+              17866,
+              18013,
+              17963,
+              17872
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              17330,
+              17325,
+              17320,
+              17357,
+              17329,
+              17341,
+              17361
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              19900,
+              19945,
+              20099,
+              19895,
+              19963,
+              20384,
+              20648
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              21528,
+              21931,
+              21613,
+              23303,
+              23045,
+              23019,
+              21688
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "variant": "candidate",
+      "kind": "core",
+      "started_unix": 1795083346.5956993,
+      "elapsed_seconds": 2.939195394515991,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 169.87,
+        "ascii_full_history_mib_s": 137.187,
+        "sgr_mib_s": 133.366,
+        "unicode_mib_s": 103.239,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 53,
+          "p95": 55,
+          "p99": 59,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3434,
+          "p95": 3724,
+          "p99": 3841,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 3,
+      "variant": "baseline",
+      "kind": "scroll",
+      "started_unix": 1795083349.5355802,
+      "elapsed_seconds": 10.962614059448242,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4616,
+              4621,
+              4686,
+              4534,
+              4566,
+              4511,
+              4531
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              5197,
+              5183,
+              4988,
+              4848,
+              4964,
+              4782,
+              4790
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              36132,
+              36079,
+              36471,
+              39552,
+              39512,
+              37373,
+              39641
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              48502,
+              42149,
+              48418,
+              48999,
+              47394,
+              46484,
+              47771
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              107990,
+              112020,
+              112644,
+              107896,
+              107453,
+              107667,
+              107876
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              117091,
+              117917,
+              118640,
+              114103,
+              113243,
+              113334,
+              116289
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              14264,
+              14180,
+              14354,
+              14179,
+              14168,
+              14190,
+              14179
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              14547,
+              14308,
+              14368,
+              14402,
+              14638,
+              14310,
+              14343
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              115723,
+              123731,
+              114657,
+              119991,
+              131266,
+              120667,
+              113315
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              131236,
+              128255,
+              116006,
+              115435,
+              115995,
+              121067,
+              119112
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              394033,
+              371620,
+              368980,
+              369402,
+              387264,
+              388861,
+              368385
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              404451,
+              396825,
+              358469,
+              354439,
+              353546,
+              375538,
+              364132
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 3,
+      "variant": "baseline",
+      "kind": "core",
+      "started_unix": 1795083360.4989576,
+      "elapsed_seconds": 2.9192001819610596,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 215.003,
+        "ascii_full_history_mib_s": 137.864,
+        "sgr_mib_s": 134.643,
+        "unicode_mib_s": 103.366,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 66,
+          "p95": 69,
+          "p99": 70,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3932,
+          "p95": 4770,
+          "p99": 4964,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 4,
+      "variant": "baseline",
+      "kind": "scroll",
+      "started_unix": 1795083363.4187677,
+      "elapsed_seconds": 12.46034049987793,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4543,
+              4579,
+              4532,
+              4533,
+              4531,
+              4529,
+              4586
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              4780,
+              4732,
+              4787,
+              4854,
+              4791,
+              4817,
+              4782
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              35875,
+              35896,
+              36166,
+              36048,
+              36274,
+              35963,
+              36009
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              37816,
+              37927,
+              39861,
+              42747,
+              46872,
+              48834,
+              43600
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              144030,
+              284485,
+              463834,
+              194355,
+              121718,
+              107723,
+              108385
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              116999,
+              125258,
+              137675,
+              118323,
+              136040,
+              128917,
+              113339
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              14113,
+              14611,
+              14117,
+              14222,
+              15238,
+              16058,
+              15463
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              14829,
+              14412,
+              14719,
+              14804,
+              14573,
+              15359,
+              14649
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              113887,
+              113388,
+              119799,
+              116396,
+              116675,
+              113078,
+              113297
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              120304,
+              142369,
+              175371,
+              191425,
+              151373,
+              163921,
+              166621
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              371487,
+              348878,
+              345005,
+              346552,
+              387774,
+              363569,
+              347618
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              427563,
+              429882,
+              359766,
+              415668,
+              377531,
+              527786,
+              656085
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "variant": "baseline",
+      "kind": "core",
+      "started_unix": 1795083375.8827074,
+      "elapsed_seconds": 3.2948572635650635,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-baseline"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 138.641,
+        "ascii_full_history_mib_s": 137.674,
+        "sgr_mib_s": 134.182,
+        "unicode_mib_s": 97.675,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 53,
+          "p95": 53,
+          "p99": 58,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3463,
+          "p95": 3776,
+          "p99": 3923,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "pair": 4,
+      "variant": "candidate",
+      "kind": "scroll",
+      "started_unix": 1795083379.1782901,
+      "elapsed_seconds": 1.1836721897125244,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/scroll-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "VT parser and screen; no PTY or rendering",
+        "iterations_per_sample": 1024,
+        "cases": [
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              4814,
+              4632,
+              4613,
+              4560,
+              4552,
+              4557,
+              4568
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              4389,
+              4404,
+              4438,
+              4451,
+              4401,
+              4398,
+              4395
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              5679,
+              5681,
+              5667,
+              5676,
+              5663,
+              5671,
+              5668
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              5927,
+              5930,
+              5952,
+              5914,
+              5944,
+              5944,
+              5970
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              7241,
+              7123,
+              7109,
+              7119,
+              7120,
+              7199,
+              7156
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 120,
+            "rows": 48,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              7067,
+              7059,
+              7084,
+              7253,
+              7278,
+              7311,
+              7307
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "S",
+            "ns_per_scroll": [
+              14567,
+              14416,
+              15432,
+              16170,
+              16838,
+              17556,
+              17379
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 1,
+            "command": "T",
+            "ns_per_scroll": [
+              16941,
+              16789,
+              17050,
+              18020,
+              18037,
+              17559,
+              16504
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "S",
+            "ns_per_scroll": [
+              17844,
+              17839,
+              17809,
+              17836,
+              17838,
+              17841,
+              17867
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 8,
+            "command": "T",
+            "ns_per_scroll": [
+              17371,
+              17311,
+              17420,
+              17343,
+              17415,
+              17674,
+              17331
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "S",
+            "ns_per_scroll": [
+              20413,
+              19963,
+              19921,
+              19931,
+              19989,
+              19929,
+              19939
+            ],
+            "allocations": 0
+          },
+          {
+            "cols": 240,
+            "rows": 80,
+            "count": 24,
+            "command": "T",
+            "ns_per_scroll": [
+              20727,
+              20724,
+              20739,
+              20738,
+              20733,
+              20777,
+              21068
+            ],
+            "allocations": 0
+          }
+        ]
+      }
+    },
+    {
+      "pair": 4,
+      "variant": "candidate",
+      "kind": "core",
+      "started_unix": 1795083380.3626964,
+      "elapsed_seconds": 2.851893186569214,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "artifacts/core-scroll/core-candidate-final"
+      ],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 206.979,
+        "ascii_full_history_mib_s": 138.904,
+        "sgr_mib_s": 133.639,
+        "unicode_mib_s": 103.505,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 53,
+          "p95": 54,
+          "p99": 58,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3433,
+          "p95": 3878,
+          "p99": 4086,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "cpu_governor": "powersave"
+}

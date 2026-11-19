@@ -1,9 +1,14 @@
 # ztty
 
-**ztty 0.3.1** 为 Linux 和 Windows 加入常用字号缩放与标签切换快捷键，
-修复 Windows 窗口缩放显示，并加强终端状态和 MCP 会话身份校验。
-下载入口为 [官方 Releases](https://github.com/LIghtJUNction/ztty/releases)。
-[发布门禁与源码记录](docs/releasing.md#031-release-gate)分别记录候选验证、正式发布和设备安装。
+**ztty 0.4.1** 已修复增强键盘协议下的小数字键盘输入，并整合 Linux 原生 UI。
+下载入口为 [官方 Releases](https://github.com/LIghtJUNction/ztty/releases)，
+[发布与安装记录](docs/numpad-release-0.4.1-2026-11-19.zh-CN.md)列出对应源码和验收结果。
+
+当前源码新增历史搜索 Alt+C 大小写切换，修复复制时当前命中被重置的问题，
+并让满历史缓冲下的阅读位置保持稳定；终端局部批量滚动改为成段搬运。
+同时修复 NumLock／Shift 状态下的小键盘路由和文字覆盖后的 Sixel 残留，
+让新开的独立 Linux 窗口使用当前安装版本，保留已有会话。
+[本轮性能与功能记录](docs/performance-function-2026-11-19.zh-CN.md)给出实测、验证和使用方法。
 
 <!-- terminal-benchmark:start -->
 [![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
@@ -124,7 +129,7 @@ cargo add zvte@0.1.3 --no-default-features
 
 本文命令对应当前源码。安装脚本下载最新已发布的
 [GitHub Release](https://github.com/LIghtJUNction/ztty/releases)，并非任意已有 tag；
-目前不会因为源码版本已改为 `0.3.1` 就下载到它。尚未发布的改动请通过源码构建使用。
+尚未发布的改动请通过源码构建使用。
 
 Arch Linux 可使用 `yay -S ztty`。其他 Linux 发行版可用一键安装脚本，
 自动选择 x86_64 或 ARM64 预编译包并校验 SHA256。
@@ -150,6 +155,9 @@ cargo build --locked --release
 `sh install.sh --from-binary ./target/release/ztty` 安装本地构建。
 安装器先暂存、校验再原子替换，保留一份旧文件供回滚；正在运行的共享 broker
 继续使用已加载的版本，不会因文件更新自动重启。
+未设置 `ZTTY_SOCKET` 时，新开的独立窗口会选择当前构建；旧窗口中的
+标签页、分屏和显式指定的会话地址仍保留原有路由。
+[升级期间的会话规则](docs/sessions.md#upgrading-a-running-broker)说明如何访问新旧会话。
 Linux 下 Ctrl+Shift+C 复制，
 Ctrl+Shift+V 粘贴，Shift+拖拽在捕获鼠标的应用中选择文字，
 Shift+PageUp/PageDown 或滚轮浏览历史，历史中的 **Back to live ↓** 入口回到底部，

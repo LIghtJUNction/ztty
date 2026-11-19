@@ -12,11 +12,12 @@ workspace; macOS does not yet implement font zoom or workspace UI.
 | Shortcut | Action |
 | --- | --- |
 | Ctrl+Shift+F | Open history search; seed it with a single-line selection |
-| Enter / Shift+Enter in search | Next / previous match, wrapping at the ends |
+| Enter / Shift+Enter in search (including keypad Enter) | Next / previous match, wrapping at the ends |
 | F3 / Shift+F3 in search | Next / previous match |
+| Alt+C in search | Toggle case-sensitive / Unicode lowercase matching |
 | Ctrl+U or Ctrl+A in search/palette | Clear the query |
 | Esc | Close the temporary search/palette |
-| Ctrl+Shift+P | Open the command palette; type to filter, arrows to select, Enter to run |
+| Ctrl+Shift+P | Open the command palette; type to filter, arrows (including keypad Up/Down) to select, Enter (including keypad Enter) to run |
 | Ctrl+Shift+S | Find a session by name, title or URI; focus its view or explicitly attach |
 | Ctrl+Shift+K / J | Previous / next retained shell command |
 | Ctrl+Shift+Y | Copy the selected command's output; otherwise copy the latest output |
@@ -59,11 +60,14 @@ switching does not take input ownership. The selected URI distinguishes sessions
 with the same display name. If a Focus target detaches while the list is open,
 the action reports that change rather than silently creating a new view.
 
-Search is case-sensitive, literal UTF-8 matching across rows joined by terminal
-autowrap. Explicit line breaks remain boundaries. It highlights complete wide
+Search uses literal UTF-8 matching across rows joined by terminal autowrap.
+Each search starts case-sensitive. Alt+C switches to Unicode lowercase comparison
+and back; the search bar displays the mode. Copying retains the original spelling.
+This comparison does not normalize accents or perform full Unicode case folding.
+Explicit line breaks remain boundaries. It highlights complete wide
 and combining cells, including the visible portion of a match extending outside
 the viewport. Queries are limited to 1,024 bytes; the streaming matcher retains
-one query's positions, not a copy of the history. The highlight map uses one bit
+one normalized query's positions, not a copy of the history. The highlight map uses one bit
 per visible cell, at most 16 KiB for a 512×256 grid.
 
 Copying a selection joins automatic line wraps while retaining explicit newlines.
@@ -86,8 +90,10 @@ The terminal keeps its full row count; there is no permanent toolbar at the live
 screen. Shift+PageUp/PageDown and the existing scroll actions remain available.
 
 When the child produces more output while you are reading history, the visible
-rows stay anchored and the control changes to **New output · Back to live ↓**
-with a blue border. The indicator remains until the view returns to the bottom.
+rows stay anchored, including after the retained-history buffer reaches its
+limit, and the control changes to **New output · Back to live ↓** with a blue
+border. If the inspected content is evicted, the view stops at the oldest row
+still retained. The indicator remains until the view returns to the bottom.
 Scrolling up again starts with the ordinary label, so an earlier output arrival
 does not appear as a new notification.
 

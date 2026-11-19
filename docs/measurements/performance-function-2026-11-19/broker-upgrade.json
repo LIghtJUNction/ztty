@@ -1,0 +1,134 @@
+{
+  "ok": true,
+  "binary_sha256": "9cfa87530c3bbbf21950e0828ff9ecf9973a699551fabc034a6a3a01d264b468",
+  "checks": [
+    "an empty default starts the current executable normally",
+    "same executable bytes at different paths share the default broker",
+    "an unlinked running image remains readable and identical copies still share it",
+    "a changed build leaves the old broker and its sessions intact",
+    "the selected socket is inherited by the new PTY",
+    "same-byte copies share the upgraded broker",
+    "an explicit socket keeps the caller's older target",
+    "tab and split requests stay in the addressed older workspace",
+    "ordinary control commands keep their existing default routing",
+    "the upgraded pool remains shared after the old default exits"
+  ],
+  "sessions": [
+    {
+      "pid": 2169645,
+      "broker": 2169611,
+      "socket": null,
+      "name": "old-one",
+      "requested": "old",
+      "executable": "ztty-old",
+      "elapsed_ms": 119.61114800215
+    },
+    {
+      "pid": 2169657,
+      "broker": 2169611,
+      "socket": null,
+      "name": "old-copy",
+      "requested": "old-copy",
+      "executable": "ztty-old",
+      "elapsed_ms": 68.84599199838703
+    },
+    {
+      "pid": 2169659,
+      "broker": 2169611,
+      "socket": null,
+      "name": "old-deleted-copy",
+      "requested": "old-copy",
+      "executable": "ztty-old (deleted)",
+      "elapsed_ms": 59.676205997675424
+    },
+    {
+      "pid": 2169677,
+      "broker": 2169669,
+      "socket": "@ztty-1000-image-1cc8e099cdb1aca5-c88bc",
+      "name": "fresh-one",
+      "requested": "new",
+      "executable": "ztty-new",
+      "elapsed_ms": 97.96839499904308
+    },
+    {
+      "pid": 2169679,
+      "broker": 2169669,
+      "socket": "@ztty-1000-image-1cc8e099cdb1aca5-c88bc",
+      "name": "fresh-copy",
+      "requested": "new-copy",
+      "executable": "ztty-new",
+      "elapsed_ms": 54.25267199825612
+    },
+    {
+      "pid": 2169681,
+      "broker": 2169611,
+      "socket": "@ztty-1000",
+      "name": "explicit-old",
+      "requested": "new",
+      "executable": "ztty-old (deleted)",
+      "elapsed_ms": 52.68477200297639
+    },
+    {
+      "pid": 2169690,
+      "broker": 2169611,
+      "socket": null,
+      "name": "tab-old",
+      "requested": "new",
+      "executable": "ztty-old (deleted)",
+      "elapsed_ms": 53.88667200168129
+    },
+    {
+      "pid": 2169692,
+      "broker": 2169611,
+      "socket": null,
+      "name": "split-old",
+      "requested": "new",
+      "executable": "ztty-old (deleted)",
+      "elapsed_ms": 52.864557001157664
+    },
+    {
+      "pid": 2169978,
+      "broker": 2169669,
+      "socket": "@ztty-1000-image-1cc8e099cdb1aca5-c88bc",
+      "name": "fresh-after-old-exit",
+      "requested": "new-copy",
+      "executable": "ztty-new",
+      "elapsed_ms": 76.00033400012762
+    }
+  ],
+  "scope": "Owned Xvfb, real IPC/PTY/processes; test-only default-address redirection",
+  "source_sha256": {
+    "src/broker.rs": "7c5b18b3e4b3333d448bea402c2295ba5a317b5d575b8c3efa788e7fa462c829",
+    "src/platform/linux.rs": "f54e75734e166d3d2424eea37c59fe7d39ded677344bdc772b45efa5c0d03c27",
+    "tests/broker_upgrade.py": "044b856131c6f4a8d20b76da7a01d2336e3e865834a4ecc8514b5de4b18b3722"
+  },
+  "display_ownership": {
+    "display": ":19422",
+    "pid": 2169600,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X19422",
+        "inode": 14430135,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X19422",
+        "inode": 14430134,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "remaining_owned_pids": [],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "stderr_tail": ""
+}

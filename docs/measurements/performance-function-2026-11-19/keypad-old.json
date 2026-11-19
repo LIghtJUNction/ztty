@@ -1,0 +1,81 @@
+{
+  "old_elf_sha256": "6739a4f1d535ada1885cafed39a808cbe667cc527f83f19769d664be5597de07",
+  "installed_elf_sha256": "72adfb846f65c3e39b72c76e971fd15263d755a06f7f2f53245f8082c61393ec",
+  "scope": "fresh process on private Xvfb; original user's broker and keyboard untouched",
+  "returncode": 1,
+  "harness": "tests/input_gui.py",
+  "observed": {
+    "ok": false,
+    "error": "{'name': 'Kitty flags 1: printable keypad keys remain text', 'injection': 'XTEST', 'expected_hex': '303132333435363738392e2b2d2a2f', 'actual_hex': '1b5b3537333939751b5b3537343030751b5b3537343031751b5b3537343032751b5b3537343033751b5b3537343034751b5b3537343035751b5b3537343036751b5b3537343037751b5b3537343038751b5b3537343039751b5b3537343133751b5b3537343132751b5b3537343131751b5b353734313075', 'ok': False}",
+    "vectors": [
+      {
+        "name": "legacy Ctrl+I",
+        "injection": "XTEST",
+        "expected_hex": "09",
+        "actual_hex": "09",
+        "ok": true
+      },
+      {
+        "name": "legacy Ctrl+Shift+I remains distinct",
+        "injection": "XTEST",
+        "expected_hex": "1b5b3130353b3675",
+        "actual_hex": "1b5b3130353b3675",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+unshifted tilde on private keyboard mapping",
+        "injection": "XTEST",
+        "expected_hex": "1e",
+        "actual_hex": "1e",
+        "ok": true
+      },
+      {
+        "name": "Num Lock toggles without writing CSI-u into a legacy shell",
+        "injection": "XTEST",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Num Lock on: keypad digits and decimal are text",
+        "injection": "XTEST",
+        "expected_hex": "303132333435363738392e",
+        "actual_hex": "303132333435363738392e",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 1: printable keypad keys remain text",
+        "injection": "XTEST",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "1b5b3537333939751b5b3537343030751b5b3537343031751b5b3537343032751b5b3537343033751b5b3537343034751b5b3537343035751b5b3537343036751b5b3537343037751b5b3537343038751b5b3537343039751b5b3537343133751b5b3537343132751b5b3537343131751b5b353734313075",
+        "ok": false
+      }
+    ],
+    "cleanup": {
+      "owned_processes_remaining": []
+    },
+    "xvfb": {
+      "display": ":18840",
+      "pid": 1841720,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X18840",
+          "inode": 11000859,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X18840",
+          "inode": 11000858,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    }
+  },
+  "original_broker_preserved": true,
+  "temporary_binary_removed": true
+}

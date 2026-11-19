@@ -1,0 +1,535 @@
+   Compiling zgraphics v0.1.1 ($CHECKOUT/crates/zgraphics)
+   Compiling zinput v0.1.2 ($CHECKOUT/crates/zinput)
+   Compiling zterm v0.4.0 ($CHECKOUT/crates/zterm)
+   Compiling ztty v0.4.1 ($CHECKOUT)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13m 19s
+     Running unittests src/lib.rs (target/debug/build/zgraphics/5763f0becc644163/out/zgraphics-5763f0becc644163)
+
+running 32 tests
+test sixel_tests::shared_sixel_snapshots_preserve_pixels_and_store_capacity_accounting ... ok
+test sixel_tests::aborted_sixel_releases_storage_and_palette_only_streams_are_valid ... ok
+test sixel_tests::sixel_bits_repeat_and_color_overprint_are_exact ... ok
+test sixel_tests::malformed_sixel_cannot_replace_an_existing_image ... ok
+test sixel_tests::sixel_default_palette_and_embedded_controls ... ok
+test sixel_tests::sixel_hls_uses_dec_hue_origin_and_palette_redefinitions ... ok
+test sixel_tests::sixel_macro_and_raster_aspect_ratios_change_only_destination ... ok
+test sixel_tests::sixel_transfer_painting_and_scene_limits_are_independent ... ok
+test sixel_tests::sixel_transparency_raster_extent_and_growth_preserve_pixels ... ok
+test tests::chunked_rgba_is_atomic_and_uses_final_cursor_position ... ok
+test tests::crop_aspect_ratio_letterboxing_and_metric_resize ... ok
+test tests::deletion_frees_only_selected_unreferenced_images ... ok
+test tests::compressed_rgb_decodes_and_wrong_dimensions_fail ... ok
+test tests::failed_combined_transmission_does_not_evict_or_replace_valid_images ... ok
+test tests::feature_query_is_honest_and_does_not_cancel_pending_transfer ... ok
+test tests::invalid_chunks_abort_but_leave_existing_images_untouched ... ok
+test tests::limits_bound_transfer_store_and_placement_counts ... ok
+test tests::malformed_base64_is_rejected_without_partial_append ... ok
+test tests::invalid_png_crc_truncation_and_bombs_are_rejected ... ok
+test tests::numbers_allocate_unique_ids_and_delete_newest_only ... ok
+test tests::partial_scroll_does_not_move_unaffected_placements ... ok
+test tests::query_decodes_without_storing_or_replacing_an_image ... ok
+test tests::quiet_modes_and_response_queue_are_bounded ... ok
+test tests::retained_pixels_outlive_scene_deletion_without_copying ... ok
+test tests::replacement_and_placement_ids_follow_lifecycle ... ok
+test tests::streamed_m_flags_quiet_errors_and_transfer_limit_are_preserved ... ok
+test tests::scroll_keeps_images_in_history_and_trims_expired_placements ... ok
+test tests::png_formats_decode_to_straight_rgba ... ok
+test tests::padded_and_unpadded_final_base64_decode_identically ... ok
+test tests::malformed_png_headers_with_valid_checksums_remain_recoverable ... ok
+test tests::current_icat_128k_chunks_can_repeat_action_and_quiet_on_continuations ... ok
+test tests::large_single_apc_like_icat_streams_with_bounded_staging_and_unpadded_tail ... ok
+
+test result: ok. 32 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/build/zinput/01991caf3cf49759/out/zinput-01991caf3cf49759)
+
+running 23 tests
+test tests::all_keyboard_flag_combinations_preserve_reset_key_release_rules ... ok
+test tests::all_xterm_mouse_buttons_have_distinct_press_codes ... ok
+test tests::kitty_alternate_keys_and_complete_associated_text ... ok
+test tests::kitty_event_reporting_and_release_exceptions ... ok
+test tests::application_keypad_keeps_disambiguated_events ... ok
+test tests::alternate_fields_and_release_text_obey_negotiated_flags ... ok
+test tests::legacy_ctrl_shift_shortcuts_do_not_collapse_to_control_characters ... ok
+test tests::kitty_disambiguates_without_breaking_reset_keys ... ok
+test tests::lock_keys_are_silent_until_the_child_requests_enhanced_events ... ok
+test tests::legacy_text_control_and_application_cursor ... ok
+test tests::invalid_mouse_inputs_never_append_partial_bytes ... ok
+test tests::keypad_identity_is_preserved_when_requested ... ok
+test tests::ime_commits_are_never_truncated_or_discarded ... ok
+test tests::clipboard_cannot_inject_a_bracket_end_or_control_keys ... ok
+test tests::modifier_keys_keypad_and_lock_state ... ok
+test tests::focus_and_reusable_buffer_append ... ok
+test tests::num_lock_overrides_legacy_application_keypad ... ok
+test tests::sgr_encoding_does_not_itself_enable_tracking ... ok
+test tests::tracking_modes_filter_motion_and_legacy_coordinates_are_bounded ... ok
+test tests::printable_keypad_stays_text_without_report_all ... ok
+test tests::wheel_releases_and_motion_are_suppressed_but_extra_buttons_can_drag ... ok
+test tests::x10_tracking_sends_only_primary_presses_without_modifiers ... ok
+test tests::num_lock_override_keeps_kitty_keypad_identity ... ok
+
+test result: ok. 23 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/build/zpty/8ac25ff5e57baa57/out/zpty-8ac25ff5e57baa57)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/darwin_spawn.rs (target/debug/build/zpty/f2ed298c23a24502/out/darwin_spawn-f2ed298c23a24502)
+SKIP darwin_spawn: requires native macOS
+     Running unittests src/lib.rs (target/debug/build/zterm/92d08646992b2e03/out/zterm-92d08646992b2e03)
+
+running 113 tests
+test shell_tests::semantic_byte_limit_never_splits_utf8 ... ok
+test shell_tests::semantic_invalid_exit_status_and_unknown_marks_do_not_end_command ... ok
+test shell_tests::semantic_alt_screen_marks_are_ignored_and_primary_output_survives ... ok
+test shell_tests::semantic_boundaries_extract_input_and_output_and_status ... ok
+test shell_tests::semantic_history_clear_marks_evicted_output_truncated ... ok
+test shell_tests::semantic_output_anchors_survive_scroll_and_history_eviction ... ok
+test shell_tests::semantic_next_prompt_closes_output_without_inventing_exit_status ... ok
+test shell_tests::semantic_resize_clear_and_reset_never_return_reassigned_ranges ... ok
+test sixel_tests::sixel_combining_mark_redraw_erases_the_existing_base_cell ... ok
+test sixel_tests::sixel_cancellation_and_truncation_never_display_partial_images ... ok
+test sixel_tests::sixel_erase_keeps_pixels_in_scrollback ... ok
+test sixel_tests::sixel_erasure_preserves_kitty_and_nonintersecting_sixel ... ok
+test shell_tests::semantic_prompt_redraw_secondary_prompt_and_duplicate_marks_are_bounded ... ok
+test sixel_tests::sixel_palette_scope_background_and_mode_queries_are_explicit ... ok
+test sixel_tests::sixel_interoperates_with_kitty_dcs_queries_and_alternate_screen ... ok
+test sixel_tests::sixel_scaled_erasure_rounds_out_to_source_pixels ... ok
+test sixel_tests::sixel_scrolls_with_history_and_respects_display_and_right_modes ... ok
+test sixel_tests::sixel_local_erase_and_spaces_release_complete_previews ... ok
+test tests::alternate_1047_preserves_retained_content_on_entry ... ok
+test tests::alternate_1047_clears_text_and_images_on_exit ... ok
+test tests::alternate_1047_reset_on_primary_preserves_both_screens ... ok
+test tests::alternate_screen_restores_primary_cursor_style_and_content ... ok
+test sixel_tests::sixel_text_overwrite_erases_only_the_intersecting_cells ... ok
+test tests::ascii_batch_overwrites_complete_wide_glyphs_and_handles_the_last_column ... ok
+test tests::ascii_batch_repairs_both_wide_boundaries_without_touching_other_glyphs ... ok
+test shell_tests::semantic_markers_are_independent_of_chunk_boundaries ... ok
+test tests::ascii_batch_uses_only_the_selected_character_set ... ok
+test tests::ascii_delayed_wrap_and_carriage_return ... ok
+test tests::cursor_restore_keeps_character_set_snapshots_local_to_each_screen ... ok
+test sixel_tests::sixel_c1_terminator_and_large_scrolling_region_are_bounded ... ok
+test tests::cursor_restore_recovers_both_character_sets_and_the_active_selection ... ok
+test tests::damage_tracking_marks_changed_rows_and_cursor_rows ... ok
+test tests::erase_half_of_wide_character_clears_both_halves ... ok
+test tests::cell_storage_has_no_heap_pointer_and_is_compact ... ok
+test tests::graphics_cursor_policy_and_reset_generation_are_stable ... ok
+test tests::graphics_dispatch_cancels_previous_osc_and_dcs_without_text_leakage ... ok
+test tests::graphics_query_precedes_device_attributes_and_reports_actual_cell_size ... ok
+test tests::graphics_follow_scroll_resize_alternate_screen_and_deletion ... ok
+test tests::height_resize_keeps_combining_marks_on_the_right_margin_cell ... ok
+test tests::height_growth_preserves_pending_wrap_for_ascii_and_wide_cells ... ok
+test tests::history_is_bounded_and_view_orders_oldest_to_newest ... ok
+test tests::height_shrink_preserves_pending_wrap_after_history_transfer ... ok
+test tests::hyperlink_survives_closure_sgr_reset_and_scroll ... ok
+test tests::incomplete_graphics_transfers_do_not_consume_following_text ... ok
+test tests::insert_delete_characters_and_lines_are_bounded ... ok
+test tests::icat_probe_finishes_on_da1_and_advertises_only_sixel ... ok
+test tests::kitty_keyboard_flags_and_stacks_are_screen_local ... ok
+test tests::mouse_encoding_and_tracking_modes_are_independent ... ok
+test tests::origin_mode_coordinates_and_cursor_report_follow_margins ... ok
+test tests::osc_color_queries_reply_with_resolved_rgb_and_valid_indices ... ok
+test tests::repeated_alternate_screen_enable_keeps_primary_saved_state ... ok
+test tests::overflowing_osc_is_rejected_as_a_whole ... ok
+test tests::resize_in_alternate_screen_preserves_primary_cursor_and_history ... ok
+test tests::resize_keeps_the_cursor_row_and_moves_discarded_rows_into_history ... ok
+test tests::scroll_region_preserves_outside_rows_and_does_not_enter_history ... ok
+test tests::resize_preserves_cells_and_removes_split_wide_glyph ... ok
+test sixel_tests::sixel_every_chunk_boundary_has_identical_pixels_and_cursor ... ok
+test tests::semicolons_in_osc_metadata_are_preserved ... ok
+test tests::sgr_supports_indexed_rgb_and_colon_forms ... ok
+test tests::sync_output_and_mode_queries_report_actual_state ... ok
+test tests::missing_st_unknown_apc_and_oversize_apc_recover_on_cancellation ... ok
+test tests::synchronized_frame_timeout_and_reset_preserve_pending_commit ... ok
+test tests::tabs_and_dec_line_drawing_work_without_allocated_glyphs ... ok
+test tests::unchanged_resize_preserves_pending_wrap ... ok
+test tests::sgr_streaming_preserves_missing_invalid_and_mixed_parameter_groups ... ok
+test tests::unicode_insert_preserves_shifted_glyphs_and_repairs_split_glyphs ... ok
+test tests::synchronized_frame_commit_survives_all_chunk_boundaries_until_painted ... ok
+test tests::unicode_narrow_overwrite_repairs_either_wide_half_and_replaces_metadata ... ok
+test tests::unicode_overwrite_handles_narrow_screens_and_wrap_boundaries ... ok
+test tests::unicode_wide_overwrite_repairs_both_outside_halves ... ok
+test tests::kitty_graphics_framing_is_independent_of_every_pty_chunk_boundary ... ok
+test tests::repeated_ring_wraps_keep_history_partial_margins_and_reverse_index_ordered ... ok
+test tests::wide_character_wraps_before_last_column ... ok
+test tests::wide_glyphs_and_combining_marks_occupy_correct_cells ... ok
+test tests::terminal_capability_queries_reject_unknown_names ... ok
+test tests::x10_mouse_mode_negotiation_preserves_other_tracking_modes ... ok
+test theme_tests::color_resets_clear_only_the_corresponding_provenance ... ok
+test theme_tests::defaults_change_but_identical_explicit_rgb_does_not ... ok
+test theme_tests::erased_cells_keep_color_sources_and_resized_blanks_use_current_defaults ... ok
+test theme_tests::history_and_rotated_screen_rows_update_without_losing_text ... ok
+test theme_tests::every_ansi_index_follows_the_palette_for_all_sgr_encodings ... ok
+test theme_tests::invalid_color_sequences_preserve_the_previous_source ... ok
+test tests::utf8_and_sequences_are_independent_of_chunk_boundaries ... ok
+test theme_tests::no_op_does_not_dirty_rows_and_shell_metadata_survives_theme_change ... ok
+test theme_tests::provenance_fits_existing_cell_and_style_storage ... ok
+test theme_tests::osc_queries_report_current_colors_with_unchanged_terminators ... ok
+test theme_tests::saved_styles_update_in_both_primary_and_cached_alternate_screens ... ok
+test theme_tests::truecolor_and_extended_indices_never_become_palette_references ... ok
+test theme_tests::wide_cells_combining_marks_hyperlinks_and_rendition_survive ... ok
+test ui_tests::capabilities_reply_is_explicit_and_actions_are_never_auto_written ... ok
+test ui_tests::interleaved_ui_does_not_cancel_chunked_kgp_transfer ... ok
+test ui_tests::cancelled_ui_and_unrecognized_namespaces_do_not_leak_or_mutate ... ok
+test wrap_tests::alternate_screens_keep_independent_wrap_metadata_through_resize_and_clear ... ok
+test ui_tests::ris_and_real_screen_transitions_clear_ui_without_revision_reuse ... ok
+test ui_tests::unsupported_host_never_claims_renderer_or_accepts_hidden_actions ... ok
+test wrap_tests::insert_delete_and_manual_scroll_sever_only_changed_row_adjacencies ... ok
+test wrap_tests::erasure_and_character_shifts_invalidate_the_affected_wrap_endpoint ... ok
+test ui_tests::oversized_frame_is_discarded_until_st_then_normal_text_recovers ... ok
+test wrap_tests::soft_wrap_is_recorded_only_after_automatic_row_advance ... ok
+test wrap_tests::replacing_screen_rows_breaks_history_links_without_mutating_inactive_history ... ok
+test wrap_tests::wrapped_rows_follow_ring_rotation_history_and_eviction ... ok
+test wrap_tests::resize_retains_complete_wraps_and_severs_clipped_successors ... ok
+test tests::unicode_overwrites_are_independent_of_pty_chunk_sizes ... ok
+test sixel_tests::repeated_sixel_preview_replacement_reclaims_image_budget ... ok
+test wrap_tests::soft_wrap_metadata_is_independent_of_pty_chunk_boundaries ... ok
+test ui_tests::ui_every_split_is_transactional_and_preserves_text_and_kgp ... ok
+test screen::row_copy_tests::logical_row_copy_handles_all_small_ring_overlap_boundaries ... ok
+test tests::malformed_input_cannot_escape_grid_bounds ... ok
+test tests::query_reply_storage_is_bounded ... ok
+test tests::large_inline_apc_from_an_existing_client_does_not_require_m_chunks_or_padding ... ok
+test tests::bulk_and_bytewise_feeds_agree_through_scroll_styles_and_charset_switches ... ok
+test tests::counted_scroll_and_line_edits_match_single_row_operations ... ok
+test terminal::history_budget_tests::retained_history_counts_wrap_metadata_spare_slots_and_reused_cell_capacity ... ok
+
+test result: ok. 113 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (target/debug/build/ztty/37a015e1db4693ff/out/ztty-37a015e1db4693ff)
+
+running 10 tests
+test native_ui::tests::current_click_emits_bound_intent_and_never_runs_a_command ... ok
+test native_ui::tests::extended_button_release_is_consumed_without_latching_motion ... ok
+test session_identity::tests::all_four_fields_bind_the_expected_stream ... ok
+test native_ui::tests::undersized_view_stays_idle_until_geometry_changes ... ok
+test session_identity::tests::large_identifiers_are_compared_without_number_rounding ... ok
+test native_ui::tests::focus_consumes_text_navigates_and_escape_returns_control ... ok
+test native_ui::tests::observing_eof_and_focus_loss_cannot_activate ... ok
+test session_identity::tests::identity_fields_are_complete_unique_and_strictly_typed ... ok
+test native_ui::tests::stale_press_is_consumed_after_update_clear_and_resize ... ok
+test output_tail::tests::storage_and_read_allocations_remain_bounded_through_wraps_and_limit_changes ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/actions.rs (target/debug/build/ztty/10c47b84943674c4/out/actions-10c47b84943674c4)
+
+running 12 tests
+test common_zoom_aliases_ignore_locks_and_keep_split_resize_distinct ... ok
+test default_zoom_uses_shifted_layout_with_no_custom_bindings ... ok
+test custom_shifted_and_base_bindings_override_new_zoom_defaults ... ok
+test custom_bindings_override_defaults_and_can_disable_them ... ok
+test invalid_keys_modifiers_and_actions_are_rejected ... ok
+test keypad_binding_names_round_trip_and_hints_follow_overrides ... ok
+test shifted_custom_binding_wins_and_unshifted_defaults_remain_available ... ok
+test session_switcher_has_an_overrideable_default_and_truthful_shortcut_hints ... ok
+test shifted_punctuation_bindings_follow_the_active_layout ... ok
+test multiword_matching_ignores_case_and_word_order_across_fields ... ok
+test mouse_and_function_keys_are_not_ambiguous ... ok
+test tab_aliases_preserve_application_tab_and_respect_custom_remaps ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/config_watch.rs (target/debug/build/ztty/19d2893756eb8d5e/out/config_watch-19d2893756eb8d5e)
+
+running 3 tests
+test missing_deep_directories_created_before_ancestor_watch_do_not_lose_file_updates ... ok
+test retaining_one_path_preserves_shared_descriptor_and_releases_the_last_reference ... ok
+test renamed_parent_recreated_before_ancestor_watch_still_reloads_later_file ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/json.rs (target/debug/build/ztty/48d85b3df7a00dea/out/json-48d85b3df7a00dea)
+
+running 4 tests
+test values_build_and_read_without_loss ... ok
+test unicode_roundtrip_preserves_request_identifiers ... ok
+test rejects_ambiguous_and_malformed_json ... ok
+test large_objects_preserve_order_and_reject_late_duplicate_keys ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/layout.rs (target/debug/build/ztty/276ed7e38f5ff73c/out/layout-276ed7e38f5ff73c)
+
+running 6 tests
+test closing_earlier_tab_keeps_current_tab_selected ... ok
+test focus_swap_resize_and_maximize_are_reversible ... ok
+test closing_pane_collapses_only_its_parent_and_preserves_focus ... ok
+test tabs_hide_other_sessions_without_losing_their_layout ... ok
+test tiny_window_never_emits_nonpositive_dimensions ... ok
+test limits_and_duplicate_ids_leave_tree_unchanged ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/mcp_protocol.rs (target/debug/build/ztty/fa32deaf0d0a7fbe/out/mcp_protocol-fa32deaf0d0a7fbe)
+
+running 27 tests
+test mcp::http::tests::accept_quality_zero_is_not_an_accepted_representation ... ok
+test mcp::http::tests::invalid_envelopes_return_http_400_and_never_create_sessions ... ok
+test mcp::http::tests::authority_allowlist_rejects_urls_userinfo_and_controls ... ok
+test mcp::http::tests::sse_final_response_keeps_partially_written_comments ... ok
+test mcp::http::tests::host_and_origin_must_both_match_the_endpoint ... ok
+test mcp::http::tests::framing_rejects_smuggling_controls_and_duplicate_headers ... ok
+test mcp::http::tests::chunk_parser_handles_fragmentation_and_rejects_unsafe_trailers ... ok
+test mcp::http::tests::sse_frames_one_json_response_and_preserves_initial_session_header ... ok
+test mcp::http::tests::sse_heartbeat_waits_for_delivery_and_overload_never_restarts_http ... ok
+test mcp::http::tests::sse_selection_keeps_http_errors_notifications_and_delete_nonstreaming ... ok
+test mcp::http::tests::authentication_binds_role_and_keeps_actor_separate_from_session_secret ... ok
+test mcp::http::tests::sse_buffer_budget_includes_framing_and_existing_unsent_bytes ... ok
+test mcp::tests::actor_cannot_be_forged_by_tool_arguments ... ok
+test mcp::tests::cancellation_requires_a_valid_notification_and_id ... ok
+test mcp::tests::command_reads_validate_ids_parts_and_bounds_for_observers ... ok
+test mcp::tests::distinct_request_ids_do_not_collide ... ok
+test mcp::tests::input_control_maps_only_explicit_valid_actions ... ok
+test mcp::tests::malformed_envelopes_never_run_requests ... ok
+test mcp::tests::malformed_ready_notification_does_not_advance_lifecycle ... ok
+test mcp::tests::guarded_tools_preserve_identity_and_observer_permissions ... ok
+test mcp::tests::malformed_read_guards_fail_before_broker_dispatch ... ok
+test mcp::tests::request_ids_are_exact_integers_without_float_rounding ... ok
+test mcp::tests::uncorrelated_error_responses_are_accepted_without_dispatch ... ok
+test mcp::tests::waiting_reads_are_deferred_and_validate_bounds ... ok
+test mcp::tests::numeric_request_ids_match_by_exact_value ... ok
+test mcp::tests::observer_catalog_and_dispatch_enforce_same_permissions ... ok
+test mcp::tests::request_id_exponent_carries_stay_bounded_by_input_size ... ok
+
+test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/native_resize.rs (target/debug/build/ztty/2581419b5f3c52c4/out/native_resize-2581419b5f3c52c4)
+
+running 5 tests
+test a_hidden_or_cancelled_pane_with_uncommitted_size_is_restored ... ok
+test failed_rollback_retains_actual_size_and_a_later_retry_recovers ... ok
+test all_ptys_accept_before_the_caller_can_commit_any_grid ... ok
+test a_middle_failure_rolls_back_only_changed_ptys_and_keeps_old_grids ... ok
+test unchanged_grid_font_changes_still_require_every_pty_to_accept ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/output_tail.rs (target/debug/build/ztty/500f7f37a65a1c05/out/output_tail-500f7f37a65a1c05)
+
+running 19 tests
+test an_explicit_cursor_inside_a_codepoint_keeps_existing_raw_byte_semantics ... ok
+test complete_utf8_pages_preserve_characters_and_extend_at_most_three_bytes ... ok
+test consumers_can_disconnect_and_replay_without_advancing_each_other ... ok
+test eof_flushes_an_incomplete_suffix_lossily_without_changing_byte_cursors ... ok
+test empty_output_and_end_cursor_have_no_more_data ... ok
+test four_byte_utf8_fed_one_byte_at_a_time_waits_then_extends_a_one_byte_page ... ok
+test evicted_utf8_continuation_prefix_is_skipped_without_losing_byte_offsets ... ok
+test invalid_prefix_does_not_consume_a_later_incomplete_utf8_suffix ... ok
+test known_invalid_sequences_do_not_wait_for_output_that_cannot_repair_them ... ok
+test multiple_malformed_sequences_before_an_incomplete_suffix_are_consumed_once ... ok
+test malformed_sequences_at_page_boundaries_always_make_progress ... ok
+test page_lookahead_distinguishes_malformed_bytes_from_a_pending_suffix ... ok
+test increasing_retention_never_resurrects_already_evicted_bytes ... ok
+test wholly_evicted_continuation_runs_advance_to_the_available_end ... ok
+test malformed_prefix_at_large_page_limits_does_not_stall_the_next_read ... ok
+test disconnected_consumers_get_explicit_truncation_after_eviction ... ok
+test lowering_retention_drops_only_the_oldest_bytes ... ok
+test request_limits_and_default_page_size_match_the_wire_contract ... ok
+test persistent_retention_is_exactly_256_kib_across_independent_pages ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/repaint_schedule.rs (target/debug/build/ztty/355b6a4cc2e4b82e/out/repaint_schedule-355b6a4cc2e4b82e)
+
+running 6 tests
+test canceling_input_and_protocol_output_cannot_create_interaction_priority ... ok
+test force_first_frame_and_expose_bypass_the_budget ... ok
+test ongoing_output_keeps_the_original_deadline ... ok
+test old_screen_repaint_does_not_consume_pending_input ... ok
+test quiet_final_damage_has_a_deadline_but_idle_has_none ... ok
+test synchronized_frames_do_not_return_expired_repaint_deadlines ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/scroll_prompt.rs (target/debug/build/ztty/2bc8ecb510d0b6b2/out/scroll_prompt-2bc8ecb510d0b6b2)
+
+running 3 tests
+test only_visible_target_pixels_are_clickable ... ok
+test narrow_and_short_views_require_a_complete_label_and_target ... ok
+test prompt_avoids_search_and_palette_without_changing_the_viewport ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/search.rs (target/debug/build/ztty/0ac5b2ce3edbc810/out/search-0ac5b2ce3edbc810)
+
+running 17 tests
+test case_switching_keeps_counts_navigation_and_original_text_consistent ... ok
+test clipped_history_does_not_invent_a_contiguous_match ... ok
+test copied_matches_reject_stale_history_and_resized_coordinates ... ok
+test lowercase_expansion_search_and_viewport_suffix_use_normalized_bytes ... ok
+test empty_absent_and_oversized_queries_allocate_no_highlight_map ... ok
+test explicit_line_breaks_never_create_a_cross_row_match ... ok
+test unicode_lowercase_matches_preserve_wide_and_combining_cell_coordinates ... ok
+test history_search_wraps_both_directions_and_counts_all_matches ... ok
+test partial_matches_at_both_viewport_edges_are_highlighted_and_copy_in_full ... ok
+test soft_wrapped_matches_count_and_navigate_across_history_and_screen ... ok
+test unicode_matches_select_complete_wide_and_combining_cells ... ok
+test visible_non_overlapping_matches_keep_the_offscreen_logical_line_alignment ... ok
+test visible_highlights_use_the_selected_scrollback_page ... ok
+test wide_wrap_padding_is_skipped_but_real_spaces_are_retained ... ok
+test ignore_case_keeps_line_boundaries_and_query_limits ... ok
+test wrapped_unicode_and_combining_matches_select_complete_cells ... ok
+test maximum_query_spans_many_rows_without_building_a_logical_line ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/selection.rs (target/debug/build/ztty/8452943597126dde/out/selection-8452943597126dde)
+
+running 5 tests
+test autowrapped_text_copies_as_one_logical_line_in_either_direction ... ok
+test invalid_or_outside_selection_coordinates_are_bounded ... ok
+test explicit_newlines_stay_separate_and_only_hard_line_padding_is_trimmed ... ok
+test selection_can_span_retained_history_and_more_than_one_viewport ... ok
+test wide_wrap_padding_is_omitted_and_partial_glyphs_copy_whole_cells ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/session_control.rs (target/debug/build/ztty/eecd3ac2de31b7c5/out/session_control-eecd3ac2de31b7c5)
+
+running 9 tests
+test an_unowned_session_can_be_acquired_without_forcing_takeover ... ok
+test explicit_takeover_revokes_previous_owner_and_requests_cancellation_once ... ok
+test actor_validation_retains_ascii_and_length_boundaries ... ok
+test initial_owner_has_exclusive_control ... ok
+test reacquiring_current_owner_does_not_request_input_cancellation ... ok
+test rejected_takeover_keeps_the_original_owner ... ok
+test release_by_another_actor_does_not_change_control ... ok
+test released_control_denies_every_actor_until_reacquired ... ok
+test repeated_transfers_keep_one_owner_and_preserve_rejected_state ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/session_core.rs (target/debug/build/ztty/488affcbf45f5784/out/session_core-488affcbf45f5784)
+bounded atomic input ... ok
+control and queue cancellation ... ok
+bounded terminal responses ... ok
+transactional PTY resize ... ok
+reaped child output drain ... ok
+fragmented UTF-8 and EOF ... ok
+per-feed history anchor ... ok
+full-history viewport retention ... ok
+native errors and descriptor cleanup ... ok
+SessionCore: 9 checks passed; every test child joined.
+     Running tests/windows_dispatch.rs (target/debug/build/ztty/4a61cb1909757df2/out/windows_dispatch-4a61cb1909757df2)
+
+running 8 tests
+test committing_resize_before_paint_does_not_consume_another_paint_obligation ... ok
+test failed_invalidation_requeues_without_counting_another_nested_paint ... ok
+test nested_paints_preserve_one_obligation_after_default_validation ... ok
+test minimize_cancels_resize_until_the_window_has_a_client_again ... ok
+test nested_resize_survives_the_mutable_dispatch_guard ... ok
+test paint_queued_during_revalidation_survives_the_current_attempt ... ok
+test rapid_resizes_commit_only_the_latest_client_dimensions ... ok
+test resize_queued_during_commit_survives_the_current_callback ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/windows_frame.rs (target/debug/build/ztty/2622fcd8349cf889/out/windows_frame-2622fcd8349cf889)
+
+running 4 tests
+test aggregate_budget_rejection_keeps_the_source_untouched ... ok
+test offscreen_capture_and_target_clipping_do_not_copy_outside_either_view ... ok
+test moved_held_frame_keeps_committed_pixels_and_does_not_touch_neighbours ... ok
+test repeated_resize_uses_the_original_committed_frame ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/working_directory.rs (target/debug/build/ztty/31a387cdf45df717/out/working_directory-31a387cdf45df717)
+
+running 4 tests
+test failed_target_preserves_cwd_errno_and_descriptor_count ... ok
+test saved_directory_failure_reports_original_emfile_before_target_lookup ... ok
+test switches_restores_and_closes_a_cloexec_path_handle ... ok
+test search_only_original_directory_can_be_saved_and_restored ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace_state.rs (target/debug/build/ztty/769d3dbc26e26fd3/out/workspace_state-769d3dbc26e26fd3)
+
+running 13 tests
+test a_recreated_session_with_the_same_uri_cannot_replace_the_saved_pty ... ok
+test focus_must_be_a_live_leaf_in_the_active_tab ... ok
+test duplicate_ids_uris_and_resolver_aliases_cannot_duplicate_a_session ... ok
+test graph_cycles_forward_references_shared_children_and_orphans_are_rejected ... ok
+test identity_integer_boundaries_survive_json_without_precision_loss ... ok
+test legacy_uri_only_snapshots_are_rejected_before_session_lookup ... ok
+test identity_fields_are_required_nonzero_and_exact_integers ... ok
+test invalid_dimensions_versions_and_field_types_are_rejected ... ok
+test roundtrip_preserves_nested_tabs_geometry_focus_and_maximization ... ok
+test invalid_split_ratios_axes_and_unexpected_fields_are_rejected ... ok
+test missing_sessions_and_unsafe_or_oversized_addresses_are_rejected ... ok
+test tab_and_pane_limits_are_enforced_in_both_directions ... ok
+test deepest_supported_tree_stays_within_json_parser_depth ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/build/ztty-ui/d08c35cf0229d6da/out/ztty_ui-d08c35cf0229d6da)
+
+running 18 tests
+test tests::capabilities_are_read_only_and_report_floor ... ok
+test tests::complete_loop_and_stale_actions ... ok
+test tests::counters_never_wrap ... ok
+test tests::events_require_opt_in_and_enabled_current_button ... ok
+test tests::image_references_have_no_pixels_and_pin_generation ... ok
+test tests::failed_update_is_atomic_and_does_not_allocate_new_unchanged_text ... ok
+test tests::invalid_graphs_and_property_kinds_are_atomic ... ok
+test tests::malformed_untrusted_payloads_leave_scene_untouched ... ok
+test tests::mixed_progress_updates_keep_general_graph_validation ... ok
+test tests::unicode_escapes_and_control_rejection ... ok
+test tests::progress_value_update_retains_the_existing_label_allocation ... ok
+test tests::reset_preserves_revision_and_event_identity ... ok
+test tests::numeric_progress_batches_match_general_transaction_observables ... ok
+test tests::numeric_progress_batches_reject_atomically_and_keep_error_precedence ... ok
+test tests::depth_node_and_text_bounds ... ok
+test tests::numeric_progress_batch_handles_all_progress_nodes_in_maximum_tree ... ok
+test tests::maximum_valid_tree_and_text_budget_are_accepted ... ok
+test tests::frame_handles_every_split_and_cancellation ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests zgraphics
+
+running 1 test
+test crates/zgraphics/src/../README.md - (line 14) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.20s; merged doctests compilation took 0.20s
+   Doc-tests zinput
+
+running 2 tests
+test crates/zinput/src/lib.rs - (line 60) ... ok
+test crates/zinput/src/lib.rs - (line 29) ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.17s; merged doctests compilation took 0.16s
+   Doc-tests zpty
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests zterm
+
+running 3 tests
+test crates/zterm/src/../README.md - (line 71) ... ok
+test crates/zterm/src/../README.md - (line 23) ... ok
+test crates/zterm/src/../README.md - (line 105) ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+all doctests ran in 0.24s; merged doctests compilation took 0.24s
+   Doc-tests ztty
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests ztty_ui
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,123 @@
+{
+  "binary": "/usr/bin/ztty",
+  "binary_sha256": "72adfb846f65c3e39b72c76e971fd15263d755a06f7f2f53245f8082c61393ec",
+  "scope": "owned Xvfb, generated red image and text only",
+  "checks": [
+    {
+      "clear_mode": "spaces",
+      "expected_background": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "stale_red_image": true
+    },
+    {
+      "clear_mode": "ECH",
+      "expected_background": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "stale_red_image": true
+    },
+    {
+      "clear_mode": "EL",
+      "expected_background": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "stale_red_image": true
+    },
+    {
+      "clear_mode": "ED0",
+      "expected_background": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "stale_red_image": true
+    },
+    {
+      "clear_mode": "ED1",
+      "expected_background": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "stale_red_image": true
+    },
+    {
+      "clear_mode": "ED2",
+      "expected_background": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "stale_red_image": false
+    },
+    {
+      "clear_mode": "kitty-delete",
+      "expected_background": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "stale_red_image": false
+    }
+  ],
+  "cell": [
+    9,
+    24
+  ]
+}

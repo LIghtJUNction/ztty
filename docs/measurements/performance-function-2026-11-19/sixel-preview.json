@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "ok": true,
+  "binary": "$CHECKOUT/target/release/ztty",
+  "binary_sha256": "9cfa87530c3bbbf21950e0828ff9ecf9973a699551fabc034a6a3a01d264b468",
+  "scope": "owned Xvfb; generated images and text only",
+  "checks": [
+    {
+      "name": "spaces",
+      "ok": true,
+      "clear_mode": "spaces",
+      "expected": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "screenshot": "preview-spaces.png"
+    },
+    {
+      "name": "ECH",
+      "ok": true,
+      "clear_mode": "ECH",
+      "expected": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "screenshot": "preview-ECH.png"
+    },
+    {
+      "name": "EL",
+      "ok": true,
+      "clear_mode": "EL",
+      "expected": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "screenshot": "preview-EL.png"
+    },
+    {
+      "name": "ED0",
+      "ok": true,
+      "clear_mode": "ED0",
+      "expected": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "screenshot": "preview-ED0.png"
+    },
+    {
+      "name": "ED1",
+      "ok": true,
+      "clear_mode": "ED1",
+      "expected": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "screenshot": "preview-ED1.png"
+    },
+    {
+      "name": "ED2",
+      "ok": true,
+      "clear_mode": "ED2",
+      "expected": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "screenshot": "preview-ED2.png"
+    },
+    {
+      "name": "kitty-delete",
+      "ok": true,
+      "clear_mode": "kitty-delete",
+      "expected": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "observed": [
+        24,
+        36,
+        48,
+        191
+      ],
+      "screenshot": "preview-kitty-delete.png"
+    },
+    {
+      "name": "partial-and-independent",
+      "ok": true,
+      "one_cell_erased": true,
+      "four_uncovered_boundaries_preserved": true,
+      "nonintersecting_sixel_preserved": true,
+      "overlapping_kitty_preserved": true,
+      "screenshots": [
+        "preview-partial.png",
+        "preview-isolated.png"
+      ]
+    }
+  ],
+  "cell_pixels": [
+    9,
+    24
+  ],
+  "passed": 8
+}
