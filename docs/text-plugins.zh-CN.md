@@ -62,7 +62,7 @@ fn transform(
 1. 用户确认动作，终端快照选区或当前可见文本。
 2. broker 启动当前终端映像的独立 worker。库在 worker 内加载，broker 不调用库代码。
 3. worker 创建实例、转换文本、销毁实例，然后调用合作卸载。
-4. broker 验证完整结果和正常退出，回收该 worker，再写剪贴板。
+4. broker 验证完整结果和正常退出，在保留退出 worker 身份时清理其进程组，再回收 worker、写剪贴板。
 
 工作进程使用独立进程组；GUI 对通信描述符做非阻塞读写，每轮限制工作量。关闭视图后仍保留作业对象，直到对应子进程被回收，避免遗留结果写入后来打开的视图。无扩展作业时不启动 worker、不建立扩展描述符或定时器；PTY 读入、VT 解析和逐字符绘制路径不调用扩展。[宿主实现](../src/plugin_host.rs) · [界面接入](../src/session.rs)
 
@@ -95,3 +95,15 @@ python3 tests/plugin_gui.py --binary target/release/ztty --example artifacts/zpl
 ```
 
 GUI 检查使用新建的私有 Xvfb、独立 broker socket 和合成文本，不操作用户桌面、剪贴板或现有会话。故障库覆盖接口版本不匹配、拒绝合作卸载、错误长度、非法 UTF-8、panic、原生崩溃、超时、CPU 限额、异常 stdout、遗留子进程通道以及母进程退出。它只用于测试，不应安装成日常扩展。
+
+## 本轮验证记录
+
+验证源码为 `68030066cb18e97fa5677a77881d54188fdc93f3`，Linux ELF SHA-256 为 `ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51`。同一 ELF 上的 CLI 22 项、私有 Xvfb GUI 10 项、日常工作流 19 项与重绘 11 项全部通过。Clippy 以 `-D warnings` 通过；Windows GNU 前端通过 `cargo check`，这不代表 Windows 已接入插件宿主。注册规则 2 项、SessionCore 真实 PTY 9 项与 Dedent 2 项测试通过，对应源码未被后续 worker 收尾修复修改。macOS 未测试。
+
+独立审查发现并直接复现了一个退出边界：插件子进程关闭标准描述符后，原 worker 可以正常返回，而子进程仍留在进程组。修复使用 `waitid(WNOWAIT)` 保留已退出 leader 的身份，先终止属于本次调用的进程组，再 `waitpid` 回收；新增故障用例验证该子进程也被终止并由测试进程回收。测试没有按进程名称清理，也没有触碰用户会话。
+
+[验证汇总](measurements/zplugin-2026-11-19/validation.json) · [CLI 与生命周期](measurements/zplugin-2026-11-19/cli.json) · [GUI 检查](measurements/zplugin-2026-11-19/gui.json) · [基线复现](measurements/zplugin-2026-11-19/group-cleanup-baseline.json) · [依赖特征图](measurements/zplugin-2026-11-19/features.log)
+
+![命令面板中的注册动作](measurements/zplugin-2026-11-19/registered-actions.png)
+
+![选区处理后的轻量复制反馈](measurements/zplugin-2026-11-19/copied-selection.png)

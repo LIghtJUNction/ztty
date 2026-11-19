@@ -1,0 +1,7 @@
+zplugin v0.3.0
+└── ztty v0.4.1 ($REPO)
+    └── ztty feature "default" (command-line)
+└── zplugin feature "macros"
+    └── ztty-plugin-api v0.1.0 ($REPO/crates/ztty-plugin-api)
+        └── ztty-plugin-api feature "default"
+            └── ztty v0.4.1 ($REPO) (*)

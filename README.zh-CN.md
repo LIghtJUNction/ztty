@@ -382,3 +382,7 @@ macOS 工作区界面也尚未补齐。各原生版本的实际验收以本页�
 
 Windows 门禁在测试自有的可见桌面执行原像素检查，并核验进程清理与桌面恢复。
 [原生验收机制](docs/native-candidates-2026-11-18.md#owned-windows-ci-desktop)。
+
+## 文本扩展（Linux）
+
+用 `--text-plugin dedent=/绝对路径/library.so` 或配置项 `text-plugin = dedent=/绝对路径/library.so` 注册可信原生文本扩展。**Ctrl+Shift+P → Copy using dedent** 处理选区（没有选区时使用可见文本）并复制结果。宿主通过真实的 no_std zplugin 接口在有界、一次性的工作进程中调用动态库。参见[接口与验收说明](docs/text-plugins.zh-CN.md)和可独立编译的 [Dedent 示例](examples/dedent-plugin/README.md)。注册名称使用 ASCII 字母、数字、短横线或下划线。

@@ -587,3 +587,7 @@ preserves its live PTY. External tools using `TERMINAL -e COMMAND`, including
 [Real integration, lifecycle and remaining platform boundaries](docs/ssmcp-observer.md).
 
 MIT © LIghtJUNction
+
+## Text extensions (Linux)
+
+Register a trusted native text action with `--text-plugin NAME=/absolute/library.so` or `text-plugin = NAME=/absolute/library.so` in the config. **Ctrl+Shift+P → Copy using NAME** transforms the selection (or visible text) and copies its result. Libraries run in bounded, disposable workers through the real no_std zplugin interface. See the [interface and validation guide](docs/text-plugins.zh-CN.md) and the independently compiled [Dedent example](examples/dedent-plugin/README.md).

@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "config registration reaches broker; CLI case-normalized override loads the real example; no selection uses visible text",
+      "ok": true
+    },
+    {
+      "name": "explicit selected text preserves wide and combining characters and hard newline; result only enters clipboard",
+      "ok": true
+    },
+    {
+      "name": "soft-wrapped selection is a single logical input line",
+      "ok": true
+    },
+    {
+      "name": "empty leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "invalid-utf8 leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "panic leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "crash leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "hung plugin does not block another window; Escape cancels without reaching source PTY",
+      "ok": true,
+      "other_window_input_ms": 10.37649299541954
+    },
+    {
+      "name": "live configuration removal cancels the owning call and preserves clipboard",
+      "ok": true
+    },
+    {
+      "name": "closing the owning view reaps only its worker; another live PTY remains responsive",
+      "ok": true
+    }
+  ],
+  "cleanup_errors": [],
+  "screenshots": {
+    "registered-actions": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/gui/registered-actions.png",
+      "sha256": "cd88f8c60da1472eafad275475f056cc1142153ee6ad3ccfac87bcf88a592cae"
+    },
+    "copied-visible-text": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/gui/copied-visible-text.png",
+      "sha256": "d4f7caf4e4b8a55b788934881528599d095a68f52ea9235abc4b5662505ee071"
+    },
+    "copied-selection": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/gui/copied-selection.png",
+      "sha256": "893e994bbf09cdb29e4dfe66406879784dab0c5349400905d2ceae7c591581df"
+    },
+    "extension-error": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/gui/extension-error.png",
+      "sha256": "20840e7286ac08fd055a7a79d1333769df8e6b5ac3efdb460ff5919577ba8678"
+    }
+  },
+  "binary_sha256": "ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51",
+  "example_sha256": "6e501149710baf10424875bc97e8ef8d6c81c64067ad31850784aef485cead6d",
+  "fixture_sha256": "fb5acac3ab64027ac363a5573fecb51c99ca1df086b27a72ee885e258e4e75a8",
+  "source_commit": "c288654cc9d7cc4884f84a9cf6aaede49ecd8cda",
+  "source_sha256": {
+    "src/main.rs": "f8e9c9250a85d63f6591d8a17f9eb6cc35245f72d2a95b439099dee813c08dc6",
+    "src/session.rs": "d7acd5c4702b691fd370d4366f192fd1c22ca2106c32ba7d5ae60c826b1059aa",
+    "src/appearance.rs": "ea4211887800e8a466a3d7452a6b9d5642f871e86a0ac9e79bc94bfddd77f0b7",
+    "src/plugin_host.rs": "73b9bc9ad09c8cbb1de4c952cf2984334ec7f8f14b94c00bd4c898bb234ad950",
+    "src/text_plugins.rs": "dc998a3a14176d2a5e4384fe5c2ba8efb7fc4ec3206df8c391304097d6db23bf",
+    "tests/plugin_gui.py": "670abfe443071e5404329bbc55c16251e2b598ef2e235a791c0830ce4943196b",
+    "tests/copy_paste_gui.py": "6d0c268174c76b61efae46a57d57ae099cc90446626763fb14d90979afa4ccbd"
+  },
+  "scope": "Owned Xvfb, explicit private broker, synthetic text, native clipboard and raw PTYs",
+  "display_ownership": {
+    "display": ":5034",
+    "pid": 3171974,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X5034",
+        "inode": 26939612,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X5034",
+        "inode": 26939611,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "stderr": ""
+}

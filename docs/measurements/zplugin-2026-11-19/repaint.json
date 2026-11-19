@@ -1,0 +1,328 @@
+{
+  "ok": true,
+  "binary": "$REPO/target/release/ztty",
+  "binary_sha256": "ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted",
+    "one-row updates still copy only one row",
+    "terminal content and search overlay share one visible copy",
+    "bulk output ending in silence publishes the final real pixels without an external wakeup",
+    "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+    "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+    "a force/expose paint of the old screen does not lose the subsequent interactive response",
+    "synchronized output and Expose retain the committed pixels until explicit release",
+    "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+    "a synchronized begin/end in one small write publishes its complete final pixels",
+    "scrollback and its return-to-live prompt share one visible copy"
+  ],
+  "timings_ms": {
+    "initial-a": 0.2923880019807257,
+    "initial-b": 0.11507899762364104,
+    "quiet-final-frame": 4.016068996861577,
+    "old-frame-expose": 0.07092499436112121,
+    "xtest-visible-echo": 0.931511000089813,
+    "broker-write-during-flood": 0.28011699760099873,
+    "rpc-visible-echo": 0.4868849937338382,
+    "sync-initial": 0.0779269976192154,
+    "sync-expose-retained": 0.2787379999062978,
+    "sync-explicit-release": 0.048057001549750566,
+    "sync-quiet-timeout": 51.10398399847327,
+    "sync-total-from-first-begin": 151.8532670015702,
+    "sync-same-feed": 0.0753720014472492,
+    "scroll-history-ready": 0.08217999857151881
+  },
+  "screenshots": {
+    "nonadjacent-frame": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/nonadjacent-frame.png",
+      "sha256": "9fcb895518a24fe035294e28b4cdafec97b0f62689d050004d3dc77f58c28cc4",
+      "rgb_sha256": "78e869259fe8a0124192bfd5c706798244b3793bb7cf2046f1c042cd153cc861"
+    },
+    "single-publish-overlay": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/single-publish-overlay.png",
+      "sha256": "a78403703c7322923d4c3f6823f1b21271f88c3ba47fe98106704d934a26a388",
+      "rgb_sha256": "9298c5cf12c6df5f0384813187c4777b8f0df812d19850bec33faea63a957683"
+    },
+    "quiet-final-frame": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/quiet-final-frame.png",
+      "sha256": "6a077c67991b8b33da2afa055046ef88435019da871c67b5a3b35eb57362bafc",
+      "rgb_sha256": "3ca4e8ba665135b81a7fd1f26e6b1fb96a44a010d3087f75c716c15f8f4fb1ce"
+    },
+    "fairness-flood": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/fairness-flood.png",
+      "sha256": "016aa8fee3be899cbada5cc64c8d78dd1209a3c59815275dba2b3285e7509e32",
+      "rgb_sha256": "f63cf24ce44c0bcd6650a53c7673852d5519975f8a1bd06e306da51cc0996248"
+    },
+    "fairness-interaction": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/fairness-interaction.png",
+      "sha256": "b0cb1e3a4249677812b67680889a4b4b143393c60be3fd1a21f2b1d188d0a097",
+      "rgb_sha256": "5e65a4d8c18ebfc49b72d19f48cc99cb66eb6cf3f7063b5d3012dbc607596f8e"
+    },
+    "sync-release": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/sync-release.png",
+      "sha256": "adc5c4cb460e19ab8b3f9bb7b5483d0649f6a8fd80e3648bf60c55c3db6539f2",
+      "rgb_sha256": "8c1e51d883ae7d83e8d22dd893cf5dd5b96ceadd13658c0e60bf4963575d6763"
+    },
+    "sync-timeout": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/sync-timeout.png",
+      "sha256": "4bc401daaca8ab4e6d1ce86c5287bdac29e6def7f1b8ef63f7e2f55a32a74c06",
+      "rgb_sha256": "c4c2af48285a9d387da56bff8bb8ea7ee59c76123280343c53505bd27a7e9b49"
+    },
+    "sync-same-feed": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/sync-same-feed.png",
+      "sha256": "13364cf21c78e5aeb8e8f010b938bcebfefdff1cfcba3fdbef3f9b14904ebf4a",
+      "rgb_sha256": "3348902948e537517045c60fc4115203bde850e48cecc55c0bd00b12908f6299"
+    },
+    "single-publish-scroll": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/repaint/single-publish-scroll.png",
+      "sha256": "eee56550c0eabd62660324278161afd28c4a346bfa79fd8083643badd0f4c08f",
+      "rgb_sha256": "5d14c2e9cd38f77aeb65b0fd9d7b0708bb6fe25f56ea30fc767dc72c2c2fc22c"
+    }
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "d7acd5c4702b691fd370d4366f192fd1c22ca2106c32ba7d5ae60c826b1059aa",
+    "src/x11.rs": "383ed7d1374d1c1374dcd095964b87137e6a5d2cdd00435b9428c9bf5b3213ce",
+    "crates/zterm/src/terminal.rs": "df1726244bc03194efd630dd2ab085fab67a1a8ed85462e3fc2de00bd2836c9b",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "d39cf19451295df18068d0f8c811c76581ede764be926ce346619e12486e28a7",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "3f67997c6ce408a910f23ba4c5445e72db9d95675d7905813c3fe628855bd9ad",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":5972",
+    "pid": 3178248,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X5972",
+        "inode": 26957493,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X5972",
+        "inode": 26957492,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "broker": {
+    "pid": 3178274,
+    "state": "S",
+    "user_ticks": 1,
+    "system_ticks": 0,
+    "threads": 1,
+    "start_ticks": 3612628,
+    "exe_sha256": "ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51"
+  },
+  "owned_processes": {
+    "3178272": 3612628,
+    "3178275": 3612633,
+    "3178274": 3612628,
+    "3178276": 3612639,
+    "3178277": 3612640
+  },
+  "nonadjacent_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      16,
+      1112,
+      736,
+      0,
+      16
+    ]
+  ],
+  "single_row_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      729,
+      1112,
+      23,
+      0,
+      729
+    ]
+  ],
+  "overlay_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "payload": {
+    "bytes": 1050937,
+    "sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+  },
+  "idle_context_switches": {
+    "seconds": 0.35,
+    "before": {
+      "voluntary_ctxt_switches": 80,
+      "nonvoluntary_ctxt_switches": 7
+    },
+    "after": {
+      "voluntary_ctxt_switches": 80,
+      "nonvoluntary_ctxt_switches": 7
+    },
+    "delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "flood_visible_colors": [
+    [
+      52,
+      92,
+      188
+    ],
+    [
+      60,
+      196,
+      148
+    ],
+    [
+      68,
+      108,
+      76
+    ],
+    [
+      70,
+      134,
+      90
+    ],
+    [
+      79,
+      59,
+      201
+    ],
+    [
+      80,
+      72,
+      96
+    ],
+    [
+      91,
+      215,
+      61
+    ],
+    [
+      92,
+      36,
+      84
+    ],
+    [
+      100,
+      140,
+      108
+    ],
+    [
+      105,
+      205,
+      95
+    ],
+    [
+      111,
+      91,
+      73
+    ],
+    [
+      122,
+      42,
+      166
+    ],
+    [
+      126,
+      94,
+      66
+    ],
+    [
+      133,
+      185,
+      67
+    ],
+    [
+      145,
+      149,
+      151
+    ],
+    [
+      151,
+      35,
+      97
+    ],
+    [
+      158,
+      126,
+      194
+    ],
+    [
+      161,
+      165,
+      71
+    ],
+    [
+      164,
+      204,
+      76
+    ],
+    [
+      173,
+      129,
+      91
+    ],
+    [
+      181,
+      41,
+      147
+    ],
+    [
+      195,
+      31,
+      53
+    ],
+    [
+      199,
+      83,
+      81
+    ],
+    [
+      207,
+      187,
+      201
+    ]
+  ],
+  "scroll_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": ""
+}
