@@ -1,9 +1,22 @@
 # Releasing ztty and its reusable libraries
 
-Report date: **2026-11-19, Asia/Taipei**. The application version is **0.3.1**.
+Report date: **2026-11-19, Asia/Taipei**. The application source version is **0.4.0**.
 Library publication, build-only candidate acceptance, formal tagged gates,
 GitHub Release publication and device installation are recorded separately below. The [experience report](experience-release-2026-11-18.md)
 retains source identities, raw evidence and failed attempts.
+
+## 0.4.0 release
+
+Version 0.4.0 integrates PR #11's experimental ZUI/1 Linux host and fixes
+printable numeric-keypad input under Kitty keyboard disambiguation.
+The source dependencies require zinput 0.1.2, ztty-ui 0.1.0 and zterm 0.4.0.
+Publish the two leaf libraries before zterm, then publish the ztty application.
+
+The tagged application release retains Verify and all six native architecture
+gates. Both Linux architectures also run the native UI interaction suite.
+The input suite checks 70 byte vectors and 14 zoom cases, including normal
+numeric input, explicit application-keypad mode and requested report-all events.
+The source-bound results and publication readback accompany the release report.
 
 ## 0.3.1 release gate
 
