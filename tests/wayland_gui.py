@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Actual xdg-shell/EGL/PTY acceptance on a private headless Sway compositor.
 
-No X server, shared runtime directory, physical input device or host window is
-used. Requires a Wayland-enabled ztty build, sway/swaymsg, wtype, grim,
+Pure Wayland checks use no X server. Only the mixed-backend checks use an
+owned Xvfb. No shared display, physical input device or host window is used. Requires a Wayland-enabled ztty build, sway/swaymsg, wtype, grim,
 wl-clipboard, Xvfb, Pillow, python-xlib and the Wayland C development tools.
 The test automatically builds its private input-method-v2 peer.
 """
