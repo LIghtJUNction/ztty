@@ -4,6 +4,98 @@ use zterm::Terminal;
 
 const MAX_BYTES: usize = 4 * 1024 * 1024;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Unit {
+    Cell,
+    Word,
+    Line,
+}
+
+/// Expand a pointer position to a complete visible selection unit. Only
+/// explicit soft wraps join rows; hard newlines always end a word or line.
+pub fn unit(
+    terminal: &Terminal,
+    point: (usize, usize),
+    history_offset: usize,
+    unit: Unit,
+) -> ((usize, usize), (usize, usize)) {
+    let cols = terminal.cols();
+    let rows = terminal.rows();
+    if cols == 0 || rows == 0 {
+        return ((0, 0), (0, 0));
+    }
+    let offset = history_offset.min(terminal.history_len());
+    let leading = |(mut col, row): (usize, usize)| {
+        if col != 0 && terminal.view_cell(col, row, offset).width == 0 {
+            col -= 1;
+        }
+        (col, row)
+    };
+    let tail = |(col, row): (usize, usize)| {
+        let width = usize::from(terminal.view_cell(col, row, offset).width).max(1);
+        ((col + width - 1).min(cols - 1), row)
+    };
+    let point = leading((point.0.min(cols - 1), point.1.min(rows - 1)));
+    if unit == Unit::Cell {
+        return (point, tail(point));
+    }
+    if unit == Unit::Line {
+        let mut first = point.1;
+        let mut last = point.1;
+        while first != 0 && terminal.view_row_wrap(first - 1, offset).is_some() {
+            first -= 1;
+        }
+        while last + 1 < rows && terminal.view_row_wrap(last, offset).is_some() {
+            last += 1;
+        }
+        return ((0, first), (cols - 1, last));
+    }
+    let class = |(col, row)| {
+        let ch = terminal.view_cell(col, row, offset).ch;
+        if ch == '\0' || ch.is_whitespace() {
+            0
+        } else if "()[]{}<>,;\"'`".contains(ch) {
+            1
+        } else {
+            // Keep paths, URLs, identifiers and Unicode text together.
+            2
+        }
+    };
+    let previous = |(col, row)| {
+        if col != 0 {
+            Some(leading((col - 1, row)))
+        } else if row != 0 {
+            terminal
+                .view_row_wrap(row - 1, offset)
+                .filter(|limit| *limit != 0)
+                .map(|limit| leading((limit.min(cols) - 1, row - 1)))
+        } else {
+            None
+        }
+    };
+    let next = |point: (usize, usize)| {
+        let (col, row) = tail(point);
+        let wrap = terminal.view_row_wrap(row, offset);
+        if col + 1 < wrap.unwrap_or(cols).min(cols) {
+            Some((col + 1, row))
+        } else if wrap.is_some() && row + 1 < rows {
+            Some((0, row + 1))
+        } else {
+            None
+        }
+    };
+    let kind = class(point);
+    let mut first = point;
+    let mut last = point;
+    while let Some(point) = previous(first).filter(|point| class(*point) == kind) {
+        first = point;
+    }
+    while let Some(point) = next(last).filter(|point| class(*point) == kind) {
+        last = point;
+    }
+    (first, tail(last))
+}
+
 /// Read an inclusive selection in viewport coordinates. Physical rows joined
 /// by terminal autowrap stay one logical line; explicit line breaks remain.
 pub fn text(
