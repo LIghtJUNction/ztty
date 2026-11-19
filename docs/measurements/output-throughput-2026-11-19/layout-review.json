@@ -1,0 +1,27 @@
+{
+  "function": "zvte::Parser<4096>::advance<zterm::terminal::State>",
+  "normalization": "Absolute instruction addresses become function offsets; local branch offsets and external symbol names retained. RIP-relative data displacements and address comments normalized.",
+  "instructions_equal_after_address_normalization": true,
+  "binaries": [
+    {
+      "version": "baseline",
+      "start_address_hex": "0x8f350",
+      "function_bytes": 5587,
+      "assembly_sha256": "5efe27949ac4e8f401dda0db0866c1f1f1dad2f7d25675b4069ef2d7f5d4e18a",
+      "normalized_sha256": "162604e32b867e4fb1be828ae6db141b17d73bb248492e5b1c8d0ddee716bccf"
+    },
+    {
+      "version": "candidate",
+      "start_address_hex": "0x8f3d0",
+      "function_bytes": 5587,
+      "assembly_sha256": "b14e45b211a135fea6099b63204ab8ec0625d03c8f93af682f86709df0e02e1d",
+      "normalized_sha256": "162604e32b867e4fb1be828ae6db141b17d73bb248492e5b1c8d0ddee716bccf"
+    }
+  ],
+  "interpretation": "No additional instructions in this parser loop; this does not establish the cause of the measured in-place throughput difference.",
+  "clear_row": "Previously inlined; candidate has an out-of-line 0x25d-byte function.",
+  "scroll_up_function_bytes": {
+    "baseline": 1933,
+    "candidate": 1448
+  }
+}

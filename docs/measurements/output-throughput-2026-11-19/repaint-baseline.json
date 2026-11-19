@@ -1,0 +1,237 @@
+{
+  "ok": true,
+  "binary": "baseline/ztty",
+  "binary_sha256": "2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted",
+    "one-row updates still copy only one row",
+    "terminal content and search overlay share one visible copy",
+    "bulk output ending in silence publishes the final real pixels without an external wakeup",
+    "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+    "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+    "a force/expose paint of the old screen does not lose the subsequent interactive response",
+    "synchronized output and Expose retain the committed pixels until explicit release",
+    "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+    "a synchronized begin/end in one small write publishes its complete final pixels",
+    "scrollback and its return-to-live prompt share one visible copy"
+  ],
+  "timings_ms": {
+    "initial-a": 0.13601500177173875,
+    "initial-b": 0.06409599882317707,
+    "quiet-final-frame": 4.69302700003027,
+    "old-frame-expose": 0.3365480006323196,
+    "xtest-visible-echo": 0.9014220013341401,
+    "broker-write-during-flood": 0.2440489988657646,
+    "rpc-visible-echo": 0.4460660020413343,
+    "sync-initial": 0.20195799879729748,
+    "sync-expose-retained": 0.14821000149822794,
+    "sync-explicit-release": 0.06824599768151529,
+    "sync-quiet-timeout": 47.832770000241,
+    "sync-total-from-first-begin": 151.31383300104062,
+    "sync-same-feed": 0.04774999979417771,
+    "scroll-history-ready": 0.11067800005548634
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "02fae116f87c3d22850bd1a89c55ba8462811e0fa8d225e27c85e09c30021a3e",
+    "src/x11.rs": "383ed7d1374d1c1374dcd095964b87137e6a5d2cdd00435b9428c9bf5b3213ce",
+    "crates/zterm/src/terminal.rs": "df1726244bc03194efd630dd2ab085fab67a1a8ed85462e3fc2de00bd2836c9b",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "d39cf19451295df18068d0f8c811c76581ede764be926ce346619e12486e28a7",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "3f67997c6ce408a910f23ba4c5445e72db9d95675d7905813c3fe628855bd9ad",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "nonadjacent_frame_copies": [
+    [
+      0,
+      16,
+      1112,
+      736,
+      0,
+      16
+    ]
+  ],
+  "single_row_frame_copies": [
+    [
+      0,
+      729,
+      1112,
+      23,
+      0,
+      729
+    ]
+  ],
+  "overlay_frame_copies": [
+    [
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "payload": {
+    "bytes": 1050937,
+    "sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+  },
+  "idle_context_switches": {
+    "seconds": 0.35,
+    "before": {
+      "voluntary_ctxt_switches": 69,
+      "nonvoluntary_ctxt_switches": 2
+    },
+    "after": {
+      "voluntary_ctxt_switches": 69,
+      "nonvoluntary_ctxt_switches": 2
+    },
+    "delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "flood_visible_colors": [
+    [
+      38,
+      102,
+      154
+    ],
+    [
+      45,
+      193,
+      187
+    ],
+    [
+      53,
+      105,
+      147
+    ],
+    [
+      63,
+      43,
+      121
+    ],
+    [
+      66,
+      82,
+      158
+    ],
+    [
+      67,
+      95,
+      53
+    ],
+    [
+      70,
+      134,
+      122
+    ],
+    [
+      73,
+      173,
+      159
+    ],
+    [
+      77,
+      33,
+      123
+    ],
+    [
+      86,
+      150,
+      106
+    ],
+    [
+      87,
+      163,
+      97
+    ],
+    [
+      91,
+      215,
+      93
+    ],
+    [
+      101,
+      153,
+      131
+    ],
+    [
+      103,
+      179,
+      177
+    ],
+    [
+      117,
+      169,
+      83
+    ],
+    [
+      127,
+      107,
+      57
+    ],
+    [
+      133,
+      185,
+      67
+    ],
+    [
+      150,
+      214,
+      74
+    ],
+    [
+      173,
+      129,
+      123
+    ],
+    [
+      180,
+      28,
+      124
+    ],
+    [
+      188,
+      132,
+      52
+    ],
+    [
+      201,
+      109,
+      95
+    ],
+    [
+      204,
+      148,
+      100
+    ],
+    [
+      222,
+      190,
+      66
+    ]
+  ],
+  "scroll_frame_copies": [
+    [
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "original_file_sha256": "d619ac3b6dc40eb2107458a5300431bb0814dcb4b72ba00470fdcce453fb906e",
+  "frame_copy_note": "X11 drawable IDs removed; source x/y, width/height and destination x/y retained."
+}
