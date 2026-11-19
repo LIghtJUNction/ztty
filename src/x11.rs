@@ -1686,6 +1686,76 @@ impl Window {
     }
 
     /// Temporary search/command UI belongs to the view, never to PTY output.
+    pub fn clipboard_menu_bounds(&self, x: i32, y: i32) -> crate::layout::Rect {
+        let width = (self.cw * 28 + 18).min(self.width).max(1);
+        let height = (2 * (self.ch + 8) + 2).min(self.height).max(1);
+        crate::layout::Rect {
+            x: x.clamp(0, (self.width - width).max(0)),
+            y: y.clamp(0, (self.height - height).max(0)),
+            width,
+            height,
+        }
+    }
+
+    pub fn clipboard_menu(
+        &mut self,
+        bounds: crate::layout::Rect,
+        selected: usize,
+        enabled: [bool; 2],
+        shortcuts: [&str; 2],
+    ) {
+        if self.suspended {
+            return;
+        }
+        self.fill_background(
+            0x5f7287,
+            false,
+            bounds.x,
+            bounds.y,
+            bounds.width as u32,
+            bounds.height as u32,
+        );
+        self.fill_background(
+            self.background,
+            false,
+            bounds.x + 1,
+            bounds.y + 1,
+            (bounds.width - 2).max(0) as u32,
+            (bounds.height - 2).max(0) as u32,
+        );
+        for (row, (label, shortcut)) in [("Copy", shortcuts[0]), ("Paste", shortcuts[1])]
+            .into_iter()
+            .enumerate()
+        {
+            let y = bounds.y + 1 + row as i32 * (self.ch + 8);
+            if y + self.ch + 8 > bounds.y + bounds.height {
+                break;
+            }
+            if row == selected && enabled[row] {
+                self.fill_background(
+                    self.selection_colors.0,
+                    false,
+                    bounds.x + 1,
+                    y,
+                    (bounds.width - 2).max(0) as u32,
+                    (self.ch + 8) as u32,
+                );
+            }
+            let color = if enabled[row] { 0xcdd6e4 } else { 0x657080 };
+            let right = bounds.x + bounds.width - 9;
+            let x = (right - self.overlay_width(shortcut)).max(bounds.x + 9);
+            self.overlay_text_color(
+                label,
+                bounds.x + 9,
+                y + 4,
+                (x - self.cw).max(bounds.x + 9),
+                color,
+            );
+            self.overlay_text_color(shortcut, x, y + 4, right, color);
+        }
+        self.damage(bounds.y, bounds.y + bounds.height);
+    }
+
     pub fn overlay(&mut self, text: &str) {
         if self.suspended {
             return;
@@ -1729,8 +1799,12 @@ impl Window {
         self.overlay_text(text, self.padding, y, self.width - self.padding);
     }
 
-    fn overlay_text(&mut self, text: &str, mut x: i32, y: i32, right: i32) {
-        let color = self.color(0xcdd6e4);
+    fn overlay_text(&mut self, text: &str, x: i32, y: i32, right: i32) {
+        self.overlay_text_color(text, x, y, right, 0xcdd6e4);
+    }
+
+    fn overlay_text_color(&mut self, text: &str, mut x: i32, y: i32, right: i32, rgb: u32) {
+        let color = self.color(rgb);
         let baseline = y + unsafe { (*self.font).ascent } + 1;
         for ch in text.chars().take(1024) {
             let font = self.glyph_font(ch);

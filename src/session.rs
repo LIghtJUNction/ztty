@@ -33,6 +33,35 @@ struct Search {
     ordinal: usize,
 }
 
+struct ClipboardMenu {
+    bounds: crate::layout::Rect,
+    selected: usize,
+    enabled: [bool; 2],
+}
+
+impl ClipboardMenu {
+    fn row(&self, x: i32, y: i32, height: i32) -> Option<usize> {
+        let bounds = self.bounds;
+        if x < bounds.x
+            || x >= bounds.x + bounds.width
+            || y < bounds.y + 1
+            || y >= bounds.y + bounds.height - 1
+        {
+            return None;
+        }
+        let row = ((y - bounds.y - 1) / (height + 8).max(1)) as usize;
+        (row < 2).then_some(row)
+    }
+
+    fn action(&self) -> Option<PaletteTarget> {
+        self.enabled[self.selected].then_some(PaletteTarget::Action(if self.selected == 0 {
+            "copy"
+        } else {
+            "paste"
+        }))
+    }
+}
+
 struct Palette {
     query: String,
     selected: usize,
@@ -94,11 +123,15 @@ struct Ui {
     owns_child: bool,
     search: Option<Search>,
     palette: Option<Palette>,
+    clipboard_menu: Option<ClipboardMenu>,
     pending_action: Option<PaletteTarget>,
     message: Option<(String, u64)>,
     command: Option<u64>,
     attachment: u64,
     selection: Option<Selection>,
+    selection_unit: ztty::selection::Unit,
+    selection_anchor: ((usize, usize), (usize, usize)),
+    clicks: Option<(u64, (usize, usize), u8)>,
     history: usize,
     new_output: bool,
     scroll_prompt: Option<crate::layout::Rect>,
@@ -130,11 +163,15 @@ impl Ui {
             owns_child: false,
             search: None,
             palette: None,
+            clipboard_menu: None,
             pending_action: None,
             message: None,
             command: None,
             attachment,
             selection: None,
+            selection_unit: ztty::selection::Unit::Cell,
+            selection_anchor: ((0, 0), (0, 0)),
+            clicks: None,
             history: 0,
             new_output: false,
             scroll_prompt: None,
@@ -166,6 +203,10 @@ impl Ui {
         ));
         self.force = true;
     }
+    fn notice(&mut self, message: &str) {
+        self.message = Some((message.into(), os::milliseconds() + 1800));
+        self.force = true;
+    }
     fn reset_input(&mut self) {
         self.native_ui.blur();
         self.held.fill(0);
@@ -173,6 +214,10 @@ impl Ui {
         self.local_buttons.fill(false);
         self.swallowed_buttons.fill(false);
         self.reported_buttons = 0;
+        self.clicks = None;
+        if self.clipboard_menu.take().is_some() {
+            self.force = true;
+        }
         if let Some(selection) = &mut self.selection {
             selection.dragging = false;
         }
@@ -195,6 +240,62 @@ impl Ui {
         self.set_history(0);
         self.selection = None;
         self.force = true;
+    }
+
+    fn extend_selection(&mut self, terminal: &Terminal, point: (usize, usize)) {
+        let (start, end) =
+            ztty::selection::unit(terminal, point, self.history, self.selection_unit);
+        if let Some(selection) = &mut self.selection {
+            let (anchor_start, anchor_end) = self.selection_anchor;
+            if (start.1, start.0) < (anchor_start.1, anchor_start.0) {
+                selection.start = anchor_end;
+                selection.end = start;
+            } else {
+                selection.start = anchor_start;
+                selection.end = end;
+            }
+            self.force = true;
+        }
+    }
+
+    // A temporary menu owns its mouse gestures, including the release after
+    // an item closes it. It never turns an outside click into application input.
+    fn clipboard_menu_pointer(&mut self, event: &x11::Event) -> bool {
+        let Some(menu) = &mut self.clipboard_menu else {
+            return false;
+        };
+        match unsafe { event.kind } {
+            x11::MOTION_NOTIFY => {
+                let e = unsafe { event.motion };
+                if let Some(row) = menu.row(e.x, e.y, self.window.ch)
+                    && menu.enabled[row]
+                    && menu.selected != row
+                {
+                    menu.selected = row;
+                    self.force = true;
+                }
+                true
+            }
+            x11::BUTTON_PRESS => {
+                let e = unsafe { event.button };
+                if !(1..=11).contains(&e.button) {
+                    return true;
+                }
+                self.swallowed_buttons[e.button as usize] = true;
+                self.local_buttons[e.button as usize] = false;
+                self.reported_buttons &= !(1u16 << e.button);
+                if e.button == 1
+                    && let Some(row) = menu.row(e.x, e.y, self.window.ch)
+                {
+                    menu.selected = row;
+                    self.pending_action = menu.action();
+                }
+                self.clipboard_menu = None;
+                self.force = true;
+                true
+            }
+            _ => false,
+        }
     }
 
     // A drawn view control takes precedence over application mouse reports and
@@ -264,6 +365,7 @@ impl Ui {
     }
 
     fn start_search(&mut self, terminal: &Terminal) {
+        self.clipboard_menu = None;
         let query = self
             .selection
             .map(|selection| selection.text(terminal, self.history))
@@ -369,6 +471,27 @@ impl Ui {
                 let mods = key_modifiers(e.state, symbol, press, &self.held);
                 if !press && self.intercepted[code] {
                     self.intercepted[code] = false;
+                    return Ok(());
+                }
+                if let Some(menu) = &mut self.clipboard_menu {
+                    if press {
+                        self.intercepted[code] = true;
+                        match symbol {
+                            0xff1b => self.clipboard_menu = None,
+                            0xff52 | 0xff54 | 0xff97 | 0xff99 => {
+                                let next = 1 - menu.selected;
+                                if menu.enabled[next] {
+                                    menu.selected = next;
+                                }
+                            }
+                            0xff0d | 0xff8d => {
+                                self.pending_action = menu.action();
+                                self.clipboard_menu = None;
+                            }
+                            _ => {}
+                        }
+                        self.force = true;
+                    }
                     return Ok(());
                 }
                 if self.search.is_some() {
@@ -623,19 +746,62 @@ impl Ui {
                 }
                 if local {
                     if pressed && e.button == 1 {
+                        let now = os::milliseconds();
+                        let count = self
+                            .clicks
+                            .filter(|(at, point, count)| {
+                                now.saturating_sub(*at) <= 400 && *point == (col, row) && *count < 3
+                            })
+                            .map_or(1, |(_, _, count)| count + 1);
+                        self.clicks = Some((now, (col, row), count));
+                        self.selection_unit = match count {
+                            2 => ztty::selection::Unit::Word,
+                            3 => ztty::selection::Unit::Line,
+                            _ => ztty::selection::Unit::Cell,
+                        };
+                        let (start, end) = ztty::selection::unit(
+                            &core.terminal,
+                            (col, row),
+                            self.history,
+                            self.selection_unit,
+                        );
+                        self.selection_anchor = (start, end);
                         self.selection = Some(Selection {
-                            start: (col, row),
-                            end: (col, row),
+                            start,
+                            end,
                             dragging: true,
                         });
+                        self.message = None;
                         self.force = true;
-                    } else if !pressed && e.button == 1 {
+                    } else if !pressed
+                        && e.button == 1
+                        && self.selection.is_some_and(|selection| selection.dragging)
+                    {
+                        self.extend_selection(&core.terminal, (col, row));
                         if let Some(ref mut s) = self.selection {
-                            s.end = (col, row);
                             s.dragging = false;
                             self.window.copy(s.text(&core.terminal, self.history), true);
+                            let selected = s.start != s.end
+                                || self.selection_unit != ztty::selection::Unit::Cell;
+                            if selected {
+                                self.notice("Selection ready · Right-click to copy");
+                            }
                             self.force = true;
                         }
+                    } else if pressed && e.button == 3 {
+                        let enabled = [self.selection.is_some(), allow_input && !core.eof()];
+                        self.clipboard_menu = Some(ClipboardMenu {
+                            bounds: self.window.clipboard_menu_bounds(e.x, e.y),
+                            selected: usize::from(!enabled[0] && enabled[1]),
+                            enabled,
+                        });
+                        self.palette = None;
+                        self.native_ui.blur();
+                        self.message = None;
+                        self.swallowed_buttons[button_index] = true;
+                        self.local_buttons[button_index] = false;
+                        self.clicks = None;
+                        self.force = true;
                     } else if pressed && e.button == 2 {
                         if allow_input {
                             self.window.paste(true);
@@ -684,11 +850,11 @@ impl Ui {
                 let (col, row) =
                     self.window
                         .coordinates(e.x, e.y, core.terminal.cols(), core.terminal.rows());
-                if let Some(ref mut s) = self.selection
-                    && s.dragging
-                {
-                    s.end = (col, row);
-                    self.force = true;
+                if self.selection.is_some_and(|selection| selection.dragging) {
+                    if self.clicks.is_some_and(|(_, point, _)| point != (col, row)) {
+                        self.clicks = None;
+                    }
+                    self.extend_selection(&core.terminal, (col, row));
                     return Ok(());
                 }
                 if !allow_input {
@@ -716,6 +882,7 @@ impl Ui {
                     return Ok(());
                 }
                 self.native_ui.invalidate();
+                self.clipboard_menu = None;
                 let (cols, rows) = self.window.resize(e.width, e.height);
                 self.scroll_prompt = None;
                 if allow_input
@@ -966,6 +1133,16 @@ impl Ui {
             } else {
                 None
             };
+            if let Some(menu) = &self.clipboard_menu {
+                let copy = actions::shortcut(&appearance.bindings, "copy").unwrap_or_default();
+                let paste = actions::shortcut(&appearance.bindings, "paste").unwrap_or_default();
+                self.window.clipboard_menu(
+                    menu.bounds,
+                    menu.selected,
+                    menu.enabled,
+                    [&copy, &paste],
+                );
+            }
             self.window.finish_frame();
             self.force = false;
             self.repaint.painted(os::milliseconds());
@@ -2038,6 +2215,7 @@ impl Pool {
         };
         let ui = self.sessions[index].ui.as_mut().unwrap();
         ui.search = None;
+        ui.clipboard_menu = None;
         ui.window.search_matches(0, Vec::new());
         ui.palette = Some(Palette {
             query: String::new(),
@@ -2172,6 +2350,7 @@ impl Pool {
             "copy" => {
                 let session = &mut self.sessions[index];
                 if let Some(ui) = &mut session.ui {
+                    ui.clipboard_menu = None;
                     let text = if ui.search.is_some() {
                         let text = ui
                             .search
@@ -2191,13 +2370,22 @@ impl Pool {
                         ui.selection
                             .map(|selection| selection.text(&session.core.terminal, ui.history))
                     };
-                    if let Some(text) = text {
+                    if let Some(text) = text.filter(|text| !text.is_empty()) {
                         ui.window.copy(text, false);
+                        ui.notice("Copied to clipboard");
+                    } else {
+                        ui.notice(
+                            "Select text first · Drag, double-click a word, or triple-click a line",
+                        );
                     }
                 }
             }
             "paste" | "paste-primary" => {
                 let session = &mut self.sessions[index];
+                if let Some(ui) = &mut session.ui {
+                    ui.clipboard_menu = None;
+                    ui.force = true;
+                }
                 if !session.core.owns("local") || session.ui.as_ref().is_some_and(|ui| ui.read_only)
                 {
                     return Err("observing views cannot paste; take input control first".into());
@@ -2271,6 +2459,8 @@ impl Pool {
                     return Err("command output is truncated; use the bounded command-output API to inspect it explicitly".into());
                 }
                 ui.window.copy(output.text, false);
+                ui.clipboard_menu = None;
+                ui.notice("Copied command output to clipboard");
             }
             "reload" => return self.reload(index),
             "font-increase" | "font-decrease" | "font-reset" => {
@@ -2854,6 +3044,26 @@ impl Pool {
                     })
                 }) {
                     let kind = unsafe { event.kind };
+                    let menu_handled = self.sessions[index]
+                        .ui
+                        .as_mut()
+                        .unwrap()
+                        .clipboard_menu_pointer(&event);
+                    if menu_handled {
+                        let pending = self.sessions[index]
+                            .ui
+                            .as_mut()
+                            .unwrap()
+                            .pending_action
+                            .take();
+                        if let Some(PaletteTarget::Action(action)) = pending
+                            && let Err(error) = self.action(index, action)
+                            && let Some(ui) = &mut self.sessions[index].ui
+                        {
+                            ui.error(error);
+                        }
+                        continue;
+                    }
                     if self.sessions[index]
                         .ui
                         .as_mut()
