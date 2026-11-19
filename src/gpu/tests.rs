@@ -25,7 +25,7 @@ fn native_fonts_shape_joining_scripts_and_complete_emoji_clusters() {
             fonts
                 .shape(face, character.encode_utf8(&mut utf8))
                 .unwrap()
-                .into_iter()
+                .iter()
                 .map(|glyph| glyph.glyph)
                 .collect::<Vec<_>>()
         })
@@ -54,6 +54,100 @@ fn native_fonts_shape_joining_scripts_and_complete_emoji_clusters() {
     let italic_bitmap = fonts.rasterize(italic, italic_glyph).unwrap();
     assert_ne!(plain_bitmap.rgba, italic_bitmap.rgba);
     assert!(fonts.shape(plain, &"a".repeat(16_385)).is_err());
+    let cached = fonts.shape(plain, "bounded cache").unwrap();
+    let repeated = fonts.shape(plain, "bounded cache").unwrap();
+    assert!(Rc::ptr_eq(&cached, &repeated));
+    for index in 0..600 {
+        fonts
+            .shape(plain, &std::format!("distinct row {index}"))
+            .unwrap();
+        assert!(fonts.shape_cache_bytes() <= 512 * 1024);
+    }
+}
+
+#[test]
+#[ignore = "requires a real EGL implementation; run with --ignored"]
+fn font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics() {
+    let _guard = EGL_TEST.lock().unwrap();
+    let display = Display::headless().unwrap();
+    let mut renderer =
+        Renderer::new(display, Target::Offscreen, 240, 100, "DejaVu Sans:size=12").unwrap();
+    renderer.begin_frame(0, 255).unwrap();
+    let style = Style {
+        bold: false,
+        italic: true,
+    };
+    let width = renderer.measure_text("office", style).unwrap();
+    let drawn_width = renderer
+        .draw_text("office", 5.0, 35.0, 0xffffff, style)
+        .unwrap();
+    assert!((drawn_width - width).abs() < 0.01);
+    renderer
+        .draw_image(
+            91,
+            1,
+            (1, 1),
+            &[255, 0, 0, 255],
+            Rect {
+                width: 1.0,
+                height: 1.0,
+                ..Rect::default()
+            },
+            Rect {
+                x: 220.0,
+                y: 80.0,
+                width: 10.0,
+                height: 10.0,
+            },
+        )
+        .unwrap();
+    let before = renderer.read_pixels().unwrap();
+    assert!(renderer.glyph_cache_entries() > 0);
+    assert_eq!(renderer.image_cache_bytes(), 4);
+    renderer.set_font("DejaVu Sans:size=24").unwrap();
+    assert_eq!(renderer.glyph_cache_entries(), 0);
+    assert_eq!(renderer.shape_cache_bytes(), 0);
+    assert_eq!(renderer.image_cache_bytes(), 4);
+    assert!(renderer.measure_text("office", style).unwrap() > width * 1.5);
+    renderer.begin_frame(0, 255).unwrap();
+    renderer
+        .draw_text("office", 5.0, 50.0, 0xffffff, style)
+        .unwrap();
+    let after = renderer.read_pixels().unwrap();
+    assert_ne!(before, after);
+    renderer.present().unwrap();
+}
+
+#[test]
+#[ignore = "requires a real EGL implementation; run with --ignored"]
+fn image_texture_coordinates_preserve_every_column_at_four_k_width() {
+    let _guard = EGL_TEST.lock().unwrap();
+    let display = Display::headless().unwrap();
+    let mut renderer =
+        Renderer::new(display, Target::Offscreen, 4096, 4, "monospace:size=11").unwrap();
+    let mut source = Vec::with_capacity(4096 * 4 * 4);
+    for y in 0..4usize {
+        for x in 0..4096usize {
+            source.extend_from_slice(&[
+                (x % 256) as u8,
+                ((x / 16) % 256) as u8,
+                (y * 63) as u8,
+                255,
+            ]);
+        }
+    }
+    renderer.begin_frame(0, 255).unwrap();
+    let rectangle = Rect {
+        x: 0.0,
+        y: 0.0,
+        width: 4096.0,
+        height: 4.0,
+    };
+    renderer
+        .draw_image(1, 1, (4096, 4), &source, rectangle, rectangle)
+        .unwrap();
+    let actual = renderer.read_pixels().unwrap();
+    assert_eq!(source, actual);
 }
 
 #[test]

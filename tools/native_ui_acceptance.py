@@ -24,21 +24,35 @@ GATES = {
     "clippy": (CARGO + ["clippy", "--locked", "--workspace", "--all-targets", "--", "-D", "warnings"], 600),
     "lib": (CARGO + ["test", "--locked", "-p", "ztty", "--lib"], 300),
     "actions": (CARGO + ["test", "--locked", "-p", "ztty", "--test", "actions"], 300),
+    "gpu": (CARGO + ["test", "--locked", "-p", "ztty", "--lib", "gpu::", "--", "--ignored", "--test-threads=1", "--show-output"], 300),
     "build": (CARGO + ["build", "--locked", "--release"], 600),
 }
-for name, script, limit in (
-    ("native_ui", "native_ui_gui.py", 240),
-    ("input", "input_gui.py", 300),
-    ("repaint", "repaint_gui.py", 180),
-):
-    command = [sys.executable, "-B", "tests/" + script, "--binary", str(BINARY),
-               "--output", str(OUT / (name + ".json"))]
-    if name == "repaint":
-        command += ["--screenshots", str(OUT / "repaint")]
-    else:
+GPU_TESTS = {
+    "gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels",
+    "gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics",
+    "gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width",
+    "gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters",
+    "gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas",
+    "gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction",
+}
+GUI_KIND = {
+    "native_ui": "native_ui", "input": "input", "repaint": "repaint",
+    "native_ui_gpu": "native_ui", "repaint_gpu": "repaint",
+    "text_gpu": "text", "retained_frame": "retained_frame",
+}
+GUI = {"native_ui": 24, "input": 14, "repaint": 11,
+       "native_ui_gpu": 24, "repaint_gpu": 11, "text_gpu": 8, "retained_frame": 2}
+for name, kind in GUI_KIND.items():
+    renderer = "gpu" if name.endswith("_gpu") else "software"
+    script = {"text": "text_gpu_gui", "retained_frame": "retained_frame_gui"}.get(kind, kind + "_gui")
+    command = [sys.executable, "-B", "tests/" + script + ".py", "--binary", str(BINARY),
+               "--renderer", renderer, "--output", str(OUT / (name + ".json"))]
+    if kind in ("repaint", "text"):
+        command += ["--screenshots", str(OUT / name)]
+    elif kind in ("native_ui", "input"):
         command += ["--source-root", str(ROOT), "--screenshot", str(OUT / (name + ".png"))]
-    GATES[name] = (command, limit)
-GUI = {"native_ui": 24, "input": 12, "repaint": 11}
+    GATES[name] = (command, 300)
+
 
 
 def require(condition, message):
@@ -135,6 +149,8 @@ def validate_gui(name, gate):
     from isolated_xvfb import display_endpoints
 
     report = read_json(name + ".json")
+    kind = GUI_KIND[name]
+    renderer = "gpu" if name.endswith("_gpu") else "software"
     gate["reported_ok"] = report.get("ok")
     gate["counts"] = {"checks": len(report.get("checks", []))}
     gate["binary_sha256"] = report.get("binary_sha256")
@@ -145,17 +161,22 @@ def validate_gui(name, gate):
     hashes = report.get("source_sha256")
     require(isinstance(hashes, dict) and hashes, f"{name} omitted source hashes")
     require(all(baseline.get(path) == value for path, value in hashes.items()), f"{name} source hashes differ")
-    if name != "repaint":
+    if kind in ("native_ui", "input"):
         require(report.get("source_commit") == read_json("source.json")["source_sha"], "harness commit differs")
         require(report.get("source_changes") == [], "harness observed source changes")
         remaining = report.get("cleanup", {}).get("owned_processes_remaining")
     else:
         remaining = report.get("remaining_owned_pids")
-        cleanup = report.get("display_cleanup", {})
-        require(all(cleanup.get(key) is False for key in ("pid_lock_exists", "socket_exists", "lease_exists")),
-                "repaint display cleanup failed or was omitted")
+        if kind in ("repaint", "text"):
+            cleanup = report.get("display_cleanup", {})
+            require(all(cleanup.get(key) is False for key in ("pid_lock_exists", "socket_exists", "lease_exists")),
+                    name + " display cleanup failed or was omitted")
     require(remaining == [], f"{name} left owned processes or omitted cleanup")
-    ownership = report.get("display_ownership" if name == "repaint" else "xvfb", {})
+    records = list(report.get("renderers_before", [report.get("renderer_before")]))
+    records += report.get("renderers_after", [report.get("renderer_after")]) if kind != "retained_frame" else []
+    require(records and all(record and record.get("actual") == renderer for record in records),
+            name + " did not use the requested renderer")
+    ownership = report.get("xvfb" if kind in ("native_ui", "input") else "display_ownership", {})
     match = re.fullmatch(r":([0-9]+)", ownership.get("display", ""))
     require(match is not None, f"{name} omitted its owned display")
     number = int(match[1])
@@ -174,18 +195,23 @@ def validate_gui(name, gate):
     require(100 <= number <= 30000 and all(clean[key] for key in
             ("ownership_verified", "process_gone", "files_gone", "listeners_gone", "lease_gone")),
             f"{name} did not clean its verified private display")
-    if name == "input":
+    if kind == "input":
         vectors, zoom = report.get("vectors", []), report.get("zoom", [])
         gate["counts"].update(vectors=len(vectors), zoom=len(zoom))
-        require(len(vectors) == 70 and len(zoom) == 14, "input coverage count mismatch")
+        require(len(vectors) == 198 and len(zoom) == 14, "input coverage count mismatch")
         require(all(item.get("ok") is True and item["actual_hex"] == item["expected_hex"] for item in vectors),
                 "input vector failed")
         require(all(item.get("ok") is True for item in zoom), "font zoom vector failed")
         require(report.get("font_restored") is True and report.get("keyboard_mapping_restored") is True,
                 "input font or keyboard mapping restoration failed")
         require(report.get("test_sha256") == baseline["tests/input_gui.py"], "input harness hash differs")
-    pictures = list(report.get("screenshots", {}).values()) if name == "repaint" else [report.get("screenshot", {})]
-    if name == "native_ui":
+    if kind in ("repaint", "text"):
+        pictures = list(report.get("screenshots", {}).values())
+    elif kind == "retained_frame":
+        pictures = [report.get("final_screenshot", {})]
+    else:
+        pictures = [report.get("screenshot", {})]
+    if kind == "native_ui":
         pictures.append(report.get("demo_screenshot", {}))
     require(pictures and all("path" in picture and "sha256" in picture for picture in pictures),
             f"{name} omitted screenshots")
@@ -215,12 +241,29 @@ def run_gate(name):
         gate["wrapper_cleanup"] = cleanup_owned()
         require(gate["command_exit_code"] == 0, f"{name} exited {gate['command_exit_code']}")
         require(gate["wrapper_cleanup"] == {"before": [], "after": []}, "gate leaked owned children")
-        if name in ("lib", "actions"):
-            expected = 10 if name == "lib" else 12
+        if name in ("lib", "actions", "gpu"):
+            log_text = (OUT / (name + ".log")).read_text(errors="replace")
             results = re.findall(r"test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored; (\d+) measured; (\d+) filtered out;",
-                                 (OUT / (name + ".log")).read_text(errors="replace"))
-            gate["counts"] = {"expected_tests": expected, "result_records": results}
-            require(results == [(str(expected), "0", "0", "0", "0")], f"{name} test count/result mismatch")
+                                 log_text)
+            rows = re.findall(r"^test (\S+) \.\.\. (ok|ignored[^\n]*|FAILED)$", log_text, re.M)
+            passed = {test for test, result in rows if result == "ok"}
+            ignored = {test for test, result in rows if result.startswith("ignored")}
+            require(len(rows) == len(passed) + len(ignored), name + " duplicate or failed test record")
+            if name == "lib":
+                # Every ordinary library test runs; only the named real-EGL
+                # cases are deferred to the explicit GPU gate below.
+                require(len(passed) >= 14 and ignored == GPU_TESTS, "library coverage or ignored set changed")
+                expected = [(str(len(passed)), "0", str(len(GPU_TESTS)), "0", "0")]
+            elif name == "gpu":
+                require(passed == GPU_TESTS and not ignored, "real GPU tests did not all execute")
+                filtered = len(read_json("lib.gate.json")["counts"]["passed_tests"])
+                expected = [(str(len(GPU_TESTS)), "0", "0", "0", str(filtered))]
+            else:
+                require(len(passed) == 12 and not ignored, "action test coverage changed")
+                expected = [("12", "0", "0", "0", "0")]
+            gate["counts"] = {"passed_tests": sorted(passed), "ignored_tests": sorted(ignored),
+                              "result_records": results}
+            require(results == expected, name + " test count/result mismatch")
         if name == "build":
             with BINARY.open("rb") as stream:
                 require(stream.read(4) == b"\x7fELF", "release output is not an ELF")

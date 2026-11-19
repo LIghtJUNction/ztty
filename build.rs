@@ -5,6 +5,10 @@ fn main() {
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {
         return;
     }
+    // Keep the original no_std executable linkage. Precompiled alloc may
+    // reference cleanup even with panic=abort; put the real system unwinder
+    // after Rust archives so --as-needed does not discard it.
+    println!("cargo::rustc-link-arg-bin=ztty=-lgcc_s");
     let out = PathBuf::from(env::var_os("OUT_DIR").expect("OUT_DIR"));
     let object = out.join("font_bridge.o");
     let flags = Command::new("pkg-config")
