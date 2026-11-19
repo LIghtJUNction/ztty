@@ -21,6 +21,14 @@ struct RLimit {
     maximum: c_ulong,
 }
 
+// Linux siginfo_t is 128 bytes. Only its first, architecture-independent
+// si_signo field is read; reserve an 8-aligned opaque area for the other fields.
+#[repr(C, align(8))]
+struct ExitInfo {
+    signal: c_int,
+    _rest: [c_int; 31],
+}
+
 unsafe extern "C" {
     fn socketpair(domain: c_int, kind: c_int, protocol: c_int, fds: *mut c_int) -> c_int;
     fn send(fd: c_int, bytes: *const c_void, count: usize, flags: c_int) -> isize;
@@ -34,6 +42,7 @@ unsafe extern "C" {
     fn prctl(option: c_int, ...) -> c_int;
     fn alarm(seconds: u32) -> u32;
     fn signal(number: c_int, handler: usize) -> usize;
+    fn waitid(kind: c_int, id: u32, info: *mut ExitInfo, options: c_int) -> c_int;
 }
 
 struct Fd(c_int);
@@ -299,6 +308,28 @@ impl Job {
         // timeout/cancel must be able to kill that original, unreused group.
         if self.failure.is_none() && !self.eof {
             return None;
+        }
+        // EOF alone does not prove that the whole owned group has exited:
+        // a faulty plugin can fork a descendant that closes the channel. Keep
+        // the exited leader unreaped (WNOWAIT) until the group is stopped, so
+        // its numeric PID/PGID cannot be reused for an unrelated process.
+        let mut info = ExitInfo {
+            signal: 0,
+            _rest: [0; 31],
+        };
+        let observed = unsafe { waitid(1, self.pid as u32, &mut info, 4 | 1 | 0x0100_0000) };
+        if observed == 0 && info.signal == 0 || observed < 0 && os::errno() == os::EINTR {
+            return None;
+        }
+        if observed < 0 {
+            if os::errno() == 10 {
+                // ECHILD: identity ownership was lost; never signal it.
+                self.pid = 0;
+                return Some(Err("extension worker ownership was lost".into()));
+            }
+            self.cancel("cannot observe extension worker exit");
+        } else {
+            self.stop();
         }
         let mut status = 0;
         let waited = unsafe { os::waitpid(self.pid, &mut status, 1) };
