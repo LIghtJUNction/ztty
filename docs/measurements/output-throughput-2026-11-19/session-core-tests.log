@@ -1,0 +1,24 @@
+   Compiling simd-adler32 v0.3.10
+   Compiling zune-inflate v0.2.54
+   Compiling zune-core v0.5.3
+   Compiling zune-png v0.5.2
+   Compiling ztty v0.4.1 (ztty)
+   Compiling zgraphics v0.1.1 (ztty/crates/zgraphics)
+   Compiling zvte v0.1.3
+   Compiling ztty-ui v0.1.0 (ztty/crates/ztty-ui)
+   Compiling unicode-width v0.2.3
+   Compiling zinput v0.1.2 (ztty/crates/zinput)
+   Compiling zterm v0.4.0 (ztty/crates/zterm)
+   Compiling zpty v0.2.1 (ztty/crates/zpty)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.09s
+     Running tests/session_core.rs (target/debug/build/ztty/488affcbf45f5784/out/session_core-488affcbf45f5784)
+bounded atomic input ... ok
+control and queue cancellation ... ok
+bounded terminal responses ... ok
+transactional PTY resize ... ok
+reaped child output drain ... ok
+fragmented UTF-8 and EOF ... ok
+per-feed history anchor ... ok
+full-history viewport retention ... ok
+native errors and descriptor cleanup ... ok
+SessionCore: 9 checks passed; every test child joined.

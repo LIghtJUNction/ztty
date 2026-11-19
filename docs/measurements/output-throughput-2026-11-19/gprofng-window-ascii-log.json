@@ -1,0 +1,142 @@
+[
+  {
+    "exclusive_seconds": 2.056,
+    "exclusive_percent": 100.0,
+    "inclusive_seconds": 2.056,
+    "inclusive_percent": 100.0,
+    "name": "<Total>"
+  },
+  {
+    "exclusive_seconds": 0.574,
+    "exclusive_percent": 27.92,
+    "inclusive_seconds": 0.574,
+    "inclusive_percent": 27.92,
+    "name": "<static>@0x1b1923 (<libc.so.6>)"
+  },
+  {
+    "exclusive_seconds": 0.511,
+    "exclusive_percent": 24.85,
+    "inclusive_seconds": 0.899,
+    "inclusive_percent": 43.73,
+    "name": "<zterm::terminal::State>::scroll_up"
+  },
+  {
+    "exclusive_seconds": 0.394,
+    "exclusive_percent": 19.16,
+    "inclusive_seconds": 1.328,
+    "inclusive_percent": 64.59,
+    "name": "<zvte::Parser<4096>>::advance::<zterm::terminal::State>"
+  },
+  {
+    "exclusive_seconds": 0.318,
+    "exclusive_percent": 15.47,
+    "inclusive_seconds": 0.318,
+    "inclusive_percent": 15.47,
+    "name": "read"
+  },
+  {
+    "exclusive_seconds": 0.043,
+    "exclusive_percent": 2.09,
+    "inclusive_seconds": 0.388,
+    "inclusive_percent": 18.87,
+    "name": "zterm::terminal::push_history"
+  },
+  {
+    "exclusive_seconds": 0.042,
+    "exclusive_percent": 2.04,
+    "inclusive_seconds": 0.042,
+    "inclusive_percent": 2.04,
+    "name": "accept4"
+  },
+  {
+    "exclusive_seconds": 0.04,
+    "exclusive_percent": 1.95,
+    "inclusive_seconds": 1.687,
+    "inclusive_percent": 82.05,
+    "name": "<ztty::session_core::SessionCore>::read_once"
+  },
+  {
+    "exclusive_seconds": 0.024,
+    "exclusive_percent": 1.17,
+    "inclusive_seconds": 0.925,
+    "inclusive_percent": 44.99,
+    "name": "<zterm::terminal::State>::advance_line"
+  },
+  {
+    "exclusive_seconds": 0.023,
+    "exclusive_percent": 1.12,
+    "inclusive_seconds": 0.023,
+    "inclusive_percent": 1.12,
+    "name": "poll"
+  },
+  {
+    "exclusive_seconds": 0.013,
+    "exclusive_percent": 0.63,
+    "inclusive_seconds": 0.013,
+    "inclusive_percent": 0.63,
+    "name": "recvmsg"
+  },
+  {
+    "exclusive_seconds": 0.009,
+    "exclusive_percent": 0.44,
+    "inclusive_seconds": 0.009,
+    "inclusive_percent": 0.44,
+    "name": "<zterm::terminal::State as zvte::Perform>::execute"
+  },
+  {
+    "exclusive_seconds": 0.006,
+    "exclusive_percent": 0.29,
+    "inclusive_seconds": 0.006,
+    "inclusive_percent": 0.29,
+    "name": "wait4"
+  },
+  {
+    "exclusive_seconds": 0.004,
+    "exclusive_percent": 0.19,
+    "inclusive_seconds": 0.02,
+    "inclusive_percent": 0.97,
+    "name": "<static>@0x415cd (<libX11.so.6.4.0>)"
+  },
+  {
+    "exclusive_seconds": 0.003,
+    "exclusive_percent": 0.15,
+    "inclusive_seconds": 0.007,
+    "inclusive_percent": 0.34,
+    "name": "<static>@0x75aac (<libX11.so.6.4.0>)"
+  },
+  {
+    "exclusive_seconds": 0.003,
+    "exclusive_percent": 0.15,
+    "inclusive_seconds": 0.004,
+    "inclusive_percent": 0.19,
+    "name": "<static>@0xbb98b (<libc.so.6>)"
+  },
+  {
+    "exclusive_seconds": 0.003,
+    "exclusive_percent": 0.15,
+    "inclusive_seconds": 0.004,
+    "inclusive_percent": 0.19,
+    "name": "clock_gettime"
+  },
+  {
+    "exclusive_seconds": 0.003,
+    "exclusive_percent": 0.15,
+    "inclusive_seconds": 0.003,
+    "inclusive_percent": 0.15,
+    "name": "malloc"
+  },
+  {
+    "exclusive_seconds": 0.003,
+    "exclusive_percent": 0.15,
+    "inclusive_seconds": 0.003,
+    "inclusive_percent": 0.15,
+    "name": "open"
+  },
+  {
+    "exclusive_seconds": 0.002,
+    "exclusive_percent": 0.1,
+    "inclusive_seconds": 0.016,
+    "inclusive_percent": 0.78,
+    "name": "<static>@0x0 (<libxcb.so.1.1.0>)"
+  }
+]
