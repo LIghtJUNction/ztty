@@ -1,0 +1,96 @@
+{
+  "files": [
+    {
+      "file": "acceptance.json",
+      "bytes": 4871,
+      "sha256": "b9eea558cfdba437d6dedbd9919b536073410c0ac64fef48962f1196a00f740f"
+    },
+    {
+      "file": "build.log",
+      "bytes": 883,
+      "sha256": "8b899658d82c2895cb8e39b7bbe769ccbbb41494ab7ccd7daa4d5cbf58fc4a61"
+    },
+    {
+      "file": "clippy.log",
+      "bytes": 1039,
+      "sha256": "dd9265f9ec3c516b75adde165cc497a391add58da09c4e4d250fa7b25950e793"
+    },
+    {
+      "file": "combined-validation.json",
+      "bytes": 1155,
+      "sha256": "712101203837fd5ba433df5aaf10c3bdbe96d71cb0f130fe4f8197a3cf31aee4"
+    },
+    {
+      "file": "copied-selection.png",
+      "bytes": 6170,
+      "sha256": "893e994bbf09cdb29e4dfe66406879784dab0c5349400905d2ceae7c591581df"
+    },
+    {
+      "file": "copied-visible-text.png",
+      "bytes": 7803,
+      "sha256": "d4f7caf4e4b8a55b788934881528599d095a68f52ea9235abc4b5662505ee071"
+    },
+    {
+      "file": "extension-error.png",
+      "bytes": 6101,
+      "sha256": "20840e7286ac08fd055a7a79d1333769df8e6b5ac3efdb460ff5919577ba8678"
+    },
+    {
+      "file": "mcp.log",
+      "bytes": 126,
+      "sha256": "05b0b36bd0dc0adea2637bdfe864e62e0c34669527b036123f017024486f620a"
+    },
+    {
+      "file": "plugin-cli.json",
+      "bytes": 10727,
+      "sha256": "6f6a3afe8aa5b134d547becffc01567fa629418da59896d272da387115af96e2"
+    },
+    {
+      "file": "plugin-gui.json",
+      "bytes": 3944,
+      "sha256": "3196ab075597f05c35e86de6e23839f04d1bc2bbaddfb387dbf242f2e4ece8e8"
+    },
+    {
+      "file": "registered-actions.png",
+      "bytes": 13568,
+      "sha256": "cd88f8c60da1472eafad275475f056cc1142153ee6ad3ccfac87bcf88a592cae"
+    },
+    {
+      "file": "risk-raw.json",
+      "bytes": 273466,
+      "sha256": "4e6ce5d58e81e872f26457f997f188f3a45c1bd509b4242a75504beb7f496261"
+    },
+    {
+      "file": "risk-summary.json",
+      "bytes": 8652,
+      "sha256": "f83e8a11a144520dfa0c8a21d66e3488d3936f2978ae7cef4553af0f462f1e95"
+    },
+    {
+      "file": "run_risk_ab.py",
+      "bytes": 5074,
+      "sha256": "24076bdfe9fa0b27280c2d41518ef325845ed738c7db249ce43fe266924749fb"
+    },
+    {
+      "file": "source-equivalence.json",
+      "bytes": 2579,
+      "sha256": "e582d547e9fe146531c3ced30a751d51ae51fb8d9e2e36371a96462c77260683"
+    },
+    {
+      "file": "summary.json",
+      "bytes": 1213,
+      "sha256": "e6a9cc14ae83cd522eb01d6dd74d4006a9fa94ded823dbe5ba5bbafbd07c7e57"
+    },
+    {
+      "file": "unit.log",
+      "bytes": 2791,
+      "sha256": "3aedda71b3c6b10ca8355266b0c5ae0927d576fb673c042748869c13d8e5a4cf"
+    },
+    {
+      "file": "validation.json",
+      "bytes": 3326,
+      "sha256": "0e271f9edbf71463ba7bb635ca9ed34484c2504d1fcb8d5608e68d77902b5449"
+    }
+  ],
+  "binary_sha256": "717487afce1e6c1588018654cbda70d1148fe7f5c22706220360d72678c5c39a",
+  "notice": "Only owned synthetic test output and screenshots; home/repository paths sanitized."
+}

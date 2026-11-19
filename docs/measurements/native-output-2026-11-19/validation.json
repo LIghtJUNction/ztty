@@ -1,0 +1,119 @@
+{
+  "ok": true,
+  "reference_commit": "f05dd2710c795412651f58839e28a345231445f6",
+  "binary_sha256": "717487afce1e6c1588018654cbda70d1148fe7f5c22706220360d72678c5c39a",
+  "platform": "Linux x86_64, real PTYs, private brokers; plugin GUI uses owned Xvfb",
+  "checks": {
+    "output_tail_rust_tests": 20,
+    "native_read_integration_groups": 4,
+    "plugin_cli_cases_same_elf": 22,
+    "plugin_gui_cases_same_elf": 10,
+    "short_ab_ba_scenarios": 40
+  },
+  "source_evidence": "source-equivalence.json",
+  "rust_and_build_steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "duration_ms": 615.765945003659
+    },
+    {
+      "name": "unit",
+      "command": [
+        "cargo",
+        "test",
+        "--test",
+        "output_tail"
+      ],
+      "exit_code": 0,
+      "duration_ms": 15147.964600997511
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--release",
+        "-p",
+        "ztty",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "duration_ms": 6327.8773849961
+    },
+    {
+      "name": "build",
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "-p",
+        "ztty"
+      ],
+      "exit_code": 0,
+      "duration_ms": 15245.539928000653
+    },
+    {
+      "name": "mcp",
+      "command": [
+        "python3",
+        "tests/mcp_raw_output.py",
+        "--binary",
+        "target/release/ztty",
+        "--output",
+        "$REPO/artifacts/native-raw-output-20261119/artifacts/native-raw-output/acceptance.json"
+      ],
+      "exit_code": 0,
+      "duration_ms": 866.7100829989067
+    }
+  ],
+  "combined_elf_steps": [
+    {
+      "name": "plugin-cli",
+      "command": [
+        "python3",
+        "tests/plugin_cli.py",
+        "--binary",
+        "target/release/ztty",
+        "--example",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup/example.so",
+        "--fixtures",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup",
+        "--output",
+        "$REPO/artifacts/native-raw-output-20261119/artifacts/native-raw-output/plugin-cli.json"
+      ],
+      "exit_code": 0,
+      "duration_ms": 7529.676329002541
+    },
+    {
+      "name": "plugin-gui",
+      "command": [
+        "python3",
+        "tests/plugin_gui.py",
+        "--binary",
+        "target/release/ztty",
+        "--example",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup/example.so",
+        "--fixture",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup/fixture-valid.so",
+        "--artifacts",
+        "$REPO/artifacts/native-raw-output-20261119/artifacts/native-raw-output/plugin-gui"
+      ],
+      "exit_code": 0,
+      "duration_ms": 5028.244530003576
+    }
+  ],
+  "performance_scope": "8f35 installed performance build versus 717 plugin/raw-output build, two AB/BA pairs; prior performance improvements remain attributed to 8f35.",
+  "limits": [
+    "Logical PTY cursor acknowledgement is not a physical display fence.",
+    "Two per-version run medians do not establish a confidence interval or eliminate small regressions.",
+    "This record does not claim Windows/macOS native MCP or plugin runtime validation."
+  ]
+}

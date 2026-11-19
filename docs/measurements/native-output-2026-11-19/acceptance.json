@@ -1,0 +1,181 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "invalid prefix then split UTF-8 preserves exact bytes and waits for a complete character",
+      "ok": true,
+      "details": {
+        "status": "passed",
+        "initial_cursor": 1,
+        "final_cursor": 8,
+        "output": "�🚀END"
+      }
+    },
+    {
+      "name": "stdio and HTTP keep malformed bytes and complete UTF-8 across live and EOF pages",
+      "ok": true,
+      "details": {
+        "status": "passed",
+        "payload_hex": "e258f09f58e4b8ade69687f09f9a80e2c2a2454e44",
+        "eof_suffix_hex": "f09f",
+        "open_reads": [
+          {
+            "transport": "stdio",
+            "max_bytes": 1,
+            "cursors": [
+              0,
+              1,
+              2,
+              4,
+              5,
+              8,
+              11,
+              15,
+              16,
+              18,
+              19,
+              20,
+              21
+            ],
+            "output": "�X�X中文🚀�¢END",
+            "output_eof": false
+          },
+          {
+            "transport": "http",
+            "max_bytes": 2,
+            "cursors": [
+              2,
+              4,
+              8,
+              11,
+              15,
+              18,
+              20,
+              21
+            ],
+            "output": "�X中文🚀�¢END",
+            "output_eof": false
+          }
+        ],
+        "closed_reads": [
+          {
+            "transport": "stdio",
+            "max_bytes": 2,
+            "cursors": [
+              0,
+              2,
+              4,
+              8,
+              11,
+              15,
+              18,
+              20,
+              23
+            ],
+            "output": "�X�X中文🚀�¢END�",
+            "output_eof": true
+          },
+          {
+            "transport": "http",
+            "max_bytes": 1,
+            "cursors": [
+              2,
+              4,
+              5,
+              8,
+              11,
+              15,
+              16,
+              18,
+              19,
+              20,
+              21,
+              23
+            ],
+            "output": "�X中文🚀�¢END�",
+            "output_eof": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "every-byte-value",
+      "ok": true,
+      "payload_bytes": 271,
+      "reads": [
+        {
+          "transport": "stdio",
+          "max_bytes": 1,
+          "pages": 216,
+          "final_cursor": 271,
+          "raw_sha256": "2767469a0afe4f839f7b3b65594e3b464228c0c4cd7e7d4811fc9b8ed9b36c67"
+        },
+        {
+          "transport": "http",
+          "max_bytes": 1,
+          "pages": 216,
+          "final_cursor": 271,
+          "raw_sha256": "2767469a0afe4f839f7b3b65594e3b464228c0c4cd7e7d4811fc9b8ed9b36c67"
+        },
+        {
+          "transport": "stdio",
+          "max_bytes": 2,
+          "pages": 114,
+          "final_cursor": 271,
+          "raw_sha256": "2767469a0afe4f839f7b3b65594e3b464228c0c4cd7e7d4811fc9b8ed9b36c67"
+        },
+        {
+          "transport": "http",
+          "max_bytes": 2,
+          "pages": 114,
+          "final_cursor": 271,
+          "raw_sha256": "2767469a0afe4f839f7b3b65594e3b464228c0c4cd7e7d4811fc9b8ed9b36c67"
+        },
+        {
+          "transport": "stdio",
+          "max_bytes": 7,
+          "pages": 36,
+          "final_cursor": 271,
+          "raw_sha256": "2767469a0afe4f839f7b3b65594e3b464228c0c4cd7e7d4811fc9b8ed9b36c67"
+        },
+        {
+          "transport": "http",
+          "max_bytes": 7,
+          "pages": 36,
+          "final_cursor": 271,
+          "raw_sha256": "2767469a0afe4f839f7b3b65594e3b464228c0c4cd7e7d4811fc9b8ed9b36c67"
+        }
+      ]
+    },
+    {
+      "name": "maximum-page-utf8-extension",
+      "ok": true,
+      "payload_bytes": 65542,
+      "reads": [
+        {
+          "transport": "stdio",
+          "max_bytes": 65536,
+          "pages": 2,
+          "final_cursor": 65542,
+          "raw_sha256": "dceed5c8a184019fc9951bd0e0af92043cc7d61c97e427e03988cde367d33abd"
+        },
+        {
+          "transport": "http",
+          "max_bytes": 65536,
+          "pages": 2,
+          "final_cursor": 65542,
+          "raw_sha256": "dceed5c8a184019fc9951bd0e0af92043cc7d61c97e427e03988cde367d33abd"
+        }
+      ]
+    }
+  ],
+  "cleanup_errors": [],
+  "binary_sha256": "717487afce1e6c1588018654cbda70d1148fe7f5c22706220360d72678c5c39a",
+  "source_commit": "68030066cb18e97fa5677a77881d54188fdc93f3",
+  "source_sha256": {
+    "src/session.rs": "598b5ddf854a3a045641a43e07a59734adaa07d51b0d12bd703b441186b80b5a",
+    "src/output_tail.rs": "77097c3034ee253d069846562f3dc1fa2f87f65062ab344979569978fa553b05",
+    "tests/mcp_sessions.py": "ee8f4f866b8e1916784cf66b3cf1c7fee2c2a829fd767b9ded5f195043263a1f",
+    "tests/mcp_raw_output.py": "efc28f6f0e0da9fcb58eb6307a98ff252483e72789d96a6670613fb8c44b6975"
+  }
+}
