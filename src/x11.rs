@@ -1741,7 +1741,7 @@ impl Window {
             }
             if row == selected && enabled[row] {
                 self.fill_background(
-                    self.selection_colors.0,
+                    self.selection_colors.1,
                     false,
                     bounds.x + 1,
                     y,
@@ -1749,7 +1749,13 @@ impl Window {
                     (self.ch + 8) as u32,
                 );
             }
-            let color = if enabled[row] { 0xcdd6e4 } else { 0x657080 };
+            let color = if !enabled[row] {
+                0x657080
+            } else if row == selected {
+                self.selection_colors.0
+            } else {
+                0xcdd6e4
+            };
             let right = bounds.x + bounds.width - 9;
             let x = (right - self.overlay_width(shortcut)).max(bounds.x + 9);
             self.overlay_text_color(
