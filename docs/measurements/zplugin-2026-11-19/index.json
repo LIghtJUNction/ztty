@@ -1,0 +1,80 @@
+{
+  "production_commit": "68030066cb18e97fa5677a77881d54188fdc93f3",
+  "files": [
+    {
+      "path": "cli.json",
+      "sha256": "227860573fbc27e1dd23c3e5531afbc4eff11e18e2845e374f09555239e2f022",
+      "bytes": 10687
+    },
+    {
+      "path": "clippy.log",
+      "sha256": "6d527e11cd39883d8c3bce1005dfaecd4622def069c1f75b0fd595ec410da9ff",
+      "bytes": 95
+    },
+    {
+      "path": "copied-selection.png",
+      "sha256": "893e994bbf09cdb29e4dfe66406879784dab0c5349400905d2ceae7c591581df",
+      "bytes": 6170
+    },
+    {
+      "path": "copied-visible-text.png",
+      "sha256": "d4f7caf4e4b8a55b788934881528599d095a68f52ea9235abc4b5662505ee071",
+      "bytes": 7803
+    },
+    {
+      "path": "daily.json",
+      "sha256": "d2731c2714684ccd8f323eec0e318ed84b65bbb4861682ea815cbfcae1fe98c3",
+      "bytes": 7170
+    },
+    {
+      "path": "extension-error.png",
+      "sha256": "20840e7286ac08fd055a7a79d1333769df8e6b5ac3efdb460ff5919577ba8678",
+      "bytes": 6101
+    },
+    {
+      "path": "features.log",
+      "sha256": "4ea1a5ee1600906b5928d4454ac8d1894f8b887649fe6c9b2e53bd9e894fa725",
+      "bytes": 298
+    },
+    {
+      "path": "group-cleanup-baseline.json",
+      "sha256": "6d5fa40b201a572fc2d30819e344f4fb1519cc83a419b503be0cb66748976d2c",
+      "bytes": 334
+    },
+    {
+      "path": "gui.json",
+      "sha256": "09110c1dea8225ec369a79f1882941021cf3beefb8cb6b6238cf626169fdb38d",
+      "bytes": 3780
+    },
+    {
+      "path": "libraries.json",
+      "sha256": "b73c40883b18d44c5648fae3cb14c2598ec245d6f47e34dd34ceeede9e34855a",
+      "bytes": 1888
+    },
+    {
+      "path": "registered-actions.png",
+      "sha256": "cd88f8c60da1472eafad275475f056cc1142153ee6ad3ccfac87bcf88a592cae",
+      "bytes": 13568
+    },
+    {
+      "path": "repaint.json",
+      "sha256": "76fb9e48268684435639a3cf54547de0da9b9cac8b928957ecb482e0a296ef35",
+      "bytes": 8616
+    },
+    {
+      "path": "rust-tests.log",
+      "sha256": "65a28eb33fcc963fda79ff26948a66773d2926d0b60b5fe5da970186ae9a8148",
+      "bytes": 965
+    },
+    {
+      "path": "validation.json",
+      "sha256": "82f200ed2c2cd40d414bd8ba1c231fe084b3a059b73bbcf1283761020f878525",
+      "bytes": 5536
+    },
+    {
+      "path": "windows-check.log",
+      "sha256": "bf41710532354abdbe5946fe5b0091d352f3a05900bce912291a2cef497a5e5a",
+      "bytes": 538
+    }
+  ]
+}

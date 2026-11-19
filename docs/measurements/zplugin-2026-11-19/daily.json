@@ -1,0 +1,145 @@
+{
+  "ok": true,
+  "checks": [
+    "OSC 133 metadata, exit codes, bounded command output and command CLI agree with the real PTY",
+    "real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input",
+    "Alt+C toggles search case; forward/backward navigation and clipboard preserve original spelling without PTY input",
+    "command navigation copies the selected first and second command regions through the real clipboard",
+    "filtered command palette executes a font action, font reset restores the grid and both preserve the running PTY",
+    "custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release",
+    "command navigation skips regions invalidated by live-screen width changes and retains intact historical output",
+    "atomic config saves update pixels/font without restarting; explicit truecolor survives theme change; malformed reload retains the previous valid state",
+    "config watching recovers after the containing directory is renamed or deleted and recreated",
+    "history shows a temporary return control; new PTY output preserves the inspected rows and marks new output; clicking returns live, clears the indication and sends no application mouse bytes",
+    "the return control avoids search and palette rows; clicking preserves both modal input flows, clipboard search and the unchanged PTY grid",
+    "observing an already attached workspace pane preserves the other pane's actual X input focus",
+    "a read-only observer can return live after new output without acquiring input, resizing or replacing the PTY, or sending mouse input",
+    "closing an observer by action or WM_DELETE preserves the agent-owned PTY and permits reattachment",
+    "observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY",
+    "same-owner local acquire leaves observation mode and restores real GUI input without replacing the PTY",
+    "attach --observe on an already attached local-owned view preserves the same live PTY when the observing window closes",
+    "a fresh --observe window owns and reaps only its newly created child when closed",
+    "launch waiter exits and session/PTY resources are released"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "$REPO/target/release/ztty",
+  "binary_sha256": "ec064a5220f3308f7c6722484f2e81a29314782241233f8668b450d07e517c51",
+  "source_sha256": {
+    "src/session.rs": "d7acd5c4702b691fd370d4366f192fd1c22ca2106c32ba7d5ae60c826b1059aa",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/output_tail.rs": "3a8435adbc9645df51e1e0b21a7c8c2e63891a6f2bb51ab9e8b5cfdd77df8e68",
+    "src/session_core.rs": "60ef2756b84c391fbbac0713cda6cacf25d35582d441651b984356d9e9217823",
+    "src/input_queue.rs": "e34883d0376d2439454e93920fcb813657fbf69007c5937dfae8dd6c4929c44d",
+    "src/search.rs": "e341db8ebeff59af1d24dd8e803cc685d295a6ec63df704efe55a5eaeb1873b0",
+    "src/scroll_prompt.rs": "27e9b9edb16d4bed1c6b63f600122c774f42bc6b701f90cc9cf51d867cad75ff",
+    "src/actions.rs": "7199f586fc81fe740ba27ce9174f7788b212df1d5c7b557f7220c4dc43dfbaae",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "src/x11.rs": "383ed7d1374d1c1374dcd095964b87137e6a5d2cdd00435b9428c9bf5b3213ce",
+    "src/appearance.rs": "ea4211887800e8a466a3d7452a6b9d5642f871e86a0ac9e79bc94bfddd77f0b7",
+    "src/main.rs": "f8e9c9250a85d63f6591d8a17f9eb6cc35245f72d2a95b439099dee813c08dc6",
+    "tests/daily_workflow.py": "1bc6f5baa2a47924cc317f3c0d7ed729d1328c228bfc82ca1df2532b8b982fea"
+  },
+  "screenshots": {
+    "history-search": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/history-search.png",
+      "sha256": "6534e4a722bef20d32a4be530be2b17737a875348751fb30229d5f3217681816"
+    },
+    "history-search-ignore-case": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/history-search-ignore-case.png",
+      "sha256": "4574bb88a5b57d3d0a0fb25b9115d32f28094feb1b95705d86b10c44346f4123"
+    },
+    "history-search-match-case": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/history-search-match-case.png",
+      "sha256": "7904ef3bd1373cd3aaf7ce127388951ccd19f2d10ee7f621060c70ff6eb18f87"
+    },
+    "command-palette": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/command-palette.png",
+      "sha256": "c193c2360f694b283b4a6104ed3452fab034632c783885da3eb5d77d7094c184"
+    },
+    "invalid-config-diagnostic": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/invalid-config-diagnostic.png",
+      "sha256": "11030689b1b934fe8023197bd7663f4137ecfa6c963237d8be38f83782381500"
+    },
+    "reloaded-terminal": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/reloaded-terminal.png",
+      "sha256": "d7e82aeca00fb990dbf8d354ba9e4fbba879bc872beb0e815915aca09079fb49"
+    },
+    "scrollback-return": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/scrollback-return.png",
+      "sha256": "b9391c09329fb4e5ca7a39e5d894bc06b0d400520b172b8c915c13268c52cda8"
+    },
+    "scrollback-new-output": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/scrollback-new-output.png",
+      "sha256": "29ea7402e047649d814bd4b251f643527addbcac7f945cc2cf5e648a810f1929"
+    },
+    "scrollback-live": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/scrollback-live.png",
+      "sha256": "3a52e9be32b0ff603f951d005bd2fafaf09ea736826cb8d1f2bb8ac1ee1075e1"
+    },
+    "scrollback-search": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/scrollback-search.png",
+      "sha256": "955ca6834d2bf39c1b599acb45cef3511b94fa1bb8817386dcedbf7977d5ee44"
+    },
+    "scrollback-palette": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/scrollback-palette.png",
+      "sha256": "cdeaf348f4fd87a763625124bceafe9437766a98b19641af9fceb0d4ee63e803"
+    },
+    "scrollback-observer": {
+      "path": "$REPO/artifacts/zplugin/group-cleanup/daily/scrollback-observer.png",
+      "sha256": "1934d3bfe60a31884f2b313be2da094241d199a57e8bccaee0fdc6e201854c97"
+    }
+  },
+  "display_ownership": {
+    "display": ":24330",
+    "pid": 3178058,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X24330",
+        "inode": 26949187,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X24330",
+        "inode": 26949186,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "scroll_prompt": {
+    "normal_bounds": [
+      778,
+      612,
+      920,
+      644
+    ],
+    "new_output_bounds": [
+      661,
+      612,
+      920,
+      644
+    ],
+    "search_bounds": [
+      778,
+      582,
+      920,
+      614
+    ],
+    "palette_bounds": [
+      778,
+      438,
+      920,
+      470
+    ],
+    "observer": {
+      "input_owner": "workflow-owner",
+      "read_only": true,
+      "pid_preserved": true
+    }
+  },
+  "stderr": ""
+}

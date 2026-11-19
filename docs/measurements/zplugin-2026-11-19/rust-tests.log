@@ -1,0 +1,21 @@
+   Compiling ztty v0.4.1 ($REPO)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.36s
+     Running tests/session_core.rs (target/debug/build/ztty/4e4282d154dad4f2/out/session_core-4e4282d154dad4f2)
+bounded atomic input ... ok
+control and queue cancellation ... ok
+bounded terminal responses ... ok
+transactional PTY resize ... ok
+reaped child output drain ... ok
+fragmented UTF-8 and EOF ... ok
+per-feed history anchor ... ok
+full-history viewport retention ... ok
+native errors and descriptor cleanup ... ok
+SessionCore: 9 checks passed; every test child joined.
+     Running tests/text_plugins.rs (target/debug/build/ztty/7bfa23543b1e583c/out/text_plugins-7bfa23543b1e583c)
+
+running 2 tests
+test overrides_do_not_consume_slots_and_failed_entries_are_transactional ... ok
+test registration_is_bounded_normalized_and_does_not_require_loading ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
