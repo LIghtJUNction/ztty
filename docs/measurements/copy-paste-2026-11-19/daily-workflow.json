@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "checks": [
+    "OSC 133 metadata, exit codes, bounded command output and command CLI agree with the real PTY",
+    "real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input",
+    "Alt+C toggles search case; forward/backward navigation and clipboard preserve original spelling without PTY input",
+    "command navigation copies the selected first and second command regions through the real clipboard",
+    "filtered command palette executes a font action, font reset restores the grid and both preserve the running PTY",
+    "custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release",
+    "command navigation skips regions invalidated by live-screen width changes and retains intact historical output",
+    "atomic config saves update pixels/font without restarting; explicit truecolor survives theme change; malformed reload retains the previous valid state",
+    "config watching recovers after the containing directory is renamed or deleted and recreated",
+    "history shows a temporary return control; new PTY output preserves the inspected rows and marks new output; clicking returns live, clears the indication and sends no application mouse bytes",
+    "the return control avoids search and palette rows; clicking preserves both modal input flows, clipboard search and the unchanged PTY grid",
+    "observing an already attached workspace pane preserves the other pane's actual X input focus",
+    "a read-only observer can return live after new output without acquiring input, resizing or replacing the PTY, or sending mouse input",
+    "closing an observer by action or WM_DELETE preserves the agent-owned PTY and permits reattachment",
+    "observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY",
+    "same-owner local acquire leaves observation mode and restores real GUI input without replacing the PTY",
+    "attach --observe on an already attached local-owned view preserves the same live PTY when the observing window closes",
+    "a fresh --observe window owns and reaps only its newly created child when closed",
+    "launch waiter exits and session/PTY resources are released"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary_sha256": "2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7",
+  "stderr": "",
+  "raw_artifact": "copy-usability/final/daily-workflow.json",
+  "raw_sha256": "714951dc6ee5ab1ead205012612b470f5ce5e473381e51f89fabb4e035f4bf08"
+}

@@ -1,0 +1,105 @@
+{
+  "code_commit": "db4253054dfad84fb1d5af64efd3d9efc4e048d1",
+  "binary_sha256": "2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7",
+  "scope": "Synthetic fixtures on private Xvfb and real owned PTYs; no user desktop screenshots.",
+  "sanitization": "Public JSON omits machine-specific absolute paths, PIDs and display/socket identifiers. Measurements, check names, byte counts, hashes, source hashes and stderr are retained. Original reports are preserved in the private evidence archive. Published log paths and trailing blank lines are normalized; untouched originals remain in the archive.",
+  "reports": [
+    {
+      "file": "validation.json",
+      "raw_artifact": "copy-usability/final/validation.json",
+      "raw_sha256": "7d1bebd0293027b2f379df37e8d650b6715d0123977c0d5b876fabb13c529a22"
+    },
+    {
+      "file": "copy-paste-gui.json",
+      "raw_artifact": "copy-usability/final/gui/acceptance.json",
+      "raw_sha256": "ed4554d8276bdf78562bee928aaff7283c91dfdfc70f4322e26d8bd22c011041"
+    },
+    {
+      "file": "clipboard-transfer.json",
+      "raw_artifact": "copy-usability/final/clipboard-transfer.json",
+      "raw_sha256": "9e1900da288714c3cedfa5a1e1d8442cf22d8b5612bf62449a54bb08f00b625c"
+    },
+    {
+      "file": "clipboard-baseline.json",
+      "raw_artifact": "clipboard-transfer/clipboard-baseline.json",
+      "raw_sha256": "bae3d134c46afa4b706bc46352c75a1928169f165aaeba27af50efd03cc4886f"
+    },
+    {
+      "file": "daily-workflow.json",
+      "raw_artifact": "copy-usability/final/daily-workflow.json",
+      "raw_sha256": "714951dc6ee5ab1ead205012612b470f5ce5e473381e51f89fabb4e035f4bf08"
+    }
+  ],
+  "files": [
+    {
+      "path": "clipboard-baseline.json",
+      "bytes": 9543,
+      "sha256": "81b31f74bd2a8570ad852d0a3784f32a2518c8dc4b7657a7b0f7515fd7565673"
+    },
+    {
+      "path": "clipboard-transfer.json",
+      "bytes": 9814,
+      "sha256": "07c22a4609bc0413b03a3eb36b4d614df8e8aac56f44a50d68fe14c5424433bd"
+    },
+    {
+      "path": "clippy.log",
+      "bytes": 383,
+      "sha256": "53b8f66ecddc94b820192f334199488ec05ba16b0e9ae3903ea206ff5d8a8955"
+    },
+    {
+      "path": "copy-paste-gui.json",
+      "bytes": 3551,
+      "sha256": "2e7380eb7de302167fc754652d9768ee3ceae48f390cc37fdec88a7bc1a89e81"
+    },
+    {
+      "path": "copy-paste-menu.png",
+      "bytes": 19942,
+      "sha256": "fc86eeb9aa24c5efb212c2e11dbd2fc1299d06ec93ea6580416cecfd2d84a998"
+    },
+    {
+      "path": "daily-workflow.json",
+      "bytes": 2627,
+      "sha256": "b18766ba5e4fd149a0cf1ce33178484c6d04eaf14e663e6060187d6c6a65885f"
+    },
+    {
+      "path": "paste-error.png",
+      "bytes": 17898,
+      "sha256": "714175aa42a232acdeccba9c13cf77961ff110296a92dbe5033653dc95b8dfcd"
+    },
+    {
+      "path": "pasted.png",
+      "bytes": 16508,
+      "sha256": "06ffdc20bd82a864c3529697900857ab0446b42397ca6892db1039f9601c6862"
+    },
+    {
+      "path": "release-build.log",
+      "bytes": 101,
+      "sha256": "6e7c8f90f3087baa919eae8e17c59d3b75eed0cd7ca88b9761f0be96007f2dbf"
+    },
+    {
+      "path": "run_validation.py",
+      "bytes": 1945,
+      "sha256": "2fc13071ee3e88087ea13a6f3a4e7785c05640afa34a7e8c74bb2ae683d21e70"
+    },
+    {
+      "path": "selection-tests.log",
+      "bytes": 1531,
+      "sha256": "7824119365e1c64bd79f035b14c946ba21aba5d5cf107a33e80a75bdd3cb33c3"
+    },
+    {
+      "path": "unicode-word.png",
+      "bytes": 17761,
+      "sha256": "ad49be668f84d7094b22f26b2cf72428da8deee2cc89137bb4521c782b39bec8"
+    },
+    {
+      "path": "validation.json",
+      "bytes": 2502,
+      "sha256": "dfd85cfa22eef13b32e90c3f642c83a586935019bfe39e0b62de742132ca264c"
+    },
+    {
+      "path": "wrapped-line.png",
+      "bytes": 17531,
+      "sha256": "7fd922ae173d966846497410b46f83491f0a038f22e38c174711787c32461b6e"
+    }
+  ]
+}

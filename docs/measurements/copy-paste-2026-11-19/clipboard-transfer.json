@@ -1,0 +1,266 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "direct UTF-8 multiline and tabs",
+      "ok": true,
+      "expected_bytes": 33,
+      "actual_bytes": 33,
+      "expected_sha256": "a2ca740a2b7417a14283e2e50111cd083e37c915108b81db7c981cd3ab8bc512",
+      "actual_sha256": "a2ca740a2b7417a14283e2e50111cd083e37c915108b81db7c981cd3ab8bc512",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "INCR UTF-8 split inside codepoints",
+      "ok": true,
+      "expected_bytes": 29,
+      "actual_bytes": 29,
+      "expected_sha256": "749601d0c2b2489391a88fd0f49f3e53bd7467f4fe5634ae7ae9b3fa16daf51f",
+      "actual_sha256": "749601d0c2b2489391a88fd0f49f3e53bd7467f4fe5634ae7ae9b3fa16daf51f",
+      "requests": 1,
+      "chunks_sent": 10
+    },
+    {
+      "name": "direct STRING fallback",
+      "ok": true,
+      "expected_bytes": 24,
+      "actual_bytes": 24,
+      "expected_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "actual_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "requests": 2,
+      "chunks_sent": 0
+    },
+    {
+      "name": "INCR STRING fallback",
+      "ok": true,
+      "expected_bytes": 24,
+      "actual_bytes": 24,
+      "expected_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "actual_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "requests": 2,
+      "chunks_sent": 6
+    },
+    {
+      "name": "large INCR complete byte-for-byte",
+      "ok": true,
+      "expected_bytes": 1360012,
+      "actual_bytes": 1360012,
+      "expected_sha256": "67652b8c2f033e81be4d531417608afe8c6bb4d028c81fa5cf8be3d9cf5673fe",
+      "actual_sha256": "67652b8c2f033e81be4d531417608afe8c6bb4d028c81fa5cf8be3d9cf5673fe",
+      "requests": 1,
+      "chunks_sent": 43
+    },
+    {
+      "name": "empty clipboard sends no paste brackets",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "control characters cannot close paste brackets",
+      "ok": true,
+      "expected_bytes": 22,
+      "actual_bytes": 22,
+      "expected_sha256": "3f2b3a6601efb492b4b192dc635072a817701911a2758d7df8dbc6891fffba0a",
+      "actual_sha256": "3f2b3a6601efb492b4b192dc635072a817701911a2758d7df8dbc6891fffba0a",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "missing text",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 2,
+      "chunks_sent": 0
+    },
+    {
+      "name": "recovery after missing text",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "non-text direct type",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "recovery after non-text direct type",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "wrong direct format",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "recovery after wrong direct format",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "malformed INCR header",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 1
+    },
+    {
+      "name": "recovery after malformed INCR header",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "INCR type change rejects prefix",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 3
+    },
+    {
+      "name": "recovery after INCR type change rejects prefix",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "malformed INCR chunk rejects prefix",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 3
+    },
+    {
+      "name": "recovery after malformed INCR chunk rejects prefix",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "oversized direct reply",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "recovery after oversized direct reply",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "oversized INCR declaration",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 1
+    },
+    {
+      "name": "recovery after oversized INCR declaration",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    },
+    {
+      "name": "cumulative INCR limit",
+      "ok": true,
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requests": 1,
+      "chunks_sent": 130
+    },
+    {
+      "name": "recovery after cumulative INCR limit",
+      "ok": true,
+      "expected_bytes": 21,
+      "actual_bytes": 21,
+      "expected_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "actual_sha256": "e262a4bd7c9ec9ffc0686f31ac43af5c527b593176dfe20be7989ccbbb10eee9",
+      "requests": 1,
+      "chunks_sent": 0
+    }
+  ],
+  "cleanup_errors": [],
+  "binary_sha256": "2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7",
+  "test_checkout_files_sha256": {
+    "src/x11.rs": "383ed7d1374d1c1374dcd095964b87137e6a5d2cdd00435b9428c9bf5b3213ce",
+    "src/main.rs": "3528fd541383aa9fb42dec3701ee017061d900569fe210f291a2877d792e8d7d",
+    "src/session.rs": "02fae116f87c3d22850bd1a89c55ba8462811e0fa8d225e27c85e09c30021a3e",
+    "tests/clipboard_transfer_gui.py": "f25ca20f820d215a2173827c5bd660f5a1dbe43a0a15309cc743eb45dc6f82de"
+  },
+  "stderr": "ztty: session broker disconnected before replying\n",
+  "raw_artifact": "copy-usability/final/clipboard-transfer.json",
+  "raw_sha256": "9e1900da288714c3cedfa5a1e1d8442cf22d8b5612bf62449a54bb08f00b625c"
+}

@@ -1,0 +1,92 @@
+{
+  "ok": true,
+  "source_commit": "db4253054dfad84fb1d5af64efd3d9efc4e048d1",
+  "source_changes": [],
+  "binary_sha256": "2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7",
+  "steps": [
+    {
+      "name": "release-build",
+      "state": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 14.651,
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release"
+      ]
+    },
+    {
+      "name": "copy-paste-gui",
+      "state": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 11.341,
+      "command": [
+        "python3",
+        "tests/copy_paste_gui.py",
+        "--binary",
+        "target/release/ztty",
+        "--artifacts",
+        "artifacts/copy-usability/final/gui"
+      ]
+    },
+    {
+      "name": "clipboard-transfer",
+      "state": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 7.632,
+      "command": [
+        "python3",
+        "tests/clipboard_transfer_gui.py",
+        "--binary",
+        "target/release/ztty",
+        "--output",
+        "artifacts/copy-usability/final/clipboard-transfer.json"
+      ]
+    },
+    {
+      "name": "daily-workflow",
+      "state": "completed",
+      "exit_code": 0,
+      "elapsed_seconds": 1.82,
+      "command": [
+        "python3",
+        "tests/daily_workflow.py",
+        "--binary",
+        "target/release/ztty",
+        "--output",
+        "artifacts/copy-usability/final/daily-workflow.json",
+        "--screenshots",
+        "artifacts/copy-usability/final/daily-workflow"
+      ]
+    }
+  ],
+  "prior_checks": {
+    "selection_tests": {
+      "passed": 10,
+      "source_commit": "5155ef8a3460502f6639acc1b05069f5a62ef3ea",
+      "selection_sources_unchanged_to_final": true,
+      "log_sha256": "4fea271b7a1fdf65f29519639783a22ba253f5fb6a7dfce71da305b7e14890ee"
+    },
+    "cargo_check": {
+      "status": "passed before UI integration commit 801df15",
+      "log_sha256": "2aeae55985a789e456ecd6c405198564d4dcd4f3e408fd021f6c9ec1723809a8"
+    },
+    "clippy": {
+      "status": "passed on integrated code before final menu colour-only correction",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--bin",
+        "ztty",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "log_sha256": "a309912e7ed263f9cf96d4f7bcebc0680f088f476b6f94a8ccdb1626ff77e91b"
+    }
+  },
+  "raw_artifact": "copy-usability/final/validation.json",
+  "raw_sha256": "7d1bebd0293027b2f379df37e8d650b6715d0123977c0d5b876fabb13c529a22"
+}

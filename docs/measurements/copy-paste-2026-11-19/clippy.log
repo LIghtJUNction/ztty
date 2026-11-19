@@ -1,0 +1,7 @@
+    Checking zgraphics v0.1.1 (<checkout>/crates/zgraphics)
+    Checking ztty-ui v0.1.0 (<checkout>/crates/ztty-ui)
+   Compiling ztty v0.4.1 (<checkout>)
+    Checking zinput v0.1.2 (<checkout>/crates/zinput)
+    Checking zterm v0.4.0 (<checkout>/crates/zterm)
+    Checking zpty v0.2.1 (<checkout>/crates/zpty)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 53.42s

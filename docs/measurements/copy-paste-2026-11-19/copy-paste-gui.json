@@ -1,0 +1,102 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "reverse drag keeps PRIMARY separate; explicit copy writes clipboard and transient feedback expires",
+      "ok": true
+    },
+    {
+      "name": "double-click selects a path; right-click preserves it and only an explicit Copy item copies",
+      "ok": true,
+      "selected_background": "#355577",
+      "selected_foreground": "#ffffff"
+    },
+    {
+      "name": "wide-character continuation and combining mark are copied as whole Unicode text",
+      "ok": true
+    },
+    {
+      "name": "triple-click joins a soft-wrapped logical line without adding a newline",
+      "ok": true
+    },
+    {
+      "name": "double-click then drag expands by whole words in either direction",
+      "ok": true
+    },
+    {
+      "name": "triple-click then drag expands by complete lines and preserves a hard newline",
+      "ok": true
+    },
+    {
+      "name": "TUI right-click remains an SGR press/release; Shift bypass owns drag/menu releases after Shift lifts",
+      "ok": true
+    },
+    {
+      "name": "right-click alone sends nothing; Paste delivers exact multiline UTF-8 bracketed bytes",
+      "ok": true
+    },
+    {
+      "name": "clipboard shortcut and middle-button PRIMARY paste keep their existing meanings",
+      "ok": true
+    },
+    {
+      "name": "arrow and Enter operate the temporary menu without leaking navigation keys",
+      "ok": true
+    },
+    {
+      "name": "empty and rejected transfers show feedback without sending a paste bracket or partial text",
+      "ok": true
+    },
+    {
+      "name": "menu clamps to window edges; outside click dismisses without reaching the PTY",
+      "ok": true
+    },
+    {
+      "name": "read-only view can copy while its Paste item stays disabled and cannot acquire input",
+      "ok": true
+    }
+  ],
+  "binary_sha256": "2eda135a24ae4507f6e9ba751fd7b2ddf042e38d1e60cca759a6fdf558d0a7d7",
+  "scope": "Owned Xvfb, XTEST, clipboard and raw PTY",
+  "source_commit": "db4253054dfad84fb1d5af64efd3d9efc4e048d1",
+  "source_changes": [],
+  "source_sha256": {
+    "src/session.rs": "02fae116f87c3d22850bd1a89c55ba8462811e0fa8d225e27c85e09c30021a3e",
+    "src/selection.rs": "ef298a020060783661f8580770978ccfb864d657fa79da5fb757a961afe8903e",
+    "src/x11.rs": "383ed7d1374d1c1374dcd095964b87137e6a5d2cdd00435b9428c9bf5b3213ce",
+    "src/main.rs": "3528fd541383aa9fb42dec3701ee017061d900569fe210f291a2877d792e8d7d",
+    "tests/copy_paste_gui.py": "6d0c268174c76b61efae46a57d57ae099cc90446626763fb14d90979afa4ccbd"
+  },
+  "grid": {
+    "cols": 40,
+    "rows": 12,
+    "cell_width": 9,
+    "cell_height": 24
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": "",
+  "screenshots": {
+    "copy-paste-menu": {
+      "path": "copy-paste-menu.png",
+      "sha256": "fc86eeb9aa24c5efb212c2e11dbd2fc1299d06ec93ea6580416cecfd2d84a998"
+    },
+    "unicode-word": {
+      "path": "unicode-word.png",
+      "sha256": "ad49be668f84d7094b22f26b2cf72428da8deee2cc89137bb4521c782b39bec8"
+    },
+    "wrapped-line": {
+      "path": "wrapped-line.png",
+      "sha256": "7fd922ae173d966846497410b46f83491f0a038f22e38c174711787c32461b6e"
+    },
+    "pasted": {
+      "path": "pasted.png",
+      "sha256": "06ffdc20bd82a864c3529697900857ab0446b42397ca6892db1039f9601c6862"
+    },
+    "paste-error": {
+      "path": "paste-error.png",
+      "sha256": "714175aa42a232acdeccba9c13cf77961ff110296a92dbe5033653dc95b8dfcd"
+    }
+  },
+  "raw_artifact": "copy-usability/final/gui/acceptance.json",
+  "raw_sha256": "ed4554d8276bdf78562bee928aaff7283c91dfdfc70f4322e26d8bd22c011041"
+}
