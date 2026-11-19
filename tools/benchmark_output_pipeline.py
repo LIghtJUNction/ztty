@@ -179,7 +179,7 @@ def measure(args, kind, mode):
     result = {"kind": kind, "mode": mode, "ok": False, "owned_remaining": []}
     owned = {}
     server = xconnection = channel = stream = listener = None
-    profiler = None
+    profiler = collector = None
     with tempfile.TemporaryDirectory(prefix="ztty-output-") as temporary:
         directory = Path(temporary)
         log = (directory / "terminal.log").open("wb")
@@ -202,8 +202,27 @@ def measure(args, kind, mode):
             listener.bind(str(directory / "control"))
             listener.listen(1)
             listener.settimeout(20)
-            subprocess.run(["taskset", "-c", str(args.broker_cpu), str(args.binary), "list"],
-                           env=env, stdout=log, stderr=log, check=True, timeout=15)
+            launch = ["taskset", "-c", str(args.broker_cpu)]
+            if args.gprofng_seconds:
+                experiment = args.output.parent / f"gprofng-{mode}-{kind}.er"
+                launch += ["gprofng", "collect", "app", "-o", str(experiment), "-p", "1",
+                           "-a", "off", "-j", "off", "-F", "=.*ztty.*"]
+                collector = subprocess.Popen(launch + [str(args.binary), "list"],
+                                             env=env, stdout=log, stderr=log)
+                deadline = time.monotonic() + 15
+                while time.monotonic() < deadline:
+                    with socket.socket(socket.AF_UNIX) as peer:
+                        try:
+                            peer.connect("\0" + env["ZTTY_SOCKET"][1:])
+                            break
+                        except ConnectionRefusedError:
+                            time.sleep(.01)
+                else:
+                    raise TimeoutError("profiled private broker did not start")
+                result["gprofng_experiment"] = str(experiment)
+            else:
+                subprocess.run(launch + [str(args.binary), "list"], env=env,
+                               stdout=log, stderr=log, check=True, timeout=15)
 
             def rpc(value):
                 with socket.socket(socket.AF_UNIX) as peer:
@@ -265,6 +284,9 @@ def measure(args, kind, mode):
             assert not retained["screen_truncated"]
             assert retained["screen"] == expected_screen, (kind, retained["screen"], expected_screen)
             result["all_visible_text_checked"] = True
+            if args.gprofng_seconds:
+                send(channel, {"op": "profile", "seconds": args.gprofng_seconds})
+                result.update(receive(stream))
             if args.perf_seconds:
                 stem = args.output.parent / f"profile-{mode}-{kind}"
                 with stem.with_suffix(".perf.log").open("wb") as perf_log:
@@ -310,6 +332,12 @@ def measure(args, kind, mode):
             for pid, token in owned.items():
                 if identity(pid) == token:
                     result["owned_remaining"].append(pid)
+            if collector is not None:
+                try:
+                    collector.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    collector.terminate()
+                    collector.wait(timeout=5)
             if xconnection is not None:
                 xconnection.close()
             if server is not None:
@@ -335,6 +363,7 @@ def main():
     parser.add_argument("--samples", type=int, default=3)
     parser.add_argument("--history", type=int, default=2000)
     parser.add_argument("--perf-seconds", type=float, default=0)
+    parser.add_argument("--gprofng-seconds", type=float, default=0)
     parser.add_argument("--broker-cpu", type=int, default=23)
     parser.add_argument("--writer-cpu", type=int, default=22)
     parser.add_argument("--xserver-cpu", type=int, default=21)
@@ -344,6 +373,7 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     assert 1 <= args.mib <= 128 and 1 <= args.samples <= 9
     assert 0 <= args.perf_seconds <= 5 and 0 <= args.history <= 100000
+    assert 0 <= args.gprofng_seconds <= 5 and not (args.perf_seconds and args.gprofng_seconds)
     kinds, modes = args.kinds.split(","), args.modes.split(",")
     assert all(kind in KINDS for kind in kinds) and all(mode in ("headless", "window") for mode in modes)
     assert {args.broker_cpu, args.writer_cpu, args.xserver_cpu} <= os.sched_getaffinity(0)
@@ -357,7 +387,8 @@ def main():
               "scope": "PTY write through logical cursor reply; software X11 rendering is concurrent, not a display fence",
               "geometry": [COLS, ROWS], "history": args.history, "appearance": APPEARANCE,
               "settings": {"mib": args.mib, "samples": args.samples, "kinds": kinds, "modes": modes,
-                           "origin": "local", "perf_seconds": args.perf_seconds},
+                           "origin": "local", "perf_seconds": args.perf_seconds,
+                           "gprofng_seconds": args.gprofng_seconds},
               "host": {"kernel": os.uname().release, "architecture": os.uname().machine,
                        "broker_cpu_governor": governor.read_text().strip() if governor.exists() else None,
                        "load_before": list(os.getloadavg()), "cpu_accounting_tick_ns": 1_000_000_000 // os.sysconf("SC_CLK_TCK")},
