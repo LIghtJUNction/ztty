@@ -4,7 +4,7 @@ use alloc::{boxed::Box, sync::Arc, vec::Vec};
 
 use crate::{Graphics, Image, StoredImage, protocol::Command};
 
-const MAX_FRAMES: usize = 512;
+pub(super) const MAX_FRAMES: usize = 512;
 
 pub(crate) struct Frame {
     pub pixels: Arc<Vec<u8>>,
@@ -78,6 +78,12 @@ fn blend(dst: &mut [u8], src: &[u8], replace: bool) {
 }
 
 impl Graphics {
+    pub(crate) fn total_frames(&self) -> usize {
+        self.images
+            .iter()
+            .map(|image| image.animation.as_ref().map_or(1, |a| a.frames.len()))
+            .sum()
+    }
     pub fn frame_count(&self, id: u32) -> usize {
         self.images
             .iter()
@@ -139,11 +145,7 @@ impl Graphics {
         if base.is_some_and(|index| frame(stored, index).is_none()) {
             return Err("ENOENT:animation base frame not found");
         }
-        let total_frames: usize = self
-            .images
-            .iter()
-            .map(|image| image.animation.as_ref().map_or(1, |a| a.frames.len()))
-            .sum();
+        let total_frames = self.total_frames();
         if editing.is_none() && total_frames >= MAX_FRAMES {
             return Err("ENOSPC:animation frame count limit reached");
         }
@@ -418,8 +420,13 @@ impl Graphics {
                 // Extremely late clocks must not create a permanently expired
                 // deadline and a busy loop. Resume from the displayed frame.
                 if deadline <= now {
-                    deadline = now
-                        .saturating_add(u64::from(animation.frames[animation.current].gap.max(1)));
+                    let Some(future) =
+                        now.checked_add(u64::from(animation.frames[animation.current].gap.max(1)))
+                    else {
+                        animation.deadline = None;
+                        continue;
+                    };
+                    deadline = future;
                 }
                 animation.deadline = Some(deadline);
                 next = Some(next.map_or(deadline, |old| old.min(deadline)));

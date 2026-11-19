@@ -567,6 +567,7 @@ unsafe extern "C" {
         detectable: c_int,
         supported: *mut c_int,
     ) -> c_int;
+    fn XGetSelectionOwner(display: *mut Display, selection: Atom) -> Xid;
     fn XSetSelectionOwner(
         display: *mut Display,
         selection: Atom,
@@ -1259,6 +1260,8 @@ pub struct Window {
     utf8: Atom,
     targets: Atom,
     transfer: Atom,
+    osc_requestor: Xid,
+    paste_limit: usize,
     incr: Atom,
     title_atom: Atom,
     clipboard_text: String,
@@ -1422,6 +1425,8 @@ impl Window {
                 utf8: XInternAtom(display, c"UTF8_STRING".as_ptr(), 0),
                 targets: XInternAtom(display, c"TARGETS".as_ptr(), 0),
                 transfer: XInternAtom(display, c"ZTTY_SELECTION".as_ptr(), 0),
+                osc_requestor: 0,
+                paste_limit: MAX_SELECTION_BYTES,
                 incr: XInternAtom(display, c"INCR".as_ptr(), 0),
                 title_atom: XInternAtom(display, c"_NET_WM_NAME".as_ptr(), 0),
                 clipboard_text: String::new(),
@@ -2612,10 +2617,17 @@ impl Window {
             }
             let dx = i64::from(placement.dest.x);
             let dy = i64::from(placement.dest.y);
-            let left = dx.max(0);
-            let top = dy.max(row_top);
-            let right = (dx + i64::from(placement.dest.width)).min(width);
-            let bottom = (dy + i64::from(placement.dest.height)).min(row_top + i64::from(self.ch));
+            let clip = placement.clip;
+            let left = dx.max(0).max(clip.map_or(i64::MIN, |c| i64::from(c.x)));
+            let top = dy
+                .max(row_top)
+                .max(clip.map_or(i64::MIN, |c| i64::from(c.y)));
+            let right = (dx + i64::from(placement.dest.width))
+                .min(width)
+                .min(clip.map_or(i64::MAX, |c| i64::from(c.x) + i64::from(c.width)));
+            let bottom = (dy + i64::from(placement.dest.height))
+                .min(row_top + i64::from(self.ch))
+                .min(clip.map_or(i64::MAX, |c| i64::from(c.y) + i64::from(c.height)));
             if left >= right || top >= bottom {
                 continue;
             }
@@ -2948,11 +2960,13 @@ impl Window {
         self.paste_selection = 0;
         self.paste_target = 0;
         self.paste_error = None;
-        if self.id != 0 {
+        if self.selection_requestor() != 0 {
             unsafe {
-                XDeleteProperty(self.display, self.id, self.transfer);
+                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
             }
         }
+        self.close_osc_requestor();
+        self.paste_limit = MAX_SELECTION_BYTES;
     }
 
     pub fn paste(&mut self, primary: bool) {
@@ -2965,7 +2979,7 @@ impl Window {
                 self.paste_selection,
                 self.utf8,
                 self.transfer,
-                self.id,
+                self.selection_requestor(),
                 0,
             );
             XFlush(self.display);
@@ -3062,6 +3076,7 @@ impl Window {
         self.incoming_type = 0;
         self.paste_selection = 0;
         self.paste_target = 0;
+        self.close_osc_requestor();
         Some(if kind == 31 {
             data.into_iter()
                 .map(char::from)
@@ -3082,10 +3097,10 @@ impl Window {
         unsafe {
             let code = XGetWindowProperty(
                 self.display,
-                self.id,
+                self.selection_requestor(),
                 self.transfer,
                 0,
-                (MAX_SELECTION_BYTES / 4) as c_long,
+                (self.paste_limit / 4) as c_long,
                 1,
                 0,
                 &mut kind,
@@ -3096,12 +3111,12 @@ impl Window {
             );
             result = if code != 0 || kind == 0 || (count != 0 && data.is_null()) {
                 Err("Could not read clipboard")
-            } else if remaining != 0 || count > MAX_SELECTION_BYTES as c_ulong {
+            } else if remaining != 0 || count > self.paste_limit as c_ulong {
                 Err("Paste exceeds the 4 MiB clipboard limit")
             } else if kind == self.incr {
                 if format != 32 || count != 1 {
                     Err("Invalid clipboard transfer")
-                } else if *data.cast::<c_ulong>() > MAX_SELECTION_BYTES as c_ulong {
+                } else if *data.cast::<c_ulong>() > self.paste_limit as c_ulong {
                     Err("Paste exceeds the 4 MiB clipboard limit")
                 } else {
                     Ok((kind, Vec::new()))
@@ -3120,14 +3135,14 @@ impl Window {
                 XFree(data.cast());
             }
             if remaining != 0 {
-                XDeleteProperty(self.display, self.id, self.transfer);
+                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
             }
         }
         result
     }
     pub fn selection_notify(&mut self, event: SelectionEvent) -> Option<Vec<u8>> {
         if self.paste_selection == 0
-            || event.requestor != self.id
+            || event.requestor != self.selection_requestor()
             || event.selection != self.paste_selection
             || event.target != self.paste_target
         {
@@ -3142,7 +3157,7 @@ impl Window {
                         self.paste_selection,
                         31,
                         self.transfer,
-                        self.id,
+                        self.selection_requestor(),
                         0,
                     );
                     XFlush(self.display);
@@ -3163,7 +3178,7 @@ impl Window {
             self.receiving = true;
             self.incoming.clear();
             unsafe {
-                XDeleteProperty(self.display, self.id, self.transfer);
+                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
                 XFlush(self.display);
             }
             None
@@ -3173,7 +3188,7 @@ impl Window {
     }
     pub fn property(&mut self, event: PropertyEvent) -> Option<Vec<u8>> {
         if !self.receiving
-            || event.window != self.id
+            || event.window != self.selection_requestor()
             || event.atom != self.transfer
             || event.state != 0
         {
@@ -3191,7 +3206,7 @@ impl Window {
             let complete = core::mem::take(&mut self.incoming);
             return self.finish_paste(complete, kind);
         }
-        if self.incoming.len().saturating_add(data.len()) > MAX_SELECTION_BYTES {
+        if self.incoming.len().saturating_add(data.len()) > self.paste_limit {
             return self.reject_paste("Paste exceeds the 4 MiB clipboard limit");
         }
         self.incoming.extend_from_slice(&data);
@@ -3204,6 +3219,7 @@ impl Window {
 
 impl Drop for Window {
     fn drop(&mut self) {
+        self.close_osc_requestor();
         while !self.images.is_empty() {
             self.discard_upload(self.images.len() - 1);
         }
@@ -3224,3 +3240,5 @@ impl Drop for Window {
         }
     }
 }
+
+mod osc52;

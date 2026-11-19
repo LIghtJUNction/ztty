@@ -101,3 +101,28 @@ fn placeholder_cache_is_lazy_and_reentrant_for_per_row_rendering() {
     assert!(t.graphics_draws(0).next().is_none());
     assert!(t.image_cache.borrow().is_none());
 }
+
+#[test]
+fn leaving_a_screen_suspends_its_animation_until_it_is_visible_again() {
+    let mut t = Terminal::new(8, 3, 10);
+    t.feed(b"\x1b_Ga=T,i=1,p=1,s=1,v=1,C=1;/wAA/w==\x1b\\");
+    t.feed(b"\x1b_Ga=f,i=1,s=1,v=1,z=10;AP8A/w==\x1b\\");
+    t.feed(b"\x1b_Ga=a,i=1,s=3\x1b\\");
+    assert_eq!(t.advance_graphics(100, 0, true), Some(110));
+    t.feed(b"\x1b[?1049h");
+    assert_eq!(t.advance_graphics(200, 0, true), None);
+    t.feed(b"\x1b[?1049l");
+    assert_eq!(t.advance_graphics(5000, 0, true), Some(5010));
+    assert_eq!(t.advance_graphics(5001, 0, false), None);
+    assert_eq!(t.graphics().animation_deadline(), None);
+}
+#[test]
+fn relative_animation_outside_horizontal_viewport_schedules_no_wake() {
+    let mut t = Terminal::new(8, 3, 10);
+    t.feed(b"\x1b_Ga=T,i=1,p=1,s=1,v=1,C=1;/wAA/w==\x1b\\");
+    t.feed(b"\x1b_Ga=T,i=2,p=1,s=1,v=1,P=1,Q=1,H=100;/wAA/w==\x1b\\");
+    t.feed(b"\x1b_Ga=f,i=2,s=1,v=1,z=10;AP8A/w==\x1b\\");
+    t.feed(b"\x1b_Ga=a,i=2,s=3\x1b\\");
+    assert_eq!(t.advance_graphics(100, 0, true), None);
+    assert_eq!(t.graphics().animation_deadline(), None);
+}

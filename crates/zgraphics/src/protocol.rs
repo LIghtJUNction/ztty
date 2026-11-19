@@ -208,34 +208,60 @@ pub(crate) fn parse(body: &[u8]) -> Result<(Command, &[u8]), &'static str> {
 }
 
 pub(crate) fn feature_supported(action: u8, key: u8, value: &str, external: bool) -> bool {
-    let nonzero = value.parse::<u32>().is_ok_and(|v| v != 0);
-    match key {
-        b'f' => matches!(action, b't' | b'T' | b'f') && matches!(value, "24" | "100"),
-        b't' => {
-            matches!(action, b't' | b'T' | b'f') && external && matches!(value, "f" | "t" | "s")
+    let unsigned = value.parse::<u32>().ok();
+    let nonzero = unsigned.is_some_and(|v| v != 0);
+    let signed = value.parse::<i32>().is_ok_and(|v| v != 0);
+    if matches!(action, b't' | b'T' | b'q' | b'f') {
+        let transfer = match key {
+            b'f' => matches!(unsigned, Some(24 | 100)),
+            b't' => external && matches!(value, "f" | "t" | "s"),
+            b'o' => value == "z",
+            b's' | b'v' | b'S' | b'O' => nonzero,
+            _ => false,
+        };
+        if transfer {
+            return true;
         }
-        b'o' => matches!(action, b't' | b'T' | b'f') && value == "z",
-        b'C' => matches!(action, b'T' | b'p' | b'c') && value == "1",
-        b's' | b'v' | b'S' | b'O' => matches!(action, b't' | b'T' | b'f' | b'a') && nonzero,
-        b'c' | b'r' | b'x' | b'y' | b'w' | b'h' | b'X' | b'Y' | b'p' => {
-            matches!(action, b'T' | b'p' | b'f' | b'c' | b'a') && nonzero
-        }
-        b'z' => {
-            matches!(action, b'T' | b'p' | b'f' | b'a')
-                && value.parse::<i32>().is_ok_and(|v| v != 0)
-        }
-        b'U' => matches!(action, b'T' | b'p') && value == "1",
-        b'P' | b'Q' => matches!(action, b'T' | b'p') && nonzero,
-        b'H' | b'V' => matches!(action, b'T' | b'p') && value.parse::<i32>().is_ok_and(|v| v != 0),
-        b'd' => {
-            action == b'd'
-                && value.len() == 1
-                && value != "a"
-                && matches!(
-                    value.as_bytes()[0].to_ascii_lowercase(),
-                    b'a' | b'i' | b'n' | b'c' | b'p' | b'q' | b'r' | b'x' | b'y' | b'z' | b'f'
-                )
-        }
+    }
+    // The same key has different meanings for display, frame loading and
+    // animation control. Only advertise values actually consumed by that action.
+    match action {
+        b'T' | b'p' => match key {
+            b'p' | b'x' | b'y' | b'w' | b'h' | b'X' | b'Y' | b'c' | b'r' | b'P' | b'Q' => nonzero,
+            b'C' | b'U' => unsigned == Some(1),
+            b'z' | b'H' | b'V' => signed,
+            _ => false,
+        },
+        b'f' => match key {
+            b'x' | b'y' | b'c' | b'r' | b'Y' => nonzero,
+            b'X' => unsigned == Some(1),
+            b'z' => signed,
+            _ => false,
+        },
+        b'a' => match key {
+            b's' => matches!(unsigned, Some(1..=3)),
+            b'v' | b'c' | b'r' => nonzero,
+            b'z' => signed,
+            _ => false,
+        },
+        b'c' => match key {
+            b'c' | b'r' | b'x' | b'y' | b'w' | b'h' | b'X' | b'Y' => nonzero,
+            b'C' => unsigned == Some(1),
+            _ => false,
+        },
+        b'd' => match key {
+            b'p' | b'x' | b'y' | b'r' => nonzero,
+            b'z' => signed,
+            b'd' => {
+                value.len() == 1
+                    && value != "a"
+                    && matches!(
+                        value.as_bytes()[0].to_ascii_lowercase(),
+                        b'a' | b'i' | b'n' | b'c' | b'p' | b'q' | b'r' | b'x' | b'y' | b'z' | b'f'
+                    )
+            }
+            _ => false,
+        },
         _ => false,
     }
 }

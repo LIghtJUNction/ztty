@@ -174,6 +174,8 @@ pub struct Terminal {
     ui_host_enabled: bool,
     text_revision: u64,
     image_cache: core::cell::RefCell<Option<Box<image_cells::Cache>>>,
+    osc_probe: u8,
+    clipboard_frame: Option<Box<crate::clipboard::Frame>>,
 }
 
 fn dimensions(cols: usize, rows: usize) -> (usize, usize) {
@@ -197,6 +199,8 @@ impl Terminal {
             ui_host_enabled: false,
             text_revision: 0,
             image_cache: core::cell::RefCell::new(None),
+            osc_probe: 0,
+            clipboard_frame: None,
         }
     }
 
@@ -249,10 +253,13 @@ impl Terminal {
                     // `contains` uses core's byte-search specialization, so
                     // the common no-underscore path scans words, not callbacks.
                     let remaining = &bytes[offset..];
-                    let string = if remaining.contains(&b'_') || remaining.contains(&b'P') {
-                        remaining
-                            .windows(2)
-                            .position(|pair| pair[0] == 0x1b && matches!(pair[1], b'_' | b'P'))
+                    let string = if remaining.contains(&b'_')
+                        || remaining.contains(&b'P')
+                        || remaining.contains(&b']')
+                    {
+                        remaining.windows(2).position(|pair| {
+                            pair[0] == 0x1b && matches!(pair[1], b'_' | b'P' | b']')
+                        })
                     } else {
                         None
                     };
@@ -266,7 +273,12 @@ impl Terminal {
                         } else {
                             self.parser
                                 .advance(&remaining[..start + 2], &mut self.state);
-                            self.framing = 4;
+                            if remaining[start + 1] == b']' {
+                                self.osc_probe = 0;
+                                self.framing = 7;
+                            } else {
+                                self.framing = 4;
+                            }
                         }
                         offset += start + 2;
                     } else {
@@ -280,6 +292,10 @@ impl Terminal {
                     offset += 1;
                     if byte == b'_' {
                         self.begin_apc();
+                    } else if byte == b']' {
+                        self.parser.advance(&[byte], &mut self.state);
+                        self.osc_probe = 0;
+                        self.framing = 7;
                     } else if byte == b'P' {
                         self.parser.advance(&[byte], &mut self.state);
                         self.framing = 4;
@@ -380,8 +396,90 @@ impl Terminal {
                         self.framing = 1;
                     }
                 }
+                7 => {
+                    // Probe only OSC 52; all other OSC commands keep zvte's
+                    // existing bounded parser and termination semantics.
+                    let byte = bytes[offset];
+                    offset += 1;
+                    let prefix = b"52;";
+                    if byte == prefix[usize::from(self.osc_probe)] {
+                        self.osc_probe += 1;
+                        if self.osc_probe == 3 {
+                            self.parser.reset();
+                            self.state.last_grapheme = None;
+                            self.state.osc_overflow = false;
+                            self.clipboard_frame = Some(Box::new(crate::clipboard::Frame::new()));
+                            self.framing = 8;
+                        }
+                    } else {
+                        self.parser
+                            .advance(&prefix[..usize::from(self.osc_probe)], &mut self.state);
+                        self.parser.advance(&[byte], &mut self.state);
+                        self.framing = u8::from(byte == 0x1b);
+                    }
+                }
+                8 => {
+                    let end = bytes[offset..]
+                        .iter()
+                        .position(|b| matches!(*b, 7 | 0x1b | 0x18 | 0x1a | 0x9c))
+                        .map_or(bytes.len(), |i| offset + i);
+                    self.clipboard_frame
+                        .as_mut()
+                        .unwrap()
+                        .push(&bytes[offset..end]);
+                    offset = end;
+                    if offset == bytes.len() {
+                        continue;
+                    }
+                    let byte = bytes[offset];
+                    offset += 1;
+                    match byte {
+                        0x1b => self.framing = 9,
+                        7 | 0x9c => {
+                            self.clipboard_frame
+                                .take()
+                                .unwrap()
+                                .finish(&mut self.state.clipboard, byte == 7);
+                            self.framing = 0;
+                        }
+                        0x18 | 0x1a => {
+                            self.clipboard_frame = None;
+                            self.framing = 0;
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+                9 => {
+                    if bytes[offset] == b'\\' {
+                        offset += 1;
+                        self.clipboard_frame
+                            .take()
+                            .unwrap()
+                            .finish(&mut self.state.clipboard, false);
+                        self.framing = 0;
+                    } else {
+                        self.clipboard_frame = None;
+                        self.parser.advance(b"\x1b", &mut self.state);
+                        self.framing = 1;
+                    }
+                }
                 _ => unreachable!(),
             }
+        }
+    }
+
+    pub fn next_clipboard_request(&mut self) -> Option<crate::ClipboardRequest> {
+        self.state.clipboard.pop()
+    }
+    /// Changes on reset/host cancellation, so an asynchronous reply cannot
+    /// complete a request made before a control or terminal generation change.
+    pub fn clipboard_epoch(&self) -> u64 {
+        self.state.clipboard.epoch
+    }
+    pub fn cancel_clipboard_requests(&mut self) {
+        self.state.clipboard.cancel();
+        if let Some(frame) = &mut self.clipboard_frame {
+            frame.abort();
         }
     }
 
@@ -890,6 +988,7 @@ struct State {
     cwd: String,
     links: Vec<Link>,
     responses: Vec<u8>,
+    clipboard: crate::clipboard::Queue,
     osc_overflow: bool,
     dcs_query: bool,
     dcs: Vec<u8>,
@@ -940,6 +1039,7 @@ impl State {
             cwd: String::new(),
             links: Vec::new(),
             responses: Vec::new(),
+            clipboard: crate::clipboard::Queue::default(),
             osc_overflow: false,
             dcs_query: false,
             dcs: Vec::new(),
@@ -1521,6 +1621,7 @@ impl State {
         }
         self.modes.alternate_screen = enabled;
         self.graphics.abort_transfer();
+        self.graphics.advance_animations(0, &[]);
         mem::swap(&mut self.graphics, &mut self.inactive_graphics);
         self.graphics.abort_transfer();
         self.graphics
@@ -1909,7 +2010,10 @@ impl Perform for State {
                 ui.reset();
                 let sync_commit_pending =
                     self.sync_commit_pending || self.modes.synchronized_output;
+                let mut clipboard = mem::take(&mut self.clipboard);
+                clipboard.cancel();
                 *self = Self::new(cols, rows, history, self.theme);
+                self.clipboard = clipboard;
                 self.sync_commit_pending = sync_commit_pending;
                 self.shell = shell;
                 self.ui = ui;
@@ -2221,8 +2325,8 @@ impl Perform for State {
                     }
                 }
             }
-            // Clipboard requests are deliberately handled by neither parser nor frontend.
-            // No child process can read or replace the desktop clipboard through OSC 52.
+            // OSC 52 is streamed into a separate bounded request queue above.
+            // The native host enforces session ownership before clipboard I/O.
             _ => {}
         }
     }

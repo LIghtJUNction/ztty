@@ -118,6 +118,8 @@ fn pty_size(cols: usize, rows: usize, window: Option<&Window>) -> zpty::Size {
     }
 }
 
+mod osc52;
+
 struct Ui {
     window: Window,
     workspace: Option<u64>,
@@ -128,6 +130,7 @@ struct Ui {
     search: Option<Search>,
     palette: Option<Palette>,
     clipboard_menu: Option<ClipboardMenu>,
+    osc_clipboard: Option<osc52::Pending>,
     pending_action: Option<PaletteTarget>,
     plugin_running: bool,
     message: Option<(String, u64)>,
@@ -169,6 +172,7 @@ impl Ui {
             search: None,
             palette: None,
             clipboard_menu: None,
+            osc_clipboard: None,
             pending_action: None,
             plugin_running: false,
             message: None,
@@ -214,7 +218,12 @@ impl Ui {
         self.force = true;
     }
     fn paste_result(&mut self, data: Option<Vec<u8>>, core: &mut SessionCore, allow_input: bool) {
-        if let Some(error) = self.window.take_paste_error() {
+        let error = self.window.take_paste_error();
+        if self.osc_clipboard.is_some() {
+            self.finish_osc_clipboard(data, error.is_some(), core, allow_input);
+            return;
+        }
+        if let Some(error) = error {
             self.error(error.into());
             return;
         }
@@ -235,6 +244,9 @@ impl Ui {
         }
     }
     fn reset_input(&mut self) {
+        if self.osc_clipboard.take().is_some() {
+            self.window.cancel_paste();
+        }
         self.native_ui.blur();
         self.held.fill(0);
         self.intercepted.fill(false);
@@ -768,8 +780,8 @@ impl Ui {
                     self.local_buttons[button_index] = false;
                 }
                 if pressed && e.button == 1 && mods.0 & 4 != 0 {
-                    let id = core.terminal.view_cell(col, row, self.history).link_id;
-                    if let Some(uri) = core.terminal.hyperlink(id) {
+                    let cell = core.terminal.view_cell(col, row, self.history);
+                    if let Some(uri) = core.terminal.cell_hyperlink(cell) {
                         openers.open(uri, self.window.fd, core.pty.fd());
                         self.swallowed_buttons[button_index] = true;
                         self.local_buttons[button_index] = false;
@@ -836,7 +848,7 @@ impl Ui {
                         self.force = true;
                     } else if pressed && e.button == 2 {
                         if allow_input {
-                            self.window.paste(true);
+                            self.manual_paste(true);
                         }
                     } else if pressed && (e.button == 4 || e.button == 5) {
                         self.set_history(if e.button == 4 {
@@ -993,6 +1005,7 @@ impl Ui {
             self.scroll_prompt = None;
         }
         let now = os::milliseconds();
+        let animation_deadline = terminal.advance_graphics(now, self.history, alive);
         if terminal.modes().synchronized_output {
             let start = self.sync_since.get_or_insert(now);
             if now.saturating_sub(*start) >= 150 {
@@ -1174,6 +1187,7 @@ impl Ui {
         let deadline = [
             self.sync_since.map(|s| s + 150),
             self.blink_deadline,
+            animation_deadline,
             repaint_deadline,
         ]
         .into_iter()
@@ -2436,7 +2450,7 @@ impl Pool {
                     return Err("observing views cannot paste; take input control first".into());
                 }
                 if let Some(ui) = &mut session.ui {
-                    ui.window.paste(action == "paste-primary");
+                    ui.manual_paste(action == "paste-primary");
                 }
             }
             "scroll-up" | "scroll-down" => {
@@ -3194,7 +3208,7 @@ impl Pool {
                     s.ui.as_ref().is_some_and(|ui| {
                         ui.open
                             && ui.window.id != 0
-                            && ui.window.id == id
+                            && ui.window.accepts_event(id, unsafe { event.kind })
                             && ui.window.display == connection.display
                     })
                 }) {
@@ -3392,6 +3406,23 @@ impl Pool {
             session.pump(buffer);
             let local_owner = session.core.owns("local");
             let alive = !session.core.eof();
+            if let Some(ui) = &mut session.ui {
+                if let Some(next) = ui.clipboard_tick(&mut session.core, local_owner && alive) {
+                    deadline = Some(deadline.map_or(next, |old| old.min(next)));
+                }
+            } else {
+                session.core.deny_clipboard_requests();
+            }
+            if !session
+                .ui
+                .as_ref()
+                .is_some_and(|ui| ui.open && ui.visible && ui.window.id != 0)
+            {
+                session
+                    .core
+                    .terminal
+                    .advance_graphics(os::milliseconds(), 0, false);
+            }
             if let Some(ui) = &mut session.ui
                 && ui.open
                 && ui.visible
