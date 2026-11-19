@@ -1080,3 +1080,59 @@ fn bulk_and_bytewise_feeds_agree_through_scroll_styles_and_charset_switches() {
         }
     }
 }
+
+#[test]
+fn counted_scroll_and_line_edits_match_single_row_operations() {
+    fn seeded(rotation: usize, top: usize, bottom: usize, command: char) -> Terminal {
+        let mut terminal = Terminal::new(8, 7, 5);
+        for _ in 0..7 + rotation {
+            terminal.feed(b"history\r\n");
+        }
+        terminal.feed(b"\x1b[H\x1b]8;;https://example.com/rows\x1b\\");
+        for row in 0..7 {
+            terminal.feed(format!("\x1b[3{}m{row}界e\u{301}xyzw", row % 7 + 1).as_bytes());
+        }
+        terminal.feed(format!("\x1b[0;48;2;1;2;3m\x1b[{top};{bottom}r").as_bytes());
+        if matches!(command, 'L' | 'M') {
+            terminal.feed(format!("\x1b[{};1H", (top + bottom) / 2).as_bytes());
+        }
+        terminal.clear_dirty();
+        terminal
+    }
+
+    for rotation in [0, 3, 6] {
+        for (top, bottom) in [(1, 7), (1, 6), (2, 7), (2, 6), (3, 4)] {
+            for command in ['S', 'T', 'L', 'M'] {
+                for count in [1, 2, 4, 7, 99] {
+                    let mut batch = seeded(rotation, top, bottom, command);
+                    let mut single = seeded(rotation, top, bottom, command);
+                    batch.feed(format!("\x1b[{count}{command}").as_bytes());
+                    for _ in 0..count {
+                        single.feed(format!("\x1b[{command}").as_bytes());
+                    }
+                    assert_eq!(batch.cursor(), single.cursor());
+                    assert_eq!(batch.history_len(), single.history_len());
+                    for y in 0..batch.rows() {
+                        assert_eq!(batch.row_dirty(y), single.row_dirty(y));
+                    }
+                    for offset in 0..=batch.history_len() {
+                        for y in 0..batch.rows() {
+                            assert_eq!(
+                                batch.view_row_wrap(y, offset),
+                                single.view_row_wrap(y, offset),
+                                "wrap: rotation={rotation}, region={top}..{bottom}, command={count}{command}, offset={offset}, row={y}"
+                            );
+                            for x in 0..batch.cols() {
+                                assert_eq!(
+                                    batch.view_cell(x, y, offset),
+                                    single.view_cell(x, y, offset),
+                                    "cell: rotation={rotation}, region={top}..{bottom}, command={count}{command}, offset={offset}, position=({x}, {y})"
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

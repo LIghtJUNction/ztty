@@ -1206,33 +1206,31 @@ impl State {
             self.shell.invalidate_screen(self.line_base);
         }
         let blank = self.style.blank();
-        if count == bottom - top + 1 && (top != 0 || bottom + 1 != self.screen.rows) {
-            for row in top..=bottom {
-                self.screen.clear_row(row, blank);
+        if top == 0 && bottom + 1 == self.screen.rows {
+            for _ in 0..count {
+                if save_history {
+                    self.record_history_row(0);
+                }
+                self.screen.row0 += 1;
+                if self.screen.row0 == self.screen.rows {
+                    self.screen.row0 = 0;
+                }
+                self.screen.clear_row(bottom, blank);
             }
         } else {
-            for _ in 0..count {
-                if top == 0 && bottom + 1 == self.screen.rows {
-                    if save_history {
-                        self.record_history_row(0);
-                    }
-                    self.screen.row0 += 1;
-                    if self.screen.row0 == self.screen.rows {
-                        self.screen.row0 = 0;
-                    }
-                    self.screen.clear_row(bottom, blank);
-                } else {
-                    for y in top..bottom {
-                        let wrapped = self.screen.row_wrap(y + 1);
-                        let source = self.screen.index(0, y + 1);
-                        let target = self.screen.index(0, y);
-                        self.screen
-                            .cells
-                            .copy_within(source..source + self.screen.cols, target);
-                        self.screen.set_row_wrap(y, wrapped);
-                    }
-                    self.screen.clear_row(bottom, blank);
-                }
+            // Move each surviving row once, including its soft-wrap endpoint.
+            // Logical row order is safe even when the backing ring wraps.
+            for y in top..bottom + 1 - count {
+                let wrapped = self.screen.row_wrap(y + count);
+                let source = self.screen.index(0, y + count);
+                let target = self.screen.index(0, y);
+                self.screen
+                    .cells
+                    .copy_within(source..source + self.screen.cols, target);
+                self.screen.set_row_wrap(y, wrapped);
+            }
+            for y in bottom + 1 - count..=bottom {
+                self.screen.clear_row(y, blank);
             }
         }
         if !save_history && count <= bottom - top {
@@ -1254,35 +1252,33 @@ impl State {
             self.shell.invalidate_screen(self.line_base);
         }
         let blank = self.style.blank();
-        for _ in 0..count.min(bottom - top + 1) {
-            if top == 0 && bottom + 1 == self.screen.rows {
+        let count = count.min(bottom - top + 1);
+        if top == 0 && bottom + 1 == self.screen.rows {
+            for _ in 0..count {
                 self.screen.row0 = if self.screen.row0 == 0 {
                     self.screen.rows - 1
                 } else {
                     self.screen.row0 - 1
                 };
                 self.screen.clear_row(top, blank);
-            } else {
-                for y in (top + 1..=bottom).rev() {
-                    let wrapped = self.screen.row_wrap(y - 1);
-                    let source = self.screen.index(0, y - 1);
-                    let target = self.screen.index(0, y);
-                    self.screen
-                        .cells
-                        .copy_within(source..source + self.screen.cols, target);
-                    self.screen.set_row_wrap(y, wrapped);
-                }
-                self.screen.clear_row(top, blank);
+            }
+        } else {
+            for y in (top + count..=bottom).rev() {
+                let wrapped = self.screen.row_wrap(y - count);
+                let source = self.screen.index(0, y - count);
+                let target = self.screen.index(0, y);
+                self.screen
+                    .cells
+                    .copy_within(source..source + self.screen.cols, target);
+                self.screen.set_row_wrap(y, wrapped);
+            }
+            for y in top..top + count {
+                self.screen.clear_row(y, blank);
             }
         }
         self.screen.set_row_wrap(bottom, 0);
-        self.graphics.scroll(
-            top,
-            bottom,
-            count.min(bottom - top + 1) as i32,
-            self.history.len(),
-            false,
-        );
+        self.graphics
+            .scroll(top, bottom, count as i32, self.history.len(), false);
         self.screen.dirty[top..=bottom].fill(true);
     }
 
