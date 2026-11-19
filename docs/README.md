@@ -24,7 +24,7 @@ The READMEs cover installation and common controls:
 | Reference | Contents |
 | --- | --- |
 | [Architecture](architecture.md) | Terminal model, libraries and resource ownership |
-| [zgpui 0.1.0](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0) | Independently published scene, layout and renderer contracts |
+| [Reusable libraries](../README.md#reusable-libraries) | Independent repositories, component responsibilities and release status |
 | [Protocols](protocols.md) | Implemented sequences, graphics and platform acceptance |
 | [Session core](session-core.md) | PTY reads, input queues, sizing and ownership |
 | [Native output bytes](native-output-bytes.zh-CN.md) | Lossless MCP output and readable text |

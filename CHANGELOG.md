@@ -3,8 +3,9 @@
 ## 0.5.0 candidate — 2026-11-20 (Asia/Taipei)
 
 This is a source candidate. The ztty application release and device installation
-are pending; published application downloads remain 0.4.1. The candidate package
-versions are zterm 0.5.0, zgraphics 0.2.0 and ztty-plugin-api 0.1.0.
+are pending; published application downloads remain 0.4.1.
+[zterm 0.5.0](https://github.com/LIghtJUNction/zterm) now has an independent
+repository and is awaiting publication.
 
 ### Added
 
@@ -33,7 +34,17 @@ versions are zterm 0.5.0, zgraphics 0.2.0 and ztty-plugin-api 0.1.0.
   minimum-height rules for interactive buttons.
 - Require recursive submodules for source builds: use `git clone
   --recurse-submodules` or `git submodule update --init --recursive` in an
-  existing checkout. zinput retains the existing 0.1.2 codec.
+  existing checkout.
+- Consume published [zinput 0.1.3](https://github.com/LIghtJUNction/zinput/commit/3761731),
+  [zpty 0.2.2](https://github.com/LIghtJUNction/zpty/commit/66919bc) and
+  [zgraphics 0.2.0](https://github.com/LIghtJUNction/zgraphics/commit/fe6357f).
+  Their canonical implementations live in independent repositories; the
+  application consumes pinned submodules and versioned dependencies.
+- Align the text-plugin host and shared API on `zplugin 0.3.1`, with
+  `zsys 0.1.1` in the locked dependency graph.
+- Separate the Linux session broker and macOS/Windows frontends into modules
+  for requests, input, drawing and system bindings. Public entry points and
+  data layouts remain unchanged.
 
 ### Fixed
 

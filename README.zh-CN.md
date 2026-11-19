@@ -57,7 +57,7 @@ macOS 和 Windows 的原生构建、打包入口见[发布说明](docs/releasing
 - VT 控制序列、真彩色、鼠标报告、括号粘贴和 Kitty 增强键盘协议。
 - 完整字符簇存储、历史重排，以及跨自动换行的文字复制。
 - Kitty 图片和 Sixel；Linux 增加动画、Unicode 占位符和相对位置。
-- Linux Kitty 文件、共享内存传输，以及有界的 OSC 52 剪贴板访问。
+- Linux X11 Kitty 文件、共享内存传输，以及有界的 OSC 52 剪贴板访问。
 - Linux 标签页、分屏、共享会话、历史搜索和命令面板。
 - Linux GPU 文字整形、Xft 回退、配置热重载和 XIM 输入法恢复。
 - 可选的 [Shell 集成](shell/README.md)和[可信文本扩展](docs/text-plugins.zh-CN.md)。
@@ -154,8 +154,17 @@ cargo build --locked --release --features wayland
 <!-- terminal-benchmark:end -->
 
 本地开发检查使用 `sh tools/check.sh`。
-UI 核心 [zgpui 0.1.0](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0)
-已经独立发布。本应用候选使用的 `zterm 0.5.0` 与 `zgraphics 0.2.0` 仍待发布。
+
+## 可复用库
+
+| 库 | 在 ztty 中的职责 | 发布状态 |
+| --- | --- | --- |
+| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI 场景与布局 | 已发布 [0.1.0](https://crates.io/crates/zgpui/0.1.0) |
+| [zinput](https://github.com/LIghtJUNction/zinput) | 键盘、鼠标与粘贴编码 | 已发布 [0.1.3](https://crates.io/crates/zinput/0.1.3) |
+| [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY 进程管理 | 已发布 [0.2.2](https://crates.io/crates/zpty/0.2.2) |
+| [zgraphics](https://github.com/LIghtJUNction/zgraphics) | 图片协议与放置 | 已发布 [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
+| [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 0.5.0 候选 |
+
 可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；
 使用指南与验收记录集中在[文档索引](docs/README.md)。
 
