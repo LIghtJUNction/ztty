@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.1 — 2026-11-19 (Asia/Taipei)
+
+### Fixed
+
+- Bound standalone release attachments to distribution archives, installers,
+  checksums and platform metadata. Keep every original screenshot and log,
+  including empty files, in the deterministic native-evidence ZIP and verify
+  the complete archive before restoring archive-only evidence for ledger checks.
+- Upload draft attachments serially with a pause between writes, resume only
+  missing files, and stop on any API error. Existing published assets remain
+  immutable and must pass the same full download verification.
+
+This patch retains the numeric-keypad correction and experimental ZUI/1
+integration from 0.4.0. All six 0.4.0 native platform gates passed, but its
+941-file standalone upload hit GitHub's secondary rate limit. The v0.4.0
+tag and published crates stay fixed; 0.4.1 has its own source-bound official
+builds and publication gates.
+
 ## 0.4.0 — 2026-11-19 (Asia/Taipei)
 
 ### Fixed
