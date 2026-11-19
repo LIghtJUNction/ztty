@@ -4,7 +4,7 @@ use crate::{
     os,
 };
 use alloc::{ffi::CString, format, string::String, vec::Vec};
-use core::ffi::{c_int, c_void};
+use core::ffi::{CStr, c_char, c_int, c_void};
 use core::sync::atomic::{AtomicU64, Ordering};
 
 const LIMIT: usize = 1024 * 1024;
@@ -45,6 +45,7 @@ unsafe extern "C" {
     fn setsid() -> c_int;
     fn dup2(old: c_int, new: c_int) -> c_int;
     fn close_range(first: u32, last: u32, flags: c_int) -> c_int;
+    fn setenv(name: *const c_char, value: *const c_char, overwrite: c_int) -> c_int;
 }
 
 pub struct Fd(pub i32);
@@ -59,6 +60,10 @@ impl Drop for Fd {
 fn address() -> Result<(Address, u32), String> {
     let default = format!("@ztty-{}", unsafe { os::getuid() });
     let name = os::env(c"ZTTY_SOCKET").unwrap_or(default.as_bytes());
+    named_address(name)
+}
+
+fn named_address(name: &[u8]) -> Result<(Address, u32), String> {
     if name.first() != Some(&b'@') || name.len() < 2 || name.len() > 107 || name.contains(&0) {
         return Err("ZTTY_SOCKET must be an abstract Unix address: @name (2..107 bytes)".into());
     }
@@ -70,23 +75,28 @@ fn address() -> Result<(Address, u32), String> {
     Ok((address, 2 + name.len() as u32))
 }
 
-fn same_user(fd: i32) -> bool {
+fn credentials(fd: i32) -> Option<Credentials> {
     let mut credentials = Credentials {
         pid: 0,
         uid: u32::MAX,
         gid: u32::MAX,
     };
     let mut size = core::mem::size_of::<Credentials>() as u32;
-    unsafe {
+    let valid = unsafe {
         getsockopt(
             fd,
             1,
             17,
             (&mut credentials as *mut Credentials).cast(),
             &mut size,
-        ) == 0
-            && credentials.uid == os::getuid()
-    }
+        )
+    } == 0;
+    (valid && size as usize == core::mem::size_of::<Credentials>() && credentials.pid > 0)
+        .then_some(credentials)
+}
+
+fn same_user(fd: i32) -> bool {
+    credentials(fd).is_some_and(|peer| peer.uid == unsafe { os::getuid() })
 }
 
 enum Connection {
@@ -98,11 +108,15 @@ enum Connection {
 
 fn connection() -> Result<Connection, String> {
     let (address, size) = address()?;
+    connection_at(&address, size)
+}
+
+fn connection_at(address: &Address, size: u32) -> Result<Connection, String> {
     let fd = Fd(unsafe { socket(1, 1 | CLOEXEC | NONBLOCK, 0) });
     if fd.0 < 0 {
         return Err("cannot create broker connection".into());
     }
-    if unsafe { connect(fd.0, &address, size) } < 0 {
+    if unsafe { connect(fd.0, address, size) } < 0 {
         return match os::errno() {
             2 | 111 => Ok(Connection::Unavailable),
             4 | 11 => Ok(Connection::Busy),
@@ -116,6 +130,126 @@ fn connection() -> Result<Connection, String> {
         return Err("session broker belongs to a different user".into());
     }
     Ok(Connection::Ready(fd))
+}
+
+// A content tag chooses a broker namespace; it is not an authentication token.
+// Hash only during a standalone GUI launch, never in the broker's event loop.
+#[derive(Clone, Copy, PartialEq, Eq)]
+struct ImageTag {
+    hash: u64,
+    bytes: u64,
+}
+
+fn image_tag(path: &CStr) -> Result<ImageTag, String> {
+    let fd = Fd(unsafe { os::open(path.as_ptr(), CLOEXEC) });
+    if fd.0 < 0 {
+        return Err(format!(
+            "cannot inspect terminal executable (OS error {})",
+            os::errno()
+        ));
+    }
+    let mut tag = ImageTag {
+        hash: 0xcbf29ce484222325,
+        bytes: 0,
+    };
+    let mut buffer = [0u8; 16384];
+    loop {
+        let count = unsafe { os::read(fd.0, buffer.as_mut_ptr().cast(), buffer.len()) };
+        if count == 0 {
+            return Ok(tag);
+        }
+        if count < 0 {
+            if os::errno() == os::EINTR {
+                continue;
+            }
+            return Err(format!(
+                "cannot read terminal executable (OS error {})",
+                os::errno()
+            ));
+        }
+        tag.bytes += count as u64;
+        for &byte in &buffer[..count as usize] {
+            tag.hash = (tag.hash ^ u64::from(byte)).wrapping_mul(0x100000001b3);
+        }
+    }
+}
+
+fn peer_image(fd: i32) -> Result<ImageTag, String> {
+    let peer = credentials(fd)
+        .filter(|peer| peer.uid == unsafe { os::getuid() })
+        .ok_or("cannot identify same-user session broker")?;
+    let path = CString::new(format!("/proc/{}/exe", peer.pid))
+        .map_err(|_| "invalid broker executable path")?;
+    image_tag(&path)
+}
+
+/// Inspect the peer without sending a request, so a legacy broker receives no
+/// create or mutation before its executable has been checked.
+fn probe_image(name: &[u8]) -> Result<Option<ImageTag>, String> {
+    let (address, size) = named_address(name)?;
+    let deadline = os::milliseconds().saturating_add(5000);
+    loop {
+        match connection_at(&address, size)? {
+            Connection::Ready(fd) => return peer_image(fd.0).map(Some),
+            Connection::Unavailable => return Ok(None),
+            Connection::Connecting(fd) => {
+                let mut poll = os::PollFd {
+                    fd: fd.0,
+                    events: os::POLLOUT,
+                    revents: 0,
+                };
+                let timeout = deadline.saturating_sub(os::milliseconds()) as i32;
+                let ready = unsafe { os::poll(&mut poll, 1, timeout) };
+                if ready > 0 {
+                    return peer_image(fd.0).map(Some);
+                }
+                if ready < 0 && os::errno() != os::EINTR {
+                    return Err("cannot poll session broker identity".into());
+                }
+            }
+            Connection::Busy => {
+                unsafe { os::poll(core::ptr::null_mut(), 0, 20) };
+            }
+        }
+        if os::milliseconds() >= deadline {
+            return Err("session broker identity check timed out".into());
+        }
+    }
+}
+
+fn use_gui_socket(name: &str) -> Result<(), String> {
+    let name = CString::new(name).map_err(|_| "invalid GUI broker address")?;
+    // This is called once, before Xlib/PTY setup, and only adds an absent entry.
+    // Existing explicit addresses and inherited session routing remain intact.
+    if unsafe { setenv(c"ZTTY_SOCKET".as_ptr(), name.as_ptr(), 0) } != 0 {
+        return Err("cannot select the current terminal broker".into());
+    }
+    Ok(())
+}
+
+/// A new independent window uses the running build when the default broker is
+/// from an earlier executable. Existing targeted operations keep their socket.
+pub fn select_gui_broker() -> Result<(), String> {
+    if os::env(c"ZTTY_SOCKET").is_some() {
+        return Ok(());
+    }
+    let current = image_tag(c"/proc/self/exe")?;
+    let uid = unsafe { os::getuid() };
+    let upgraded = format!(
+        "@ztty-{uid}-image-{:016x}-{:x}",
+        current.hash, current.bytes
+    );
+    if let Some(peer) = probe_image(upgraded.as_bytes())? {
+        if peer != current {
+            return Err("current-build broker address belongs to a different executable".into());
+        }
+        return use_gui_socket(&upgraded);
+    }
+    let default = format!("@ztty-{uid}");
+    if probe_image(default.as_bytes())?.is_some_and(|peer| peer != current) {
+        use_gui_socket(&upgraded)?;
+    }
+    Ok(())
 }
 
 fn start() -> Result<(), String> {

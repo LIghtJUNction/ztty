@@ -5,6 +5,9 @@ use core::ffi::CStr;
 
 pub fn run(cfg: Config) -> Result<i32, String> {
     use json::{Value, object};
+    if cfg.target.is_none() {
+        broker::select_gui_broker()?;
+    }
     let mut request = object([
         ("op", Value::from("create")),
         ("origin", Value::from("local")),
