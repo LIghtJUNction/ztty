@@ -311,12 +311,16 @@ def main():
 
             clicks(16, 0, 2)
             expect_selection(Xatom.PRIMARY, "/tmp/report.txt")
-            open_menu()
+            box = open_menu()
+            menu_pixels = image()
+            assert menu_pixels.getpixel((box[0] + 2, box[1] + 2)) == (53, 85, 119), "menu uses configured selection background"
+            highlighted = menu_pixels.crop((box[0] + 1, box[1] + 1, box[2] - 1, box[1] + ch + 9))
+            assert any(rgb == (255, 255, 255) for _, rgb in highlighted.getcolors(highlighted.width * highlighted.height)), "menu uses configured selection foreground"
             capture("copy-paste-menu")
             assert received() == b""
             choose(0)
             expect_selection(clipboard, "/tmp/report.txt")
-            record("double-click selects a path; right-click preserves it and only an explicit Copy item copies")
+            record("double-click selects a path; right-click preserves it and only an explicit Copy item copies", selected_background="#355577", selected_foreground="#ffffff")
 
             clicks(5, 1, 2)
             expect_selection(Xatom.PRIMARY, "中文e\u0301")
