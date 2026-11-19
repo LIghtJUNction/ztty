@@ -666,6 +666,7 @@ impl Graphics {
             let count = self.images.len() + usize::from(replaced == 0);
             if self.used - replaced + size <= self.limits.max_total_bytes
                 && count <= self.limits.max_images
+                && self.total_frames() + usize::from(replaced == 0) <= animation::MAX_FRAMES
             {
                 return Ok(());
             }
@@ -856,6 +857,13 @@ impl Graphics {
         let mut image = match image {
             Ok(image) => image,
             Err(error) => {
+                // A short or invalid external payload must not reveal whether
+                // the requested local path exists or how many bytes it holds.
+                let error = if command.transport == b'd' {
+                    error
+                } else {
+                    "EBADF:Failed to read image file"
+                };
                 self.respond(&command, command.id, error, replies);
                 return Outcome::default();
             }
@@ -1122,7 +1130,10 @@ impl Graphics {
             return;
         }
         let mut reply = format!("\x1b_Gi={}", c.id);
-        if matches!(c.feature, b't' | b'T' | b'p' | b'd' | b'f' | b'a' | b'c') {
+        if matches!(
+            c.feature,
+            b't' | b'T' | b'q' | b'p' | b'd' | b'f' | b'a' | b'c'
+        ) {
             reply.push_str(&format!(",e={}", c.feature as char));
             // Echo only supported nondefault values. Unsupported options remain
             // absent, allowing clients to fall back without a false capability.

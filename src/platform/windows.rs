@@ -528,16 +528,27 @@ impl Surface {
         let py = i64::from(viewport.y) + i64::from(padding);
         let dx = i64::from(draw.dest.x) + px;
         let dy = i64::from(draw.dest.y) + py;
-        let left = dx.max(px).max(self.clip.x as i64).max(0);
-        let top = dy.max(py).max(self.clip.y as i64).max(0);
+        let clip = draw.clip;
+        let left = dx
+            .max(px)
+            .max(self.clip.x as i64)
+            .max(0)
+            .max(clip.map_or(i64::MIN, |c| px + i64::from(c.x)));
+        let top = dy
+            .max(py)
+            .max(self.clip.y as i64)
+            .max(0)
+            .max(clip.map_or(i64::MIN, |c| py + i64::from(c.y)));
         let right = (dx + i64::from(draw.dest.width))
             .min(px + cols as i64 * i64::from(cell_width))
             .min(i64::from(self.clip.x) + i64::from(self.clip.width))
-            .min(self.width as i64);
+            .min(self.width as i64)
+            .min(clip.map_or(i64::MAX, |c| px + i64::from(c.x) + i64::from(c.width)));
         let bottom = (dy + i64::from(draw.dest.height))
             .min(py + rows as i64 * i64::from(cell_height))
             .min(i64::from(self.clip.y) + i64::from(self.clip.height))
-            .min(self.height as i64);
+            .min(self.height as i64)
+            .min(clip.map_or(i64::MAX, |c| py + i64::from(c.y) + i64::from(c.height)));
         if left >= right || top >= bottom {
             return;
         }
@@ -1796,6 +1807,11 @@ impl App {
                 pane.blink_deadline = now + self.appearance.cursor_blink_interval;
                 pane.dirty = true;
             }
+            let images_visible = pane.visible && !pane.core.eof();
+            osc52::process(self.hwnd, &mut pane.core, images_visible);
+            pane.core
+                .terminal
+                .advance_graphics(now, pane.history, images_visible);
             let revision = pane.core.terminal.graphics().revision();
             if revision != pane.graphics_revision {
                 pane.graphics_revision = revision;
@@ -1837,6 +1853,9 @@ impl App {
                     .unwrap_or(self.appearance.cursor_blink)
             {
                 timeout = timeout.min(pane.blink_deadline.saturating_sub(now).min(1000) as u32);
+            }
+            if let Some(deadline) = pane.core.terminal.graphics().animation_deadline() {
+                timeout = timeout.min(deadline.saturating_sub(now).min(1000) as u32);
             }
             if pane.core.input.pending() {
                 timeout = timeout.min(8);
@@ -1981,7 +2000,7 @@ impl App {
                         .core
                         .terminal
                         .view_cell(col, row, self.panes[index].history);
-                if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 {
+                if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 || cell.ch == '\u{10eeee}' {
                     continue;
                 }
                 let mut fg = if cell.flags & zterm::INVERSE != 0 {
@@ -2007,12 +2026,9 @@ impl App {
                         .min(px + self.panes[index].core.terminal.cols() as i32 * cw),
                     bottom: y + ch,
                 };
-                let mut text = [0u16; 6];
+                let mut text = [0u16; zterm::MAX_GRAPHEME_BYTES];
                 let mut length = 0;
-                for scalar in core::iter::once(cell.ch)
-                    .chain(cell.combining)
-                    .filter(|&c| c != '\0')
-                {
+                for scalar in self.panes[index].core.terminal.cell_chars(cell) {
                     let mut units = [0u16; 2];
                     let units = scalar.encode_utf16(&mut units);
                     text[length..length + units.len()].copy_from_slice(units);
@@ -2045,7 +2061,7 @@ impl App {
                         .core
                         .terminal
                         .view_cell(col, row, self.panes[index].history);
-                if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 {
+                if cell.width == 0 || cell.flags & zterm::HIDDEN != 0 || cell.ch == '\u{10eeee}' {
                     continue;
                 }
                 let fg = if cell.flags & zterm::INVERSE != 0 {
@@ -2100,13 +2116,13 @@ impl App {
                         let cell = self.panes[index].core.terminal.cell(col, row);
                         let width = cw * i32::from(cell.width.max(1));
                         self.surface.fill(x, y, width, ch, color);
-                        if cell.width != 0 && cell.flags & zterm::HIDDEN == 0 {
-                            let mut text = [0u16; 6];
+                        if cell.width != 0
+                            && cell.flags & zterm::HIDDEN == 0
+                            && cell.ch != '\u{10eeee}'
+                        {
+                            let mut text = [0u16; zterm::MAX_GRAPHEME_BYTES];
                             let mut length = 0;
-                            for scalar in core::iter::once(cell.ch)
-                                .chain(cell.combining)
-                                .filter(|&c| c != '\0')
-                            {
+                            for scalar in self.panes[index].core.terminal.cell_chars(cell) {
                                 let mut units = [0u16; 2];
                                 let units = scalar.encode_utf16(&mut units);
                                 text[length..length + units.len()].copy_from_slice(units);
@@ -2705,12 +2721,9 @@ impl App {
         }
     }
     fn open_link(&self, col: usize, row: usize) {
-        let id = self.panes[self.active]
-            .core
-            .terminal
-            .view_cell(col, row, self.panes[self.active].history)
-            .link_id;
-        let Some(uri) = self.panes[self.active].core.terminal.hyperlink(id) else {
+        let terminal = &self.panes[self.active].core.terminal;
+        let cell = terminal.view_cell(col, row, self.panes[self.active].history);
+        let Some(uri) = terminal.cell_hyperlink(cell) else {
             return;
         };
         if uri.len() > 8192
@@ -3708,3 +3721,6 @@ mod ffi {
         pub fn ImmSetCompositionWindow(context: Handle, form: *const CompositionForm) -> i32;
     }
 }
+
+#[path = "windows/osc52.rs"]
+mod osc52;

@@ -7,6 +7,7 @@
 extern crate alloc;
 
 pub mod actions;
+mod graphics_io;
 pub mod input_queue;
 pub mod json;
 pub mod layout;

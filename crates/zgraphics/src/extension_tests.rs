@@ -293,3 +293,81 @@ fn streaming_frame_commits_only_at_final_st() {
     assert_eq!(g.frame_count(1), 2);
     assert!(has(replies, b";OK"));
 }
+
+#[test]
+fn static_upload_cannot_exceed_scene_frame_count() {
+    let mut g = Graphics::default();
+    image(&mut g, 1);
+    for _ in 1..512 {
+        assert!(has(
+            send(&mut g, b"Ga=f,i=1,s=2,v=1", &[0; 8], context()),
+            b";OK"
+        ));
+    }
+    assert_eq!(g.total_frames(), 512);
+    assert!(has(
+        send(&mut g, b"Ga=T,i=2,s=1,v=1", &[1, 2, 3, 255], context()),
+        b"ENOSPC"
+    ));
+    assert_eq!(g.total_frames(), 512);
+    assert!(g.image(2).is_none());
+    command(&mut g, b"Ga=d,d=f,i=1,r=512");
+    assert!(has(
+        send(&mut g, b"Ga=T,i=2,s=1,v=1", &[1, 2, 3, 255], context()),
+        b";OK"
+    ));
+    assert_eq!(g.total_frames(), 512);
+}
+#[test]
+fn running_animation_at_saturated_clock_has_no_expired_wake() {
+    let mut g = Graphics::default();
+    image(&mut g, 1);
+    send(&mut g, b"Ga=f,i=1,s=2,v=1,z=10", &[9; 8], context());
+    command(&mut g, b"Ga=a,i=1,s=3");
+    assert_eq!(g.advance_animations(u64::MAX, &[1]), None);
+    assert_eq!(g.animation_deadline(), None);
+    assert_eq!(g.advance_animations(u64::MAX, &[1]), None);
+}
+
+#[test]
+fn feature_queries_report_action_specific_values_without_false_capabilities() {
+    let mut g = Graphics::default();
+    for (query, expected) in [
+        (
+            b"Ga=q,i=1,e=a,s=4,v=3,c=2,r=1,z=-1,S=9,p=1,X=1,w=1,U=1".as_slice(),
+            b"\x1b_Gi=1,e=a,v=3,c=2,r=1,z=-1;OK\x1b\\".as_slice(),
+        ),
+        (
+            b"Ga=q,i=1,e=f,f=24,c=1,r=2,X=2,Y=17,w=1,U=1,C=1",
+            b"\x1b_Gi=1,e=f,f=24,c=1,r=2,Y=17;OK\x1b\\",
+        ),
+        (
+            b"Ga=q,i=1,e=q,f=100,s=4,t=s,U=1,C=1;ignored",
+            b"\x1b_Gi=1,e=q,f=100,s=4;OK\x1b\\",
+        ),
+    ] {
+        assert_eq!(command(&mut g, query), expected);
+    }
+    for format in [8, 16, 32] {
+        assert_eq!(
+            command(&mut g, format!("Ga=q,i=1,e=T,f={format}").as_bytes()),
+            b"\x1b_Gi=1,e=T;OK\x1b\\"
+        );
+    }
+    assert_eq!(g.image_count(), 0);
+}
+
+#[test]
+fn external_short_pixels_and_invalid_png_use_the_same_opaque_file_error() {
+    let mut g = Graphics::default();
+    image(&mut g, 1);
+    let before = Arc::clone(&g.image(1).unwrap().pixels);
+    g.set_external_reader(Some(|_| Ok(vec![0; 4])));
+    for header in [b"Ga=T,i=1,s=2,v=1,t=f".as_slice(), b"Ga=T,i=1,f=100,t=f"] {
+        assert_eq!(
+            send(&mut g, header, b"/synthetic", context()),
+            b"\x1b_Gi=1;EBADF:Failed to read image file\x1b\\"
+        );
+        assert!(Arc::ptr_eq(&before, &g.image(1).unwrap().pixels));
+    }
+}

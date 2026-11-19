@@ -48,3 +48,6 @@ mod ui_tests;
 
 #[cfg(test)]
 mod grapheme_tests;
+
+pub mod clipboard;
+pub use clipboard::{ClipboardRequest, MAX_CLIPBOARD_BYTES, MAX_CLIPBOARD_REQUESTS};

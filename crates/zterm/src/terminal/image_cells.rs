@@ -153,6 +153,16 @@ impl Terminal {
         let mut count = 0;
         if visible {
             for draw in self.graphics_draws(history) {
+                let rect = draw.clip.unwrap_or(draw.dest);
+                if rect.width == 0
+                    || rect.height == 0
+                    || i64::from(rect.x) + i64::from(rect.width) <= 0
+                    || i64::from(rect.y) + i64::from(rect.height) <= 0
+                    || i64::from(rect.x) >= self.cols() as i64 * i64::from(self.state.cell_width)
+                    || i64::from(rect.y) >= self.rows() as i64 * i64::from(self.state.cell_height)
+                {
+                    continue;
+                }
                 if count < ids.len() && !ids[..count].contains(&draw.image_id) {
                     ids[count] = draw.image_id;
                     count += 1;
