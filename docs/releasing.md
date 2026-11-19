@@ -22,7 +22,7 @@ when preparing the dependent packages.
 
 [zgpui](https://github.com/LIghtJUNction/zgpui) is an independent repository,
 included at `crates/zgpui` as a Git submodule pinned to
-[`cc62da25d28b2e25113f461177ee03277f030135`](https://github.com/LIghtJUNction/zgpui/commit/cc62da25d28b2e25113f461177ee03277f030135).
+[`1d796d1fc63808dc099ed7b10c92e75835ae2814`](https://github.com/LIghtJUNction/zgpui/commit/1d796d1fc63808dc099ed7b10c92e75835ae2814).
 Initialize the submodule before building a fresh checkout. It replaces the
 former `ztty-ui` package; `zterm::ui` remains the public re-export and the
 ZUI/1 wire format is retained. Its scene, layout and renderer contracts are
