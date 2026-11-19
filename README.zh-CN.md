@@ -5,8 +5,8 @@
 ztty 是面向 Linux、macOS 和 Windows 的原生终端，核心用不依赖标准库的
 Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令行或 MCP 客户端使用。
 
-当前正式下载版本为 **0.4.1**。本页描述当前源码；使用尚未进入发布包的改动，
-请从源码构建。
+ztty 当前正式下载版本仍为 **0.4.1**。本页描述 **0.5.0 源码候选版**，
+应用正式发布和设备安装尚未完成。
 
 ## Linux 安装
 
@@ -37,13 +37,15 @@ sudo apt install build-essential pkg-config libx11-dev libxft-dev libxrender-dev
 ```
 
 ```sh
-git clone https://github.com/LIghtJUNction/ztty.git
+git clone --recurse-submodules https://github.com/LIghtJUNction/ztty.git
 cd ztty
 cargo build --locked --release
 ./target/release/ztty --font 'monospace:size=12' --geometry 100x28
 ./target/release/ztty --cwd /path/to/project -e /bin/bash
 sh install.sh --from-binary ./target/release/ztty
 ```
+
+已有克隆请先运行 `git submodule update --init --recursive`，再进行构建。
 
 Linux/macOS 使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用 `COMSPEC`，
 缺省为 `cmd.exe`。用 `-e` 指定其他程序。安装更新会保留现有会话，
@@ -54,12 +56,13 @@ macOS 和 Windows 的原生构建、打包入口见[发布说明](docs/releasing
 
 - VT 控制序列、真彩色、鼠标报告、括号粘贴和 Kitty 增强键盘协议。
 - 完整字符簇存储、历史重排，以及跨自动换行的文字复制。
-- 静态 Kitty 图片和 Sixel；可运行 `kitten icat --transfer-mode=stream photo.png`。
+- Kitty 图片和 Sixel；Linux 增加动画、Unicode 占位符和相对位置。
+- Linux Kitty 文件、共享内存传输，以及有界的 OSC 52 剪贴板访问。
 - Linux 标签页、分屏、共享会话、历史搜索和命令面板。
 - Linux GPU 文字整形、Xft 回退、配置热重载和 XIM 输入法恢复。
 - 可选的 [Shell 集成](shell/README.md)和[可信文本扩展](docs/text-plugins.zh-CN.md)。
 
-Linux 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使用 Xft。
+Linux X11 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使用 Xft。
 [配置指南](docs/configuration.md)和[协议说明](docs/protocols.md)列出支持的模式与范围。
 
 ## Linux 常用操作
@@ -83,7 +86,7 @@ Linux 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使用 
 
 ## 共享会话与 MCP（Linux）
 
-Linux 多个窗口自动共用会话进程、显示连接和字体缓存；
+Linux X11 多个窗口自动共用会话进程、显示连接和字体缓存；
 每个会话分别保留自己的 PTY、屏幕和历史。
 
 ```sh
@@ -114,21 +117,33 @@ background-opacity = 92
 renderer = auto
 ```
 
-Linux 会在原窗口中应用有效配置。[配置指南](docs/configuration.md)
+Linux X11 会在原窗口中应用有效配置。[配置指南](docs/configuration.md)
 包含各平台路径、颜色、光标、快捷键和渲染器选项。
 
 ## 平台范围
 
 | 平台 | 当前源码 |
 | --- | --- |
-| Linux | X11/XWayland；共享会话、标签页、分屏、Attach、MCP |
+| Linux X11/XWayland | GPU 或 Xft；共享会话、标签页、分屏、Attach、MCP |
+| Linux 原生 Wayland | 显式启用的实验性单窗口；EGL/GLES 与 XKB 输入 |
 | macOS | 原生 AppKit/CoreText 窗口与 Darwin PTY；本地会话 |
 | Windows | 原生 Win32/GDI 与 ConPTY；本地标签页和分屏 |
 
 macOS 无需 X11，Windows 无需 WSL。Windows 支持字体与工作区快捷键；
 macOS 复制粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
-共享会话、Attach、搜索与 MCP 当前使用 Linux 运行时。
+共享会话、Attach、搜索与 MCP 当前使用 Linux X11 运行时。
 各平台实际测试范围见[验收说明](docs/protocols.md#acceptance-coverage)。
+
+试用实验性原生 Wayland 窗口：
+
+```sh
+cargo build --locked --release --features wayland
+./target/release/ztty --backend wayland
+```
+
+官方 Linux 包的构建会启用 Wayland 支持，运行时仍默认使用 X11。
+[Wayland 配置](docs/configuration.md#native-wayland-experimental)列出额外依赖，
+以及剪贴板、输入法和工作区等当前边界。
 
 ## 性能与开发
 
@@ -139,6 +154,8 @@ macOS 复制粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
 <!-- terminal-benchmark:end -->
 
 本地开发检查使用 `sh tools/check.sh`。
+UI 核心 [zgpui 0.1.0](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0)
+已经独立发布。本应用候选使用的 `zterm 0.5.0` 与 `zgraphics 0.2.0` 仍待发布。
 可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；
 使用指南与验收记录集中在[文档索引](docs/README.md)。
 
