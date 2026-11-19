@@ -1,0 +1,201 @@
+{
+  "ok": true,
+  "results": [
+    {
+      "name": "fmt-checked",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.923
+    },
+    {
+      "name": "clippy-checked",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 6.614
+    },
+    {
+      "name": "rust-tests-checked",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 10.199
+    },
+    {
+      "name": "release-checked",
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "seconds": 17.353
+    },
+    {
+      "name": "baseline-final-fixture",
+      "command": [
+        "python3",
+        "tests/graphics_extensions_gui.py",
+        "--binary",
+        "$WORKTREE/artifacts/graphics-integration-20261120/before-gpu-clip.ztty",
+        "--renderer",
+        "gpu",
+        "--artifacts",
+        "$WORKTREE/artifacts/graphics-integration-20261120/before-gpu-clip-final-fixture"
+      ],
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "seconds": 8.715
+    },
+    {
+      "name": "graphics_extensions-gpu",
+      "command": [
+        "python3",
+        "tests/graphics_extensions_gui.py",
+        "--binary",
+        "$WORKTREE/target/release/ztty",
+        "--renderer",
+        "gpu",
+        "--artifacts",
+        "$WORKTREE/artifacts/graphics-integration-20261120/graphics_extensions-gpu"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 2.834
+    },
+    {
+      "name": "osc52-gpu",
+      "command": [
+        "python3",
+        "tests/osc52_gui.py",
+        "--binary",
+        "$WORKTREE/target/release/ztty",
+        "--renderer",
+        "gpu",
+        "--artifacts",
+        "$WORKTREE/artifacts/graphics-integration-20261120/osc52-gpu"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 4.518
+    },
+    {
+      "name": "graphics_extensions-software",
+      "command": [
+        "python3",
+        "tests/graphics_extensions_gui.py",
+        "--binary",
+        "$WORKTREE/target/release/ztty",
+        "--renderer",
+        "software",
+        "--artifacts",
+        "$WORKTREE/artifacts/graphics-integration-20261120/graphics_extensions-software"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 2.668
+    },
+    {
+      "name": "osc52-software",
+      "command": [
+        "python3",
+        "tests/osc52_gui.py",
+        "--binary",
+        "$WORKTREE/target/release/ztty",
+        "--renderer",
+        "software",
+        "--artifacts",
+        "$WORKTREE/artifacts/graphics-integration-20261120/osc52-software"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 4.104
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.301
+    },
+    {
+      "name": "windows-typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--target",
+        "x86_64-pc-windows-gnu",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 0.646
+    },
+    {
+      "name": "bare-metal",
+      "command": [
+        "cargo",
+        "check",
+        "--target",
+        "x86_64-unknown-none",
+        "--locked",
+        "-p",
+        "zterm",
+        "-p",
+        "zgraphics"
+      ],
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "seconds": 1.494
+    }
+  ],
+  "binary_sha256": "f8f6f218a44c2873c1246651cb474e5e324a7cdb06df8f1062f4494623d8aefe",
+  "source_sha256": {
+    "Cargo.lock": "e3eada6b7231b14903fa277e726c049ce44d322400f538d171081e7848e59427",
+    "src/session.rs": "53dc8324adc6aa606cb055ec16b904f634ba5c37e22539148b9e809cfe0698d8",
+    "src/x11.rs": "82ce17bdf35925818b33776338eb1d6e8d4c381ce8acbf982625585a21c79918",
+    "src/x11/osc52.rs": "901f2409c179ecc81404a903ae3be0d97390e1fd9f739b59b556446a91e85e72",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/graphics_io.rs": "3ab06f546e6e443a0fd18ee5b37baabc882f355cf7a6a0abfe29e228c087e727",
+    "crates/zterm/src/clipboard.rs": "8bf611cb5a88d1b8a3ecd51c26b99c711ddb3298fd3abafb9bc99f2e12b9eb23",
+    "crates/zgraphics/src/extension_tests.rs": "7513eb7c370ece924d14cf2c9a12206be60aa068f78d55b3a3b8e10d0bb8aa45",
+    "tests/gui_smoke.py": "92f2948c82d1309586f0cc567ba7cf115669c46a004232ba73051bc5644c535f",
+    "tests/graphics_extensions_gui.py": "76999f247496cddcf64453af444059c0e2dd560060b14a8a238986987701eb31",
+    "tests/osc52_gui.py": "50dcaf314c29fe5534640dc2adecf916a018b27b997feb71b9f3cb09a310bb4a",
+    "src/platform/windows/osc52.rs": "357bdb9f409b84da77d6f791c707202c45c94bb7cffc77e3a944d6f84a861883",
+    "tools/check_no_std.py": "28e4e2e9b7dd035696a81cd06897ae90c701259af6a352603cea38e711ebe088"
+  },
+  "binary_unchanged": true,
+  "source_commit": "05e14c3c25526514f50bfeed35a463cf0d85d0bf",
+  "scope": "Linux X11 on private Xvfb; forced GPU uses llvmpipe; Windows compilation only",
+  "test_totals": {
+    "rust_and_doctest_passed": 439,
+    "ignored": 6,
+    "session_core_pty": 9,
+    "graphics_per_renderer": 8,
+    "osc52_per_renderer": 13
+  }
+}
