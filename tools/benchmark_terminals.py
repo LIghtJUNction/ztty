@@ -485,7 +485,8 @@ def terminal_command(app, binary, directory, tag, mode="shared"):
     ]
 
 
-def measure(app, binary, repetition, settle, count=None, mode="shared", workload="idle", purpose="comparison"):
+def measure(app, binary, repetition, settle, count=None, mode="shared", workload="idle",
+            purpose="comparison", ztty_renderer="auto"):
     from Xlib import X, display
     count = WINDOWS if count is None else count
     result = {"app": app, "windows": count, "mode": mode, "workload": workload,
@@ -502,7 +503,8 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
         directory = Path(temporary)
         tag = directory.name
         prefix = "terminal-benchmark-" + tag + "-"
-        (directory / "ztty.conf").write_text(ZTTY_CONFIG)
+        ztty_config = ZTTY_CONFIG + f"renderer = {ztty_renderer}\n"
+        (directory / "ztty.conf").write_text(ztty_config)
         ghostty_config = GHOSTTY_CONFIG.replace(
             "gtk-single-instance = true",
             "gtk-single-instance = " + ("true" if mode == "shared" else "false"))
@@ -570,7 +572,7 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
                 result["command"] = command
                 result["commands"] = []
                 result["config"] = {
-                    "ztty": ZTTY_CONFIG, "kitty": KITTY_CONFIG, "ghostty": ghostty_config,
+                    "ztty": ztty_config, "kitty": KITTY_CONFIG, "ghostty": ghostty_config,
                 }[app]
                 result["environment_overrides"] = {
                     key: environment[key] for key in (
@@ -632,6 +634,14 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
                 windows = application_windows(xconnection, prefix)
                 if len(windows) != count:
                     raise RuntimeError(f"expected {count} mapped windows, found {len(windows)}")
+                if app == "ztty":
+                    from gui_renderer import record_renderer
+                    result["renderers"] = [
+                        record_renderer(xconnection, row["window"], ztty_renderer)
+                        for row in windows.values()
+                    ]
+                    if any(row["actual"] not in ("gpu", "software") for row in result["renderers"]):
+                        raise RuntimeError("ztty omitted its actual renderer identity")
                 if workload == "hidden":
                     for title, row in windows.items():
                         if title != prefix + "1":
@@ -710,7 +720,7 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
                                        if key in server_after and key in server_before else None
                                        for key in FIELDS}},
                     private_dbus=sample_process(bus.pid, process_stat(bus.pid)["start_ticks"]),
-                    gpu_memory={"available": False, "reason": "Xvfb software renderer; no native GPU context"},
+                    gpu_memory={"available": False, "reason": "Xvfb with Mesa software GL; hardware GPU/VRAM not measured"},
                     first_presented_frame={"available": False, "reason": "no presentation fence; startup uses DSR"},
                     input_to_display_latency={"available": False,
                                               "reason": "DSR times PTY processing, not display presentation"},
@@ -744,6 +754,13 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
                 result["latency_p99_us"] = percentile(latency, 99)
                 result["output_mib_per_second"] = statistics.median(
                     row["median_output_mib_per_second"] for row in performance)
+                if app == "ztty":
+                    result["renderers_after"] = [
+                        record_renderer(xconnection, row["window"], ztty_renderer)
+                        for row in windows.values()
+                    ]
+                    if result["renderers_after"] != result["renderers"]:
+                        raise RuntimeError("ztty renderer identity changed during measurement")
                 if len(application_windows(xconnection, prefix, include_hidden=workload == "hidden")) != count:
                     raise RuntimeError("window count changed during performance measurements")
                 result["ok"] = True
@@ -1186,6 +1203,8 @@ def update_readmes(repetitions=REPETITIONS):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ztty", type=Path, default=ROOT / "target/release/ztty")
+    parser.add_argument("--ztty-renderer", choices=("auto", "gpu", "software"), default="auto",
+                        help="record the selected path; gpu requires the real EGL/GLES renderer")
     parser.add_argument("--ghostty", type=Path)
     parser.add_argument("--kitty", type=Path)
     parser.add_argument("--json", type=Path, default=REPORT)
@@ -1264,7 +1283,7 @@ def main():
         "machine": machine(), "command": [sys.executable, str(Path(__file__).resolve()), *sys.argv[1:]],
         "script_sha256": sha256(__file__),
         "source_sha256": {name: sha256(ROOT / "tools" / name) for name in
-                          ("benchmark_terminals.py", "measure_runtime.py", "measure_multiwindow.py", "isolated_xvfb.py")},
+                          ("benchmark_terminals.py", "measure_runtime.py", "measure_multiwindow.py", "isolated_xvfb.py", "gui_renderer.py")},
         "git": {
             "head": capture(["git", "-C", str(ROOT), "rev-parse", "HEAD"]),
             "status": capture(["git", "-C", str(ROOT), "status", "--short"]),
@@ -1274,6 +1293,7 @@ def main():
             "windows": counts[0] if len(counts) == 1 else None,
             "counts": counts, "modes": modes, "workloads": workloads, "apps": apps,
             "repetitions": args.repetitions, "geometry": [COLS, ROWS],
+            "ztty_renderer": args.ztty_renderer,
             "font": "monospace", "font_size_pt": 11, "xvfb_screen": "7680 pixels wide; height grows to tile selected window count", "dpi": 96,
             "sharing": {"ztty": "same broker socket in shared mode; separate socket per window in independent mode",
                         "kitty": "--single-instance + unique --instance-group only in shared mode",
@@ -1334,7 +1354,8 @@ def main():
                         if sha256(binaries[app]) != metadata[app]["sha256"]:
                             raise RuntimeError(f"{app} binary changed during benchmark")
                         run = measure(app, binaries[app], repetition + 1, args.settle_seconds,
-                                      count=count, mode=mode, workload=workload, purpose=args.purpose)
+                                      count=count, mode=mode, workload=workload, purpose=args.purpose,
+                                      ztty_renderer=args.ztty_renderer)
                         report["runs"].append(run)
                         print(json.dumps({
                             "app": app, "windows": count, "mode": mode, "workload": workload,
