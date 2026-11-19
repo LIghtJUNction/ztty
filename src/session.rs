@@ -1,13 +1,14 @@
 //! Shared PTYs and desktop windows, driven by one poll loop.
 use crate::{
     Appearance, actions, broker, config_watch,
+    display::{Connection, Window},
     json::{self, Value},
     layout::Layout,
     os, plugin_host,
     repaint::Repaint,
     search,
     session_core::{ReadStep, SessionCore},
-    x11::{self, Connection, Selection, Window},
+    x11::{self, Selection},
 };
 use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
 use core::ffi::c_int;
@@ -239,10 +240,22 @@ impl Pool {
         }
     }
 
-    fn connection(&mut self, env: &[CString]) -> Result<Rc<Connection>, String> {
-        let display = env
-            .iter()
-            .find_map(|e| e.to_bytes().strip_prefix(b"DISPLAY="));
+    fn connection(&mut self, env: &[CString], wayland: bool) -> Result<Rc<Connection>, String> {
+        let value = |prefix: &[u8]| env.iter().find_map(|e| e.to_bytes().strip_prefix(prefix));
+        if wayland {
+            let key = format!(
+                "wayland:{}:{}",
+                String::from_utf8_lossy(value(b"XDG_RUNTIME_DIR=").unwrap_or_default()),
+                String::from_utf8_lossy(value(b"WAYLAND_DISPLAY=").unwrap_or(b"wayland-0"))
+            );
+            if let Some((_, c)) = self.connections.iter().find(|(name, _)| *name == key) {
+                return Ok(c.clone());
+            }
+            let c = Connection::wayland(env).map_err(String::from)?;
+            self.connections.push((key, c.clone()));
+            return Ok(c);
+        }
+        let display = value(b"DISPLAY=");
         let key = display
             .map(|s| String::from_utf8_lossy(s).into_owned())
             .unwrap_or_default();
@@ -851,16 +864,9 @@ impl Pool {
         for connection_index in 0..self.connections.len() {
             let connection = self.connections[connection_index].1.clone();
             for _ in 0..512 {
-                if unsafe { x11::XPending(connection.display) } == 0 {
+                let Some(mut event) = connection.next_event() else {
                     break;
-                }
-                let mut event = x11::Event { pad: [0; 24] };
-                unsafe {
-                    x11::XNextEvent(connection.display, &mut event);
-                }
-                if unsafe { x11::XFilterEvent(&mut event, 0) } != 0 {
-                    continue;
-                }
+                };
                 let id = event.window();
                 let kind = unsafe { event.kind };
                 if matches!(kind, x11::BUTTON_PRESS | x11::BUTTON_RELEASE) {
@@ -912,7 +918,7 @@ impl Pool {
                     }
                 }
                 if matches!(kind, x11::FOCUS_IN | x11::FOCUS_OUT)
-                    && (kind == x11::FOCUS_IN) != (x11::input_focus(connection.display) == id)
+                    && (kind == x11::FOCUS_IN) != (connection.input_focus() == id)
                 {
                     continue;
                 }
@@ -1323,11 +1329,7 @@ pub fn serve() -> Result<(), String> {
             });
         }
         for (_, connection) in &pool.connections {
-            fds.push(os::PollFd {
-                fd: connection.fd,
-                events: os::POLLIN,
-                revents: 0,
-            });
+            connection.descriptors(&mut fds);
         }
         for session in &pool.sessions {
             if !session.core.eof() {
@@ -1346,6 +1348,7 @@ pub fn serve() -> Result<(), String> {
         let mut timeout = deadline
             .into_iter()
             .chain(server.next_deadline())
+            .chain(pool.connections.iter().filter_map(|(_, c)| c.deadline()))
             .min()
             .map(|end| end.saturating_sub(os::milliseconds()).min(5000) as c_int)
             .unwrap_or(5000);
@@ -1355,11 +1358,7 @@ pub fn serve() -> Result<(), String> {
         if openers.pending() {
             timeout = timeout.min(50);
         }
-        if pool
-            .connections
-            .iter()
-            .any(|(_, c)| unsafe { x11::XPending(c.display) } != 0)
-        {
+        if pool.connections.iter().any(|(_, c)| c.pending()) {
             timeout = 0;
         }
         if unsafe { os::poll(fds.as_mut_ptr(), fds.len(), timeout) } < 0 && os::errno() != os::EINTR

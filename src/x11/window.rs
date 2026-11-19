@@ -253,15 +253,18 @@ impl Window {
             let ic = connection.input_context(id, events);
             let fd = connection.fd;
             let mut out = Self {
-                display,
-                id,
-                fd,
-                cw,
-                ch,
-                width,
-                height,
-                wm_delete,
-                configure_serial: core::cell::Cell::new(0),
+                state: crate::display::WindowState {
+                    display,
+                    id,
+                    fd,
+                    cw,
+                    ch,
+                    width,
+                    height,
+                    wm_delete,
+                    configure_serial: core::cell::Cell::new(0),
+                    focused: activate,
+                },
                 depth,
                 visual,
                 colormap,
@@ -324,7 +327,6 @@ impl Window {
                 image_clock: 0,
                 graphics_revision: 0,
                 graphics_alternate: false,
-                focused: activate,
                 suspended: false,
                 search_cols: 0,
                 search_bits: Vec::new(),
@@ -343,10 +345,10 @@ impl Window {
             return;
         };
         unsafe {
-            XStoreName(self.display, self.id, title.as_ptr());
+            XStoreName(self.state.display, self.state.id, title.as_ptr());
             XChangeProperty(
-                self.display,
-                self.id,
+                self.state.display,
+                self.state.id,
                 self.title_atom,
                 self.utf8,
                 8,
@@ -358,8 +360,8 @@ impl Window {
     }
     pub fn coordinates(&self, x: i32, y: i32, cols: usize, rows: usize) -> (usize, usize) {
         (
-            (((x - self.padding).max(0) / self.cw) as usize).min(cols.saturating_sub(1)),
-            (((y - self.padding).max(0) / self.ch) as usize).min(rows.saturating_sub(1)),
+            (((x - self.padding).max(0) / self.state.cw) as usize).min(cols.saturating_sub(1)),
+            (((y - self.padding).max(0) / self.state.ch) as usize).min(rows.saturating_sub(1)),
         )
     }
 
@@ -377,22 +379,22 @@ impl Window {
         let font = fonts.font;
         let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
         unsafe {
-            XftTextExtentsUtf8(self.display, font, b"M".as_ptr(), 1, &mut metrics);
+            XftTextExtentsUtf8(self.state.display, font, b"M".as_ptr(), 1, &mut metrics);
         }
         let cw = i32::from(metrics.x_off).max(1);
         let ch = unsafe { (*font).ascent + (*font).descent + 3 }.max(1);
         if cw > 512 || ch > 1024 {
             return Err("font cell size exceeds the supported limit".into());
         }
-        let cols = (((self.width - appearance.padding * 2) / cw).max(1) as usize).min(512);
-        let rows = (((self.height - appearance.padding * 2) / ch).max(1) as usize).min(256);
+        let cols = (((self.state.width - appearance.padding * 2) / cw).max(1) as usize).min(512);
+        let rows = (((self.state.height - appearance.padding * 2) / ch).max(1) as usize).min(256);
         // Font validation and the host's fallible PTY update happen before any
         // live window state changes, so rejected reloads retain the old view.
         before(cols, rows, cw, ch)?;
         self.fonts = fonts;
         self.font = font;
-        self.cw = cw;
-        self.ch = ch;
+        self.state.cw = cw;
+        self.state.ch = ch;
         self.requested_opacity = appearance.opacity;
         self.padding = appearance.padding;
         self.background = appearance.theme.background;
@@ -412,11 +414,24 @@ impl Window {
                 alpha: (65535 * opacity / 100) as u16,
             });
             unsafe {
-                let blur = XInternAtom(self.display, c"_KDE_NET_WM_BLUR_BEHIND_REGION".as_ptr(), 0);
+                let blur = XInternAtom(
+                    self.state.display,
+                    c"_KDE_NET_WM_BLUR_BEHIND_REGION".as_ptr(),
+                    0,
+                );
                 if appearance.blur {
-                    XChangeProperty(self.display, self.id, blur, 6, 32, 0, core::ptr::null(), 0);
+                    XChangeProperty(
+                        self.state.display,
+                        self.state.id,
+                        blur,
+                        6,
+                        32,
+                        0,
+                        core::ptr::null(),
+                        0,
+                    );
                 } else {
-                    XDeleteProperty(self.display, self.id, blur);
+                    XDeleteProperty(self.state.display, self.state.id, blur);
                 }
             }
         }
@@ -428,74 +443,91 @@ impl Window {
     /// Request a character-grid resize. ConfigureNotify applies the resulting
     /// pixel size to the backing pixmap and the host's terminal model.
     pub fn resize_grid(&self, cols: usize, rows: usize) {
-        if self.id == 0 {
+        if self.state.id == 0 {
             return;
         }
         let width = cols
-            .saturating_mul(self.cw as usize)
+            .saturating_mul(self.state.cw as usize)
             .saturating_add((self.padding * 2) as usize)
             .clamp(1, u16::MAX as usize);
         let height = rows
-            .saturating_mul(self.ch as usize)
+            .saturating_mul(self.state.ch as usize)
             .saturating_add((self.padding * 2) as usize)
             .clamp(1, u16::MAX as usize);
         unsafe {
-            self.configure_serial.set(XNextRequest(self.display));
-            XResizeWindow(self.display, self.id, width as c_uint, height as c_uint);
-            XFlush(self.display);
+            self.state
+                .configure_serial
+                .set(XNextRequest(self.state.display));
+            XResizeWindow(
+                self.state.display,
+                self.state.id,
+                width as c_uint,
+                height as c_uint,
+            );
+            XFlush(self.state.display);
         }
     }
 
     pub fn resize(&mut self, width: i32, height: i32) -> (usize, usize) {
-        if self.width != width.max(1) || self.height != height.max(1) {
-            self.width = width.max(1);
-            self.height = height.max(1);
+        if self.state.width != width.max(1) || self.state.height != height.max(1) {
+            self.state.width = width.max(1);
+            self.state.height = height.max(1);
             self.retained_valid = false;
             self.pending_damage = None;
             self.resize_gpu();
             if !self.suspended {
                 unsafe {
                     let pixmap = XCreatePixmap(
-                        self.display,
-                        self.id,
-                        self.width as u32,
-                        self.height as u32,
+                        self.state.display,
+                        self.state.id,
+                        self.state.width as u32,
+                        self.state.height as u32,
                         self.depth,
                     );
                     XftDrawChange(self.draw, pixmap);
-                    XFreePixmap(self.display, self.pixmap);
+                    XFreePixmap(self.state.display, self.pixmap);
                     self.pixmap = pixmap;
                 }
             }
         }
         (
-            (((self.width - self.padding * 2) / self.cw).max(1) as usize).min(512),
-            (((self.height - self.padding * 2) / self.ch).max(1) as usize).min(256),
+            (((self.state.width - self.padding * 2) / self.state.cw).max(1) as usize).min(512),
+            (((self.state.height - self.padding * 2) / self.state.ch).max(1) as usize).min(256),
         )
     }
 
     pub fn parent(&mut self, parent: Option<Xid>) {
-        if self.id == 0 {
+        if self.state.id == 0 {
             return;
         }
         unsafe {
-            let root = XRootWindow(self.display, self.fonts.connection.screen);
-            XUnmapWindow(self.display, self.id);
-            self.configure_serial.set(XNextRequest(self.display));
-            XReparentWindow(self.display, self.id, parent.unwrap_or(root), 0, 0);
+            let root = XRootWindow(self.state.display, self.fonts.connection.screen);
+            XUnmapWindow(self.state.display, self.state.id);
+            self.state
+                .configure_serial
+                .set(XNextRequest(self.state.display));
+            XReparentWindow(
+                self.state.display,
+                self.state.id,
+                parent.unwrap_or(root),
+                0,
+                0,
+            );
             if !self.suspended {
-                XMapWindow(self.display, self.id);
+                XMapWindow(self.state.display, self.state.id);
             }
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
 
     pub fn place(&mut self, rect: crate::layout::Rect) -> (usize, usize) {
         unsafe {
-            self.configure_serial.set(XNextRequest(self.display));
+            self.state
+                .configure_serial
+                .set(XNextRequest(self.state.display));
             XMoveResizeWindow(
-                self.display,
-                self.id,
+                self.state.display,
+                self.state.id,
                 rect.x,
                 rect.y,
                 rect.width.max(1) as u32,
@@ -506,7 +538,7 @@ impl Window {
     }
 
     pub fn visible(&mut self, visible: bool) {
-        if self.id == 0 || visible != self.suspended {
+        if self.state.id == 0 || visible != self.suspended {
             return;
         }
         self.retained_valid = false;
@@ -514,44 +546,44 @@ impl Window {
         unsafe {
             if visible {
                 let pixmap = XCreatePixmap(
-                    self.display,
-                    self.id,
-                    self.width as u32,
-                    self.height as u32,
+                    self.state.display,
+                    self.state.id,
+                    self.state.width as u32,
+                    self.state.height as u32,
                     self.depth,
                 );
                 XftDrawChange(self.draw, pixmap);
-                XFreePixmap(self.display, self.pixmap);
+                XFreePixmap(self.state.display, self.pixmap);
                 self.pixmap = pixmap;
                 self.last_cursor = None;
-                XMapWindow(self.display, self.id);
+                XMapWindow(self.state.display, self.state.id);
             } else {
-                XUnmapWindow(self.display, self.id);
+                XUnmapWindow(self.state.display, self.state.id);
                 // Hidden tabs keep canonical pixels but release all rebuildable
                 // server uploads and their full-size retained surface.
                 while !self.images.is_empty() {
                     self.discard_upload(self.images.len() - 1);
                 }
-                let pixmap = XCreatePixmap(self.display, self.id, 1, 1, self.depth);
+                let pixmap = XCreatePixmap(self.state.display, self.state.id, 1, 1, self.depth);
                 XftDrawChange(self.draw, pixmap);
-                XFreePixmap(self.display, self.pixmap);
+                XFreePixmap(self.state.display, self.pixmap);
                 self.pixmap = pixmap;
                 self.focus(false);
             }
             self.suspended = !visible;
             self.visible_gpu(visible);
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
     /// Bring an already attached session back without opening a second window.
     pub fn raise(&self) {
-        if self.id == 0 {
+        if self.state.id == 0 {
             return;
         }
         unsafe {
-            XMapRaised(self.display, self.id);
-            XSetInputFocus(self.display, self.id, 1, 0);
-            XFlush(self.display);
+            XMapRaised(self.state.display, self.state.id);
+            XSetInputFocus(self.state.display, self.state.id, 1, 0);
+            XFlush(self.state.display);
         }
     }
 }
@@ -567,16 +599,33 @@ impl Drop for Window {
             self.ic.close();
             XftDrawDestroy(self.draw);
             for color in &mut self.colors {
-                XftColorFree(self.display, self.visual, self.colormap, &mut color.color);
+                XftColorFree(
+                    self.state.display,
+                    self.visual,
+                    self.colormap,
+                    &mut color.color,
+                );
             }
-            XFreeGC(self.display, self.gc);
-            XFreePixmap(self.display, self.pixmap);
-            if self.id != 0 {
-                XDestroyWindow(self.display, self.id);
+            XFreeGC(self.state.display, self.gc);
+            XFreePixmap(self.state.display, self.pixmap);
+            if self.state.id != 0 {
+                XDestroyWindow(self.state.display, self.state.id);
             }
             if self.owns_colormap {
-                XFreeColormap(self.display, self.colormap);
+                XFreeColormap(self.state.display, self.colormap);
             }
         }
+    }
+}
+
+impl core::ops::Deref for Window {
+    type Target = crate::display::WindowState;
+    fn deref(&self) -> &Self::Target {
+        &self.state
+    }
+}
+impl core::ops::DerefMut for Window {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.state
     }
 }

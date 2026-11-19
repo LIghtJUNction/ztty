@@ -6,13 +6,13 @@ impl Window {
         // Expose already requests a full repaint in the view. A swapped EGL
         // back buffer is not retained content and must not be published again.
         if self.gpu.is_none() && !self.gpu_repaint && self.retained_valid {
-            self.present_region(0, self.height);
+            self.present_region(0, self.state.height);
         }
     }
 
     pub(super) fn damage(&mut self, top: i32, bottom: i32) {
-        let top = top.clamp(0, self.height);
-        let bottom = bottom.clamp(top, self.height);
+        let top = top.clamp(0, self.state.height);
+        let bottom = bottom.clamp(top, self.state.height);
         if top == bottom {
             return;
         }
@@ -38,23 +38,23 @@ impl Window {
     }
 
     fn present_region(&self, top: i32, bottom: i32) {
-        if self.suspended || self.id == 0 || !self.retained_valid {
+        if self.suspended || self.state.id == 0 || !self.retained_valid {
             return;
         }
         unsafe {
             XCopyArea(
-                self.display,
+                self.state.display,
                 self.pixmap,
-                self.id,
+                self.state.id,
                 self.gc,
                 0,
                 top,
-                self.width as u32,
+                self.state.width as u32,
                 (bottom - top) as u32,
                 0,
                 top,
             );
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
     fn cell_colors(&self, cell: &Cell, selected: bool) -> (u32, u32, bool) {
@@ -98,7 +98,7 @@ impl Window {
             // Replace the retained pixels, including alpha, on every damaged row.
             unsafe {
                 XRenderFillRectangle(
-                    self.display,
+                    self.state.display,
                     1,
                     XftDrawPicture(self.draw),
                     color,
@@ -181,12 +181,12 @@ impl Window {
                 true,
                 0,
                 0,
-                self.width as u32,
-                self.height as u32,
+                self.state.width as u32,
+                self.state.height as u32,
             );
         }
         if force {
-            self.damage(0, self.height);
+            self.damage(0, self.state.height);
         }
         for row in 0..rows {
             if !(force
@@ -199,8 +199,8 @@ impl Window {
             {
                 continue;
             }
-            let y = self.padding + row as i32 * self.ch;
-            self.damage(y, y + self.ch);
+            let y = self.padding + row as i32 * self.state.ch;
+            self.damage(y, y + self.state.ch);
             let mut col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
@@ -223,10 +223,10 @@ impl Window {
                 self.fill_background(
                     rgb,
                     translucent,
-                    self.padding + col as i32 * self.cw,
+                    self.padding + col as i32 * self.state.cw,
                     y,
-                    ((end - col) as i32 * self.cw) as u32,
-                    self.ch as u32,
+                    ((end - col) as i32 * self.state.cw) as u32,
+                    self.state.ch as u32,
                 );
                 col = end;
             }
@@ -246,10 +246,10 @@ impl Window {
                         self.fill_background(
                             rgb,
                             false,
-                            self.padding + col as i32 * self.cw,
+                            self.padding + col as i32 * self.state.cw,
                             y,
-                            self.cw as u32,
-                            self.ch as u32,
+                            self.state.cw as u32,
+                            self.state.ch as u32,
                         );
                     }
                 }
@@ -268,7 +268,7 @@ impl Window {
                         || self.search_match(col, row),
                 );
                 let color = self.color(fg);
-                let x = self.padding + col as i32 * self.cw;
+                let x = self.padding + col as i32 * self.state.cw;
                 let baseline = y + unsafe { (*self.font).ascent } + 1;
                 let mut text = [0u8; 2048];
                 let mut len = 0;
@@ -337,12 +337,12 @@ impl Window {
                             len as i32,
                         );
                     }
-                    let width = (cells.max(cell.width as usize) as i32 * self.cw) as u32;
+                    let width = (cells.max(cell.width as usize) as i32 * self.state.cw) as u32;
                     if cell.flags & UNDERLINE != 0 || cell.link_id != 0 {
                         XftDrawRect(self.draw, &color, x, baseline + 2, width, 1);
                     }
                     if cell.flags & STRIKE != 0 {
-                        XftDrawRect(self.draw, &color, x, y + self.ch / 2, width, 1);
+                        XftDrawRect(self.draw, &color, x, y + self.state.ch / 2, width, 1);
                     }
                 }
                 col += cells;
@@ -366,17 +366,21 @@ impl Window {
         shape: CursorShape,
     ) {
         let cell = terminal.cell(column, row);
-        let rgb = if self.focused {
+        let rgb = if self.state.focused {
             self.cursor_color
         } else {
             ((self.cursor_color & 0xfefefe) >> 1) + ((self.background & 0xfefefe) >> 1)
         };
         let color = self.color(rgb);
-        let x = self.padding + column as i32 * self.cw;
+        let x = self.padding + column as i32 * self.state.cw;
         let (top, width, height) = match shape {
-            CursorShape::Block => (y, self.cw * i32::from(cell.width.max(1)), self.ch),
-            CursorShape::Underline => (y + self.ch - 2, self.cw, 2),
-            CursorShape::Bar => (y, self.cw.min(2), self.ch),
+            CursorShape::Block => (
+                y,
+                self.state.cw * i32::from(cell.width.max(1)),
+                self.state.ch,
+            ),
+            CursorShape::Underline => (y + self.state.ch - 2, self.state.cw, 2),
+            CursorShape::Bar => (y, self.state.cw.min(2), self.state.ch),
         };
         unsafe { XftDrawRect(self.draw, &color, x, top, width as u32, height as u32) };
         if shape == CursorShape::Block && cell.width > 0 && !self.text_hidden(cell) {

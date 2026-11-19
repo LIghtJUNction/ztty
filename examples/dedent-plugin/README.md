@@ -5,6 +5,9 @@ code, while retaining relative indentation, Unicode, and line endings. Tabs are
 left intact. The terminal decides the input: a selection, or the visible viewport
 when no selection exists. The extension never receives the PTY file descriptor.
 
+The example uses the local `ztty-plugin-api` source and pins `zplugin = "=0.3.1"`.
+The API package 0.1.0 is awaiting its first registry release.
+
 From the ztty repository root:
 
 ```sh

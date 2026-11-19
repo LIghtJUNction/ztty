@@ -6,19 +6,19 @@ impl Window {
         if self.osc_requestor != 0 {
             self.osc_requestor
         } else {
-            self.id
+            self.state.id
         }
     }
     pub(super) fn close_osc_requestor(&mut self) {
         if self.osc_requestor != 0 {
             unsafe {
-                XDestroyWindow(self.display, self.osc_requestor);
+                XDestroyWindow(self.state.display, self.osc_requestor);
             }
             self.osc_requestor = 0;
         }
     }
     pub fn accepts_event(&self, window: Xid, kind: c_int) -> bool {
-        window == self.id
+        window == self.state.id
             || self.osc_requestor != 0
                 && window == self.osc_requestor
                 && matches!(kind, SELECTION_NOTIFY | PROPERTY_NOTIFY)
@@ -27,20 +27,21 @@ impl Window {
         self.paste_selection != 0
     }
     pub fn clipboard_available(&self, primary: bool) -> bool {
-        self.id != 0
+        self.state.id != 0
             && unsafe {
-                XGetSelectionOwner(self.display, if primary { 1 } else { self.clipboard }) != 0
+                XGetSelectionOwner(self.state.display, if primary { 1 } else { self.clipboard })
+                    != 0
             }
     }
     pub fn read_osc_clipboard(&mut self, primary: bool) -> bool {
         self.cancel_paste();
-        if self.id == 0 {
+        if self.state.id == 0 {
             return false;
         }
         let requestor = unsafe {
             XCreateWindow(
-                self.display,
-                self.id,
+                self.state.display,
+                self.state.id,
                 0,
                 0,
                 1,
@@ -61,16 +62,16 @@ impl Window {
         self.paste_selection = if primary { 1 } else { self.clipboard };
         self.paste_target = self.utf8;
         unsafe {
-            XSelectInput(self.display, requestor, 1 << 22);
+            XSelectInput(self.state.display, requestor, 1 << 22);
             XConvertSelection(
-                self.display,
+                self.state.display,
                 self.paste_selection,
                 self.utf8,
                 self.transfer,
                 requestor,
                 0,
             );
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
         true
     }

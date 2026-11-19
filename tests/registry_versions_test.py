@@ -34,8 +34,8 @@ class RegistryVersions(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="ztty-registry-versions-") as temporary:
             root = Path(temporary)
             for versions in [
-                {"zinput": "0.7.1", "zgraphics": "0.8.2", "zpty": "0.9.3", "zgpui": "0.1.0", "zterm": "0.10.4"},
-                {"zinput": "0.7.2", "zgraphics": "0.8.3", "zpty": "0.9.4", "zgpui": "0.2.0", "zterm": "0.11.0"},
+                {"zinput": "0.7.1", "zgraphics": "0.8.2", "zpty": "0.9.3", "zgpui": "0.1.0", "zterm": "0.10.4", "ztty-plugin-api": "0.1.0"},
+                {"zinput": "0.7.2", "zgraphics": "0.8.3", "zpty": "0.9.4", "zgpui": "0.2.0", "zterm": "0.11.0", "ztty-plugin-api": "0.2.0"},
             ]:
                 with self.subTest(versions=versions):
                     self.fixture(root, versions)
@@ -53,7 +53,7 @@ class RegistryVersions(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="ztty-registry-versions-") as temporary:
             root = Path(temporary)
             self.fixture(root, {
-                "zinput": "0.7.1", "zgraphics": "0.8.2", "zpty": "0.9.3", "zgpui": "0.1.0", "zterm": "0.10.4",
+                "zinput": "0.7.1", "zgraphics": "0.8.2", "zpty": "0.9.3", "zgpui": "0.1.0", "zterm": "0.10.4", "ztty-plugin-api": "0.1.0",
             }, inherited=False)
             with self.assertRaises((KeyError, ValueError)):
                 runpy.run_path(str(root / "tools/verify_registry.py"))
@@ -61,7 +61,7 @@ class RegistryVersions(unittest.TestCase):
 
     def cargo_fixture(self, root, stage="", scope=""):
         self.fixture(root, {
-            "zinput": "0.7.1", "zgraphics": "0.8.2", "zpty": "0.9.3", "zgpui": "0.1.0", "zterm": "0.10.4",
+            "zinput": "0.7.1", "zgraphics": "0.8.2", "zpty": "0.9.3", "zgpui": "0.1.0", "zterm": "0.10.4", "ztty-plugin-api": "0.1.0",
         })
         binary = root / "bin" / "cargo"
         binary.parent.mkdir()

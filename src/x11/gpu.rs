@@ -98,14 +98,14 @@ impl Window {
         }
     }
     fn renderer_property(&self, name: &core::ffi::CStr, value: &str) {
-        if self.id == 0 {
+        if self.state.id == 0 {
             return;
         }
         unsafe {
-            let property = super::XInternAtom(self.display, name.as_ptr(), 0);
+            let property = super::XInternAtom(self.state.display, name.as_ptr(), 0);
             super::XChangeProperty(
-                self.display,
-                self.id,
+                self.state.display,
+                self.state.id,
                 property,
                 self.utf8,
                 8,
@@ -150,7 +150,7 @@ impl Window {
     }
 
     fn start_gpu(&mut self) {
-        if self.suspended || self.id == 0 || self.renderer_kind == RendererKind::Software {
+        if self.suspended || self.state.id == 0 || self.renderer_kind == RendererKind::Software {
             return;
         }
         let result = (|| {
@@ -160,11 +160,11 @@ impl Window {
             Renderer::new(
                 display,
                 Target::X11 {
-                    window: self.id as usize,
+                    window: self.state.id as usize,
                     visual: visual as i32,
                 },
-                self.width as u32,
-                self.height as u32,
+                self.state.width as u32,
+                self.state.height as u32,
                 &font,
             )
         })();
@@ -218,7 +218,7 @@ impl Window {
 
     pub(super) fn resize_gpu(&mut self) {
         if let Some(renderer) = &mut self.gpu
-            && let Err(error) = renderer.resize(self.width as u32, self.height as u32)
+            && let Err(error) = renderer.resize(self.state.width as u32, self.state.height as u32)
         {
             self.gpu_failure(error);
         }
@@ -256,8 +256,8 @@ impl Window {
         };
         let style = GridStyle {
             padding: self.padding as f32,
-            cell_width: self.cw as f32,
-            cell_height: self.ch as f32,
+            cell_width: self.state.cw as f32,
+            cell_height: self.state.ch as f32,
             ascent: unsafe { (*self.font).ascent + 1 } as f32,
             background: self.background,
             background_alpha: if self.owns_colormap {
@@ -268,7 +268,7 @@ impl Window {
             selection_foreground: self.selection_colors.0,
             selection_background: self.selection_colors.1,
             cursor,
-            cursor_color: if self.focused {
+            cursor_color: if self.state.focused {
                 self.cursor_color
             } else {
                 ((self.cursor_color & 0xfefefe) >> 1) + ((self.background & 0xfefefe) >> 1)
@@ -284,7 +284,7 @@ impl Window {
         self.graphics_revision = terminal.graphics().revision();
         self.graphics_alternate = terminal.modes().alternate_screen;
         terminal.clear_dirty();
-        self.damage(0, self.height);
+        self.damage(0, self.state.height);
         true
     }
 
@@ -298,7 +298,7 @@ impl Window {
         };
         if self.pending_damage.take().is_some()
             && !self.suspended
-            && self.id != 0
+            && self.state.id != 0
             && let Err(error) = renderer.present()
         {
             self.gpu_failure(error);
@@ -340,7 +340,7 @@ impl Window {
         let result = (|| {
             renderer.clip(Some(rect(bounds.x, bounds.y, bounds.width, bounds.height)))?;
             let baseline = bounds.y + unsafe { (*self.font).ascent } + 1;
-            let rows = (bounds.height / self.ch).clamp(0, 32) as usize;
+            let rows = (bounds.height / self.state.ch).clamp(0, 32) as usize;
             for (row, line) in text.split('\n').take(rows).enumerate() {
                 // Scene strings are already bounded. Menus also use this path;
                 // never let an arbitrarily large label bypass the shaper limit.
@@ -353,7 +353,7 @@ impl Window {
                 renderer.draw_text(
                     &line[..end],
                     bounds.x as f32,
-                    (baseline + row as i32 * self.ch) as f32,
+                    (baseline + row as i32 * self.state.ch) as f32,
                     rgb,
                     Style::default(),
                 )?;

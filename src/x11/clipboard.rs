@@ -11,8 +11,8 @@ impl Window {
             self.clipboard
         };
         unsafe {
-            XSetSelectionOwner(self.display, selection, self.id, 0);
-            XFlush(self.display);
+            XSetSelectionOwner(self.state.display, selection, self.state.id, 0);
+            XFlush(self.state.display);
         }
     }
     pub fn cancel_paste(&mut self) {
@@ -24,7 +24,11 @@ impl Window {
         self.paste_error = None;
         if self.selection_requestor() != 0 {
             unsafe {
-                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
+                XDeleteProperty(
+                    self.state.display,
+                    self.selection_requestor(),
+                    self.transfer,
+                );
             }
         }
         self.close_osc_requestor();
@@ -37,14 +41,14 @@ impl Window {
         self.paste_target = self.utf8;
         unsafe {
             XConvertSelection(
-                self.display,
+                self.state.display,
                 self.paste_selection,
                 self.utf8,
                 self.transfer,
                 self.selection_requestor(),
                 0,
             );
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
     pub fn selection_request(&self, request: SelectionRequest) {
@@ -52,7 +56,7 @@ impl Window {
             kind: SELECTION_NOTIFY,
             serial: 0,
             send_event: 1,
-            display: self.display,
+            display: self.state.display,
             requestor: request.requestor,
             selection: request.selection,
             target: request.target,
@@ -68,7 +72,7 @@ impl Window {
             if request.target == self.targets {
                 let targets = [self.targets, self.utf8, 31];
                 XChangeProperty(
-                    self.display,
+                    self.state.display,
                     request.requestor,
                     property,
                     4,
@@ -95,7 +99,7 @@ impl Window {
                     text.as_bytes()
                 };
                 XChangeProperty(
-                    self.display,
+                    self.state.display,
                     request.requestor,
                     property,
                     request.target,
@@ -106,7 +110,7 @@ impl Window {
                 );
                 for chunk in data.chunks(32768) {
                     XChangeProperty(
-                        self.display,
+                        self.state.display,
                         request.requestor,
                         property,
                         request.target,
@@ -119,8 +123,8 @@ impl Window {
                 notify.property = property;
             }
             let mut event = Event { selection: notify };
-            XSendEvent(self.display, request.requestor, 0, 0, &mut event);
-            XFlush(self.display);
+            XSendEvent(self.state.display, request.requestor, 0, 0, &mut event);
+            XFlush(self.state.display);
         }
     }
     pub fn take_paste_error(&mut self) -> Option<&'static str> {
@@ -158,7 +162,7 @@ impl Window {
         let result;
         unsafe {
             let code = XGetWindowProperty(
-                self.display,
+                self.state.display,
                 self.selection_requestor(),
                 self.transfer,
                 0,
@@ -197,7 +201,11 @@ impl Window {
                 XFree(data.cast());
             }
             if remaining != 0 {
-                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
+                XDeleteProperty(
+                    self.state.display,
+                    self.selection_requestor(),
+                    self.transfer,
+                );
             }
         }
         result
@@ -215,14 +223,14 @@ impl Window {
                 self.paste_target = 31;
                 unsafe {
                     XConvertSelection(
-                        self.display,
+                        self.state.display,
                         self.paste_selection,
                         31,
                         self.transfer,
                         self.selection_requestor(),
                         0,
                     );
-                    XFlush(self.display);
+                    XFlush(self.state.display);
                 }
             } else {
                 return self.reject_paste("No text in clipboard");
@@ -240,8 +248,12 @@ impl Window {
             self.receiving = true;
             self.incoming.clear();
             unsafe {
-                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
-                XFlush(self.display);
+                XDeleteProperty(
+                    self.state.display,
+                    self.selection_requestor(),
+                    self.transfer,
+                );
+                XFlush(self.state.display);
             }
             None
         } else {
@@ -273,7 +285,7 @@ impl Window {
         }
         self.incoming.extend_from_slice(&data);
         unsafe {
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
         None
     }
