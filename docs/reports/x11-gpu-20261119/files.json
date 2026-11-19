@@ -1,0 +1,26 @@
+{
+  "report.zh-CN.md": {
+    "bytes": 6518,
+    "sha256": "92b1e297928bb8209878a7302b4bafda0c856cd231be98b4d41a8b9295c47cc8"
+  },
+  "validation.json": {
+    "bytes": 13099,
+    "sha256": "3d42cd70809607c897ff9822618766f1ddbf43e59a9b73d56d7a681471791bd4"
+  },
+  "source-sha256.json": {
+    "bytes": 9172,
+    "sha256": "c488254b8cb756a942255c9bfec51470629ce6909f45710f068dbe7b34bd060f"
+  },
+  "canvas-comparison.json": {
+    "bytes": 4143,
+    "sha256": "56246e2733fc22b42c73140ff874d2458d4cf6a9cc4b17dfc1a56f9429eff670"
+  },
+  "complete-graphemes.png": {
+    "bytes": 3976,
+    "sha256": "57d5070ca0a10e5bae904b745e79c437a93070cecaea6dda30da82fefc0e57d9"
+  },
+  "native-ui.png": {
+    "bytes": 13697,
+    "sha256": "339ba9fdb1fd943ffc234b5d1ac390eb121a1e6e7b310ec1e38949ded8e0e89c"
+  }
+}
