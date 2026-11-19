@@ -1,388 +1,145 @@
 # ztty
 
-## Linux 安装与运行
+[English](README.md) · [文档](docs/README.md) · [下载](https://github.com/LIghtJUNction/ztty/releases)
 
-本文命令对应当前源码。安装脚本下载最新已发布的
-[GitHub Release](https://github.com/LIghtJUNction/ztty/releases)，并非任意已有 tag；
-尚未发布的改动请通过源码构建使用。
+ztty 是面向 Linux、macOS 和 Windows 的原生终端，核心用不依赖标准库的
+Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令行或 MCP 客户端使用。
 
-Arch Linux 可使用 `yay -S ztty`。其他 Linux 发行版可用一键安装脚本，
-自动选择 x86_64 或 ARM64 预编译包并校验 SHA256。
+当前正式下载版本为 **0.4.1**。本页描述当前源码；使用尚未进入发布包的改动，
+请从源码构建。
+
+## Linux 安装
+
+Arch Linux 使用 `yay -S ztty`。下载已发布的 x86_64 或 ARM64 预编译版：
 
 ```sh
 curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/install.sh
 sh install.sh
+ztty
 ```
 
-脚本安装最新已发布版本，默认位置为 `~/.local/bin`。Linux 预编译版需要
-glibc、X11、Xft 和 Xrender 运行库。当前源码中的新功能可能尚未进入
-最新发布包。
+安装器校验归档后安装到 `~/.local/bin`。0.4.1 Linux 版需要 glibc、X11、
+Xft 和 Xrender；Wayland 桌面通过 XWayland 运行。
 
-安装 Rust 1.100.0、X11/Xft/Xrender 开发库和等宽字体后：
+## 从源码构建
+
+需要 Rust **1.100.0**、C 编译器和等宽字体。当前 Linux 源码的系统依赖：
 
 ```sh
-cargo build --locked --release
-./target/release/ztty
-./target/release/ztty --font 'monospace:size=12' --geometry 100x28
+# Arch Linux
+sudo pacman -S --needed base-devel pkgconf libx11 libxft libxrender \
+  fontconfig freetype2 harfbuzz libglvnd ttf-dejavu
+
+# Debian / Ubuntu
+sudo apt install build-essential pkg-config libx11-dev libxft-dev libxrender-dev \
+  libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev \
+  libgles2-mesa-dev fonts-dejavu-core
 ```
 
-`make install` 通过安装器安装到当前用户的 `~/.local`；也可用
-`sh install.sh --from-binary ./target/release/ztty` 安装本地构建。
-安装器先暂存、校验再原子替换，保留一份旧文件供回滚；正在运行的共享 broker
-继续使用已加载的版本，不会因文件更新自动重启。
-未设置 `ZTTY_SOCKET` 时，新开的独立窗口会选择当前构建；旧窗口中的
-标签页、分屏和显式指定的会话地址仍保留原有路由。
-[升级期间的会话规则](docs/sessions.md#upgrading-a-running-broker)说明如何访问新旧会话。
-Linux 下 Ctrl+Shift+C 复制，
-Ctrl+Shift+V 粘贴，Shift+拖拽在捕获鼠标的应用中选择文字，
-Shift+PageUp/PageDown 或滚轮浏览历史，历史中的 **Back to live ↓** 入口回到底部，
-Ctrl+点击打开链接。
-应用捕获鼠标时，按住 Shift 可使用本地选择、滚轮历史和中键粘贴。
+```sh
+git clone https://github.com/LIghtJUNction/ztty.git
+cd ztty
+cargo build --locked --release
+./target/release/ztty --font 'monospace:size=12' --geometry 100x28
+./target/release/ztty --cwd /path/to/project -e /bin/bash
+sh install.sh --from-binary ./target/release/ztty
+```
 
-Linux 和 Windows 的字体、标签页与分屏快捷键如下；macOS 尚未实现这组窗口操作，
-其复制、粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
+Linux/macOS 使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用 `COMSPEC`，
+缺省为 `cmd.exe`。用 `-e` 指定其他程序。安装更新会保留现有会话，
+[共享进程升级规则](docs/sessions.md#upgrading-a-running-broker)说明新旧会话的路由。
+macOS 和 Windows 的原生构建、打包入口见[发布说明](docs/releasing.md)。
+
+## 核心能力
+
+- VT 控制序列、真彩色、鼠标报告、括号粘贴和 Kitty 增强键盘协议。
+- 完整字符簇存储、历史重排，以及跨自动换行的文字复制。
+- 静态 Kitty 图片和 Sixel；可运行 `kitten icat --transfer-mode=stream photo.png`。
+- Linux 标签页、分屏、共享会话、历史搜索和命令面板。
+- Linux GPU 文字整形、Xft 回退、配置热重载和 XIM 输入法恢复。
+- 可选的 [Shell 集成](shell/README.md)和[可信文本扩展](docs/text-plugins.zh-CN.md)。
+
+Linux 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使用 Xft。
+[配置指南](docs/configuration.md)和[协议说明](docs/protocols.md)列出支持的模式与范围。
+
+## Linux 常用操作
 
 | 操作 | 快捷键 |
 | --- | --- |
-| 放大字体 | Ctrl+Plus 或 Ctrl+Equal；也可使用 Ctrl+Shift+Equal |
-| 缩小字体 | Ctrl+Minus 或 Ctrl+Shift+Minus |
-| 恢复配置中的字体 | Ctrl+0；Linux 也支持 Ctrl+Shift+0 |
-| 小键盘放大、缩小、恢复 | Ctrl+小键盘 Add / Subtract / 0；小键盘 0 需开启 Num Lock |
-| 下一个、上一个标签页 | Ctrl+Tab / Ctrl+Shift+Tab |
-| 增大、缩小当前分屏 | Ctrl+Alt+Shift+Equal / Minus |
+| 复制 / 粘贴 | Ctrl+Shift+C / V |
+| 在捕获鼠标的 TUI 中选择文字 | Shift+拖拽 |
+| 搜索历史 / 打开命令面板 | Ctrl+Shift+F / P |
+| 切换会话 | Ctrl+Shift+S |
+| 新建标签页 / 向右分屏 | Ctrl+Shift+T / E |
+| 下一个 / 上一个标签页 | Ctrl+Tab / Ctrl+Shift+Tab |
+| 放大 / 缩小 / 恢复字体 | Ctrl+Plus / Minus / 0 |
+| 浏览历史 | Shift+PageUp / PageDown 或滚轮 |
+| 打开链接 | Ctrl+点击 |
+| 重载配置 | Ctrl+Shift+R |
 
-字体缩放保留窗口和正在运行的 PTY；Windows 会协调同一工作区的所有窗格。
-恢复字体时，Linux 使用最近成功加载的配置，Windows 使用启动时的配置。
-Windows 在多键盘布局下可能保留 Ctrl+Shift+0，因此优先使用 Ctrl+0；
-带 Shift 的别名仅在系统把按键交给 ztty 时生效。
-[微软对这一系统快捷键的说明](https://learn.microsoft.com/en-us/windows/terminal/troubleshooting#ctrl-doesnt-increase-the-font-size)。
-Linux 按当前键盘布局识别加号，包括通过 Shift 产生加号的按键。
-自定义绑定优先于默认绑定；Num Lock 关闭时，小键盘 0 仍按 Insert 处理。
+双击选词，三击选行。浏览历史时，点击 **Back to live ↓** 回到最新输出。
+[日常操作](docs/daily-workflow.md)、[工作区](docs/workspaces.md)和
+[输入兼容性](docs/input-compatibility.md)说明自定义绑定、小键盘和其他操作。
 
-Linux/macOS 默认使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用
-`COMSPEC`，缺省为 `cmd.exe`。用 `-e` 指定其他命令、`--cwd PATH` 指定初始目录；
-相对命令使用目标目录，相对配置路径仍使用启动器原目录。
-[目录行为与原生验收](docs/startup-directory.md)说明实现范围。macOS 与 Windows
-的打包和原生验收入口见 [发布工作流](.github/workflows/release.yml)。
-Windows 包携带固定版本的 Microsoft ConPTY 运行组件，库也支持回退到
-系统自带 API，细节见 [`zpty` 文档](crates/zpty/README.md)。
+## 共享会话与 MCP（Linux）
 
-## 项目概览
-
-**ztty 0.4.1** 已修复增强键盘协议下的小数字键盘输入，并整合 Linux 原生 UI。
-下载入口为 [官方 Releases](https://github.com/LIghtJUNction/ztty/releases)，
-[发布与安装记录](docs/numpad-release-0.4.1-2026-11-19.zh-CN.md)列出对应源码和验收结果。
-
-当前源码新增历史搜索 Alt+C 大小写切换，修复复制时当前命中被重置的问题，
-并让满历史缓冲下的阅读位置保持稳定；终端局部批量滚动改为成段搬运。
-同时修复 NumLock／Shift 状态下的小键盘路由和文字覆盖后的 Sixel 残留，
-让新开的独立 Linux 窗口使用当前安装版本，保留已有会话。
-[本轮性能与功能记录](docs/performance-function-2026-11-19.zh-CN.md)给出实测、验证和使用方法。
-
-当前 Linux 源码还支持双击选词、三击选行、临时右键复制粘贴菜单和可见反馈，
-并修复大段及分块剪贴板传输。[复制粘贴使用方法与验收](docs/copy-paste-2026-11-19.zh-CN.md)记录具体操作和已测范围。
-
-<!-- terminal-benchmark:start -->
-[![已核验独立 Xvfb 归属的 10 个共享终端对比](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
-
-本次测量 1、10 个共享空闲终端，每格独立启动 3 轮取中位数；图中展示 10 终端结果。[原始数据](docs/benchmarks/guarded-idle-1-10-2026-11-18.json) · [条件、来源与限制](docs/benchmarks/guarded-idle-1-10-2026-11-18.md) · 从当前源码重新构建并测量：`make benchmark-terminals`。
-
-实测源码为 `fa2f2017`，固定二进制为 `a339a7d2…1b6d4d`。18 个场景均核验了独立 Xvfb 监听端点归属，并完成所属进程清理。单个 ztty 终端实测 **22.02 MiB RSS**，尚未达到低于 10 MiB 的目标。
-
-范围为 Linux 软件 X11 渲染：24 个逻辑 CPU，主机 load1 为 4.46–10.58，已有 Swap 占用为 17.34–17.96 GiB。RSS、PSS、Swap 分开报告；真实 GPU 显存、首个显示帧和输入到显示延迟未测。具备显示归属核验的 5/20 终端、独立进程及其他负载矩阵仍未补齐。
-
-<!-- terminal-benchmark:end -->
-
-**2026-11-18 较早的 Shell 检查点：** 已修复 Bash 加载与提示符钩子，MCP 输出读取新增原会话身份校验和读取终止标记。该次候选通过 225 项 Rust 测试、6 项文档测试、四种 Shell 集成、11 组 Bash 检查、17 项实际 Linux 工作区检查及三套 MCP 检查。[实现与证据](docs/shell-resume-2026-11-18.md) · [上一轮 Unicode 测量](docs/integration-unicode-2026-11-18.md)。
-
-**2026-11-18 输出吞吐记录：** 源码 `dfe949c7`（ztty 0.2.1）的另一批十窗口测试测得 **227.58 MiB/s**。
-独立的旧／新配对测试为 19.48 → 200.52 MiB/s，提升 **10.29 倍**，应用 PSS 基本持平。
-负载为 Xvfb 软件渲染下的 ASCII／颜色原地更新；源码和批次与上方 guarded 图表分开记录。
-对应的较早整合检查点见 Shell 记录；这些测量不等于当前版本的完整验收。
-[实测、实现与正确性证据](docs/benchmarks/throughput-2026-11-18.md)。
-
-ztty 是一个用 Rust 开发的原生终端，生产代码不依赖 Rust 标准库。
-它通过 Linux、macOS、Windows 的系统接口运行真实 shell 和终端程序，
-支持静态 Kitty 图形协议。项目优先验证 Linux，按具体负载测量
-内存占用和交互行为，比较结论以对应实验的范围为准。
-
-Linux 上的多个窗口自动复用一个会话进程、显示连接和字体缓存。
-每个窗口分别保存自己的 PTY、屏幕和历史记录。共享会话与 MCP 目前仅支持 Linux。
-
-Linux 持续 PTY 输出现使用 8 ms 重绘合并预算，同时继续解析数据和处理交互。
-固定二进制、单窗口 Xvfb A/B 的逻辑 PTY 吞吐中位数为 18.88 → 133.01 MiB/s，
-最终像素完全相同；新版本三轮结果为 130.97–278.57 MiB/s，存在明显波动。
-[原始测量、最终帧检查与限制](docs/benchmarks/repaint-ab-2026-11-18.md)记录完整证据。
-该结果只适用于本次调度负载，真实硬件显示延迟及新版本多终端内存、性能对比仍待测量。
-
-Linux 支持跨软换行的历史搜索、临时会话切换器和命令面板、快捷键与鼠标绑定、
-配置热重载、OSC 133 命令跳转与复制输出。上翻历史时会显示 **Back to live ↓**
-入口；新输出到达时显示提示，点击后回到底部，底部没有常驻工具栏。
-Bash、Zsh、Fish、Nushell 可以按需启用集成。
-[操作与边界](docs/daily-workflow.md)、[Shell 配置](shell/README.md)、
-[MCP 观察者权限与命令读取](docs/sessions.md)提供完整说明。
-
-终端的工作可以拆成三件事：把键盘操作编码后送给程序，理解程序返回的
-文字和控制指令，再把变化的内容画出来。图片也遵循这条路径：程序
-通过 PTY 发送图片字节，终端解码并记住图片的位置，窗口后端负责合成。
-这些逻辑拆成独立的库，平台后端负责操作系统接口。
-
-## 已经可以做什么
-
-启动真实 shell、运行命令行程序，支持主备屏、滚动区域、UTF-8 和中日韩
-宽字符、真彩色、鼠标报告、复制粘贴、输入法接口、OSC 8 超链接，以及
-Kitty 增强键盘和同步输出协议。图片支持内联 PNG、RGB、RGBA，以及
-透明度、裁剪、缩放、滚动、主备屏隔离和删除。界面采用深色背景、
-等宽字体和留白。具体平台上的验证范围如下。
-
-| 平台 | 原生实现 | 绑定源码的验收记录 |
-| --- | --- | --- |
-| Linux | X11/XWayland 窗口、Xft 文字、Xrender 图片合成、Linux PTY | 较早的正式尝试 9b5497d 在 x86_64、ARM64 各通过六套 GUI、67 组检查与 27 张 PNG；校验源码、二进制和自有资源清理 |
-| macOS | AppKit 窗口、CoreText/CoreGraphics 渲染、Darwin PTY | 同一 9b5497d 在 Intel、Apple Silicon 各通过 8 项 spawn 和 24 项原生检查，覆盖 13 阶段、10 张 PNG；进程清理通过 |
-| Windows | Win32 窗口、GDI 文字、自行合成 RGBA、ConPTY | 普通候选 2f2fae44 在 x64、ARM64 各通过 8 个新进程，每进程 31 项基础检查、10 次 warm 快速缩放、10 对背靠背缩放，以及独立的 19 组工作区检查；清理通过 |
-
-macOS 后端不要求 X11，Windows 后端不要求 WSL。上述原生检查在
-对应操作系统运行，跨目标编译本身不代表运行或画面正确。
-[Windows 普通候选运行 44349551432](https://github.com/LIghtJUNction/ztty/actions/runs/44349551432)
-关闭了 paint 和 NC-policy 诊断；应用自身设置 DWM 非客户区策略，最终读回两种架构
-均已关闭 DWM 非客户区渲染。窗口保留标准系统边框及最小化、最大化、关闭按钮；
-本轮实际截图是经典浅蓝标题栏，不是现代深色 DWM 外框。
-
-旧 `v0.3.0` tag 固定在 `9b5497d`，当时 Windows ARM 快速缩放失败，正式发布被跳过，
-Release-by-tag API 返回 404。设备后来确实安装了源码 `19274145` 的本地候选
-`ztty 0.3.0-1`，它与失败的 tag 不同源，也不是官方 Release 下载。
-完整 `0.3.1` 候选源码 `90ec70fe` 已在[运行 44365691692](https://github.com/LIghtJUNction/ztty/actions/runs/44365691692)
-通过六个原生架构任务；正式 tag 验证、实际发布资产和设备安装各有独立记录。
-[发布记录](docs/releasing.md)保留这些不同阶段；[协议说明](docs/protocols.md#acceptance-coverage)
-记录能力范围。Hyprland 图片属于历史验收，Xvfb 检查也不代表物理显示延迟或完整输入法矩阵。
-
-默认显示 120×32 个字符。历史记录按需增长，保留的字符与软换行元数据合计最多 8 MiB；
-历史达到上限后复用旧行。详细协议范围以 [英文 README](README.md)
-和 [协议说明](docs/protocols.md) 为准。
-
-## 可独立使用的库
-
-| 库 | 当前源码版本 | 做什么 | 使用场景 |
-| --- | --- | --- | --- |
-| [`zvte`](https://github.com/LIghtJUNction/zvte) | 0.1.3 | 解析 ANSI/VT 字节流 | 只需要理解终端控制序列的程序 |
-| [`zinput`](crates/zinput) | 0.1.1 | 编码键盘、鼠标、焦点和粘贴事件 | 图形终端、远程终端、终端客户端 |
-| [`zterm`](crates/zterm) | 0.3.0 | 维护屏幕、历史、图片锚点、模式和协议回复 | 自定义终端界面、终端录制和回放 |
-| [`zpty`](crates/zpty) | 0.2.1 | 管理 Linux/macOS PTY 和 Windows ConPTY | 终端、进程控制、交互式测试工具 |
-| [`zgraphics`](crates/zgraphics) | 0.1.1 | 处理 Kitty 图形协议、Sixel、图片解码、存储和放置 | 需要图片支持的终端或回放工具 |
-
-这些库都有独立 Cargo 包。`zinput` 和 `zpty` 没有 Cargo 依赖；
-`zterm` 复用 Project Z 的 `zinput`、`zvte`、`zgraphics` 和 `no_std`
-Unicode 宽度表。`zgraphics` 使用第三方 `zune-png`、`zune-core` 和
-`zune-inflate` 的 `no_std` 配置解码 PNG 与 DEFLATE。所有直接生产依赖
-关闭默认特性，实际启用的依赖图由 [审计脚本](tools/check_no_std.py) 检查。
-
-需要动态内存的地方使用 `alloc`，分配器由宿主提供。图片像素通过
-`Arc` 共享，因此 `zgraphics` 要求目标支持指针宽度的原子操作。
-不依赖 Rust 标准库仍然需要系统 API：Linux 使用 X11 等系统库，
-macOS 使用 Apple 框架，Windows 使用 Win32 和 ConPTY。
-
-[`zinput 0.1.1`](https://crates.io/crates/zinput/0.1.1)、
-[`zgraphics 0.1.1`](https://crates.io/crates/zgraphics/0.1.1)、
-[`zpty 0.2.1`](https://crates.io/crates/zpty/0.2.1) 和
-[`zterm 0.3.0`](https://crates.io/crates/zterm/0.3.0) 已发布到 crates.io，
-与 `ztty 0.3.1` 应用的正式发布分别记录。
-[注册表记录](docs/releasing.md#published-packages)区分当前版本的 API 与校验和确认，
-以及较早版本在工作区外的独立消费者测试。
-
-```sh
-cargo add zinput@0.1.1 --no-default-features
-cargo add zgraphics@0.1.1 --no-default-features
-cargo add zpty@0.2.1 --no-default-features
-cargo add zterm@0.3.0 --no-default-features
-cargo add zvte@0.1.3 --no-default-features
-```
-
-
-## 多窗口、会话与 MCP（Linux）
-
-重复获取自己的输入控制权会保留已接受的输入，并让本地只读视图恢复操作；[状态规则与真实 PTY 证据](docs/session-core.md)说明了这一行为。 输出游标也已修复非法字节后分段 UTF-8 字符被提前消费的问题。
-
-正常启动多个 ztty 即可共享资源，无需额外开启复用模式：
+Linux 多个窗口自动共用会话进程、显示连接和字体缓存；
+每个会话分别保留自己的 PTY、屏幕和历史。
 
 ```sh
 ztty --name work -e /bin/bash &
-ztty --name logs -e /bin/sh &
-ztty attach
-ztty attach work
-```
-
-`ztty attach` 不带参数时列出全部本地和 MCP 会话。带名字时打开该会话的
-窗口，已有窗口则将它置前；命令会等待窗口关闭后返回。示例中的 `&`
-让启动命令在后台等待，当前 shell 可以继续使用。
-
-本地会话地址为 `ztty://local/work`。MCP 创建的会话按来源命名：
-
-| 来源 | 地址示例 |
-| --- | --- |
-| stdio | `ztty://mcp/stdio/work` |
-| HTTP | `ztty://mcp/http/127.0.0.1:8732/work` |
-
-同一个短名字可以出现在不同来源下；重名时使用完整地址。名字支持 1–64 个
-ASCII 字母、数字、点、下划线或连字符，省略名字时自动生成 `session-N`。
-
-```sh
-# 默认 stdio，启动时不打开窗口
-ztty mcp
-
-# Streamable HTTP，地址为 http://127.0.0.1:8732/mcp
+ztty attach                     # 列出会话
+ztty attach work                # 打开窗口或将已有窗口置前
+ztty attach --observe work      # 只读观察
+ztty mcp                        # stdio MCP
 ztty mcp --transport http --host 127.0.0.1 --port 8732
-
-# 可选 SSE 响应：输出等待期间发送保活注释
-ztty mcp --transport http --http-response sse
-
-ztty attach ztty://mcp/stdio/work
 ```
 
-九个 MCP 工具负责创建、列出、读取、输入、调整尺寸、关闭会话、输入控制权、
-命令记录和命令输出读取。MCP 会话
-在连接退出后继续保留，关闭观察窗口只会脱离显示；程序退出后仍可查看输出
-和退出码，通过 `session_close` 释放会话。普通本地窗口关闭时会结束其会话。
-
-HTTP 支持配置主机和端口，端口 `0` 自动选择空闲端口。监听非回环地址时
-需要通过 `ZTTY_MCP_TOKEN` 或 `--token` 配置令牌。每次输入最多 64 KiB；
-读取按字节游标分页，单页可多返回最多 3 字节以补全 UTF-8 字符。
-
-HTTP 默认返回 JSON；SSE 模式先建立响应流，等待期间每五秒保活，完成后发送
-一个 JSON-RPC 结果并关闭连接。完整的客户端配置、工具参数和生命周期见
-[会话与 MCP](docs/sessions.md)。
-
-客户端可把先前创建、列出或读取结果中的会话身份作为 `expected_session`，
-用于读取、写入、改尺寸、申请控制权或关闭操作。URI、ID、创建时间或 broker PID
-不匹配时，带校验的修改会在执行前被拒绝，防止同名会话重建后操作了另一 PTY。
-
-`ztty --observe -e COMMAND` 新建只读命令窗口，启动时不请求焦点；关闭时结束
-这个窗口自己创建的子进程。`ztty attach --observe NAME` 连接既有会话，关闭
-观察窗会保留原 PTY。支持 `TERMINAL -e COMMAND` 的工具可使用
-[tools/ztty-observer](tools/ztty-observer) 适配器，实际 ssmcp 联调与平台边界见
-[观察模式验收](docs/ssmcp-observer.md)。
-
-`ztty save-layout NAME > workspace.json` 保存仍存活会话的布局，
-`ztty restore-layout workspace.json` 按会话 ID、创建时间与 broker 身份验证后
-恢复，不重新启动已退出的命令。详见 [工作区](docs/workspaces.md)。
-
-## 在终端里显示图片
-
-在 ztty 中运行现成工具：
-
-```sh
-kitten icat --scale-up photo.jpg
-kitten icat transparent.png
-```
-
-JPEG 由工具先转换成协议支持的像素数据，再通过 PTY 发送。第一版
-自动探测会选择 `stream` 内联传输，也可以显式指定
-`--transfer-mode=stream`。第一版覆盖能力查询、zlib 压缩、分片、图片 ID、
-放置、裁剪、缩放与删除。文件路径传输、共享内存和动画留待后续。
-
-Linux 图像验收通过真实 PTY 发送数据，再读取窗口像素检查颜色、
-透明边缘、裁剪和删除后的画面；还检查滚动、窗口缩放、主备屏切换及
-坏输入后的恢复。实际 `kitten icat` 0.50 已通过照片和透明 PNG 检查。
-图片及传输有独立内存上限，详见 [图像协议范围](docs/protocols.md#kitty-graphics)。
-
-![真实 Hyprland/XWayland 中显示照片和透明 PNG](docs/assets/kitty-graphics-hyprland.png)
-
-Sixel 已使用 `no_std` 流式解码，复用 `zgraphics` 的图像存储、放置与渲染路径，
-处理透明背景、取消和有界资源。Linux 实际窗口像素已有验证，其他原生平台的
-验收范围以 [协议矩阵](docs/protocols.md) 和 [发布记录](docs/releasing.md) 为准。
+MCP 支持创建会话、读取输出、输入、调整尺寸、关闭 PTY 和管理输入控制权。
+MCP 创建的会话在连接断开后保留，关闭附加视图也会保留它的 PTY。
+HTTP 监听非回环地址时需要令牌。
+客户端配置、会话身份校验、JSON/SSE 响应与命令输出读取见[会话指南](docs/sessions.md)；
+ssmcp 等工具的接入见[观察模式](docs/ssmcp-observer.md)。
 
 ## 外观
 
-Linux 默认使用 `~/.config/ztty/ztty.conf`，macOS 默认使用
-`~/Library/Application Support/ztty/ztty.conf`；这两个平台显式设置
-`XDG_CONFIG_HOME` 时使用其下的 `ztty/ztty.conf`。Windows 使用
-`%APPDATA%\ztty\ztty.conf`。
-也可以通过 `ztty --config PATH` 指定配置文件。
-Linux 会监听配置文件与所在目录的替换并热重载；无效配置保留原状态并显示错误，
-Ctrl+Shift+R 可手动重载。macOS/Windows 当前在下次启动时读取配置。
-`--font` 优先于文件中的字体。
+Linux 默认配置为 `~/.config/ztty/ztty.conf`，也可用 `--config PATH` 指定文件。
 
 ```ini
 font = monospace:size=11
 window-padding = 16
-foreground = #e1e7f0
 background = #161a23
+foreground = #e1e7f0
 background-opacity = 92
-background-blur = true
-cursor-shape = underline
-cursor-blink = true
-cursor-blink-interval = 500
-cursor-color = #b1ccff
-selection-foreground = #f0f4fa
-selection-background = #394969
-palette = 1=#e06c75
+renderer = auto
 ```
 
-Linux 透明度用百分比表示，仅作用于默认背景。模糊由桌面合成器实现，
-`background-blur` 控制兼容 KWin 的 X11 请求，Hyprland 使用自己的
-窗口规则。设为 `background-opacity = 100` 可让 Linux 窗口完全不透明。
-macOS 实现使用原生视觉效果视图提供模糊，Windows 使用不透明 GDI 画布，
-当前候选采用系统标准非客户区边框，关闭 DWM 非客户区渲染。
-标题栏外观随系统主题而变；本轮 Windows 截图为经典浅蓝边框。
+Linux 会在原窗口中应用有效配置。[配置指南](docs/configuration.md)
+包含各平台路径、颜色、光标、快捷键和渲染器选项。
 
-光标支持方块 `block`、下划线 `underline` 和竖线 `bar`，闪烁间隔
-以毫秒为单位。终端应用可以通过 DECSCUSR 和 DEC 私有模式 12
-控制当前光标。完整选项和范围见 [英文说明](README.md#appearance)。
+## 平台范围
 
-## 性能与当前范围
+| 平台 | 当前源码 |
+| --- | --- |
+| Linux | X11/XWayland；共享会话、标签页、分屏、Attach、MCP |
+| macOS | 原生 AppKit/CoreText 窗口与 Darwin PTY；本地会话 |
+| Windows | 原生 Win32/GDI 与 ConPTY；本地标签页和分屏 |
 
-同机配对测量中，8 个空闲窗口的 ztty 总 PSS 从 47.021 MiB 降至
-15.366 MiB，减少 67.3%；统计包含共享进程和 8 个等待命令返回的启动进程。
-从 1 个增加到 8 个窗口时，每新增窗口的平均 PSS 从 5.198 MiB 降至
-0.599 MiB。单窗口 PSS 则增加了 0.539 MiB。
+macOS 无需 X11，Windows 无需 WSL。Windows 支持字体与工作区快捷键；
+macOS 复制粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
+共享会话、Attach、搜索与 MCP 当前使用 Linux 运行时。
+各平台实际测试范围见[验收说明](docs/protocols.md#acceptance-coverage)。
 
-每个窗口的 X server pixmap 仍占 3,273,728 字节，单独计算；shell 和它运行
-的程序也另计。完整表格、测量条件及原始数据见
-[多窗口内存报告](docs/performance.md#multiple-window-memory)。
-核心解析、PTY 往返与实际屏幕显示延迟分别记录。
+## 性能与开发
 
-当前通过 X11/XWayland 提供 Linux 窗口。原生 Wayland、专用 GPU
-渲染后端、Kitty 文件/共享内存传输与动画、Unicode 图片占位符、
-相对放置、OSC 52、完整复杂字形布局和历史重排是后续工作。
-“超过 Kitty/Ghostty”是项目目标，比较结论按实际完成的相同条件实验报告。
+<!-- terminal-benchmark:start -->
+[本轮基准报告](docs/benchmarks/resume-2026-11-20.md)列出实测版本、负载与原始数据。
+[复现方法](docs/benchmarks/README.md)说明如何运行同条件对比；
+[较早的性能记录](docs/performance.md)保留对应的测量环境。
+<!-- terminal-benchmark:end -->
 
-## 验证
+本地开发检查使用 `sh tools/check.sh`。
+可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；
+使用指南与验收记录集中在[文档索引](docs/README.md)。
 
-```sh
-sh tools/check.sh
-cargo test --workspace --doc
-python3 tests/gui_smoke.py --binary ./target/release/ztty
-python3 tests/graphics_smoke.py --binary ./target/release/ztty
-python3 tests/shared_gui_smoke.py --binary ./target/release/ztty
-python3 tests/repaint_gui.py --binary ./target/release/ztty
-python3 tests/test_throughput_benchmark.py
-python3 tests/mcp_transport.py --binary ./target/release/ztty
-python3 tests/mcp_sessions.py --binary ./target/release/ztty
-# 可选：真实 Fcitx 5、Pinyin 插件和独立 D-Bus 会话。
-python3 tests/gui_smoke.py --fcitx --binary ./target/release/ztty
-```
-
-界面和图像测试创建独立 Xvfb 会话，需要 Xvfb、python-xlib 和 Pillow；
-图像测试还需要 `kitten`。结果和截图写入 `artifacts/`。Fcitx 检查验证
-普通按键与中文提交进入 PTY，保留为单独的可选验收。
-
-进一步阅读：[架构](docs/architecture.md)、[协议范围](docs/protocols.md)、
-[性能](docs/performance.md)、[发布](docs/releasing.md)。
-
-## Linux 标签页与分屏
-
-共享会话支持标签页、横竖分屏、焦点切换、尺寸调整与跨窗口移动。
-使用 `ztty --split-right NAME`、`ztty --tab NAME`，或 Ctrl+Shift+E/T。
-`ztty detach NAME` 保留 PTY；`ztty attach --observe NAME` 打开观察视图。
-[操作、权限与真实验收记录](docs/workspaces.md)。
-
-三个前端使用同一 no_std 会话库处理 PTY 读写、有界输入和终端状态。
-[核心说明与真实 PTY 验收](docs/session-core.md)覆盖部分写入与尺寸提交顺序。
-Windows 已有本地标签页与分屏；跨窗口共享会话、Attach 和 MCP 仍是 Linux 功能，
-macOS 工作区界面也尚未补齐。各原生版本的实际验收以本页平台表和发布记录为准。
-
-Windows 门禁在测试自有的可见桌面执行原像素检查，并核验进程清理与桌面恢复。
-[原生验收机制](docs/native-candidates-2026-11-18.md#owned-windows-ci-desktop)。
-
-## 文本扩展（Linux）
-
-用 `--text-plugin dedent=/绝对路径/library.so` 或配置项 `text-plugin = dedent=/绝对路径/library.so` 注册可信原生文本扩展。**Ctrl+Shift+P → Copy using dedent** 处理选区（没有选区时使用可见文本）并复制结果。宿主通过真实的 no_std zplugin 接口在有界、一次性的工作进程中调用动态库。参见[接口与验收说明](docs/text-plugins.zh-CN.md)和可独立编译的 [Dedent 示例](examples/dedent-plugin/README.md)。注册名称使用 ASCII 字母、数字、短横线或下划线。
+MIT © LIghtJUNction
