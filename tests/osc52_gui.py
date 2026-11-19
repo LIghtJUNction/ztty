@@ -11,6 +11,7 @@ import tempfile
 import time
 
 from gui_smoke import Gui
+from gui_renderer import record_renderer
 
 LIMIT=1024*1024
 def osc(data=None,target="c",bell=False):
@@ -19,9 +20,9 @@ def osc(data=None,target="c",bell=False):
 def reply(data=b"",target="c",bell=False):return osc(data,target,bell).encode()
 
 class ClipboardGui(Gui):
-    def __init__(self,*args):
+    def __init__(self,*args,**kwargs):
         self.sources={};self.held=[];self.transfers={};self.xerrors=[]
-        super().__init__(*args)
+        super().__init__(*args,**kwargs)
         self.d.set_error_handler(lambda error,_request:self.xerrors.append(type(error).__name__))
         sessions=self.rpc({"op":"list"})["sessions"]
         assert len(sessions)==1 and sessions[0]["window_id"]==self.window.id
@@ -89,8 +90,9 @@ class ClipboardGui(Gui):
                     else:del self.transfers[key]
                     self.d.flush()
             elif event.type==X.SelectionClear:
-                if getattr(self.d.get_selection_owner(event.selection),"id",0)!=self.helper.id:
-                    self.sources.pop(event.selection,None)
+                # python-Xlib names this field atom, unlike SelectionRequest.
+                if getattr(self.d.get_selection_owner(event.atom),"id",0)!=self.helper.id:
+                    self.sources.pop(event.atom,None)
             elif event.type==X.SelectionNotify and event.requestor.id==self.helper.id:
                 if event.property==X.NONE:self.selection_result=False
                 else:
@@ -226,17 +228,20 @@ def observer_denied(gui):return denied_view(gui,False)
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary",type=Path,required=True);parser.add_argument("--artifacts",type=Path,required=True)
+    parser.add_argument("--renderer",choices=("gpu","software"))
     args=parser.parse_args();binary=args.binary.resolve(strict=True);args.artifacts.mkdir(parents=True,exist_ok=True)
     report={"schema":1,"ok":False,"binary":str(binary),"binary_sha256":hashlib.sha256(binary.read_bytes()).hexdigest(),"checks":[],"cleanup_errors":[]}
     os.environ.pop("WAYLAND_DISPLAY",None);os.environ.pop("WAYLAND_SOCKET",None);gui=None
     with tempfile.TemporaryDirectory(prefix="ztty-osc52-") as directory:
         try:
             os.environ["XDG_CONFIG_HOME"]=str(Path(directory)/"config")
-            gui=ClipboardGui(binary,"monospace:size=11",directory)
+            gui=ClipboardGui(binary,"monospace:size=11",directory,renderer=args.renderer)
             report["display_ownership"]=gui.xvfb.evidence
+            report["renderer_before"]=record_renderer(gui.d,gui.window,args.renderer)
             for check in [writes,queries,latin_and_incr,exact_budget,over_budget,invalid_text,denied_owner,headless_denied,observer_denied,cancelled_owner,cancelled_by_manual_paste,query_during_manual_transfer,query_timeout]:
                 try:report["checks"].append({"name":check.__name__,"ok":True,**check(gui)})
                 except Exception as error:report["checks"].append({"name":check.__name__,"ok":False,"error":repr(error)})
+            report["renderer_after"]=record_renderer(gui.d,gui.window,args.renderer)
             report["ok"]=all(c["ok"] for c in report["checks"])
             report["expected_cancelled_x_errors"]=len(gui.xerrors)
         except Exception as error:report["error"]=repr(error)

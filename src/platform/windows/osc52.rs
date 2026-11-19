@@ -1,6 +1,6 @@
 //! Native OSC 52 clipboard bridge, independent of bracketed user paste.
 use super::*;
-pub(super) fn process(hwnd: ffi::Handle, core: &mut SessionCore, visible: bool) {
+pub(super) fn process(hwnd: Handle, core: &mut SessionCore, visible: bool) {
     if !visible || core.eof() || !core.owns("local") {
         core.deny_clipboard_requests();
         return;
@@ -27,7 +27,7 @@ pub(super) fn process(hwnd: ffi::Handle, core: &mut SessionCore, visible: bool) 
         }
     }
 }
-fn write(hwnd: ffi::Handle, text: &str) {
+fn write(hwnd: Handle, text: &str) {
     if unsafe { ffi::OpenClipboard(hwnd) } == 0 {
         return;
     }
@@ -55,7 +55,7 @@ fn write(hwnd: ffi::Handle, text: &str) {
         ffi::CloseClipboard();
     }
 }
-fn read(hwnd: ffi::Handle) -> Option<String> {
+fn read(hwnd: Handle) -> Option<String> {
     if unsafe { ffi::OpenClipboard(hwnd) } == 0 {
         return None;
     }

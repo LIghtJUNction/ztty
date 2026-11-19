@@ -14,6 +14,7 @@ import time
 import zlib
 
 from gui_smoke import Gui, ROOT
+from gui_renderer import record_renderer
 from graphics_smoke import BG, command, expect_pixel, pixel, png
 
 RED=(255,0,0,255)
@@ -128,6 +129,10 @@ def placeholders(gui,root):
     gui.emit(at(7,5)+"\x1b[38;5;42;58;5;7m"+PH+"\u0305\u0305"+PH+"\x1b[0m")
     expect_pixel(gui,7,5,RED,x=gui.cw//2,y=gui.ch//2)
     expect_pixel(gui,8,5,GREEN,x=gui.cw//2,y=gui.ch//2)
+    # Omitted coordinates inherit from the current left placeholder. Pin the
+    # right tile explicitly before deleting its predecessor; Kitty does not
+    # require guessed coordinates to survive a missing left neighbour.
+    gui.emit(at(8,5)+"\x1b[38;5;42;58;5;7m"+PH+"\u0305\u030d"+"\x1b[0m")
     gui.emit(at(7,5)+" "+at(0,0))
     expect_pixel(gui,7,5,BG,x=gui.cw//2,y=gui.ch//2)
     expect_pixel(gui,8,5,GREEN,x=gui.cw//2,y=gui.ch//2)
@@ -157,6 +162,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary",type=Path,required=True)
     parser.add_argument("--artifacts",type=Path,required=True)
+    parser.add_argument("--renderer",choices=("gpu","software"))
     args=parser.parse_args();binary=args.binary.resolve(strict=True);args.artifacts.mkdir(parents=True,exist_ok=True)
     report={"schema":1,"ok":False,"binary":str(binary),"binary_sha256":hashlib.sha256(binary.read_bytes()).hexdigest(),"checks":[],"cleanup_errors":[]}
     os.environ.pop("WAYLAND_DISPLAY",None);os.environ.pop("WAYLAND_SOCKET",None)
@@ -164,14 +170,16 @@ def main():
     with tempfile.TemporaryDirectory(prefix="ztty-graphics-extensions-") as temporary:
         root=Path(temporary)
         try:
-            gui=Gui(binary,"monospace:size=11",temporary)
+            gui=Gui(binary,"monospace:size=11",temporary,renderer=args.renderer)
             report["cell_pixels"]=[gui.cw,gui.ch];report["display_ownership"]=gui.xvfb.evidence
+            report["renderer_before"]=record_renderer(gui.d,gui.window,args.renderer)
             for check in [file_and_symlink,temporary_file,shared_memory,invalid_sources,compressed_files,relative_placements,placeholders,animation]:
                 try:
                     detail=check(gui,root);report["checks"].append({"name":check.__name__,"ok":True,**detail})
                     gui.stable_image().save(args.artifacts/(check.__name__+".png"))
                 except Exception as error:
                     report["checks"].append({"name":check.__name__,"ok":False,"error":repr(error)})
+            report["renderer_after"]=record_renderer(gui.d,gui.window,args.renderer)
             report["ok"]=all(c["ok"] for c in report["checks"])
         except Exception as error:report["error"]=repr(error)
         finally:
