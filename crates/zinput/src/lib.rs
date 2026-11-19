@@ -283,13 +283,13 @@ pub fn encode_key_with_alternates_into(
 
     let legacy_exception = matches!(key, Key::Enter | Key::Tab | Key::Backspace);
     let text_key = matches!(key, Key::Character(_)) || keypad_text(key).is_some();
-    // Disambiguation keeps ordinary printable keypad input as text. Explicit
-    // application-keypad mode and report-all still request functional events.
+    // Num Lock overrides application-keypad mode, but Kitty's explicit
+    // report-all and non-text/control-key reporting remain independent.
     let enhanced = all
         || (flags & DISAMBIGUATE != 0
             && !legacy_exception
             && (key == Key::Escape
-                || (modes.app_keypad && keypad_text(key).is_some())
+                || (application_keypad_active(modes, modifiers) && keypad_text(key).is_some())
                 || !text_key
                 || modifiers.contains(Modifiers::CTRL | Modifiers::ALT)))
         || (events && !text_key && !legacy_exception)
@@ -508,8 +508,12 @@ pub fn encode_paste_into(text: &str, modes: &Modes, output: &mut Vec<u8>) {
     }
 }
 
+fn application_keypad_active(modes: &Modes, modifiers: Modifiers) -> bool {
+    modes.app_keypad && !modifiers.contains(Modifiers::NUM_LOCK)
+}
+
 fn legacy_key(key: Key, modifiers: Modifiers, text: &str, modes: &Modes, output: &mut Vec<u8>) {
-    if modes.app_keypad
+    if application_keypad_active(modes, modifiers)
         && let Some(suffix) = application_keypad(key)
     {
         ss3_or_modified(suffix, modifiers, output);
@@ -1106,6 +1110,128 @@ mod tests {
     }
 
     #[test]
+    fn num_lock_overrides_legacy_application_keypad() {
+        let keys: &[(Key, &str, &[u8])] = &[
+            (Key::KeypadDigit(0), "0", b"\x1bOp"),
+            (Key::KeypadDigit(1), "1", b"\x1bOq"),
+            (Key::KeypadDigit(2), "2", b"\x1bOr"),
+            (Key::KeypadDigit(3), "3", b"\x1bOs"),
+            (Key::KeypadDigit(4), "4", b"\x1bOt"),
+            (Key::KeypadDigit(5), "5", b"\x1bOu"),
+            (Key::KeypadDigit(6), "6", b"\x1bOv"),
+            (Key::KeypadDigit(7), "7", b"\x1bOw"),
+            (Key::KeypadDigit(8), "8", b"\x1bOx"),
+            (Key::KeypadDigit(9), "9", b"\x1bOy"),
+            (Key::KeypadDecimal, ".", b"\x1bOn"),
+            (Key::KeypadDecimal, ",", b"\x1bOn"),
+            (Key::KeypadDivide, "/", b"\x1bOo"),
+            (Key::KeypadMultiply, "*", b"\x1bOj"),
+            (Key::KeypadSubtract, "-", b"\x1bOm"),
+            (Key::KeypadAdd, "+", b"\x1bOk"),
+            (Key::KeypadEnter, "\r", b"\x1bOM"),
+            (Key::KeypadEqual, "=", b"\x1bOX"),
+            (Key::KeypadSeparator, ",", b"\x1bOl"),
+        ];
+        for app_keypad in [false, true] {
+            let m = Modes {
+                app_keypad,
+                ..modes(0)
+            };
+            for locks in [
+                0,
+                Modifiers::NUM_LOCK,
+                Modifiers::NUM_LOCK | Modifiers::CAPS_LOCK,
+            ] {
+                for &(key, text, application) in keys {
+                    let expected = if app_keypad && locks == 0 {
+                        application
+                    } else {
+                        text.as_bytes()
+                    };
+                    for event in [KeyEvent::Press, KeyEvent::Repeat] {
+                        assert_eq!(
+                            encode_key(key, Modifiers(locks), event, text, &m),
+                            expected,
+                            "app_keypad={app_keypad}, locks={locks}, key={key:?}, event={event:?}"
+                        );
+                    }
+                    assert!(
+                        encode_key(key, Modifiers(locks), KeyEvent::Release, "", &m).is_empty()
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn num_lock_override_keeps_kitty_keypad_identity() {
+        // Num Lock cancels only DECKPAM. Kitty's explicit event/identity
+        // negotiation is independent and still applies to the original key.
+        let keys = [
+            (Key::KeypadDigit(1), "1"),
+            (Key::KeypadDecimal, ","),
+            (Key::KeypadDivide, "/"),
+            (Key::KeypadMultiply, "*"),
+            (Key::KeypadSubtract, "-"),
+            (Key::KeypadAdd, "+"),
+            (Key::KeypadEnter, "\r"),
+            (Key::KeypadEqual, "="),
+            (Key::KeypadSeparator, ","),
+        ];
+        for flags in 0..32 {
+            let normal = modes(flags);
+            let application = Modes {
+                app_keypad: true,
+                ..normal
+            };
+            for (key, text) in keys {
+                for event in [KeyEvent::Press, KeyEvent::Repeat, KeyEvent::Release] {
+                    assert_eq!(
+                        encode_key(
+                            key,
+                            Modifiers(Modifiers::NUM_LOCK),
+                            event,
+                            text,
+                            &application
+                        ),
+                        encode_key(key, Modifiers(Modifiers::NUM_LOCK), event, text, &normal),
+                        "flags={flags}, key={key:?}, event={event:?}"
+                    );
+                }
+            }
+        }
+        for (flags, key, text, expected) in [
+            (1, Key::KeypadDigit(1), "1", b"1".as_slice()),
+            (3, Key::KeypadAdd, "+", b"+".as_slice()),
+            (1, Key::KeypadEnter, "\r", b"\x1b[57414;129u".as_slice()),
+            (8, Key::KeypadDigit(1), "1", b"\x1b[57400;129u".as_slice()),
+            (8, Key::KeypadAdd, "+", b"\x1b[57413;129u".as_slice()),
+            (8, Key::KeypadEnter, "\r", b"\x1b[57414;129u".as_slice()),
+            (
+                24,
+                Key::KeypadDigit(1),
+                "1",
+                b"\x1b[57400;129;49u".as_slice(),
+            ),
+        ] {
+            let m = Modes {
+                app_keypad: true,
+                ..modes(flags)
+            };
+            assert_eq!(
+                encode_key(
+                    key,
+                    Modifiers(Modifiers::NUM_LOCK),
+                    KeyEvent::Press,
+                    text,
+                    &m
+                ),
+                expected
+            );
+        }
+    }
+
+    #[test]
     fn application_keypad_keeps_disambiguated_events() {
         let mut m = Modes {
             app_keypad: true,
@@ -1113,7 +1239,7 @@ mod tests {
         };
         let key = Key::KeypadDigit(1);
         assert_eq!(
-            encode_key(key, Modifiers(128), KeyEvent::Press, "1", &m),
+            encode_key(key, Modifiers(0), KeyEvent::Press, "1", &m),
             b"\x1b[57400u"
         );
         m.kitty_keyboard = 3;
@@ -1122,7 +1248,7 @@ mod tests {
             (KeyEvent::Repeat, b"\x1b[57400;1:2u".as_slice()),
             (KeyEvent::Release, b"\x1b[57400;1:3u".as_slice()),
         ] {
-            assert_eq!(encode_key(key, Modifiers(128), event, "1", &m), expected);
+            assert_eq!(encode_key(key, Modifiers(0), event, "1", &m), expected);
         }
     }
 
