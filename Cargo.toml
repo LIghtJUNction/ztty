@@ -11,7 +11,7 @@ repository = "https://github.com/LIghtJUNction/ztty"
 
 [package]
 name = "ztty"
-version = "0.4.1"
+version = "0.5.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -34,7 +34,7 @@ path = "tests/session_core.rs"
 harness = false
 
 [dependencies]
-zterm = { path = "crates/zterm", version = "0.4.0", default-features = false }
+zterm = { path = "crates/zterm", version = "0.5.0", default-features = false }
 zpty = { path = "crates/zpty", version = "0.2.1", default-features = false }
 
 [profile.dev]
@@ -52,4 +52,4 @@ codegen-units = 1
 
 [target.'cfg(target_os = "linux")'.dependencies]
 zplugin = { version = "=0.3.0", default-features = false }
-ztty-plugin-api = { path = "crates/ztty-plugin-api" }
+ztty-plugin-api = { path = "crates/ztty-plugin-api", version = "0.1.0" }
