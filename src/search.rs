@@ -1,10 +1,50 @@
 //! Literal UTF-8 history search across soft-wrapped rows. The streaming matcher
 //! keeps at most one query's byte positions, never a copy of a logical line or
 //! the history. Match counts and navigation do not retain all matches.
-use alloc::{string::String, vec, vec::Vec};
+use alloc::{borrow::Cow, string::String, vec, vec::Vec};
 use zterm::Terminal;
 
 const MAX_QUERY: usize = 1024;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Case {
+    Sensitive,
+    Insensitive,
+}
+
+enum Characters {
+    Exact(core::iter::Once<char>),
+    Lower(core::char::ToLowercase),
+}
+
+impl Iterator for Characters {
+    type Item = char;
+
+    fn next(&mut self) -> Option<char> {
+        match self {
+            Self::Exact(chars) => chars.next(),
+            Self::Lower(chars) => chars.next(),
+        }
+    }
+}
+
+impl Case {
+    fn characters(self, ch: char) -> Characters {
+        match self {
+            Self::Sensitive => Characters::Exact(core::iter::once(ch)),
+            Self::Insensitive => Characters::Lower(ch.to_lowercase()),
+        }
+    }
+
+    // Unicode lowercase comparison preserves original cells for copy/highlight.
+    // It does not normalize accents or apply full Unicode case folding.
+    fn query(self, query: &str) -> Cow<'_, str> {
+        match self {
+            Self::Sensitive => Cow::Borrowed(query),
+            Self::Insensitive => Cow::Owned(query.chars().flat_map(char::to_lowercase).collect()),
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Hit {
@@ -108,7 +148,14 @@ fn row_wrap(terminal: &Terminal, absolute: usize) -> Option<usize> {
 
 /// Scan whole rows through `end`, then at most query.len()-1 more bytes so
 /// matches ending below a viewport still highlight their visible beginning.
-fn hits(terminal: &Terminal, query: &str, first: usize, end: usize, mut visit: impl FnMut(Hit)) {
+fn hits(
+    terminal: &Terminal,
+    query: &str,
+    case: Case,
+    first: usize,
+    end: usize,
+    mut visit: impl FnMut(Hit),
+) {
     let mut matcher = Matcher::new(query, terminal.text_revision());
     let mut suffix = query.len() - 1;
     for absolute in first..terminal.history_len() + terminal.rows() {
@@ -123,6 +170,7 @@ fn hits(terminal: &Terminal, query: &str, first: usize, end: usize, mut visit: i
             }
             for ch in core::iter::once(if cell.ch == '\0' { ' ' } else { cell.ch })
                 .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
+                .flat_map(|ch| case.characters(ch))
             {
                 let mut encoded = [0; 4];
                 for &value in ch.encode_utf8(&mut encoded).as_bytes() {
@@ -156,7 +204,13 @@ fn hits(terminal: &Terminal, query: &str, first: usize, end: usize, mut visit: i
     }
 }
 
-pub fn find(terminal: &Terminal, query: &str, from: Option<Hit>, forward: bool) -> Result {
+pub fn find(
+    terminal: &Terminal,
+    query: &str,
+    case: Case,
+    from: Option<Hit>,
+    forward: bool,
+) -> Result {
     if query.is_empty() || query.len() > MAX_QUERY {
         return Result {
             hit: None,
@@ -164,6 +218,7 @@ pub fn find(terminal: &Terminal, query: &str, from: Option<Hit>, forward: bool) 
             ordinal: 0,
         };
     }
+    let query = case.query(query);
     let from = from.filter(|hit| hit.revision == terminal.text_revision());
     let mut first = None;
     let mut last = None;
@@ -171,7 +226,8 @@ pub fn find(terminal: &Terminal, query: &str, from: Option<Hit>, forward: bool) 
     let mut count = 0;
     hits(
         terminal,
-        query,
+        &query,
+        case,
         0,
         terminal.history_len() + terminal.rows(),
         |hit| {
@@ -200,10 +256,11 @@ pub fn find(terminal: &Terminal, query: &str, from: Option<Hit>, forward: bool) 
     }
 }
 
-pub fn highlights(terminal: &Terminal, query: &str, history: usize) -> Vec<u64> {
+pub fn highlights(terminal: &Terminal, query: &str, case: Case, history: usize) -> Vec<u64> {
     if query.is_empty() || query.len() > MAX_QUERY {
         return Vec::new();
     }
+    let query = case.query(query);
     let cols = terminal.cols();
     let rows = terminal.rows();
     let mut bits = vec![0u64; (cols * rows).div_ceil(64)];
@@ -216,7 +273,7 @@ pub fn highlights(terminal: &Terminal, query: &str, history: usize) -> Vec<u64> 
     while begin != 0 && row_wrap(terminal, begin - 1).is_some() {
         begin -= 1;
     }
-    hits(terminal, query, begin, first + rows, |hit| {
+    hits(terminal, &query, case, begin, first + rows, |hit| {
         for absolute in hit.row.max(first)..=hit.end_row.min(first + rows - 1) {
             let start = if absolute == hit.row { hit.start } else { 0 };
             let end = if absolute == hit.end_row {

@@ -115,7 +115,7 @@ Ctrl+Shift+D detaches; U moves a pane to a new window; G takes input control.\n\
 Ctrl+Shift+S opens the session switcher (action: sessions).\n\
 Type name/title/URI words; Up/Down selects; Enter focuses or explicitly attaches.\n\
 Switching preserves the PTY and input owner; observing attaches stay read-only.\n\
-Ctrl+Shift+F searches across soft-wrapped text; Enter/Shift+Enter finds next/previous.\n\
+Ctrl+Shift+F searches across soft-wrapped text; Alt+C toggles case, Enter/Shift+Enter navigates.\n\
 Copy joins soft-wrapped rows and preserves explicit line breaks.\n\
 Ctrl+Shift+P opens actions: filter with multiple words and see effective bindings.\n\
 Ctrl+U clears an overlay query; Esc closes it. Ctrl+Shift+R reloads configuration.\n\

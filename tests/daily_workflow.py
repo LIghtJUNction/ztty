@@ -31,7 +31,7 @@ emit("\x1b]2;daily workflow\x07\x1b]133;A\x07$ \x1b]133;B\x07echo first\r\n\x1b]
 emit("first-output 中文\r\n\x1b]133;D;7\x07")
 emit("\x1b]133;A\x07$ \x1b]133;B\x07echo history\r\n\x1b]133;C\x07")
 for n in range(100):
-    emit(("history %03d  " % n) + ("needle" if n in (10,55) else "retained output") + "\r\n")
+    emit(("history %03d  " % n) + ("needle" if n in (10,55) else "CaseTarget" if n == 15 else "casetarget" if n == 60 else "retained output") + "\r\n")
 emit("\x1b]133;D;0\x07\x1b]133;A\x07$ \x1b]133;B\x07")
 emit("\x1b[38;2;255;0;255mtruecolor-sentinel\x1b[0m default-sentinel\r\nREADY\r\n")
 # Enable application mouse reporting to catch leaked bound button events.
@@ -333,6 +333,33 @@ def main():
             key("Escape")
             assert input_bytes() == b"", input_bytes()
             report["checks"].append("real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input")
+
+            # Search case mode is local UI state. The clipboard proves both
+            # the selected original spelling and the navigation order.
+            key("Control_L", "Shift_L", "f")
+            key("Control_L", "u")
+            text("casetarget")
+            key("Control_L", "Shift_L", "c")
+            expect_clipboard("casetarget")
+            key("Return")
+            key("Control_L", "Shift_L", "c")
+            expect_clipboard("casetarget")
+            key("Alt_L", "c")
+            key("Return")
+            key("Control_L", "Shift_L", "c")
+            expect_clipboard("CaseTarget")
+            capture("history-search-ignore-case")
+            key("Shift_L", "Return")
+            key("Control_L", "Shift_L", "c")
+            expect_clipboard("casetarget")
+            key("Alt_L", "c")
+            key("Return")
+            key("Control_L", "Shift_L", "c")
+            expect_clipboard("casetarget")
+            capture("history-search-match-case")
+            key("Escape")
+            assert input_bytes() == b"", input_bytes()
+            report["checks"].append("Alt+C toggles search case; forward/backward navigation and clipboard preserve original spelling without PTY input")
 
             # Command navigation and clipboard use retained regions, never a
             # second copy of command stdout. The latest prompt may be incomplete.
