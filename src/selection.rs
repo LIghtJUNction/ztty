@@ -2,6 +2,9 @@
 use alloc::string::String;
 use zterm::Terminal;
 
+mod resize;
+pub use resize::{Points, RestoredView, ViewAnchor};
+
 const MAX_BYTES: usize = 4 * 1024 * 1024;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -108,8 +111,11 @@ pub fn text(
     if cols == 0 {
         return String::new();
     }
-    let start = (start.1, start.0.min(cols - 1));
-    let end = (end.1, end.0.min(cols - 1));
+    // A remapped boundary can sit just past a hard line. Preserve that exact
+    // value without accepting arbitrary out-of-grid pointer coordinates.
+    let column = |col: usize| if col == cols { cols } else { col.min(cols - 1) };
+    let start = (start.1, column(start.0));
+    let end = (end.1, column(end.0));
     let (start, end) = (start.min(end), start.max(end));
     let history = terminal.history_len();
     let first = history.saturating_sub(history_offset.min(history));
@@ -119,6 +125,7 @@ pub fn text(
     }
     let last = end.0.min(available - 1);
     let mut output = String::new();
+    let mut pending_spaces = 0usize;
     for row in start.0..=last {
         // view_cell accepts a visible row, so rebase every absolute history
         // row. This also copies search hits extending past the viewport.
@@ -135,31 +142,42 @@ pub fn text(
         if begin != 0 && terminal.view_cell(begin, view_row, offset).width == 0 {
             begin -= 1;
         }
-        let line_start = output.len();
         for col in begin..limit {
             let cell = terminal.view_cell(col, view_row, offset);
             if cell.width == 0 {
                 continue;
             }
+            if cell.ch == ' ' && cell.combining == ['\0'; 2] && cell.grapheme_id == 0 {
+                pending_spaces = pending_spaces.saturating_add(1);
+                continue;
+            }
             let chars = terminal.cell_chars(cell);
             let bytes = chars.clone().map(char::len_utf8).sum::<usize>();
-            if output.len() + bytes > MAX_BYTES {
+            let spaces = pending_spaces.min(MAX_BYTES - output.len());
+            output.extend(core::iter::repeat_n(' ', spaces));
+            if spaces != pending_spaces || bytes > MAX_BYTES - output.len() {
                 return output;
             }
+            pending_spaces = 0;
             output.extend(chars);
         }
-        // Soft-wrap metadata distinguishes meaningful line-end spaces from
-        // untouched padding. Preserve them when joining the following row.
+        // Trim at logical line ends, including padding retained across soft
+        // rows by a resize. Interior spaces are flushed before their glyph.
         if wrap.is_none() {
-            while output.len() > line_start && output.ends_with(' ') {
-                output.pop();
-            }
+            pending_spaces = 0;
             if row != last {
                 if output.len() == MAX_BYTES {
                     return output;
                 }
                 output.push('\n');
             }
+        } else if row == last {
+            // A selection ending inside an ongoing soft-wrapped line includes
+            // its selected spaces even though the following glyph is outside.
+            output.extend(core::iter::repeat_n(
+                ' ',
+                pending_spaces.min(MAX_BYTES - output.len()),
+            ));
         }
     }
     output

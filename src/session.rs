@@ -257,6 +257,29 @@ impl Ui {
         self.reset_input();
     }
 
+    fn capture_view_anchor(&self, terminal: &Terminal) -> ztty::selection::ViewAnchor {
+        ztty::selection::ViewAnchor::capture(
+            terminal,
+            self.history,
+            self.selection
+                .as_ref()
+                .map(|selection| (selection.start, selection.end)),
+        )
+    }
+
+    fn restore_view_anchor(&mut self, terminal: &Terminal, anchor: ztty::selection::ViewAnchor) {
+        let restored = anchor.restore(terminal);
+        self.set_history(restored.history);
+        self.selection = restored.selection.map(|(start, end)| x11::Selection {
+            start,
+            end,
+            dragging: false,
+        });
+        self.selection_anchor = restored.selection.unwrap_or(((0, 0), (0, 0)));
+        self.selection_unit = ztty::selection::Unit::Cell;
+        self.clicks = None;
+    }
+
     fn set_history(&mut self, history: usize) {
         self.history = history;
         if history == 0 {
@@ -919,14 +942,16 @@ impl Ui {
                 self.clipboard_menu = None;
                 let (cols, rows) = self.window.resize(e.width, e.height);
                 self.scroll_prompt = None;
-                if allow_input
-                    && (cols != core.terminal.cols() || rows != core.terminal.rows())
-                    && let Err(error) = core.resize(pty_size(cols, rows, Some(&self.window)))
-                {
-                    self.error(format!("cannot resize the PTY: {error}"));
+                if allow_input && (cols != core.terminal.cols() || rows != core.terminal.rows()) {
+                    let mut anchor = self.capture_view_anchor(&core.terminal);
+                    match core.resize_anchored(
+                        pty_size(cols, rows, Some(&self.window)),
+                        anchor.anchors_mut(),
+                    ) {
+                        Ok(()) => self.restore_view_anchor(&core.terminal, anchor),
+                        Err(error) => self.error(format!("cannot resize the PTY: {error}")),
+                    }
                 }
-                self.set_history(self.history.min(core.terminal.history_len()));
-                self.selection = None;
                 self.force = true;
             }
             x11::FOCUS_IN | x11::FOCUS_OUT => {
@@ -1897,11 +1922,18 @@ impl Pool {
                     && (cols != session.core.terminal.cols()
                         || rows != session.core.terminal.rows())
                 {
+                    let mut anchor = ui.capture_view_anchor(&session.core.terminal);
                     let resized = if session.core.eof() {
-                        session.core.terminal.resize(cols, rows);
+                        session
+                            .core
+                            .terminal
+                            .resize_anchored(cols, rows, anchor.anchors_mut());
                         true
                     } else {
-                        match session.core.resize(pty_size(cols, rows, Some(&ui.window))) {
+                        match session.core.resize_anchored(
+                            pty_size(cols, rows, Some(&ui.window)),
+                            anchor.anchors_mut(),
+                        ) {
                             Ok(()) => true,
                             Err(error) => {
                                 if failure.is_none() {
@@ -1914,8 +1946,7 @@ impl Pool {
                     // Keep the model at the accepted PTY size after a failed
                     // ioctl so the next arrange retries instead of skipping it.
                     if resized {
-                        ui.set_history(ui.history.min(session.core.terminal.history_len()));
-                        ui.selection = None;
+                        ui.restore_view_anchor(&session.core.terminal, anchor);
                     }
                 }
                 ui.window.visible(true);
@@ -2716,11 +2747,12 @@ impl Pool {
                 ui.palette = None;
             }
             let allow_resize = session.core.owns("local") && !ui.read_only;
+            let mut anchor = ui.capture_view_anchor(&session.core.terminal);
             let (cols, rows) = ui.window.reconfigure(&appearance, |cols, rows, cw, ch| {
                 if allow_resize && !session.core.eof() {
                     session
                         .core
-                        .resize_with_cell_size(
+                        .resize_with_cell_size_anchored(
                             zpty::Size {
                                 cols: cols as u16,
                                 rows: rows as u16,
@@ -2728,6 +2760,7 @@ impl Pool {
                                 pixel_height: (rows * ch as usize).min(u16::MAX as usize) as u16,
                             },
                             (cw as u32, ch as u32),
+                            anchor.anchors_mut(),
                         )
                         .map_err(|e| format!("cannot resize reconfigured PTY: {e}"))?;
                 }
@@ -2739,11 +2772,13 @@ impl Pool {
                 .terminal
                 .set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
             if allow_resize && session.core.eof() {
-                session.core.terminal.resize(cols, rows);
+                session
+                    .core
+                    .terminal
+                    .resize_anchored(cols, rows, anchor.anchors_mut());
             }
-            ui.set_history(ui.history.min(session.core.terminal.history_len()));
+            ui.restore_view_anchor(&session.core.terminal, anchor);
             ui.scroll_prompt = None;
-            ui.selection = None;
             ui.last_cursor = None;
             ui.force = true;
             ui.reset_blink = true;
@@ -3010,18 +3045,24 @@ impl Pool {
                 let cols = bounded(request, "cols", 120, 2, 512)?;
                 let rows = bounded(request, "rows", 32, 2, 256)?;
                 let session = &mut self.sessions[index];
+                let mut anchor = session
+                    .ui
+                    .as_ref()
+                    .map(|ui| ui.capture_view_anchor(&session.core.terminal))
+                    .unwrap_or_else(|| {
+                        ztty::selection::ViewAnchor::capture(&session.core.terminal, 0, None)
+                    });
                 session
                     .core
-                    .resize(pty_size(
-                        cols,
-                        rows,
-                        session.ui.as_ref().map(|ui| &ui.window),
-                    ))
+                    .resize_anchored(
+                        pty_size(cols, rows, session.ui.as_ref().map(|ui| &ui.window)),
+                        anchor.anchors_mut(),
+                    )
                     .map_err(|e| format!("resize failed: {e}"))?;
                 if let Some(ui) = &mut session.ui {
                     ui.window.resize_grid(cols, rows);
                     ui.force = true;
-                    ui.set_history(ui.history.min(session.core.terminal.history_len()));
+                    ui.restore_view_anchor(&session.core.terminal, anchor);
                     ui.scroll_prompt = None;
                 }
                 Ok(Reply::Value(session.info()))
