@@ -371,3 +371,29 @@ fn external_short_pixels_and_invalid_png_use_the_same_opaque_file_error() {
         assert!(Arc::ptr_eq(&before, &g.image(1).unwrap().pixels));
     }
 }
+
+#[test]
+fn anchor_reflow_moves_only_physical_roots_and_cascades_lost_anchors() {
+    let mut g = Graphics::default();
+    for id in 1..=4 {
+        image(&mut g, id);
+    }
+    command(&mut g, b"Ga=p,i=2,p=1,P=1,Q=1,H=2,V=3");
+    command(&mut g, b"Ga=p,i=3,p=1,U=1,c=2,r=1");
+    command(&mut g, b"Ga=p,i=4,p=1,P=3,Q=1,H=1,V=1");
+    assert_eq!(g.anchors().collect::<Vec<_>>(), [(0, 0)]);
+    let before = g.draws(0).find(|d| d.image_id == 2).unwrap().dest;
+    let mut mapped = 0;
+    g.remap_anchors(|col, row| {
+        mapped += 1;
+        Some((col + 3, row + 2))
+    });
+    assert_eq!(mapped, 1);
+    assert_eq!(g.anchors().collect::<Vec<_>>(), [(3, 2)]);
+    let after = g.draws(0).find(|d| d.image_id == 2).unwrap().dest;
+    assert_eq!((after.x - before.x, after.y - before.y), (24, 32));
+    g.remap_anchors(|_, _| None);
+    assert_eq!(g.anchors().count(), 0);
+    assert_eq!(g.placement_count(), 2); // Virtual root and its dependent remain.
+    assert!(g.image(2).is_none() && g.image(3).is_some() && g.image(4).is_some());
+}

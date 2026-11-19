@@ -17,13 +17,13 @@ mod terminal;
 
 pub use grapheme::{CellChars, MAX_GRAPHEME_BYTES};
 pub use screen::{
-    BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, EXPLICIT_FG, HIDDEN, INVERSE, ITALIC,
-    PALETTE_BG, PALETTE_FG, STRIKE, UNDERLINE,
+    BLINK, BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, EXPLICIT_FG, HIDDEN, INVERSE,
+    ITALIC, PALETTE_BG, PALETTE_FG, RAPID_BLINK, STRIKE, UNDERLINE,
 };
 pub use shell::{
     CommandRecord, CommandText, MAX_COMMAND_TEXT, MAX_COMMANDS, ShellPhase, TextPosition,
 };
-pub use terminal::{CursorShape, Modes, Terminal, Theme};
+pub use terminal::{CursorShape, Modes, ResizeAnchor, Terminal, Theme};
 
 #[cfg(test)]
 extern crate std;
@@ -51,3 +51,8 @@ mod grapheme_tests;
 
 pub mod clipboard;
 pub use clipboard::{ClipboardRequest, MAX_CLIPBOARD_BYTES, MAX_CLIPBOARD_REQUESTS};
+#[cfg(test)]
+mod blink_tests;
+
+#[cfg(test)]
+mod reflow_tests;

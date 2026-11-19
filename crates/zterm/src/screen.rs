@@ -18,6 +18,10 @@ pub const EXPLICIT_FG: u16 = 256;
 pub const PALETTE_FG: u16 = 512;
 /// The background refers to the ANSI palette, indexed by `Cell::palette_indices`.
 pub const PALETTE_BG: u16 = 1024;
+/// SGR 5 slow text blinking, independent of cursor blinking.
+pub const BLINK: u16 = 1 << 11;
+/// SGR 6 rapid text blinking, mutually exclusive with BLINK.
+pub const RAPID_BLINK: u16 = 1 << 12;
 const COLOR_FLAGS: u16 = EXPLICIT_FG | EXPLICIT_BG | PALETTE_FG | PALETTE_BG;
 
 /// A character cell. A wide glyph's trailing cell has `width == 0`.

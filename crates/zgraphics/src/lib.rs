@@ -593,6 +593,40 @@ impl Graphics {
         self.changed();
     }
 
+    /// Physical placement anchors in stable scene order, in text-cell units.
+    /// Negative rows refer to retained primary-screen history.
+    pub fn anchors(&self) -> impl Iterator<Item = (i32, i32)> + '_ {
+        self.placements
+            .iter()
+            .filter(|placement| placement.parent.is_none() && !placement.virtual_placement)
+            .map(|placement| (placement.col, placement.row))
+    }
+
+    /// Move anchors through a text-layout change, preserving image/source/size
+    /// metadata. None drops a placement whose original text is no longer kept.
+    pub fn remap_anchors(&mut self, mut map: impl FnMut(i32, i32) -> Option<(i32, i32)>) {
+        let mut changed = false;
+        self.placements.retain_mut(|placement| {
+            if placement.parent.is_some() || placement.virtual_placement {
+                return true;
+            }
+            if let Some((col, row)) = map(placement.col, placement.row) {
+                changed |= (placement.col, placement.row) != (col, row);
+                placement.col = col;
+                placement.row = row;
+                true
+            } else {
+                changed = true;
+                false
+            }
+        });
+        if changed {
+            self.prune_dependencies();
+            self.collect_unreferenced_anonymous();
+            self.changed();
+        }
+    }
+
     /// Drop placements whose last pixel is older than retained text history.
     pub fn trim_history(&mut self, history: usize) {
         let history = history.min(i32::MAX as usize);

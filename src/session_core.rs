@@ -5,7 +5,7 @@ use crate::{
     session_control::SessionControl,
 };
 use alloc::string::String;
-use zterm::Terminal;
+use zterm::{ResizeAnchor, Terminal};
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum ReadStep {
@@ -154,8 +154,18 @@ impl SessionCore {
     /// Commit the terminal grid only after the native PTY accepts the size.
     /// Retained EOF views may resize only their terminal in frontend code.
     pub fn resize(&mut self, size: zpty::Size) -> Result<(), zpty::Error> {
+        self.resize_anchored(size, &mut [])
+    }
+
+    /// As resize, remapping selection/viewport positions only after PTY accepts.
+    pub fn resize_anchored(
+        &mut self,
+        size: zpty::Size,
+        anchors: &mut [ResizeAnchor],
+    ) -> Result<(), zpty::Error> {
         self.pty.resize(size)?;
-        self.terminal.resize(size.cols as usize, size.rows as usize);
+        self.terminal
+            .resize_anchored(size.cols as usize, size.rows as usize, anchors);
         Ok(())
     }
 
@@ -166,9 +176,19 @@ impl SessionCore {
         size: zpty::Size,
         cell_size: (u32, u32),
     ) -> Result<(), zpty::Error> {
+        self.resize_with_cell_size_anchored(size, cell_size, &mut [])
+    }
+
+    pub fn resize_with_cell_size_anchored(
+        &mut self,
+        size: zpty::Size,
+        cell_size: (u32, u32),
+        anchors: &mut [ResizeAnchor],
+    ) -> Result<(), zpty::Error> {
         self.pty.resize(size)?;
         self.terminal.set_cell_size(cell_size.0, cell_size.1);
-        self.terminal.resize(size.cols as usize, size.rows as usize);
+        self.terminal
+            .resize_anchored(size.cols as usize, size.rows as usize, anchors);
         Ok(())
     }
 
