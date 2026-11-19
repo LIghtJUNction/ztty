@@ -292,7 +292,7 @@ pub fn encode_key_with_alternates_into(
                 || !text_key
                 || modifiers.contains(Modifiers::CTRL | Modifiers::ALT)))
         || (events && !text_key && !legacy_exception)
-        || (matches!(key, Key::Character(_))
+        || (text_key
             && modifiers.contains(Modifiers::SUPER | Modifiers::HYPER | Modifiers::META))
         // Kitty and Ghostty preserve Ctrl+Shift text-key shortcuts even in
         // legacy mode. Space retains its documented C0/NUL exception.
@@ -1107,6 +1107,24 @@ mod tests {
     #[test]
     fn keypad_identity_is_preserved_when_requested() {
         let digit = Key::KeypadDigit(1);
+        for (modifier, expected) in [
+            (Modifiers::SUPER, b"\x1b[57400;9u".as_slice()),
+            (Modifiers::HYPER, b"\x1b[57400;17u".as_slice()),
+            (Modifiers::META, b"\x1b[57400;33u".as_slice()),
+        ] {
+            for flags in [0, 1] {
+                assert_eq!(
+                    encode_key(
+                        digit,
+                        Modifiers(modifier),
+                        KeyEvent::Press,
+                        "1",
+                        &modes(flags)
+                    ),
+                    expected
+                );
+            }
+        }
         assert_eq!(
             encode_key(
                 digit,
