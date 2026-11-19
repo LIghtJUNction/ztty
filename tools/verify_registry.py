@@ -16,7 +16,7 @@ import tomllib
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PACKAGES = ("zinput", "zgraphics", "zpty", "ztty-ui", "zterm")
+PACKAGES = ("zinput", "zgraphics", "zpty", "ztty-ui", "ztty-plugin-api", "zterm")
 DEFAULT_CARGO_TIMEOUT = 90
 
 
@@ -106,7 +106,18 @@ def library(selected):
         source += '''    let size = zpty::Size::new(80, 24);
     assert_eq!((size.cols, size.rows), (80, 24));
 '''
-    return source + "}\n"
+    if "ztty-plugin-api" in selected:
+        source += "    assert_eq!(ztty_plugin_api::MAX_TEXT_BYTES, 1024 * 1024);\n"
+    source += "}\n"
+    if "ztty-plugin-api" in selected:
+        source += r'''
+pub fn transform_text<T: ztty_plugin_api::TextAction>(
+    plugin: &mut T, input: &str, output: &mut [u8],
+) -> Option<u64> {
+    plugin.transform(input, output).ok()
+}
+'''
+    return source
 
 
 def executable(selected, crate_name):
@@ -221,7 +232,7 @@ def check(selected, directory, cargo_timeout=DEFAULT_CARGO_TIMEOUT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--packages", nargs="+", choices=PACKAGES, default=list(PACKAGES),
-                        help="crates to verify; default: zinput zgraphics zpty ztty-ui zterm")
+                        help="crates to verify; default: " + " ".join(PACKAGES))
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "artifacts/registry-consumer.json")
     parser.add_argument("--cargo-timeout", type=float, default=DEFAULT_CARGO_TIMEOUT, metavar="SECONDS",
                         help="maximum seconds per Cargo command, including compiler-lock wait (default: %(default)s)")
