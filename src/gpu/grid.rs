@@ -1,7 +1,8 @@
 use super::{Rect, Renderer, Style, TextCell};
 use alloc::{string::String, vec::Vec};
 use zterm::{
-    BOLD, Cell, CursorShape, DIM, EXPLICIT_BG, HIDDEN, INVERSE, ITALIC, STRIKE, Terminal, UNDERLINE,
+    BLINK, BOLD, Cell, CursorShape, DIM, EXPLICIT_BG, HIDDEN, INVERSE, ITALIC, RAPID_BLINK, STRIKE,
+    Terminal, UNDERLINE,
 };
 
 /// Geometry and colors belong to the view. The terminal continues to own text,
@@ -46,10 +47,10 @@ fn colors(cell: &Cell, selected: bool, style: &GridStyle) -> (u32, u32, bool) {
 }
 
 fn hidden(cell: &Cell, style: &GridStyle) -> bool {
-    // These bits are reserved for SGR 5/6 by the shared terminal model.
-    cell.flags & HIDDEN != 0
-        || (cell.flags & (1 << 11) != 0 && !style.slow_blink_visible)
-        || (cell.flags & (1 << 12) != 0 && !style.rapid_blink_visible)
+    cell.ch == '\u{10eeee}'
+        || cell.flags & HIDDEN != 0
+        || (cell.flags & BLINK != 0 && !style.slow_blink_visible)
+        || (cell.flags & RAPID_BLINK != 0 && !style.rapid_blink_visible)
 }
 
 impl Renderer {
@@ -117,14 +118,24 @@ impl Renderer {
                 CursorShape::Block => Rect {
                     x,
                     y,
-                    width: style.cell_width,
+                    width: style.cell_width
+                        * terminal.view_cell(column, row, history_offset).width.max(1) as f32,
                     height: style.cell_height,
                 },
             };
             self.draw_rect(rectangle, style.cursor_color, 255)?;
             if shape == CursorShape::Block {
                 self.clip(Some(rectangle))?;
-                let foreground = terminal.view_cell(column, row, history_offset).bg;
+                let rgb = style.cursor_color;
+                let foreground = if ((rgb >> 16) * 299
+                    + ((rgb >> 8) & 255) * 587
+                    + (rgb & 255) * 114)
+                    >= 128_000
+                {
+                    0x000000
+                } else {
+                    0xffffff
+                };
                 self.text_row(
                     terminal,
                     history_offset,
@@ -149,7 +160,9 @@ impl Renderer {
                 u64::from(draw.image_id) == *key && draw.image.generation == cached.revision);
             let in_ui = terminal.ui_scene().is_some_and(|scene| scene.nodes.iter().any(|node| {
                 matches!(&node.kind, zterm::ui::Kind::Image { image_id, generation, .. }
-                    if u64::from(*image_id) == *key && generation.is_none_or(|g| g == cached.revision))
+                    if u64::from(*image_id) == *key
+                        && generation.is_none_or(|g| g == cached.revision)
+                        && terminal.graphics().image(*image_id).is_some_and(|image| image.generation == cached.revision))
             }));
             (!placed && !in_ui).then_some(*key)
         }).collect();

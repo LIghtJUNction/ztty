@@ -232,4 +232,3 @@ int ztty_fonts_glyph(ZttyFonts *fonts, unsigned id, uint32_t glyph,
 uint32_t ztty_unicode_script(uint32_t scalar) {
     return hb_unicode_script(hb_unicode_funcs_get_default(), scalar);
 }
-

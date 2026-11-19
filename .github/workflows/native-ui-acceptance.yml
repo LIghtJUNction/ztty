@@ -73,7 +73,7 @@ jobs:
           export RUSTUP_HOME="$RUNNER_TEMP/ztty-native-ui-rustup"
           printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
           sudo apt-get update
-          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev libxtst6 libxres1 \
+          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev libxtst6 libxres1 \
             xvfb x11-xkb-utils fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
           python -m pip install --disable-pip-version-check 'python-xlib==0.33' 'Pillow==13.0.0'
           fc-cache -f
@@ -93,7 +93,7 @@ jobs:
         if: ${{ always() && steps.dependencies.outcome == 'success' }}
         run: python tools/native_ui_acceptance.py run clippy
 
-      - name: Run 10 ztty library tests
+      - name: Run all ordinary ztty library tests
         id: lib
         if: ${{ always() && steps.dependencies.outcome == 'success' }}
         run: python tools/native_ui_acceptance.py run lib
@@ -102,6 +102,11 @@ jobs:
         id: actions
         if: ${{ always() && steps.dependencies.outcome == 'success' }}
         run: python tools/native_ui_acceptance.py run actions
+
+      - name: Run the six real EGL and font tests
+        id: gpu
+        if: ${{ always() && steps.lib.outcome == 'success' }}
+        run: python tools/native_ui_acceptance.py run gpu
 
       - name: Build and preserve the one release ELF
         id: build
@@ -113,7 +118,7 @@ jobs:
         if: ${{ always() && steps.build.outcome == 'success' }}
         run: python tools/native_ui_acceptance.py run native_ui
 
-      - name: Run 59 input vectors and 14 zoom cases in 12 groups
+      - name: Run 198 input vectors and 14 zoom cases in 14 groups
         id: input
         if: ${{ always() && steps.build.outcome == 'success' }}
         run: python tools/native_ui_acceptance.py run input
@@ -122,6 +127,26 @@ jobs:
         id: repaint
         if: ${{ always() && steps.build.outcome == 'success' }}
         run: python tools/native_ui_acceptance.py run repaint
+
+      - name: GPU native UI pixels and interactions
+        id: native_ui_gpu
+        if: ${{ always() && steps.build.outcome == 'success' }}
+        run: python tools/native_ui_acceptance.py run native_ui_gpu
+
+      - name: GPU frame atomicity and interaction fairness
+        id: repaint_gpu
+        if: ${{ always() && steps.build.outcome == 'success' }}
+        run: python tools/native_ui_acceptance.py run repaint_gpu
+
+      - name: Complete text, blink, font parity and renderer reload
+        id: text_gpu
+        if: ${{ always() && steps.build.outcome == 'success' }}
+        run: python tools/native_ui_acceptance.py run text_gpu
+
+      - name: Software retained-frame validity through resize and visibility
+        id: retained_frame
+        if: ${{ always() && steps.build.outcome == 'success' }}
+        run: python tools/native_ui_acceptance.py run retained_frame
 
       - name: Finalize hashes, gate results, cleanup, and demo image record
         if: ${{ always() }}

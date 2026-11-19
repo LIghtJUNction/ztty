@@ -4,9 +4,31 @@ use zterm::{CursorShape, Theme};
 
 use crate::os;
 
+#[cfg(target_os = "linux")]
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
+pub enum RendererKind {
+    #[default]
+    Auto,
+    Gpu,
+    Software,
+}
+
+#[cfg(target_os = "linux")]
+impl RendererKind {
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Auto => "auto",
+            Self::Gpu => "gpu",
+            Self::Software => "software",
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct Appearance {
     pub font: String,
+    #[cfg(target_os = "linux")]
+    pub renderer: RendererKind,
     pub theme: Theme,
     pub padding: i32,
     pub opacity: u8,
@@ -27,6 +49,8 @@ impl Default for Appearance {
     fn default() -> Self {
         Self {
             font: String::from(default_font()),
+            #[cfg(target_os = "linux")]
+            renderer: RendererKind::Auto,
             theme: Theme {
                 foreground: 0xe1e7f0,
                 background: 0x161a23,
@@ -59,6 +83,7 @@ impl Appearance {
         use crate::json::Value;
         let mut entries = alloc::vec![
             ("font", self.font.clone()),
+            ("renderer", String::from(self.renderer.name())),
             ("foreground", format!("#{:06x}", self.theme.foreground)),
             ("background", format!("#{:06x}", self.theme.background)),
             ("window-padding", format!("{}", self.padding)),
@@ -205,6 +230,15 @@ impl Appearance {
         let color = || rgb(value);
         match key {
             "font" => self.set_font(value)?,
+            #[cfg(target_os = "linux")]
+            "renderer" => {
+                self.renderer = match value {
+                    "auto" => RendererKind::Auto,
+                    "gpu" => RendererKind::Gpu,
+                    "software" => RendererKind::Software,
+                    _ => return Err("expected renderer = auto, gpu or software"),
+                };
+            }
             #[cfg(target_os = "linux")]
             "text-plugin" => self.set_text_plugin(value)?,
             #[cfg(any(target_os = "linux", target_os = "windows"))]

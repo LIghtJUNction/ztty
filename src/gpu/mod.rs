@@ -137,8 +137,12 @@ fn program() -> Result<u32, &'static str> {
         attribute vec2 texcoord;
         attribute vec4 tint;
         uniform vec2 viewport;
-        varying vec2 uv;
-        varying vec4 color;
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        varying highp vec2 uv;
+        #else
+        varying mediump vec2 uv;
+        #endif
+        varying mediump vec4 color;
         void main() {
             gl_Position = vec4(position.x * 2.0 / viewport.x - 1.0,
                 1.0 - position.y * 2.0 / viewport.y, 0.0, 1.0);
@@ -148,10 +152,15 @@ fn program() -> Result<u32, &'static str> {
     let fragment = match shader(
         0x8b30,
         c"
+        #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+        varying highp vec2 uv;
+        #else
         precision mediump float;
+        varying mediump vec2 uv;
+        #endif
         uniform sampler2D image;
-        varying vec2 uv;
-        varying vec4 color;
+        varying mediump vec4 color;
         void main() {
             vec4 sample_color = texture2D(image, uv);
             gl_FragColor = vec4(sample_color.rgb * color.rgb * color.a,
@@ -288,6 +297,15 @@ impl Renderer {
     pub fn metrics(&self) -> Metrics {
         self.fonts.metrics()
     }
+
+    /// Change the shaping face without creating a second EGL surface for the
+    /// same native window. Cached glyph coordinates are invalidated together.
+    pub fn set_font(&mut self, name: &str) -> Result<(), &'static str> {
+        let fonts = font::Fonts::new(name)?;
+        self.clear_atlas()?;
+        self.fonts = fonts;
+        Ok(())
+    }
     pub fn driver(&self) -> &str {
         &self.driver
     }
@@ -296,6 +314,9 @@ impl Renderer {
     }
     pub fn glyph_cache_entries(&self) -> usize {
         self.glyphs.len()
+    }
+    pub fn shape_cache_bytes(&self) -> usize {
+        self.fonts.shape_cache_bytes()
     }
 
     fn check(&self) -> Result<(), &'static str> {
@@ -629,6 +650,20 @@ impl Renderer {
         Ok(())
     }
 
+    pub fn measure_text(&mut self, text: &str, style: Style) -> Result<f32, &'static str> {
+        let mut width = 0.0;
+        for run in self.runs(text, style)? {
+            for glyph in self
+                .fonts
+                .shape(run.font, &text[run.start..run.end])?
+                .iter()
+            {
+                width += glyph.x_advance;
+            }
+        }
+        Ok(width)
+    }
+
     /// Shape free-flowing UI text with script and complete-grapheme font fallback.
     pub fn draw_text(
         &mut self,
@@ -641,7 +676,7 @@ impl Renderer {
         let mut pen = x;
         for run in self.runs(text, style)? {
             let glyphs = self.fonts.shape(run.font, &text[run.start..run.end])?;
-            for glyph in glyphs {
+            for glyph in glyphs.iter() {
                 self.draw_glyph(
                     run.font,
                     glyph.glyph,
@@ -686,6 +721,19 @@ impl Renderer {
         }
         for run in self.runs(text, style)? {
             let glyphs = self.fonts.shape(run.font, &text[run.start..run.end])?;
+            let ascending = glyphs
+                .first()
+                .zip(glyphs.last())
+                .is_none_or(|(first, last)| first.cluster <= last.cluster);
+            if glyphs.windows(2).any(|pair| {
+                if ascending {
+                    pair[0].cluster > pair[1].cluster
+                } else {
+                    pair[0].cluster < pair[1].cluster
+                }
+            }) {
+                return Err("nonmonotone HarfBuzz clusters");
+            }
             let mut index = 0;
             while index < glyphs.len() {
                 let cluster = glyphs[index].cluster as usize + run.start;
@@ -696,12 +744,17 @@ impl Renderer {
                 while end < glyphs.len() && glyphs[end].cluster == glyphs[index].cluster {
                     end += 1;
                 }
-                let next = glyphs
-                    .iter()
-                    .map(|glyph| glyph.cluster as usize + run.start)
-                    .filter(|byte| *byte > cluster)
-                    .min()
-                    .unwrap_or(run.end);
+                // HarfBuzz uses MONOTONE_GRAPHEMES. The adjacent group gives
+                // the next logical boundary in either direction; scanning the
+                // whole row for every glyph would make long rows quadratic.
+                let next = if ascending {
+                    glyphs.get(end)
+                } else {
+                    index
+                        .checked_sub(1)
+                        .and_then(|previous| glyphs.get(previous))
+                }
+                .map_or(run.end, |glyph| glyph.cluster as usize + run.start);
                 let first = cells
                     .partition_point(|cell| cell.byte as usize <= cluster)
                     .saturating_sub(1);

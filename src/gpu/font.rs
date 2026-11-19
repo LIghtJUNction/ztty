@@ -1,4 +1,4 @@
-use alloc::{collections::BTreeMap, ffi::CString, string::String, vec, vec::Vec};
+use alloc::{collections::BTreeMap, ffi::CString, rc::Rc, string::String, vec, vec::Vec};
 use core::{
     ffi::{c_char, c_int, c_void},
     ptr::NonNull,
@@ -75,6 +75,25 @@ pub struct Fonts {
     fallback: [BTreeMap<String, u32>; 4],
     fallback_bytes: usize,
     fallback_entries: usize,
+    shaped: BTreeMap<(u32, u64), Shaped>,
+    shaped_bytes: usize,
+}
+
+const SHAPED_BYTES: usize = 512 * 1024;
+const SHAPED_ENTRIES: usize = 512;
+
+struct Shaped {
+    text: String,
+    glyphs: Rc<[Glyph]>,
+    bytes: usize,
+}
+
+fn text_hash(text: &str) -> u64 {
+    // This is only a bounded cache index. A hit also compares the full text;
+    // collisions cannot substitute another run's glyphs.
+    text.bytes().fold(0xcbf29ce484222325, |hash, byte| {
+        (hash ^ u64::from(byte)).wrapping_mul(0x100000001b3)
+    })
 }
 
 impl Fonts {
@@ -89,6 +108,8 @@ impl Fonts {
             fallback: core::array::from_fn(|_| BTreeMap::new()),
             fallback_bytes: 0,
             fallback_entries: 0,
+            shaped: BTreeMap::new(),
+            shaped_bytes: 0,
         })
     }
 
@@ -132,9 +153,15 @@ impl Fonts {
         Ok(id)
     }
 
-    pub fn shape(&mut self, font: u32, text: &str) -> Result<Vec<Glyph>, &'static str> {
+    pub fn shape(&mut self, font: u32, text: &str) -> Result<Rc<[Glyph]>, &'static str> {
         if text.len() > 16_384 {
             return Err("shaping text exceeds 16 KiB");
+        }
+        let key = (font, text_hash(text));
+        if let Some(cached) = self.shaped.get(&key)
+            && cached.text == text
+        {
+            return Ok(Rc::clone(&cached.glyphs));
         }
         let capacity = (text.chars().count() * 3 + 8).min(8192);
         let mut glyphs = vec![Glyph::default(); capacity];
@@ -166,7 +193,30 @@ impl Fonts {
             return Err("invalid native glyph count");
         }
         glyphs.truncate(count);
+        let glyphs: Rc<[Glyph]> = glyphs.into();
+        let bytes = text.len() + core::mem::size_of_val(&*glyphs);
+        if bytes <= SHAPED_BYTES {
+            if self.shaped_bytes + bytes > SHAPED_BYTES || self.shaped.len() >= SHAPED_ENTRIES {
+                self.shaped.clear();
+                self.shaped_bytes = 0;
+            }
+            if let Some(previous) = self.shaped.insert(
+                key,
+                Shaped {
+                    text: String::from(text),
+                    glyphs: Rc::clone(&glyphs),
+                    bytes,
+                },
+            ) {
+                self.shaped_bytes -= previous.bytes;
+            }
+            self.shaped_bytes += bytes;
+        }
         Ok(glyphs)
+    }
+
+    pub fn shape_cache_bytes(&self) -> usize {
+        self.shaped_bytes
     }
 
     pub fn rasterize(&mut self, font: u32, glyph: u32) -> Result<Bitmap, &'static str> {
