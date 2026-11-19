@@ -531,6 +531,23 @@ unsafe extern "C" {
         class: *mut c_char,
     ) -> *mut c_void;
     fn XCloseIM(im: *mut c_void) -> c_int;
+    fn XSetIMValues(im: *mut c_void, ...) -> *mut c_char;
+    fn XRegisterIMInstantiateCallback(
+        display: *mut Display,
+        database: *mut c_void,
+        name: *mut c_char,
+        class: *mut c_char,
+        callback: unsafe extern "C" fn(*mut Display, *mut c_void, *mut c_void),
+        data: *mut c_void,
+    ) -> c_int;
+    fn XUnregisterIMInstantiateCallback(
+        display: *mut Display,
+        database: *mut c_void,
+        name: *mut c_char,
+        class: *mut c_char,
+        callback: unsafe extern "C" fn(*mut Display, *mut c_void, *mut c_void),
+        data: *mut c_void,
+    ) -> c_int;
     fn XCreateIC(im: *mut c_void, ...) -> *mut c_void;
     fn XGetICValues(ic: *mut c_void, ...) -> *mut c_char;
     fn XDestroyIC(ic: *mut c_void);
@@ -862,7 +879,10 @@ pub struct Connection {
     pub display: *mut Display,
     pub fd: i32,
     screen: i32,
-    im: *mut c_void,
+    im: core::cell::Cell<*mut c_void>,
+    im_registered: core::cell::Cell<bool>,
+    im_opening: core::cell::Cell<bool>,
+    contexts: RefCell<Vec<Weak<InputContext>>>,
     fonts: RefCell<Vec<Weak<Fonts>>>,
 }
 
@@ -880,24 +900,128 @@ impl Connection {
                 return Err("cannot open DISPLAY; ztty needs X11 or XWayland");
             }
             let screen = XDefaultScreen(display);
-            let im = XOpenIM(
-                display,
-                core::ptr::null_mut(),
-                core::ptr::null_mut(),
-                core::ptr::null_mut(),
-            );
             let mut supported = 0;
             XkbSetDetectableAutoRepeat(display, 1, &mut supported);
             let fd = XConnectionNumber(display);
             crate::os::fcntl(fd, 2, 1);
-            Ok(Rc::new(Self {
+            let connection = Rc::new(Self {
                 display,
                 fd,
                 screen,
-                im,
+                im: core::cell::Cell::new(core::ptr::null_mut()),
+                im_registered: core::cell::Cell::new(false),
+                im_opening: core::cell::Cell::new(false),
+                contexts: RefCell::new(Vec::new()),
                 fonts: RefCell::new(Vec::new()),
-            }))
+            });
+            if !connection.open_im() {
+                connection.watch_im();
+            }
+            Ok(connection)
         }
+    }
+
+    // Xlib keeps these callback pointers until unregister/close. Connection is
+    // always Rc-allocated, so its address stays stable even when windows move.
+    fn callback_data(&self) -> *mut c_void {
+        (self as *const Self).cast_mut().cast()
+    }
+
+    fn watch_im(&self) {
+        if self.im_registered.replace(true) {
+            return;
+        }
+        let registered = unsafe {
+            XRegisterIMInstantiateCallback(
+                self.display,
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+                im_available,
+                self.callback_data(),
+            )
+        };
+        if registered == 0 {
+            self.im_registered.set(false);
+        }
+    }
+
+    fn unwatch_im(&self) {
+        if self.im_registered.replace(false) {
+            unsafe {
+                XUnregisterIMInstantiateCallback(
+                    self.display,
+                    core::ptr::null_mut(),
+                    core::ptr::null_mut(),
+                    core::ptr::null_mut(),
+                    im_available,
+                    self.callback_data(),
+                );
+            }
+        }
+    }
+
+    fn open_im(&self) -> bool {
+        if !self.im.get().is_null() {
+            return true;
+        }
+        if self.im_opening.replace(true) {
+            return false;
+        }
+        unsafe {
+            let im = XOpenIM(
+                self.display,
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+                core::ptr::null_mut(),
+            );
+            if !im.is_null() {
+                self.im.set(im);
+                let callback = ImCallback {
+                    data: self.callback_data(),
+                    callback: im_destroyed,
+                };
+                if !XSetIMValues(
+                    im,
+                    c"destroyCallback".as_ptr(),
+                    &callback as *const ImCallback,
+                    core::ptr::null::<c_char>(),
+                )
+                .is_null()
+                {
+                    self.im.set(core::ptr::null_mut());
+                    XCloseIM(im);
+                }
+            }
+        }
+        if !self.im.get().is_null() {
+            self.unwatch_im();
+            // Xlib can call the destroy callback while creating an IC. Do not
+            // hold a RefCell borrow across any Xlib call.
+            let contexts = self.contexts.borrow().clone();
+            for context in contexts.iter().filter_map(Weak::upgrade) {
+                context.create();
+            }
+        }
+        self.im_opening.set(false);
+        !self.im.get().is_null()
+    }
+
+    fn input_context(self: &Rc<Self>, window: Xid, events: c_long) -> Rc<InputContext> {
+        let context = Rc::new(InputContext {
+            connection: Rc::clone(self),
+            window,
+            events,
+            handle: core::cell::Cell::new(core::ptr::null_mut()),
+            focused: core::cell::Cell::new(false),
+        });
+        {
+            let mut contexts = self.contexts.borrow_mut();
+            contexts.retain(|entry| entry.strong_count() != 0);
+            contexts.push(Rc::downgrade(&context));
+        }
+        context.create();
+        context
     }
 
     fn fonts(self: &Rc<Self>, name: &str) -> Result<Rc<Fonts>, &'static str> {
@@ -927,11 +1051,122 @@ impl Connection {
 impl Drop for Connection {
     fn drop(&mut self) {
         unsafe {
-            if !self.im.is_null() {
-                XCloseIM(self.im);
+            self.unwatch_im();
+            let im = self.im.replace(core::ptr::null_mut());
+            if !im.is_null() {
+                XCloseIM(im);
             }
             XCloseDisplay(self.display);
         }
+    }
+}
+
+#[repr(C)]
+struct ImCallback {
+    data: *mut c_void,
+    callback: unsafe extern "C" fn(*mut c_void, *mut c_void, *mut c_void),
+}
+
+unsafe extern "C" fn im_available(_display: *mut Display, data: *mut c_void, _call: *mut c_void) {
+    let connection = unsafe { &*data.cast::<Connection>() };
+    connection.open_im();
+}
+
+unsafe extern "C" fn im_destroyed(im: *mut c_void, data: *mut c_void, _call: *mut c_void) {
+    let connection = unsafe { &*data.cast::<Connection>() };
+    if connection.im.get() != im {
+        return;
+    }
+    connection.im.set(core::ptr::null_mut());
+    // Xlib destroys this IM and all its ICs after this callback. Calling
+    // XDestroyIC/XCloseIM here, or retaining their pointers, is invalid.
+    for context in connection
+        .contexts
+        .borrow()
+        .iter()
+        .filter_map(Weak::upgrade)
+    {
+        context.handle.set(core::ptr::null_mut());
+    }
+    connection.watch_im();
+}
+
+struct InputContext {
+    connection: Rc<Connection>,
+    window: Xid,
+    events: c_long,
+    handle: core::cell::Cell<*mut c_void>,
+    focused: core::cell::Cell<bool>,
+}
+
+impl InputContext {
+    fn create(&self) {
+        let im = self.connection.im.get();
+        if im.is_null() || !self.handle.get().is_null() {
+            return;
+        }
+        unsafe {
+            let ic = XCreateIC(
+                im,
+                c"inputStyle".as_ptr(),
+                0x408 as c_ulong,
+                c"clientWindow".as_ptr(),
+                self.window,
+                c"focusWindow".as_ptr(),
+                self.window,
+                core::ptr::null::<c_char>(),
+            );
+            if ic.is_null() || self.connection.im.get() != im {
+                return;
+            }
+            self.handle.set(ic);
+            let mut filter_events: c_long = 0;
+            if XGetICValues(
+                ic,
+                c"filterEvents".as_ptr(),
+                &mut filter_events as *mut c_long,
+                core::ptr::null::<c_char>(),
+            )
+            .is_null()
+            {
+                XSelectInput(
+                    self.connection.display,
+                    self.window,
+                    self.events | filter_events,
+                );
+            }
+            if self.focused.get() && self.handle.get() == ic {
+                XSetICFocus(ic);
+            }
+        }
+    }
+
+    fn focus(&self, focused: bool) {
+        self.focused.set(focused);
+        let ic = self.handle.get();
+        if !ic.is_null() {
+            unsafe {
+                if focused {
+                    XSetICFocus(ic);
+                } else {
+                    XUnsetICFocus(ic);
+                }
+            }
+        }
+    }
+
+    fn close(&self) {
+        self.focused.set(false);
+        let ic = self.handle.replace(core::ptr::null_mut());
+        if !ic.is_null() {
+            unsafe { XDestroyIC(ic) };
+        }
+    }
+}
+
+impl Drop for InputContext {
+    fn drop(&mut self) {
+        self.close();
     }
 }
 
@@ -1019,7 +1254,7 @@ pub struct Window {
     fonts: Rc<Fonts>,
     colors: Vec<ColorEntry>,
     next_color: usize,
-    ic: *mut c_void,
+    ic: Rc<InputContext>,
     clipboard: Atom,
     utf8: Atom,
     targets: Atom,
@@ -1157,34 +1392,7 @@ impl Window {
             let pixmap = XCreatePixmap(display, id, width as u32, height as u32, depth);
             let gc = XCreateGC(display, id, 0, core::ptr::null_mut());
             let draw = XftDrawCreate(display, pixmap, visual, colormap);
-            let im = connection.im;
-            let ic = if im.is_null() {
-                core::ptr::null_mut()
-            } else {
-                XCreateIC(
-                    im,
-                    c"inputStyle".as_ptr(),
-                    0x408 as c_ulong,
-                    c"clientWindow".as_ptr(),
-                    id,
-                    c"focusWindow".as_ptr(),
-                    id,
-                    core::ptr::null::<c_char>(),
-                )
-            };
-            if !ic.is_null() {
-                let mut filter_events: c_long = 0;
-                if XGetICValues(
-                    ic,
-                    c"filterEvents".as_ptr(),
-                    &mut filter_events as *mut c_long,
-                    core::ptr::null::<c_char>(),
-                )
-                .is_null()
-                {
-                    XSelectInput(display, id, events | filter_events);
-                }
-            }
+            let ic = connection.input_context(id, events);
             let fd = connection.fd;
             let mut out = Self {
                 display,
@@ -1283,15 +1491,7 @@ impl Window {
     }
     pub fn focus(&mut self, focused: bool) {
         self.focused = focused;
-        if !self.ic.is_null() {
-            unsafe {
-                if focused {
-                    XSetICFocus(self.ic);
-                } else {
-                    XUnsetICFocus(self.ic);
-                }
-            }
-        }
+        self.ic.focus(focused);
     }
     pub fn coordinates(&self, x: i32, y: i32, cols: usize, rows: usize) -> (usize, usize) {
         (
@@ -1554,8 +1754,9 @@ impl Window {
     pub fn lookup(&self, event: &mut KeyEvent, buffer: &mut Vec<u8>) -> Lookup {
         let mut symbol = 0;
         let mut status = 4;
+        let ic = self.ic.handle.get();
         let mut count = unsafe {
-            if self.ic.is_null() {
+            if ic.is_null() {
                 XLookupString(
                     event,
                     buffer.as_mut_ptr().cast(),
@@ -1565,7 +1766,7 @@ impl Window {
                 )
             } else {
                 Xutf8LookupString(
-                    self.ic,
+                    ic,
                     event,
                     buffer.as_mut_ptr().cast(),
                     buffer.len() as i32,
@@ -1574,11 +1775,16 @@ impl Window {
                 )
             }
         };
-        if status == -1 && count > 0 && count <= 65536 {
+        if status == -1
+            && count > 0
+            && count <= 65536
+            && !ic.is_null()
+            && self.ic.handle.get() == ic
+        {
             buffer.resize(count as usize + 1, 0);
             count = unsafe {
                 Xutf8LookupString(
-                    self.ic,
+                    ic,
                     event,
                     buffer.as_mut_ptr().cast(),
                     buffer.len() as i32,
@@ -3002,9 +3208,7 @@ impl Drop for Window {
             self.discard_upload(self.images.len() - 1);
         }
         unsafe {
-            if !self.ic.is_null() {
-                XDestroyIC(self.ic);
-            }
+            self.ic.close();
             XftDrawDestroy(self.draw);
             for color in &mut self.colors {
                 XftColorFree(self.display, self.visual, self.colormap, &mut color.color);
