@@ -137,3 +137,15 @@ fn selection_units_read_the_scrolled_view_and_clamp_pointer_coordinates() {
     assert_eq!(start, (5, 1));
     assert_eq!(end, (5, 1));
 }
+
+#[test]
+fn full_emoji_clusters_copy_from_either_cell_and_across_wraps() {
+    let mut terminal = Terminal::new(4, 3, 20);
+    terminal.feed("abc👩🏽‍💻Z".as_bytes());
+    assert_eq!(selection::text(&terminal, (0, 0), (2, 1), 0), "abc👩🏽‍💻Z");
+    assert_eq!(selection::text(&terminal, (1, 1), (1, 1), 0), "👩🏽‍💻");
+    assert_eq!(
+        selection::unit(&terminal, (1, 1), 0, selection::Unit::Cell),
+        ((0, 1), (1, 1))
+    );
+}

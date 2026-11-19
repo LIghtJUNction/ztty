@@ -17,3 +17,4 @@ zgraphics = { version = "0.1.1", path = "../zgraphics", default-features = false
 zinput = { version = "0.1.2", path = "../zinput", default-features = false }
 zvte = { version = "=0.1.3", default-features = false }
 unicode-width = { version = "=0.2.3", default-features = false }
+unicode-segmentation = { version = "=1.13.3", default-features = false }
