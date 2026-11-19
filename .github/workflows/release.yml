@@ -768,7 +768,9 @@ jobs:
                   assert artifact.is_file() and artifact.stat().st_size == details["bytes"], name
                   assert hashlib.sha256(artifact.read_bytes()).hexdigest() == details["sha256"], name
       - name: Check release evidence packaging contracts
-        run: python3 -m unittest discover -s tests -p 'release_assets_test.py'
+        run: |
+          python3 -m unittest discover -s tests -p 'release_assets_test.py'
+          python3 -m unittest discover -s tests -p 'release_upload_test.py'
       - name: Publish or verify GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -781,11 +783,9 @@ jobs:
           mapfile -d '' -t native_assets < "$out/upload-assets.bin"
           assets=("$out/ztty-$VERSION.tar.gz" "$out/SHA256SUMS" "${native_assets[@]}")
           (cd "$out/bin" && for checksum in *.sha256; do sha256sum -c "$checksum"; done)
-          if ! gh release view "v$VERSION" >/dev/null 2>&1; then
-            gh release create "v$VERSION" --verify-tag --generate-notes --draft \
-              --notes "Raw native evidence, including empty logs, is retained in ztty-$VERSION-native-evidence.zip." \
-              "${assets[@]}"
-          fi
+          python3 tools/release_upload.py --repo "$GITHUB_REPOSITORY" --tag "v$VERSION" \
+            --notes "Raw native evidence, including empty logs, is retained in ztty-$VERSION-native-evidence.zip." \
+            "${assets[@]}"
           readback=$(mktemp -d)
           patterns=()
           for asset in "${assets[@]}"; do patterns+=(--pattern "${asset##*/}"); done
