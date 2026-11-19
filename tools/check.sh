@@ -1,12 +1,23 @@
 #!/bin/sh
 set -eu
 
+# Use the same opt-in frontend feature for the test and release executable.
+if [ "${ZTTY_WAYLAND:-0}" = 1 ]; then
+    set -- --features wayland
+else
+    set --
+fi
+
 python3 tests/registry_versions_test.py
 python3 tests/source_archive_test.py
 cargo fmt --all -- --check
-cargo test --locked --workspace
-cargo clippy --locked --workspace --all-targets -- -D warnings
-cargo build --locked --release
+cargo fmt --manifest-path crates/zgpui/Cargo.toml --all -- --check
+cargo test --locked --manifest-path crates/zgpui/Cargo.toml --lib
+cargo test --locked --manifest-path crates/zgpui/Cargo.toml --doc
+cargo test --locked --workspace "$@"
+cargo clippy --locked --workspace --all-targets "$@" -- -D warnings
+cargo clippy --locked --manifest-path crates/zgpui/Cargo.toml --all-targets -- -D warnings
+cargo build --locked --release "$@"
 python3 tools/check_no_std.py
 if [ "$(uname -s)" = Linux ]; then
     python3 tests/install_test.py

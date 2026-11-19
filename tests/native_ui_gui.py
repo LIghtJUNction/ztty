@@ -78,7 +78,8 @@ def main():
         "source_sha256": {}, "checks": [], "actions": [],
     }
     for filename in ("src/x11/gpu.rs", "src/gpu/mod.rs", "src/gpu/font.rs", "src/gpu/grid.rs", "src/text_blink.rs", "src/appearance.rs", "tools/gui_renderer.py", "src/native_ui.rs", "src/session.rs", "src/session_core.rs", "src/x11.rs",
-                     "crates/ztty-ui/src/lib.rs", "crates/ztty-ui/src/wire.rs", "crates/zterm/src/terminal.rs",
+                     "crates/zgpui/src/lib.rs", "crates/zgpui/src/wire.rs",
+                     "crates/zgpui/src/layout.rs", "crates/zgpui/Cargo.toml", "crates/zterm/src/terminal.rs",
                      "Cargo.toml", "Cargo.lock",
                      "tests/input_gui.py", "tests/native_ui_gui.py", "examples/native_ui.py", "tools/isolated_xvfb.py"):
         path = source / filename

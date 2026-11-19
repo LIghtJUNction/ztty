@@ -1,0 +1,3 @@
+[submodule "crates/zgpui"]
+	path = crates/zgpui
+	url = https://github.com/LIghtJUNction/zgpui.git
