@@ -419,30 +419,30 @@ can be used without the graphical application.
 
 | Package | Source version | Responsibility | Direct Rust dependencies |
 | --- | --- | --- | --- |
-| [zinput](crates/zinput) | 0.1.1 | Legacy / Kitty keyboard, mouse, focus, and paste encoding | None |
+| [zinput](crates/zinput) | 0.1.2 | Legacy / Kitty keyboard, mouse, focus, and paste encoding | None |
 | [zpty](crates/zpty) | 0.2.1 | Linux/macOS PTY, Windows ConPTY, explicit child lifecycle | None |
-| [zterm](crates/zterm) | 0.3.0 | Screen, scrollback, VT state, image anchoring, queries, damage | zinput, zvte, zgraphics, unicode-width |
+| [zterm](crates/zterm) | 0.4.0 | Screen, scrollback, VT and native UI state, image anchoring, queries, damage | zinput, zvte, zgraphics, ztty-ui, unicode-width |
+| [ztty-ui](crates/ztty-ui) | 0.1.0 | Bounded ZUI/1 scenes, updates and action events | None |
 | [zgraphics](crates/zgraphics) | 0.1.1 | Bounded Kitty graphics, PNG/RGB/RGBA decoding, image storage and placement | zune-core, zune-png, zune-inflate |
 | [zvte](https://github.com/LIghtJUNction/zvte) | 0.1.3 | Allocation-free streaming ANSI/VT parser | None |
 
 The reusable packages are available from crates.io:
 
 ```sh
-cargo add zinput@0.1.1 --no-default-features
+cargo add zinput@0.1.2 --no-default-features
 cargo add zgraphics@0.1.1 --no-default-features
 cargo add zpty@0.2.1 --no-default-features
-cargo add zterm@0.3.0 --no-default-features
+cargo add ztty-ui@0.1.0 --no-default-features
+cargo add zterm@0.4.0 --no-default-features
 # For applications that need only the parser:
 cargo add zvte@0.1.3 --no-default-features
 ```
 
-[`zinput 0.1.1`](https://crates.io/crates/zinput/0.1.1),
-[`zgraphics 0.1.1`](https://crates.io/crates/zgraphics/0.1.1),
-[`zpty 0.2.1`](https://crates.io/crates/zpty/0.2.1), and
-[`zterm 0.3.0`](https://crates.io/crates/zterm/0.3.0) are published on crates.io.
-Their publication is independent of the `ztty 0.3.1` application release.
-The [registry record](docs/releasing.md#published-packages) distinguishes current
-API/version checks from the earlier versions' independent consumer tests.
+The workspace release uses zinput 0.1.2, zgraphics 0.1.1, zpty 0.2.1,
+ztty-ui 0.1.0 and zterm 0.4.0. Library publication is independent of the
+ztty 0.4.0 application release. The
+[release record](docs/releasing.md) identifies published versions and verifies
+isolated registry consumers without local path dependencies.
 
 Production Rust compiles without `std`. The Project Z crates use `#![no_std]`;
 the PNG, DEFLATE, checksum, and Unicode-width dependencies are selected with

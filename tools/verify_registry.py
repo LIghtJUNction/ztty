@@ -16,7 +16,7 @@ import tomllib
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PACKAGES = ("zinput", "zgraphics", "zpty", "zterm")
+PACKAGES = ("zinput", "zgraphics", "zpty", "ztty-ui", "zterm")
 DEFAULT_CARGO_TIMEOUT = 90
 
 
@@ -66,6 +66,9 @@ def library(selected):
     let bytes = zinput::encode_key(zinput::Key::Character('c'),
         zinput::Modifiers(4), zinput::KeyEvent::Press, "", &modes);
     assert_eq!(bytes, b"\x1b[99;5u");
+    assert_eq!(zinput::encode_key(zinput::Key::KeypadDigit(1),
+        zinput::Modifiers(zinput::Modifiers::NUM_LOCK), zinput::KeyEvent::Press,
+        "1", &modes), b"1");
 '''
     if "zgraphics" in selected:
         source += r'''    let mut scene = zgraphics::Graphics::default();
@@ -78,6 +81,11 @@ def library(selected):
     scene.command(b"Ga=d,d=I,i=7", context, &mut replies);
     assert_eq!(scene.image_count(), 0);
 '''
+    if "ztty-ui" in selected:
+        source += r'''    let mut ui = ztty_ui::State::new();
+    assert_eq!(ui.apply(br#"{"v":1,"op":"capabilities"}"#),
+        Ok(ztty_ui::Change::Capabilities));
+'''
     if "zterm" in selected:
         source += r'''    let mut terminal = zterm::Terminal::new(80, 24, 20);
     terminal.feed("\x1b[31m你a\x1b[6n".as_bytes());
@@ -85,6 +93,12 @@ def library(selected):
     assert_eq!(terminal.cell(0, 0).width, 2);
     assert_eq!(terminal.responses(), b"\x1b[1;4R");
     assert!(!terminal.modes().input().bracketed_paste);
+    terminal.set_ui_host_enabled(true);
+    terminal.feed(b"\x1b_ZUI;1;{\"v\":1,\"op\":\"replace\",\"surface\":1,\"rev\":1,\"root\":1,\"nodes\":[{\"id\":1,\"type\":\"text\",\"text\":\"registry-ui-ok\"}]}\x1b\\");
+    assert_eq!(terminal.ui_scene().unwrap().surface, 1);
+    assert_eq!(zterm::ui::VERSION, 1);
+    terminal.reset_ui();
+    assert!(terminal.ui_scene().is_none());
 '''
         if "zinput" in selected:
             source += "    let _: zinput::Modes = terminal.modes().input();\n"
@@ -207,7 +221,7 @@ def check(selected, directory, cargo_timeout=DEFAULT_CARGO_TIMEOUT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--packages", nargs="+", choices=PACKAGES, default=list(PACKAGES),
-                        help="crates to verify; default: zinput zgraphics zpty zterm")
+                        help="crates to verify; default: zinput zgraphics zpty ztty-ui zterm")
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "artifacts/registry-consumer.json")
     parser.add_argument("--cargo-timeout", type=float, default=DEFAULT_CARGO_TIMEOUT, metavar="SECONDS",
                         help="maximum seconds per Cargo command, including compiler-lock wait (default: %(default)s)")
