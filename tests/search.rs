@@ -273,7 +273,7 @@ fn copied_matches_reject_stale_history_and_resized_coordinates() {
 }
 
 #[test]
-fn clipped_history_does_not_invent_a_contiguous_match() {
+fn reflowed_history_preserves_text_without_inventing_a_contiguous_match() {
     let mut terminal = Terminal::new(5, 2, 10);
     terminal.feed(b"abcdefghijk");
     assert_eq!(terminal.history_len(), 1);
@@ -288,7 +288,7 @@ fn clipped_history_does_not_invent_a_contiguous_match() {
     );
     assert_eq!(
         search::find(&terminal, "defg", Sensitive, None, true).count,
-        0
+        1
     );
     terminal.resize(6, 2);
     assert_eq!(
@@ -408,4 +408,22 @@ fn ignore_case_keeps_line_boundaries_and_query_limits() {
         search::text(&wrapped, result.hit.unwrap()).as_deref(),
         Some(query.as_str())
     );
+}
+
+#[test]
+fn emoji_substring_search_selects_and_copies_the_complete_cluster() {
+    let mut terminal = Terminal::new(16, 3, 20);
+    terminal.feed("A👩🏽‍💻B".as_bytes());
+    let hit = search::find(&terminal, "💻", Sensitive, None, true)
+        .hit
+        .unwrap();
+    assert_eq!((hit.start, hit.end), (1, 2));
+    assert_eq!(search::text(&terminal, hit).as_deref(), Some("👩🏽‍💻"));
+    let bits = search::highlights(&terminal, "💻", Sensitive, 0);
+    assert_ne!(bits[0] & (1 << 1), 0);
+    assert_ne!(bits[0] & (1 << 2), 0);
+    let hit = search::find(&terminal, "🏽‍💻B", Sensitive, None, true)
+        .hit
+        .unwrap();
+    assert_eq!(search::text(&terminal, hit).as_deref(), Some("👩🏽‍💻B"));
 }

@@ -10,6 +10,11 @@ use zvte::{Params, Parser, Perform};
 
 use crate::screen::*;
 
+mod grapheme;
+mod image_cells;
+mod reflow;
+pub use reflow::ResizeAnchor;
+
 const MAX_HISTORY_BYTES: usize = 8 * 1024 * 1024;
 const MAX_LINKS: usize = 1024;
 const MAX_RESPONSES: usize = 65536;
@@ -170,6 +175,9 @@ pub struct Terminal {
     ui_frame: ztty_ui::Frame,
     ui_host_enabled: bool,
     text_revision: u64,
+    image_cache: core::cell::RefCell<Option<Box<image_cells::Cache>>>,
+    osc_probe: u8,
+    clipboard_frame: Option<Box<crate::clipboard::Frame>>,
 }
 
 fn dimensions(cols: usize, rows: usize) -> (usize, usize) {
@@ -192,6 +200,9 @@ impl Terminal {
             ui_frame: ztty_ui::Frame::new(),
             ui_host_enabled: false,
             text_revision: 0,
+            image_cache: core::cell::RefCell::new(None),
+            osc_probe: 0,
+            clipboard_frame: None,
         }
     }
 
@@ -244,10 +255,13 @@ impl Terminal {
                     // `contains` uses core's byte-search specialization, so
                     // the common no-underscore path scans words, not callbacks.
                     let remaining = &bytes[offset..];
-                    let string = if remaining.contains(&b'_') || remaining.contains(&b'P') {
-                        remaining
-                            .windows(2)
-                            .position(|pair| pair[0] == 0x1b && matches!(pair[1], b'_' | b'P'))
+                    let string = if remaining.contains(&b'_')
+                        || remaining.contains(&b'P')
+                        || remaining.contains(&b']')
+                    {
+                        remaining.windows(2).position(|pair| {
+                            pair[0] == 0x1b && matches!(pair[1], b'_' | b'P' | b']')
+                        })
                     } else {
                         None
                     };
@@ -261,7 +275,12 @@ impl Terminal {
                         } else {
                             self.parser
                                 .advance(&remaining[..start + 2], &mut self.state);
-                            self.framing = 4;
+                            if remaining[start + 1] == b']' {
+                                self.osc_probe = 0;
+                                self.framing = 7;
+                            } else {
+                                self.framing = 4;
+                            }
                         }
                         offset += start + 2;
                     } else {
@@ -275,6 +294,10 @@ impl Terminal {
                     offset += 1;
                     if byte == b'_' {
                         self.begin_apc();
+                    } else if byte == b']' {
+                        self.parser.advance(&[byte], &mut self.state);
+                        self.osc_probe = 0;
+                        self.framing = 7;
                     } else if byte == b'P' {
                         self.parser.advance(&[byte], &mut self.state);
                         self.framing = 4;
@@ -375,8 +398,90 @@ impl Terminal {
                         self.framing = 1;
                     }
                 }
+                7 => {
+                    // Probe only OSC 52; all other OSC commands keep zvte's
+                    // existing bounded parser and termination semantics.
+                    let byte = bytes[offset];
+                    offset += 1;
+                    let prefix = b"52;";
+                    if byte == prefix[usize::from(self.osc_probe)] {
+                        self.osc_probe += 1;
+                        if self.osc_probe == 3 {
+                            self.parser.reset();
+                            self.state.last_grapheme = None;
+                            self.state.osc_overflow = false;
+                            self.clipboard_frame = Some(Box::new(crate::clipboard::Frame::new()));
+                            self.framing = 8;
+                        }
+                    } else {
+                        self.parser
+                            .advance(&prefix[..usize::from(self.osc_probe)], &mut self.state);
+                        self.parser.advance(&[byte], &mut self.state);
+                        self.framing = u8::from(byte == 0x1b);
+                    }
+                }
+                8 => {
+                    let end = bytes[offset..]
+                        .iter()
+                        .position(|b| matches!(*b, 7 | 0x1b | 0x18 | 0x1a | 0x9c))
+                        .map_or(bytes.len(), |i| offset + i);
+                    self.clipboard_frame
+                        .as_mut()
+                        .unwrap()
+                        .push(&bytes[offset..end]);
+                    offset = end;
+                    if offset == bytes.len() {
+                        continue;
+                    }
+                    let byte = bytes[offset];
+                    offset += 1;
+                    match byte {
+                        0x1b => self.framing = 9,
+                        7 | 0x9c => {
+                            self.clipboard_frame
+                                .take()
+                                .unwrap()
+                                .finish(&mut self.state.clipboard, byte == 7);
+                            self.framing = 0;
+                        }
+                        0x18 | 0x1a => {
+                            self.clipboard_frame = None;
+                            self.framing = 0;
+                        }
+                        _ => unreachable!(),
+                    }
+                }
+                9 => {
+                    if bytes[offset] == b'\\' {
+                        offset += 1;
+                        self.clipboard_frame
+                            .take()
+                            .unwrap()
+                            .finish(&mut self.state.clipboard, false);
+                        self.framing = 0;
+                    } else {
+                        self.clipboard_frame = None;
+                        self.parser.advance(b"\x1b", &mut self.state);
+                        self.framing = 1;
+                    }
+                }
                 _ => unreachable!(),
             }
+        }
+    }
+
+    pub fn next_clipboard_request(&mut self) -> Option<crate::ClipboardRequest> {
+        self.state.clipboard.pop()
+    }
+    /// Changes on reset/host cancellation, so an asynchronous reply cannot
+    /// complete a request made before a control or terminal generation change.
+    pub fn clipboard_epoch(&self) -> u64 {
+        self.state.clipboard.epoch
+    }
+    pub fn cancel_clipboard_requests(&mut self) {
+        self.state.clipboard.cancel();
+        if let Some(frame) = &mut self.clipboard_frame {
+            frame.abort();
         }
     }
 
@@ -520,29 +625,45 @@ impl Terminal {
         &self.state.graphics
     }
 
-    /// Borrow visible image placements in z-order; this iterator allocates nothing.
+    /// Visible image draws, with bounded cached text-backed geometry.
     pub fn graphics_draws(
         &self,
         history_offset: usize,
     ) -> impl Iterator<Item = zgraphics::Draw<'_>> {
-        self.state
-            .graphics
-            .draws(if self.state.modes.alternate_screen {
-                0
-            } else {
-                history_offset.min(self.history_len())
-            })
+        self.image_draws(history_offset)
     }
 
+    /// Resize retained primary text, rejoining only recorded soft wraps.
+    /// A narrower screen can evict history at the existing byte/row limits.
+    /// Addressed content below the cursor is clipped when it cannot fit.
     pub fn resize(&mut self, cols: usize, rows: usize) {
+        self.resize_anchored(cols, rows, &mut []);
+    }
+
+    /// Resize and remap caller-owned text locations in the active screen.
+    /// Lost or clipped locations become None. Old TextPosition coordinates must
+    /// not be reused across a width change without passing them as anchors.
+    /// Alternate screens retain grid-resize semantics rather than text reflow.
+    pub fn resize_anchored(&mut self, cols: usize, rows: usize, anchors: &mut [ResizeAnchor]) {
         let (cols, rows) = dimensions(cols, rows);
         if self.cols() == cols && self.rows() == rows {
             return;
         }
+        for anchor in anchors.iter_mut() {
+            anchor.position = anchor.position.filter(|point| {
+                self.retained_row(point.line).is_some_and(|row| {
+                    point.column <= row.len() && (!anchor.cell || point.column < row.len())
+                })
+            });
+        }
+        let last_grapheme = self.state.last_grapheme.map(|(x, y)| *self.cell(x, y));
         self.text_revision = self.text_revision.wrapping_add(1);
         if cols != self.cols() {
-            self.state.shell.invalidate_screen(self.state.line_base);
+            self.state.reflow_primary(cols, rows, anchors);
+            self.resize_tabs(cols);
+            return;
         }
+        let alternate_drop = self.state.screen.y.saturating_add(1).saturating_sub(rows);
         if !self.state.modes.alternate_screen {
             let dropped = self.state.screen.y.saturating_add(1).saturating_sub(rows);
             for row in 0..dropped {
@@ -599,6 +720,26 @@ impl Terminal {
             rows,
         );
         self.state.graphics.trim_history(self.state.history.len());
+        self.state.last_grapheme = self
+            .state
+            .previous_cell()
+            .filter(|(x, y)| last_grapheme == Some(*self.cell(*x, *y)));
+        for anchor in anchors {
+            anchor.position = anchor.position.and_then(|mut point| {
+                if self.state.modes.alternate_screen {
+                    point.line = point.line.checked_sub(alternate_drop as u64)?;
+                }
+                self.retained_row(point.line)
+                    .filter(|row| {
+                        point.column <= row.len() && (!anchor.cell || point.column < row.len())
+                    })
+                    .map(|_| point)
+            });
+        }
+        self.resize_tabs(cols);
+    }
+
+    fn resize_tabs(&mut self, cols: usize) {
         let previous_cols = self.state.tabs.len();
         self.state.tabs.resize(cols, false);
         for (x, tab) in self.state.tabs.iter_mut().enumerate().skip(previous_cols) {
@@ -629,6 +770,83 @@ impl Terminal {
             return &self.state.screen.blank;
         }
         &self.state.screen.cells[self.state.screen.index(col, row)]
+    }
+
+    /// Complete original extended cluster for this Terminal-owned cell.
+    /// None denotes ordinary inline scalar content. IDs are scoped to this
+    /// Terminal and may be reclaimed after no retained cell references them.
+    pub fn grapheme(&self, cell: &Cell) -> Option<&str> {
+        self.state.graphemes.get(cell.grapheme_id)
+    }
+
+    /// Iterate the original cluster without normalization or allocation.
+    pub fn cell_chars(&self, cell: &Cell) -> crate::CellChars<'_> {
+        self.state.graphemes.chars(cell)
+    }
+
+    /// Convert viewport coordinates to a retained location. The right-hand
+    /// boundary (col == cols) and retained rows below the viewport are allowed.
+    pub fn view_position(
+        &self,
+        col: usize,
+        row: usize,
+        offset: usize,
+    ) -> Option<crate::TextPosition> {
+        if col > self.cols() {
+            return None;
+        }
+        let base = if self.state.modes.alternate_screen {
+            0
+        } else {
+            self.state.line_base
+        };
+        let top = base.saturating_sub(offset.min(self.history_len()) as u64);
+        let line = top.checked_add(u64::try_from(row).ok()?)?;
+        self.retained_row(line).filter(|cells| col <= cells.len())?;
+        Some(crate::TextPosition { line, column: col })
+    }
+
+    /// Borrow a cell at a current retained location, including scrollback.
+    pub fn position_cell(&self, position: crate::TextPosition) -> Option<&Cell> {
+        self.retained_row(position.line)?.get(position.column)
+    }
+
+    /// Map a current retained location back to viewport coordinates. Rows below
+    /// the viewport are retained so a selection can survive later scrolling.
+    pub fn position_in_view(
+        &self,
+        position: crate::TextPosition,
+        offset: usize,
+    ) -> Option<(usize, usize)> {
+        self.retained_row(position.line)
+            .filter(|cells| position.column <= cells.len())?;
+        let base = if self.state.modes.alternate_screen {
+            0
+        } else {
+            self.state.line_base
+        };
+        let top = base.saturating_sub(offset.min(self.history_len()) as u64);
+        Some((
+            position.column,
+            usize::try_from(position.line.checked_sub(top)?).ok()?,
+        ))
+    }
+
+    fn retained_row(&self, line: u64) -> Option<&[Cell]> {
+        if self.state.modes.alternate_screen {
+            let row = usize::try_from(line).ok()?;
+            return (row < self.rows()).then(|| self.state.screen.row(row));
+        }
+        if line >= self.state.line_base {
+            let row = usize::try_from(line - self.state.line_base).ok()?;
+            return (row < self.rows()).then(|| self.state.screen.row(row));
+        }
+        let oldest = self
+            .state
+            .line_base
+            .saturating_sub(self.state.history.len() as u64);
+        let row = usize::try_from(line.checked_sub(oldest)?).ok()?;
+        self.state.history.get(row).map(|row| row.cells.as_slice())
     }
 
     /// View the visible screen, moved `offset` lines into primary-screen history.
@@ -720,7 +938,8 @@ impl Terminal {
 
     /// Copy rendered command output, excluding its input and following prompt.
     ///
-    /// Physical screen lines become newlines and trailing blank cells are omitted.
+    /// Soft-wrapped rows join without a newline; hard line boundaries remain.
+    /// Trailing blank cells on hard lines are omitted.
     /// This reads existing primary-screen/history cells; it does not save a second
     /// output transcript. Evicted or destructively edited ranges set `truncated`.
     /// `max_bytes` is capped at `MAX_COMMAND_TEXT` and never splits UTF-8.
@@ -791,7 +1010,8 @@ impl Terminal {
     }
     /// Absolute row at the top of the primary screen. Unlike history_len(),
     /// this advances when a full history ring evicts its oldest rows. A full
-    /// terminal reset restarts the position at zero.
+    /// terminal reset restarts the position at zero. Width reflow can decrease
+    /// this coordinate; retain locations through resize_anchored across resizes.
     pub fn history_position(&self) -> u64 {
         self.state.line_base
     }
@@ -804,6 +1024,15 @@ impl Terminal {
             .get(id as usize - 1)
             .map(|link| link.uri.as_str())
     }
+    /// Placeholder link_id is a graphics placement ID, never an OSC 8 link.
+    pub fn cell_hyperlink(&self, cell: &Cell) -> Option<&str> {
+        if cell.ch == '\u{10eeee}' {
+            None
+        } else {
+            self.hyperlink(cell.link_id)
+        }
+    }
+
     /// Whether a synchronized frame ended since the frontend last cleared damage.
     ///
     /// This remains set when begin/end arrive in the same PTY chunk. Frontends
@@ -865,6 +1094,7 @@ struct State {
     cwd: String,
     links: Vec<Link>,
     responses: Vec<u8>,
+    clipboard: crate::clipboard::Queue,
     osc_overflow: bool,
     dcs_query: bool,
     dcs: Vec<u8>,
@@ -876,6 +1106,11 @@ struct State {
     sixel_private: bool,
     sixel_palette: Option<Box<zgraphics::SixelPalette>>,
     last_char: char,
+    graphemes: crate::grapheme::Graphemes,
+    last_grapheme: Option<(usize, usize)>,
+    grapheme_overflow: bool,
+    grapheme_writes: usize,
+    grapheme_collect_after: usize,
     graphics: zgraphics::Graphics,
     inactive_graphics: zgraphics::Graphics,
     ui: ztty_ui::State,
@@ -910,6 +1145,7 @@ impl State {
             cwd: String::new(),
             links: Vec::new(),
             responses: Vec::new(),
+            clipboard: crate::clipboard::Queue::default(),
             osc_overflow: false,
             dcs_query: false,
             dcs: Vec::new(),
@@ -921,6 +1157,11 @@ impl State {
             sixel_private: true,
             sixel_palette: None,
             last_char: ' ',
+            graphemes: crate::grapheme::Graphemes::default(),
+            last_grapheme: None,
+            grapheme_overflow: false,
+            grapheme_writes: 0,
+            grapheme_collect_after: 0,
             graphics: zgraphics::Graphics::default(),
             inactive_graphics: zgraphics::Graphics::default(),
             ui: ztty_ui::State::new(),
@@ -968,41 +1209,53 @@ impl State {
             result.truncated |= start != end;
             return result;
         }
+        let mut pending_spaces = 0usize;
         for line in first..=end.line.min(last) {
-            let cells = if line < self.line_base {
-                &self.history[(line - oldest) as usize].cells[..]
+            let (cells, wrapped) = if line < self.line_base {
+                let row = &self.history[(line - oldest) as usize];
+                (row.cells.as_slice(), row.wrapped)
             } else {
-                screen.row((line - self.line_base) as usize)
+                let row = (line - self.line_base) as usize;
+                (screen.row(row), screen.row_wrap(row))
             };
+            let joined = wrapped != 0 && line < end.line;
             let from = if line == start.line { start.column } else { 0 };
             let until = if line == end.line {
                 end.column
+            } else if joined {
+                wrapped.min(cells.len())
             } else {
                 cells.len()
             };
             result.truncated |= from > cells.len() || until > cells.len();
             let from = from.min(cells.len());
             let until = until.min(cells.len()).max(from);
-            let selected = &cells[from..until];
-            let length = selected
-                .iter()
-                .rposition(|cell| cell.ch != ' ' || cell.combining != ['\0'; 2])
-                .map_or(0, |index| index + 1);
-            for cell in &selected[..length] {
+            for cell in &cells[from..until] {
                 if cell.width == 0 {
                     continue;
                 }
-                for ch in core::iter::once(cell.ch)
-                    .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
-                {
-                    if result.text.len() + ch.len_utf8() > limit {
-                        result.truncated = true;
-                        return result;
-                    }
-                    result.text.push(ch);
+                // Reflow can retain blank columns for saved cursor positions.
+                // Delay plain spaces until another glyph makes them interior
+                // to the logical line, including across soft row boundaries.
+                if cell.ch == ' ' && cell.combining == ['\0'; 2] && cell.grapheme_id == 0 {
+                    pending_spaces = pending_spaces.saturating_add(1);
+                    continue;
                 }
+                let chars = self.graphemes.chars(cell);
+                let bytes = chars.clone().map(char::len_utf8).sum::<usize>();
+                let spaces = pending_spaces.min(limit - result.text.len());
+                result.text.extend(core::iter::repeat_n(' ', spaces));
+                if spaces != pending_spaces || bytes > limit - result.text.len() {
+                    result.truncated = true;
+                    return result;
+                }
+                pending_spaces = 0;
+                result.text.extend(chars);
             }
-            if line < end.line {
+            if !joined {
+                pending_spaces = 0;
+            }
+            if line < end.line && !joined {
                 if result.text.len() == limit {
                     result.truncated = true;
                     return result;
@@ -1328,31 +1581,11 @@ impl State {
         if if self.use_g1 { self.g1 } else { self.g0 } {
             ch = dec_graphics(ch);
         }
+        if self.extend_grapheme(ch) {
+            return;
+        }
         let width = UnicodeWidthChar::width(ch).unwrap_or(0).min(2);
         if width == 0 {
-            let mut x = if self.screen.wrap {
-                self.screen.x
-            } else {
-                self.screen.x.saturating_sub(1)
-            };
-            if self.screen.x == 0 && !self.screen.wrap {
-                return;
-            }
-            let y = self.screen.y;
-            if self.screen.cells[self.screen.index(x, y)].width == 0 && x > 0 {
-                x -= 1;
-            }
-            let index = self.screen.index(x, y);
-            let width = usize::from(self.screen.cells[index].width.max(1));
-            if let Some(slot) = self.screen.cells[index]
-                .combining
-                .iter_mut()
-                .find(|v| **v == '\0')
-            {
-                *slot = ch;
-                self.screen.dirty[y] = true;
-                self.erase_sixel_span(y, x, x + width);
-            }
             return;
         }
         if self.screen.wrap && self.autowrap {
@@ -1369,7 +1602,11 @@ impl State {
                 );
                 self.soft_wrap(self.screen.cols - 1);
             } else {
-                ch = '\u{fffd}';
+                // A one-column viewport clips presentation, not stored text.
+                // With autowrap disabled retain the existing margin fallback.
+                if !self.autowrap {
+                    ch = '\u{fffd}';
+                }
                 width = 1;
             }
         }
@@ -1394,6 +1631,7 @@ impl State {
             self.screen.x += width;
             self.screen.wrap = false;
         }
+        self.remember_grapheme(x, y, 1);
     }
 
     fn ascii(&mut self, mut bytes: &[u8]) {
@@ -1403,6 +1641,11 @@ impl State {
                 self.put_char(byte as char);
             }
             return;
+        }
+        if let Some(&first) = bytes.first()
+            && self.extend_grapheme(first as char)
+        {
+            bytes = &bytes[1..];
         }
         while !bytes.is_empty() {
             if self.screen.wrap {
@@ -1429,6 +1672,7 @@ impl State {
             } else {
                 self.screen.x += count;
             }
+            self.remember_grapheme(x + count - 1, y, count);
             bytes = &bytes[count..];
         }
     }
@@ -1497,6 +1741,7 @@ impl State {
         }
         self.modes.alternate_screen = enabled;
         self.graphics.abort_transfer();
+        self.graphics.advance_animations(0, &[]);
         mem::swap(&mut self.graphics, &mut self.inactive_graphics);
         self.graphics.abort_transfer();
         self.graphics
@@ -1671,6 +1916,8 @@ impl State {
                         self.style.flags |= UNDERLINE;
                     }
                 }
+                5 => self.style.flags = (self.style.flags & !RAPID_BLINK) | BLINK,
+                6 => self.style.flags = (self.style.flags & !BLINK) | RAPID_BLINK,
                 21 => self.style.flags |= UNDERLINE,
                 7 => self.style.flags |= INVERSE,
                 8 => self.style.flags |= HIDDEN,
@@ -1678,6 +1925,7 @@ impl State {
                 22 => self.style.flags &= !(BOLD | DIM),
                 23 => self.style.flags &= !ITALIC,
                 24 => self.style.flags &= !UNDERLINE,
+                25 => self.style.flags &= !(BLINK | RAPID_BLINK),
                 27 => self.style.flags &= !INVERSE,
                 28 => self.style.flags &= !HIDDEN,
                 29 => self.style.flags &= !STRIKE,
@@ -1703,6 +1951,7 @@ impl State {
                 }
                 39 => {
                     self.style.fg = self.theme.foreground;
+                    self.style.graphics_fg = 0;
                     self.style.flags &= !(EXPLICIT_FG | PALETTE_FG);
                     self.style.palette_indices &= 0xf0;
                 }
@@ -1711,7 +1960,8 @@ impl State {
                     self.style.flags &= !(EXPLICIT_BG | PALETTE_BG);
                     self.style.palette_indices &= 0x0f;
                 }
-                38 | 48 => {
+                59 => self.style.underline_color = 0,
+                38 | 48 | 58 => {
                     let mut palette = None;
                     let color = if group.len() > 1 {
                         match group.get(1) {
@@ -1755,7 +2005,11 @@ impl State {
                         }
                     };
                     if let Some(color) = color {
-                        self.style.set_color(value == 38, color, palette);
+                        if value == 58 {
+                            self.style.underline_color = palette.map_or(color, u32::from);
+                        } else {
+                            self.style.set_color(value == 38, color, palette);
+                        }
                     }
                 }
                 _ => {}
@@ -1825,6 +2079,7 @@ impl Perform for State {
     }
 
     fn execute(&mut self, byte: u8) {
+        self.last_grapheme = None;
         match byte {
             0x08 => self.cursor_to(self.screen.x.saturating_sub(1), self.screen.y),
             0x09 => {
@@ -1848,6 +2103,7 @@ impl Perform for State {
     }
 
     fn esc_dispatch(&mut self, intermediates: &[u8], ignore: bool, byte: u8) {
+        self.last_grapheme = None;
         if ignore {
             return;
         }
@@ -1877,7 +2133,10 @@ impl Perform for State {
                 ui.reset();
                 let sync_commit_pending =
                     self.sync_commit_pending || self.modes.synchronized_output;
+                let mut clipboard = mem::take(&mut self.clipboard);
+                clipboard.cancel();
                 *self = Self::new(cols, rows, history, self.theme);
+                self.clipboard = clipboard;
                 self.sync_commit_pending = sync_commit_pending;
                 self.shell = shell;
                 self.ui = ui;
@@ -1902,6 +2161,9 @@ impl Perform for State {
     }
 
     fn csi_dispatch(&mut self, params: &Params, intermediates: &[u8], ignore: bool, action: char) {
+        if action != 'm' {
+            self.last_grapheme = None;
+        }
         if ignore {
             return;
         }
@@ -2101,6 +2363,7 @@ impl Perform for State {
     }
 
     fn osc_dispatch(&mut self, params: &[&[u8]], bell_terminated: bool) {
+        self.last_grapheme = None;
         if mem::take(&mut self.osc_overflow) {
             return;
         }
@@ -2185,13 +2448,14 @@ impl Perform for State {
                     }
                 }
             }
-            // Clipboard requests are deliberately handled by neither parser nor frontend.
-            // No child process can read or replace the desktop clipboard through OSC 52.
+            // OSC 52 is streamed into a separate bounded request queue above.
+            // The native host enforces session ownership before clipboard I/O.
             _ => {}
         }
     }
 
     fn hook(&mut self, params: &Params, intermediates: &[u8], ignore: bool, action: char) {
+        self.last_grapheme = None;
         self.dcs.clear();
         self.dcs_overflow = false;
         self.dcs_query = !ignore && intermediates == b"+" && action == 'q';

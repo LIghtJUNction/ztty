@@ -26,12 +26,14 @@ def main():
             source = pathlib.Path(target["src_path"]).read_text()
             unconditional = re.search(r"#!\[no_std\]", source)
             conditional = re.search(
-                r'#!\[cfg_attr\(not\(feature\s*=\s*"std"\),\s*no_std\)\]', source
+                r'#!\[cfg_attr\(not\(feature\s*=\s*"([^"]+)"\),\s*no_std\)\]', source
             )
-            # The feature graph above proves the condition for dependency
-            # crates that offer std as an optional feature. Bare-metal cargo
+            # Evaluate the exact negated feature against the resolved graph,
+            # including libc's rustc-dep-of-std condition. Bare-metal cargo
             # check additionally verifies the complete portable dependency graph.
-            assert unconditional or conditional, target["src_path"]
+            assert unconditional or (
+                conditional and conditional.group(1) not in node["features"]
+            ), target["src_path"]
         for dep in node["deps"]:
             if any(kind["kind"] is None for kind in dep["dep_kinds"]):
                 pending.append(dep["pkg"])

@@ -10,9 +10,10 @@ fn changed_theme() -> Theme {
 }
 
 #[test]
-fn provenance_fits_existing_cell_and_style_storage() {
-    assert_eq!(core::mem::size_of::<Cell>(), 28);
-    assert_eq!(core::mem::size_of::<crate::screen::Style>(), 16);
+fn provenance_and_complete_cluster_id_fit_compact_copy_storage() {
+    assert_eq!(core::mem::size_of::<Cell>(), 32);
+    // Cursor styles retain raw Kitty color IDs; per-cell storage stays 32 B.
+    assert_eq!(core::mem::size_of::<crate::screen::Style>(), 24);
 }
 
 #[test]

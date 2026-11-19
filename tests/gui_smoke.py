@@ -25,7 +25,7 @@ RESET = "\x1bc\x1b[?25l"
 
 
 class Gui:
-    def __init__(self, binary, font, directory, fcitx=False):
+    def __init__(self, binary, font, directory, fcitx=False, renderer=None):
         self.terminal = self.fcitx = self.xvfb = self.control = self.d = None
         self.xlog = self.tlog = None
         from PIL import Image
@@ -76,7 +76,8 @@ class Gui:
         config.write_text(
             "window-padding = 12\nbackground = #203040\nbackground-opacity = 75\n"
             "palette = 1=#c04060\ncursor-color = #e0c080\n"
-            "cursor-shape = bar\ncursor-blink-interval = 150\n",
+            "cursor-shape = bar\ncursor-blink-interval = 150\n"
+            + (f"renderer = {renderer}\n" if renderer else ""),
             encoding="utf-8",
         )
         if fcitx:

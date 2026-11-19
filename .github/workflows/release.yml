@@ -164,7 +164,7 @@ jobs:
           export RUSTUP_HOME="$RUNNER_TEMP/ztty-release-rustup"
           printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
           sudo apt-get update
-          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev libxtst6 \
+          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev libxtst6 \
             xvfb fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
           python -m pip install --disable-pip-version-check 'python-xlib==0.33' 'Pillow==13.0.0'
           fc-cache -f
@@ -183,6 +183,18 @@ jobs:
             --arch "$ARCH" --version "$VERSION" \
             --output "dist/$ARTIFACT_STEM.native.json" \
             --evidence-dir "dist/$ARTIFACT_STEM.native"
+          cargo +"$RUST_TOOLCHAIN" test --locked --lib gpu:: -- --ignored --test-threads=1 --show-output > "dist/$ARTIFACT_STEM.native/gpu-tests.log" 2>&1
+          python tests/text_gpu_gui.py --binary target/release/ztty --renderer gpu \
+            --output "dist/$ARTIFACT_STEM.native/gpu-text.json" \
+            --screenshots "dist/$ARTIFACT_STEM.native/gpu-text"
+          python tests/native_ui_gui.py --binary target/release/ztty --renderer gpu \
+            --source-root "$GITHUB_WORKSPACE" --output "dist/$ARTIFACT_STEM.native/gpu-ui.json" \
+            --screenshot "dist/$ARTIFACT_STEM.native/gpu-ui.png"
+          python tests/repaint_gui.py --binary target/release/ztty --renderer gpu \
+            --output "dist/$ARTIFACT_STEM.native/gpu-repaint.json" \
+            --screenshots "dist/$ARTIFACT_STEM.native/gpu-repaint"
+          python tests/retained_frame_gui.py --binary target/release/ztty --renderer software \
+            --output "dist/$ARTIFACT_STEM.native/retained-frame.json"
       - name: Package the native Linux executable
         id: package
         run: |
@@ -728,7 +740,7 @@ jobs:
           out="$RUNNER_TEMP/ztty-release"
           bash tools/release-source.sh "$out"
           docker run --rm -v "$out:/work" -e VERSION archlinux:base-devel bash -euxc '
-            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender
+            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender fontconfig freetype2 harfbuzz libglvnd pkgconf
             useradd -m builder
             install -d -o builder -g builder /home/builder/package
             cp /work/aur/PKGBUILD "/work/ztty-$VERSION.tar.gz" /home/builder/package/

@@ -172,7 +172,7 @@ fn unicode_insert_preserves_shifted_glyphs_and_repairs_split_glyphs() {
 fn unicode_overwrite_handles_narrow_screens_and_wrap_boundaries() {
     let mut narrow = Terminal::new(1, 2, 0);
     narrow.feed("界é".as_bytes());
-    assert_eq!(line(&narrow, 0), "\u{fffd}");
+    assert_eq!(line(&narrow, 0), "界");
     assert_eq!(line(&narrow, 1), "é");
     assert_eq!(narrow.cell(0, 0).width, 1);
     assert_eq!(narrow.cell(0, 1).width, 1);
@@ -256,12 +256,20 @@ fn erase_half_of_wide_character_clears_both_halves() {
 }
 
 #[test]
-fn resize_preserves_cells_and_removes_split_wide_glyph() {
+fn resize_reflows_cells_and_keeps_complete_wide_glyphs() {
     let mut t = Terminal::new(5, 3, 4);
     t.feed("ab界\r\nline".as_bytes());
     t.resize(3, 2);
-    assert_eq!(line(&t, 0), "ab ");
-    assert_eq!(line(&t, 1), "lin");
+    assert_eq!(t.history_len(), 2);
+    assert_eq!(t.view_cell(0, 0, 2).ch, 'a');
+    assert_eq!(t.view_row_wrap(0, 2), Some(2));
+    assert_eq!(
+        (t.view_cell(0, 0, 1).ch, t.view_cell(0, 0, 1).width),
+        ('界', 2)
+    );
+    assert_eq!(t.view_cell(1, 0, 1).width, 0);
+    assert_eq!(line(&t, 0), "lin");
+    assert_eq!(line(&t, 1), "e  ");
     assert!(t.cursor().0 < 3);
     assert!(t.cursor().1 < 2);
     assert!(t.row_dirty(0));
@@ -807,8 +815,8 @@ fn icat_probe_finishes_on_da1_and_advertises_only_sixel() {
         assert_eq!(
             t.responses(),
             b"\x1b_Gi=1;OK\x1b\\\
-              \x1b_Gi=2;ENOTSUP:only direct transmission is supported\x1b\\\
-              \x1b_Gi=3;ENOTSUP:only direct transmission is supported\x1b\\\x1b[?62;4c"
+              \x1b_Gi=2;ENOTSUP:host image I/O unavailable\x1b\\\
+              \x1b_Gi=3;ENOTSUP:host image I/O unavailable\x1b\\\x1b[?62;4c"
         );
         let start = t
             .responses()

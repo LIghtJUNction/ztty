@@ -9,13 +9,18 @@ use alloc::format;
 use alloc::sync::Arc;
 use alloc::vec::Vec;
 
+mod animation;
 mod decode;
+mod placement;
 mod protocol;
 mod sixel;
 mod stream;
+mod transport;
 
+pub use placement::{MAX_PLACEHOLDER_RUNS, Placeholder};
 pub use sixel::Palette as SixelPalette;
 pub use stream::CommandStream;
+pub use transport::{ExternalRead, ExternalReader, Medium, ReadError};
 
 use protocol::Command;
 
@@ -77,7 +82,35 @@ pub struct Draw<'a> {
     pub placement_id: u32,
     pub source: Rect,
     pub dest: PixelRect,
+    /// An optional viewport-relative clip, preserving the full source-to-dest
+    /// transform. Unicode placeholder cells use this instead of rounding
+    /// fractional source coordinates to whole pixels.
+    pub clip: Option<PixelRect>,
     pub z: i32,
+}
+
+/// Cacheable geometry, without borrowing pixels or retaining image resources.
+#[derive(Clone, Copy, Debug)]
+pub struct DrawGeometry {
+    pub image_id: u32,
+    pub placement_id: u32,
+    pub source: Rect,
+    pub dest: PixelRect,
+    pub clip: Option<PixelRect>,
+    pub z: i32,
+}
+
+impl Draw<'_> {
+    pub fn geometry(&self) -> DrawGeometry {
+        DrawGeometry {
+            image_id: self.image_id,
+            placement_id: self.placement_id,
+            source: self.source,
+            dest: self.dest,
+            clip: self.clip,
+            z: self.z,
+        }
+    }
 }
 
 /// Grid context at the instant the final image chunk is received.
@@ -111,6 +144,16 @@ struct StoredImage {
     /// Remaining nontransparent source pixels; None identifies Kitty storage.
     sixel_pixels: Option<usize>,
     image: Image,
+    animation: Option<Box<animation::Animation>>,
+}
+
+impl StoredImage {
+    fn bytes(&self) -> usize {
+        self.animation.as_ref().map_or_else(
+            || self.image.pixels.capacity(),
+            |animation| animation.frames.iter().map(|f| f.pixels.capacity()).sum(),
+        )
+    }
 }
 
 struct Placement {
@@ -125,6 +168,10 @@ struct Placement {
     y_offset: u32,
     z: i32,
     pixel_scale_y: u32,
+    virtual_placement: bool,
+    parent: Option<(u32, u32)>,
+    horizontal: i32,
+    vertical: i32,
 }
 
 impl Placement {
@@ -175,7 +222,7 @@ struct Transfer {
     bytes: Vec<u8>,
 }
 
-/// A bounded image store and Kitty static-image command processor.
+/// A bounded image store and Kitty image/animation command processor.
 /// No platform calls, filesystem access, threads, or rendering backend.
 pub struct Graphics {
     limits: Limits,
@@ -189,6 +236,7 @@ pub struct Graphics {
     cell_width: u32,
     cell_height: u32,
     visible_rows: usize,
+    external_reader: Option<ExternalReader>,
 }
 
 impl Default for Graphics {
@@ -211,6 +259,7 @@ impl Graphics {
             cell_width: 8,
             cell_height: 16,
             visible_rows: 24,
+            external_reader: None,
         }
     }
 
@@ -328,6 +377,18 @@ impl Graphics {
             .map(|image| &image.image)
     }
 
+    pub fn draw_geometry(&self, geometry: &DrawGeometry) -> Option<Draw<'_>> {
+        Some(Draw {
+            image: self.image(geometry.image_id)?,
+            image_id: geometry.image_id,
+            placement_id: geometry.placement_id,
+            source: geometry.source,
+            dest: geometry.dest,
+            clip: geometry.clip,
+            z: geometry.z,
+        })
+    }
+
     fn changed(&mut self) {
         self.revision = self.revision.wrapping_add(1);
     }
@@ -353,7 +414,10 @@ impl Graphics {
         let history_offset = history_offset.min(i32::MAX as usize);
         self.placements.iter().filter_map(move |p| {
             let image = self.image(p.image_id)?;
-            let dest = p.rect(self.cell_width, self.cell_height, history_offset);
+            if p.virtual_placement {
+                return None;
+            }
+            let dest = self.placement_rect(p, history_offset, &[])?;
             if i64::from(dest.y) + i64::from(dest.height) <= 0
                 || i64::from(dest.y) >= (self.visible_rows as i64) * i64::from(self.cell_height)
             {
@@ -365,6 +429,7 @@ impl Graphics {
                 placement_id: p.id,
                 source: p.source,
                 dest,
+                clip: None,
                 z: p.z,
             })
         })
@@ -453,6 +518,7 @@ impl Graphics {
                 pixels: Arc::new(decoded.pixels),
                 generation: self.revision,
             },
+            animation: None,
         });
         self.placements.push(Placement {
             image_id: id,
@@ -471,6 +537,10 @@ impl Graphics {
             y_offset: 0,
             z: -1,
             pixel_scale_y: decoded.scale_y,
+            virtual_placement: false,
+            parent: None,
+            horizontal: 0,
+            vertical: 0,
         });
         self.placements.sort_by_key(|p| (p.z, p.image_id));
         Some(result)
@@ -504,6 +574,9 @@ impl Graphics {
         let cw = self.cell_width;
         let ch = self.cell_height;
         self.placements.retain_mut(|p| {
+            if p.parent.is_some() || p.virtual_placement {
+                return true;
+            }
             if full && save_history && delta < 0 {
                 p.row = p.row.saturating_add(delta);
                 let rect = p.rect(cw, ch, 0);
@@ -515,8 +588,43 @@ impl Graphics {
                 true
             }
         });
+        self.prune_dependencies();
         self.collect_unreferenced_anonymous();
         self.changed();
+    }
+
+    /// Physical placement anchors in stable scene order, in text-cell units.
+    /// Negative rows refer to retained primary-screen history.
+    pub fn anchors(&self) -> impl Iterator<Item = (i32, i32)> + '_ {
+        self.placements
+            .iter()
+            .filter(|placement| placement.parent.is_none() && !placement.virtual_placement)
+            .map(|placement| (placement.col, placement.row))
+    }
+
+    /// Move anchors through a text-layout change, preserving image/source/size
+    /// metadata. None drops a placement whose original text is no longer kept.
+    pub fn remap_anchors(&mut self, mut map: impl FnMut(i32, i32) -> Option<(i32, i32)>) {
+        let mut changed = false;
+        self.placements.retain_mut(|placement| {
+            if placement.parent.is_some() || placement.virtual_placement {
+                return true;
+            }
+            if let Some((col, row)) = map(placement.col, placement.row) {
+                changed |= (placement.col, placement.row) != (col, row);
+                placement.col = col;
+                placement.row = row;
+                true
+            } else {
+                changed = true;
+                false
+            }
+        });
+        if changed {
+            self.prune_dependencies();
+            self.collect_unreferenced_anonymous();
+            self.changed();
+        }
     }
 
     /// Drop placements whose last pixel is older than retained text history.
@@ -526,9 +634,13 @@ impl Graphics {
         let ch = self.cell_height;
         let before = self.placements.len();
         self.placements.retain(|p| {
+            if p.parent.is_some() || p.virtual_placement {
+                return true;
+            }
             let r = p.rect(cw, ch, 0);
             i64::from(r.y) + i64::from(r.height) > -(history as i64) * i64::from(ch)
         });
+        self.prune_dependencies();
         if before != self.placements.len() {
             self.changed();
         }
@@ -543,7 +655,7 @@ impl Graphics {
         self.images.retain(|image| {
             let keep = !image.anonymous || placements.iter().any(|p| p.image_id == image.id);
             if keep {
-                used += image.image.pixels.capacity();
+                used += image.bytes();
             }
             keep
         });
@@ -584,10 +696,11 @@ impl Graphics {
                 .images
                 .iter()
                 .find(|i| i.id == id)
-                .map_or(0, |i| i.image.pixels.capacity());
+                .map_or(0, StoredImage::bytes);
             let count = self.images.len() + usize::from(replaced == 0);
             if self.used - replaced + size <= self.limits.max_total_bytes
                 && count <= self.limits.max_images
+                && self.total_frames() + usize::from(replaced == 0) <= animation::MAX_FRAMES
             {
                 return Ok(());
             }
@@ -596,7 +709,7 @@ impl Graphics {
             }) else {
                 return Err("ENOSPC:image storage is full");
             };
-            self.used -= self.images.remove(index).image.pixels.capacity();
+            self.used -= self.images.remove(index).bytes();
             self.changed();
         }
     }
@@ -701,16 +814,17 @@ impl Graphics {
                 );
                 result.unwrap_or_default()
             }
-            b't' | b'T' | b'q' => {
-                if command.transport != b'd' {
-                    self.respond(
-                        &command,
-                        command.id,
-                        "ENOTSUP:only direct transmission is supported",
-                        replies,
-                    );
-                    return Outcome::default();
-                }
+            b'a' | b'c' => {
+                let id = self.resolve(&command).unwrap_or(command.id);
+                let result = if command.action == b'a' {
+                    self.control_animation(id, &command)
+                } else {
+                    self.compose_frame(id, &command)
+                };
+                self.respond(&command, id, result.err().unwrap_or("OK"), replies);
+                Outcome::default()
+            }
+            b't' | b'T' | b'q' | b'f' => {
                 if !matches!(command.format, 24 | 32 | 100) {
                     self.respond(
                         &command,
@@ -730,6 +844,15 @@ impl Graphics {
                         replies,
                     );
                     return Outcome::default();
+                }
+                if command.transport != b'd' {
+                    return match self.external(&command, payload) {
+                        Ok(bytes) => self.finish(command, bytes, context, replies),
+                        Err(error) => {
+                            self.respond(&command, command.id, error, replies);
+                            Outcome::default()
+                        }
+                    };
                 }
                 let mut bytes = Vec::new();
                 if let Err(error) =
@@ -768,12 +891,25 @@ impl Graphics {
         let mut image = match image {
             Ok(image) => image,
             Err(error) => {
+                // A short or invalid external payload must not reveal whether
+                // the requested local path exists or how many bytes it holds.
+                let error = if command.transport == b'd' {
+                    error
+                } else {
+                    "EBADF:Failed to read image file"
+                };
                 self.respond(&command, command.id, error, replies);
                 return Outcome::default();
             }
         };
         if command.action == b'q' {
             self.respond(&command, command.id, "OK", replies);
+            return Outcome::default();
+        }
+        if command.action == b'f' {
+            let id = self.resolve(&command).unwrap_or(command.id);
+            let result = self.store_frame(id, &command, image);
+            self.respond(&command, id, result.err().unwrap_or("OK"), replies);
             return Outcome::default();
         }
         let id = if command.id == 0 {
@@ -802,8 +938,9 @@ impl Graphics {
         self.changed();
         image.generation = self.revision;
         if let Some(index) = self.images.iter().position(|i| i.id == id) {
-            self.used -= self.images.remove(index).image.pixels.capacity();
+            self.used -= self.images.remove(index).bytes();
             self.placements.retain(|p| p.image_id != id);
+            self.prune_dependencies();
         }
         self.used += image.pixels.capacity();
         self.images.push(StoredImage {
@@ -812,6 +949,7 @@ impl Graphics {
             anonymous: command.id == 0 && command.number == 0,
             sixel_pixels: None,
             image,
+            animation: None,
         });
         let result = if command.action == b'T' {
             self.place(id, &command, context)
@@ -844,6 +982,7 @@ impl Graphics {
         if c.x >= image.width || c.y >= image.height {
             return Err("EINVAL:source rectangle is outside image");
         }
+        self.validate_parent(id, c)?;
         let source = Rect {
             x: c.x,
             y: c.y,
@@ -870,6 +1009,10 @@ impl Graphics {
             y_offset: c.y_offset,
             z: c.z,
             pixel_scale_y: 1,
+            virtual_placement: c.virtual_placement,
+            parent: (c.parent_image != 0).then_some((c.parent_image, c.parent_placement)),
+            horizontal: c.horizontal,
+            vertical: c.vertical,
         })
     }
 
@@ -904,7 +1047,7 @@ impl Graphics {
         self.placements.sort_by_key(|p| (p.z, p.image_id));
         self.changed();
         Ok(Outcome {
-            cursor_move: if c.no_cursor_move {
+            cursor_move: if c.no_cursor_move || c.virtual_placement || c.parent_image != 0 {
                 None
             } else {
                 Some((cols as usize, rows as usize))
@@ -914,6 +1057,9 @@ impl Graphics {
 
     fn delete(&mut self, c: &Command, ctx: Context) -> Result<(), &'static str> {
         let selector = c.delete.to_ascii_lowercase();
+        if selector == b'f' {
+            return self.delete_frame(self.resolve(c).unwrap_or(c.id), c);
+        }
         if !matches!(
             selector,
             b'a' | b'i' | b'n' | b'c' | b'p' | b'q' | b'r' | b'x' | b'y' | b'z'
@@ -935,14 +1081,31 @@ impl Graphics {
         } * i64::from(ch);
         let rows = ctx.rows as i64 * i64::from(ch);
         let mut affected = Vec::new();
+        let rectangles: Vec<_> = self
+            .placements
+            .iter()
+            .map(|p| self.placement_rect(p, 0, &[]))
+            .collect();
+        let mut position = 0;
         self.placements.retain(|p| {
-            let r = p.rect(cw, ch, 0);
+            let rect = rectangles[position];
+            position += 1;
+            let r = rect.unwrap_or(PixelRect {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+            });
             let x = i64::from(r.x);
             let y = i64::from(r.y);
             let right = x + i64::from(r.width);
             let bottom = y + i64::from(r.height);
-            let visible =
-                bottom > 0 && y < rows && x < ctx.cols as i64 * i64::from(cw) && right > 0;
+            let visible = !p.virtual_placement
+                && rect.is_some()
+                && bottom > 0
+                && y < rows
+                && x < ctx.cols as i64 * i64::from(cw)
+                && right > 0;
             let hit_x = x < cx + i64::from(cw) && right > cx;
             let hit_y = y < cy + i64::from(ch) && bottom > cy;
             let delete = match selector {
@@ -961,6 +1124,7 @@ impl Graphics {
             }
             !delete
         });
+        self.prune_dependencies();
         if c.delete.is_ascii_uppercase() {
             let placements = &self.placements;
             self.images.retain(|image| {
@@ -971,11 +1135,7 @@ impl Graphics {
                 };
                 !selected || placements.iter().any(|p| p.image_id == image.id)
             });
-            self.used = self
-                .images
-                .iter()
-                .map(|image| image.image.pixels.capacity())
-                .sum();
+            self.used = self.images.iter().map(StoredImage::bytes).sum();
         }
         self.collect_unreferenced_anonymous();
         self.changed();
@@ -1004,12 +1164,20 @@ impl Graphics {
             return;
         }
         let mut reply = format!("\x1b_Gi={}", c.id);
-        if matches!(c.feature, b't' | b'T' | b'p' | b'd') {
+        if matches!(
+            c.feature,
+            b't' | b'T' | b'q' | b'p' | b'd' | b'f' | b'a' | b'c'
+        ) {
             reply.push_str(&format!(",e={}", c.feature as char));
             // Echo only supported nondefault values. Unsupported options remain
             // absent, allowing clients to fall back without a false capability.
             for (key, value) in &c.fields {
-                if protocol::feature_supported(c.feature, *key, value) {
+                if protocol::feature_supported(
+                    c.feature,
+                    *key,
+                    value,
+                    self.external_reader.is_some(),
+                ) {
                     reply.push(',');
                     reply.push(*key as char);
                     reply.push('=');
@@ -1030,6 +1198,8 @@ fn append_reply(replies: &mut Vec<u8>, text: &str) {
 
 #[cfg(test)]
 extern crate std;
+#[cfg(test)]
+mod extension_tests;
 #[cfg(test)]
 mod sixel_tests;
 #[cfg(test)]

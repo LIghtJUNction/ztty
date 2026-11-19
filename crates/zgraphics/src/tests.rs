@@ -1,7 +1,7 @@
 use super::*;
 use alloc::vec;
 
-fn context() -> Context {
+pub(super) fn context() -> Context {
     Context {
         col: 0,
         row: 0,
@@ -12,7 +12,7 @@ fn context() -> Context {
     }
 }
 
-fn base64(bytes: &[u8]) -> Vec<u8> {
+pub(super) fn base64(bytes: &[u8]) -> Vec<u8> {
     const TABLE: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     let mut out = Vec::new();
     for c in bytes.chunks(3) {
@@ -35,7 +35,7 @@ fn base64(bytes: &[u8]) -> Vec<u8> {
     out
 }
 
-fn send(g: &mut Graphics, header: &[u8], data: &[u8], ctx: Context) -> Vec<u8> {
+pub(super) fn send(g: &mut Graphics, header: &[u8], data: &[u8], ctx: Context) -> Vec<u8> {
     let mut body = header.to_vec();
     body.push(b';');
     body.extend(base64(data));
@@ -44,7 +44,7 @@ fn send(g: &mut Graphics, header: &[u8], data: &[u8], ctx: Context) -> Vec<u8> {
     replies
 }
 
-fn command(g: &mut Graphics, body: &[u8]) -> Vec<u8> {
+pub(super) fn command(g: &mut Graphics, body: &[u8]) -> Vec<u8> {
     let mut replies = Vec::new();
     g.command(body, context(), &mut replies);
     replies
@@ -371,10 +371,10 @@ fn feature_query_is_honest_and_does_not_cancel_pending_transfer() {
     command(&mut g, b"Ga=t,i=4,s=2,v=1,m=1;AAAA");
     assert_eq!(
         command(&mut g, b"Ga=q,i=1,e=T,U=1,C=1,t=f"),
-        b"\x1b_Gi=1,e=T,C=1;OK\x1b\\"
+        b"\x1b_Gi=1,e=T,U=1,C=1;OK\x1b\\"
     );
     assert_eq!(g.pending_bytes(), 3);
-    assert_eq!(command(&mut g, b"Ga=q,i=2,e=f"), b"\x1b_Gi=2;OK\x1b\\");
+    assert_eq!(command(&mut g, b"Ga=q,i=2,e=f"), b"\x1b_Gi=2,e=f;OK\x1b\\");
     assert_eq!(g.pending_bytes(), 3);
 }
 

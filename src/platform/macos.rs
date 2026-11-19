@@ -303,7 +303,7 @@ fn fill(context: Id, rect: Rect, color: u32, alpha: f64) {
 
 struct Renderer {
     fonts: [Id; 4],
-    lines: BTreeMap<(u32, u32, u32, u8), Id>,
+    lines: BTreeMap<String, Id>,
     color_space: Id,
     cell_width: f64,
     cell_height: f64,
@@ -404,21 +404,37 @@ impl Renderer {
         cf_release(string);
         line
     }
-    fn cell(&mut self, context: Id, cell: &Cell, x: f64, y: f64, color: u32) {
+    fn cell(
+        &mut self,
+        context: Id,
+        terminal: &zterm::Terminal,
+        cell: &Cell,
+        x: f64,
+        y: f64,
+        color: u32,
+    ) {
         if cell.width == 0
             || cell.flags & HIDDEN != 0
-            || cell.ch == ' ' && cell.combining == ['\0'; 2]
+            || cell.ch == '\u{10eeee}'
+            || cell.ch == ' ' && cell.grapheme_id == 0 && cell.combining == ['\0'; 2]
         {
             return;
         }
         let style = u8::from(cell.flags & BOLD != 0) | (u8::from(cell.flags & ITALIC != 0) << 1);
-        let key = (
-            cell.ch as u32,
-            cell.combining[0] as u32,
-            cell.combining[1] as u32,
-            style,
-        );
-        let line = if let Some(&line) = self.lines.get(&key) {
+        // Borrow the stack key on hits: full clusters do not allocate per paint.
+        let mut bytes = [0u8; zterm::MAX_GRAPHEME_BYTES + 1];
+        bytes[0] = b'0' + style;
+        let mut n = 1;
+        for ch in terminal.cell_chars(cell) {
+            let length = ch.len_utf8();
+            if n + length > bytes.len() {
+                return;
+            }
+            ch.encode_utf8(&mut bytes[n..n + length]);
+            n += length;
+        }
+        let key = core::str::from_utf8(&bytes[..n]).unwrap_or("");
+        let line = if let Some(&line) = self.lines.get(key) {
             line
         } else {
             if self.lines.len() >= MAX_LINES {
@@ -426,17 +442,9 @@ impl Renderer {
                     cf_release(line);
                 }
             }
-            let mut bytes = [0u8; 12];
-            let mut n = cell.ch.encode_utf8(&mut bytes[..4]).len();
-            for &ch in &cell.combining {
-                if ch != '\0' {
-                    n += ch.encode_utf8(&mut bytes[n..n + 4]).len();
-                }
-            }
-            let text = core::str::from_utf8(&bytes[..n]).unwrap_or("");
-            let line = self.make_line(text, style);
+            let line = self.make_line(&key[1..], style);
             if !line.is_null() {
-                self.lines.insert(key, line);
+                self.lines.insert(String::from(key), line);
             }
             line
         };
@@ -665,14 +673,38 @@ impl Host {
         let mut size = zpty::Size::new(cols as u16, rows as u16);
         size.pixel_width = ((cw as usize * cols).min(u16::MAX as usize)) as u16;
         size.pixel_height = ((ch as usize * rows).min(u16::MAX as usize)) as u16;
-        if self.core.resize_with_cell_size(size, (cw, ch)).is_err() {
+        let mut anchor = ztty::selection::ViewAnchor::capture(
+            &self.core.terminal,
+            self.history,
+            self.selection.map(|selection| {
+                (
+                    (selection.start.col, selection.start.row),
+                    (selection.end.col, selection.end.row),
+                )
+            }),
+        );
+        if self
+            .core
+            .resize_with_cell_size_anchored(size, (cw, ch), anchor.anchors_mut())
+            .is_err()
+        {
             os::print(2, b"ztty: PTY resize failed; retaining the terminal grid\n");
             self.force = true;
             return;
         }
         self.scale = scale;
-        self.history = self.history.min(self.core.terminal.history_len());
-        self.selection = None;
+        let restored = anchor.restore(&self.core.terminal);
+        self.history = restored.history;
+        self.selection = restored.selection.map(|(start, end)| Selection {
+            start: CellPosition {
+                col: start.0,
+                row: start.1,
+            },
+            end: CellPosition {
+                col: end.0,
+                row: end.1,
+            },
+        });
         self.force = true;
     }
     fn tick(&mut self) {
@@ -704,6 +736,13 @@ impl Host {
             self.blink_at = now + self.appearance.cursor_blink_interval;
             self.force = true;
         }
+        let visible = !self.core.eof()
+            && send!(self.window, c"isVisible", bool)
+            && !send!(self.window, c"isMiniaturized", bool);
+        self.core
+            .terminal
+            .advance_graphics(now, self.history, visible);
+        osc52::process(&mut self.core, visible);
         let revision = self.core.terminal.graphics().revision();
         if revision != self.last_revision {
             self.last_revision = revision;
@@ -804,7 +843,8 @@ impl Host {
                 }
                 let x = padding + col as f64 * width;
                 let y = bounds.size.height - padding - (row + 1) as f64 * height;
-                self.renderer.cell(context, cell, x, y, fg);
+                self.renderer
+                    .cell(context, &self.core.terminal, cell, x, y, fg);
                 if cell.flags & UNDERLINE != 0 {
                     fill(
                         context,
@@ -961,6 +1001,20 @@ impl Host {
                     let y = view_height
                         - self.appearance.padding as f64
                         - (draw.dest.y as f64 + draw.dest.height as f64) / self.scale;
+                    CGContextSaveGState(context);
+                    if let Some(clip) = draw.clip {
+                        CGContextClipToRect(
+                            context,
+                            Rect::new(
+                                self.appearance.padding as f64 + clip.x as f64 / self.scale,
+                                view_height
+                                    - self.appearance.padding as f64
+                                    - (clip.y as f64 + clip.height as f64) / self.scale,
+                                clip.width as f64 / self.scale,
+                                clip.height as f64 / self.scale,
+                            ),
+                        );
+                    }
                     CGContextDrawImage(
                         context,
                         Rect::new(
@@ -971,6 +1025,7 @@ impl Host {
                         ),
                         crop,
                     );
+                    CGContextRestoreGState(context);
                     CGImageRelease(crop);
                 }
                 CGImageRelease(whole);
@@ -1517,7 +1572,7 @@ unsafe extern "C" fn mouse(view: Id, _: Sel, event: Id) {
             let cell = host.core.terminal.view_cell(col, row, host.history);
             host.core
                 .terminal
-                .hyperlink(cell.link_id)
+                .cell_hyperlink(cell)
                 .filter(|uri| {
                     uri.len() <= 8192
                         && !uri.chars().any(char::is_control)
@@ -1967,7 +2022,10 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
         if let Some(start) = host.sync_since {
             deadline = deadline.min(start.saturating_add(150));
         }
-        // The deadline drives cursor/sync state only. CFFileDescriptor wakes
+        if let Some(animation) = host.core.terminal.graphics().animation_deadline() {
+            deadline = deadline.min(animation);
+        }
+        // The deadline drives visual state only. CFFileDescriptor wakes
         // nextEvent immediately for PTY output and bounded queued input.
         let interval = deadline.saturating_sub(now).min(1000) as f64 / 1000.0;
         let date = send!(class(c"NSDate"), c"dateWithTimeIntervalSinceNow:", Id, f64 => interval);
@@ -2003,3 +2061,6 @@ fn run_app(cfg: Config, pty: zpty::Pty) -> Result<i32, &'static str> {
         .map(|s| s.code().unwrap_or(128 + s.signal().unwrap_or(0)))
         .unwrap_or(0))
 }
+
+#[path = "macos/osc52.rs"]
+mod osc52;
