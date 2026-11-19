@@ -108,6 +108,8 @@ struct StoredImage {
     id: u32,
     number: u32,
     anonymous: bool,
+    /// Remaining nontransparent source pixels; None identifies Kitty storage.
+    sixel_pixels: Option<usize>,
     image: Image,
 }
 
@@ -234,6 +236,88 @@ impl Graphics {
     pub fn is_empty(&self) -> bool {
         self.placements.is_empty()
     }
+    /// Erase Sixel pixels intersecting a rectangle in the live cell grid.
+    ///
+    /// Kitty images and history outside this rectangle are unchanged. Erasure
+    /// uses source-pixel granularity: a scaled pixel touching the rectangle is
+    /// cleared completely. At a nonaligned vertical boundary this can clear up
+    /// to pixel_scale_y - 1 additional display pixels. Unscaled images retain
+    /// every pixel outside the requested rectangle exactly.
+    pub fn erase_sixel_cells(&mut self, col: usize, row: usize, cols: usize, rows: usize) {
+        if self.placements.is_empty() || cols == 0 || rows == 0 {
+            return;
+        }
+        let left = col.min(65535) as i64 * i64::from(self.cell_width);
+        let top = row.min(65535) as i64 * i64::from(self.cell_height);
+        let right = col.saturating_add(cols).min(65535) as i64 * i64::from(self.cell_width);
+        let bottom = row.saturating_add(rows).min(65535) as i64 * i64::from(self.cell_height);
+        let generation = self.revision.wrapping_add(1);
+        let mut changed = false;
+        for stored in &mut self.images {
+            let Some(remaining) = &mut stored.sixel_pixels else {
+                continue;
+            };
+            for placement in self.placements.iter().filter(|p| p.image_id == stored.id) {
+                let rect = placement.rect(self.cell_width, self.cell_height, 0);
+                let x = i64::from(rect.x);
+                let y = i64::from(rect.y);
+                let x0 = left.max(x);
+                let y0 = top.max(y);
+                let x1 = right.min(x + i64::from(rect.width));
+                let y1 = bottom.min(y + i64::from(rect.height));
+                if x0 >= x1 || y0 >= y1 {
+                    continue;
+                }
+                let source = placement.source;
+                let sx0 = source.x as usize
+                    + ((x0 - x) as u64 * u64::from(source.width) / u64::from(rect.width)) as usize;
+                let sx1 = source.x as usize
+                    + ((x1 - x) as u64 * u64::from(source.width)).div_ceil(u64::from(rect.width))
+                        as usize;
+                let sy0 = source.y as usize
+                    + ((y0 - y) as u64 * u64::from(source.height) / u64::from(rect.height))
+                        as usize;
+                let sy1 = source.y as usize
+                    + ((y1 - y) as u64 * u64::from(source.height)).div_ceil(u64::from(rect.height))
+                        as usize;
+                let width = stored.image.width as usize;
+                let pixels = Arc::make_mut(&mut stored.image.pixels);
+                for source_row in sy0..sy1 {
+                    let begin = (source_row * width + sx0) * 4;
+                    let end = (source_row * width + sx1) * 4;
+                    for pixel in pixels[begin..end].as_chunks_mut::<4>().0 {
+                        if pixel[3] != 0 {
+                            pixel.fill(0);
+                            *remaining -= 1;
+                            stored.image.generation = generation;
+                            changed = true;
+                        }
+                    }
+                }
+                // Also reclaim a transparent-only Sixel when its area is erased.
+                changed |= *remaining == 0;
+            }
+        }
+        if changed {
+            let images = &self.images;
+            self.placements.retain(|placement| {
+                images
+                    .iter()
+                    .any(|image| image.id == placement.image_id && image.sixel_pixels != Some(0))
+            });
+            let used = &mut self.used;
+            self.images.retain(|image| {
+                if image.sixel_pixels == Some(0) {
+                    *used -= image.image.pixels.capacity();
+                    false
+                } else {
+                    true
+                }
+            });
+            self.changed();
+        }
+    }
+
     pub fn image(&self, id: u32) -> Option<&Image> {
         self.images
             .iter()
@@ -351,6 +435,15 @@ impl Graphics {
             id,
             number: 0,
             anonymous: true,
+            sixel_pixels: Some(
+                decoded
+                    .pixels
+                    .as_chunks::<4>()
+                    .0
+                    .iter()
+                    .filter(|pixel| pixel[3] != 0)
+                    .count(),
+            ),
             image: Image {
                 width: decoded.width,
                 height: decoded.height,
@@ -714,6 +807,7 @@ impl Graphics {
             id,
             number: command.number,
             anonymous: command.id == 0 && command.number == 0,
+            sixel_pixels: None,
             image,
         });
         let result = if command.action == b'T' {

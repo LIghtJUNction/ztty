@@ -1188,10 +1188,33 @@ impl State {
         }
     }
 
+    #[inline]
+    fn erase_sixel_span(&mut self, row: usize, start: usize, end: usize) {
+        // Text-only output avoids scanning the image store. ASCII calls this
+        // once per contiguous row span, never once per character.
+        if self.graphics.is_empty() {
+            return;
+        }
+        let mut start = start.min(self.screen.cols);
+        let mut end = end.min(self.screen.cols);
+        if start >= end {
+            return;
+        }
+        let cells = self.screen.row(row);
+        if start > 0 && cells[start].width == 0 {
+            start -= 1;
+        }
+        if end < cells.len() && cells[end].width == 0 {
+            end += 1;
+        }
+        self.graphics.erase_sixel_cells(start, row, end - start, 1);
+    }
+
     fn erase_range(&mut self, row: usize, start: usize, end: usize, blank: Cell) {
         if start == 0 && end >= self.screen.cols {
             self.break_before(row);
         }
+        self.erase_sixel_span(row, start, end);
         self.screen.clear_range(row, start, end, blank);
     }
 
@@ -1320,6 +1343,7 @@ impl State {
                 x -= 1;
             }
             let index = self.screen.index(x, y);
+            let width = usize::from(self.screen.cells[index].width.max(1));
             if let Some(slot) = self.screen.cells[index]
                 .combining
                 .iter_mut()
@@ -1327,6 +1351,7 @@ impl State {
             {
                 *slot = ch;
                 self.screen.dirty[y] = true;
+                self.erase_sixel_span(y, x, x + width);
             }
             return;
         }
@@ -1336,7 +1361,7 @@ impl State {
         let mut width = width;
         if width == 2 && self.screen.x + 1 >= self.screen.cols {
             if self.autowrap && self.screen.cols > 1 {
-                self.screen.clear_range(
+                self.erase_range(
                     self.screen.y,
                     self.screen.x,
                     self.screen.cols,
@@ -1354,6 +1379,7 @@ impl State {
             self.insert_chars(width);
         }
         let style = self.style;
+        self.erase_sixel_span(y, x, x + width);
         let cells = self.screen.overwrite_span(y, x, x + width, style.blank());
         cells[0] = style.cell(ch, width as u8);
         if width == 2 {
@@ -1386,6 +1412,7 @@ impl State {
             let x = self.screen.x;
             let y = self.screen.y;
             let style = self.style;
+            self.erase_sixel_span(y, x, x + count);
             for (cell, &byte) in self
                 .screen
                 .overwrite_span(y, x, x + count, style.blank())
@@ -1415,6 +1442,7 @@ impl State {
         if x == 0 && count == cols {
             self.break_before(y);
         }
+        self.erase_sixel_span(y, x, cols);
         let row = self.screen.row_mut(y);
         if x > 0 && row[x].width == 0 {
             row[x - 1] = blank;
@@ -1433,6 +1461,7 @@ impl State {
         let cols = self.screen.cols;
         let count = count.min(cols - x);
         let blank = self.style.blank();
+        self.erase_sixel_span(y, x, cols);
         self.erase_range(y, x, x + count, blank);
         let row = self.screen.row_mut(y);
         row.copy_within(x + count..cols, x);
@@ -1741,6 +1770,12 @@ impl State {
         match mode {
             0 => {
                 self.erase_range(y, x, self.screen.cols, blank);
+                self.graphics.erase_sixel_cells(
+                    0,
+                    y + 1,
+                    self.screen.cols,
+                    self.screen.rows - y - 1,
+                );
                 for row in y + 1..self.screen.rows {
                     self.screen.clear_row(row, blank);
                     self.screen.dirty[row] = true;
@@ -1750,6 +1785,7 @@ impl State {
                 if y != 0 {
                     self.break_before(0);
                 }
+                self.graphics.erase_sixel_cells(0, 0, self.screen.cols, y);
                 for row in 0..y {
                     self.screen.clear_row(row, blank);
                     self.screen.dirty[row] = true;
