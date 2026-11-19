@@ -172,7 +172,7 @@ fn unicode_insert_preserves_shifted_glyphs_and_repairs_split_glyphs() {
 fn unicode_overwrite_handles_narrow_screens_and_wrap_boundaries() {
     let mut narrow = Terminal::new(1, 2, 0);
     narrow.feed("界é".as_bytes());
-    assert_eq!(line(&narrow, 0), "\u{fffd}");
+    assert_eq!(line(&narrow, 0), "界");
     assert_eq!(line(&narrow, 1), "é");
     assert_eq!(narrow.cell(0, 0).width, 1);
     assert_eq!(narrow.cell(0, 1).width, 1);

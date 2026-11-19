@@ -1,0 +1,285 @@
+{
+  "ok": true,
+  "code_commit": "12a8e4686b8af7cd8bf780852c888e1483fa7c5d",
+  "source_sha256": "e9075e1dbe5d8a57611f8efbb8aea551cfbd8ba8791bd4999f03e805a200fdac",
+  "binary": {
+    "sha256": "3170f71b0535b2e7920ba035080b3a7ab43d98fff8407e9ad52d3b39e170a0e6",
+    "bytes": 1040416
+  },
+  "isolated_build": true,
+  "byte_identical_to_gui_candidate": true,
+  "build_gates": [
+    {
+      "name": "metadata",
+      "exit_code": 0,
+      "seconds": 0.46580351699958555,
+      "sha256": "c4f3c7b8ace1bdb572a5c9e4e2946a66dbdb7b84ec710090b3b406749518ca57"
+    },
+    {
+      "name": "format_source",
+      "exit_code": 0,
+      "seconds": 0.6652090749994386,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fmt",
+      "exit_code": 0,
+      "seconds": 0.5649592679983471,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gpu_tests",
+      "exit_code": 0,
+      "seconds": 13.551243604000774,
+      "sha256": "ee0f368143c2c39bb093f3682045d67cd95c5bc9dc7938ad8a14973e16f78fb2"
+    },
+    {
+      "name": "blink_tests",
+      "exit_code": 0,
+      "seconds": 0.17885415300406748,
+      "sha256": "ee93d7e1ed2502a20ca7270e30250cdea1942cc2e90f8e2a3eef51691cf784a1"
+    },
+    {
+      "name": "clippy",
+      "exit_code": 0,
+      "seconds": 13.191031312999257,
+      "sha256": "48fc328ba4986425913192ea77a4075108913b2bac413e4656ac40dc80e2dc66"
+    },
+    {
+      "name": "release",
+      "exit_code": 0,
+      "seconds": 19.96013020099781,
+      "sha256": "1912801c78990d3356071605e17187baca9553d3eba2646f7e1644f1a9543f99"
+    },
+    {
+      "name": "no_std",
+      "exit_code": 0,
+      "seconds": 0.21453929499693913,
+      "sha256": "f4f492b92ba73ac87546c6597e649006ca76860a6bb6eee1cb7ecd58970f45d0"
+    }
+  ],
+  "gpu_driver": [
+    "NVIDIA GeForce RTX 4060 Laptop GPU/PCIe/SSE2"
+  ],
+  "gpu_tests": [
+    "gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels",
+    "gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics",
+    "gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width",
+    "gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters",
+    "gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas",
+    "gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction"
+  ],
+  "blink_tests": [
+    "text_blink::tests::erasing_or_unfocusing_stops_deadlines_and_restores_text",
+    "text_blink::tests::idle_and_hidden_text_do_not_schedule_polling",
+    "text_blink::tests::slow_and_rapid_text_have_independent_deadlines_and_catch_up",
+    "text_blink::tests::synchronized_output_and_alternate_views_reset_visibility"
+  ],
+  "gui": {
+    "text": {
+      "checks": [
+        "complete colored ZWJ and flag clusters reach real pixels in two-cell allocations",
+        "the ARGB window preserves configured 70 percent background alpha",
+        "real drag and Ctrl+Shift+C copy the exact original ZWJ, flag and combining sequence",
+        "SGR 5 and SGR 6 change actual pixels independently while ordinary text remains visible",
+        "unfocused blinking text stays visible without recurring repaint wakeups",
+        "font reload changes geometry while retaining the same window, broker and PTY",
+        "GPU and Xft use the same display-resolved font size and baseline",
+        "live GPU/software switching preserves the PTY and returns to the requested backend"
+      ],
+      "raw_sha256": "d58ae8913e6008f5f0f36d12a585e87b3e751343c9bb6be46ba5cbf8417f37fe",
+      "renderer_before": {
+        "window_id": 2097155,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "renderer_after": {
+        "window_id": 2097155,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "background_alpha": 178,
+      "backend_font_boxes": {
+        "software": [
+          1,
+          5,
+          43,
+          19
+        ],
+        "gpu": [
+          1,
+          5,
+          44,
+          19
+        ]
+      },
+      "unfocused_idle": {
+        "seconds": 0.55,
+        "context_switch_delta": {
+          "voluntary_ctxt_switches": 0,
+          "nonvoluntary_ctxt_switches": 0
+        }
+      },
+      "remaining_owned_pids": []
+    },
+    "native_ui": {
+      "checks": [
+        "unsupported producer fallback uses plain text, never changes screen/cursor modes, and restores termios",
+        "one transmitted KGP image renders correct red/blue pixels at two native scene references",
+        "GPU images allocate no X server pixmaps for either reference",
+        "mouse click emits only a surface/revision/node-bound action, with no PTY mouse bytes",
+        "button focus consumes ordinary text and Tab; Enter emits one structured action",
+        "Escape returns ordinary typing to the PTY and consumes its own gesture",
+        "view-only font zoom works during button focus, cancels captured geometry and consumes release",
+        "drag/release outside a button never activates or leaks a mouse gesture",
+        "focus loss cancels a captured click while still consuming its release",
+        "a revision change between press and release cancels activation and consumes release",
+        "malformed and oversized payloads preserve revision 2 and recover for the following VT traffic",
+        "retransmitting the same KGP ID refreshes both scene references without a scene update",
+        "pane resize invalidates the captured hit and relayout restores actual image pixels",
+        "alternate-screen transition clears the surface and cancels a pending gesture",
+        "RIS clears surface/actions; revision floor survives and a fresh scene can be drawn",
+        "explicit clear removes image UI and cancels the captured click",
+        "events:false previews the scene but never emits an action",
+        "narrow text leaf renders visible glyphs while clipping combining ink at both horizontal bounds",
+        "native press -> tab change -> other-view motion/release never reaches either PTY; reporting resumes after release",
+        "release outside every ztty view is observed by a separate X client; return motion retires stale capture and reaches the PTY",
+        "an observer cannot emit action intents or ordinary PTY input",
+        "PTY EOF clears the surface and leaves no actionable retained UI",
+        "shipped Python producer negotiates supported ZUI/1 and renders its actual generated image",
+        "real click -> producer action decoder -> revision update reaches 100% native progress pixels"
+      ],
+      "raw_sha256": "00be557ed02342a5aab9576b203fc5722605cc6294918c88d854e9bfd7a63d36",
+      "renderer_before": {
+        "window_id": 2097154,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "renderer_after": {
+        "window_id": 2097269,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "remaining_owned_pids": []
+    },
+    "input": {
+      "checks": [
+        "real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings",
+        "Num Lock stays silent in legacy mode; verified physical keypad digits/decimal use text while all eleven navigation keys retain legacy or requested Kitty identity, including Begin; lock reporting stays explicit",
+        "every physical keypad digit/decimal follows the XKB NumLock/Shift layer; application cursor/keypad modes, NumLock override and held-key release identity are verified",
+        "vertical and horizontal wheel input has distinct SGR press codes and no release reports",
+        "extra button press/release reports retain button identity; report records physical XTEST versus synthetic XSendEvent coverage",
+        "held extra-button state survives motion and clears on release, including X11 buttons lacking core state-mask bits",
+        "press ownership remains stable when Shift changes before a primary or extra-button release",
+        "focus loss clears held extra-button state before focus returns, motion, and release",
+        "mode 9 filters input correctly, follows SGR selection, and its reset cannot cancel active mode 1000",
+        "custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled",
+        "shifted punctuation bindings consume their press, release and palette input using the active XKB layout",
+        "real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered",
+        "keypad Enter and Shift+Enter reproduce search selection; keypad Up/Down choose and execute distinct palette actions without leaking press/release bytes",
+        "Ctrl+Tab and Ctrl+Shift+Tab move between real raw PTYs without leaking a consumed key release after focus changes"
+      ],
+      "raw_sha256": "32aa036ab4cb7da03bbbe4ed655928ef8249eb1ba1cd0054f597cfc39eb9ffbb",
+      "renderer_before": {
+        "window_id": 2097154,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "renderer_after": {
+        "window_id": 2097154,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "vectors": 198,
+      "zoom": 14,
+      "remaining_owned_pids": []
+    },
+    "repaint": {
+      "checks": [
+        "nonadjacent dirty rows publish once after the complete frame is painted",
+        "one-row GPU updates publish one complete surface swap",
+        "terminal content and search overlay share one visible copy",
+        "bulk output ending in silence publishes the final real pixels without an external wakeup",
+        "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+        "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+        "a force/expose paint of the old screen does not lose the subsequent interactive response",
+        "synchronized output and Expose retain the committed pixels until explicit release",
+        "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+        "a synchronized begin/end in one small write publishes its complete final pixels",
+        "scrollback and its return-to-live prompt share one visible copy"
+      ],
+      "raw_sha256": "40bba43f8167c8483319483fc92806c6a7b8269e6cfe7d71e4a958725c42b4f3",
+      "renderers_before": [
+        {
+          "window_id": 2097154,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+        },
+        {
+          "window_id": 2097158,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+        }
+      ],
+      "renderers_after": [
+        {
+          "window_id": 2097154,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+        },
+        {
+          "window_id": 2097158,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+        }
+      ],
+      "timings_ms": {
+        "initial-a": 0.1275449976674281,
+        "initial-b": 0.06609399861190468,
+        "quiet-final-frame": 5.427885000244714,
+        "old-frame-expose": 0.09542499901726842,
+        "xtest-visible-echo": 18.402611000055913,
+        "broker-write-during-flood": 5.497955993632786,
+        "rpc-visible-echo": 0.09299600060330704,
+        "sync-initial": 0.0701769968145527,
+        "sync-expose-retained": 0.03558799653546885,
+        "sync-explicit-release": 1.3309749992913567,
+        "sync-quiet-timeout": 49.4649969987222,
+        "sync-total-from-first-begin": 152.688998998201,
+        "sync-same-feed": 1.7377939948346466,
+        "scroll-history-ready": 2.045134999207221
+      },
+      "remaining_owned_pids": []
+    },
+    "canvas": {
+      "checks": [
+        "expected canvas publication result observed from real X server source pixels",
+        "all resizes and visibility transitions preserve the owned PTY and broker"
+      ],
+      "raw_sha256": "fe956cbd1db6c52261a58d3d53468423b648d32a3c098cd333f43b14b44ca43e",
+      "renderer_before": {
+        "window_id": 2097155,
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      },
+      "invalid_publications": 0,
+      "remaining_owned_pids": []
+    }
+  },
+  "scope": "Owned Xvfb/PTY/XTEST/clipboard and X11/EGL pixels; no physical display latency claim.",
+  "raw_evidence_sha256": {
+    "build": "61ae495321c1e1d02298a117ec7f0896b1d99b0409afab34068ef0fcceee77f1",
+    "gui": "45575b74db8b42a6fb2c5b1114c88b1f30870c1bc0a42c2207d0625a895c1111"
+  }
+}

@@ -168,10 +168,7 @@ fn hits(
             if cell.width == 0 {
                 continue;
             }
-            for ch in core::iter::once(if cell.ch == '\0' { ' ' } else { cell.ch })
-                .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
-                .flat_map(|ch| case.characters(ch))
-            {
+            for ch in terminal.cell_chars(cell).flat_map(|ch| case.characters(ch)) {
                 let mut encoded = [0; 4];
                 for &value in ch.encode_utf8(&mut encoded).as_bytes() {
                     if absolute >= end {
@@ -320,12 +317,10 @@ pub fn text(terminal: &Terminal, hit: Hit) -> Option<String> {
             if cell.width == 0 {
                 continue;
             }
-            for ch in core::iter::once(if cell.ch == '\0' { ' ' } else { cell.ch })
-                .chain(cell.combining.into_iter().filter(|ch| *ch != '\0'))
-            {
-                // Only the two endpoint cells can add scalars outside the
-                // query; each stores a base scalar and two combining scalars.
-                if text.len() + ch.len_utf8() > MAX_QUERY + 16 {
+            for ch in terminal.cell_chars(cell) {
+                // Only the two endpoint clusters may contribute bytes outside
+                // the query. Each retained cluster has an explicit byte cap.
+                if text.len() + ch.len_utf8() > MAX_QUERY + 2 * zterm::MAX_GRAPHEME_BYTES {
                     return None;
                 }
                 text.push(ch);
