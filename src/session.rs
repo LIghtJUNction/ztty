@@ -207,6 +207,27 @@ impl Ui {
         self.message = Some((message.into(), os::milliseconds() + 1800));
         self.force = true;
     }
+    fn paste_result(&mut self, data: Option<Vec<u8>>, core: &mut SessionCore, allow_input: bool) {
+        if let Some(error) = self.window.take_paste_error() {
+            self.error(error.into());
+            return;
+        }
+        if !allow_input {
+            return;
+        }
+        if let Some(data) = data {
+            match paste(data, &core.terminal, &mut core.input) {
+                Ok(0) => self.notice("Clipboard is empty"),
+                Ok(_) => {
+                    self.scroll_bottom();
+                    self.clicks = None;
+                    self.repaint.input_sent();
+                    self.notice("Pasted");
+                }
+                Err(error) => self.error(error.into()),
+            }
+        }
+    }
     fn reset_input(&mut self) {
         self.native_ui.blur();
         self.held.fill(0);
@@ -929,24 +950,12 @@ impl Ui {
                 self.window.selection_request(unsafe { event.request });
             }
             x11::SELECTION_NOTIFY => {
-                if let Some(data) = self.window.selection_notify(unsafe { event.selection })
-                    && allow_input
-                {
-                    if !data.is_empty() {
-                        self.repaint.input_sent();
-                    }
-                    paste(data, &core.terminal, &mut core.input);
-                }
+                let data = self.window.selection_notify(unsafe { event.selection });
+                self.paste_result(data, core, allow_input);
             }
             x11::PROPERTY_NOTIFY => {
-                if let Some(data) = self.window.property(unsafe { event.property })
-                    && allow_input
-                {
-                    if !data.is_empty() {
-                        self.repaint.input_sent();
-                    }
-                    paste(data, &core.terminal, &mut core.input);
-                }
+                let data = self.window.property(unsafe { event.property });
+                self.paste_result(data, core, allow_input);
             }
             x11::SELECTION_CLEAR => {}
             _ => {}
