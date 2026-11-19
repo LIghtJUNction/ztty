@@ -256,12 +256,20 @@ fn erase_half_of_wide_character_clears_both_halves() {
 }
 
 #[test]
-fn resize_preserves_cells_and_removes_split_wide_glyph() {
+fn resize_reflows_cells_and_keeps_complete_wide_glyphs() {
     let mut t = Terminal::new(5, 3, 4);
     t.feed("ab界\r\nline".as_bytes());
     t.resize(3, 2);
-    assert_eq!(line(&t, 0), "ab ");
-    assert_eq!(line(&t, 1), "lin");
+    assert_eq!(t.history_len(), 2);
+    assert_eq!(t.view_cell(0, 0, 2).ch, 'a');
+    assert_eq!(t.view_row_wrap(0, 2), Some(2));
+    assert_eq!(
+        (t.view_cell(0, 0, 1).ch, t.view_cell(0, 0, 1).width),
+        ('界', 2)
+    );
+    assert_eq!(t.view_cell(1, 0, 1).width, 0);
+    assert_eq!(line(&t, 0), "lin");
+    assert_eq!(line(&t, 1), "e  ");
     assert!(t.cursor().0 < 3);
     assert!(t.cursor().1 < 2);
     assert!(t.row_dirty(0));

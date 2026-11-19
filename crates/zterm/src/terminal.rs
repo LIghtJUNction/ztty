@@ -12,6 +12,8 @@ use crate::screen::*;
 
 mod grapheme;
 mod image_cells;
+mod reflow;
+pub use reflow::ResizeAnchor;
 
 const MAX_HISTORY_BYTES: usize = 8 * 1024 * 1024;
 const MAX_LINKS: usize = 1024;
@@ -631,16 +633,37 @@ impl Terminal {
         self.image_draws(history_offset)
     }
 
+    /// Resize retained primary text, rejoining only recorded soft wraps.
+    /// A narrower screen can evict history at the existing byte/row limits.
+    /// Addressed content below the cursor is clipped when it cannot fit.
     pub fn resize(&mut self, cols: usize, rows: usize) {
+        self.resize_anchored(cols, rows, &mut []);
+    }
+
+    /// Resize and remap caller-owned text locations in the active screen.
+    /// Lost or clipped locations become None. Old TextPosition coordinates must
+    /// not be reused across a width change without passing them as anchors.
+    /// Alternate screens retain grid-resize semantics rather than text reflow.
+    pub fn resize_anchored(&mut self, cols: usize, rows: usize, anchors: &mut [ResizeAnchor]) {
         let (cols, rows) = dimensions(cols, rows);
         if self.cols() == cols && self.rows() == rows {
             return;
         }
+        for anchor in anchors.iter_mut() {
+            anchor.position = anchor.position.filter(|point| {
+                self.retained_row(point.line).is_some_and(|row| {
+                    point.column <= row.len() && (!anchor.cell || point.column < row.len())
+                })
+            });
+        }
         let last_grapheme = self.state.last_grapheme.map(|(x, y)| *self.cell(x, y));
         self.text_revision = self.text_revision.wrapping_add(1);
         if cols != self.cols() {
-            self.state.shell.invalidate_screen(self.state.line_base);
+            self.state.reflow_primary(cols, rows, anchors);
+            self.resize_tabs(cols);
+            return;
         }
+        let alternate_drop = self.state.screen.y.saturating_add(1).saturating_sub(rows);
         if !self.state.modes.alternate_screen {
             let dropped = self.state.screen.y.saturating_add(1).saturating_sub(rows);
             for row in 0..dropped {
@@ -701,6 +724,22 @@ impl Terminal {
             .state
             .previous_cell()
             .filter(|(x, y)| last_grapheme == Some(*self.cell(*x, *y)));
+        for anchor in anchors {
+            anchor.position = anchor.position.and_then(|mut point| {
+                if self.state.modes.alternate_screen {
+                    point.line = point.line.checked_sub(alternate_drop as u64)?;
+                }
+                self.retained_row(point.line)
+                    .filter(|row| {
+                        point.column <= row.len() && (!anchor.cell || point.column < row.len())
+                    })
+                    .map(|_| point)
+            });
+        }
+        self.resize_tabs(cols);
+    }
+
+    fn resize_tabs(&mut self, cols: usize) {
         let previous_cols = self.state.tabs.len();
         self.state.tabs.resize(cols, false);
         for (x, tab) in self.state.tabs.iter_mut().enumerate().skip(previous_cols) {
@@ -743,6 +782,71 @@ impl Terminal {
     /// Iterate the original cluster without normalization or allocation.
     pub fn cell_chars(&self, cell: &Cell) -> crate::CellChars<'_> {
         self.state.graphemes.chars(cell)
+    }
+
+    /// Convert viewport coordinates to a retained location. The right-hand
+    /// boundary (col == cols) and retained rows below the viewport are allowed.
+    pub fn view_position(
+        &self,
+        col: usize,
+        row: usize,
+        offset: usize,
+    ) -> Option<crate::TextPosition> {
+        if col > self.cols() {
+            return None;
+        }
+        let base = if self.state.modes.alternate_screen {
+            0
+        } else {
+            self.state.line_base
+        };
+        let top = base.saturating_sub(offset.min(self.history_len()) as u64);
+        let line = top.checked_add(u64::try_from(row).ok()?)?;
+        self.retained_row(line).filter(|cells| col <= cells.len())?;
+        Some(crate::TextPosition { line, column: col })
+    }
+
+    /// Borrow a cell at a current retained location, including scrollback.
+    pub fn position_cell(&self, position: crate::TextPosition) -> Option<&Cell> {
+        self.retained_row(position.line)?.get(position.column)
+    }
+
+    /// Map a current retained location back to viewport coordinates. Rows below
+    /// the viewport are retained so a selection can survive later scrolling.
+    pub fn position_in_view(
+        &self,
+        position: crate::TextPosition,
+        offset: usize,
+    ) -> Option<(usize, usize)> {
+        self.retained_row(position.line)
+            .filter(|cells| position.column <= cells.len())?;
+        let base = if self.state.modes.alternate_screen {
+            0
+        } else {
+            self.state.line_base
+        };
+        let top = base.saturating_sub(offset.min(self.history_len()) as u64);
+        Some((
+            position.column,
+            usize::try_from(position.line.checked_sub(top)?).ok()?,
+        ))
+    }
+
+    fn retained_row(&self, line: u64) -> Option<&[Cell]> {
+        if self.state.modes.alternate_screen {
+            let row = usize::try_from(line).ok()?;
+            return (row < self.rows()).then(|| self.state.screen.row(row));
+        }
+        if line >= self.state.line_base {
+            let row = usize::try_from(line - self.state.line_base).ok()?;
+            return (row < self.rows()).then(|| self.state.screen.row(row));
+        }
+        let oldest = self
+            .state
+            .line_base
+            .saturating_sub(self.state.history.len() as u64);
+        let row = usize::try_from(line.checked_sub(oldest)?).ok()?;
+        self.state.history.get(row).map(|row| row.cells.as_slice())
     }
 
     /// View the visible screen, moved `offset` lines into primary-screen history.
@@ -834,7 +938,8 @@ impl Terminal {
 
     /// Copy rendered command output, excluding its input and following prompt.
     ///
-    /// Physical screen lines become newlines and trailing blank cells are omitted.
+    /// Soft-wrapped rows join without a newline; hard line boundaries remain.
+    /// Trailing blank cells on hard lines are omitted.
     /// This reads existing primary-screen/history cells; it does not save a second
     /// output transcript. Evicted or destructively edited ranges set `truncated`.
     /// `max_bytes` is capped at `MAX_COMMAND_TEXT` and never splits UTF-8.
@@ -905,7 +1010,8 @@ impl Terminal {
     }
     /// Absolute row at the top of the primary screen. Unlike history_len(),
     /// this advances when a full history ring evicts its oldest rows. A full
-    /// terminal reset restarts the position at zero.
+    /// terminal reset restarts the position at zero. Width reflow can decrease
+    /// this coordinate; retain locations through resize_anchored across resizes.
     pub fn history_position(&self) -> u64 {
         self.state.line_base
     }
@@ -1103,39 +1209,53 @@ impl State {
             result.truncated |= start != end;
             return result;
         }
+        let mut pending_spaces = 0usize;
         for line in first..=end.line.min(last) {
-            let cells = if line < self.line_base {
-                &self.history[(line - oldest) as usize].cells[..]
+            let (cells, wrapped) = if line < self.line_base {
+                let row = &self.history[(line - oldest) as usize];
+                (row.cells.as_slice(), row.wrapped)
             } else {
-                screen.row((line - self.line_base) as usize)
+                let row = (line - self.line_base) as usize;
+                (screen.row(row), screen.row_wrap(row))
             };
+            let joined = wrapped != 0 && line < end.line;
             let from = if line == start.line { start.column } else { 0 };
             let until = if line == end.line {
                 end.column
+            } else if joined {
+                wrapped.min(cells.len())
             } else {
                 cells.len()
             };
             result.truncated |= from > cells.len() || until > cells.len();
             let from = from.min(cells.len());
             let until = until.min(cells.len()).max(from);
-            let selected = &cells[from..until];
-            let length = selected
-                .iter()
-                .rposition(|cell| cell.ch != ' ' || cell.combining != ['\0'; 2])
-                .map_or(0, |index| index + 1);
-            for cell in &selected[..length] {
+            for cell in &cells[from..until] {
                 if cell.width == 0 {
+                    continue;
+                }
+                // Reflow can retain blank columns for saved cursor positions.
+                // Delay plain spaces until another glyph makes them interior
+                // to the logical line, including across soft row boundaries.
+                if cell.ch == ' ' && cell.combining == ['\0'; 2] && cell.grapheme_id == 0 {
+                    pending_spaces = pending_spaces.saturating_add(1);
                     continue;
                 }
                 let chars = self.graphemes.chars(cell);
                 let bytes = chars.clone().map(char::len_utf8).sum::<usize>();
-                if result.text.len() + bytes > limit {
+                let spaces = pending_spaces.min(limit - result.text.len());
+                result.text.extend(core::iter::repeat_n(' ', spaces));
+                if spaces != pending_spaces || bytes > limit - result.text.len() {
                     result.truncated = true;
                     return result;
                 }
+                pending_spaces = 0;
                 result.text.extend(chars);
             }
-            if line < end.line {
+            if !joined {
+                pending_spaces = 0;
+            }
+            if line < end.line && !joined {
                 if result.text.len() == limit {
                     result.truncated = true;
                     return result;
@@ -1796,6 +1916,8 @@ impl State {
                         self.style.flags |= UNDERLINE;
                     }
                 }
+                5 => self.style.flags = (self.style.flags & !RAPID_BLINK) | BLINK,
+                6 => self.style.flags = (self.style.flags & !BLINK) | RAPID_BLINK,
                 21 => self.style.flags |= UNDERLINE,
                 7 => self.style.flags |= INVERSE,
                 8 => self.style.flags |= HIDDEN,
@@ -1803,6 +1925,7 @@ impl State {
                 22 => self.style.flags &= !(BOLD | DIM),
                 23 => self.style.flags &= !ITALIC,
                 24 => self.style.flags &= !UNDERLINE,
+                25 => self.style.flags &= !(BLINK | RAPID_BLINK),
                 27 => self.style.flags &= !INVERSE,
                 28 => self.style.flags &= !HIDDEN,
                 29 => self.style.flags &= !STRIKE,

@@ -673,14 +673,38 @@ impl Host {
         let mut size = zpty::Size::new(cols as u16, rows as u16);
         size.pixel_width = ((cw as usize * cols).min(u16::MAX as usize)) as u16;
         size.pixel_height = ((ch as usize * rows).min(u16::MAX as usize)) as u16;
-        if self.core.resize_with_cell_size(size, (cw, ch)).is_err() {
+        let mut anchor = ztty::selection::ViewAnchor::capture(
+            &self.core.terminal,
+            self.history,
+            self.selection.map(|selection| {
+                (
+                    (selection.start.col, selection.start.row),
+                    (selection.end.col, selection.end.row),
+                )
+            }),
+        );
+        if self
+            .core
+            .resize_with_cell_size_anchored(size, (cw, ch), anchor.anchors_mut())
+            .is_err()
+        {
             os::print(2, b"ztty: PTY resize failed; retaining the terminal grid\n");
             self.force = true;
             return;
         }
         self.scale = scale;
-        self.history = self.history.min(self.core.terminal.history_len());
-        self.selection = None;
+        let restored = anchor.restore(&self.core.terminal);
+        self.history = restored.history;
+        self.selection = restored.selection.map(|(start, end)| Selection {
+            start: CellPosition {
+                col: start.0,
+                row: start.1,
+            },
+            end: CellPosition {
+                col: end.0,
+                row: end.1,
+            },
+        });
         self.force = true;
     }
     fn tick(&mut self) {
