@@ -268,7 +268,23 @@ impl Screen {
     }
 
     pub fn clear_row(&mut self, y: usize, blank: Cell) {
-        self.row_mut(y).fill(blank);
+        let row = self.row_mut(y);
+        if row.len() <= 16 {
+            row.fill(blank);
+        } else {
+            // Cell is 28 bytes: scalar fill emits many stores per column.
+            // Seed a few cells, then copy initialized, nonoverlapping spans.
+            // This keeps the ordinary scroll path allocation-free without a
+            // cached blank row or architecture-specific vector instructions.
+            row[..8].fill(blank);
+            let mut initialized = 8;
+            while initialized < row.len() {
+                let (prefix, suffix) = row.split_at_mut(initialized);
+                let count = prefix.len().min(suffix.len());
+                suffix[..count].copy_from_slice(&prefix[..count]);
+                initialized += count;
+            }
+        }
         self.set_row_wrap(y, 0);
     }
 
@@ -424,6 +440,50 @@ mod row_copy_tests {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod clear_row_tests {
+    use super::{Cell, Screen, Style};
+
+    #[test]
+    fn cleared_rows_preserve_exact_blank_attributes_and_neighbouring_ring_rows() {
+        let occupied = Cell {
+            ch: '界',
+            combining: ['\u{301}', '\u{308}'],
+            fg: 0x123456,
+            bg: 0xabcdef,
+            flags: u16::MAX,
+            width: 2,
+            palette_indices: 0x71,
+            link_id: 42,
+        };
+        let blank = Style {
+            fg: 0x789abc,
+            bg: 0xdef012,
+            flags: u16::MAX,
+            palette_indices: 0x35,
+            link_id: 99,
+        }
+        .blank();
+        for cols in 1..=257 {
+            for row0 in 0..3 {
+                let mut screen = Screen::new(cols, 3, Style::default());
+                screen.row0 = row0;
+                screen.cells.fill(occupied);
+                screen.wrapped.fill(cols);
+                screen.clear_row(1, blank);
+                for y in 0..3 {
+                    let expected = if y == 1 { blank } else { occupied };
+                    assert!(
+                        screen.row(y).iter().all(|cell| *cell == expected),
+                        "cols={cols}, row0={row0}, row={y}"
+                    );
+                    assert_eq!(screen.row_wrap(y), if y == 1 { 0 } else { cols });
                 }
             }
         }
