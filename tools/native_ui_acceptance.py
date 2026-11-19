@@ -177,7 +177,7 @@ def validate_gui(name, gate):
     if name == "input":
         vectors, zoom = report.get("vectors", []), report.get("zoom", [])
         gate["counts"].update(vectors=len(vectors), zoom=len(zoom))
-        require(len(vectors) == 59 and len(zoom) == 14, "input coverage count mismatch")
+        require(len(vectors) == 70 and len(zoom) == 14, "input coverage count mismatch")
         require(all(item.get("ok") is True and item["actual_hex"] == item["expected_hex"] for item in vectors),
                 "input vector failed")
         require(all(item.get("ok") is True for item in zoom), "font zoom vector failed")
