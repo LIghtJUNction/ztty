@@ -12,10 +12,9 @@ python3 tests/registry_versions_test.py
 python3 tests/source_archive_test.py
 cargo fmt --all -- --check
 # Independent reusable crates keep their own workspace and validation scope.
-for package in zgpui zinput; do
+for package in zgpui zinput zpty zgraphics; do
     cargo fmt --manifest-path "crates/$package/Cargo.toml" --all -- --check
-    cargo test --locked --manifest-path "crates/$package/Cargo.toml" --lib
-    cargo test --locked --manifest-path "crates/$package/Cargo.toml" --doc
+    cargo test --locked --manifest-path "crates/$package/Cargo.toml"
     cargo clippy --locked --manifest-path "crates/$package/Cargo.toml" --all-targets -- -D warnings
 done
 cargo test --locked --workspace "$@"

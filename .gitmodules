@@ -4,3 +4,9 @@
 [submodule "crates/zinput"]
 	path = crates/zinput
 	url = https://github.com/LIghtJUNction/zinput.git
+[submodule "crates/zpty"]
+	path = crates/zpty
+	url = https://github.com/LIghtJUNction/zpty.git
+[submodule "crates/zgraphics"]
+	path = crates/zgraphics
+	url = https://github.com/LIghtJUNction/zgraphics.git

@@ -346,7 +346,7 @@ jobs:
           from pathlib import Path
           stem = os.environ["ARTIFACT_STEM"]
           command = ["cargo", "+" + os.environ["RUST_TOOLCHAIN"], "test", "--locked",
-                     "-p", "zpty", "--test", "darwin_spawn", "--target", os.environ["RUST_TARGET"]]
+                     "--manifest-path", "crates/zpty/Cargo.toml", "--test", "darwin_spawn", "--target", os.environ["RUST_TARGET"]]
           report = {"passed": False, "status": "failed", "source_sha": os.environ["SOURCE_SHA"],
                     "suite": "darwin-threaded-spawn", "command": command, "timeout_seconds": 120,
                     "host_machine": platform.machine(), "architecture": os.environ["ARCH"]}
