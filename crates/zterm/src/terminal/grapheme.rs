@@ -124,6 +124,8 @@ impl State {
             flags: old.flags,
             palette_indices: old.palette_indices,
             link_id: old.link_id,
+            graphics_fg: old.fg,
+            underline_color: old.link_id,
         };
         self.erase_sixel_span(y, x, x + old_width);
         self.screen.clear_range(y, x, x + old_width, style.blank());

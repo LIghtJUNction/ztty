@@ -179,6 +179,12 @@ impl Renderer {
         style: &GridStyle,
         layer: u8,
     ) -> Result<(), &'static str> {
+        let viewport = Rect {
+            x: style.padding,
+            y: style.padding,
+            width: terminal.cols() as f32 * style.cell_width,
+            height: terminal.rows() as f32 * style.cell_height,
+        };
         for draw in terminal.graphics_draws(offset) {
             let current = if draw.z < -1_073_741_824 {
                 0
@@ -189,6 +195,26 @@ impl Renderer {
             };
             if current != layer {
                 continue;
+            }
+            if let Some(clip) = draw.clip {
+                // Unicode placeholders reveal only their occupied text cells.
+                // Keep the full source transform, but intersect the tile with
+                // the viewport before submitting any image vertices.
+                let left = (style.padding + clip.x as f32).max(viewport.x);
+                let top = (style.padding + clip.y as f32).max(viewport.y);
+                let right = (style.padding + clip.x as f32 + clip.width as f32)
+                    .min(viewport.x + viewport.width);
+                let bottom = (style.padding + clip.y as f32 + clip.height as f32)
+                    .min(viewport.y + viewport.height);
+                if right <= left || bottom <= top {
+                    continue;
+                }
+                self.clip(Some(Rect {
+                    x: left,
+                    y: top,
+                    width: right - left,
+                    height: bottom - top,
+                }))?;
             }
             self.draw_image(
                 u64::from(draw.image_id),
@@ -208,6 +234,9 @@ impl Renderer {
                     height: draw.dest.height as f32,
                 },
             )?;
+            if draw.clip.is_some() {
+                self.clip(Some(viewport))?;
+            }
         }
         Ok(())
     }

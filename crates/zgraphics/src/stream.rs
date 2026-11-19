@@ -98,8 +98,9 @@ impl CommandStream {
                 return;
             };
             self.more = command.more;
-            self.transmitting =
-                matches!(command.action, b't' | b'T' | b'q') && command.feature == 0;
+            self.transmitting = matches!(command.action, b't' | b'T' | b'q' | b'f')
+                && command.feature == 0
+                && command.transport == b'd';
             if self.transmitting {
                 // Validate dimensions/transport and install metadata immediately,
                 // without retaining or decoding the entire encoded APC body.
@@ -114,6 +115,13 @@ impl CommandStream {
             }
         }
         if !self.transmitting {
+            // External names are a single, bounded payload. Never open or
+            // unlink a host object before the APC has really reached ST.
+            if self.payload.len().saturating_add(bytes.len()) > 4096 {
+                self.abort(graphics);
+            } else {
+                self.payload.extend_from_slice(bytes);
+            }
             return;
         }
         if self.payload.capacity() < 4096
@@ -186,7 +194,7 @@ impl CommandStream {
                 )
             }
         } else if let Some(command) = self.deferred.take() {
-            graphics.process(command, &[], context, replies)
+            graphics.process(command, &self.payload, context, replies)
         } else {
             Outcome::default()
         };
