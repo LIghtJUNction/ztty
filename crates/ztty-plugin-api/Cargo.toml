@@ -10,7 +10,7 @@ authors.workspace = true
 readme = "README.md"
 keywords = ["terminal", "plugin", "no-std"]
 categories = ["no-std", "api-bindings"]
-include = ["src/**", "Cargo.toml", "README.md", "LICENSE"]
+include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE"]
 
 [dependencies]
 zplugin = { version = "=0.3.0", default-features = false, features = ["macros"] }
