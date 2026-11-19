@@ -84,12 +84,14 @@ impl SessionCore {
         let bytes = match self.pty.read(buffer) {
             Ok(0) => {
                 self.eof = true;
+                self.terminal.reset_ui();
                 return Ok(ReadStep::Eof);
             }
             Ok(bytes) => bytes,
             Err(error) if error.is_would_block() => return Ok(ReadStep::Pending),
             Err(error) => {
                 self.eof = true;
+                self.terminal.reset_ui();
                 return Err(error);
             }
         };

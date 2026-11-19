@@ -101,6 +101,7 @@ struct Ui {
     history: usize,
     new_output: bool,
     scroll_prompt: Option<crate::layout::Rect>,
+    native_ui: ztty::native_ui::View,
     force: bool,
     repaint: Repaint,
     open: bool,
@@ -136,6 +137,7 @@ impl Ui {
             history: 0,
             new_output: false,
             scroll_prompt: None,
+            native_ui: ztty::native_ui::View::default(),
             force: true,
             repaint: Repaint::default(),
             open: true,
@@ -164,6 +166,7 @@ impl Ui {
         self.force = true;
     }
     fn reset_input(&mut self) {
+        self.native_ui.blur();
         self.held.fill(0);
         self.intercepted.fill(false);
         self.local_buttons.fill(false);
@@ -272,6 +275,64 @@ impl Ui {
         });
         self.find(terminal, false, true);
     }
+    fn native_action(&mut self, core: &mut SessionCore, action: Option<zterm::ui::Action>) {
+        if let Some(action) = action {
+            let bytes = ztty::native_ui::action_bytes(action);
+            self.repaint.input_sent();
+            queue_input(&mut core.input, &bytes);
+        }
+    }
+
+    fn native_pointer(
+        &mut self,
+        event: &x11::Event,
+        core: &mut SessionCore,
+        allow_input: bool,
+    ) -> bool {
+        let geometry_current = self
+            .native_ui
+            .layout
+            .as_ref()
+            .is_none_or(|layout| layout.geometry == self.window.native_ui_geometry());
+        if !geometry_current {
+            self.native_ui.blur();
+            self.force = true;
+        }
+        let interactive = geometry_current
+            && allow_input
+            && self.visible
+            && self.open
+            && !core.eof()
+            && self.history == 0
+            && self.search.is_none()
+            && self.palette.is_none()
+            && core.terminal.ui_scene().is_some_and(|scene| scene.events);
+        match unsafe { event.kind } {
+            x11::BUTTON_PRESS | x11::BUTTON_RELEASE => {
+                let e = unsafe { event.button };
+                let focused = self.native_ui.focused_node();
+                let (handled, action) = self.native_ui.pointer(
+                    &mut core.terminal,
+                    e.x,
+                    e.y,
+                    e.button,
+                    e.kind == x11::BUTTON_PRESS,
+                    interactive,
+                );
+                if handled || focused != self.native_ui.focused_node() {
+                    self.force = true;
+                }
+                self.native_action(core, action);
+                handled
+            }
+            x11::MOTION_NOTIFY => {
+                let e = unsafe { event.motion };
+                self.native_ui.blocks_motion(e.x, e.y)
+            }
+            _ => false,
+        }
+    }
+
     // The view borrows shared session state; window ownership stays separate
     // from the PTY and its input queue.
     fn event(
@@ -395,6 +456,31 @@ impl Ui {
                     }
                     self.force = true;
                     return Ok(());
+                }
+                if press {
+                    let geometry_current =
+                        self.native_ui.layout.as_ref().is_none_or(|layout| {
+                            layout.geometry == self.window.native_ui_geometry()
+                        });
+                    let interactive = geometry_current
+                        && allow_input
+                        && self.visible
+                        && self.open
+                        && !core.eof()
+                        && self.history == 0;
+                    let (handled, action) = self.native_ui.key(
+                        &mut core.terminal,
+                        symbol,
+                        mods.0 & 1 != 0,
+                        repeated,
+                        interactive,
+                    );
+                    if handled {
+                        self.intercepted[code] = true;
+                        self.force = true;
+                        self.native_action(core, action);
+                        return Ok(());
+                    }
                 }
                 let lookup = if press {
                     self.window.lookup(&mut e, text_buffer)
@@ -600,6 +686,7 @@ impl Ui {
                 if e.serial < self.window.configure_serial.get() {
                     return Ok(());
                 }
+                self.native_ui.invalidate();
                 let (cols, rows) = self.window.resize(e.width, e.height);
                 self.scroll_prompt = None;
                 if allow_input
@@ -675,6 +762,7 @@ impl Ui {
         terminal: &mut Terminal,
         appearance: &Appearance,
         observing: bool,
+        alive: bool,
     ) -> Option<u64> {
         if self
             .message
@@ -738,6 +826,16 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
+        let native_interactive =
+            alive && !observing && terminal.ui_scene().is_some_and(|scene| scene.events);
+        if self.native_ui.refresh(
+            terminal,
+            self.window.native_ui_geometry(),
+            self.history == 0 && self.search.is_none() && self.palette.is_none(),
+            native_interactive,
+        ) {
+            self.force = true;
+        }
         let plan = self.repaint.plan(
             now,
             self.force
@@ -763,6 +861,8 @@ impl Ui {
             }
             self.window
                 .render(terminal, self.history, self.selection, self.force, cursor);
+            self.window
+                .native_ui(terminal, &self.native_ui, native_interactive);
             let mut overlay_rows = 0;
             if let Some(search) = &self.search {
                 self.window.overlay(&format!(
@@ -1058,6 +1158,14 @@ struct Workspace {
     title: String,
 }
 
+#[derive(Clone, Copy)]
+struct NativeGesture {
+    session: u64,
+    attachment: u64,
+    display: *mut x11::Display,
+    button: u32,
+}
+
 struct Pool {
     sessions: Vec<Session>,
     workspaces: Vec<Workspace>,
@@ -1069,6 +1177,7 @@ struct Pool {
     reaping: Vec<(i32, u64)>,
     shortcuts: [bool; 256],
     mouse_shortcuts: [bool; 12],
+    native_gestures: Vec<NativeGesture>,
     watcher: config_watch::Watcher,
 }
 
@@ -1166,6 +1275,7 @@ impl Pool {
             reaping: Vec::new(),
             shortcuts: [false; 256],
             mouse_shortcuts: [false; 12],
+            native_gestures: Vec::new(),
             watcher: config_watch::Watcher::new(),
         }
     }
@@ -1390,6 +1500,7 @@ impl Pool {
         drop(directory);
         let mut terminal = Terminal::with_theme(cols, rows, history, appearance.theme);
         if let Some(ui) = &ui {
+            terminal.set_ui_host_enabled(true);
             terminal.set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
         }
         let session = Session {
@@ -1653,6 +1764,7 @@ impl Pool {
 
     fn detach(&mut self, index: usize) -> Value {
         let session = &mut self.sessions[index];
+        session.core.terminal.set_ui_host_enabled(false);
         session.persistent = true;
         let id = session.id;
         if let Some(ui) = session.ui.take() {
@@ -1944,6 +2056,7 @@ impl Pool {
         ui.read_only = read_only;
         session.appearance = appearance;
         session.ui = Some(ui);
+        session.core.terminal.set_ui_host_enabled(true);
         Ok(())
     }
 
@@ -2223,6 +2336,7 @@ impl Pool {
                 }
                 Ok(())
             })?;
+            ui.native_ui.invalidate();
             session
                 .core
                 .terminal
@@ -2561,6 +2675,18 @@ impl Pool {
         }
     }
 
+    fn cancel_native_gesture(&mut self, gesture: NativeGesture) {
+        if let Some(ui) = self
+            .sessions
+            .iter_mut()
+            .find(|session| session.id == gesture.session)
+            .and_then(|session| session.ui.as_mut())
+            .filter(|ui| ui.attachment == gesture.attachment)
+        {
+            ui.native_ui.cancel_button(gesture.button);
+        }
+    }
+
     fn events(&mut self, openers: &mut os::Openers, buffers: &mut InputBuffers) {
         for connection_index in 0..self.connections.len() {
             let connection = self.connections[connection_index].1.clone();
@@ -2577,6 +2703,54 @@ impl Pool {
                 }
                 let id = event.window();
                 let kind = unsafe { event.kind };
+                if matches!(kind, x11::BUTTON_PRESS | x11::BUTTON_RELEASE) {
+                    let button = unsafe { event.button.button };
+                    if let Some(position) = self.native_gestures.iter().position(|gesture| {
+                        gesture.display == connection.display && gesture.button == button
+                    }) {
+                        let gesture = self.native_gestures.swap_remove(position);
+                        let same_view = self.sessions.iter().any(|session| {
+                            session.id == gesture.session
+                                && session.ui.as_ref().is_some_and(|ui| {
+                                    ui.open
+                                        && ui.visible
+                                        && ui.attachment == gesture.attachment
+                                        && ui.window.id == id
+                                        && ui.window.display == connection.display
+                                })
+                        });
+                        if kind == x11::BUTTON_PRESS || !same_view {
+                            // A new press supersedes a release delivered outside our
+                            // windows. Cross-view releases belong to the original UI.
+                            self.cancel_native_gesture(gesture);
+                        }
+                        if kind == x11::BUTTON_RELEASE && !same_view {
+                            continue;
+                        }
+                    }
+                }
+                if kind == x11::MOTION_NOTIFY {
+                    let state = unsafe { event.motion.state };
+                    for position in (0..self.native_gestures.len()).rev() {
+                        let gesture = self.native_gestures[position];
+                        if gesture.display == connection.display
+                            && gesture.button <= 5
+                            && state & (1 << (gesture.button + 7)) == 0
+                        {
+                            // Unmapping a view drops X11's implicit grab. A
+                            // release outside this client may never be delivered.
+                            let gesture = self.native_gestures.swap_remove(position);
+                            self.cancel_native_gesture(gesture);
+                        }
+                    }
+                    if self
+                        .native_gestures
+                        .iter()
+                        .any(|gesture| gesture.display == connection.display && gesture.button <= 5)
+                    {
+                        continue;
+                    }
+                }
                 if matches!(kind, x11::FOCUS_IN | x11::FOCUS_OUT)
                     && (kind == x11::FOCUS_IN) != (x11::input_focus(connection.display) == id)
                 {
@@ -2660,6 +2834,29 @@ impl Pool {
                         }
                         continue;
                     }
+                    let native_handled = {
+                        let session = &mut self.sessions[index];
+                        let ui = session.ui.as_mut().unwrap();
+                        let allow_input = !ui.read_only && session.core.owns("local");
+                        ui.native_pointer(&event, &mut session.core, allow_input)
+                    };
+                    if native_handled {
+                        if kind == x11::BUTTON_PRESS {
+                            let session_id = self.sessions[index].id;
+                            let attachment = self.sessions[index].ui.as_ref().unwrap().attachment;
+                            self.native_gestures.push(NativeGesture {
+                                session: session_id,
+                                attachment,
+                                display: connection.display,
+                                button: unsafe { event.button.button },
+                            });
+                            if let Some(workspace) = self.workspace(session_id) {
+                                self.workspaces[workspace].layout.focus(session_id);
+                            }
+                            self.sessions[index].ui.as_ref().unwrap().window.raise();
+                        }
+                        continue;
+                    }
                     if kind == x11::KEY_RELEASE {
                         let code = (unsafe { event.key.keycode } as usize).min(255);
                         if self.shortcuts[code] {
@@ -2677,6 +2874,17 @@ impl Pool {
                             .then(|| window.key_symbol(&mut e, true));
                         if let Some(action) =
                             actions::key_action_with_shifted(bindings, symbol, shifted, e.state)
+                            && (self.sessions[index]
+                                .ui
+                                .as_ref()
+                                .unwrap()
+                                .native_ui
+                                .focused_node()
+                                .is_none()
+                                || matches!(
+                                    action,
+                                    "font-increase" | "font-decrease" | "font-reset"
+                                ))
                         {
                             self.shortcuts[(e.keycode as usize).min(255)] = true;
                             if let Err(error) = self.action(index, action) {
@@ -2781,6 +2989,7 @@ impl Pool {
         for session in &mut self.sessions {
             session.pump(buffer);
             let local_owner = session.core.owns("local");
+            let alive = !session.core.eof();
             if let Some(ui) = &mut session.ui
                 && ui.open
                 && ui.visible
@@ -2789,6 +2998,7 @@ impl Pool {
                     &mut session.core.terminal,
                     &session.appearance,
                     ui.read_only || !local_owner,
+                    alive,
                 )
             {
                 deadline = Some(deadline.map_or(next, |old: u64| old.min(next)));
