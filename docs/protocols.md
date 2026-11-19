@@ -85,7 +85,7 @@ These are default limits per graphics scene, as defined by
 | Resource | Default bound |
 | --- | --- |
 | Width or height | 8192 pixels |
-| One decoded image | 16 MiB |
+| One decoded image | 32 MiB |
 | Retained decoded image storage | 32 MiB, counting vector capacity |
 | Pending transfer | 16 MiB |
 | Stored images | 128 |

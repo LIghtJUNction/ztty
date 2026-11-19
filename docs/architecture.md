@@ -111,7 +111,7 @@ Nonessential PNG metadata is removed before decoding. An invalid transfer is
 discarded while previously stored images remain usable. The implementation is
 in [`decode.rs`](../crates/zgraphics/src/decode.rs).
 
-Each screen has its own graphics scene. The default limit is 16 MiB per decoded
+Each screen has its own graphics scene. The default limit is 32 MiB per decoded
 image and 32 MiB of retained decoded storage per scene, counting vector capacity,
 with at most 128 images and 512 placements. Width and height are each limited to
 8192 pixels and must also satisfy the byte limit. A scene allocates no image

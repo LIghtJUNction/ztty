@@ -41,7 +41,7 @@ graphics API has finished reading it. Renderers must release their retained
 references and converted-image caches when no longer needed. The dependency on
 `Arc` requires targets with pointer-width atomics.
 
-Default limits per scene are 8192 pixels per dimension, 16 MiB per decoded image,
+Default limits per scene are 8192 pixels per dimension, 32 MiB per decoded image,
 32 MiB total decoded storage, 16 MiB per pending transfer, 128 stored images and
 512 placements. Limits are configurable. PNG decoding has additional temporary
 buffers bounded by validated dimensions and compressed input; the decoded-store
@@ -81,7 +81,7 @@ completed image or move the text cursor.
 
 During decoding the indexed canvas uses at most half the decoded-image quota.
 Final conversion can briefly hold that canvas and one RGBA buffer together
-(24 MiB with the default 16 MiB image quota). Completed images remain subject to
+(48 MiB with the default 32 MiB image quota). Completed images remain subject to
 the existing 32 MiB scene quota; renderer-owned uploads are separate. Palette
 changes in a later image do not recolor already completed RGBA images.
 
