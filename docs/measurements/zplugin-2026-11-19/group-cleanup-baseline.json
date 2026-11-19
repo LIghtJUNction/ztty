@@ -1,0 +1,18 @@
+{
+  "returncode": 0,
+  "stdout": "child",
+  "stderr": "",
+  "worker_reaped": true,
+  "child_state": "S",
+  "child_parent": 3168870,
+  "child_group": 3169027,
+  "owned_group": 3169027,
+  "leaked": true,
+  "lifecycle": [
+    "create 3169027",
+    "transform",
+    "child 3169028",
+    "destroy"
+  ],
+  "test_cleaned_descendant": true
+}
