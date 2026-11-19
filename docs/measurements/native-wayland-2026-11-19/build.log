@@ -1,0 +1,21 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling simd-adler32 v0.3.10
+   Compiling zune-inflate v0.2.54
+   Compiling zune-core v0.5.3
+   Compiling zune-png v0.5.2
+   Compiling syn v2.0.119
+   Compiling zgraphics v0.1.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zgraphics)
+   Compiling zplugin-macros v0.3.0
+   Compiling unicode-width v0.2.3
+   Compiling zplugin v0.3.0
+   Compiling ztty-ui v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/ztty-ui)
+   Compiling zvte v0.1.3
+   Compiling unicode-segmentation v1.13.3
+   Compiling ztty v0.4.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119)
+   Compiling zinput v0.1.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zinput)
+   Compiling zterm v0.4.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zterm)
+   Compiling ztty-plugin-api v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/ztty-plugin-api)
+   Compiling zpty v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zpty)
+    Finished `release` profile [optimized] target(s) in 27.29s

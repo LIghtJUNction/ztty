@@ -1,0 +1,56 @@
+{
+  "source": "4d9027099d76fd7a80414496e09fea531cd8849e",
+  "source_worktree_dirty": false,
+  "binary_sha256": "8c96835d857fcc4b6e147a9a2429784a5be98259d12d3d0a62124fd78f062a14",
+  "checks": [
+    {
+      "name": "invalid_backend",
+      "command": [
+        "$BINARY",
+        "--config",
+        "$TEST_RUNTIME/minimal.conf",
+        "--backend",
+        "wrong"
+      ],
+      "passed": true,
+      "exit_code": 1,
+      "stderr": "ztty: --backend must be x11 or wayland\n"
+    },
+    {
+      "name": "unsupported_shared_session",
+      "command": [
+        "$BINARY",
+        "--config",
+        "$TEST_RUNTIME/minimal.conf",
+        "--backend",
+        "wayland",
+        "--name",
+        "not-supported"
+      ],
+      "passed": true,
+      "exit_code": 1,
+      "stderr": "ztty: the experimental Wayland backend owns one standalone PTY; shared-session options require --backend x11\n"
+    },
+    {
+      "name": "missing_compositor",
+      "command": [
+        "$BINARY",
+        "--config",
+        "$TEST_RUNTIME/minimal.conf",
+        "--backend",
+        "wayland",
+        "-e",
+        "/usr/bin/touch",
+        "$TEST_RUNTIME/should-not-exist"
+      ],
+      "passed": true,
+      "exit_code": 1,
+      "stderr": "ztty: cannot connect to a Wayland compositor with xdg-shell\n"
+    },
+    {
+      "name": "connection_failure_does_not_spawn_child",
+      "passed": true
+    }
+  ],
+  "passed": true
+}
