@@ -1,0 +1,539 @@
+{
+  "schema": 1,
+  "production_commit": "8b9f566c15ec3fb1020c4e2d96d41138c8cd2293",
+  "production_tree": "3951117e1a25ce15460118a251fa9e0ce7131639",
+  "base_commit": "e37d6de4d09d52bc0951e899a1a50d9a393ad18b",
+  "binary_sha256": "7fbaf9942d82c168bc08c54a472ccda8acd81c24f31d65558ebc48771a4dee74",
+  "binary_bytes": 1227648,
+  "finished_utc": "2026-11-19T23:24:51.353712+00:00",
+  "source_unchanged_during_build": true,
+  "committed_production_files_match_build_manifest": true,
+  "build_stages": [
+    {
+      "name": "c-format",
+      "command": [
+        "clang-format",
+        "-i",
+        "native/wayland_services.c",
+        "native/wayland_services.h",
+        "tests/wayland_services_budget.c",
+        "tests/wayland_ime_peer.c"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.08
+    },
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.768
+    },
+    {
+      "name": "native-source-budget",
+      "command": [
+        "python3",
+        "tests/wayland_services.py",
+        "--sanitize",
+        "--output",
+        "$WORKTREE/artifacts/wayland-shared-gate-5/source-budget"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.868
+    },
+    {
+      "name": "clippy-wayland",
+      "command": [
+        "cargo",
+        "clippy",
+        "--features",
+        "wayland",
+        "--bin",
+        "ztty",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 446.514
+    },
+    {
+      "name": "clippy-x11",
+      "command": [
+        "cargo",
+        "clippy",
+        "--no-default-features",
+        "--bin",
+        "ztty",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 0.129
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "--features",
+        "wayland",
+        "--bin",
+        "ztty"
+      ],
+      "exit_code": 0,
+      "elapsed_s": 386.195
+    }
+  ],
+  "wayland": {
+    "passed": true,
+    "compositor_version": "1.12",
+    "scope": "Linux headless Sway, software Mesa EGL, private shared broker; no physical display",
+    "ime_states": [
+      "STATE 1 1 13 0"
+    ],
+    "owned_brokers_remaining": [],
+    "owned_children_remaining": [],
+    "owned_helpers_remaining": [],
+    "checks": [
+      {
+        "name": "native_surface_and_pty",
+        "passed": true
+      },
+      {
+        "name": "cwd_and_terminal_environment",
+        "passed": true
+      },
+      {
+        "name": "actual_egl_pixels",
+        "passed": true
+      },
+      {
+        "name": "ascii_keyboard",
+        "passed": true
+      },
+      {
+        "name": "unicode_keyboard",
+        "passed": true
+      },
+      {
+        "name": "control_key",
+        "passed": true
+      },
+      {
+        "name": "navigation_keys",
+        "passed": true
+      },
+      {
+        "name": "alt_key",
+        "passed": true
+      },
+      {
+        "name": "keyboard_repeat",
+        "passed": true
+      },
+      {
+        "name": "repeat_stops_on_release",
+        "passed": true
+      },
+      {
+        "name": "kitty_press_release",
+        "passed": true
+      },
+      {
+        "name": "osc_title_reaches_compositor",
+        "passed": true
+      },
+      {
+        "name": "configure_resizes_real_pty",
+        "passed": true
+      },
+      {
+        "name": "text_survives_resize",
+        "passed": true
+      },
+      {
+        "name": "history_keyboard_scroll",
+        "passed": true
+      },
+      {
+        "name": "history_returns_live",
+        "passed": true
+      },
+      {
+        "name": "synchronized_full_frame",
+        "passed": true
+      },
+      {
+        "name": "green_frame_visible",
+        "passed": true
+      },
+      {
+        "name": "native_window_uses_shared_broker",
+        "passed": true
+      },
+      {
+        "name": "concurrent_native_windows_share_broker_not_pty",
+        "passed": true
+      },
+      {
+        "name": "closing_sibling_preserves_other_native_window",
+        "passed": true
+      },
+      {
+        "name": "mcp_reads_same_native_pty",
+        "passed": true
+      },
+      {
+        "name": "mcp_preserves_local_input_owner",
+        "passed": true
+      },
+      {
+        "name": "mcp_write_reaches_same_pty",
+        "passed": true
+      },
+      {
+        "name": "local_keyboard_blocked_while_mcp_owns",
+        "passed": true
+      },
+      {
+        "name": "local_control_reacquired",
+        "passed": true
+      },
+      {
+        "name": "native_clipboard_utf8_bracketed_paste",
+        "passed": true
+      },
+      {
+        "name": "native_primary_paste",
+        "passed": true
+      },
+      {
+        "name": "native_clipboard_export",
+        "passed": true
+      },
+      {
+        "name": "primary_copy_uses_real_input_serial",
+        "passed": true
+      },
+      {
+        "name": "native_primary_export",
+        "passed": true
+      },
+      {
+        "name": "native_osc52_reads_clipboard",
+        "passed": true
+      },
+      {
+        "name": "slow_clipboard_does_not_block_keyboard",
+        "passed": true
+      },
+      {
+        "name": "slow_clipboard_input_latency",
+        "passed": true
+      },
+      {
+        "name": "stalled_clipboard_times_out_without_partial_paste",
+        "passed": true
+      },
+      {
+        "name": "clipboard_recovers_after_timeout",
+        "passed": true
+      },
+      {
+        "name": "ime_requests_terminal_without_fake_surrounding",
+        "passed": true
+      },
+      {
+        "name": "ime_preedit_is_visible_without_pty_input",
+        "passed": true
+      },
+      {
+        "name": "ime_commit_exact_utf8_once",
+        "passed": true
+      },
+      {
+        "name": "ime_chunk_boundaries_preserve_utf8",
+        "passed": true
+      },
+      {
+        "name": "ime_cannot_delete_unowned_shell_buffer",
+        "passed": true
+      },
+      {
+        "name": "ime_recovers_after_invalid_delete",
+        "passed": true
+      },
+      {
+        "name": "ime_peer_clean_exit",
+        "passed": true
+      },
+      {
+        "name": "mixed-x11-first-x11_actual_x11_window",
+        "passed": true
+      },
+      {
+        "name": "x11_first_routes_both_backends_in_one_broker",
+        "passed": true
+      },
+      {
+        "name": "x11_first_keeps_separate_ptys",
+        "passed": true
+      },
+      {
+        "name": "x11_first_mixed_sessions_closed",
+        "passed": true
+      },
+      {
+        "name": "mixed-wayland-first-x11_actual_x11_window",
+        "passed": true
+      },
+      {
+        "name": "wayland_first_routes_both_backends_in_one_broker",
+        "passed": true
+      },
+      {
+        "name": "wayland_first_keeps_separate_ptys",
+        "passed": true
+      },
+      {
+        "name": "wayland_first_mixed_sessions_closed",
+        "passed": true
+      },
+      {
+        "name": "mixed_backend_tests_preserve_original_session",
+        "passed": true
+      },
+      {
+        "name": "detach_keeps_native_pty_alive",
+        "passed": true
+      },
+      {
+        "name": "native_observer_reuses_same_pty",
+        "passed": true
+      },
+      {
+        "name": "observer_keyboard_cannot_write",
+        "passed": true
+      },
+      {
+        "name": "observer_detach_keeps_pty_alive",
+        "passed": true
+      },
+      {
+        "name": "reattached_native_view_controls_same_pty",
+        "passed": true
+      },
+      {
+        "name": "reattach_identity_stays_stable",
+        "passed": true
+      },
+      {
+        "name": "persistent_native_window_close_detaches",
+        "passed": true
+      },
+      {
+        "name": "explicit_close_reaps_persistent_pty",
+        "passed": true
+      },
+      {
+        "name": "compositor_close_exits_cleanly",
+        "passed": true
+      },
+      {
+        "name": "closed_window_reaps_child",
+        "passed": true
+      },
+      {
+        "name": "child_exit_code_propagates",
+        "passed": true
+      },
+      {
+        "name": "lost_compositor_reports_error",
+        "passed": true
+      },
+      {
+        "name": "lost_compositor_reaps_child",
+        "passed": true
+      }
+    ],
+    "mixed_private_xvfb_identity_verified": true
+  },
+  "x11_clipboard": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "direct UTF-8 multiline and tabs",
+        "passed": true
+      },
+      {
+        "name": "INCR UTF-8 split inside codepoints",
+        "passed": true
+      },
+      {
+        "name": "direct STRING fallback",
+        "passed": true
+      },
+      {
+        "name": "INCR STRING fallback",
+        "passed": true
+      },
+      {
+        "name": "large INCR complete byte-for-byte",
+        "passed": true
+      },
+      {
+        "name": "empty clipboard sends no paste brackets",
+        "passed": true
+      },
+      {
+        "name": "control characters cannot close paste brackets",
+        "passed": true
+      },
+      {
+        "name": "missing text",
+        "passed": true
+      },
+      {
+        "name": "recovery after missing text",
+        "passed": true
+      },
+      {
+        "name": "non-text direct type",
+        "passed": true
+      },
+      {
+        "name": "recovery after non-text direct type",
+        "passed": true
+      },
+      {
+        "name": "wrong direct format",
+        "passed": true
+      },
+      {
+        "name": "recovery after wrong direct format",
+        "passed": true
+      },
+      {
+        "name": "malformed INCR header",
+        "passed": true
+      },
+      {
+        "name": "recovery after malformed INCR header",
+        "passed": true
+      },
+      {
+        "name": "INCR type change rejects prefix",
+        "passed": true
+      },
+      {
+        "name": "recovery after INCR type change rejects prefix",
+        "passed": true
+      },
+      {
+        "name": "malformed INCR chunk rejects prefix",
+        "passed": true
+      },
+      {
+        "name": "recovery after malformed INCR chunk rejects prefix",
+        "passed": true
+      },
+      {
+        "name": "oversized direct reply",
+        "passed": true
+      },
+      {
+        "name": "recovery after oversized direct reply",
+        "passed": true
+      },
+      {
+        "name": "oversized INCR declaration",
+        "passed": true
+      },
+      {
+        "name": "recovery after oversized INCR declaration",
+        "passed": true
+      },
+      {
+        "name": "cumulative INCR limit",
+        "passed": true
+      },
+      {
+        "name": "recovery after cumulative INCR limit",
+        "passed": true
+      }
+    ],
+    "cleanup_errors": []
+  },
+  "x11_input": {
+    "passed": true,
+    "vector_count": 198,
+    "all_vectors_passed": true,
+    "ui_groups": [
+      "real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings",
+      "Num Lock stays silent in legacy mode; verified physical keypad digits/decimal use text while all eleven navigation keys retain legacy or requested Kitty identity, including Begin; lock reporting stays explicit",
+      "every physical keypad digit/decimal follows the XKB NumLock/Shift layer; application cursor/keypad modes, NumLock override and held-key release identity are verified",
+      "vertical and horizontal wheel input has distinct SGR press codes and no release reports",
+      "extra button press/release reports retain button identity; report records physical XTEST versus synthetic XSendEvent coverage",
+      "held extra-button state survives motion and clears on release, including X11 buttons lacking core state-mask bits",
+      "press ownership remains stable when Shift changes before a primary or extra-button release",
+      "focus loss clears held extra-button state before focus returns, motion, and release",
+      "mode 9 filters input correctly, follows SGR selection, and its reset cannot cancel active mode 1000",
+      "custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled",
+      "shifted punctuation bindings consume their press, release and palette input using the active XKB layout",
+      "real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered",
+      "keypad Enter and Shift+Enter reproduce search selection; keypad Up/Down choose and execute distinct palette actions without leaking press/release bytes",
+      "Ctrl+Tab and Ctrl+Shift+Tab move between real raw PTYs without leaking a consumed key release after focus changes"
+    ],
+    "zoom_count": 14,
+    "all_zoom_passed": true,
+    "keypad_overlay_count": 4,
+    "all_keypad_overlays_passed": true,
+    "renderer": {
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    "keyboard_mapping_restored": true,
+    "cleanup": {
+      "owned_processes_remaining": []
+    }
+  },
+  "native_source_budget": {
+    "passed": true,
+    "sanitizers": true,
+    "stdout": "PASS: full-budget replacement, oversize rejection, live-writer preservation, cancelled-writer lifetime, final accounting\n",
+    "source_sha256": {
+      "native/wayland_services.c": "56b40c13395e6a3e6f31fa447e835b195d43390426f3f3537460c8b0bd4cba25",
+      "native/wayland_services.h": "e79bb9e9e37eda3b30e33bee132df26c0b3033c0b0ec65690062632915e3ff4f",
+      "tests/wayland_services_budget.c": "491f25f06714a3aa820137a3f1c893ce0683632576b4132e50d9339e4fe20410",
+      "tests/wayland_services.py": "da4bee3923d212d956d6b6ecad3d401f6372ce86c5d6f2b6e9e38bd63996aea1"
+    },
+    "groups": 5,
+    "single_payload_limit_bytes": 4194304,
+    "live_payload_budget_bytes": 8388608
+  },
+  "fixture_normalization_after_run": {
+    "path": "tests/wayland_gui.py",
+    "change": "remove redundant final blank line only; production sources and ELF unchanged",
+    "tested_sha256": "cd56ccbe3afecc3780efb76ee56ff0200425009d85cb2325b1168a58dbada91a",
+    "committed_sha256": "e70c87ae70220387ee99ea0da0d3fd0c943fe9a7bc2c6bd79b8bb612e8314fd4",
+    "removed_lf_bytes": 1
+  },
+  "pinned_protocol_sha256": "99414dbad9458e71aa1fa01bc45f94ca6685787bfcb4d98948f72c1b45b60703",
+  "raw_private_evidence_sha256": {
+    "artifacts/wayland-shared-gate-5/summary.json": "bbb15595d302cde614cf8ecf68a93c9a107c6bc86297355cfd4a6be520821dd0",
+    "artifacts/wayland-shared-gate-5/sources.json": "f82d65726793331c400c4bfd862997868ada76546d98d84a403ea21ef710a787",
+    "artifacts/wayland-shared-gate-5/source-budget/validation.json": "e14edf2f1de8a68ee44c58c402b81124c4d49d0faebae33af456cc71fd144600",
+    "artifacts/wayland-shared-final-gui/summary.json": "242b7923621f116e96a28010963f15408d54a78700cd3df6979bfa2db24a75df",
+    "artifacts/wayland-shared-final-gui/wayland/validation.json": "a35edb24a339ea594f70bdfd72bbdf3690172d87d440a533dbcaf7b136bfb5b0",
+    "artifacts/wayland-shared-final-gui/x11-clipboard.json": "3a650fc525dd3defc83834d1fb48fa1d56f03e398c722430b07e5eec64600f70",
+    "artifacts/wayland-shared-final-gui/x11-input.json": "a512d0ab383d67755fbb80dc55787efb367ebbf9526d990de0e0ae5d1d76327f"
+  },
+  "public_evidence_policy": "Sanitized results only. Raw logs, runtime identities, and screenshots remain private; no host-desktop input or user clipboard was accessed."
+}
