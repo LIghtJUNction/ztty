@@ -108,9 +108,11 @@ time.sleep(30)
     data = "0123456789abcdef" * 4096
     accepted = 0
     digest = hashlib.sha256()
-    # Stop at an actual broker queue-full response, proving that bytes still
-    # reside in its user-space queue while the child is deliberately not reading.
-    for _ in range(32):
+    # Allow the broker's 8 MiB queue plus the kernel PTY buffer, with a fixed
+    # 10 MiB sending budget. A real queue-full response is still required before
+    # reacquiring control while the child is deliberately not reading.
+    send_budget = 10 * 1024 * 1024
+    for attempt in range(1, send_budget // len(data) + 1):
         client.identifier += 1
         send(client.proc, packet("tools/call", client.identifier, {
             "name": "session_write", "arguments": {"session": uri, "data": data},
@@ -124,7 +126,8 @@ time.sleep(30)
         accepted += len(data)
         digest.update(data.encode())
     else:
-        raise AssertionError("could not establish bounded PTY input backpressure")
+        raise AssertionError({"error": "could not establish bounded PTY input backpressure",
+                              "send_budget_bytes": send_budget, "accepted_bytes": accepted})
     assert accepted > 0
     for takeover in [False, True]:
         acquired = client.tool("session_control", {
@@ -143,6 +146,7 @@ time.sleep(30)
     sessions.remove(uri)
     return {"status": "passed", "accepted_bytes": accepted,
             "received_bytes": observed["received"], "sha256": observed["sha256"],
+            "send_budget_bytes": send_budget, "write_attempts": attempt,
             "queue_full_before_reacquire": True}
 
 
