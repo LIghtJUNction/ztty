@@ -1,0 +1,1421 @@
+{
+  "ok": true,
+  "binary_sha256": "5ab07a927c84861332a37b12e9918677aab0968e7c3e450cec861bed3de214a8",
+  "test_sha256": "8588fb9c9324f48a449b9fafde8e1fc0abf093c7134dc828b83c895cafc7fda8",
+  "source_sha256": {
+    "src/session.rs": "02fae116f87c3d22850bd1a89c55ba8462811e0fa8d225e27c85e09c30021a3e",
+    "src/x11.rs": "9f21c041d47608380dc8695362f9743a32bb4472e6042ca2f62d57ee3c95c8fe",
+    "src/main.rs": "3528fd541383aa9fb42dec3701ee017061d900569fe210f291a2877d792e8d7d",
+    "src/actions.rs": "7199f586fc81fe740ba27ce9174f7788b212df1d5c7b557f7220c4dc43dfbaae",
+    "crates/zinput/src/lib.rs": "c3baf0aed281484da2c95a797d4978c1ddd85f22a84248e049e50c323d20a0f1",
+    "crates/zterm/src/lib.rs": "d5412f4eaa7a28f7514d134d6c3645313c6a82c4b79b015b0ee286a8912c1253",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+  },
+  "checks": [
+    "real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings",
+    "Num Lock stays silent in legacy mode; verified physical keypad digits/decimal use text while all eleven navigation keys retain legacy or requested Kitty identity, including Begin; lock reporting stays explicit",
+    "every physical keypad digit/decimal follows the XKB NumLock/Shift layer; application cursor/keypad modes, NumLock override and held-key release identity are verified",
+    "vertical and horizontal wheel input has distinct SGR press codes and no release reports",
+    "extra button press/release reports retain button identity; report records physical XTEST versus synthetic XSendEvent coverage",
+    "held extra-button state survives motion and clears on release, including X11 buttons lacking core state-mask bits",
+    "press ownership remains stable when Shift changes before a primary or extra-button release",
+    "focus loss clears held extra-button state before focus returns, motion, and release",
+    "mode 9 filters input correctly, follows SGR selection, and its reset cannot cancel active mode 1000",
+    "custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled",
+    "shifted punctuation bindings consume their press, release and palette input using the active XKB layout",
+    "real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered",
+    "keypad Enter and Shift+Enter reproduce search selection; keypad Up/Down choose and execute distinct palette actions without leaking press/release bytes",
+    "Ctrl+Tab and Ctrl+Shift+Tab move between real raw PTYs without leaking a consumed key release after focus changes"
+  ],
+  "vectors": [
+    {
+      "name": "legacy Ctrl+I",
+      "injection": "XTEST",
+      "expected_hex": "09",
+      "actual_hex": "09",
+      "ok": true
+    },
+    {
+      "name": "legacy Ctrl+Shift+I remains distinct",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3130353b3675",
+      "actual_hex": "1b5b3130353b3675",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+unshifted tilde on private keyboard mapping",
+      "injection": "XTEST",
+      "expected_hex": "1e",
+      "actual_hex": "1e",
+      "ok": true
+    },
+    {
+      "name": "Num Lock toggles without writing CSI-u into a legacy shell",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Num Lock on: keypad digits and decimal are text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e",
+      "actual_hex": "303132333435363738392e",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 1: printable keypad keys remain text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 2: printable keypad keys remain text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 3: printable keypad keys remain text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 4: printable keypad keys remain text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 5: printable keypad keys remain text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 6: printable keypad keys remain text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 7: printable keypad keys remain text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty report-all retains keypad identity",
+      "injection": "XTEST",
+      "expected_hex": "1b5b35373430303b31323975",
+      "actual_hex": "1b5b35373430303b31323975",
+      "ok": true
+    },
+    {
+      "name": "Kitty report-all includes requested keypad text",
+      "injection": "XTEST",
+      "expected_hex": "1b5b35373430303b3132393b343975",
+      "actual_hex": "1b5b35373430303b3132393b343975",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_0",
+      "injection": "XTEST",
+      "expected_hex": "30",
+      "actual_hex": "30",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_1",
+      "injection": "XTEST",
+      "expected_hex": "31",
+      "actual_hex": "31",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_2",
+      "injection": "XTEST",
+      "expected_hex": "32",
+      "actual_hex": "32",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_3",
+      "injection": "XTEST",
+      "expected_hex": "33",
+      "actual_hex": "33",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_4",
+      "injection": "XTEST",
+      "expected_hex": "34",
+      "actual_hex": "34",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_5",
+      "injection": "XTEST",
+      "expected_hex": "35",
+      "actual_hex": "35",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_6",
+      "injection": "XTEST",
+      "expected_hex": "36",
+      "actual_hex": "36",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_7",
+      "injection": "XTEST",
+      "expected_hex": "37",
+      "actual_hex": "37",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_8",
+      "injection": "XTEST",
+      "expected_hex": "38",
+      "actual_hex": "38",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_9",
+      "injection": "XTEST",
+      "expected_hex": "39",
+      "actual_hex": "39",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_Decimal",
+      "injection": "XTEST",
+      "expected_hex": "2e",
+      "actual_hex": "2e",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_Add",
+      "injection": "XTEST",
+      "expected_hex": "2b",
+      "actual_hex": "2b",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_Subtract",
+      "injection": "XTEST",
+      "expected_hex": "2d",
+      "actual_hex": "2d",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_Multiply",
+      "injection": "XTEST",
+      "expected_hex": "2a",
+      "actual_hex": "2a",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_Divide",
+      "injection": "XTEST",
+      "expected_hex": "2f",
+      "actual_hex": "2f",
+      "ok": true
+    },
+    {
+      "name": "Num Lock overrides application keypad: KP_Enter",
+      "injection": "XTEST",
+      "expected_hex": "0d",
+      "actual_hex": "0d",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 1: Num Lock overrides application keypad text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 2: Num Lock overrides application keypad text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 3: Num Lock overrides application keypad text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 4: Num Lock overrides application keypad text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 5: Num Lock overrides application keypad text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 6: Num Lock overrides application keypad text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Kitty flags 7: Num Lock overrides application keypad text",
+      "injection": "XTEST",
+      "expected_hex": "303132333435363738392e2b2d2a2f",
+      "actual_hex": "303132333435363738392e2b2d2a2f",
+      "ok": true
+    },
+    {
+      "name": "Num Lock and application keypad: Alt+KP_Enter",
+      "injection": "XTEST",
+      "expected_hex": "1b0d",
+      "actual_hex": "1b0d",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off: application keypad keeps disambiguated identity",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734313475",
+      "actual_hex": "1b5b353734313475",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off: application keypad keeps press and release events",
+      "injection": "XTEST",
+      "expected_hex": "1b5b35373431343b313a31751b5b35373431343b313a3375",
+      "actual_hex": "1b5b35373431343b313a31751b5b35373431343b313a3375",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off emits no legacy input",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_0 sends KP_Insert",
+      "injection": "XTEST",
+      "expected_hex": "1b5b327e",
+      "actual_hex": "1b5b327e",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_1 sends KP_End",
+      "injection": "XTEST",
+      "expected_hex": "1b5b46",
+      "actual_hex": "1b5b46",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_2 sends KP_Down",
+      "injection": "XTEST",
+      "expected_hex": "1b5b42",
+      "actual_hex": "1b5b42",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_3 sends KP_Next",
+      "injection": "XTEST",
+      "expected_hex": "1b5b367e",
+      "actual_hex": "1b5b367e",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_4 sends KP_Left",
+      "injection": "XTEST",
+      "expected_hex": "1b5b44",
+      "actual_hex": "1b5b44",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_5 sends KP_Begin",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3145",
+      "actual_hex": "1b5b3145",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_6 sends KP_Right",
+      "injection": "XTEST",
+      "expected_hex": "1b5b43",
+      "actual_hex": "1b5b43",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_7 sends KP_Home",
+      "injection": "XTEST",
+      "expected_hex": "1b5b48",
+      "actual_hex": "1b5b48",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_8 sends KP_Up",
+      "injection": "XTEST",
+      "expected_hex": "1b5b41",
+      "actual_hex": "1b5b41",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_9 sends KP_Prior",
+      "injection": "XTEST",
+      "expected_hex": "1b5b357e",
+      "actual_hex": "1b5b357e",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 0: physical KP_Decimal sends KP_Delete",
+      "injection": "XTEST",
+      "expected_hex": "1b5b337e",
+      "actual_hex": "1b5b337e",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_0 sends KP_Insert",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734323575",
+      "actual_hex": "1b5b353734323575",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_1 sends KP_End",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734323475",
+      "actual_hex": "1b5b353734323475",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_2 sends KP_Down",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734323075",
+      "actual_hex": "1b5b353734323075",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_3 sends KP_Next",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734323275",
+      "actual_hex": "1b5b353734323275",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_4 sends KP_Left",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734313775",
+      "actual_hex": "1b5b353734313775",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_5 sends KP_Begin",
+      "injection": "XTEST",
+      "expected_hex": "1b5b45",
+      "actual_hex": "1b5b45",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_6 sends KP_Right",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734313875",
+      "actual_hex": "1b5b353734313875",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_7 sends KP_Home",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734323375",
+      "actual_hex": "1b5b353734323375",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_8 sends KP_Up",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734313975",
+      "actual_hex": "1b5b353734313975",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_9 sends KP_Prior",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734323175",
+      "actual_hex": "1b5b353734323175",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off, Kitty flags 1: physical KP_Decimal sends KP_Delete",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353734323675",
+      "actual_hex": "1b5b353734323675",
+      "ok": true
+    },
+    {
+      "name": "explicit Kitty opt-in still reports Num Lock and its state",
+      "injection": "XTEST",
+      "expected_hex": "1b5b35373336303b31323975",
+      "actual_hex": "1b5b35373336303b31323975",
+      "ok": true
+    },
+    {
+      "name": "return to legacy mode stops reporting lock keys",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_0",
+      "injection": "XTEST",
+      "expected_hex": "1b5b327e",
+      "actual_hex": "1b5b327e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_0",
+      "injection": "XTEST",
+      "expected_hex": "30",
+      "actual_hex": "30",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_1",
+      "injection": "XTEST",
+      "expected_hex": "1b5b46",
+      "actual_hex": "1b5b46",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_1",
+      "injection": "XTEST",
+      "expected_hex": "31",
+      "actual_hex": "31",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_2",
+      "injection": "XTEST",
+      "expected_hex": "1b5b42",
+      "actual_hex": "1b5b42",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_2",
+      "injection": "XTEST",
+      "expected_hex": "32",
+      "actual_hex": "32",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_3",
+      "injection": "XTEST",
+      "expected_hex": "1b5b367e",
+      "actual_hex": "1b5b367e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_3",
+      "injection": "XTEST",
+      "expected_hex": "33",
+      "actual_hex": "33",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_4",
+      "injection": "XTEST",
+      "expected_hex": "1b5b44",
+      "actual_hex": "1b5b44",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_4",
+      "injection": "XTEST",
+      "expected_hex": "34",
+      "actual_hex": "34",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_5",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3145",
+      "actual_hex": "1b5b3145",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_5",
+      "injection": "XTEST",
+      "expected_hex": "35",
+      "actual_hex": "35",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_6",
+      "injection": "XTEST",
+      "expected_hex": "1b5b43",
+      "actual_hex": "1b5b43",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_6",
+      "injection": "XTEST",
+      "expected_hex": "36",
+      "actual_hex": "36",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_7",
+      "injection": "XTEST",
+      "expected_hex": "1b5b48",
+      "actual_hex": "1b5b48",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_7",
+      "injection": "XTEST",
+      "expected_hex": "37",
+      "actual_hex": "37",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_8",
+      "injection": "XTEST",
+      "expected_hex": "1b5b41",
+      "actual_hex": "1b5b41",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_8",
+      "injection": "XTEST",
+      "expected_hex": "38",
+      "actual_hex": "38",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_9",
+      "injection": "XTEST",
+      "expected_hex": "1b5b357e",
+      "actual_hex": "1b5b357e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_9",
+      "injection": "XTEST",
+      "expected_hex": "39",
+      "actual_hex": "39",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=False: KP_Decimal",
+      "injection": "XTEST",
+      "expected_hex": "1b5b337e",
+      "actual_hex": "1b5b337e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=False Shift=True: KP_Decimal",
+      "injection": "XTEST",
+      "expected_hex": "2e",
+      "actual_hex": "2e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_0",
+      "injection": "XTEST",
+      "expected_hex": "30",
+      "actual_hex": "30",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_0",
+      "injection": "XTEST",
+      "expected_hex": "1b5b323b327e",
+      "actual_hex": "1b5b323b327e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_1",
+      "injection": "XTEST",
+      "expected_hex": "31",
+      "actual_hex": "31",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_1",
+      "injection": "XTEST",
+      "expected_hex": "1b5b313b3246",
+      "actual_hex": "1b5b313b3246",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_2",
+      "injection": "XTEST",
+      "expected_hex": "32",
+      "actual_hex": "32",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_2",
+      "injection": "XTEST",
+      "expected_hex": "1b5b313b3242",
+      "actual_hex": "1b5b313b3242",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_3",
+      "injection": "XTEST",
+      "expected_hex": "33",
+      "actual_hex": "33",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_3",
+      "injection": "XTEST",
+      "expected_hex": "1b5b363b327e",
+      "actual_hex": "1b5b363b327e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_4",
+      "injection": "XTEST",
+      "expected_hex": "34",
+      "actual_hex": "34",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_4",
+      "injection": "XTEST",
+      "expected_hex": "1b5b313b3244",
+      "actual_hex": "1b5b313b3244",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_5",
+      "injection": "XTEST",
+      "expected_hex": "35",
+      "actual_hex": "35",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_5",
+      "injection": "XTEST",
+      "expected_hex": "1b5b313b3245",
+      "actual_hex": "1b5b313b3245",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_6",
+      "injection": "XTEST",
+      "expected_hex": "36",
+      "actual_hex": "36",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_6",
+      "injection": "XTEST",
+      "expected_hex": "1b5b313b3243",
+      "actual_hex": "1b5b313b3243",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_7",
+      "injection": "XTEST",
+      "expected_hex": "37",
+      "actual_hex": "37",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_7",
+      "injection": "XTEST",
+      "expected_hex": "1b5b313b3248",
+      "actual_hex": "1b5b313b3248",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_8",
+      "injection": "XTEST",
+      "expected_hex": "38",
+      "actual_hex": "38",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_8",
+      "injection": "XTEST",
+      "expected_hex": "1b5b313b3241",
+      "actual_hex": "1b5b313b3241",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_9",
+      "injection": "XTEST",
+      "expected_hex": "39",
+      "actual_hex": "39",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_9",
+      "injection": "XTEST",
+      "expected_hex": "1b5b353b327e",
+      "actual_hex": "1b5b353b327e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=False: KP_Decimal",
+      "injection": "XTEST",
+      "expected_hex": "2e",
+      "actual_hex": "2e",
+      "ok": true
+    },
+    {
+      "name": "PC keypad NumLock=True Shift=True: KP_Decimal",
+      "injection": "XTEST",
+      "expected_hex": "1b5b333b327e",
+      "actual_hex": "1b5b333b327e",
+      "ok": true
+    },
+    {
+      "name": "Application cursor mode routes keypad navigation: KP_1",
+      "injection": "XTEST",
+      "expected_hex": "1b4f46",
+      "actual_hex": "1b4f46",
+      "ok": true
+    },
+    {
+      "name": "Application cursor mode routes keypad navigation: KP_2",
+      "injection": "XTEST",
+      "expected_hex": "1b4f42",
+      "actual_hex": "1b4f42",
+      "ok": true
+    },
+    {
+      "name": "Application cursor mode routes keypad navigation: KP_4",
+      "injection": "XTEST",
+      "expected_hex": "1b4f44",
+      "actual_hex": "1b4f44",
+      "ok": true
+    },
+    {
+      "name": "Application cursor mode routes keypad navigation: KP_6",
+      "injection": "XTEST",
+      "expected_hex": "1b4f43",
+      "actual_hex": "1b4f43",
+      "ok": true
+    },
+    {
+      "name": "Application cursor mode routes keypad navigation: KP_7",
+      "injection": "XTEST",
+      "expected_hex": "1b4f48",
+      "actual_hex": "1b4f48",
+      "ok": true
+    },
+    {
+      "name": "Application cursor mode routes keypad navigation: KP_8",
+      "injection": "XTEST",
+      "expected_hex": "1b4f41",
+      "actual_hex": "1b4f41",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_0",
+      "injection": "XTEST",
+      "expected_hex": "1b4f70",
+      "actual_hex": "1b4f70",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_1",
+      "injection": "XTEST",
+      "expected_hex": "1b4f71",
+      "actual_hex": "1b4f71",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_2",
+      "injection": "XTEST",
+      "expected_hex": "1b4f72",
+      "actual_hex": "1b4f72",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_3",
+      "injection": "XTEST",
+      "expected_hex": "1b4f73",
+      "actual_hex": "1b4f73",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_4",
+      "injection": "XTEST",
+      "expected_hex": "1b4f74",
+      "actual_hex": "1b4f74",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_5",
+      "injection": "XTEST",
+      "expected_hex": "1b4f75",
+      "actual_hex": "1b4f75",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_6",
+      "injection": "XTEST",
+      "expected_hex": "1b4f76",
+      "actual_hex": "1b4f76",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_7",
+      "injection": "XTEST",
+      "expected_hex": "1b4f77",
+      "actual_hex": "1b4f77",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_8",
+      "injection": "XTEST",
+      "expected_hex": "1b4f78",
+      "actual_hex": "1b4f78",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_9",
+      "injection": "XTEST",
+      "expected_hex": "1b4f79",
+      "actual_hex": "1b4f79",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_Decimal",
+      "injection": "XTEST",
+      "expected_hex": "1b4f6e",
+      "actual_hex": "1b4f6e",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_Add",
+      "injection": "XTEST",
+      "expected_hex": "1b4f6b",
+      "actual_hex": "1b4f6b",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_Subtract",
+      "injection": "XTEST",
+      "expected_hex": "1b4f6d",
+      "actual_hex": "1b4f6d",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_Multiply",
+      "injection": "XTEST",
+      "expected_hex": "1b4f6a",
+      "actual_hex": "1b4f6a",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_Divide",
+      "injection": "XTEST",
+      "expected_hex": "1b4f6f",
+      "actual_hex": "1b4f6f",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off keeps application keypad: KP_Enter",
+      "injection": "XTEST",
+      "expected_hex": "1b4f4d",
+      "actual_hex": "1b4f4d",
+      "ok": true
+    },
+    {
+      "name": "Keypad release retains the pressed identity after Shift is released",
+      "injection": "XTEST",
+      "expected_hex": "1b5b35373432343b3133303a31751b5b35373432343b3132393a3375",
+      "actual_hex": "1b5b35373432343b3133303a31751b5b35373432343b3132393a3375",
+      "ok": true
+    },
+    {
+      "name": "Keypad autorepeat and release retain identity after Shift is released",
+      "injection": "XTEST",
+      "expected_hex": "1b5b35373432343b3133303a31751b5b35373432343b3132393a32751b5b35373432343b3132393a3375",
+      "actual_hex": "1b5b35373432343b3133303a31751b5b35373432343b3132393a32751b5b35373432343b3132393a3375",
+      "ok": true
+    },
+    {
+      "name": "wheel button 4: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36343b383b364d",
+      "actual_hex": "1b5b3c36343b383b364d",
+      "ok": true
+    },
+    {
+      "name": "wheel button 5: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36353b383b364d",
+      "actual_hex": "1b5b3c36353b383b364d",
+      "ok": true
+    },
+    {
+      "name": "wheel button 6: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36363b383b364d",
+      "actual_hex": "1b5b3c36363b383b364d",
+      "ok": true
+    },
+    {
+      "name": "wheel button 7: press without release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c36373b383b364d",
+      "actual_hex": "1b5b3c36373b383b364d",
+      "ok": true
+    },
+    {
+      "name": "extra button 8: SGR press/release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132383b383b364d1b5b3c3132383b383b366d",
+      "actual_hex": "1b5b3c3132383b383b364d1b5b3c3132383b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 9: SGR press/release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132393b383b364d1b5b3c3132393b383b366d",
+      "actual_hex": "1b5b3c3132393b383b364d1b5b3c3132393b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 10: SGR press/release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3133303b383b364d1b5b3c3133303b383b366d",
+      "actual_hex": "1b5b3c3133303b383b364d1b5b3c3133303b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 11: SGR press/release",
+      "injection": "XSendEvent (outside virtual pointer button count)",
+      "expected_hex": "1b5b3c3133313b383b364d1b5b3c3133313b383b366d",
+      "actual_hex": "1b5b3c3133313b383b364d1b5b3c3133313b383b366d",
+      "ok": true
+    },
+    {
+      "name": "extra button 8: drag in mode 1002",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132383b383b364d1b5b3c3136303b31303b374d1b5b3c3132383b31303b376d",
+      "actual_hex": "1b5b3c3132383b383b364d1b5b3c3136303b31303b374d1b5b3c3132383b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "extra button 9: drag in mode 1002",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132393b383b364d1b5b3c3136313b31303b374d1b5b3c3132393b31303b376d",
+      "actual_hex": "1b5b3c3132393b383b364d1b5b3c3136313b31303b374d1b5b3c3132393b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "extra button 10: drag in mode 1002",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3133303b383b364d1b5b3c3136323b31303b374d1b5b3c3133303b31303b376d",
+      "actual_hex": "1b5b3c3133303b383b364d1b5b3c3136323b31303b374d1b5b3c3133303b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "extra button 11: drag in mode 1002",
+      "injection": "XSendEvent (outside virtual pointer button count)",
+      "expected_hex": "1b5b3c3133313b383b364d1b5b3c3136333b31303b374d1b5b3c3133313b31303b376d",
+      "actual_hex": "1b5b3c3133313b383b364d1b5b3c3136333b31303b374d1b5b3c3133313b31303b376d",
+      "ok": true
+    },
+    {
+      "name": "button 1: remote release survives Shift change",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c303b383b364d1b5b3c343b383b366d",
+      "actual_hex": "1b5b3c303b383b364d1b5b3c343b383b366d",
+      "ok": true
+    },
+    {
+      "name": "button 1: local Shift press cannot leak a remote release",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "button 8: remote release survives Shift change",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c3132383b383b364d1b5b3c3133323b383b366d",
+      "actual_hex": "1b5b3c3132383b383b364d1b5b3c3133323b383b366d",
+      "ok": true
+    },
+    {
+      "name": "button 8: local Shift press cannot leak a remote release",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "focus loss clears extra-button drag and unmatched release",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "X10 primary press ignores modifiers and release",
+      "injection": "XTEST",
+      "expected_hex": "1b5b4d202826",
+      "actual_hex": "1b5b4d202826",
+      "ok": true
+    },
+    {
+      "name": "X10 suppresses wheel extra-button and motion",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "X10 tracking is independent from SGR encoding",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c303b383b364d",
+      "actual_hex": "1b5b3c303b383b364d",
+      "ok": true
+    },
+    {
+      "name": "reset X10 does not cancel subsequently enabled normal tracking",
+      "injection": "XTEST",
+      "expected_hex": "1b5b3c303b383b364d1b5b3c303b383b366d",
+      "actual_hex": "1b5b3c303b383b364d1b5b3c303b383b366d",
+      "ok": true
+    },
+    {
+      "name": "custom key binding and search input never leak to PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "custom mouse binding and palette input never leak to PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "custom extra-button binding and palette input never leak to PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "shifted punctuation binding: US question mark",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "shifted punctuation binding: US colon",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "shifted punctuation binding: question mark on a non-US key",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Shift+Plus increases font: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Shift+0 restores configured font: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Shift+Minus decreases font: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+0 restores configured font: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Equal retains font increase: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Minus retains font decrease: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "default plus on non-US physical key: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "restore after non-US zoom: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+keypad Add with Num Lock off: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+keypad Subtract with Num Lock off: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+keypad Add with Num Lock on: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+keypad 0 resets with Num Lock on: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Num Lock off: Ctrl+keypad Insert remains application input",
+      "injection": "XTEST",
+      "expected_hex": "1b5b323b357e",
+      "actual_hex": "1b5b323b357e",
+      "ok": true
+    },
+    {
+      "name": "custom none disables shifted plus and consumes release",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "custom keypad remap wins over font increase default: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "restore after custom keypad remap: shortcut press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "custom base-key none wins over shifted default plus",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "main Enter: navigation press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "main Enter: bare Shift press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "main Enter: search exit stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "main Shift+Enter: navigation press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "main Shift+Enter: bare Shift press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "main Shift+Enter: search exit stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "search keypad Enter: navigation press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "search keypad Enter: bare Shift press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "search keypad Enter: search exit stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "search Shift+keypad Enter: navigation press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "search Shift+keypad Enter: bare Shift press/release stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "search Shift+keypad Enter: search exit stays local",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "palette keypad Enter executes font increase: press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "palette keypad Down selects font decrease: press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "palette keypad Up wraps to font reset: press/release stay out of PTY",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Shift+Tab selects previous tab: original PTY stays silent",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Shift+Tab selects previous tab: peer PTY stays silent",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Tab selects next tab: original PTY stays silent",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Tab selects next tab: peer PTY stays silent",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Shift+Tab returns to original tab: original PTY stays silent",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+Shift+Tab returns to original tab: peer PTY stays silent",
+      "injection": "XTEST",
+      "expected_hex": "",
+      "actual_hex": "",
+      "ok": true
+    }
+  ],
+  "cleanup": {
+    "owned_processes_remaining": []
+  }
+}
