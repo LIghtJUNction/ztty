@@ -1,4 +1,4 @@
-//! Linux shared-session frontend. The broker owns PTYs and X11 windows.
+//! Linux shared-session frontend. The broker owns PTYs and native windows.
 use crate::{Config, appearance::Appearance, broker, json, os};
 use alloc::string::String;
 use core::ffi::CStr;
@@ -12,6 +12,10 @@ pub fn run(cfg: Config) -> Result<i32, String> {
         ("op", Value::from("create")),
         ("origin", Value::from("local")),
         ("headless", Value::Bool(false)),
+        (
+            "_backend",
+            Value::from(if cfg.wayland { "wayland" } else { "x11" }),
+        ),
         ("observe", Value::Bool(cfg.observe)),
         ("cols", Value::from(cfg.cols)),
         ("rows", Value::from(cfg.rows)),
@@ -98,13 +102,32 @@ pub fn attach(args: &[&CStr]) -> Result<i32, String> {
         }
         return Ok(0);
     }
-    let (observe, args) = if args.first().is_some_and(|s| s.to_bytes() == b"--observe") {
-        (true, &args[1..])
-    } else {
-        (false, args)
-    };
+    let mut observe = false;
+    let mut backend = "x11";
+    let mut args = args;
+    while let Some(first) = args.first() {
+        match first.to_bytes() {
+            b"--observe" => {
+                observe = true;
+                args = &args[1..];
+            }
+            b"--backend" => {
+                backend = args
+                    .get(1)
+                    .and_then(|s| s.to_str().ok())
+                    .ok_or("--backend needs x11 or wayland")?;
+                if !matches!(backend, "x11" | "wayland") {
+                    return Err("--backend needs x11 or wayland".into());
+                }
+                args = &args[2..];
+            }
+            _ => break,
+        }
+    }
     if args.len() != 1 {
-        return Err("usage: ztty attach [--observe] [NAME | ztty://ADDRESS]".into());
+        return Err(
+            "usage: ztty attach [--observe] [--backend x11|wayland] [NAME | ztty://ADDRESS]".into(),
+        );
     }
     let name = args[0]
         .to_str()
@@ -114,6 +137,7 @@ pub fn attach(args: &[&CStr]) -> Result<i32, String> {
         ("op", Value::from("attach")),
         ("session", Value::from(name)),
         ("observe", Value::Bool(observe)),
+        ("_backend", Value::from(backend)),
         ("_appearance", appearance.to_json()),
     ]))?;
     wait_session(&value)

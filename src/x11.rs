@@ -1270,15 +1270,7 @@ struct ImageUpload {
 const MAX_SELECTION_BYTES: usize = 4 * 1024 * 1024;
 
 pub struct Window {
-    pub display: *mut Display,
-    pub id: Xid,
-    pub fd: i32,
-    pub cw: i32,
-    pub ch: i32,
-    pub width: i32,
-    pub height: i32,
-    pub wm_delete: Atom,
-    pub configure_serial: core::cell::Cell<c_ulong>,
+    pub state: crate::display::WindowState,
     depth: u32,
     visual: *mut c_void,
     colormap: c_ulong,
@@ -1327,7 +1319,6 @@ pub struct Window {
     image_clock: u64,
     graphics_revision: u64,
     graphics_alternate: bool,
-    pub focused: bool,
     suspended: bool,
     search_cols: usize,
     search_bits: Vec<u64>,
@@ -1442,15 +1433,18 @@ impl Window {
             let ic = connection.input_context(id, events);
             let fd = connection.fd;
             let mut out = Self {
-                display,
-                id,
-                fd,
-                cw,
-                ch,
-                width,
-                height,
-                wm_delete,
-                configure_serial: core::cell::Cell::new(0),
+                state: crate::display::WindowState {
+                    display,
+                    id,
+                    fd,
+                    cw,
+                    ch,
+                    width,
+                    height,
+                    wm_delete,
+                    configure_serial: core::cell::Cell::new(0),
+                    focused: activate,
+                },
                 depth,
                 visual,
                 colormap,
@@ -1513,7 +1507,6 @@ impl Window {
                 image_clock: 0,
                 graphics_revision: 0,
                 graphics_alternate: false,
-                focused: activate,
                 suspended: false,
                 search_cols: 0,
                 search_bits: Vec::new(),
@@ -1532,10 +1525,10 @@ impl Window {
             return;
         };
         unsafe {
-            XStoreName(self.display, self.id, title.as_ptr());
+            XStoreName(self.state.display, self.state.id, title.as_ptr());
             XChangeProperty(
-                self.display,
-                self.id,
+                self.state.display,
+                self.state.id,
                 self.title_atom,
                 self.utf8,
                 8,
@@ -1546,13 +1539,13 @@ impl Window {
         }
     }
     pub fn focus(&mut self, focused: bool) {
-        self.focused = focused;
+        self.state.focused = focused;
         self.ic.focus(focused);
     }
     pub fn coordinates(&self, x: i32, y: i32, cols: usize, rows: usize) -> (usize, usize) {
         (
-            (((x - self.padding).max(0) / self.cw) as usize).min(cols.saturating_sub(1)),
-            (((y - self.padding).max(0) / self.ch) as usize).min(rows.saturating_sub(1)),
+            (((x - self.padding).max(0) / self.state.cw) as usize).min(cols.saturating_sub(1)),
+            (((y - self.padding).max(0) / self.state.ch) as usize).min(rows.saturating_sub(1)),
         )
     }
 
@@ -1570,22 +1563,22 @@ impl Window {
         let font = fonts.font;
         let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
         unsafe {
-            XftTextExtentsUtf8(self.display, font, b"M".as_ptr(), 1, &mut metrics);
+            XftTextExtentsUtf8(self.state.display, font, b"M".as_ptr(), 1, &mut metrics);
         }
         let cw = i32::from(metrics.x_off).max(1);
         let ch = unsafe { (*font).ascent + (*font).descent + 3 }.max(1);
         if cw > 512 || ch > 1024 {
             return Err("font cell size exceeds the supported limit".into());
         }
-        let cols = (((self.width - appearance.padding * 2) / cw).max(1) as usize).min(512);
-        let rows = (((self.height - appearance.padding * 2) / ch).max(1) as usize).min(256);
+        let cols = (((self.state.width - appearance.padding * 2) / cw).max(1) as usize).min(512);
+        let rows = (((self.state.height - appearance.padding * 2) / ch).max(1) as usize).min(256);
         // Font validation and the host's fallible PTY update happen before any
         // live window state changes, so rejected reloads retain the old view.
         before(cols, rows, cw, ch)?;
         self.fonts = fonts;
         self.font = font;
-        self.cw = cw;
-        self.ch = ch;
+        self.state.cw = cw;
+        self.state.ch = ch;
         self.requested_opacity = appearance.opacity;
         self.padding = appearance.padding;
         self.background = appearance.theme.background;
@@ -1605,11 +1598,24 @@ impl Window {
                 alpha: (65535 * opacity / 100) as u16,
             });
             unsafe {
-                let blur = XInternAtom(self.display, c"_KDE_NET_WM_BLUR_BEHIND_REGION".as_ptr(), 0);
+                let blur = XInternAtom(
+                    self.state.display,
+                    c"_KDE_NET_WM_BLUR_BEHIND_REGION".as_ptr(),
+                    0,
+                );
                 if appearance.blur {
-                    XChangeProperty(self.display, self.id, blur, 6, 32, 0, core::ptr::null(), 0);
+                    XChangeProperty(
+                        self.state.display,
+                        self.state.id,
+                        blur,
+                        6,
+                        32,
+                        0,
+                        core::ptr::null(),
+                        0,
+                    );
                 } else {
-                    XDeleteProperty(self.display, self.id, blur);
+                    XDeleteProperty(self.state.display, self.state.id, blur);
                 }
             }
         }
@@ -1622,13 +1628,13 @@ impl Window {
         // Expose already requests a full repaint in the view. A swapped EGL
         // back buffer is not retained content and must not be published again.
         if self.gpu.is_none() && !self.gpu_repaint && self.retained_valid {
-            self.present_region(0, self.height);
+            self.present_region(0, self.state.height);
         }
     }
 
     fn damage(&mut self, top: i32, bottom: i32) {
-        let top = top.clamp(0, self.height);
-        let bottom = bottom.clamp(top, self.height);
+        let top = top.clamp(0, self.state.height);
+        let bottom = bottom.clamp(top, self.state.height);
         if top == bottom {
             return;
         }
@@ -1654,96 +1660,113 @@ impl Window {
     }
 
     fn present_region(&self, top: i32, bottom: i32) {
-        if self.suspended || self.id == 0 || !self.retained_valid {
+        if self.suspended || self.state.id == 0 || !self.retained_valid {
             return;
         }
         unsafe {
             XCopyArea(
-                self.display,
+                self.state.display,
                 self.pixmap,
-                self.id,
+                self.state.id,
                 self.gc,
                 0,
                 top,
-                self.width as u32,
+                self.state.width as u32,
                 (bottom - top) as u32,
                 0,
                 top,
             );
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
     /// Request a character-grid resize. ConfigureNotify applies the resulting
     /// pixel size to the backing pixmap and the host's terminal model.
     pub fn resize_grid(&self, cols: usize, rows: usize) {
-        if self.id == 0 {
+        if self.state.id == 0 {
             return;
         }
         let width = cols
-            .saturating_mul(self.cw as usize)
+            .saturating_mul(self.state.cw as usize)
             .saturating_add((self.padding * 2) as usize)
             .clamp(1, u16::MAX as usize);
         let height = rows
-            .saturating_mul(self.ch as usize)
+            .saturating_mul(self.state.ch as usize)
             .saturating_add((self.padding * 2) as usize)
             .clamp(1, u16::MAX as usize);
         unsafe {
-            self.configure_serial.set(XNextRequest(self.display));
-            XResizeWindow(self.display, self.id, width as c_uint, height as c_uint);
-            XFlush(self.display);
+            self.state
+                .configure_serial
+                .set(XNextRequest(self.state.display));
+            XResizeWindow(
+                self.state.display,
+                self.state.id,
+                width as c_uint,
+                height as c_uint,
+            );
+            XFlush(self.state.display);
         }
     }
 
     pub fn resize(&mut self, width: i32, height: i32) -> (usize, usize) {
-        if self.width != width.max(1) || self.height != height.max(1) {
-            self.width = width.max(1);
-            self.height = height.max(1);
+        if self.state.width != width.max(1) || self.state.height != height.max(1) {
+            self.state.width = width.max(1);
+            self.state.height = height.max(1);
             self.retained_valid = false;
             self.pending_damage = None;
             self.resize_gpu();
             if !self.suspended {
                 unsafe {
                     let pixmap = XCreatePixmap(
-                        self.display,
-                        self.id,
-                        self.width as u32,
-                        self.height as u32,
+                        self.state.display,
+                        self.state.id,
+                        self.state.width as u32,
+                        self.state.height as u32,
                         self.depth,
                     );
                     XftDrawChange(self.draw, pixmap);
-                    XFreePixmap(self.display, self.pixmap);
+                    XFreePixmap(self.state.display, self.pixmap);
                     self.pixmap = pixmap;
                 }
             }
         }
         (
-            (((self.width - self.padding * 2) / self.cw).max(1) as usize).min(512),
-            (((self.height - self.padding * 2) / self.ch).max(1) as usize).min(256),
+            (((self.state.width - self.padding * 2) / self.state.cw).max(1) as usize).min(512),
+            (((self.state.height - self.padding * 2) / self.state.ch).max(1) as usize).min(256),
         )
     }
 
     pub fn parent(&mut self, parent: Option<Xid>) {
-        if self.id == 0 {
+        if self.state.id == 0 {
             return;
         }
         unsafe {
-            let root = XRootWindow(self.display, self.fonts.connection.screen);
-            XUnmapWindow(self.display, self.id);
-            self.configure_serial.set(XNextRequest(self.display));
-            XReparentWindow(self.display, self.id, parent.unwrap_or(root), 0, 0);
+            let root = XRootWindow(self.state.display, self.fonts.connection.screen);
+            XUnmapWindow(self.state.display, self.state.id);
+            self.state
+                .configure_serial
+                .set(XNextRequest(self.state.display));
+            XReparentWindow(
+                self.state.display,
+                self.state.id,
+                parent.unwrap_or(root),
+                0,
+                0,
+            );
             if !self.suspended {
-                XMapWindow(self.display, self.id);
+                XMapWindow(self.state.display, self.state.id);
             }
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
 
     pub fn place(&mut self, rect: crate::layout::Rect) -> (usize, usize) {
         unsafe {
-            self.configure_serial.set(XNextRequest(self.display));
+            self.state
+                .configure_serial
+                .set(XNextRequest(self.state.display));
             XMoveResizeWindow(
-                self.display,
-                self.id,
+                self.state.display,
+                self.state.id,
                 rect.x,
                 rect.y,
                 rect.width.max(1) as u32,
@@ -1754,7 +1777,7 @@ impl Window {
     }
 
     pub fn visible(&mut self, visible: bool) {
-        if self.id == 0 || visible != self.suspended {
+        if self.state.id == 0 || visible != self.suspended {
             return;
         }
         self.retained_valid = false;
@@ -1762,33 +1785,33 @@ impl Window {
         unsafe {
             if visible {
                 let pixmap = XCreatePixmap(
-                    self.display,
-                    self.id,
-                    self.width as u32,
-                    self.height as u32,
+                    self.state.display,
+                    self.state.id,
+                    self.state.width as u32,
+                    self.state.height as u32,
                     self.depth,
                 );
                 XftDrawChange(self.draw, pixmap);
-                XFreePixmap(self.display, self.pixmap);
+                XFreePixmap(self.state.display, self.pixmap);
                 self.pixmap = pixmap;
                 self.last_cursor = None;
-                XMapWindow(self.display, self.id);
+                XMapWindow(self.state.display, self.state.id);
             } else {
-                XUnmapWindow(self.display, self.id);
+                XUnmapWindow(self.state.display, self.state.id);
                 // Hidden tabs keep canonical pixels but release all rebuildable
                 // server uploads and their full-size retained surface.
                 while !self.images.is_empty() {
                     self.discard_upload(self.images.len() - 1);
                 }
-                let pixmap = XCreatePixmap(self.display, self.id, 1, 1, self.depth);
+                let pixmap = XCreatePixmap(self.state.display, self.state.id, 1, 1, self.depth);
                 XftDrawChange(self.draw, pixmap);
-                XFreePixmap(self.display, self.pixmap);
+                XFreePixmap(self.state.display, self.pixmap);
                 self.pixmap = pixmap;
                 self.focus(false);
             }
             self.suspended = !visible;
             self.visible_gpu(visible);
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
     /// Keep character identity unshifted, but let XKB choose the keypad layer.
@@ -1811,7 +1834,7 @@ impl Window {
         let mut consumed = 0;
         if unsafe {
             XkbLookupKeySym(
-                self.display,
+                self.state.display,
                 event.keycode as u8,
                 state,
                 &mut consumed,
@@ -1888,14 +1911,25 @@ impl Window {
             value,
         };
         unsafe {
-            XftColorAllocValue(self.display, self.visual, self.colormap, &value, &mut color);
+            XftColorAllocValue(
+                self.state.display,
+                self.visual,
+                self.colormap,
+                &value,
+                &mut color,
+            );
         }
         if self.colors.len() < 256 {
             self.colors.push(ColorEntry { rgb, color });
         } else {
             let entry = &mut self.colors[self.next_color];
             unsafe {
-                XftColorFree(self.display, self.visual, self.colormap, &mut entry.color);
+                XftColorFree(
+                    self.state.display,
+                    self.visual,
+                    self.colormap,
+                    &mut entry.color,
+                );
             }
             *entry = ColorEntry { rgb, color };
             self.next_color = (self.next_color + 1) % 256;
@@ -1908,13 +1942,13 @@ impl Window {
 
     /// Bring an already attached session back without opening a second window.
     pub fn raise(&self) {
-        if self.id == 0 {
+        if self.state.id == 0 {
             return;
         }
         unsafe {
-            XMapRaised(self.display, self.id);
-            XSetInputFocus(self.display, self.id, 1, 0);
-            XFlush(self.display);
+            XMapRaised(self.state.display, self.state.id);
+            XSetInputFocus(self.state.display, self.state.id, 1, 0);
+            XFlush(self.state.display);
         }
     }
 
@@ -1951,7 +1985,7 @@ impl Window {
             // Replace the retained pixels, including alpha, on every damaged row.
             unsafe {
                 XRenderFillRectangle(
-                    self.display,
+                    self.state.display,
                     1,
                     XftDrawPicture(self.draw),
                     color,
@@ -1984,11 +2018,11 @@ impl Window {
 
     /// Temporary search/command UI belongs to the view, never to PTY output.
     pub fn clipboard_menu_bounds(&self, x: i32, y: i32) -> crate::layout::Rect {
-        let width = (self.cw * 28 + 18).min(self.width).max(1);
-        let height = (2 * (self.ch + 8) + 2).min(self.height).max(1);
+        let width = (self.state.cw * 28 + 18).min(self.state.width).max(1);
+        let height = (2 * (self.state.ch + 8) + 2).min(self.state.height).max(1);
         crate::layout::Rect {
-            x: x.clamp(0, (self.width - width).max(0)),
-            y: y.clamp(0, (self.height - height).max(0)),
+            x: x.clamp(0, (self.state.width - width).max(0)),
+            y: y.clamp(0, (self.state.height - height).max(0)),
             width,
             height,
         }
@@ -2024,8 +2058,8 @@ impl Window {
             .into_iter()
             .enumerate()
         {
-            let y = bounds.y + 1 + row as i32 * (self.ch + 8);
-            if y + self.ch + 8 > bounds.y + bounds.height {
+            let y = bounds.y + 1 + row as i32 * (self.state.ch + 8);
+            if y + self.state.ch + 8 > bounds.y + bounds.height {
                 break;
             }
             if row == selected && enabled[row] {
@@ -2035,7 +2069,7 @@ impl Window {
                     bounds.x + 1,
                     y,
                     (bounds.width - 2).max(0) as u32,
-                    (self.ch + 8) as u32,
+                    (self.state.ch + 8) as u32,
                 );
             }
             let color = if !enabled[row] {
@@ -2051,7 +2085,7 @@ impl Window {
                 label,
                 bounds.x + 9,
                 y + 4,
-                (x - self.cw).max(bounds.x + 9),
+                (x - self.state.cw).max(bounds.x + 9),
                 color,
             );
             self.overlay_text_color(shortcut, x, y + 4, right, color);
@@ -2063,17 +2097,17 @@ impl Window {
         if self.suspended {
             return;
         }
-        let y = (self.height - self.padding - self.ch).max(0);
+        let y = (self.state.height - self.padding - self.state.ch).max(0);
         self.fill_background(
             self.background,
             false,
             0,
             y,
-            self.width as u32,
-            (self.height - y) as u32,
+            self.state.width as u32,
+            (self.state.height - y) as u32,
         );
         self.overlay_line(text, y);
-        self.damage(y, self.height);
+        self.damage(y, self.state.height);
     }
 
     pub fn overlay_lines(&mut self, lines: &[String]) {
@@ -2082,24 +2116,24 @@ impl Window {
         }
         let count = lines
             .len()
-            .min(((self.height - self.padding).max(self.ch) / self.ch) as usize);
-        let y = (self.height - self.padding - self.ch * count as i32).max(0);
+            .min(((self.state.height - self.padding).max(self.state.ch) / self.state.ch) as usize);
+        let y = (self.state.height - self.padding - self.state.ch * count as i32).max(0);
         self.fill_background(
             self.background,
             false,
             0,
             y,
-            self.width as u32,
-            (self.height - y) as u32,
+            self.state.width as u32,
+            (self.state.height - y) as u32,
         );
         for (row, line) in lines.iter().take(count).enumerate() {
-            self.overlay_line(line, y + row as i32 * self.ch);
+            self.overlay_line(line, y + row as i32 * self.state.ch);
         }
-        self.damage(y, self.height);
+        self.damage(y, self.state.height);
     }
 
     fn overlay_line(&mut self, text: &str, y: i32) {
-        self.overlay_text(text, self.padding, y, self.width - self.padding);
+        self.overlay_text(text, self.padding, y, self.state.width - self.padding);
     }
 
     fn overlay_text(&mut self, text: &str, x: i32, y: i32, right: i32) {
@@ -2113,7 +2147,7 @@ impl Window {
                 x,
                 y,
                 width: (right - x).max(0),
-                height: self.ch,
+                height: self.state.ch,
             },
             rgb,
         ) {
@@ -2128,7 +2162,7 @@ impl Window {
             let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
             unsafe {
                 XftTextExtentsUtf8(
-                    self.display,
+                    self.state.display,
                     font,
                     text.as_ptr(),
                     text.len() as i32,
@@ -2165,7 +2199,7 @@ impl Window {
             let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
             unsafe {
                 XftTextExtentsUtf8(
-                    self.display,
+                    self.state.display,
                     font,
                     text.as_ptr(),
                     text.len() as i32,
@@ -2195,10 +2229,10 @@ impl Window {
         for text in labels {
             let width = self.overlay_width(text);
             let Some(rect) = place(
-                self.width,
-                self.height,
+                self.state.width,
+                self.state.height,
                 self.padding,
-                self.ch,
+                self.state.ch,
                 width,
                 overlay_rows,
             ) else {
@@ -2234,10 +2268,10 @@ impl Window {
 
     pub fn native_ui_geometry(&self) -> ztty::native_ui::Geometry {
         ztty::native_ui::Geometry {
-            width: self.width,
-            height: self.height,
-            cell_width: self.cw,
-            cell_height: self.ch,
+            width: self.state.width,
+            height: self.state.height,
+            cell_width: self.state.cw,
+            cell_height: self.state.ch,
             padding: self.padding,
         }
     }
@@ -2277,11 +2311,11 @@ impl Window {
 
         let color = self.color(rgb);
         let right = rect.x + rect.width;
-        let rows = (rect.height / self.ch).max(0) as usize;
+        let rows = (rect.height / self.state.ch).max(0) as usize;
         let draw = self.draw;
         for (row, line) in text.split('\n').take(rows.min(32)).enumerate() {
             let mut x = rect.x;
-            let baseline = rect.y + row as i32 * self.ch + unsafe { (*self.font).ascent } + 1;
+            let baseline = rect.y + row as i32 * self.state.ch + unsafe { (*self.font).ascent } + 1;
             // One Xft draw per font run, with bounded stack storage. Fallback
             // fonts share the terminal's existing glyph/font cache.
             let mut run = [0u8; 4096];
@@ -2310,7 +2344,7 @@ impl Window {
                 let mut metrics: GlyphInfo = unsafe { core::mem::zeroed() };
                 unsafe {
                     XftTextExtentsUtf8(
-                        self.display,
+                        self.state.display,
                         font,
                         text.as_ptr(),
                         text.len() as i32,
@@ -2397,9 +2431,9 @@ impl Window {
             ],
         };
         unsafe {
-            XRenderSetPictureTransform(self.display, picture, &transform);
+            XRenderSetPictureTransform(self.state.display, picture, &transform);
             XRenderComposite(
-                self.display,
+                self.state.display,
                 3,
                 picture,
                 0,
@@ -2463,7 +2497,7 @@ impl Window {
                 x: panel.x + 16,
                 y: panel.y + 10,
                 width: panel.width - 32,
-                height: self.ch,
+                height: self.state.ch,
             },
             0x94a3b8,
         );
@@ -2486,14 +2520,14 @@ impl Window {
                     self.native_ui_text(
                         label,
                         Rect {
-                            height: self.ch.min(rect.height),
+                            height: self.state.ch.min(rect.height),
                             ..rect
                         },
                         0xcdd6e4,
                     );
-                    if rect.height >= self.ch + 10 {
+                    if rect.height >= self.state.ch + 10 {
                         let bar = Rect {
-                            y: rect.y + self.ch + 6,
+                            y: rect.y + self.state.ch + 6,
                             height: 4,
                             ..rect
                         };
@@ -2508,7 +2542,7 @@ impl Window {
                     }
                 }
                 Kind::Button { label, enabled, .. } => {
-                    if rect.height < self.ch + 16 {
+                    if rect.height < self.state.ch + 16 {
                         continue;
                     }
                     let active = interactive && *enabled;
@@ -2535,7 +2569,7 @@ impl Window {
                             x: rect.x + 12,
                             y: rect.y + 8,
                             width: rect.width - 24,
-                            height: self.ch,
+                            height: self.state.ch,
                         },
                         if active { 0xdce9fb } else { 0x7c8999 },
                     );
@@ -2548,8 +2582,12 @@ impl Window {
                     rows,
                 } => {
                     let image_rect = Rect {
-                        width: rect.width.min(i32::from(*cols).saturating_mul(self.cw)),
-                        height: rect.height.min(i32::from(*rows).saturating_mul(self.ch)),
+                        width: rect
+                            .width
+                            .min(i32::from(*cols).saturating_mul(self.state.cw)),
+                        height: rect
+                            .height
+                            .min(i32::from(*rows).saturating_mul(self.state.ch)),
                         ..rect
                     };
                     if !self.native_ui_image(terminal, *image_id, *generation, image_rect) {
@@ -2580,8 +2618,8 @@ impl Window {
         let upload = self.images.swap_remove(index);
         self.image_bytes = self.image_bytes.saturating_sub(upload.bytes);
         unsafe {
-            XRenderFreePicture(self.display, upload.picture);
-            XFreePixmap(self.display, upload.pixmap);
+            XRenderFreePicture(self.state.display, upload.picture);
+            XFreePixmap(self.state.display, upload.pixmap);
         }
     }
 
@@ -2629,7 +2667,7 @@ impl Window {
                 );
             }
             let ximage = XCreateImage(
-                self.display,
+                self.state.display,
                 self.visual,
                 32,
                 2,
@@ -2644,25 +2682,31 @@ impl Window {
                 free(data.cast());
                 return None;
             }
-            let format = XRenderFindStandardFormat(self.display, 0); // PictStandardARGB32
+            let format = XRenderFindStandardFormat(self.state.display, 0); // PictStandardARGB32
             if format.is_null() {
                 XDestroyImage(ximage);
                 return None;
             }
-            let pixmap = XCreatePixmap(self.display, self.id, image.width, image.height, 32);
-            let gc = XCreateGC(self.display, pixmap, 0, core::ptr::null_mut());
+            let pixmap = XCreatePixmap(
+                self.state.display,
+                self.state.id,
+                image.width,
+                image.height,
+                32,
+            );
+            let gc = XCreateGC(self.state.display, pixmap, 0, core::ptr::null_mut());
             if pixmap == 0 || gc.is_null() {
                 if !gc.is_null() {
-                    XFreeGC(self.display, gc);
+                    XFreeGC(self.state.display, gc);
                 }
                 if pixmap != 0 {
-                    XFreePixmap(self.display, pixmap);
+                    XFreePixmap(self.state.display, pixmap);
                 }
                 XDestroyImage(ximage);
                 return None;
             }
             XPutImage(
-                self.display,
+                self.state.display,
                 pixmap,
                 gc,
                 ximage,
@@ -2673,15 +2717,16 @@ impl Window {
                 image.width,
                 image.height,
             );
-            XFreeGC(self.display, gc);
+            XFreeGC(self.state.display, gc);
             XDestroyImage(ximage);
-            let picture = XRenderCreatePicture(self.display, pixmap, format, 0, core::ptr::null());
+            let picture =
+                XRenderCreatePicture(self.state.display, pixmap, format, 0, core::ptr::null());
             if picture == 0 {
-                XFreePixmap(self.display, pixmap);
+                XFreePixmap(self.state.display, pixmap);
                 return None;
             }
             XRenderSetPictureFilter(
-                self.display,
+                self.state.display,
                 picture,
                 c"nearest".as_ptr(),
                 core::ptr::null(),
@@ -2703,8 +2748,8 @@ impl Window {
     /// Composite only the damaged row. The transform maps destination pixels
     /// back into the requested source crop, without allocating a resized image.
     fn draw_images(&mut self, terminal: &Terminal, offset: usize, row: usize, layer: u8) {
-        let width = terminal.cols() as i64 * i64::from(self.cw);
-        let row_top = row as i64 * i64::from(self.ch);
+        let width = terminal.cols() as i64 * i64::from(self.state.cw);
+        let row_top = row as i64 * i64::from(self.state.ch);
         for placement in terminal.graphics_draws(offset) {
             let wanted_layer = if placement.z < -1_073_741_824 {
                 0
@@ -2727,7 +2772,7 @@ impl Window {
                 .min(width)
                 .min(clip.map_or(i64::MAX, |c| i64::from(c.x) + i64::from(c.width)));
             let bottom = (dy + i64::from(placement.dest.height))
-                .min(row_top + i64::from(self.ch))
+                .min(row_top + i64::from(self.state.ch))
                 .min(clip.map_or(i64::MAX, |c| i64::from(c.y) + i64::from(c.height)));
             if left >= right || top >= bottom {
                 continue;
@@ -2754,9 +2799,9 @@ impl Window {
                 ],
             };
             unsafe {
-                XRenderSetPictureTransform(self.display, picture, &transform);
+                XRenderSetPictureTransform(self.state.display, picture, &transform);
                 XRenderComposite(
-                    self.display,
+                    self.state.display,
                     3,
                     picture,
                     0,
@@ -2825,12 +2870,12 @@ impl Window {
                 true,
                 0,
                 0,
-                self.width as u32,
-                self.height as u32,
+                self.state.width as u32,
+                self.state.height as u32,
             );
         }
         if force {
-            self.damage(0, self.height);
+            self.damage(0, self.state.height);
         }
         for row in 0..rows {
             if !(force
@@ -2843,8 +2888,8 @@ impl Window {
             {
                 continue;
             }
-            let y = self.padding + row as i32 * self.ch;
-            self.damage(y, y + self.ch);
+            let y = self.padding + row as i32 * self.state.ch;
+            self.damage(y, y + self.state.ch);
             let mut col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
@@ -2867,10 +2912,10 @@ impl Window {
                 self.fill_background(
                     rgb,
                     translucent,
-                    self.padding + col as i32 * self.cw,
+                    self.padding + col as i32 * self.state.cw,
                     y,
-                    ((end - col) as i32 * self.cw) as u32,
-                    self.ch as u32,
+                    ((end - col) as i32 * self.state.cw) as u32,
+                    self.state.ch as u32,
                 );
                 col = end;
             }
@@ -2890,10 +2935,10 @@ impl Window {
                         self.fill_background(
                             rgb,
                             false,
-                            self.padding + col as i32 * self.cw,
+                            self.padding + col as i32 * self.state.cw,
                             y,
-                            self.cw as u32,
-                            self.ch as u32,
+                            self.state.cw as u32,
+                            self.state.ch as u32,
                         );
                     }
                 }
@@ -2912,7 +2957,7 @@ impl Window {
                         || self.search_match(col, row),
                 );
                 let color = self.color(fg);
-                let x = self.padding + col as i32 * self.cw;
+                let x = self.padding + col as i32 * self.state.cw;
                 let baseline = y + unsafe { (*self.font).ascent } + 1;
                 let mut text = [0u8; 2048];
                 let mut len = 0;
@@ -2981,12 +3026,12 @@ impl Window {
                             len as i32,
                         );
                     }
-                    let width = (cells.max(cell.width as usize) as i32 * self.cw) as u32;
+                    let width = (cells.max(cell.width as usize) as i32 * self.state.cw) as u32;
                     if cell.flags & UNDERLINE != 0 || cell.link_id != 0 {
                         XftDrawRect(self.draw, &color, x, baseline + 2, width, 1);
                     }
                     if cell.flags & STRIKE != 0 {
-                        XftDrawRect(self.draw, &color, x, y + self.ch / 2, width, 1);
+                        XftDrawRect(self.draw, &color, x, y + self.state.ch / 2, width, 1);
                     }
                 }
                 col += cells;
@@ -3010,17 +3055,21 @@ impl Window {
         shape: CursorShape,
     ) {
         let cell = terminal.cell(column, row);
-        let rgb = if self.focused {
+        let rgb = if self.state.focused {
             self.cursor_color
         } else {
             ((self.cursor_color & 0xfefefe) >> 1) + ((self.background & 0xfefefe) >> 1)
         };
         let color = self.color(rgb);
-        let x = self.padding + column as i32 * self.cw;
+        let x = self.padding + column as i32 * self.state.cw;
         let (top, width, height) = match shape {
-            CursorShape::Block => (y, self.cw * i32::from(cell.width.max(1)), self.ch),
-            CursorShape::Underline => (y + self.ch - 2, self.cw, 2),
-            CursorShape::Bar => (y, self.cw.min(2), self.ch),
+            CursorShape::Block => (
+                y,
+                self.state.cw * i32::from(cell.width.max(1)),
+                self.state.ch,
+            ),
+            CursorShape::Underline => (y + self.state.ch - 2, self.state.cw, 2),
+            CursorShape::Bar => (y, self.state.cw.min(2), self.state.ch),
         };
         unsafe { XftDrawRect(self.draw, &color, x, top, width as u32, height as u32) };
         if shape == CursorShape::Block && cell.width > 0 && !self.text_hidden(cell) {
@@ -3067,8 +3116,8 @@ impl Window {
             self.clipboard
         };
         unsafe {
-            XSetSelectionOwner(self.display, selection, self.id, 0);
-            XFlush(self.display);
+            XSetSelectionOwner(self.state.display, selection, self.state.id, 0);
+            XFlush(self.state.display);
         }
     }
     pub fn cancel_paste(&mut self) {
@@ -3080,7 +3129,11 @@ impl Window {
         self.paste_error = None;
         if self.selection_requestor() != 0 {
             unsafe {
-                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
+                XDeleteProperty(
+                    self.state.display,
+                    self.selection_requestor(),
+                    self.transfer,
+                );
             }
         }
         self.close_osc_requestor();
@@ -3093,14 +3146,14 @@ impl Window {
         self.paste_target = self.utf8;
         unsafe {
             XConvertSelection(
-                self.display,
+                self.state.display,
                 self.paste_selection,
                 self.utf8,
                 self.transfer,
                 self.selection_requestor(),
                 0,
             );
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
     }
     pub fn selection_request(&self, request: SelectionRequest) {
@@ -3108,7 +3161,7 @@ impl Window {
             kind: SELECTION_NOTIFY,
             serial: 0,
             send_event: 1,
-            display: self.display,
+            display: self.state.display,
             requestor: request.requestor,
             selection: request.selection,
             target: request.target,
@@ -3124,7 +3177,7 @@ impl Window {
             if request.target == self.targets {
                 let targets = [self.targets, self.utf8, 31];
                 XChangeProperty(
-                    self.display,
+                    self.state.display,
                     request.requestor,
                     property,
                     4,
@@ -3151,7 +3204,7 @@ impl Window {
                     text.as_bytes()
                 };
                 XChangeProperty(
-                    self.display,
+                    self.state.display,
                     request.requestor,
                     property,
                     request.target,
@@ -3162,7 +3215,7 @@ impl Window {
                 );
                 for chunk in data.chunks(32768) {
                     XChangeProperty(
-                        self.display,
+                        self.state.display,
                         request.requestor,
                         property,
                         request.target,
@@ -3175,8 +3228,8 @@ impl Window {
                 notify.property = property;
             }
             let mut event = Event { selection: notify };
-            XSendEvent(self.display, request.requestor, 0, 0, &mut event);
-            XFlush(self.display);
+            XSendEvent(self.state.display, request.requestor, 0, 0, &mut event);
+            XFlush(self.state.display);
         }
     }
     pub fn take_paste_error(&mut self) -> Option<&'static str> {
@@ -3214,7 +3267,7 @@ impl Window {
         let result;
         unsafe {
             let code = XGetWindowProperty(
-                self.display,
+                self.state.display,
                 self.selection_requestor(),
                 self.transfer,
                 0,
@@ -3253,7 +3306,11 @@ impl Window {
                 XFree(data.cast());
             }
             if remaining != 0 {
-                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
+                XDeleteProperty(
+                    self.state.display,
+                    self.selection_requestor(),
+                    self.transfer,
+                );
             }
         }
         result
@@ -3271,14 +3328,14 @@ impl Window {
                 self.paste_target = 31;
                 unsafe {
                     XConvertSelection(
-                        self.display,
+                        self.state.display,
                         self.paste_selection,
                         31,
                         self.transfer,
                         self.selection_requestor(),
                         0,
                     );
-                    XFlush(self.display);
+                    XFlush(self.state.display);
                 }
             } else {
                 return self.reject_paste("No text in clipboard");
@@ -3296,8 +3353,12 @@ impl Window {
             self.receiving = true;
             self.incoming.clear();
             unsafe {
-                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
-                XFlush(self.display);
+                XDeleteProperty(
+                    self.state.display,
+                    self.selection_requestor(),
+                    self.transfer,
+                );
+                XFlush(self.state.display);
             }
             None
         } else {
@@ -3329,7 +3390,7 @@ impl Window {
         }
         self.incoming.extend_from_slice(&data);
         unsafe {
-            XFlush(self.display);
+            XFlush(self.state.display);
         }
         None
     }
@@ -3346,18 +3407,35 @@ impl Drop for Window {
             self.ic.close();
             XftDrawDestroy(self.draw);
             for color in &mut self.colors {
-                XftColorFree(self.display, self.visual, self.colormap, &mut color.color);
+                XftColorFree(
+                    self.state.display,
+                    self.visual,
+                    self.colormap,
+                    &mut color.color,
+                );
             }
-            XFreeGC(self.display, self.gc);
-            XFreePixmap(self.display, self.pixmap);
-            if self.id != 0 {
-                XDestroyWindow(self.display, self.id);
+            XFreeGC(self.state.display, self.gc);
+            XFreePixmap(self.state.display, self.pixmap);
+            if self.state.id != 0 {
+                XDestroyWindow(self.state.display, self.state.id);
             }
             if self.owns_colormap {
-                XFreeColormap(self.display, self.colormap);
+                XFreeColormap(self.state.display, self.colormap);
             }
         }
     }
 }
 
 mod osc52;
+
+impl core::ops::Deref for Window {
+    type Target = crate::display::WindowState;
+    fn deref(&self) -> &Self::Target {
+        &self.state
+    }
+}
+impl core::ops::DerefMut for Window {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.state
+    }
+}
