@@ -52,5 +52,6 @@ lto = "fat"
 codegen-units = 1
 
 [target.'cfg(target_os = "linux")'.dependencies]
+libc = { version = "=0.2.191", default-features = false }
 zplugin = { version = "=0.3.0", default-features = false }
 ztty-plugin-api = { path = "crates/ztty-plugin-api" }
