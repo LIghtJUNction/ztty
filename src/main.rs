@@ -10,6 +10,8 @@ mod broker;
 #[cfg(target_os = "linux")]
 mod config_watch;
 #[cfg(target_os = "linux")]
+mod display;
+#[cfg(target_os = "linux")]
 mod mcp;
 #[cfg(target_os = "linux")]
 mod os;
@@ -505,10 +507,6 @@ fn launch(args: &[&CStr]) -> Result<i32, String> {
             #[cfg(target_os = "linux")]
             {
                 if cfg.wayland {
-                    #[cfg(feature = "wayland")]
-                    {
-                        return wayland::run(cfg);
-                    }
                     #[cfg(not(feature = "wayland"))]
                     {
                         return Err(

@@ -17,15 +17,18 @@
 #include <xkbcommon/xkbcommon.h>
 #include <xkbcommon/xkbcommon-compose.h>
 #include "xdg-shell-client-protocol.h"
+#include "wayland_services.h"
 
 #define QUEUE_CAPACITY 512
 struct ztty_wl_event {
     uint32_t kind, symbol, modifiers, state;
     int32_t x, y;
+    uint32_t keycode, shifted;
     char text[64];
 };
 struct ztty_wl {
     struct wl_display *display;
+    struct ztty_wl_services *services;
     struct wl_registry *registry;
     struct wl_compositor *compositor;
     struct wl_shm *shm;
@@ -52,7 +55,7 @@ struct ztty_wl {
     int repeat_rate, repeat_delay;
     uint32_t repeat_key;
     int64_t repeat_at;
-    int configured, failed;
+    int configured, failed, flush_pending;
     unsigned head, count;
     struct ztty_wl_event events[QUEUE_CAPACITY];
 };
@@ -64,6 +67,11 @@ static int64_t now_ms(void) {
 static void push(struct ztty_wl *w, struct ztty_wl_event event) {
     if (w->count == QUEUE_CAPACITY) { w->failed = 1; return; }
     w->events[(w->head + w->count++) % QUEUE_CAPACITY] = event;
+}
+static void service_event(void *owner,uint32_t kind,uint32_t state,uint32_t flags,const char *text) {
+    struct ztty_wl_event event={.kind=kind,.state=state,.modifiers=flags};
+    if(text) {size_t n=strnlen(text,63);memcpy(event.text,text,n);}
+    push(owner,event);
 }
 static uint32_t modifiers(struct ztty_wl *w) {
     if (!w->xkb_state) return 0;
@@ -84,7 +92,10 @@ static void emit_key(struct ztty_wl *w, uint32_t key, uint32_t transition) {
     xkb_layout_index_t layout = xkb_state_key_get_layout(w->xkb_state, code);
     int count = xkb_keymap_key_get_syms_by_level(w->keymap, code, layout, 0, &base);
     struct ztty_wl_event event = { .kind = 2, .symbol = count == 1 ? base[0] : sym,
-        .modifiers = modifiers(w), .state = transition, .x = (int32_t)sym };
+        .modifiers = modifiers(w), .state = transition, .x = (int32_t)sym, .keycode=code };
+    const xkb_keysym_t *shifted=NULL;
+    int shifted_count=xkb_keymap_key_get_syms_by_level(w->keymap,code,layout,1,&shifted);
+    event.shifted=shifted_count==1?shifted[0]:event.symbol;
     /* Preserve NumLock's keypad interpretation instead of treating KP_0 as
        Insert just because level zero is the navigation keysym. */
     if (sym >= XKB_KEY_KP_Space && sym <= XKB_KEY_KP_Equal) event.symbol = sym;
@@ -140,6 +151,8 @@ static void keyboard_keymap(void *data, struct wl_keyboard *keyboard,
 static void keyboard_enter(void *data, struct wl_keyboard *keyboard,
         uint32_t serial, struct wl_surface *surface, struct wl_array *keys) {
     (void)keyboard; (void)serial; (void)surface; (void)keys;
+    struct ztty_wl *w=data;
+    ztty_wl_services_serial(w->services,serial);
     push(data, (struct ztty_wl_event){.kind = 3, .state = 1});
 }
 static void keyboard_leave(void *data, struct wl_keyboard *keyboard,
@@ -153,6 +166,7 @@ static void keyboard_key(void *data, struct wl_keyboard *keyboard,
         uint32_t serial, uint32_t time, uint32_t key, uint32_t state) {
     (void)keyboard; (void)serial; (void)time;
     struct ztty_wl *w = data;
+    ztty_wl_services_serial(w->services,serial);
     emit_key(w, key, state == WL_KEYBOARD_KEY_STATE_PRESSED ? 1 : 0);
     if (state == WL_KEYBOARD_KEY_STATE_PRESSED && w->repeat_rate > 0 &&
         w->keymap && key <= UINT32_MAX - 8 && xkb_keymap_key_repeats(w->keymap, key + 8)) {
@@ -199,6 +213,7 @@ static void pointer_motion(void *data, struct wl_pointer *pointer, uint32_t time
 static void pointer_button(void *data, struct wl_pointer *pointer,
         uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
     (void)pointer; (void)serial; (void)time; struct ztty_wl *w = data;
+    ztty_wl_services_serial(w->services,serial);
     push(w, (struct ztty_wl_event){.kind = 4, .symbol = button, .state = state,
         .modifiers = modifiers(w), .x = w->pointer_x, .y = w->pointer_y});
 }
@@ -267,6 +282,7 @@ static const struct wl_shm_listener shm_listener = {.format = shm_format};
 static void registry_global(void *data, struct wl_registry *registry,
         uint32_t name, const char *interface, uint32_t version) {
     struct ztty_wl *w = data;
+    ztty_wl_services_global(w->services,registry,name,interface,version);
     if (!strcmp(interface, wl_compositor_interface.name) && !w->compositor) {
         w->compositor = wl_registry_bind(registry, name, &wl_compositor_interface, version < 4 ? version : 4);
         w->compositor_name = name;
@@ -317,6 +333,7 @@ static const struct wl_callback_listener frame_listener = {.done = frame_done};
 
 void ztty_wl_destroy(struct ztty_wl *w) {
     if (!w) return;
+    ztty_wl_services_destroy(w->services);
     if (w->frame) wl_callback_destroy(w->frame);
     if (w->window) wl_egl_window_destroy(w->window);
     if (w->toplevel) xdg_toplevel_destroy(w->toplevel);
@@ -336,15 +353,17 @@ void ztty_wl_destroy(struct ztty_wl *w) {
     if (w->display) wl_display_disconnect(w->display);
     free(w);
 }
-struct ztty_wl *ztty_wl_create(int32_t width, int32_t height) {
+struct ztty_wl *ztty_wl_create(int32_t width, int32_t height, const char *endpoint, const char *locale) {
     struct ztty_wl *w = calloc(1, sizeof(*w));
     if (!w) return NULL;
     w->width = w->pending_width = width; w->height = w->pending_height = height;
-    w->display = wl_display_connect(NULL);
+    w->display = wl_display_connect(endpoint);
     w->xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
     if (!w->display || !w->xkb_context) goto fail;
+    w->services=ztty_wl_services_new(w->display,w,service_event);
+    if(!w->services) goto fail;
     w->compose_table = xkb_compose_table_new_from_locale(w->xkb_context,
-        setlocale(LC_CTYPE, NULL), XKB_COMPOSE_COMPILE_NO_FLAGS);
+        locale, XKB_COMPOSE_COMPILE_NO_FLAGS);
     if (w->compose_table) w->compose = xkb_compose_state_new(w->compose_table, XKB_COMPOSE_STATE_NO_FLAGS);
     w->registry = wl_display_get_registry(w->display);
     if (!w->registry) goto fail;
@@ -369,6 +388,7 @@ struct ztty_wl *ztty_wl_create(int32_t width, int32_t height) {
         if (w->cursor && w->cursor->image_count) w->cursor_surface = wl_compositor_create_surface(w->compositor);
         else w->cursor = NULL;
     }
+    ztty_wl_services_start(w->services,w->seat,w->surface);
     wl_surface_commit(w->surface); /* No buffer before xdg_surface.configure. */
     return w;
 fail:
@@ -402,10 +422,12 @@ int ztty_wl_request_frame(struct ztty_wl *w) {
  * that can block if EGL already consumed the readable socket event. */
 int ztty_wl_pump(struct ztty_wl *w, int pty_fd, int want_write, int timeout) {
     if (w->failed) return -1;
+    ztty_wl_services_pump(w->services);
     while (wl_display_prepare_read(w->display) != 0) {
         if (wl_display_dispatch_pending(w->display) < 0 || w->failed) return -1;
     }
     int flush = wl_display_flush(w->display);
+    w->flush_pending = flush < 0 && errno == EAGAIN;
     if (flush < 0 && errno != EAGAIN) { wl_display_cancel_read(w->display); return -1; }
     int64_t now = now_ms();
     if (w->count) timeout = 0;
@@ -433,5 +455,31 @@ int ztty_wl_pump(struct ztty_wl *w, int pty_fd, int want_write, int timeout) {
         emit_key(w, w->repeat_key, 2);
         w->repeat_at = now + (1000 / w->repeat_rate > 0 ? 1000 / w->repeat_rate : 1);
     }
+    ztty_wl_services_pump(w->services);
     return w->failed ? -1 : fds[1].revents;
 }
+
+
+int ztty_wl_fd(struct ztty_wl *w) { return wl_display_get_fd(w->display); }
+int ztty_wl_events(struct ztty_wl *w) { return POLLIN | (w->flush_pending ? POLLOUT : 0); }
+uint64_t ztty_wl_deadline(struct ztty_wl *w) {
+    if(!w->configured) return 1;
+    uint64_t d=ztty_wl_services_deadline(w->services),r=(uint64_t)w->repeat_at;
+    return !d?r:(!r||d<r?d:r);
+}
+int ztty_wl_pending(struct ztty_wl *w) { return w->count != 0; }
+void ztty_wl_grid_size(struct ztty_wl *w, int width, int height) {
+    if (width < 32 || height < 32 || width>8192 || height>8192 || (int64_t)width*height>16777216) return;
+    w->pending_width=width;w->pending_height=height;
+    push(w,(struct ztty_wl_event){.kind=1,.x=width,.y=height});
+}
+
+size_t ztty_wl_service_fds(struct ztty_wl *w,struct pollfd *fds,size_t cap) {return ztty_wl_services_fds(w->services,fds,cap);}
+int ztty_wl_copy(struct ztty_wl *w,const uint8_t *text,size_t len,int primary) {return ztty_wl_services_copy(w->services,text,len,primary);}
+int ztty_wl_clip_available(struct ztty_wl *w,int primary) {return ztty_wl_services_available(w->services,primary);}
+int ztty_wl_receive(struct ztty_wl *w,int primary,size_t limit,uint32_t generation) {return ztty_wl_services_receive(w->services,primary,limit,generation);}
+void ztty_wl_cancel_receive(struct ztty_wl *w) {ztty_wl_services_cancel(w->services);}
+const uint8_t *ztty_wl_clip_result(struct ztty_wl *w,uint32_t generation,size_t *len,int *error) {return ztty_wl_services_result(w->services,generation,len,error);}
+void ztty_wl_ime_focus(struct ztty_wl *w,int focus) {ztty_wl_services_focus(w->services,focus);}
+void ztty_wl_ime_cursor(struct ztty_wl *w,int x,int y,int width,int height) {ztty_wl_services_cursor(w->services,x,y,width,height);}
+const char *ztty_wl_preedit(struct ztty_wl *w) {return ztty_wl_services_preedit(w->services);}
