@@ -1,5 +1,43 @@
 # ztty
 
+## Install on Linux
+
+The examples below describe the current source tree. Release downloads follow
+the latest published [GitHub Release](https://github.com/LIghtJUNction/ztty/releases),
+not every Git tag; build from source for unreleased changes. A source version
+number alone does not establish that downloadable assets have been published.
+
+On Arch Linux, install the AUR package with `yay -S ztty`. Other Linux
+distributions can install a prebuilt x86_64 or AArch64 binary with:
+
+```sh
+curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/install.sh
+sh install.sh
+```
+
+The script installs the latest published release, verifies its archive, and
+installs to `~/.local/bin`. The Linux binary requires glibc, X11, Xft, and Xrender.
+The working tree may contain changes that have not yet reached that release.
+
+The installer in this source tree stages and checks the executable before
+replacing the installed file with an atomic rename. An upgrade retains one
+previous executable at `~/.local/bin/ztty.previous`, with its SHA256 in
+`ztty.previous.sha256`; reinstalling identical bytes keeps that rollback copy.
+If the previous installation was a symlink, the backup preserves the link.
+The desktop entry uses the absolute installed path, so an older `ztty` elsewhere
+in `PATH` does not take precedence when launching from the application menu.
+
+Set `ZTTY_INSTALL_DIR` to choose the binary directory and `ZTTY_DESKTOP_DIR` to
+choose the launcher directory. The latter defaults to
+`${XDG_DATA_HOME:-$HOME/.local/share}/applications`. Replacing the executable does
+not restart an existing shared broker; it keeps running its loaded version
+until it exits. A new independent Linux window without `ZTTY_SOCKET`
+selects the currently installed build, while explicit addresses and targeted
+tab/split operations keep their existing routing. See
+[upgrading a running broker](docs/sessions.md#upgrading-a-running-broker).
+
+## Project overview
+
 **ztty 0.4.1** fixes numeric-keypad input under enhanced keyboard protocols
 and includes the bounded Linux native UI. Download published assets from the
 [official Releases](https://github.com/LIghtJUNction/ztty/releases).
@@ -13,6 +51,11 @@ when text overwrites them, and selects the installed build for new independent
 Linux windows while preserving existing sessions.
 See the [iteration measurements and verification](docs/performance-function-2026-11-19.zh-CN.md)
 for the tested source and workload.
+
+The current Linux source also adds double-click word selection, triple-click line
+selection and a temporary Copy/Paste menu, with visible clipboard feedback. Large
+and incremental clipboard transfers are checked end to end. See the
+[copy/paste guide and verification](docs/copy-paste-2026-11-19.zh-CN.md).
 
 <!-- terminal-benchmark:start -->
 [![Ten shared terminal windows with verified Xvfb ownership](docs/benchmarks/guarded-idle-1-10-2026-11-18.svg)](docs/benchmarks/guarded-idle-1-10-2026-11-18.md)
@@ -134,41 +177,6 @@ images remain historical evidence. The Linux native gate uses private Xvfb
 displays; live desktop interaction and physical display latency have separate
 acceptance scopes.
 
-## Install on Linux
-
-The examples below describe the current source tree. Release downloads follow
-the latest published [GitHub Release](https://github.com/LIghtJUNction/ztty/releases),
-not every Git tag; build from source for unreleased changes. A source version
-number alone does not establish that downloadable assets have been published.
-
-On Arch Linux, install the AUR package with `yay -S ztty`. Other Linux
-distributions can install a prebuilt x86_64 or AArch64 binary with:
-
-```sh
-curl -fsSLO https://github.com/LIghtJUNction/ztty/releases/latest/download/install.sh
-sh install.sh
-```
-
-The script installs the latest published release, verifies its archive, and
-installs to `~/.local/bin`. The Linux binary requires glibc, X11, Xft, and Xrender.
-The working tree may contain changes that have not yet reached that release.
-
-The installer in this source tree stages and checks the executable before
-replacing the installed file with an atomic rename. An upgrade retains one
-previous executable at `~/.local/bin/ztty.previous`, with its SHA256 in
-`ztty.previous.sha256`; reinstalling identical bytes keeps that rollback copy.
-If the previous installation was a symlink, the backup preserves the link.
-The desktop entry uses the absolute installed path, so an older `ztty` elsewhere
-in `PATH` does not take precedence when launching from the application menu.
-
-Set `ZTTY_INSTALL_DIR` to choose the binary directory and `ZTTY_DESKTOP_DIR` to
-choose the launcher directory. The latter defaults to
-`${XDG_DATA_HOME:-$HOME/.local/share}/applications`. Replacing the executable does
-not restart an existing shared broker; it keeps running its loaded version
-until it exits. A new independent Linux window without `ZTTY_SOCKET`
-selects the currently installed build, while explicit addresses and targeted
-tab/split operations keep their existing routing. See
-[upgrading a running broker](docs/sessions.md#upgrading-a-running-broker).
 
 ## Build and run
 
