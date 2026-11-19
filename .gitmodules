@@ -1,3 +1,6 @@
 [submodule "crates/zgpui"]
 	path = crates/zgpui
 	url = https://github.com/LIghtJUNction/zgpui.git
+[submodule "crates/zinput"]
+	path = crates/zinput
+	url = https://github.com/LIghtJUNction/zinput.git
