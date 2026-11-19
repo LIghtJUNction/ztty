@@ -1,0 +1,85 @@
+{
+  "binaries": {
+    "baseline": "8f35b08477877a798cc2d44ff4431731bdddd418c9c3c72097493c68cc3d2d0c",
+    "candidate": "717487afce1e6c1588018654cbda70d1148fe7f5c22706220360d72678c5c39a"
+  },
+  "normalization": "Strip disassembly addresses, direct branch/call addresses, RIP-relative relocation displacements and symbol-relative offsets; retain instructions, registers, non-relocation immediates and memory offsets.",
+  "functions": [
+    {
+      "name": "<zterm::terminal::State>::put_char",
+      "baseline_size": 2141,
+      "candidate_size": 2141,
+      "normalized_equal": true,
+      "baseline_hash": "4c0077b96ee5d98e0615ff2e41aa09974c62f9c3a3b75307ee45e824d60979b9",
+      "candidate_hash": "4c0077b96ee5d98e0615ff2e41aa09974c62f9c3a3b75307ee45e824d60979b9",
+      "diff_lines": 0
+    },
+    {
+      "name": "<zterm::terminal::State>::scroll_up",
+      "baseline_size": 1448,
+      "candidate_size": 1448,
+      "normalized_equal": true,
+      "baseline_hash": "30ac2c8e632461838cf6477cc6c1460af2f4c6d57622a004682bb0d76aec9792",
+      "candidate_hash": "30ac2c8e632461838cf6477cc6c1460af2f4c6d57622a004682bb0d76aec9792",
+      "diff_lines": 0
+    },
+    {
+      "name": "<ztty::session_core::SessionCore>::read_once",
+      "baseline_size": 12783,
+      "candidate_size": 12783,
+      "normalized_equal": true,
+      "baseline_hash": "c49b67b0e7603c068c822353a96d60c9ff4a6e8aae0804d51571987808ad5bdd",
+      "candidate_hash": "c49b67b0e7603c068c822353a96d60c9ff4a6e8aae0804d51571987808ad5bdd",
+      "diff_lines": 0
+    },
+    {
+      "name": "<ztty::session_core::SessionCore>::read_output",
+      "baseline_size": 1014,
+      "candidate_size": 1014,
+      "normalized_equal": true,
+      "baseline_hash": "e1a89c58f8bc69d0397bd38791f938f51887521be463a57eca43b34fe706de80",
+      "candidate_hash": "e1a89c58f8bc69d0397bd38791f938f51887521be463a57eca43b34fe706de80",
+      "diff_lines": 0
+    },
+    {
+      "name": "<ztty::session::Ui>::paint",
+      "baseline_size": 23609,
+      "candidate_size": 23609,
+      "normalized_equal": false,
+      "baseline_hash": "62a13e366aaf705a56328be62eb76e1b26ba56ebd83629f9798cef60acb52e14",
+      "candidate_hash": "675e47fabfff585f072a9c5cf85d86b03a818c81d17336afb7108b6abb6c8716",
+      "diff_lines": 2463
+    },
+    {
+      "name": "<ztty::session::Pool>::events",
+      "baseline_size": 22413,
+      "candidate_size": 24735,
+      "normalized_equal": false,
+      "baseline_hash": "5895da8422c9717227f22e7c09f8db4dfe05740549082a3d47cd4bf6184d88b1",
+      "candidate_hash": "04f4dd20f95c254bab25c1b8b7c4f47b2aa004d3b548e3c5dc29debed8187e57",
+      "diff_lines": 4346
+    },
+    {
+      "name": "<ztty::session::Pool>::poll_plugins",
+      "baseline_present": false,
+      "candidate_present": false
+    },
+    {
+      "name": "ztty::session::serve",
+      "baseline_present": false,
+      "candidate_present": true
+    }
+  ],
+  "source_review": {
+    "unchanged": [
+      "crates/zterm",
+      "src/x11.rs",
+      "src/repaint.rs",
+      "src/terminal.rs",
+      "src/session_core.rs"
+    ],
+    "plugin_idle": "Empty jobs vector returns before reading the clock; empty descriptor iteration adds no fd. Palette entries are built only when explicitly opened.",
+    "raw_output": "Base64 is generated only in explicit read_value; the timed writer uses PTY DSR and does not issue read RPCs.",
+    "conclusion": "No per-line plugin processing or new render work was found. The two-run color-window decline remains unexplained and is retained, not declared noise or ruled out."
+  }
+}
