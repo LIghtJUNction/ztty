@@ -283,12 +283,13 @@ pub fn encode_key_with_alternates_into(
 
     let legacy_exception = matches!(key, Key::Enter | Key::Tab | Key::Backspace);
     let text_key = matches!(key, Key::Character(_)) || keypad_text(key).is_some();
-    // Disambiguation keeps printable keypad input as text. Only report-all
-    // requests dedicated key events for unmodified digits and operators.
+    // Disambiguation keeps ordinary printable keypad input as text. Explicit
+    // application-keypad mode and report-all still request functional events.
     let enhanced = all
         || (flags & DISAMBIGUATE != 0
             && !legacy_exception
             && (key == Key::Escape
+                || (modes.app_keypad && keypad_text(key).is_some())
                 || !text_key
                 || modifiers.contains(Modifiers::CTRL | Modifiers::ALT)))
         || (events && !text_key && !legacy_exception)
@@ -1101,6 +1102,27 @@ mod tests {
                     );
                 }
             }
+        }
+    }
+
+    #[test]
+    fn application_keypad_keeps_disambiguated_events() {
+        let mut m = Modes {
+            app_keypad: true,
+            ..modes(1)
+        };
+        let key = Key::KeypadDigit(1);
+        assert_eq!(
+            encode_key(key, Modifiers(128), KeyEvent::Press, "1", &m),
+            b"\x1b[57400u"
+        );
+        m.kitty_keyboard = 3;
+        for (event, expected) in [
+            (KeyEvent::Press, b"\x1b[57400;1:1u".as_slice()),
+            (KeyEvent::Repeat, b"\x1b[57400;1:2u".as_slice()),
+            (KeyEvent::Release, b"\x1b[57400;1:3u".as_slice()),
+        ] {
+            assert_eq!(encode_key(key, Modifiers(128), event, "1", &m), expected);
         }
     }
 
