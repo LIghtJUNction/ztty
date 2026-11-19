@@ -108,6 +108,7 @@ dependencies = [
 name = "ztty"
 version = "0.4.1"
 dependencies = [
+ "unicode-segmentation",
  "zplugin",
  "zpty",
  "zterm",
