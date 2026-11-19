@@ -520,10 +520,15 @@
   },
   "fixture_normalization_after_run": {
     "path": "tests/wayland_gui.py",
-    "change": "remove redundant final blank line only; production sources and ELF unchanged",
+    "change": "remove redundant final blank line and correct private Xvfb scope in docstring only; production sources and ELF unchanged",
     "tested_sha256": "cd56ccbe3afecc3780efb76ee56ff0200425009d85cb2325b1168a58dbada91a",
-    "committed_sha256": "e70c87ae70220387ee99ea0da0d3fd0c943fe9a7bc2c6bd79b8bb612e8314fd4",
-    "removed_lf_bytes": 1
+    "committed_sha256": "5da1da4e1c8e184cdd71f6d54d600a85cf64a29f77949936ab85cdafa8959022",
+    "removed_lf_bytes": 1,
+    "pre_comment_correction_sha256": "e70c87ae70220387ee99ea0da0d3fd0c943fe9a7bc2c6bd79b8bb612e8314fd4",
+    "post_test_changes": [
+      "removed one redundant final LF",
+      "docstring clarifies owned Xvfb for mixed-backend checks"
+    ]
   },
   "pinned_protocol_sha256": "99414dbad9458e71aa1fa01bc45f94ca6685787bfcb4d98948f72c1b45b60703",
   "raw_private_evidence_sha256": {

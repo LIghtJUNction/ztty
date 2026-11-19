@@ -12,7 +12,7 @@
 7fbaf9942d82c168bc08c54a472ccda8acd81c24f31d65558ebc48771a4dee74
 ```
 
-[validation.json](validation.json) 保存脱敏结果，[source-sha256.json](source-sha256.json) 保存生产文件清单。构建前后文件摘要一致，且逐文件确认与上述生产提交完全相符。最后一次测试后仅删除了 Python GUI 夹具末尾一个多余空行；原测试摘要、提交摘要和这一字节级差异均保留在证据中，生产源码及 ELF 没有变化。固定的上游输入法协议 XML 保留原始字节及 MIT 许可，包括其原有尾随空格。
+[validation.json](validation.json) 保存脱敏结果，[source-sha256.json](source-sha256.json) 保存生产文件清单。构建前后文件摘要一致，且逐文件确认与上述生产提交完全相符。最后一次测试后只整理了 Python GUI 夹具末尾一个多余空行，并修正其使用私有 Xvfb 的说明；原测试摘要、提交摘要和这些非执行文本差异均保留在证据中，生产源码及 ELF 没有变化。固定的上游输入法协议 XML 保留原始字节及 MIT 许可，包括其原有尾随空格。
 
 ## 改动解决了什么
 
@@ -37,7 +37,7 @@
 
 这些计数按各脚本原口径列出，不把 UI 分组与其输入向量重复累加为独立测试总数。
 
-Wayland 使用私有 headless Sway 1.12，pixman 合成及 Mesa 软件 EGL。输入法 peer 是实际 input-method-v2 客户端，经 compositor 转发到 ztty 的 text-input-v3；已验证可见预编辑不进入 PTY、中文与 emoji 提交精确一次、长 UTF-8 提交跨分块不损坏、拒绝不拥有的 shell 删除后继续输入。X11 输入回归强制 GPU 路径，报告实际驱动为 llvmpipe。它们证明协议和 GLES 绘制正确性，不代表物理显示器延迟或硬件 GPU 性能排名。
+Wayland 使用私有 headless Sway 1.12，pixman 合成及 Mesa 软件 EGL。输入法 peer 是实际 input-method-v2 客户端，经 compositor 转发到 ztty 的 text-input-v3；已验证可见预编辑不进入 PTY、中文与 emoji 提交精确一次、长 UTF-8 提交跨分块不损坏、拒绝不拥有的 shell 删除后继续输入。X11 输入回归强制 GPU 路径，报告实际驱动为 llvmpipe。它们证明协议和 GLES 绘制正确性，不代表物理显示器延迟或硬件 GPU 性能排名。 [Sway 1.9 官方源码](https://github.com/swaywm/sway/blob/1.9/sway/server.c) 已注册本次所用的 text-input-v3、input-method-v2、primary-selection、screencopy 和 data-control 等协议；但本次没有实际运行 Sway 1.9，能力核对不能代替 Ubuntu 上的运行验收。
 
 所有自有 broker、PTY 子进程、剪贴板/IME/MCP helper 均已回收；Xvfb 显示所有权通过 PID 锁与内核 socket 身份核对，键盘映射已恢复。没有向宿主桌面注入按键，没有读取用户的真实剪贴板。原始日志、截图和运行时身份只留在私有验收目录，公开结果保留其摘要。
 
