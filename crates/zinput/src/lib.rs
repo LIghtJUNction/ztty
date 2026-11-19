@@ -283,12 +283,12 @@ pub fn encode_key_with_alternates_into(
 
     let legacy_exception = matches!(key, Key::Enter | Key::Tab | Key::Backspace);
     let text_key = matches!(key, Key::Character(_)) || keypad_text(key).is_some();
-    let keypad = keypad_code(key);
+    // Disambiguation keeps printable keypad input as text. Only report-all
+    // requests dedicated key events for unmodified digits and operators.
     let enhanced = all
         || (flags & DISAMBIGUATE != 0
             && !legacy_exception
             && (key == Key::Escape
-                || keypad.is_some()
                 || !text_key
                 || modifiers.contains(Modifiers::CTRL | Modifiers::ALT)))
         || (events && !text_key && !legacy_exception)
@@ -916,9 +916,8 @@ mod tests {
             encode_key(Key::Character('c'), Modifiers(4), KeyEvent::Release, "", &m),
             b"\x1b[99;5:3u"
         );
-        assert_eq!(
-            encode_key(Key::KeypadDigit(1), Modifiers(0), KeyEvent::Release, "", &m),
-            b"\x1b[57400;1:3u"
+        assert!(
+            encode_key(Key::KeypadDigit(1), Modifiers(0), KeyEvent::Release, "", &m).is_empty()
         );
         assert_eq!(
             encode_key(Key::Enter, Modifiers(0), KeyEvent::Release, "", &modes(11)),
@@ -1047,7 +1046,7 @@ mod tests {
                 "1",
                 &modes(1)
             ),
-            b"\x1b[57400u"
+            b"1"
         );
         let m = Modes {
             app_keypad: true,
@@ -1058,6 +1057,94 @@ mod tests {
             b"\x1bOq"
         );
         assert!(encode_key(Key::KeypadDigit(15), Modifiers(0), KeyEvent::Press, "", &m).is_empty());
+    }
+
+    #[test]
+    fn printable_keypad_stays_text_without_report_all() {
+        let keys = [
+            (Key::KeypadDigit(0), "0"),
+            (Key::KeypadDigit(1), "1"),
+            (Key::KeypadDigit(2), "2"),
+            (Key::KeypadDigit(3), "3"),
+            (Key::KeypadDigit(4), "4"),
+            (Key::KeypadDigit(5), "5"),
+            (Key::KeypadDigit(6), "6"),
+            (Key::KeypadDigit(7), "7"),
+            (Key::KeypadDigit(8), "8"),
+            (Key::KeypadDigit(9), "9"),
+            (Key::KeypadDecimal, "."),
+            (Key::KeypadDecimal, ","),
+            (Key::KeypadAdd, "+"),
+            (Key::KeypadSubtract, "-"),
+            (Key::KeypadMultiply, "*"),
+            (Key::KeypadDivide, "/"),
+            (Key::KeypadEqual, "="),
+            (Key::KeypadSeparator, ","),
+        ];
+        for flags in 0..REPORT_ALL {
+            for (key, text) in keys {
+                for locks in [
+                    0,
+                    Modifiers::NUM_LOCK,
+                    Modifiers::NUM_LOCK | Modifiers::CAPS_LOCK,
+                ] {
+                    for event in [KeyEvent::Press, KeyEvent::Repeat] {
+                        assert_eq!(
+                            encode_key(key, Modifiers(locks), event, text, &modes(flags)),
+                            text.as_bytes(),
+                            "flags={flags}, key={key:?}, locks={locks}, event={event:?}"
+                        );
+                    }
+                    assert!(
+                        encode_key(key, Modifiers(locks), KeyEvent::Release, "", &modes(flags))
+                            .is_empty()
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn keypad_identity_is_preserved_when_requested() {
+        let digit = Key::KeypadDigit(1);
+        assert_eq!(
+            encode_key(
+                digit,
+                Modifiers(Modifiers::CTRL),
+                KeyEvent::Press,
+                "",
+                &modes(1)
+            ),
+            b"\x1b[57400;5u"
+        );
+        assert_eq!(
+            encode_key(
+                Key::KeypadLeft,
+                Modifiers(0),
+                KeyEvent::Press,
+                "",
+                &modes(1)
+            ),
+            b"\x1b[57417u"
+        );
+        assert_eq!(
+            encode_key(digit, Modifiers(128), KeyEvent::Press, "1", &modes(8)),
+            b"\x1b[57400;129u"
+        );
+        for (event, expected) in [
+            (KeyEvent::Press, b"\x1b[57400;129:1u".as_slice()),
+            (KeyEvent::Repeat, b"\x1b[57400;129:2u".as_slice()),
+            (KeyEvent::Release, b"\x1b[57400;129:3u".as_slice()),
+        ] {
+            assert_eq!(
+                encode_key(digit, Modifiers(128), event, "1", &modes(10)),
+                expected
+            );
+        }
+        assert_eq!(
+            encode_key(digit, Modifiers(128), KeyEvent::Press, "1", &modes(24)),
+            b"\x1b[57400;129;49u"
+        );
     }
 
     #[test]
