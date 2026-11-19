@@ -16,7 +16,7 @@ import time
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "artifacts/native-ui-acceptance"
+OUT = Path(os.environ.get("ZTTY_ACCEPTANCE_OUTPUT", str(ROOT / "artifacts/native-ui-acceptance"))).resolve()
 BINARY = ROOT / "target/release/ztty"
 CARGO = ["cargo", "+" + os.environ.get("RUST_TOOLCHAIN", "1.100.0")]
 GATES = {
