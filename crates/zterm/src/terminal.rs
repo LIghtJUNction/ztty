@@ -1689,6 +1689,8 @@ impl State {
                         self.style.flags |= UNDERLINE;
                     }
                 }
+                5 => self.style.flags = (self.style.flags & !RAPID_BLINK) | BLINK,
+                6 => self.style.flags = (self.style.flags & !BLINK) | RAPID_BLINK,
                 21 => self.style.flags |= UNDERLINE,
                 7 => self.style.flags |= INVERSE,
                 8 => self.style.flags |= HIDDEN,
@@ -1696,6 +1698,7 @@ impl State {
                 22 => self.style.flags &= !(BOLD | DIM),
                 23 => self.style.flags &= !ITALIC,
                 24 => self.style.flags &= !UNDERLINE,
+                25 => self.style.flags &= !(BLINK | RAPID_BLINK),
                 27 => self.style.flags &= !INVERSE,
                 28 => self.style.flags &= !HIDDEN,
                 29 => self.style.flags &= !STRIKE,

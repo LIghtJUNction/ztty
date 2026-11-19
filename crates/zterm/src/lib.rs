@@ -17,8 +17,8 @@ mod terminal;
 
 pub use grapheme::{CellChars, MAX_GRAPHEME_BYTES};
 pub use screen::{
-    BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, EXPLICIT_FG, HIDDEN, INVERSE, ITALIC,
-    PALETTE_BG, PALETTE_FG, STRIKE, UNDERLINE,
+    BLINK, BOLD, Cell, DEFAULT_BG, DEFAULT_FG, DIM, EXPLICIT_BG, EXPLICIT_FG, HIDDEN, INVERSE,
+    ITALIC, PALETTE_BG, PALETTE_FG, RAPID_BLINK, STRIKE, UNDERLINE,
 };
 pub use shell::{
     CommandRecord, CommandText, MAX_COMMAND_TEXT, MAX_COMMANDS, ShellPhase, TextPosition,
@@ -48,3 +48,6 @@ mod ui_tests;
 
 #[cfg(test)]
 mod grapheme_tests;
+
+#[cfg(test)]
+mod blink_tests;
