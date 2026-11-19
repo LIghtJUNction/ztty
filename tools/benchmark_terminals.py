@@ -640,8 +640,11 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
                         record_renderer(xconnection, row["window"], ztty_renderer)
                         for row in windows.values()
                     ]
-                    if any(row["actual"] not in ("gpu", "software") for row in result["renderers"]):
-                        raise RuntimeError("ztty omitted its actual renderer identity")
+                    # Older baseline ELFs predate these properties. Auto mode
+                    # records that gap; an explicit GPU/software request is
+                    # still enforced by record_renderer above.
+                    result["renderer_identity_available"] = all(
+                        row["actual"] in ("gpu", "software") for row in result["renderers"])
                 if workload == "hidden":
                     for title, row in windows.items():
                         if title != prefix + "1":
