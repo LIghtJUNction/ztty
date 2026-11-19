@@ -603,14 +603,15 @@ impl Host {
             match self.core.read_once(&mut self.read_buffer, false) {
                 Ok(ReadStep::Data {
                     bytes,
-                    history_before,
+                    history_scrolled,
                     history_after,
+                    ..
                 }) => {
                     budget = budget.saturating_sub(bytes);
                     if self.history > 0 {
                         self.history = self
                             .history
-                            .saturating_add(history_after.saturating_sub(history_before))
+                            .saturating_add(history_scrolled)
                             .min(history_after);
                         self.selection = None;
                     }

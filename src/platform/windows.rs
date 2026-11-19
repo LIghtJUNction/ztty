@@ -1714,14 +1714,14 @@ impl App {
                 for _ in 0..(16 / count).max(1) {
                     match pane.core.read_once(&mut buffer, false) {
                         Ok(ReadStep::Data {
-                            history_before,
+                            history_scrolled,
                             history_after,
                             ..
                         }) => {
                             if pane.history != 0 {
                                 pane.history = pane
                                     .history
-                                    .saturating_add(history_after.saturating_sub(history_before))
+                                    .saturating_add(history_scrolled)
                                     .min(history_after);
                             }
                             pane.dirty = true;

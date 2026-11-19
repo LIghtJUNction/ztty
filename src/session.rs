@@ -1038,7 +1038,7 @@ impl Session {
         for _ in 0..4 {
             match self.core.read_once(buffer, self.persistent) {
                 Ok(ReadStep::Data {
-                    history_before,
+                    history_scrolled,
                     history_after,
                     ..
                 }) => {
@@ -1050,7 +1050,7 @@ impl Session {
                             ui.new_output = true;
                             ui.set_history(
                                 ui.history
-                                    .saturating_add(history_after.saturating_sub(history_before))
+                                    .saturating_add(history_scrolled)
                                     .min(history_after),
                             );
                             ui.force = true;

@@ -147,6 +147,19 @@ fn child(mode: &str, directory: &Path) {
                 child_write(directory, "finished", b"i\r\nj\r\nk\r\nl\r\nm\r\nn\r\n");
             }
         }
+        "full-history" => {
+            let lines = |start, end| -> String {
+                (start..end).map(|line| format!("L{line:03}\r\n")).collect()
+            };
+            child_write(directory, "ready", lines(0, 60).as_bytes());
+            if !child_wait(directory, "grow") {
+                return;
+            }
+            child_write(directory, "grown", lines(60, 65).as_bytes());
+            if child_wait(directory, "evict") {
+                child_write(directory, "finished", lines(65, 105).as_bytes());
+            }
+        }
         "exit" => {
             fs::write(directory.join("ready"), b"1").unwrap();
         }
@@ -303,14 +316,12 @@ fn drain_phase(core: &mut SessionCore, history: &mut usize) -> Vec<ReadStep> {
         let step = core.read_once(&mut buffer, false).unwrap();
         match step {
             ReadStep::Data {
-                history_before,
+                history_scrolled,
                 history_after,
                 ..
             } => {
                 if *history != 0 {
-                    *history = history
-                        .saturating_add(history_after.saturating_sub(history_before))
-                        .min(history_after);
+                    *history = history.saturating_add(history_scrolled).min(history_after);
                 }
                 steps.push(step);
             }
@@ -403,6 +414,34 @@ fn history_clear_resets_the_anchor_before_later_growth() {
     drain_phase(&mut fixture.core, &mut history);
     assert!(fixture.core.terminal.history_len() > 0);
     assert_eq!(history, 0);
+    drain_to_eof(&mut fixture.core);
+}
+
+#[cfg(unix)]
+fn full_history_keeps_the_visible_rows_until_they_are_evicted() {
+    let mut fixture = Fixture::new("full-history", 4096);
+    drain_phase(&mut fixture.core, &mut 0);
+    assert_eq!(fixture.core.terminal.history_len(), 32);
+    let mut history = 10;
+    let visible = |terminal: &Terminal, offset| -> String {
+        (0..terminal.cols())
+            .map(|col| terminal.view_cell(col, 0, offset).ch)
+            .collect()
+    };
+    let original = visible(&fixture.core.terminal, history);
+    assert!(original.starts_with("L045"), "{original:?}");
+    fixture.signal("grow");
+    fixture.wait_file("grown");
+    drain_phase(&mut fixture.core, &mut history);
+    assert_eq!(fixture.core.terminal.history_len(), 32);
+    assert_eq!(history, 15);
+    assert_eq!(visible(&fixture.core.terminal, history), original);
+    fixture.signal("evict");
+    fixture.wait_file("finished");
+    drain_phase(&mut fixture.core, &mut history);
+    assert_eq!(history, 32);
+    let oldest = visible(&fixture.core.terminal, history);
+    assert!(oldest.starts_with("L068"), "{oldest:?}");
     drain_to_eof(&mut fixture.core);
 }
 
@@ -502,6 +541,10 @@ fn main() {
         run(
             "per-feed history anchor",
             history_clear_resets_the_anchor_before_later_growth,
+        );
+        run(
+            "full-history viewport retention",
+            full_history_keeps_the_visible_rows_until_they_are_evicted,
         );
         run(
             "native errors and descriptor cleanup",
