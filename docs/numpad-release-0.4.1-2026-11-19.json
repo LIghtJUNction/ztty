@@ -1,0 +1,1561 @@
+{
+  "schema": 1,
+  "report_date": "2026-11-19",
+  "generated_at_utc": "2026-11-19T07:10:15.577361+00:00",
+  "repository": "https://github.com/LIghtJUNction/ztty",
+  "version": "0.4.1",
+  "source": {
+    "tag": "v0.4.1",
+    "source_commit": "6b91e29e923aaee0207953f2b04393087f19e0d8",
+    "source_tree": "58979bd10bb13b8ff0cdb08dfb4104094c3e0e54",
+    "tested_commit": "2df8ff229d270e45815a470c1bb9e61844186206"
+  },
+  "merged_pull_requests": [
+    {
+      "number": 11,
+      "url": "https://github.com/LIghtJUNction/ztty/pull/11",
+      "merged": true,
+      "merge_commit": "9987226bb06a5b595e91151b7ea8a2a34ece3d08"
+    },
+    {
+      "number": 15,
+      "url": "https://github.com/LIghtJUNction/ztty/pull/15",
+      "merged": true,
+      "merge_commit": "43f221e5c810da0bb8d69e64e699314270c3a62f"
+    },
+    {
+      "number": 16,
+      "url": "https://github.com/LIghtJUNction/ztty/pull/16",
+      "merged": true,
+      "merge_commit": "6b91e29e923aaee0207953f2b04393087f19e0d8"
+    }
+  ],
+  "open_pull_requests_at_report": 0,
+  "baseline": {
+    "version": "0.3.1",
+    "expected_to_fail": true,
+    "scope": "XTEST events through real X11/private Xvfb and raw PTY",
+    "failing_vectors": [
+      {
+        "name": "Kitty flags 1: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "1b5b3537333939751b5b3537343030751b5b3537343031751b5b3537343032751b5b3537343033751b5b3537343034751b5b3537343035751b5b3537343036751b5b3537343037751b5b3537343038751b5b3537343039751b5b3537343133751b5b3537343132751b5b3537343131751b5b353734313075",
+        "ok": false
+      }
+    ],
+    "evidence_sha256": "a7e78e1cf54014383ea38760ec4d59351fbe89e62ffd914d3c5652429749fe4c"
+  },
+  "development_checks": {
+    "source_commit": "be8c2bc71f92a09fe77fe15e8de6223b8cbbf7b9",
+    "checks": [
+      {
+        "name": "workspace-tests",
+        "exit_code": 0,
+        "seconds": 21.2,
+        "rust_results": [
+          [
+            "31",
+            "0"
+          ],
+          [
+            "21",
+            "0"
+          ],
+          [
+            "0",
+            "0"
+          ],
+          [
+            "104",
+            "0"
+          ],
+          [
+            "10",
+            "0"
+          ],
+          [
+            "12",
+            "0"
+          ],
+          [
+            "3",
+            "0"
+          ],
+          [
+            "4",
+            "0"
+          ],
+          [
+            "6",
+            "0"
+          ],
+          [
+            "27",
+            "0"
+          ],
+          [
+            "5",
+            "0"
+          ],
+          [
+            "19",
+            "0"
+          ],
+          [
+            "6",
+            "0"
+          ],
+          [
+            "3",
+            "0"
+          ],
+          [
+            "13",
+            "0"
+          ],
+          [
+            "5",
+            "0"
+          ],
+          [
+            "9",
+            "0"
+          ],
+          [
+            "8",
+            "0"
+          ],
+          [
+            "4",
+            "0"
+          ],
+          [
+            "4",
+            "0"
+          ],
+          [
+            "13",
+            "0"
+          ],
+          [
+            "18",
+            "0"
+          ],
+          [
+            "1",
+            "0"
+          ],
+          [
+            "2",
+            "0"
+          ],
+          [
+            "0",
+            "0"
+          ],
+          [
+            "3",
+            "0"
+          ],
+          [
+            "0",
+            "0"
+          ],
+          [
+            "0",
+            "0"
+          ]
+        ]
+      },
+      {
+        "name": "clippy",
+        "exit_code": 0,
+        "seconds": 5.6,
+        "rust_results": []
+      }
+    ]
+  },
+  "final_local_checks": {
+    "source_commit": "2df8ff229d270e45815a470c1bb9e61844186206",
+    "source_tree": "58979bd10bb13b8ff0cdb08dfb4104094c3e0e54",
+    "checks": [
+      {
+        "name": "metadata",
+        "exit_code": 0,
+        "seconds": 0.04
+      },
+      {
+        "name": "release-build",
+        "exit_code": 0,
+        "seconds": 7.28
+      },
+      {
+        "name": "no-std",
+        "exit_code": 0,
+        "seconds": 0.12
+      },
+      {
+        "name": "linux-native",
+        "exit_code": 0,
+        "seconds": 19.49
+      }
+    ]
+  },
+  "prior_integration_checks": {
+    "source_commit": "7f731f25bc4d772e6d1dbe20e210fab1ba7922a2",
+    "prior_source_commit": "2e634ac3a181d47e8c258f5e4949d5c1a9e75d42",
+    "prior_checks": [
+      {
+        "name": "fmt",
+        "exit_code": 0,
+        "seconds": 0.46
+      },
+      {
+        "name": "metadata",
+        "exit_code": 0,
+        "seconds": 34.97
+      },
+      {
+        "name": "consumer-api-smoke",
+        "exit_code": 0,
+        "seconds": 4.1
+      }
+    ],
+    "checks": [
+      {
+        "name": "release-build",
+        "exit_code": 0,
+        "seconds": 10.38
+      },
+      {
+        "name": "no-std",
+        "exit_code": 0,
+        "seconds": 0.14
+      },
+      {
+        "name": "bare-metal",
+        "exit_code": 0,
+        "seconds": 2.29
+      },
+      {
+        "name": "linux-native",
+        "exit_code": 0,
+        "seconds": 20.42
+      }
+    ]
+  },
+  "final_local_native": {
+    "passed": true,
+    "source_commit": "2df8ff229d270e45815a470c1bb9e61844186206",
+    "binary_sha256": "d1276d06108a8f23bc2b088078ebdbf6a72d50505fb2c5b43aeff342b9c12335",
+    "scope": "Native Linux ELF and real PTY/X11 GUI acceptance under guarded private Xvfb",
+    "limitations": [
+      "No native Wayland or hardware GPU/scanout acceptance.",
+      "No physical input-to-display latency measurement."
+    ],
+    "ime_keyboard": "synthetic XTEST input; no hardware IME acceptance",
+    "cases": [
+      {
+        "name": "workspaces",
+        "passed": true,
+        "checks_completed": 17,
+        "exit_code": 0,
+        "leftover_owned_processes": 0
+      },
+      {
+        "name": "daily_workflow",
+        "passed": true,
+        "checks_completed": 18,
+        "exit_code": 0,
+        "leftover_owned_processes": 0
+      },
+      {
+        "name": "session_switcher",
+        "passed": true,
+        "checks_completed": 6,
+        "exit_code": 0,
+        "leftover_owned_processes": 0
+      },
+      {
+        "name": "sixel_gui",
+        "passed": true,
+        "checks_completed": 10,
+        "exit_code": 0,
+        "leftover_owned_processes": 0
+      },
+      {
+        "name": "input_gui",
+        "passed": true,
+        "checks_completed": 12,
+        "exit_code": 0,
+        "leftover_owned_processes": 0
+      },
+      {
+        "name": "repaint_gui",
+        "passed": true,
+        "checks_completed": 11,
+        "exit_code": 0,
+        "leftover_owned_processes": 0
+      },
+      {
+        "name": "native_ui_gui",
+        "passed": true,
+        "checks_completed": 24,
+        "exit_code": 0,
+        "leftover_owned_processes": 0
+      }
+    ]
+  },
+  "input_regression": {
+    "source_commit": "2df8ff229d270e45815a470c1bb9e61844186206",
+    "ok": true,
+    "vector_count": 70,
+    "zoom_count": 14,
+    "group_count": 12,
+    "vectors": [
+      {
+        "name": "legacy Ctrl+I",
+        "expected_hex": "09",
+        "actual_hex": "09",
+        "ok": true
+      },
+      {
+        "name": "legacy Ctrl+Shift+I remains distinct",
+        "expected_hex": "1b5b3130353b3675",
+        "actual_hex": "1b5b3130353b3675",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+unshifted tilde on private keyboard mapping",
+        "expected_hex": "1e",
+        "actual_hex": "1e",
+        "ok": true
+      },
+      {
+        "name": "Num Lock toggles without writing CSI-u into a legacy shell",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Num Lock on: keypad digits and decimal are text",
+        "expected_hex": "303132333435363738392e",
+        "actual_hex": "303132333435363738392e",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 1: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "303132333435363738392e2b2d2a2f",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 2: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "303132333435363738392e2b2d2a2f",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 3: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "303132333435363738392e2b2d2a2f",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 4: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "303132333435363738392e2b2d2a2f",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 5: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "303132333435363738392e2b2d2a2f",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 6: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "303132333435363738392e2b2d2a2f",
+        "ok": true
+      },
+      {
+        "name": "Kitty flags 7: printable keypad keys remain text",
+        "expected_hex": "303132333435363738392e2b2d2a2f",
+        "actual_hex": "303132333435363738392e2b2d2a2f",
+        "ok": true
+      },
+      {
+        "name": "Kitty report-all retains keypad identity",
+        "expected_hex": "1b5b35373430303b31323975",
+        "actual_hex": "1b5b35373430303b31323975",
+        "ok": true
+      },
+      {
+        "name": "Kitty report-all includes requested keypad text",
+        "expected_hex": "1b5b35373430303b3132393b343975",
+        "actual_hex": "1b5b35373430303b3132393b343975",
+        "ok": true
+      },
+      {
+        "name": "Application keypad keeps disambiguated identity",
+        "expected_hex": "1b5b353734303075",
+        "actual_hex": "1b5b353734303075",
+        "ok": true
+      },
+      {
+        "name": "Application keypad keeps press and release events",
+        "expected_hex": "1b5b35373430303b313a31751b5b35373430303b313a3375",
+        "actual_hex": "1b5b35373430303b313a31751b5b35373430303b313a3375",
+        "ok": true
+      },
+      {
+        "name": "Num Lock off emits no legacy input",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Num Lock off: keypad zero retains the standard Insert key",
+        "expected_hex": "1b5b327e",
+        "actual_hex": "1b5b327e",
+        "ok": true
+      },
+      {
+        "name": "explicit Kitty opt-in still reports Num Lock and its state",
+        "expected_hex": "1b5b35373336303b31323975",
+        "actual_hex": "1b5b35373336303b31323975",
+        "ok": true
+      },
+      {
+        "name": "return to legacy mode stops reporting lock keys",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "wheel button 4: press without release",
+        "expected_hex": "1b5b3c36343b383b364d",
+        "actual_hex": "1b5b3c36343b383b364d",
+        "ok": true
+      },
+      {
+        "name": "wheel button 5: press without release",
+        "expected_hex": "1b5b3c36353b383b364d",
+        "actual_hex": "1b5b3c36353b383b364d",
+        "ok": true
+      },
+      {
+        "name": "wheel button 6: press without release",
+        "expected_hex": "1b5b3c36363b383b364d",
+        "actual_hex": "1b5b3c36363b383b364d",
+        "ok": true
+      },
+      {
+        "name": "wheel button 7: press without release",
+        "expected_hex": "1b5b3c36373b383b364d",
+        "actual_hex": "1b5b3c36373b383b364d",
+        "ok": true
+      },
+      {
+        "name": "extra button 8: SGR press/release",
+        "expected_hex": "1b5b3c3132383b383b364d1b5b3c3132383b383b366d",
+        "actual_hex": "1b5b3c3132383b383b364d1b5b3c3132383b383b366d",
+        "ok": true
+      },
+      {
+        "name": "extra button 9: SGR press/release",
+        "expected_hex": "1b5b3c3132393b383b364d1b5b3c3132393b383b366d",
+        "actual_hex": "1b5b3c3132393b383b364d1b5b3c3132393b383b366d",
+        "ok": true
+      },
+      {
+        "name": "extra button 10: SGR press/release",
+        "expected_hex": "1b5b3c3133303b383b364d1b5b3c3133303b383b366d",
+        "actual_hex": "1b5b3c3133303b383b364d1b5b3c3133303b383b366d",
+        "ok": true
+      },
+      {
+        "name": "extra button 11: SGR press/release",
+        "expected_hex": "1b5b3c3133313b383b364d1b5b3c3133313b383b366d",
+        "actual_hex": "1b5b3c3133313b383b364d1b5b3c3133313b383b366d",
+        "ok": true
+      },
+      {
+        "name": "extra button 8: drag in mode 1002",
+        "expected_hex": "1b5b3c3132383b383b364d1b5b3c3136303b31303b374d1b5b3c3132383b31303b376d",
+        "actual_hex": "1b5b3c3132383b383b364d1b5b3c3136303b31303b374d1b5b3c3132383b31303b376d",
+        "ok": true
+      },
+      {
+        "name": "extra button 9: drag in mode 1002",
+        "expected_hex": "1b5b3c3132393b383b364d1b5b3c3136313b31303b374d1b5b3c3132393b31303b376d",
+        "actual_hex": "1b5b3c3132393b383b364d1b5b3c3136313b31303b374d1b5b3c3132393b31303b376d",
+        "ok": true
+      },
+      {
+        "name": "extra button 10: drag in mode 1002",
+        "expected_hex": "1b5b3c3133303b383b364d1b5b3c3136323b31303b374d1b5b3c3133303b31303b376d",
+        "actual_hex": "1b5b3c3133303b383b364d1b5b3c3136323b31303b374d1b5b3c3133303b31303b376d",
+        "ok": true
+      },
+      {
+        "name": "extra button 11: drag in mode 1002",
+        "expected_hex": "1b5b3c3133313b383b364d1b5b3c3136333b31303b374d1b5b3c3133313b31303b376d",
+        "actual_hex": "1b5b3c3133313b383b364d1b5b3c3136333b31303b374d1b5b3c3133313b31303b376d",
+        "ok": true
+      },
+      {
+        "name": "button 1: remote release survives Shift change",
+        "expected_hex": "1b5b3c303b383b364d1b5b3c343b383b366d",
+        "actual_hex": "1b5b3c303b383b364d1b5b3c343b383b366d",
+        "ok": true
+      },
+      {
+        "name": "button 1: local Shift press cannot leak a remote release",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "button 8: remote release survives Shift change",
+        "expected_hex": "1b5b3c3132383b383b364d1b5b3c3133323b383b366d",
+        "actual_hex": "1b5b3c3132383b383b364d1b5b3c3133323b383b366d",
+        "ok": true
+      },
+      {
+        "name": "button 8: local Shift press cannot leak a remote release",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "focus loss clears extra-button drag and unmatched release",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "X10 primary press ignores modifiers and release",
+        "expected_hex": "1b5b4d202826",
+        "actual_hex": "1b5b4d202826",
+        "ok": true
+      },
+      {
+        "name": "X10 suppresses wheel extra-button and motion",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "X10 tracking is independent from SGR encoding",
+        "expected_hex": "1b5b3c303b383b364d",
+        "actual_hex": "1b5b3c303b383b364d",
+        "ok": true
+      },
+      {
+        "name": "reset X10 does not cancel subsequently enabled normal tracking",
+        "expected_hex": "1b5b3c303b383b364d1b5b3c303b383b366d",
+        "actual_hex": "1b5b3c303b383b364d1b5b3c303b383b366d",
+        "ok": true
+      },
+      {
+        "name": "custom key binding and search input never leak to PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "custom mouse binding and palette input never leak to PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "custom extra-button binding and palette input never leak to PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "shifted punctuation binding: US question mark",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "shifted punctuation binding: US colon",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "shifted punctuation binding: question mark on a non-US key",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+Plus increases font: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+0 restores configured font: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+Minus decreases font: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+0 restores configured font: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Equal retains font increase: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Minus retains font decrease: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "default plus on non-US physical key: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "restore after non-US zoom: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad Add with Num Lock off: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad Subtract with Num Lock off: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad Add with Num Lock on: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad 0 resets with Num Lock on: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Num Lock off: Ctrl+keypad Insert remains application input",
+        "expected_hex": "1b5b323b357e",
+        "actual_hex": "1b5b323b357e",
+        "ok": true
+      },
+      {
+        "name": "custom none disables shifted plus and consumes release",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "custom keypad remap wins over font increase default: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "restore after custom keypad remap: shortcut press/release stay out of PTY",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "custom base-key none wins over shifted default plus",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+Tab selects previous tab: original PTY stays silent",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+Tab selects previous tab: peer PTY stays silent",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Tab selects next tab: original PTY stays silent",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Tab selects next tab: peer PTY stays silent",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+Tab returns to original tab: original PTY stays silent",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+Tab returns to original tab: peer PTY stays silent",
+        "expected_hex": "",
+        "actual_hex": "",
+        "ok": true
+      }
+    ],
+    "zoom": [
+      {
+        "name": "Ctrl+Shift+Plus increases font",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+0 restores configured font",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Shift+Minus decreases font",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+0 restores configured font",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Equal retains font increase",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+Minus retains font decrease",
+        "ok": true
+      },
+      {
+        "name": "default plus on non-US physical key",
+        "ok": true
+      },
+      {
+        "name": "restore after non-US zoom",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad Add with Num Lock off",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad Subtract with Num Lock off",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad Add with Num Lock on",
+        "ok": true
+      },
+      {
+        "name": "Ctrl+keypad 0 resets with Num Lock on",
+        "ok": true
+      },
+      {
+        "name": "custom keypad remap wins over font increase default",
+        "ok": true
+      },
+      {
+        "name": "restore after custom keypad remap",
+        "ok": true
+      }
+    ]
+  },
+  "published_library_consumers": {
+    "timestamp_utc": "2026-11-19T06:13:24.566032+00:00",
+    "ok": true,
+    "versions": {
+      "zinput": "0.1.2",
+      "zgraphics": "0.1.1",
+      "zpty": "0.2.1",
+      "ztty-ui": "0.1.0",
+      "zterm": "0.4.0"
+    },
+    "packages": [
+      {
+        "name": "zinput",
+        "version": "0.1.2",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "selected": true,
+        "vcs": {
+          "git": {
+            "sha1": "43f221e5c810da0bb8d69e64e699314270c3a62f"
+          },
+          "path_in_vcs": "crates/zinput"
+        },
+        "cargo_lock_checksum": "10ec6da21e706277882dc59fa2d6780512b28e6a643fca7245dfa0dc90518c8d",
+        "library_source_has_no_std": true
+      },
+      {
+        "name": "zgraphics",
+        "version": "0.1.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "selected": true,
+        "vcs": {
+          "git": {
+            "sha1": "74a599445fa358bbe7d1fdb71e923a97fe398467"
+          },
+          "path_in_vcs": "crates/zgraphics"
+        },
+        "cargo_lock_checksum": "5d47cac5269b7873f7c7a1c1e24bf56636f1be29830ddd17f96ed2e847533ebc",
+        "library_source_has_no_std": true
+      },
+      {
+        "name": "zpty",
+        "version": "0.2.1",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "selected": true,
+        "vcs": {
+          "git": {
+            "sha1": "74a599445fa358bbe7d1fdb71e923a97fe398467"
+          },
+          "path_in_vcs": "crates/zpty"
+        },
+        "cargo_lock_checksum": "e04083399cd7e57fa3cd362d4574108ef9761041b3acb5fe5cb8960325f7bca4",
+        "library_source_has_no_std": true
+      },
+      {
+        "name": "ztty-ui",
+        "version": "0.1.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "selected": true,
+        "vcs": {
+          "git": {
+            "sha1": "43f221e5c810da0bb8d69e64e699314270c3a62f"
+          },
+          "path_in_vcs": "crates/ztty-ui"
+        },
+        "cargo_lock_checksum": "da29f1c1258b424edcc4bd15a23d92f603c3878b073c892a0fc9cf7cfbb7a2be",
+        "library_source_has_no_std": true
+      },
+      {
+        "name": "zterm",
+        "version": "0.4.0",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "selected": true,
+        "vcs": {
+          "git": {
+            "sha1": "43f221e5c810da0bb8d69e64e699314270c3a62f"
+          },
+          "path_in_vcs": "crates/zterm"
+        },
+        "cargo_lock_checksum": "51bdb8079b94eae29840f47874fb57a6431852d59f961dcb122b2f04a5ca3c94",
+        "library_source_has_no_std": true
+      }
+    ],
+    "individual_checks": [
+      {
+        "selected": [
+          "zinput"
+        ],
+        "ok": true,
+        "consumer_library_no_std": true,
+        "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies",
+        "checks": [
+          {
+            "stage": "metadata",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "no_std_library_check",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "consumer_run",
+            "ok": true,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "selected": [
+          "zgraphics"
+        ],
+        "ok": true,
+        "consumer_library_no_std": true,
+        "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies",
+        "checks": [
+          {
+            "stage": "metadata",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "no_std_library_check",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "consumer_run",
+            "ok": true,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "selected": [
+          "zpty"
+        ],
+        "ok": true,
+        "consumer_library_no_std": true,
+        "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies",
+        "checks": [
+          {
+            "stage": "metadata",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "no_std_library_check",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "consumer_run",
+            "ok": true,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "selected": [
+          "ztty-ui"
+        ],
+        "ok": true,
+        "consumer_library_no_std": true,
+        "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies",
+        "checks": [
+          {
+            "stage": "metadata",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "no_std_library_check",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "consumer_run",
+            "ok": true,
+            "exit_code": 0
+          }
+        ]
+      },
+      {
+        "selected": [
+          "zterm"
+        ],
+        "ok": true,
+        "consumer_library_no_std": true,
+        "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies",
+        "checks": [
+          {
+            "stage": "metadata",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "no_std_library_check",
+            "ok": true,
+            "exit_code": 0
+          },
+          {
+            "stage": "consumer_run",
+            "ok": true,
+            "exit_code": 0
+          }
+        ]
+      }
+    ],
+    "combined_check": {
+      "selected": [
+        "zinput",
+        "zgraphics",
+        "zpty",
+        "ztty-ui",
+        "zterm"
+      ],
+      "ok": true,
+      "consumer_library_no_std": true,
+      "consumer_dependency_kind": "exact crates.io versions; no path or git dependencies",
+      "checks": [
+        {
+          "stage": "metadata",
+          "ok": true,
+          "exit_code": 0
+        },
+        {
+          "stage": "no_std_library_check",
+          "ok": true,
+          "exit_code": 0
+        },
+        {
+          "stage": "consumer_run",
+          "ok": true,
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "application_registry_install": {
+    "version": "0.4.1",
+    "exit_code": 0,
+    "seconds": 37.53,
+    "source": "crates.io",
+    "local_path_dependencies": false,
+    "reported_version": "ztty 0.4.1",
+    "binary_sha256": "3e50573c8157c2adceb98c53542bf30aade4a39eca349d6ca8f00187c7a11215"
+  },
+  "installation": {
+    "exit_code": 0,
+    "source_commit": "6b91e29e923aaee0207953f2b04393087f19e0d8",
+    "source_tree": "58979bd10bb13b8ff0cdb08dfb4104094c3e0e54",
+    "artifact_origin": "Locally built release ELF, passed source-bound Linux native acceptance",
+    "existing_ztty_processes_before": 5,
+    "existing_processes_still_alive": 5,
+    "package_version": "ztty 0.4.1-1",
+    "reported_version": "ztty 0.4.1",
+    "binary_sha256": "d1276d06108a8f23bc2b088078ebdbf6a72d50505fb2c5b43aeff342b9c12335",
+    "user_launcher_target": "/usr/bin/ztty",
+    "desktop_exec": "Exec=/usr/bin/ztty",
+    "package_integrity": {
+      "exit_code": 0
+    }
+  },
+  "release_asset_rehearsal": {
+    "original_run_id": 44470108654,
+    "source_commit": "43f221e5c810da0bb8d69e64e699314270c3a62f",
+    "prepared": {
+      "source_sha": "43f221e5c810da0bb8d69e64e699314270c3a62f",
+      "version": "0.4.0",
+      "files_preserved": 949,
+      "empty_files_preserved": 10,
+      "standalone_assets": 45,
+      "archive_sha256": "20513511bd984ab6aa4a4418460168f2a49ab6e0d391551e34ee39e3ba66165c"
+    },
+    "verified": {
+      "passed": true,
+      "source_sha": "43f221e5c810da0bb8d69e64e699314270c3a62f",
+      "version": "0.4.0",
+      "files_verified": 949,
+      "archive_sha256": "20513511bd984ab6aa4a4418460168f2a49ab6e0d391551e34ee39e3ba66165c"
+    },
+    "archive_only_files_restored": 906,
+    "empty_files_restored": 10,
+    "platforms_verified": 6,
+    "ledger_file_checks": 936,
+    "standalone_assets_with_source": 47,
+    "passed": true
+  },
+  "publication": {
+    "passed": true,
+    "timestamp_utc": "2026-11-19T07:03:59.619655+00:00",
+    "source_commit": "6b91e29e923aaee0207953f2b04393087f19e0d8",
+    "tag": "v0.4.1",
+    "workflow": {
+      "id": 44474100248,
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44474100248",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1
+    },
+    "jobs": [
+      {
+        "id": 135390341987,
+        "name": "version",
+        "conclusion": "success"
+      },
+      {
+        "id": 135390434970,
+        "name": "windows (windows-11-arm, aarch64, arm64, aarch64-pc-windows-msvc, aarch64-pc-windows-gnullvm, 7d7...",
+        "conclusion": "success"
+      },
+      {
+        "id": 135390434993,
+        "name": "linux (ubuntu-24.04-arm, aarch64, arm64)",
+        "conclusion": "success"
+      },
+      {
+        "id": 135390434995,
+        "name": "windows (windows-2025, x86_64, x64, x86_64-pc-windows-msvc, x86_64-pc-windows-gnullvm, 552191b575...",
+        "conclusion": "success"
+      },
+      {
+        "id": 135390435022,
+        "name": "linux (ubuntu-24.04, x86_64, x64)",
+        "conclusion": "success"
+      },
+      {
+        "id": 135390435099,
+        "name": "macos (macos-15-intel, x86_64, x86_64, x64, x86_64-apple-darwin)",
+        "conclusion": "success"
+      },
+      {
+        "id": 135390435137,
+        "name": "verify / checks",
+        "conclusion": "success"
+      },
+      {
+        "id": 135390435378,
+        "name": "macos (macos-15, aarch64, arm64, arm64, aarch64-apple-darwin)",
+        "conclusion": "success"
+      },
+      {
+        "id": 135392273182,
+        "name": "publish",
+        "conclusion": "success",
+        "steps": [
+          {
+            "name": "Set up job",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "conclusion": "success"
+          },
+          {
+            "name": "Prepare source and test Arch package",
+            "conclusion": "success"
+          },
+          {
+            "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+            "conclusion": "success"
+          },
+          {
+            "name": "Verify every platform artifact belongs to the accepted source",
+            "conclusion": "success"
+          },
+          {
+            "name": "Check release evidence packaging contracts",
+            "conclusion": "success"
+          },
+          {
+            "name": "Publish or verify GitHub Release",
+            "conclusion": "success"
+          },
+          {
+            "name": "Update AUR",
+            "conclusion": "success"
+          },
+          {
+            "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "conclusion": "success"
+          },
+          {
+            "name": "Complete job",
+            "conclusion": "success"
+          }
+        ]
+      }
+    ],
+    "publish_steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "conclusion": "success"
+      },
+      {
+        "name": "Prepare source and test Arch package",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify every platform artifact belongs to the accepted source",
+        "conclusion": "success"
+      },
+      {
+        "name": "Check release evidence packaging contracts",
+        "conclusion": "success"
+      },
+      {
+        "name": "Publish or verify GitHub Release",
+        "conclusion": "success"
+      },
+      {
+        "name": "Update AUR",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ],
+    "release": {
+      "id": 450973873,
+      "url": "https://github.com/LIghtJUNction/ztty/releases/tag/v0.4.1",
+      "published_at": "2026-11-19T06:49:54Z",
+      "draft": false,
+      "assets": [
+        {
+          "name": "install.sh",
+          "bytes": 9589,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/install.sh",
+          "digest": "sha256:89c0933c4e4a4a8d60d436191f58510d88b8a52275f4dab2bf00176a4bb5fba4"
+        },
+        {
+          "name": "SHA256SUMS",
+          "bytes": 84,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/SHA256SUMS",
+          "digest": "sha256:d17eecb3a17023a6ce104102cbad40cc51d68f779ea4166dd0243c619e22bd31"
+        },
+        {
+          "name": "ztty-0.4.1-native-evidence.zip",
+          "bytes": 15152975,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-0.4.1-native-evidence.zip",
+          "digest": "sha256:e25a56822929d46857585784058081a173044fb4f1cdb06092954c1777ac0621"
+        },
+        {
+          "name": "ztty-0.4.1-native-evidence.zip.sha256",
+          "bytes": 97,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-0.4.1-native-evidence.zip.sha256",
+          "digest": "sha256:e1ba4b0f74ba17ff0925b847bf191ace6dfdfabe506dd95a1846e69ed1048478"
+        },
+        {
+          "name": "ztty-0.4.1.tar.gz",
+          "bytes": 4681117,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-0.4.1.tar.gz",
+          "digest": "sha256:f8c4fbf1b6e0afcbc4c72d10caa23a4d57a21a845070f936bf601e44e01f1196"
+        },
+        {
+          "name": "ztty-linux-aarch64.build.json",
+          "bytes": 1545,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-aarch64.build.json",
+          "digest": "sha256:50e03ee1c1efc093937bc70c22b7f172f081d19c6deaf23aff195866fd844252"
+        },
+        {
+          "name": "ztty-linux-aarch64.build.json.sha256",
+          "bytes": 96,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-aarch64.build.json.sha256",
+          "digest": "sha256:bb57a8e7db4d22aa296576dd9f154499915210a4a515e00d2461225927b8e8d1"
+        },
+        {
+          "name": "ztty-linux-aarch64.native.json",
+          "bytes": 26424,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-aarch64.native.json",
+          "digest": "sha256:b140dfd7469e4e7bfc9e0234a292d37382668e9e0e0ff5fc585756e6981c6ef8"
+        },
+        {
+          "name": "ztty-linux-aarch64.tar.gz",
+          "bytes": 374888,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-aarch64.tar.gz",
+          "digest": "sha256:c40eed517d36703f76e76bf907ef1e49d02ec67d9ed0cc7fd044d254f942974f"
+        },
+        {
+          "name": "ztty-linux-aarch64.tar.gz.sha256",
+          "bytes": 92,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-aarch64.tar.gz.sha256",
+          "digest": "sha256:441df09e9d3e32cc1433b40d551c0cb1d3ec48cd55997152dd0b0dbc3dc7d851"
+        },
+        {
+          "name": "ztty-linux-x86_64.build.json",
+          "bytes": 1531,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-x86_64.build.json",
+          "digest": "sha256:d09149f8257bc570a53b11b425987de679013e680bff65d9815f696adc062f3a"
+        },
+        {
+          "name": "ztty-linux-x86_64.build.json.sha256",
+          "bytes": 95,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-x86_64.build.json.sha256",
+          "digest": "sha256:e5e062aa33fe927a79b4c18981bcc867411be884ac75082c9f9620bb010697ef"
+        },
+        {
+          "name": "ztty-linux-x86_64.native.json",
+          "bytes": 26363,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-x86_64.native.json",
+          "digest": "sha256:6cecebb92f53dba383c8bb1cd7a1d02bc9d283f10be2aa51b8d40642d02eea9a"
+        },
+        {
+          "name": "ztty-linux-x86_64.tar.gz",
+          "bytes": 392890,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-x86_64.tar.gz",
+          "digest": "sha256:8a65f736f13c1c7a415997a38853f1eb876a3a9edea5fa7c7880178a2b9a289c"
+        },
+        {
+          "name": "ztty-linux-x86_64.tar.gz.sha256",
+          "bytes": 91,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-linux-x86_64.tar.gz.sha256",
+          "digest": "sha256:b06f77f455047fd11987697382369b1d3b4074fe696541dab1574344810183dc"
+        },
+        {
+          "name": "ztty-macos-aarch64.build.json",
+          "bytes": 11956,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.build.json",
+          "digest": "sha256:a4e18b961576ff74150727e768315b4af22c4eab3bab94755a2e1ddd97f5bfd4"
+        },
+        {
+          "name": "ztty-macos-aarch64.build.json.sha256",
+          "bytes": 96,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.build.json.sha256",
+          "digest": "sha256:e3de7314d87590667682b87befe1f31c3c68067b99b9b2d243ef8231d05c2747"
+        },
+        {
+          "name": "ztty-macos-aarch64.manifest.json",
+          "bytes": 2967,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.manifest.json",
+          "digest": "sha256:a3043ebf83c916d301a82e76616d0350b4be3e95457e5f005cfd9ec6640c07cc"
+        },
+        {
+          "name": "ztty-macos-aarch64.manifest.json.sha256",
+          "bytes": 99,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.manifest.json.sha256",
+          "digest": "sha256:beb81874bd792c491006f73ef560d68defd89d5f200f432025407a9aa05e89c2"
+        },
+        {
+          "name": "ztty-macos-aarch64.native.json",
+          "bytes": 69957,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.native.json",
+          "digest": "sha256:b49b34ff0a98946f8d8f2d3953b67f4e80014659a21607d1b1897eab4af11a62"
+        },
+        {
+          "name": "ztty-macos-aarch64.tar.gz",
+          "bytes": 188202,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.tar.gz",
+          "digest": "sha256:5d66a5b71608e3ddc299c820faba84bdb7c1e7d508299bc937fe3d7250320f54"
+        },
+        {
+          "name": "ztty-macos-aarch64.tar.gz.sha256",
+          "bytes": 92,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.tar.gz.sha256",
+          "digest": "sha256:79258ac2281fcb2e56396f0a8196252e149b1d347d4151331e53d5ea4305be2f"
+        },
+        {
+          "name": "ztty-macos-aarch64.zip",
+          "bytes": 188652,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.zip",
+          "digest": "sha256:cec7b9c1dff01fd2120997efa80d3c240fdc2cd2838d1f25a8fa71ef8b2023fb"
+        },
+        {
+          "name": "ztty-macos-aarch64.zip.sha256",
+          "bytes": 89,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-aarch64.zip.sha256",
+          "digest": "sha256:7d4998a5756456f45138bceb5842e556a2c0b3cc1b21e39e050efef3c09a4cc8"
+        },
+        {
+          "name": "ztty-macos-x86_64.build.json",
+          "bytes": 11899,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.build.json",
+          "digest": "sha256:fde73517229c52ab31b27a9334ddfe80f9b830a41fa283021ec1fe96721d9fa1"
+        },
+        {
+          "name": "ztty-macos-x86_64.build.json.sha256",
+          "bytes": 95,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.build.json.sha256",
+          "digest": "sha256:5dbec9af41c3dd1cd753a1715b16ac0d0fa8c5fdfe75eab3681c6cc45a9df704"
+        },
+        {
+          "name": "ztty-macos-x86_64.manifest.json",
+          "bytes": 2963,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.manifest.json",
+          "digest": "sha256:7c59ecffd4cbdee78c8de11b8b1a54bd4dc555a758ad87e1217e56aa79d6c4c8"
+        },
+        {
+          "name": "ztty-macos-x86_64.manifest.json.sha256",
+          "bytes": 98,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.manifest.json.sha256",
+          "digest": "sha256:9f2ed45c2380ef41ccdb722776973660ed8d72ec21a24c91894f23699a95f1cb"
+        },
+        {
+          "name": "ztty-macos-x86_64.native.json",
+          "bytes": 70032,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.native.json",
+          "digest": "sha256:344859e0f25cf043395025a5dd276a499e906cf80f96a8f48d8a61794b1cdf3b"
+        },
+        {
+          "name": "ztty-macos-x86_64.tar.gz",
+          "bytes": 206208,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.tar.gz",
+          "digest": "sha256:94cc094c87ff4a1e9e884541187320986e29cade2d3e39cbb9ec06ef34820dda"
+        },
+        {
+          "name": "ztty-macos-x86_64.tar.gz.sha256",
+          "bytes": 91,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.tar.gz.sha256",
+          "digest": "sha256:5569f1032bf33afa7aebef9826bcf9796dc0ead2cd3853fdb3b598ad05470de1"
+        },
+        {
+          "name": "ztty-macos-x86_64.zip",
+          "bytes": 206857,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.zip",
+          "digest": "sha256:035ee16ebcb0b2fa9814b9a3bc5ae968f67c485a7a0f037569677251c3d3c0c7"
+        },
+        {
+          "name": "ztty-macos-x86_64.zip.sha256",
+          "bytes": 88,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-macos-x86_64.zip.sha256",
+          "digest": "sha256:e8c5736ba9befdcd953662bbbc2eb10881df93670ed4fb5e1a309c48b70eae3e"
+        },
+        {
+          "name": "ztty-windows-aarch64.build.json",
+          "bytes": 72226,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-aarch64.build.json",
+          "digest": "sha256:65f9fb2f8dd14892139d3fdf0e26a920f74afd2b8e5568cd0ca13ee7d21edc8e"
+        },
+        {
+          "name": "ztty-windows-aarch64.build.json.sha256",
+          "bytes": 99,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-aarch64.build.json.sha256",
+          "digest": "sha256:b30f72166a80a4781af17ee673d2750e4965568446b93b834be18d67567e91b2"
+        },
+        {
+          "name": "ztty-windows-aarch64.manifest.json",
+          "bytes": 1257,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-aarch64.manifest.json",
+          "digest": "sha256:dec485179e6f24bb4df004061abb6a31891350478681fc894ce38794d3642fdf"
+        },
+        {
+          "name": "ztty-windows-aarch64.manifest.json.sha256",
+          "bytes": 102,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-aarch64.manifest.json.sha256",
+          "digest": "sha256:a74957e3a3d6fd567a5d9782d5f618daa52bc74e37fd7077192cb0883dd2ba01"
+        },
+        {
+          "name": "ztty-windows-aarch64.native.json",
+          "bytes": 338595,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-aarch64.native.json",
+          "digest": "sha256:3010e53bbfbff9e01c70823f59023c1ced33867fc0e26f7727e8d24a565787f8"
+        },
+        {
+          "name": "ztty-windows-aarch64.zip",
+          "bytes": 792773,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-aarch64.zip",
+          "digest": "sha256:be823e3a35821a385a6e0de9dcb9d441fe10b8a2b25247f05bd9e4a85cbdb7bf"
+        },
+        {
+          "name": "ztty-windows-aarch64.zip.sha256",
+          "bytes": 92,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-aarch64.zip.sha256",
+          "digest": "sha256:dbdccb7e8a9684628bef73ceeaa2d068fa8b3a2d53c73ec2f4754867d4e361fa"
+        },
+        {
+          "name": "ztty-windows-x86_64.build.json",
+          "bytes": 71829,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-x86_64.build.json",
+          "digest": "sha256:87f3994fd4284bc67feb6f527e1236274e06d426965cca0fb9d5c2bed16e3aee"
+        },
+        {
+          "name": "ztty-windows-x86_64.build.json.sha256",
+          "bytes": 98,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-x86_64.build.json.sha256",
+          "digest": "sha256:9d90a6a3b83bf76fcdf586dab4d5f58354edf71d3d3a4888161edaa5043cd6f1"
+        },
+        {
+          "name": "ztty-windows-x86_64.manifest.json",
+          "bytes": 1255,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-x86_64.manifest.json",
+          "digest": "sha256:97eb7b21659e7176449ea998c35efebff8d0ba82521a3fc31703605d43a3b895"
+        },
+        {
+          "name": "ztty-windows-x86_64.manifest.json.sha256",
+          "bytes": 101,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-x86_64.manifest.json.sha256",
+          "digest": "sha256:8d3b933bfc9e2af93288638d83e01786534b024ab7004d7d95b8c0d9d9d81589"
+        },
+        {
+          "name": "ztty-windows-x86_64.native.json",
+          "bytes": 337661,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-x86_64.native.json",
+          "digest": "sha256:6281e4481c9200f834e704f38170eae7e7951c3275acbbae5c4c60082f38a2a7"
+        },
+        {
+          "name": "ztty-windows-x86_64.zip",
+          "bytes": 861421,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-x86_64.zip",
+          "digest": "sha256:dd292023a8935d7b1dd68efba77bec4b66342ba0656fb648aa2609b3bf3a98a6"
+        },
+        {
+          "name": "ztty-windows-x86_64.zip.sha256",
+          "bytes": 91,
+          "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.4.1/ztty-windows-x86_64.zip.sha256",
+          "digest": "sha256:97b4eba89c035ba8799bbe249164fb0c3d457833366fc1446d337ce43f9c2199"
+        }
+      ]
+    },
+    "public_linux_download": {
+      "reported_version": "ztty 0.4.1",
+      "source_commit": "6b91e29e923aaee0207953f2b04393087f19e0d8",
+      "binary_sha256": "65d5487ef55c92e982d601f5621d0364d1c2f17836e50b872fc331ccc86868fa",
+      "archive_sha256": "8a65f736f13c1c7a415997a38853f1eb876a3a9edea5fa7c7880178a2b9a289c",
+      "native_passed": true
+    },
+    "public_application_crate": {
+      "name": "ztty",
+      "version": "0.4.1",
+      "checksum": "c3298386a6a77518db93fa783081153a7b67c2bd400e6ae9c98cf5806fa475a8",
+      "downloaded_vcs_commit": "6b91e29e923aaee0207953f2b04393087f19e0d8",
+      "matches_release_source_commit": true,
+      "registry_install_passed": true
+    },
+    "published_evidence": {
+      "files_verified": 949,
+      "empty_files_preserved": 10,
+      "archive_only_files_restored": 906,
+      "archive_sha256": "e25a56822929d46857585784058081a173044fb4f1cdb06092954c1777ac0621",
+      "standalone_assets_with_source": 47
+    },
+    "aur_update_step": "success"
+  },
+  "removed_review_worktrees": [
+    {
+      "worktree": "native-ui-release-gate-worktree",
+      "status": "removed_after_merged_content_check",
+      "commit": "57a6539a69b203834e143760463535105350e60c"
+    },
+    {
+      "worktree": "release-asset-bounds-worktree",
+      "status": "removed_after_merged_content_check",
+      "commit": "f80cacf0ab018065ec7d33064a29362a83f301e0"
+    },
+    {
+      "worktree": "release-upload-worktree",
+      "status": "removed_after_merged_content_check",
+      "commit": "ccaeff54608a39e4cb5f28f664fd0dab7ac5283c"
+    }
+  ],
+  "operational_note": "Installed executable updated; existing broker and PTY sessions continue running old code until a new broker is started. No user process was killed.",
+  "scope_note": "Synthetic XTEST input, real PTY/X11 and private Xvfb; no claim of physical keyboard/IME/Wayland or ssmcp hardware end-to-end acceptance."
+}
