@@ -208,6 +208,56 @@ impl Screen {
         &mut self.cells[start..start + self.cols]
     }
 
+    /// Copy logical rows with memmove semantics across the backing ring.
+    pub fn copy_rows(&mut self, start: usize, target: usize, mut count: usize) {
+        debug_assert!(start + count <= self.rows && target + count <= self.rows);
+        if count == 0 || start == target {
+            return;
+        }
+        if target < start {
+            let mut source = self.row_index(start);
+            let mut destination = self.row_index(target);
+            while count != 0 {
+                let rows = count.min(self.rows - source).min(self.rows - destination);
+                self.cells.copy_within(
+                    source * self.cols..(source + rows) * self.cols,
+                    destination * self.cols,
+                );
+                self.wrapped.copy_within(source..source + rows, destination);
+                count -= rows;
+                source += rows;
+                destination += rows;
+                if source == self.rows {
+                    source = 0;
+                }
+                if destination == self.rows {
+                    destination = 0;
+                }
+            }
+        } else {
+            let mut source = self.row_index(start + count - 1) + 1;
+            let mut destination = self.row_index(target + count - 1) + 1;
+            while count != 0 {
+                let rows = count.min(source).min(destination);
+                self.cells.copy_within(
+                    (source - rows) * self.cols..source * self.cols,
+                    (destination - rows) * self.cols,
+                );
+                self.wrapped
+                    .copy_within(source - rows..source, destination - rows);
+                count -= rows;
+                source -= rows;
+                destination -= rows;
+                if source == 0 {
+                    source = self.rows;
+                }
+                if destination == 0 {
+                    destination = self.rows;
+                }
+            }
+        }
+    }
+
     pub fn row_wrap(&self, y: usize) -> usize {
         self.wrapped[self.row_index(y)]
     }
@@ -336,6 +386,46 @@ impl Screen {
         self.dirty = vec![true; rows];
         for y in 0..rows {
             self.repair_row(y, self.blank);
+        }
+    }
+}
+
+#[cfg(test)]
+mod row_copy_tests {
+    use super::{Screen, Style};
+    use alloc::vec::Vec;
+
+    #[test]
+    fn logical_row_copy_handles_all_small_ring_overlap_boundaries() {
+        for rows in 1..=8 {
+            for row0 in 0..rows {
+                for start in 0..rows {
+                    for count in 0..=rows - start {
+                        for target in 0..=rows - count {
+                            let mut screen = Screen::new(3, rows, Style::default());
+                            screen.row0 = row0;
+                            for y in 0..rows {
+                                let ch = char::from(b'A' + y as u8);
+                                screen.row_mut(y).fill(Style::default().cell(ch, 1));
+                                screen.set_row_wrap(y, y + 1);
+                            }
+                            let mut expected: Vec<usize> = (0..rows).collect();
+                            expected.copy_within(start..start + count, target);
+                            screen.copy_rows(start, target, count);
+                            for (y, &original) in expected.iter().enumerate() {
+                                assert_eq!(screen.row_wrap(y), original + 1);
+                                for cell in screen.row(y) {
+                                    assert_eq!(
+                                        cell.ch,
+                                        char::from(b'A' + original as u8),
+                                        "rows={rows}, row0={row0}, start={start}, target={target}, count={count}, row={y}"
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
