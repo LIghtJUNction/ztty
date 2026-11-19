@@ -2,7 +2,7 @@
 
 本轮针对实际 PTY 输出链路，而不是只重复此前的局部滚动微基准。在固定的 Linux/X11 测试中，普通日志吞吐提高约 **14.0%**，彩色日志提高约 **19.8%**，包含中日韩文字和组合字符的日志提高约 **10.0%**。持续原地覆盖的两个控制场景没有获得同样收益：进度输出中位数下降约 **1.3%**，整屏原地更新下降约 **1.7%**。完整样本与范围保留在下文；不能把日志场景的提升推广到所有终端工作负载。
 
-生产改动对应 [94aa9b55709af44cf61ea4b362b06cd37ac20f51](https://github.com/LIghtJUNction/ztty/commit/94aa9b55709af44cf61ea4b362b06cd37ac20f51)，基线为 [db4253054dfad84fb1d5af64efd3d9efc4e048d1](https://github.com/LIghtJUNction/ztty/commit/db4253054dfad84fb1d5af64efd3d9efc4e048d1)。本记录描述已提交、已验证的独立性能候选；没有在这一验证阶段替换用户运行中的终端、安装新包或发布 Release。
+生产改动对应 [94aa9b55709af44cf61ea4b362b06cd37ac20f51](https://github.com/LIghtJUNction/ztty/commit/94aa9b55709af44cf61ea4b362b06cd37ac20f51)，基线为 [db4253054dfad84fb1d5af64efd3d9efc4e048d1](https://github.com/LIghtJUNction/ztty/commit/db4253054dfad84fb1d5af64efd3d9efc4e048d1)。下文先记录独立候选的验证结果，再记录主分支集成与本机安装；性能验证阶段没有替换用户运行中的终端。
 
 ## 为什么先改空白行初始化
 
@@ -77,3 +77,21 @@ python3 docs/measurements/output-throughput-2026-11-19/run_ab.py \
 ```
 
 公开 JSON 保留全部正式计时值和源绑定，仅去掉开发机绝对路径、临时进程标识和重复标准错误输出。原始文件与采样实验保存在开发机 `/home/lightjunction/Documents/GITHUB/ztty/artifacts/output-throughput-20261119-evidence/`，目录内包含 SHA-256 清单，便于复核与后续归档。
+
+## 主分支集成与本机更新
+
+验证后，候选已通过 [e036272bb963bde259a620770bc45ca76b9b62f6](https://github.com/LIghtJUNction/ztty/commit/e036272bb963bde259a620770bc45ca76b9b62f6) 合入主分支。对生产源目录、Cargo 清单及构建脚本的比较为空，安装的 ELF 与完成上述测试的候选完全一致。
+
+本机 Arch 包已更新为 **ztty 0.4.1-5**，新启动的终端使用这一版本。已有终端继续使用各自已加载的程序；安装前记录的 **7 个 ztty 进程**在安装后均保持相同 PID、启动时间和程序内容。用户的自定义启动器和桌面入口内容也保持原样，包管理器检查结果为 9 个文件、0 个变更。
+
+| 项目 | 核对结果 |
+|---|---|
+| `/usr/bin/ztty` 与 `~/.cargo/bin/ztty` | SHA-256 `8f35b08477877a798cc2d44ff4431731bdddd418c9c3c72097493c68cc3d2d0c` |
+| 本机安装包 | `ztty-0.4.1-5-x86_64.pkg.tar.zst` |
+| 安装包 SHA-256 | `e359b954f6051ecec2882ba9f8c5686a457458b2a1389ada46d695ab6366c6d0` |
+| 上一版回退包 | `~/Backups/ztty/2026-11-19-output-throughput/ztty-0.4.1-4-x86_64.pkg.tar.zst` |
+| 回退包 SHA-256 | `11dcd145feb64131ac28a63e7ad627de30cca6b0e09e7a0879e735c643122236` |
+
+需要回退时，可以安装上表的 0.4.1-4 包，并将其 `/usr/bin/ztty` 原子替换到 `~/.cargo/bin/ztty`，再新开窗口核对。无需关闭已有终端。本轮只更新开发机本地包，没有创建或发布 GitHub Release。
+
+本机安装记录保存在开发机 `artifacts/output-integrated-20261119/artifacts/installation/`，包含安装前后快照、包构建日志和 pacman 日志。正式性能原始证据的 SHA256SUMS 文件哈希为 `25ab923d3cd586bae3cf331dc858457508681d5d4e7ee09db6823d67380fb59d`，共归档 155 个文件、8,986,278 字节。
