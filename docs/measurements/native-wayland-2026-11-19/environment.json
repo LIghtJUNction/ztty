@@ -1,0 +1,90 @@
+{
+  "recorded_utc": "2026-11-19T21:36:12.362774+00:00",
+  "source_commit": "4d9027099d76fd7a80414496e09fea531cd8849e",
+  "source_tree": "af61e852e3b94d408e6f84bf135500de7ea47d06",
+  "source_sha256": {
+    "Cargo.toml": "83606c61ce17c3d7f7a9f31240baee494e5d3a90fa906582250f2a7a4ca2a3f1",
+    "build.rs": "6436bc131d53cb739aa7b936f9ee53674cff2047803613acc3772d12330b36dd",
+    "build/wayland.rs": "60808d62b18ab425d0d41db15d7544767c0a48d0037e740a5850d0be740dbb3b",
+    "src/main.rs": "8953f3c6ecc707d3cef9f5ed78f41637dc1ec4c11b0a2ed05668a532f18ac9dc",
+    "native/wayland_bridge.c": "be613adfff0c6621cce41684fdb398dc1d15bd7c5c51d7ffef52b6f1900e3921",
+    "src/platform/wayland.rs": "fb15171fc26ca7f1fd445a4b5cff658dde7000140f4b850335b1fe51f737d37a"
+  },
+  "binary_path": "target-wayland-resume/release/ztty",
+  "binary_sha256": "8c96835d857fcc4b6e147a9a2429784a5be98259d12d3d0a62124fd78f062a14",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "system_libraries": {
+    "wayland-client": "1.26.0",
+    "wayland-egl": "18.1.0",
+    "wayland-cursor": "1.26.0",
+    "xkbcommon": "1.13.2",
+    "wayland-protocols": "1.50",
+    "egl": "1.5",
+    "glesv2": "3.2"
+  },
+  "compositor": "Sway 1.12, extracted signed Arch package inside ignored artifacts; no system installation",
+  "test_environment": {
+    "WLR_BACKENDS": "headless",
+    "WLR_HEADLESS_OUTPUTS": "1",
+    "WLR_RENDERER": "pixman",
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "XKB_DEFAULT_LAYOUT": "us",
+    "xwayland": "disabled",
+    "XDG_RUNTIME_DIR": "private mode-0700 temporary directory"
+  },
+  "renderer_query": "Exact GLES renderer name not queried; test setting forces Mesa software path",
+  "physical_devices_tested": false,
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "build",
+        "--release",
+        "--features",
+        "wayland"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cargo",
+        "clippy",
+        "--features",
+        "wayland",
+        "--bin",
+        "ztty",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "cargo",
+        "check",
+        "--workspace",
+        "--no-default-features"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/wayland_gui.py",
+        "--binary",
+        "target-wayland-resume/release/ztty",
+        "--sway",
+        "artifacts/wayland-test-tools/root/usr/bin/sway",
+        "--output",
+        "artifacts/wayland-validation/gui-committed"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "build_environment": {
+    "CARGO_TARGET_DIR": "target-wayland-resume",
+    "CARGO_BUILD_JOBS": "2"
+  },
+  "interpretation": "Acceptance and compatibility checks only; elapsed time is not an input-latency or throughput benchmark."
+}

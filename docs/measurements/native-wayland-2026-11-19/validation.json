@@ -1,0 +1,154 @@
+{
+  "schema": 1,
+  "binary_sha256": "8c96835d857fcc4b6e147a9a2429784a5be98259d12d3d0a62124fd78f062a14",
+  "source": "4d9027099d76fd7a80414496e09fea531cd8849e",
+  "source_worktree_dirty": false,
+  "scope": "Linux headless Sway, software Mesa EGL; no physical display or IME acceptance",
+  "checks": [
+    {
+      "name": "native_surface_and_pty",
+      "passed": true,
+      "app_id": "org.project-z.ztty"
+    },
+    {
+      "name": "cwd_and_terminal_environment",
+      "passed": true,
+      "state": {
+        "cols": 78,
+        "rows": 21,
+        "term": "xterm-256color",
+        "program": "ztty",
+        "pwd_matches_cwd": true
+      }
+    },
+    {
+      "name": "actual_egl_pixels",
+      "passed": true,
+      "red_pixels": 4000
+    },
+    {
+      "name": "ascii_keyboard",
+      "passed": true,
+      "expected_hex": "48656c6c6f207a74747921",
+      "actual_hex": "48656c6c6f207a74747921"
+    },
+    {
+      "name": "unicode_keyboard",
+      "passed": true,
+      "expected_hex": "e4b8ade69687",
+      "actual_hex": "e4b8ade69687"
+    },
+    {
+      "name": "control_key",
+      "passed": true,
+      "expected_hex": "03",
+      "actual_hex": "03"
+    },
+    {
+      "name": "navigation_keys",
+      "passed": true,
+      "expected_hex": "1b5b411b5b44",
+      "actual_hex": "1b5b411b5b44"
+    },
+    {
+      "name": "alt_key",
+      "passed": true,
+      "expected_hex": "1b78",
+      "actual_hex": "1b78"
+    },
+    {
+      "name": "keyboard_repeat",
+      "passed": true,
+      "bytes": 8
+    },
+    {
+      "name": "repeat_stops_on_release",
+      "passed": true
+    },
+    {
+      "name": "kitty_press_release",
+      "passed": true,
+      "expected_hex": "1b5b39373b313a31751b5b39373b313a3375",
+      "actual_hex": "1b5b39373b313a31751b5b39373b313a3375"
+    },
+    {
+      "name": "osc_title_reaches_compositor",
+      "passed": true
+    },
+    {
+      "name": "configure_resizes_real_pty",
+      "passed": true,
+      "sizes": [
+        [
+          620,
+          330,
+          60,
+          15
+        ],
+        [
+          990,
+          550,
+          97,
+          26
+        ],
+        [
+          410,
+          240,
+          39,
+          11
+        ],
+        [
+          800,
+          450,
+          78,
+          21
+        ]
+      ]
+    },
+    {
+      "name": "text_survives_resize",
+      "passed": true
+    },
+    {
+      "name": "history_keyboard_scroll",
+      "passed": true
+    },
+    {
+      "name": "history_returns_live",
+      "passed": true
+    },
+    {
+      "name": "synchronized_full_frame",
+      "passed": true,
+      "capture_seconds": 0.09343373100273311
+    },
+    {
+      "name": "green_frame_visible",
+      "passed": true
+    },
+    {
+      "name": "compositor_close_exits_cleanly",
+      "passed": true
+    },
+    {
+      "name": "closed_window_reaps_child",
+      "passed": true
+    },
+    {
+      "name": "child_exit_code_propagates",
+      "passed": true
+    },
+    {
+      "name": "lost_compositor_reports_error",
+      "passed": true
+    },
+    {
+      "name": "lost_compositor_reaps_child",
+      "passed": true
+    }
+  ],
+  "compositor_version": "1.12",
+  "owned_children_remaining": [],
+  "passed": true,
+  "elapsed_seconds": 5.395438545005163
+}

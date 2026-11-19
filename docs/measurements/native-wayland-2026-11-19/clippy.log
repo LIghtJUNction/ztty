@@ -1,0 +1,10 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Checking zgraphics v0.1.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zgraphics)
+    Checking ztty-ui v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/ztty-ui)
+    Checking zinput v0.1.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zinput)
+   Compiling ztty v0.4.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119)
+    Checking zterm v0.4.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zterm)
+    Checking ztty-plugin-api v0.1.0 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/ztty-plugin-api)
+    Checking zpty v0.2.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/native-wayland-20261119/crates/zpty)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5m 23s
