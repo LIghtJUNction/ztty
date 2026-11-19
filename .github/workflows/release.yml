@@ -164,26 +164,26 @@ jobs:
           export RUSTUP_HOME="$RUNNER_TEMP/ztty-release-rustup"
           printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
           sudo apt-get update
-          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev libxtst6 \
-            xvfb fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
+          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev libxtst6 libwayland-dev libwayland-bin wayland-protocols libxkbcommon-dev \
+            xvfb sway wtype grim wl-clipboard fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
           python -m pip install --disable-pip-version-check 'python-xlib==0.33' 'Pillow==13.0.0'
           fc-cache -f
           test "$(uname -m)" = "$ARCH"
           rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
       - name: Build the native Linux executable
         id: build
-        run: cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty
+        run: cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty --features wayland
       - name: Run native Linux PTY and X11 GUI acceptance
         id: native
         run: |
-          cargo +"$RUST_TOOLCHAIN" test --locked --test working_directory -- --test-threads=1 > "dist/$ARTIFACT_STEM.working-directory.log" 2>&1
+          cargo +"$RUST_TOOLCHAIN" test --locked --features wayland --test working_directory -- --test-threads=1 > "dist/$ARTIFACT_STEM.working-directory.log" 2>&1
           python tests/linux_native_test.py -v > "dist/$ARTIFACT_STEM.gate-tests.log" 2>&1
           python tests/linux_native.py --binary target/release/ztty \
             --source-root "$GITHUB_WORKSPACE" --source-sha "$SOURCE_SHA" \
             --arch "$ARCH" --version "$VERSION" \
             --output "dist/$ARTIFACT_STEM.native.json" \
             --evidence-dir "dist/$ARTIFACT_STEM.native"
-          cargo +"$RUST_TOOLCHAIN" test --locked --lib gpu:: -- --ignored --test-threads=1 --show-output > "dist/$ARTIFACT_STEM.native/gpu-tests.log" 2>&1
+          cargo +"$RUST_TOOLCHAIN" test --locked --features wayland --lib gpu:: -- --ignored --test-threads=1 --show-output > "dist/$ARTIFACT_STEM.native/gpu-tests.log" 2>&1
           python tests/text_gpu_gui.py --binary target/release/ztty --renderer gpu \
             --output "dist/$ARTIFACT_STEM.native/gpu-text.json" \
             --screenshots "dist/$ARTIFACT_STEM.native/gpu-text"
@@ -195,6 +195,36 @@ jobs:
             --screenshots "dist/$ARTIFACT_STEM.native/gpu-repaint"
           python tests/retained_frame_gui.py --binary target/release/ztty --renderer software \
             --output "dist/$ARTIFACT_STEM.native/retained-frame.json"
+          for renderer in gpu software; do
+            python tests/graphics_extensions_gui.py --binary target/release/ztty --renderer "$renderer" \
+              --artifacts "dist/$ARTIFACT_STEM.native/graphics-$renderer"
+            python tests/osc52_gui.py --binary target/release/ztty --renderer "$renderer" \
+              --artifacts "dist/$ARTIFACT_STEM.native/osc52-$renderer"
+          done
+          python tests/clipboard_transfer_gui.py --binary target/release/ztty \
+            --output "dist/$ARTIFACT_STEM.native/clipboard.json"
+          python tests/wayland_gui.py --binary target/release/ztty \
+            --output "dist/$ARTIFACT_STEM.native/wayland"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path("dist") / (os.environ["ARTIFACT_STEM"] + ".native")
+          expected = hashlib.sha256(Path("target/release/ztty").read_bytes()).hexdigest()
+          checks = [("clipboard.json", 25, "ok"), ("wayland/validation.json", 65, "passed")]
+          for renderer in ("gpu", "software"):
+              checks.extend([(f"graphics-{renderer}/graphics-extensions.json", 8, "ok"),
+                             (f"osc52-{renderer}/osc52.json", 13, "ok")])
+          for name, count, flag in checks:
+              report = json.loads((root / name).read_text())
+              assert report[flag] is True, (name, report.get("error"))
+              assert report["binary_sha256"] == expected, name
+              assert len(report["checks"]) == count, (name, len(report["checks"]))
+              assert all(row[flag] is True for row in report["checks"]), name
+          wayland = json.loads((root / "wayland/validation.json").read_text())
+          assert wayland["source"] == os.environ["SOURCE_SHA"]
+          assert all(wayland[key] == [] for key in (
+              "owned_brokers_remaining", "owned_children_remaining", "owned_helpers_remaining"))
+          PY
       - name: Package the native Linux executable
         id: package
         run: |
@@ -740,7 +770,7 @@ jobs:
           out="$RUNNER_TEMP/ztty-release"
           bash tools/release-source.sh "$out"
           docker run --rm -v "$out:/work" -e VERSION archlinux:base-devel bash -euxc '
-            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender fontconfig freetype2 harfbuzz libglvnd pkgconf
+            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender fontconfig freetype2 harfbuzz libglvnd wayland libxkbcommon wayland-protocols pkgconf
             useradd -m builder
             install -d -o builder -g builder /home/builder/package
             cp /work/aur/PKGBUILD "/work/ztty-$VERSION.tar.gz" /home/builder/package/
