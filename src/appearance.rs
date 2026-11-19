@@ -19,6 +19,8 @@ pub struct Appearance {
     pub selection_background: u32,
     #[cfg(any(target_os = "linux", target_os = "windows"))]
     pub bindings: alloc::vec::Vec<ztty::actions::Binding>,
+    #[cfg(target_os = "linux")]
+    pub text_plugins: alloc::vec::Vec<ztty::text_plugins::Registration>,
 }
 
 impl Default for Appearance {
@@ -45,6 +47,8 @@ impl Default for Appearance {
             selection_background: 0x394969,
             #[cfg(any(target_os = "linux", target_os = "windows"))]
             bindings: alloc::vec::Vec::new(),
+            #[cfg(target_os = "linux")]
+            text_plugins: alloc::vec::Vec::new(),
         }
     }
 }
@@ -95,6 +99,9 @@ impl Appearance {
                 },
                 binding.config(),
             ));
+        }
+        for plugin in &self.text_plugins {
+            entries.push(("text-plugin", plugin.config()));
         }
         Value::Array(
             entries
@@ -177,6 +184,11 @@ impl Appearance {
         Ok(())
     }
 
+    #[cfg(target_os = "linux")]
+    pub fn set_text_plugin(&mut self, value: &str) -> Result<(), &'static str> {
+        ztty::text_plugins::set(&mut self.text_plugins, value)
+    }
+
     fn set(&mut self, key: &str, value: &str) -> Result<(), &'static str> {
         let boolean = || match value {
             "true" => Ok(true),
@@ -193,6 +205,8 @@ impl Appearance {
         let color = || rgb(value);
         match key {
             "font" => self.set_font(value)?,
+            #[cfg(target_os = "linux")]
+            "text-plugin" => self.set_text_plugin(value)?,
             #[cfg(any(target_os = "linux", target_os = "windows"))]
             "keybind" | "mousebind" => {
                 let binding = ztty::actions::parse(value, key == "mousebind")?;
