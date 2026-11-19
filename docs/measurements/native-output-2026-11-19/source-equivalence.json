@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "scope": "Compare each source/test hash recorded by the test to the committed file. The native-read report began before its staged changes were committed; its original source_commit is retained.",
+  "raw_feature_commit": "5036de5a86dffd8061da1965650594504bad2d7e",
+  "reference_commit": "f05dd2710c795412651f58839e28a345231445f6",
+  "reports": [
+    {
+      "test": "native-read",
+      "recorded_source_commit": "68030066cb18e97fa5677a77881d54188fdc93f3",
+      "reference_commit": "f05dd2710c795412651f58839e28a345231445f6",
+      "matching_recorded_file_hashes": {
+        "src/session.rs": "598b5ddf854a3a045641a43e07a59734adaa07d51b0d12bd703b441186b80b5a",
+        "src/output_tail.rs": "77097c3034ee253d069846562f3dc1fa2f87f65062ab344979569978fa553b05",
+        "tests/mcp_sessions.py": "ee8f4f866b8e1916784cf66b3cf1c7fee2c2a829fd767b9ded5f195043263a1f",
+        "tests/mcp_raw_output.py": "efc28f6f0e0da9fcb58eb6307a98ff252483e72789d96a6670613fb8c44b6975"
+      }
+    },
+    {
+      "test": "plugin-cli",
+      "recorded_source_commit": "f05dd2710c795412651f58839e28a345231445f6",
+      "reference_commit": "f05dd2710c795412651f58839e28a345231445f6",
+      "matching_recorded_file_hashes": {
+        "src/plugin_host.rs": "73b9bc9ad09c8cbb1de4c952cf2984334ec7f8f14b94c00bd4c898bb234ad950",
+        "crates/ztty-plugin-api/src/lib.rs": "edf7482a3af57c379f6f3e9bc7ddcf2326ac030da858fb4fbbbddab78552371e",
+        "tests/fixtures/text-plugin/src/lib.rs": "7e6f6967d2e24bca80b77967b0b2867074c567f39867047a5d68328cf47a378b",
+        "tests/plugin_cli.py": "b23c4be83c90e7ef6d5c05fc76f2c94bfb0fd06a0d792eab0385c3b2412df024"
+      }
+    },
+    {
+      "test": "plugin-gui",
+      "recorded_source_commit": "f05dd2710c795412651f58839e28a345231445f6",
+      "reference_commit": "f05dd2710c795412651f58839e28a345231445f6",
+      "matching_recorded_file_hashes": {
+        "src/main.rs": "f8e9c9250a85d63f6591d8a17f9eb6cc35245f72d2a95b439099dee813c08dc6",
+        "src/session.rs": "598b5ddf854a3a045641a43e07a59734adaa07d51b0d12bd703b441186b80b5a",
+        "src/appearance.rs": "ea4211887800e8a466a3d7452a6b9d5642f871e86a0ac9e79bc94bfddd77f0b7",
+        "src/plugin_host.rs": "73b9bc9ad09c8cbb1de4c952cf2984334ec7f8f14b94c00bd4c898bb234ad950",
+        "src/text_plugins.rs": "dc998a3a14176d2a5e4384fe5c2ba8efb7fc4ec3206df8c391304097d6db23bf",
+        "tests/plugin_gui.py": "670abfe443071e5404329bbc55c16251e2b598ef2e235a791c0830ce4943196b",
+        "tests/copy_paste_gui.py": "6d0c268174c76b61efae46a57d57ae099cc90446626763fb14d90979afa4ccbd"
+      }
+    }
+  ]
+}

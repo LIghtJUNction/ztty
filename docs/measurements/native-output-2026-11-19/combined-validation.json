@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "plugin-cli",
+      "command": [
+        "python3",
+        "tests/plugin_cli.py",
+        "--binary",
+        "target/release/ztty",
+        "--example",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup/example.so",
+        "--fixtures",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup",
+        "--output",
+        "$REPO/artifacts/native-raw-output-20261119/artifacts/native-raw-output/plugin-cli.json"
+      ],
+      "exit_code": 0,
+      "duration_ms": 7529.676329002541
+    },
+    {
+      "name": "plugin-gui",
+      "command": [
+        "python3",
+        "tests/plugin_gui.py",
+        "--binary",
+        "target/release/ztty",
+        "--example",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup/example.so",
+        "--fixture",
+        "$REPO/artifacts/zplugin-20261119/artifacts/zplugin/group-cleanup/fixture-valid.so",
+        "--artifacts",
+        "$REPO/artifacts/native-raw-output-20261119/artifacts/native-raw-output/plugin-gui"
+      ],
+      "exit_code": 0,
+      "duration_ms": 5028.244530003576
+    }
+  ]
+}
