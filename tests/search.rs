@@ -409,3 +409,21 @@ fn ignore_case_keeps_line_boundaries_and_query_limits() {
         Some(query.as_str())
     );
 }
+
+#[test]
+fn emoji_substring_search_selects_and_copies_the_complete_cluster() {
+    let mut terminal = Terminal::new(16, 3, 20);
+    terminal.feed("A👩🏽‍💻B".as_bytes());
+    let hit = search::find(&terminal, "💻", Sensitive, None, true)
+        .hit
+        .unwrap();
+    assert_eq!((hit.start, hit.end), (1, 2));
+    assert_eq!(search::text(&terminal, hit).as_deref(), Some("👩🏽‍💻"));
+    let bits = search::highlights(&terminal, "💻", Sensitive, 0);
+    assert_ne!(bits[0] & (1 << 1), 0);
+    assert_ne!(bits[0] & (1 << 2), 0);
+    let hit = search::find(&terminal, "🏽‍💻B", Sensitive, None, true)
+        .hit
+        .unwrap();
+    assert_eq!(search::text(&terminal, hit).as_deref(), Some("👩🏽‍💻B"));
+}
