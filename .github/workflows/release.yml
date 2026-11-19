@@ -167,6 +167,8 @@ jobs:
           printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
           sudo apt-get update
           sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev libxtst6 \
+            libwayland-dev libwayland-bin wayland-protocols libxkbcommon-dev \
+            libwayland-client0 libwayland-egl1 libwayland-cursor0 libxkbcommon0 \
             xvfb fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
           python -m pip install --disable-pip-version-check 'python-xlib==0.33' 'Pillow==13.0.0'
           fc-cache -f
@@ -174,18 +176,18 @@ jobs:
           rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
       - name: Build the native Linux executable
         id: build
-        run: cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty
+        run: cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty --features wayland
       - name: Run native Linux PTY and X11 GUI acceptance
         id: native
         run: |
-          cargo +"$RUST_TOOLCHAIN" test --locked --test working_directory -- --test-threads=1 > "dist/$ARTIFACT_STEM.working-directory.log" 2>&1
+          cargo +"$RUST_TOOLCHAIN" test --locked --features wayland --test working_directory -- --test-threads=1 > "dist/$ARTIFACT_STEM.working-directory.log" 2>&1
           python tests/linux_native_test.py -v > "dist/$ARTIFACT_STEM.gate-tests.log" 2>&1
           python tests/linux_native.py --binary target/release/ztty \
             --source-root "$GITHUB_WORKSPACE" --source-sha "$SOURCE_SHA" \
             --arch "$ARCH" --version "$VERSION" \
             --output "dist/$ARTIFACT_STEM.native.json" \
             --evidence-dir "dist/$ARTIFACT_STEM.native"
-          cargo +"$RUST_TOOLCHAIN" test --locked --lib gpu:: -- --ignored --test-threads=1 --show-output > "dist/$ARTIFACT_STEM.native/gpu-tests.log" 2>&1
+          cargo +"$RUST_TOOLCHAIN" test --locked --features wayland --lib gpu:: -- --ignored --test-threads=1 --show-output > "dist/$ARTIFACT_STEM.native/gpu-tests.log" 2>&1
           python tests/text_gpu_gui.py --binary target/release/ztty --renderer gpu \
             --output "dist/$ARTIFACT_STEM.native/gpu-text.json" \
             --screenshots "dist/$ARTIFACT_STEM.native/gpu-text"
@@ -745,7 +747,7 @@ jobs:
           out="$RUNNER_TEMP/ztty-release"
           bash tools/release-source.sh "$out"
           docker run --rm -v "$out:/work" -e VERSION archlinux:base-devel bash -euxc '
-            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender fontconfig freetype2 harfbuzz libglvnd pkgconf
+            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender fontconfig freetype2 harfbuzz libglvnd wayland libxkbcommon wayland-protocols pkgconf
             useradd -m builder
             install -d -o builder -g builder /home/builder/package
             cp /work/aur/PKGBUILD "/work/ztty-$VERSION.tar.gz" /home/builder/package/

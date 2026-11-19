@@ -9,7 +9,7 @@ pub use zgraphics as graphics;
 /// Platform-independent terminal input encoders.
 pub use zinput as input;
 /// Bounded native ZUI/1 scenes, component catalog and action intents.
-pub use ztty_ui as ui;
+pub use zgpui as ui;
 mod grapheme;
 mod screen;
 mod shell;

@@ -62,8 +62,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca718471876992059f251e33aafc334346ada08042b7661dd1fe313a9bced557"
 
 [[package]]
+name = "zgpui"
+version = "0.1.0"
+
+[[package]]
 name = "zgraphics"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "zune-core",
  "zune-inflate",
@@ -100,19 +104,19 @@ version = "0.2.1"
 
 [[package]]
 name = "zterm"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "unicode-segmentation",
  "unicode-width",
+ "zgpui",
  "zgraphics",
  "zinput",
- "ztty-ui",
  "zvte",
 ]
 
 [[package]]
 name = "ztty"
-version = "0.4.1"
+version = "0.5.0"
 dependencies = [
  "libc",
  "unicode-segmentation",
@@ -128,10 +132,6 @@ version = "0.1.0"
 dependencies = [
  "zplugin",
 ]
-
-[[package]]
-name = "ztty-ui"
-version = "0.1.0"
 
 [[package]]
 name = "zune-core"

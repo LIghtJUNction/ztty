@@ -3,12 +3,12 @@
 pkgname=ztty
 pkgver=@VERSION@
 pkgrel=1
-pkgdesc='Lightweight no_std Rust terminal emulator for X11 and XWayland'
+pkgdesc='Lightweight no_std Rust terminal emulator for X11, XWayland and Wayland'
 arch=('x86_64')
 url='https://github.com/LIghtJUNction/ztty'
 license=('MIT')
-depends=('gcc-libs' 'glibc' 'libx11' 'libxft' 'libxrender' 'fontconfig' 'freetype2' 'harfbuzz' 'libglvnd')
-makedepends=('rustup' 'pkgconf')
+depends=('gcc-libs' 'glibc' 'libx11' 'libxft' 'libxrender' 'fontconfig' 'freetype2' 'harfbuzz' 'libglvnd' 'wayland' 'libxkbcommon')
+makedepends=('rustup' 'wayland-protocols' 'pkgconf')
 optdepends=('xdg-utils: open hyperlinks' 'ttf-dejavu: default monospace font')
 source=("$url/releases/download/v$pkgver/$pkgname-$pkgver.tar.gz")
 sha256sums=('@SHA256@')
@@ -20,12 +20,12 @@ prepare() {
 
 build() {
     cd "$pkgname-$pkgver" || return
-    cargo build --frozen --release
+    cargo build --frozen --release --features wayland
 }
 
 check() {
     cd "$pkgname-$pkgver" || return
-    cargo test --frozen --workspace --lib
+    cargo test --frozen --workspace --lib --features wayland
 }
 
 package() {

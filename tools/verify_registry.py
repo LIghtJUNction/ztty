@@ -16,7 +16,7 @@ import tomllib
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PACKAGES = ("zinput", "zgraphics", "zpty", "ztty-ui", "zterm")
+PACKAGES = ("zinput", "zgraphics", "zpty", "zgpui", "zterm")
 DEFAULT_CARGO_TIMEOUT = 90
 
 
@@ -81,10 +81,10 @@ def library(selected):
     scene.command(b"Ga=d,d=I,i=7", context, &mut replies);
     assert_eq!(scene.image_count(), 0);
 '''
-    if "ztty-ui" in selected:
-        source += r'''    let mut ui = ztty_ui::State::new();
+    if "zgpui" in selected:
+        source += r'''    let mut ui = zgpui::State::new();
     assert_eq!(ui.apply(br#"{"v":1,"op":"capabilities"}"#),
-        Ok(ztty_ui::Change::Capabilities));
+        Ok(zgpui::Change::Capabilities));
 '''
     if "zterm" in selected:
         source += r'''    let mut terminal = zterm::Terminal::new(80, 24, 20);
@@ -221,7 +221,7 @@ def check(selected, directory, cargo_timeout=DEFAULT_CARGO_TIMEOUT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--packages", nargs="+", choices=PACKAGES, default=list(PACKAGES),
-                        help="crates to verify; default: zinput zgraphics zpty ztty-ui zterm")
+                        help="crates to verify; default: zinput zgraphics zpty zgpui zterm")
     parser.add_argument("--output", type=pathlib.Path, default=ROOT / "artifacts/registry-consumer.json")
     parser.add_argument("--cargo-timeout", type=float, default=DEFAULT_CARGO_TIMEOUT, metavar="SECONDS",
                         help="maximum seconds per Cargo command, including compiler-lock wait (default: %(default)s)")

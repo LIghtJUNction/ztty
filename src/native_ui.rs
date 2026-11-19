@@ -4,7 +4,10 @@ use crate::{json, layout::Rect};
 use alloc::{format, vec::Vec};
 use zterm::{
     Terminal,
-    ui::{Action, Kind, Scene},
+    ui::{
+        Action, Kind, Scene,
+        layout::{Layout as SceneLayout, Metrics, Rect as SceneRect, natural_height},
+    },
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -49,106 +52,6 @@ fn contains(rect: Rect, x: i32, y: i32) -> bool {
     x >= rect.x && y >= rect.y && x < rect.x + rect.width && y < rect.y + rect.height
 }
 
-fn index(scene: &Scene, id: u32) -> Option<usize> {
-    scene.nodes.binary_search_by_key(&id, |node| node.id).ok()
-}
-
-fn height(scene: &Scene, id: u32, ch: i32, depth: usize) -> i32 {
-    if depth > 16 {
-        return 0;
-    }
-    let Some(index) = index(scene, id) else {
-        return 0;
-    };
-    match &scene.nodes[index].kind {
-        Kind::Column { children } => children
-            .iter()
-            .fold(0i32, |sum, id| {
-                sum.saturating_add(height(scene, *id, ch, depth + 1))
-                    .saturating_add(10)
-            })
-            .saturating_sub(10)
-            .max(0),
-        Kind::Row { children } => children
-            .iter()
-            .map(|id| height(scene, *id, ch, depth + 1))
-            .max()
-            .unwrap_or(0),
-        Kind::Text { text, .. } => (text.split('\n').count().min(32) as i32).max(1) * ch,
-        Kind::Progress { .. } => ch + 14,
-        Kind::Button { .. } => ch + 16,
-        Kind::Image { rows, .. } => i32::from(*rows).saturating_mul(ch),
-    }
-}
-
-fn place(
-    scene: &Scene,
-    id: u32,
-    rect: Rect,
-    geometry: Geometry,
-    depth: usize,
-    out: &mut Vec<Item>,
-) {
-    if depth > 16 || rect.width <= 0 || rect.height <= 0 {
-        return;
-    }
-    let Some(index) = index(scene, id) else {
-        return;
-    };
-    match &scene.nodes[index].kind {
-        Kind::Column { children } => {
-            let mut y = rect.y;
-            let bottom = rect.y + rect.height;
-            for id in children {
-                let h = height(scene, *id, geometry.cell_height, depth + 1).min(bottom - y);
-                if h <= 0 {
-                    break;
-                }
-                place(
-                    scene,
-                    *id,
-                    Rect {
-                        x: rect.x,
-                        y,
-                        width: rect.width,
-                        height: h,
-                    },
-                    geometry,
-                    depth + 1,
-                    out,
-                );
-                y = y.saturating_add(h).saturating_add(10);
-            }
-        }
-        Kind::Row { children } => {
-            if children.is_empty() {
-                return;
-            }
-            let gap = 12;
-            let count = children.len() as i32;
-            let available = (rect.width - gap * (count - 1)).max(0);
-            for (column, id) in children.iter().enumerate() {
-                let left = available * column as i32 / count;
-                let right = available * (column as i32 + 1) / count;
-                place(
-                    scene,
-                    *id,
-                    Rect {
-                        x: rect.x + left + column as i32 * gap,
-                        y: rect.y,
-                        width: right - left,
-                        height: rect.height,
-                    },
-                    geometry,
-                    depth + 1,
-                    out,
-                );
-            }
-        }
-        _ => out.push(Item { index, rect }),
-    }
-}
-
 impl Layout {
     fn new(scene: &Scene, change: u64, geometry: Geometry) -> Option<Self> {
         let inset = geometry.padding.max(0) + 12;
@@ -158,28 +61,45 @@ impl Layout {
         if width < 96 || available < header + geometry.cell_height + 16 {
             return None;
         }
-        let content_height =
-            height(scene, scene.root, geometry.cell_height, 0).min(available - header - 16);
+        let metrics = Metrics {
+            line_height: geometry.cell_height,
+            column_gap: 10,
+            row_gap: 12,
+            button_extra: 16,
+            progress_extra: 14,
+        };
+        let content_height = natural_height(scene, metrics)
+            .ok()?
+            .min(available - header - 16);
         let panel = Rect {
             x: inset,
             y: inset,
             width,
             height: content_height + header + 16,
         };
-        let mut items = Vec::with_capacity(scene.nodes.len());
-        place(
+        let items = SceneLayout::new(
             scene,
-            scene.root,
-            Rect {
+            SceneRect {
                 x: inset + 16,
                 y: inset + header,
                 width: width - 32,
                 height: content_height,
             },
-            geometry,
-            0,
-            &mut items,
-        );
+            metrics,
+        )
+        .ok()?
+        .items
+        .into_iter()
+        .map(|item| Item {
+            index: item.index,
+            rect: Rect {
+                x: item.rect.x,
+                y: item.rect.y,
+                width: item.rect.width,
+                height: item.rect.height,
+            },
+        })
+        .collect();
         Some(Self {
             stamp: Stamp {
                 surface: scene.surface,
@@ -577,5 +497,90 @@ mod tests {
         assert!(handled);
         assert!(action.is_none());
         assert!(!view.pointer(&mut terminal, 790, 470, 8, false, false).0);
+    }
+
+    #[test]
+    fn empty_container_keeps_following_button_clickable() {
+        let mut terminal = Terminal::new(100, 24, 0);
+        terminal.set_ui_host_enabled(true);
+        terminal.feed(
+            concat!(
+                "\x1b_ZUI;1;",
+                r#"{"v":1,"op":"replace","surface":7,"rev":1,"root":1,"events":true,"nodes":[{"id":1,"type":"column","children":[2,3]},{"id":2,"type":"row","children":[]},{"id":3,"type":"button","label":"Run","action":"run","enabled":true}]}"#,
+                "\x1b\\"
+            )
+            .as_bytes(),
+        );
+        let mut view = View::default();
+        view.refresh(&terminal, geometry(), true, true);
+        let layout = view.layout.as_ref().unwrap();
+        assert_eq!(layout.items.len(), 1);
+        assert_eq!(layout.items[0].rect.y, 64);
+        assert_eq!(layout.items[0].rect.height, 34);
+        let (x, y) = first(&view);
+        view.pointer(&mut terminal, x, y, 1, true, true);
+        let action = view.pointer(&mut terminal, x, y, 1, false, true).1.unwrap();
+        assert_eq!(action.node, 3);
+    }
+
+    #[test]
+    fn reused_scene_ids_do_not_revive_stale_input() {
+        let mut terminal = Terminal::new(100, 24, 0);
+        scene(&mut terminal, 1);
+        let mut view = View::default();
+        view.refresh(&terminal, geometry(), true, true);
+        let original = view.layout.as_ref().unwrap().stamp;
+        let (x, y) = first(&view);
+        view.pointer(&mut terminal, x, y, 1, true, true);
+        terminal.feed(b"\x1bc");
+        scene(&mut terminal, 1);
+        assert_ne!(terminal.ui_revision(), original.change);
+        assert_eq!(terminal.ui_scene().unwrap().surface, original.surface);
+        assert_eq!(terminal.ui_scene().unwrap().revision, original.revision);
+        let (handled, action) = view.pointer(&mut terminal, x, y, 1, false, true);
+        assert!(handled);
+        assert!(action.is_none());
+        let (handled, action) = view.key(&mut terminal, 0xff0d, false, false, true);
+        assert!(handled);
+        assert!(action.is_none());
+        assert_eq!(view.focused_node(), None);
+    }
+
+    #[test]
+    fn clipped_button_is_skipped_by_pointer_and_tab() {
+        let mut terminal = Terminal::new(100, 24, 0);
+        scene(&mut terminal, 1);
+        let mut view = View::default();
+        view.refresh(
+            &terminal,
+            Geometry {
+                height: 127,
+                ..geometry()
+            },
+            true,
+            true,
+        );
+        let clipped = view.layout.as_ref().unwrap().items[1].rect;
+        assert_eq!(clipped.height, 1);
+        assert!(
+            view.pointer(&mut terminal, clipped.x + 1, clipped.y, 1, true, true)
+                .0
+        );
+        assert!(
+            view.pointer(&mut terminal, clipped.x + 1, clipped.y, 1, false, true)
+                .1
+                .is_none()
+        );
+        assert_eq!(view.focused_node(), None);
+        let (x, y) = first(&view);
+        view.pointer(&mut terminal, x, y, 1, true, true);
+        view.pointer(&mut terminal, x, y, 1, false, true);
+        view.key(&mut terminal, 0xff09, false, false, true);
+        assert_eq!(view.focused_node(), Some(2));
+        let action = view
+            .key(&mut terminal, 0xff0d, false, false, true)
+            .1
+            .unwrap();
+        assert_eq!(action.node, 2);
     }
 }

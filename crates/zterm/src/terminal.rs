@@ -172,7 +172,7 @@ pub struct Terminal {
     framing: u8,
     apc: zgraphics::CommandStream,
     apc_route: u8,
-    ui_frame: ztty_ui::Frame,
+    ui_frame: zgpui::Frame,
     ui_host_enabled: bool,
     text_revision: u64,
     image_cache: core::cell::RefCell<Option<Box<image_cells::Cache>>>,
@@ -197,7 +197,7 @@ impl Terminal {
             framing: 0,
             apc: zgraphics::CommandStream::new(),
             apc_route: 0,
-            ui_frame: ztty_ui::Frame::new(),
+            ui_frame: zgpui::Frame::new(),
             ui_host_enabled: false,
             text_revision: 0,
             image_cache: core::cell::RefCell::new(None),
@@ -539,14 +539,14 @@ impl Terminal {
                     return;
                 };
                 if !self.ui_host_enabled {
-                    if ztty_ui::is_capabilities_request(payload) {
+                    if zgpui::is_capabilities_request(payload) {
                         self.state.reply("\x1b_ZUI;1;{\"v\":1,\"type\":\"capabilities\",\"supported\":false,\"events\":false,\"components\":[]}\x1b\\");
                     }
                     return;
                 }
                 match self.state.ui.apply(payload) {
-                    Ok(ztty_ui::Change::Updated) => self.state.screen.mark_all(),
-                    Ok(ztty_ui::Change::Capabilities) => {
+                    Ok(zgpui::Change::Updated) => self.state.screen.mark_all(),
+                    Ok(zgpui::Change::Capabilities) => {
                         let mut reply = String::from("\x1b_ZUI;1;");
                         if self.state.ui.write_capabilities(&mut reply).is_ok() {
                             reply.push_str("\x1b\\");
@@ -571,7 +571,7 @@ impl Terminal {
     }
 
     /// Native host panel scene, separate from terminal cells and scrollback.
-    pub fn ui_scene(&self) -> Option<&ztty_ui::Scene> {
+    pub fn ui_scene(&self) -> Option<&zgpui::Scene> {
         self.state.ui.scene()
     }
 
@@ -587,7 +587,7 @@ impl Terminal {
         node_id: u32,
         expected_surface: u64,
         expected_revision: u64,
-    ) -> Option<ztty_ui::Action> {
+    ) -> Option<zgpui::Action> {
         if !self.ui_host_enabled {
             return None;
         }
@@ -1113,7 +1113,7 @@ struct State {
     grapheme_collect_after: usize,
     graphics: zgraphics::Graphics,
     inactive_graphics: zgraphics::Graphics,
-    ui: ztty_ui::State,
+    ui: zgpui::State,
     cell_width: u32,
     cell_height: u32,
 }
@@ -1164,7 +1164,7 @@ impl State {
             grapheme_collect_after: 0,
             graphics: zgraphics::Graphics::default(),
             inactive_graphics: zgraphics::Graphics::default(),
-            ui: ztty_ui::State::new(),
+            ui: zgpui::State::new(),
             cell_width: 8,
             cell_height: 16,
         }

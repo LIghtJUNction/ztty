@@ -24,6 +24,11 @@ ZTTY_DESKTOP_DIR  Launcher directory (default: $XDG_DATA_HOME/applications,
 DESTDIR           Optional package staging root; launchers use the final path.
 
 An upgrade keeps one verified binary or original symlink at ztty.previous.
+
+Official Linux builds support X11 (default) and Wayland.
+Wayland runtime packages:
+  Debian/Ubuntu: libwayland-client0 libwayland-egl1 libwayland-cursor0 libxkbcommon0
+  Arch: wayland libxkbcommon
 USAGE
         exit 0 ;;
     2)
@@ -157,7 +162,7 @@ staged_hash=$(digest "$binary_stage") || fail 'Could not calculate the staged ex
 [ "$source_hash" = "$staged_hash" ] ||
     fail 'ztty staging checksum mismatch.'
 if ! installed_version=$("$binary_stage" --version); then
-    fail 'ztty could not run. Check the native architecture and required runtime libraries (Linux: glibc, X11, Xft, Xrender).'
+    fail 'ztty could not run. Check the native architecture and required Linux runtime libraries: glibc, X11, Xft, Xrender, fontconfig, FreeType, HarfBuzz, EGL/GLES, Wayland and xkbcommon (see --help for Wayland package names).'
 fi
 case "$installed_version" in *'
 '*) fail 'The executable returned an invalid ztty version.' ;; esac

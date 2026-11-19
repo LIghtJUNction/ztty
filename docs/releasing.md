@@ -1,5 +1,61 @@
 # Releasing ztty and its reusable libraries
 
+## 0.5.0 candidate — 2026-11-20
+
+The current checkout is a **0.5.0 source candidate**. Publication and device
+installation are not complete. A successful library test, candidate build or
+cross-compilation check establishes only its recorded source and scope.
+
+### Source and dependency order
+
+| Stage | Package | Candidate version | Required before publication or release |
+| --- | --- | --- | --- |
+| 1 | `zgpui` | `0.1.0` | Its independent repository's candidate checks |
+| 1 | `zgraphics` | `0.2.0` | Package verification and existing registry dependencies |
+| 1 | `ztty-plugin-api` | `0.1.0` | Package verification and `zplugin 0.3.0` |
+| 2 | `zterm` | `0.5.0` | Published `zgpui 0.1.0` and `zgraphics 0.2.0` |
+| 3 | `ztty` application | `0.5.0` | Published `zterm 0.5.0`, `ztty-plugin-api 0.1.0` and complete application gates |
+
+`zinput` stays at `0.1.2`; this candidate does not change its source.
+The `zpty` dependency remains `0.2.1`. Reuse the existing registry versions
+when preparing the dependent packages.
+
+[zgpui](https://github.com/LIghtJUNction/zgpui) is an independent repository,
+included at `crates/zgpui` as a Git submodule pinned to
+[`cc62da25d28b2e25113f461177ee03277f030135`](https://github.com/LIghtJUNction/zgpui/commit/cc62da25d28b2e25113f461177ee03277f030135).
+Initialize the submodule before building a fresh checkout. It replaces the
+former `ztty-ui` package; `zterm::ui` remains the public re-export and the
+ZUI/1 wire format is retained. Its scene, layout and renderer contracts are
+platform-independent; native windows and graphics remain host responsibilities.
+
+### Candidate to release
+
+1. Commit the versioned source, lockfile and submodule pin, then record the
+   candidate SHA. Run the local gates and required native checks against that
+   fixed source; any source change creates a new candidate.
+2. Publish `zgpui` through its own
+   [release workflow](https://github.com/LIghtJUNction/zgpui/blob/main/.github/workflows/release.yml).
+   For its first `0.1.0`, use `bump=none`. A retry supplies the same full
+   candidate SHA. The workflow requires `CARGO_REGISTRY_TOKEN`, validates that
+   exact candidate, and checks any existing tag and archive before continuing.
+3. Verify and publish the remaining changed libraries in the order above from
+   a clean committed checkout. Confirm the registry versions and package
+   contents before verifying downstream packages without workspace path
+   overrides.
+4. Run the [application Release workflow](../.github/workflows/release.yml) for
+   `v0.5.0`. Formal publication requires Verify and all six native architecture
+   gates on that tagged source, plus source and artifact readback. Retain the
+   immutable tag and record published downloads separately from candidate
+   artifacts.
+5. Install the accepted application artifact and record the installed version
+   and executable hash. Publication alone does not establish device installation.
+
+## Historical records: 0.4.1 and earlier
+
+The records below retain their original dates, versions, commands and outcomes.
+References to the current source or latest checks within those records apply
+to their recorded date; they do not establish 0.5.0 acceptance.
+
 Report date: **2026-11-19, Asia/Taipei**. The application source version is **0.4.0**.
 Library publication, build-only candidate acceptance, formal tagged gates,
 GitHub Release publication and device installation are recorded separately below. The [experience report](experience-release-2026-11-18.md)
