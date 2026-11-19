@@ -1,4 +1,5 @@
-//! X11/XWayland window and Xft text rendering, accessed through a small C ABI.
+//! X11/XWayland windows with a shared GPU renderer and Xft fallback.
+mod gpu;
 use alloc::ffi::CString;
 use alloc::format;
 use alloc::rc::{Rc, Weak};
@@ -7,7 +8,8 @@ use alloc::vec::Vec;
 use core::cell::RefCell;
 use core::ffi::{CStr, c_char, c_int, c_long, c_uint, c_ulong, c_void};
 use zterm::{
-    BOLD, Cell, CursorShape, DIM, EXPLICIT_BG, HIDDEN, INVERSE, STRIKE, Terminal, UNDERLINE,
+    BLINK, BOLD, Cell, CursorShape, DIM, EXPLICIT_BG, HIDDEN, INVERSE, ITALIC, RAPID_BLINK, STRIKE,
+    Terminal, UNDERLINE,
 };
 
 #[repr(C)]
@@ -414,6 +416,7 @@ unsafe extern "C" {
     fn XDefaultScreen(display: *mut Display) -> c_int;
     fn XDefaultDepth(display: *mut Display, screen: c_int) -> c_int;
     fn XDefaultVisual(display: *mut Display, screen: c_int) -> *mut c_void;
+    fn XVisualIDFromVisual(visual: *mut c_void) -> c_ulong;
     fn XDefaultColormap(display: *mut Display, screen: c_int) -> c_ulong;
     fn XRootWindow(display: *mut Display, screen: c_int) -> Xid;
     fn XGetVisualInfo(
@@ -567,6 +570,7 @@ unsafe extern "C" {
         detectable: c_int,
         supported: *mut c_int,
     ) -> c_int;
+    fn XGetSelectionOwner(display: *mut Display, selection: Atom) -> Xid;
     fn XSetSelectionOwner(
         display: *mut Display,
         selection: Atom,
@@ -884,6 +888,7 @@ pub struct Connection {
     im_opening: core::cell::Cell<bool>,
     contexts: RefCell<Vec<Weak<InputContext>>>,
     fonts: RefCell<Vec<Weak<Fonts>>>,
+    gpu_display: RefCell<Option<Rc<ztty::gpu::Display>>>,
 }
 
 impl Connection {
@@ -913,6 +918,7 @@ impl Connection {
                 im_opening: core::cell::Cell::new(false),
                 contexts: RefCell::new(Vec::new()),
                 fonts: RefCell::new(Vec::new()),
+                gpu_display: RefCell::new(None),
             });
             if !connection.open_im() {
                 connection.watch_im();
@@ -1042,6 +1048,7 @@ impl Connection {
             name: name.into(),
             font,
             fallbacks: RefCell::new(Vec::new()),
+            italic: RefCell::new(Vec::new()),
         });
         cache.push(Rc::downgrade(&fonts));
         Ok(fonts)
@@ -1050,6 +1057,7 @@ impl Connection {
 
 impl Drop for Connection {
     fn drop(&mut self) {
+        drop(self.gpu_display.get_mut().take());
         unsafe {
             self.unwatch_im();
             let im = self.im.replace(core::ptr::null_mut());
@@ -1175,9 +1183,36 @@ struct Fonts {
     name: String,
     font: *mut Font,
     fallbacks: RefCell<Vec<*mut Font>>,
+    italic: RefCell<Vec<*mut Font>>,
 }
 
 impl Fonts {
+    fn italic_glyph(&self, ch: char) -> *mut Font {
+        let display = self.connection.display;
+        let mut fonts = self.italic.borrow_mut();
+        unsafe {
+            for &font in fonts.iter() {
+                if XftCharExists(display, font, ch as u32) != 0 {
+                    return font;
+                }
+            }
+            if fonts.len() < 16
+                && let Ok(name) =
+                    CString::new(format!("{}:slant=100:charset={:x}", self.name, ch as u32))
+            {
+                let font = XftFontOpenName(display, self.connection.screen, name.as_ptr());
+                if !font.is_null() {
+                    if XftCharExists(display, font, ch as u32) != 0 {
+                        fonts.push(font);
+                        return font;
+                    }
+                    XftFontClose(display, font);
+                }
+            }
+        }
+        self.glyph(ch)
+    }
+
     fn glyph(&self, ch: char) -> *mut Font {
         let display = self.connection.display;
         unsafe {
@@ -1211,6 +1246,9 @@ impl Drop for Fonts {
     fn drop(&mut self) {
         unsafe {
             for &font in self.fallbacks.get_mut().iter() {
+                XftFontClose(self.connection.display, font);
+            }
+            for &font in self.italic.get_mut().iter() {
                 XftFontClose(self.connection.display, font);
             }
             XftFontClose(self.connection.display, self.font);
@@ -1247,9 +1285,16 @@ pub struct Window {
     owns_colormap: bool,
     requested_opacity: u8,
     pixmap: Xid,
+    // Only a completed software frame may be copied on an Expose event.
+    retained_valid: bool,
     pending_damage: Option<(i32, i32)>,
     gc: *mut c_void,
     draw: *mut XftDraw,
+    gpu: Option<ztty::gpu::Renderer>,
+    renderer_kind: crate::appearance::RendererKind,
+    gpu_repaint: bool,
+    gpu_notice: Option<&'static str>,
+    text_blink_visible: [bool; 2],
     font: *mut Font,
     fonts: Rc<Fonts>,
     colors: Vec<ColorEntry>,
@@ -1259,6 +1304,8 @@ pub struct Window {
     utf8: Atom,
     targets: Atom,
     transfer: Atom,
+    osc_requestor: Xid,
+    paste_limit: usize,
     incr: Atom,
     title_atom: Atom,
     clipboard_text: String,
@@ -1410,9 +1457,15 @@ impl Window {
                 owns_colormap: alpha.is_some(),
                 requested_opacity: appearance.opacity,
                 pixmap,
+                retained_valid: false,
                 pending_damage: None,
                 gc,
                 draw,
+                gpu: None,
+                renderer_kind: appearance.renderer,
+                gpu_repaint: false,
+                gpu_notice: None,
+                text_blink_visible: [true; 2],
                 font,
                 fonts,
                 colors: Vec::with_capacity(256),
@@ -1422,6 +1475,8 @@ impl Window {
                 utf8: XInternAtom(display, c"UTF8_STRING".as_ptr(), 0),
                 targets: XInternAtom(display, c"TARGETS".as_ptr(), 0),
                 transfer: XInternAtom(display, c"ZTTY_SELECTION".as_ptr(), 0),
+                osc_requestor: 0,
+                paste_limit: MAX_SELECTION_BYTES,
                 incr: XInternAtom(display, c"INCR".as_ptr(), 0),
                 title_atom: XInternAtom(display, c"_NET_WM_NAME".as_ptr(), 0),
                 clipboard_text: String::new(),
@@ -1467,6 +1522,7 @@ impl Window {
             out.fill_background(background, true, 0, 0, width as u32, height as u32);
             XMapWindow(display, id);
             XFlush(display);
+            out.configure_gpu(appearance);
             Ok(out)
         }
     }
@@ -1559,10 +1615,15 @@ impl Window {
         }
         self.last_cursor = None;
         self.graphics_revision = 0;
+        self.configure_gpu(appearance);
         Ok((cols, rows))
     }
     pub fn present(&self) {
-        self.present_region(0, self.height);
+        // Expose already requests a full repaint in the view. A swapped EGL
+        // back buffer is not retained content and must not be published again.
+        if self.gpu.is_none() && !self.gpu_repaint && self.retained_valid {
+            self.present_region(0, self.height);
+        }
     }
 
     fn damage(&mut self, top: i32, bottom: i32) {
@@ -1581,13 +1642,19 @@ impl Window {
     /// Xlib may send its buffer during drawing, so delaying XFlush alone does not
     /// prevent several earlier XCopyArea requests from exposing a partial frame.
     pub fn finish_frame(&mut self) {
+        if self.finish_gpu_frame() {
+            return;
+        }
         if let Some((top, bottom)) = self.pending_damage.take() {
+            // render() rebuilds every pixel after allocation or backend changes;
+            // publish only after its overlays are complete too.
+            self.retained_valid = true;
             self.present_region(top, bottom);
         }
     }
 
     fn present_region(&self, top: i32, bottom: i32) {
-        if self.suspended || self.id == 0 {
+        if self.suspended || self.id == 0 || !self.retained_valid {
             return;
         }
         unsafe {
@@ -1631,6 +1698,9 @@ impl Window {
         if self.width != width.max(1) || self.height != height.max(1) {
             self.width = width.max(1);
             self.height = height.max(1);
+            self.retained_valid = false;
+            self.pending_damage = None;
+            self.resize_gpu();
             if !self.suspended {
                 unsafe {
                     let pixmap = XCreatePixmap(
@@ -1687,6 +1757,8 @@ impl Window {
         if self.id == 0 || visible != self.suspended {
             return;
         }
+        self.retained_valid = false;
+        self.pending_damage = None;
         unsafe {
             if visible {
                 let pixmap = XCreatePixmap(
@@ -1715,6 +1787,7 @@ impl Window {
                 self.focus(false);
             }
             self.suspended = !visible;
+            self.visible_gpu(visible);
             XFlush(self.display);
         }
     }
@@ -1863,7 +1936,17 @@ impl Window {
         let translucent = !selected && cell.flags & (INVERSE | EXPLICIT_BG) == 0;
         (fg, bg, translucent)
     }
+
+    fn text_hidden(&self, cell: &Cell) -> bool {
+        cell.ch == '\u{10eeee}'
+            || cell.flags & HIDDEN != 0
+            || (cell.flags & BLINK != 0 && !self.text_blink_visible[0])
+            || (cell.flags & RAPID_BLINK != 0 && !self.text_blink_visible[1])
+    }
     fn fill_background(&mut self, rgb: u32, translucent: bool, x: i32, y: i32, w: u32, h: u32) {
+        if self.gpu_fill(rgb, x, y, w, h) {
+            return;
+        }
         if let Some(color) = self.background_fill.as_ref().filter(|_| translucent) {
             // Replace the retained pixels, including alpha, on every damaged row.
             unsafe {
@@ -2024,6 +2107,18 @@ impl Window {
     }
 
     fn overlay_text_color(&mut self, text: &str, mut x: i32, y: i32, right: i32, rgb: u32) {
+        if self.gpu_text(
+            text,
+            crate::layout::Rect {
+                x,
+                y,
+                width: (right - x).max(0),
+                height: self.ch,
+            },
+            rgb,
+        ) {
+            return;
+        }
         let color = self.color(rgb);
         let baseline = y + unsafe { (*self.font).ascent } + 1;
         for ch in text.chars().take(1024) {
@@ -2059,6 +2154,9 @@ impl Window {
     }
 
     fn overlay_width(&mut self, text: &str) -> i32 {
+        if let Some(width) = self.gpu_overlay_width(text) {
+            return width;
+        }
         let mut width: i32 = 0;
         for ch in text.chars() {
             let font = self.glyph_font(ch);
@@ -2106,17 +2204,14 @@ impl Window {
             ) else {
                 continue;
             };
-            let border = self.color(if new_output { 0x89b4fa } else { 0x64748b });
-            unsafe {
-                XftDrawRect(
-                    self.draw,
-                    &border,
-                    rect.x,
-                    rect.y,
-                    rect.width as u32,
-                    rect.height as u32,
-                );
-            }
+            self.fill_background(
+                if new_output { 0x89b4fa } else { 0x64748b },
+                false,
+                rect.x,
+                rect.y,
+                rect.width as u32,
+                rect.height as u32,
+            );
             self.fill_background(
                 self.background,
                 false,
@@ -2151,21 +2246,21 @@ impl Window {
         if rect.width <= 0 || rect.height <= 0 {
             return;
         }
-        let color = self.color(rgb);
-        unsafe {
-            XftDrawRect(
-                self.draw,
-                &color,
-                rect.x,
-                rect.y,
-                rect.width as u32,
-                rect.height as u32,
-            );
-        }
+        self.fill_background(
+            rgb,
+            false,
+            rect.x,
+            rect.y,
+            rect.width as u32,
+            rect.height as u32,
+        );
     }
 
     fn native_ui_text(&mut self, text: &str, rect: crate::layout::Rect, rgb: u32) {
         if rect.width <= 0 || rect.height <= 0 {
+            return;
+        }
+        if self.gpu_text(text, rect, rgb) {
             return;
         }
         let clip = ClipRectangle {
@@ -2262,9 +2357,6 @@ impl Window {
         {
             return false;
         }
-        let Some(picture) = self.image_picture(image_id, image) else {
-            return false;
-        };
         let (width, height) = if i64::from(rect.width) * i64::from(image.height)
             <= i64::from(rect.height) * i64::from(image.width)
         {
@@ -2279,6 +2371,20 @@ impl Window {
                     as i32,
                 rect.height,
             )
+        };
+        if self.gpu_native_image(
+            image_id,
+            image,
+            crate::layout::Rect {
+                width,
+                height,
+                ..rect
+            },
+        ) {
+            return true;
+        }
+        let Some(picture) = self.image_picture(image_id, image) else {
+            return false;
         };
         let fixed = |source: u32, destination: i32| {
             ((u64::from(source) << 16) / destination as u64).min(i32::MAX as u64) as i32
@@ -2612,10 +2718,17 @@ impl Window {
             }
             let dx = i64::from(placement.dest.x);
             let dy = i64::from(placement.dest.y);
-            let left = dx.max(0);
-            let top = dy.max(row_top);
-            let right = (dx + i64::from(placement.dest.width)).min(width);
-            let bottom = (dy + i64::from(placement.dest.height)).min(row_top + i64::from(self.ch));
+            let clip = placement.clip;
+            let left = dx.max(0).max(clip.map_or(i64::MIN, |c| i64::from(c.x)));
+            let top = dy
+                .max(row_top)
+                .max(clip.map_or(i64::MIN, |c| i64::from(c.y)));
+            let right = (dx + i64::from(placement.dest.width))
+                .min(width)
+                .min(clip.map_or(i64::MAX, |c| i64::from(c.x) + i64::from(c.width)));
+            let bottom = (dy + i64::from(placement.dest.height))
+                .min(row_top + i64::from(self.ch))
+                .min(clip.map_or(i64::MAX, |c| i64::from(c.y) + i64::from(c.height)));
             if left >= right || top >= bottom {
                 continue;
             }
@@ -2668,10 +2781,15 @@ impl Window {
         force: bool,
         cursor: Option<DrawnCursor>,
     ) {
+        if self.render_gpu(terminal, offset, selection, cursor) {
+            return;
+        }
         // A scene change can remove pixels outside the new placement. Rebuild
         // the visible frame on structural changes; ordinary text still damages
         // only its own rows and re-composites the images intersecting those rows.
-        let force = force || self.graphics_changed(terminal);
+        let force =
+            force || !self.retained_valid || self.gpu_repaint || self.graphics_changed(terminal);
+        self.gpu_repaint = false;
         if self.graphics_alternate != terminal.modes().alternate_screen {
             while !self.images.is_empty() {
                 self.discard_upload(self.images.len() - 1);
@@ -2784,7 +2902,7 @@ impl Window {
             col = 0;
             while col < cols {
                 let cell = terminal.view_cell(col, row, offset);
-                if cell.width == 0 {
+                if cell.width == 0 || self.text_hidden(cell) {
                     col += 1;
                     continue;
                 }
@@ -2799,23 +2917,31 @@ impl Window {
                 let mut text = [0u8; 2048];
                 let mut len = 0;
                 let mut cells = 1;
-                let mut chars = [cell.ch, cell.combining[0], cell.combining[1]];
-                if chars[0] == '\0' {
-                    chars[0] = ' ';
+                for ch in terminal.cell_chars(cell) {
+                    let ch = if ch == '\0' { ' ' } else { ch };
+                    len += ch.encode_utf8(&mut text[len..]).len();
                 }
-                for ch in chars {
-                    if ch != '\0' {
-                        len += ch.encode_utf8(&mut text[len..]).len();
-                    }
+                if len == 0 {
+                    text[0] = b' ';
+                    len = 1;
                 }
-                let font = self.glyph_font(cell.ch);
+                let font = if cell.flags & ITALIC != 0 {
+                    self.fonts.italic_glyph(cell.ch)
+                } else {
+                    self.glyph_font(cell.ch)
+                };
                 // Adjacent simple ASCII cells share a single Xft draw call.
-                if cell.ch.is_ascii() && cell.width == 1 && cell.combining == ['\0'; 2] {
+                if cell.ch.is_ascii()
+                    && cell.width == 1
+                    && cell.combining == ['\0'; 2]
+                    && cell.grapheme_id == 0
+                {
                     while col + cells < cols && len < text.len() - 4 {
                         let next = terminal.view_cell(col + cells, row, offset);
                         if !next.ch.is_ascii()
                             || next.width != 1
                             || next.combining != ['\0'; 2]
+                            || next.grapheme_id != 0
                             || next.flags != cell.flags
                             || next.link_id != cell.link_id
                             || self
@@ -2897,7 +3023,7 @@ impl Window {
             CursorShape::Bar => (y, self.cw.min(2), self.ch),
         };
         unsafe { XftDrawRect(self.draw, &color, x, top, width as u32, height as u32) };
-        if shape == CursorShape::Block && cell.width > 0 && cell.flags & HIDDEN == 0 {
+        if shape == CursorShape::Block && cell.width > 0 && !self.text_hidden(cell) {
             let contrast =
                 if ((rgb >> 16) * 299 + ((rgb >> 8) & 255) * 587 + (rgb & 255) * 114) >= 128000 {
                     0x000000
@@ -2905,10 +3031,14 @@ impl Window {
                     0xffffff
                 };
             let fg = self.color(contrast);
-            let font = self.glyph_font(cell.ch);
-            let mut bytes = [0; 12];
+            let font = if cell.flags & ITALIC != 0 {
+                self.fonts.italic_glyph(cell.ch)
+            } else {
+                self.glyph_font(cell.ch)
+            };
+            let mut bytes = [0; zterm::MAX_GRAPHEME_BYTES];
             let mut len = 0;
-            for ch in [cell.ch, cell.combining[0], cell.combining[1]] {
+            for ch in terminal.cell_chars(cell) {
                 if ch != '\0' {
                     len += ch.encode_utf8(&mut bytes[len..]).len();
                 }
@@ -2948,11 +3078,13 @@ impl Window {
         self.paste_selection = 0;
         self.paste_target = 0;
         self.paste_error = None;
-        if self.id != 0 {
+        if self.selection_requestor() != 0 {
             unsafe {
-                XDeleteProperty(self.display, self.id, self.transfer);
+                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
             }
         }
+        self.close_osc_requestor();
+        self.paste_limit = MAX_SELECTION_BYTES;
     }
 
     pub fn paste(&mut self, primary: bool) {
@@ -2965,7 +3097,7 @@ impl Window {
                 self.paste_selection,
                 self.utf8,
                 self.transfer,
-                self.id,
+                self.selection_requestor(),
                 0,
             );
             XFlush(self.display);
@@ -3062,6 +3194,7 @@ impl Window {
         self.incoming_type = 0;
         self.paste_selection = 0;
         self.paste_target = 0;
+        self.close_osc_requestor();
         Some(if kind == 31 {
             data.into_iter()
                 .map(char::from)
@@ -3082,10 +3215,10 @@ impl Window {
         unsafe {
             let code = XGetWindowProperty(
                 self.display,
-                self.id,
+                self.selection_requestor(),
                 self.transfer,
                 0,
-                (MAX_SELECTION_BYTES / 4) as c_long,
+                (self.paste_limit / 4) as c_long,
                 1,
                 0,
                 &mut kind,
@@ -3096,12 +3229,12 @@ impl Window {
             );
             result = if code != 0 || kind == 0 || (count != 0 && data.is_null()) {
                 Err("Could not read clipboard")
-            } else if remaining != 0 || count > MAX_SELECTION_BYTES as c_ulong {
+            } else if remaining != 0 || count > self.paste_limit as c_ulong {
                 Err("Paste exceeds the 4 MiB clipboard limit")
             } else if kind == self.incr {
                 if format != 32 || count != 1 {
                     Err("Invalid clipboard transfer")
-                } else if *data.cast::<c_ulong>() > MAX_SELECTION_BYTES as c_ulong {
+                } else if *data.cast::<c_ulong>() > self.paste_limit as c_ulong {
                     Err("Paste exceeds the 4 MiB clipboard limit")
                 } else {
                     Ok((kind, Vec::new()))
@@ -3120,14 +3253,14 @@ impl Window {
                 XFree(data.cast());
             }
             if remaining != 0 {
-                XDeleteProperty(self.display, self.id, self.transfer);
+                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
             }
         }
         result
     }
     pub fn selection_notify(&mut self, event: SelectionEvent) -> Option<Vec<u8>> {
         if self.paste_selection == 0
-            || event.requestor != self.id
+            || event.requestor != self.selection_requestor()
             || event.selection != self.paste_selection
             || event.target != self.paste_target
         {
@@ -3142,7 +3275,7 @@ impl Window {
                         self.paste_selection,
                         31,
                         self.transfer,
-                        self.id,
+                        self.selection_requestor(),
                         0,
                     );
                     XFlush(self.display);
@@ -3163,7 +3296,7 @@ impl Window {
             self.receiving = true;
             self.incoming.clear();
             unsafe {
-                XDeleteProperty(self.display, self.id, self.transfer);
+                XDeleteProperty(self.display, self.selection_requestor(), self.transfer);
                 XFlush(self.display);
             }
             None
@@ -3173,7 +3306,7 @@ impl Window {
     }
     pub fn property(&mut self, event: PropertyEvent) -> Option<Vec<u8>> {
         if !self.receiving
-            || event.window != self.id
+            || event.window != self.selection_requestor()
             || event.atom != self.transfer
             || event.state != 0
         {
@@ -3191,7 +3324,7 @@ impl Window {
             let complete = core::mem::take(&mut self.incoming);
             return self.finish_paste(complete, kind);
         }
-        if self.incoming.len().saturating_add(data.len()) > MAX_SELECTION_BYTES {
+        if self.incoming.len().saturating_add(data.len()) > self.paste_limit {
             return self.reject_paste("Paste exceeds the 4 MiB clipboard limit");
         }
         self.incoming.extend_from_slice(&data);
@@ -3204,6 +3337,8 @@ impl Window {
 
 impl Drop for Window {
     fn drop(&mut self) {
+        self.close_osc_requestor();
+        self.gpu = None;
         while !self.images.is_empty() {
             self.discard_upload(self.images.len() - 1);
         }
@@ -3224,3 +3359,5 @@ impl Drop for Window {
         }
     }
 }
+
+mod osc52;

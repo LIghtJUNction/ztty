@@ -5,7 +5,7 @@ use crate::{
     session_control::SessionControl,
 };
 use alloc::string::String;
-use zterm::Terminal;
+use zterm::{ResizeAnchor, Terminal};
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum ReadStep {
@@ -27,10 +27,12 @@ pub struct SessionCore {
     control: SessionControl,
     output: OutputTail,
     eof: bool,
+    control_epoch: u64,
 }
 
 impl SessionCore {
-    pub fn new(pty: zpty::Pty, terminal: Terminal, owner: String, input_limit: usize) -> Self {
+    pub fn new(pty: zpty::Pty, mut terminal: Terminal, owner: String, input_limit: usize) -> Self {
+        terminal.set_graphics_reader(crate::graphics_io::reader());
         Self {
             pty,
             terminal,
@@ -38,7 +40,12 @@ impl SessionCore {
             control: SessionControl::new(owner),
             output: OutputTail::new(),
             eof: false,
+            control_epoch: 1,
         }
+    }
+
+    pub fn control_epoch(&self) -> u64 {
+        self.control_epoch
     }
 
     pub fn owner(&self) -> Option<&str> {
@@ -55,6 +62,8 @@ impl SessionCore {
         let changed = self.control.acquire(actor, takeover)?;
         if changed {
             self.input.clear();
+            self.control_epoch = self.control_epoch.wrapping_add(1);
+            self.terminal.cancel_clipboard_requests();
         }
         Ok(changed)
     }
@@ -62,6 +71,8 @@ impl SessionCore {
     pub fn release(&mut self, actor: &str) -> Result<(), &'static str> {
         self.control.release(actor)?;
         self.input.clear();
+        self.control_epoch = self.control_epoch.wrapping_add(1);
+        self.terminal.cancel_clipboard_requests();
         Ok(())
     }
 
@@ -86,6 +97,7 @@ impl SessionCore {
         let bytes = match self.pty.read(buffer) {
             Ok(0) => {
                 self.eof = true;
+                self.terminal.cancel_clipboard_requests();
                 self.terminal.reset_ui();
                 return Ok(ReadStep::Eof);
             }
@@ -93,6 +105,7 @@ impl SessionCore {
             Err(error) if error.is_would_block() => return Ok(ReadStep::Pending),
             Err(error) => {
                 self.eof = true;
+                self.terminal.cancel_clipboard_requests();
                 self.terminal.reset_ui();
                 return Err(error);
             }
@@ -122,6 +135,18 @@ impl SessionCore {
         accepted
     }
 
+    /// Headless/observing/non-local hosts answer queries without clipboard data.
+    /// Writes are ignored; the queue never accumulates until a later attachment.
+    pub fn deny_clipboard_requests(&mut self) {
+        while let Some(request) = self.terminal.next_clipboard_request() {
+            if request.text.is_none() {
+                let _ = self
+                    .input
+                    .push(&request.reply(request.selectors()[0], None));
+            }
+        }
+    }
+
     pub fn flush_input(&mut self) -> Result<(), zpty::Error> {
         self.input.flush(&self.pty)
     }
@@ -129,8 +154,18 @@ impl SessionCore {
     /// Commit the terminal grid only after the native PTY accepts the size.
     /// Retained EOF views may resize only their terminal in frontend code.
     pub fn resize(&mut self, size: zpty::Size) -> Result<(), zpty::Error> {
+        self.resize_anchored(size, &mut [])
+    }
+
+    /// As resize, remapping selection/viewport positions only after PTY accepts.
+    pub fn resize_anchored(
+        &mut self,
+        size: zpty::Size,
+        anchors: &mut [ResizeAnchor],
+    ) -> Result<(), zpty::Error> {
         self.pty.resize(size)?;
-        self.terminal.resize(size.cols as usize, size.rows as usize);
+        self.terminal
+            .resize_anchored(size.cols as usize, size.rows as usize, anchors);
         Ok(())
     }
 
@@ -141,9 +176,19 @@ impl SessionCore {
         size: zpty::Size,
         cell_size: (u32, u32),
     ) -> Result<(), zpty::Error> {
+        self.resize_with_cell_size_anchored(size, cell_size, &mut [])
+    }
+
+    pub fn resize_with_cell_size_anchored(
+        &mut self,
+        size: zpty::Size,
+        cell_size: (u32, u32),
+        anchors: &mut [ResizeAnchor],
+    ) -> Result<(), zpty::Error> {
         self.pty.resize(size)?;
         self.terminal.set_cell_size(cell_size.0, cell_size.1);
-        self.terminal.resize(size.cols as usize, size.rows as usize);
+        self.terminal
+            .resize_anchored(size.cols as usize, size.rows as usize, anchors);
         Ok(())
     }
 

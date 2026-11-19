@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "ok": false,
+  "binary": "$WORKTREE/artifacts/graphics-integration-20261120/before-gpu-clip.ztty",
+  "binary_sha256": "d608d97ba30ab23a5db0bd5bac5bdb73b92c0475c96b157ae4f5f0d6ccedcf19",
+  "checks": [
+    {
+      "name": "file_and_symlink",
+      "ok": true,
+      "symlink_followed": true,
+      "offset": 6,
+      "bytes": 4,
+      "pixels": [
+        255,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "name": "temporary_file",
+      "ok": true,
+      "eligible_source_unlinked": true,
+      "nonprotocol_name_retained": true
+    },
+    {
+      "name": "shared_memory",
+      "ok": true,
+      "names_with_and_without_slash": true,
+      "range_verified": true,
+      "objects_unlinked": true
+    },
+    {
+      "name": "invalid_sources",
+      "ok": true,
+      "opaque_error_cases": 7,
+      "fifo_did_not_block": true,
+      "sources_preserved": true
+    },
+    {
+      "name": "compressed_files",
+      "ok": true,
+      "zlib_rgba_and_png": true
+    },
+    {
+      "name": "relative_placements",
+      "ok": true,
+      "child_followed_moved_parent": true,
+      "parent_removal_cascaded": true
+    },
+    {
+      "name": "placeholders",
+      "ok": false,
+      "error": "AssertionError('timed out waiting for pixel (4,3)+(4,12)=(24, 36, 48, 191); observed (255, 0, 0, 255)')"
+    },
+    {
+      "name": "animation",
+      "ok": true,
+      "timer_advanced_real_pixels": true,
+      "stop_stable": true,
+      "edit_compose_delete": true
+    }
+  ],
+  "cleanup_errors": [],
+  "cell_pixels": [
+    9,
+    24
+  ],
+  "display_ownership": {
+    "display": ":8859",
+    "pid": 846160,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X8859",
+        "inode": 55450573,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X8859",
+        "inode": 55450572,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+  },
+  "renderer_after": {
+    "window_id": 2097155,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+  },
+  "stderr_tail": "",
+  "passed": 7
+}

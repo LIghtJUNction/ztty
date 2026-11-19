@@ -118,6 +118,8 @@ fn pty_size(cols: usize, rows: usize, window: Option<&Window>) -> zpty::Size {
     }
 }
 
+mod osc52;
+
 struct Ui {
     window: Window,
     workspace: Option<u64>,
@@ -128,6 +130,7 @@ struct Ui {
     search: Option<Search>,
     palette: Option<Palette>,
     clipboard_menu: Option<ClipboardMenu>,
+    osc_clipboard: Option<osc52::Pending>,
     pending_action: Option<PaletteTarget>,
     plugin_running: bool,
     message: Option<(String, u64)>,
@@ -157,6 +160,7 @@ struct Ui {
     cursor_visible: bool,
     last_cursor: Option<((usize, usize), CursorShape)>,
     reset_blink: bool,
+    text_blink: ztty::text_blink::TextBlink,
 }
 impl Ui {
     fn new(window: Window, attachment: u64) -> Self {
@@ -169,6 +173,7 @@ impl Ui {
             search: None,
             palette: None,
             clipboard_menu: None,
+            osc_clipboard: None,
             pending_action: None,
             plugin_running: false,
             message: None,
@@ -196,6 +201,7 @@ impl Ui {
             cursor_visible: true,
             last_cursor: None,
             reset_blink: false,
+            text_blink: ztty::text_blink::TextBlink::default(),
         }
     }
     fn error(&mut self, message: String) {
@@ -214,7 +220,12 @@ impl Ui {
         self.force = true;
     }
     fn paste_result(&mut self, data: Option<Vec<u8>>, core: &mut SessionCore, allow_input: bool) {
-        if let Some(error) = self.window.take_paste_error() {
+        let error = self.window.take_paste_error();
+        if self.osc_clipboard.is_some() {
+            self.finish_osc_clipboard(data, error.is_some(), core, allow_input);
+            return;
+        }
+        if let Some(error) = error {
             self.error(error.into());
             return;
         }
@@ -235,6 +246,9 @@ impl Ui {
         }
     }
     fn reset_input(&mut self) {
+        if self.osc_clipboard.take().is_some() {
+            self.window.cancel_paste();
+        }
         self.native_ui.blur();
         self.held.fill(0);
         self.intercepted.fill(false);
@@ -253,6 +267,29 @@ impl Ui {
         self.repaint.cancel_input();
         self.window.cancel_paste();
         self.reset_input();
+    }
+
+    fn capture_view_anchor(&self, terminal: &Terminal) -> ztty::selection::ViewAnchor {
+        ztty::selection::ViewAnchor::capture(
+            terminal,
+            self.history,
+            self.selection
+                .as_ref()
+                .map(|selection| (selection.start, selection.end)),
+        )
+    }
+
+    fn restore_view_anchor(&mut self, terminal: &Terminal, anchor: ztty::selection::ViewAnchor) {
+        let restored = anchor.restore(terminal);
+        self.set_history(restored.history);
+        self.selection = restored.selection.map(|(start, end)| x11::Selection {
+            start,
+            end,
+            dragging: false,
+        });
+        self.selection_anchor = restored.selection.unwrap_or(((0, 0), (0, 0)));
+        self.selection_unit = ztty::selection::Unit::Cell;
+        self.clicks = None;
     }
 
     fn set_history(&mut self, history: usize) {
@@ -768,8 +805,8 @@ impl Ui {
                     self.local_buttons[button_index] = false;
                 }
                 if pressed && e.button == 1 && mods.0 & 4 != 0 {
-                    let id = core.terminal.view_cell(col, row, self.history).link_id;
-                    if let Some(uri) = core.terminal.hyperlink(id) {
+                    let cell = core.terminal.view_cell(col, row, self.history);
+                    if let Some(uri) = core.terminal.cell_hyperlink(cell) {
                         openers.open(uri, self.window.fd, core.pty.fd());
                         self.swallowed_buttons[button_index] = true;
                         self.local_buttons[button_index] = false;
@@ -836,7 +873,7 @@ impl Ui {
                         self.force = true;
                     } else if pressed && e.button == 2 {
                         if allow_input {
-                            self.window.paste(true);
+                            self.manual_paste(true);
                         }
                     } else if pressed && (e.button == 4 || e.button == 5) {
                         self.set_history(if e.button == 4 {
@@ -917,14 +954,16 @@ impl Ui {
                 self.clipboard_menu = None;
                 let (cols, rows) = self.window.resize(e.width, e.height);
                 self.scroll_prompt = None;
-                if allow_input
-                    && (cols != core.terminal.cols() || rows != core.terminal.rows())
-                    && let Err(error) = core.resize(pty_size(cols, rows, Some(&self.window)))
-                {
-                    self.error(format!("cannot resize the PTY: {error}"));
+                if allow_input && (cols != core.terminal.cols() || rows != core.terminal.rows()) {
+                    let mut anchor = self.capture_view_anchor(&core.terminal);
+                    match core.resize_anchored(
+                        pty_size(cols, rows, Some(&self.window)),
+                        anchor.anchors_mut(),
+                    ) {
+                        Ok(()) => self.restore_view_anchor(&core.terminal, anchor),
+                        Err(error) => self.error(format!("cannot resize the PTY: {error}")),
+                    }
                 }
-                self.set_history(self.history.min(core.terminal.history_len()));
-                self.selection = None;
                 self.force = true;
             }
             x11::FOCUS_IN | x11::FOCUS_OUT => {
@@ -980,6 +1019,9 @@ impl Ui {
         observing: bool,
         alive: bool,
     ) -> Option<u64> {
+        if let Some(message) = self.window.take_renderer_notice() {
+            self.error(message);
+        }
         if self
             .message
             .as_ref()
@@ -993,6 +1035,7 @@ impl Ui {
             self.scroll_prompt = None;
         }
         let now = os::milliseconds();
+        let animation_deadline = terminal.advance_graphics(now, self.history, alive);
         if terminal.modes().synchronized_output {
             let start = self.sync_since.get_or_insert(now);
             if now.saturating_sub(*start) >= 150 {
@@ -1042,6 +1085,16 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
+        let text_blink = self.text_blink.update(
+            terminal,
+            self.history,
+            self.force,
+            self.window.focused,
+            synchronized,
+            now,
+        );
+        self.force |= text_blink.changed;
+        self.window.set_text_blink_visible(text_blink.visible);
         let native_interactive =
             alive && !observing && terminal.ui_scene().is_some_and(|scene| scene.events);
         if self.native_ui.refresh(
@@ -1165,15 +1218,18 @@ impl Ui {
                 );
             }
             self.window.finish_frame();
-            self.force = false;
+            self.force = self.window.needs_repaint();
             self.repaint.painted(os::milliseconds());
         }
 
         // A synchronized frame only uses its existing 150 ms safety deadline;
         // returning an expired ordinary deadline here would busy-poll.
         let deadline = [
+            (self.window.needs_repaint() && !synchronized).then_some(now),
             self.sync_since.map(|s| s + 150),
             self.blink_deadline,
+            animation_deadline,
+            text_blink.deadline,
             repaint_deadline,
         ]
         .into_iter()
@@ -1351,12 +1407,7 @@ impl Session {
                 if cell.width == 0 {
                     continue;
                 }
-                row.push(cell.ch);
-                for c in cell.combining {
-                    if c != '\0' {
-                        row.push(c);
-                    }
-                }
+                row.extend(self.core.terminal.cell_chars(cell));
             }
             let row = row.trim_end();
             if screen.len() + row.len() + 1 > 65536 {
@@ -1885,11 +1936,18 @@ impl Pool {
                     && (cols != session.core.terminal.cols()
                         || rows != session.core.terminal.rows())
                 {
+                    let mut anchor = ui.capture_view_anchor(&session.core.terminal);
                     let resized = if session.core.eof() {
-                        session.core.terminal.resize(cols, rows);
+                        session
+                            .core
+                            .terminal
+                            .resize_anchored(cols, rows, anchor.anchors_mut());
                         true
                     } else {
-                        match session.core.resize(pty_size(cols, rows, Some(&ui.window))) {
+                        match session.core.resize_anchored(
+                            pty_size(cols, rows, Some(&ui.window)),
+                            anchor.anchors_mut(),
+                        ) {
                             Ok(()) => true,
                             Err(error) => {
                                 if failure.is_none() {
@@ -1902,8 +1960,7 @@ impl Pool {
                     // Keep the model at the accepted PTY size after a failed
                     // ioctl so the next arrange retries instead of skipping it.
                     if resized {
-                        ui.set_history(ui.history.min(session.core.terminal.history_len()));
-                        ui.selection = None;
+                        ui.restore_view_anchor(&session.core.terminal, anchor);
                     }
                 }
                 ui.window.visible(true);
@@ -2441,7 +2498,7 @@ impl Pool {
                     return Err("observing views cannot paste; take input control first".into());
                 }
                 if let Some(ui) = &mut session.ui {
-                    ui.window.paste(action == "paste-primary");
+                    ui.manual_paste(action == "paste-primary");
                 }
             }
             "scroll-up" | "scroll-down" => {
@@ -2704,11 +2761,12 @@ impl Pool {
                 ui.palette = None;
             }
             let allow_resize = session.core.owns("local") && !ui.read_only;
+            let mut anchor = ui.capture_view_anchor(&session.core.terminal);
             let (cols, rows) = ui.window.reconfigure(&appearance, |cols, rows, cw, ch| {
                 if allow_resize && !session.core.eof() {
                     session
                         .core
-                        .resize_with_cell_size(
+                        .resize_with_cell_size_anchored(
                             zpty::Size {
                                 cols: cols as u16,
                                 rows: rows as u16,
@@ -2716,6 +2774,7 @@ impl Pool {
                                 pixel_height: (rows * ch as usize).min(u16::MAX as usize) as u16,
                             },
                             (cw as u32, ch as u32),
+                            anchor.anchors_mut(),
                         )
                         .map_err(|e| format!("cannot resize reconfigured PTY: {e}"))?;
                 }
@@ -2727,11 +2786,13 @@ impl Pool {
                 .terminal
                 .set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
             if allow_resize && session.core.eof() {
-                session.core.terminal.resize(cols, rows);
+                session
+                    .core
+                    .terminal
+                    .resize_anchored(cols, rows, anchor.anchors_mut());
             }
-            ui.set_history(ui.history.min(session.core.terminal.history_len()));
+            ui.restore_view_anchor(&session.core.terminal, anchor);
             ui.scroll_prompt = None;
-            ui.selection = None;
             ui.last_cursor = None;
             ui.force = true;
             ui.reset_blink = true;
@@ -2998,18 +3059,24 @@ impl Pool {
                 let cols = bounded(request, "cols", 120, 2, 512)?;
                 let rows = bounded(request, "rows", 32, 2, 256)?;
                 let session = &mut self.sessions[index];
+                let mut anchor = session
+                    .ui
+                    .as_ref()
+                    .map(|ui| ui.capture_view_anchor(&session.core.terminal))
+                    .unwrap_or_else(|| {
+                        ztty::selection::ViewAnchor::capture(&session.core.terminal, 0, None)
+                    });
                 session
                     .core
-                    .resize(pty_size(
-                        cols,
-                        rows,
-                        session.ui.as_ref().map(|ui| &ui.window),
-                    ))
+                    .resize_anchored(
+                        pty_size(cols, rows, session.ui.as_ref().map(|ui| &ui.window)),
+                        anchor.anchors_mut(),
+                    )
                     .map_err(|e| format!("resize failed: {e}"))?;
                 if let Some(ui) = &mut session.ui {
                     ui.window.resize_grid(cols, rows);
                     ui.force = true;
-                    ui.set_history(ui.history.min(session.core.terminal.history_len()));
+                    ui.restore_view_anchor(&session.core.terminal, anchor);
                     ui.scroll_prompt = None;
                 }
                 Ok(Reply::Value(session.info()))
@@ -3199,7 +3266,7 @@ impl Pool {
                     s.ui.as_ref().is_some_and(|ui| {
                         ui.open
                             && ui.window.id != 0
-                            && ui.window.id == id
+                            && ui.window.accepts_event(id, unsafe { event.kind })
                             && ui.window.display == connection.display
                     })
                 }) {
@@ -3397,6 +3464,23 @@ impl Pool {
             session.pump(buffer);
             let local_owner = session.core.owns("local");
             let alive = !session.core.eof();
+            if let Some(ui) = &mut session.ui {
+                if let Some(next) = ui.clipboard_tick(&mut session.core, local_owner && alive) {
+                    deadline = Some(deadline.map_or(next, |old| old.min(next)));
+                }
+            } else {
+                session.core.deny_clipboard_requests();
+            }
+            if !session
+                .ui
+                .as_ref()
+                .is_some_and(|ui| ui.open && ui.visible && ui.window.id != 0)
+            {
+                session
+                    .core
+                    .terminal
+                    .advance_graphics(os::milliseconds(), 0, false);
+            }
             if let Some(ui) = &mut session.ui
                 && ui.open
                 && ui.visible

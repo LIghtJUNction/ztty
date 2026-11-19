@@ -18,10 +18,14 @@ pub const EXPLICIT_FG: u16 = 256;
 pub const PALETTE_FG: u16 = 512;
 /// The background refers to the ANSI palette, indexed by `Cell::palette_indices`.
 pub const PALETTE_BG: u16 = 1024;
+/// SGR 5 slow text blinking, independent of cursor blinking.
+pub const BLINK: u16 = 1 << 11;
+/// SGR 6 rapid text blinking, mutually exclusive with BLINK.
+pub const RAPID_BLINK: u16 = 1 << 12;
 const COLOR_FLAGS: u16 = EXPLICIT_FG | EXPLICIT_BG | PALETTE_FG | PALETTE_BG;
 
 /// A character cell. A wide glyph's trailing cell has `width == 0`.
-/// Two combining scalars are stored inline, without per-cell allocations.
+/// Short scalar content is inline; complete clusters use a bounded shared table.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Cell {
     pub ch: char,
@@ -32,9 +36,12 @@ pub struct Cell {
     pub width: u8,
     /// ANSI color indices: foreground in bits 0..4, background in bits 4..8.
     /// Each index is meaningful only when its `PALETTE_FG`/`PALETTE_BG` flag is set.
-    /// This occupies an existing padding byte; a cell remains 28 bytes.
+    /// The Copy cell, including its complete-cluster ID, occupies 32 bytes.
     pub palette_indices: u8,
+    /// OSC 8 ID for text; U+10EEEE uses this slot for its Kitty placement ID.
     pub link_id: u32,
+    /// Terminal-owned full cluster ID; zero uses ch and combining inline.
+    pub grapheme_id: u32,
 }
 
 impl Default for Cell {
@@ -53,6 +60,7 @@ impl Cell {
         width: 1,
         palette_indices: 0,
         link_id: 0,
+        grapheme_id: 0,
     };
 }
 
@@ -63,6 +71,9 @@ pub(crate) struct Style {
     pub flags: u16,
     pub palette_indices: u8,
     pub link_id: u32,
+    /// Preserve indexed IDs before theme/palette resolution for placeholders.
+    pub graphics_fg: u32,
+    pub underline_color: u32,
 }
 
 impl Default for Style {
@@ -73,13 +84,15 @@ impl Default for Style {
             flags: 0,
             palette_indices: 0,
             link_id: 0,
+            graphics_fg: 0,
+            underline_color: 0,
         }
     }
 }
 
 impl Style {
     pub fn cell(self, ch: char, width: u8) -> Cell {
-        Cell {
+        let mut cell = Cell {
             ch,
             combining: ['\0'; 2],
             fg: self.fg,
@@ -88,7 +101,16 @@ impl Style {
             width,
             palette_indices: self.palette_indices,
             link_id: self.link_id,
+            grapheme_id: 0,
+        };
+        if ch == '\u{10eeee}' {
+            // Placeholder attributes are protocol data. They do not produce a
+            // text glyph or hyperlink, and theme changes must not alter IDs.
+            cell.fg = self.graphics_fg;
+            cell.link_id = self.underline_color;
+            cell.flags = (cell.flags | EXPLICIT_FG) & !PALETTE_FG;
         }
+        cell
     }
 
     pub fn blank(self) -> Cell {
@@ -103,6 +125,9 @@ impl Style {
     }
 
     pub fn set_color(&mut self, foreground: bool, color: u32, palette: Option<u16>) {
+        if foreground {
+            self.graphics_fg = palette.map_or(color, u32::from);
+        }
         let (target, explicit, indexed, shift) = if foreground {
             (&mut self.fg, EXPLICIT_FG, PALETTE_FG, 0)
         } else {
@@ -272,7 +297,7 @@ impl Screen {
         if row.len() <= 16 {
             row.fill(blank);
         } else {
-            // Cell is 28 bytes: scalar fill emits many stores per column.
+            // Cell is 32 bytes: scalar fill emits many stores per column.
             // Seed a few cells, then copy initialized, nonoverlapping spans.
             // This keeps the ordinary scroll path allocation-free without a
             // cached blank row or architecture-specific vector instructions.
@@ -461,6 +486,7 @@ mod clear_row_tests {
             width: 2,
             palette_indices: 0x71,
             link_id: 42,
+            grapheme_id: 0,
         };
         let blank = Style {
             fg: 0x789abc,
@@ -468,6 +494,7 @@ mod clear_row_tests {
             flags: u16::MAX,
             palette_indices: 0x35,
             link_id: 99,
+            ..Style::default()
         }
         .blank();
         for cols in 1..=257 {
