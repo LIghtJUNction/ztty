@@ -341,7 +341,21 @@ def main():
                 key(f"KP_{digit}")
             key("KP_Decimal")
             assert_input("Num Lock on: keypad digits and decimal are text", b"0123456789.")
-            begin()
+            for flags in range(1, 8):
+                begin(RESET + f"\x1b[={flags}u")
+                for digit in range(10):
+                    key(f"KP_{digit}")
+                for symbol in ("KP_Decimal", "KP_Add", "KP_Subtract", "KP_Multiply", "KP_Divide"):
+                    key(symbol)
+                assert_input(f"Kitty flags {flags}: printable keypad keys remain text",
+                             b"0123456789.+-*/")
+            begin(RESET + "\x1b[=8u")
+            key("KP_1")
+            assert_input("Kitty report-all retains keypad identity", b"\x1b[57400;129u")
+            begin(RESET + "\x1b[=24u")
+            key("KP_1")
+            assert_input("Kitty report-all includes requested keypad text", b"\x1b[57400;129;49u")
+            begin(RESET)
             num_lock(False)
             assert_input("Num Lock off emits no legacy input", b"")
             begin()
