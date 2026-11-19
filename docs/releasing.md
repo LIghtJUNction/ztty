@@ -515,3 +515,38 @@ git push origin refs/tags/vX.Y.Z
 The AUR step retains the existing `AUR_SSH_KEY` secret and pinned host key in
 `packaging/aur/known_hosts`. An older tag cannot downgrade the package. This work
 did not change the user's desktop configuration or other project jobs.
+
+## 0.4.1 release attachment contract
+
+All six native platform gates, Verify, source-package checks, and full artifact
+provenance checks remain required. The 0.4.0 application and native gates passed,
+but uploading 941 standalone attachments triggered a GitHub secondary rate limit.
+The 0.4.0 tag and registry packages remain immutable; 0.4.1 uses a new source
+commit and new official artifacts.
+
+`tools/release_assets.py` retains every original evidence file in a deterministic
+ZIP. Only distribution bundles, their checksums, platform build/native reports,
+application manifests, and `install.sh` are standalone assets. The complete set
+contains 47 uploads, including the source archive, `SHA256SUMS`, evidence ZIP, and
+ZIP checksum; a hard maximum of 64 covers the complete publication set.
+
+Readback first compares the downloaded evidence ZIP with the accepted ZIP,
+checks its identity, exact member set, lengths, and hashes, and requires every
+standalone distribution file to have been downloaded independently. Only then
+does it restore archive-only raw evidence without overwriting existing files.
+The original platform-ledger and checksum checks still cover every file.
+
+`tools/release_upload.py` confirms release existence through authenticated
+GraphQL, creates only an explicitly absent draft, and reads assets by release ID.
+It uploads missing draft assets serially, pauses at least one second after each
+write, and stops at the first API error. It never replaces an existing asset or
+writes to an already published release. A failed draft can be resumed after the
+server-requested cooldown; only a complete successful readback permits publication.
+See [GitHub API best practices](https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api).
+
+Run both packaging and upload contracts before publication:
+
+```sh
+python3 -m unittest discover -s tests -p 'release_assets_test.py'
+python3 -m unittest discover -s tests -p 'release_upload_test.py'
+```
