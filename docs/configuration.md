@@ -15,9 +15,10 @@ On Linux and macOS, setting `XDG_CONFIG_HOME` selects
 `$XDG_CONFIG_HOME/ztty/ztty.conf`. `ztty --config PATH` selects a file explicitly.
 `--font` overrides the configured font.
 
-Linux reloads the file when it changes, including atomic saves. Ctrl+Shift+R
-reloads it manually. Invalid changes leave the previous configuration active
-and show a temporary error. macOS and Windows read settings at startup.
+The Linux X11 backend reloads the file when it changes, including atomic saves.
+Ctrl+Shift+R reloads it manually. Invalid changes leave the previous configuration
+active and show a temporary error. macOS, Windows and the experimental Wayland
+backend read settings at startup.
 
 ## Fonts, colors and cursor
 
@@ -51,7 +52,7 @@ palette = 4=#61afef
 Terminal applications can change the active cursor through DECSCUSR and
 DEC private mode 12.
 
-On Linux, opacity applies to the default background; explicit ANSI backgrounds,
+On Linux X11, opacity applies to the default background; explicit ANSI backgrounds,
 selection and glyph colors retain their own opacity. Blur is supplied by the
 compositor. `background-blur` sends the KWin-compatible X11 request; Hyprland
 uses its own window rules. Set opacity to 100 for an opaque window.
@@ -60,7 +61,7 @@ macOS uses a native visual-effect view for blur. Windows uses an opaque GDI
 surface. The platform backends implement these settings through different
 native APIs.
 
-## Linux renderer
+## Linux X11 renderer
 
 The current source supports these values:
 
@@ -71,10 +72,48 @@ The current source supports these values:
 | `renderer = software` | Use Xft/XRender |
 
 The GPU path uses HarfBuzz for shaping and FreeType/Fontconfig for fonts.
-Linux can switch renderer through a configuration reload while keeping its
+Linux X11 can switch renderer through a configuration reload while keeping its
 window and PTY. A GPU failure schedules a complete software redraw.
 See the [renderer verification](reports/x11-gpu-20261119/report.zh-CN.md)
 for tested text and frame behavior.
+
+## Native Wayland (experimental)
+
+Native Wayland is an explicit single-window path using xdg-shell, EGL/GLES and
+XKB. Enable the Cargo feature when building from source. The official Linux
+package build enables it, while runtime startup continues to select X11.
+
+Install these dependencies in addition to the Linux build dependencies in the
+[README](../README.md#build-and-run):
+
+```sh
+# Arch Linux
+sudo pacman -S --needed wayland wayland-protocols libxkbcommon
+
+# Debian / Ubuntu
+sudo apt install libwayland-dev libwayland-bin wayland-protocols libxkbcommon-dev
+```
+
+Use a separate configuration such as `wayland.conf`:
+
+```ini
+font = monospace:pixelsize=16
+renderer = gpu
+window-padding = 8
+background-opacity = 100
+```
+
+```sh
+cargo build --locked --release --features wayland
+./target/release/ztty --backend wayland --config ./wayland.conf
+```
+
+This path provides a local PTY, native keyboard input, history scrolling and
+window resizing. Shared sessions, tabs/splits, attach/MCP, search, system
+clipboard, text-input IME and native UI scenes remain outside its current scope.
+Custom bindings and text plugins cause an explicit startup error on this backend.
+See [native Wayland](native-wayland.zh-CN.md) for the implemented scope and
+source-bound acceptance record.
 
 ## Key and mouse bindings
 
@@ -90,7 +129,7 @@ A custom binding takes priority over the default for that chord.
 `alt` and `super`; the command palette shows active shortcuts.
 See [binding names and input rules](daily-workflow.md#custom-keys-and-mouse-buttons).
 
-## Text actions on Linux
+## Text actions on Linux X11
 
 Register a trusted native library with:
 

@@ -7,7 +7,8 @@ The READMEs cover installation and common controls:
 
 | Guide | Contents |
 | --- | --- |
-| [Configuration](configuration.md) | Fonts, colors, renderer, keys and text actions |
+| [Configuration](configuration.md) | Fonts, colors, X11 renderer, Wayland setup, keys and text actions |
+| [Native Wayland](native-wayland.zh-CN.md) | Explicit experimental single window and current platform limits |
 | [Daily workflow](daily-workflow.md) | Search, command palette, live configuration and shell commands |
 | [Workspaces](workspaces.md) | Tabs, splits, pane movement and saved layouts |
 | [Sessions and MCP](sessions.md) | Shared sessions, attach, input ownership and MCP clients |
@@ -23,10 +24,12 @@ The READMEs cover installation and common controls:
 | Reference | Contents |
 | --- | --- |
 | [Architecture](architecture.md) | Terminal model, libraries and resource ownership |
+| [zgpui 0.1.0](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0) | Independently published scene, layout and renderer contracts |
 | [Protocols](protocols.md) | Implemented sequences, graphics and platform acceptance |
 | [Session core](session-core.md) | PTY reads, input queues, sizing and ownership |
 | [Native output bytes](native-output-bytes.zh-CN.md) | Lossless MCP output and readable text |
 | [Darwin PTY helper](darwin-threaded-pty.md) | Native macOS process creation |
+| [Current benchmark report](benchmarks/resume-2026-11-20.md) | Candidate identity, workloads and raw measurements |
 | [Benchmark instructions](benchmarks/README.md) | Workloads, accounting and reproduction |
 | [Performance](performance.md) | Design and dated measurements |
 | [Releasing](releasing.md) | Native builds, packages and published versions |
@@ -38,6 +41,8 @@ These reports retain the source, executable and environment used for each run.
 | Area | Record |
 | --- | --- |
 | X11 rendering | [GPU text and complete frames](reports/x11-gpu-20261119/report.zh-CN.md) |
+| Native Wayland | [Single-window acceptance](measurements/native-wayland-2026-11-19/README.md) |
+| Kitty and OSC 52 | [Linux GPU/software integration](reports/graphics-extensions-20261120/report.zh-CN.md) |
 | Input method | [XIM lifecycle and recovery](xim-recovery-2026-11-19.zh-CN.md) |
 | Input and controls | [Keypad routing](keypad-input-2026-11-19.zh-CN.md), [shortcut verification](shortcuts-validation-2026-11-19.zh-CN.md) |
 | Clipboard | [Copy/paste behavior](copy-paste-2026-11-19.zh-CN.md) |

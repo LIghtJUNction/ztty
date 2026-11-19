@@ -6,8 +6,8 @@ ztty is a native terminal for Linux, macOS and Windows. Its terminal core is
 written in Rust without the standard library. On Linux, the same live session
 can be used from a window, the CLI or an MCP client.
 
-Published downloads are **0.4.1**. This page describes the current source tree;
-build from source for changes that have not reached a release.
+Published ztty downloads remain **0.4.1**. This page describes the **0.5.0 source
+candidate**; its application release and device installation are still pending.
 
 ## Install on Linux
 
@@ -39,13 +39,15 @@ sudo apt install build-essential pkg-config libx11-dev libxft-dev libxrender-dev
 ```
 
 ```sh
-git clone https://github.com/LIghtJUNction/ztty.git
+git clone --recurse-submodules https://github.com/LIghtJUNction/ztty.git
 cd ztty
 cargo build --locked --release
 ./target/release/ztty --font 'monospace:size=12' --geometry 100x28
 ./target/release/ztty --cwd /path/to/project -e /bin/bash
 sh install.sh --from-binary ./target/release/ztty
 ```
+
+For an existing clone, run `git submodule update --init --recursive` before building.
 
 Linux/macOS use `SHELL` (falling back to `/bin/sh`); Windows uses `COMSPEC`
 (falling back to `cmd.exe`). `-e` chooses another program. Installing an update
@@ -56,12 +58,13 @@ preserves running sessions; see [broker upgrades](docs/sessions.md#upgrading-a-r
 
 - VT sequences, true color, mouse reports, bracketed paste and Kitty keyboard input.
 - Unicode grapheme storage, history reflow and copy across wrapped lines.
-- Static Kitty images and Sixel; try `kitten icat --transfer-mode=stream photo.png`.
+- Kitty images and Sixel; Linux adds animation, Unicode placeholders and relative placement.
+- Linux Kitty file/shared-memory transport and bounded OSC 52 clipboard access.
 - Linux tabs, splits, shared sessions, history search and a command palette.
 - Linux GPU text shaping with Xft fallback, live configuration and XIM recovery.
 - Optional [shell integration](shell/README.md) and [trusted text actions](docs/text-plugins.zh-CN.md).
 
-The Linux renderer defaults to `renderer = auto`: hardware EGL when available,
+The Linux X11 renderer defaults to `renderer = auto`: hardware EGL when available,
 otherwise Xft. [Configuration](docs/configuration.md) and the
 [protocol reference](docs/protocols.md) describe supported modes and limits.
 
@@ -87,7 +90,7 @@ button returns from history to current output.
 
 ## Shared sessions and MCP (Linux)
 
-Linux windows automatically share a broker, display connection and font cache.
+Linux X11 windows automatically share a broker, display connection and font cache.
 Each session keeps its own PTY, screen and history.
 
 ```sh
@@ -119,21 +122,33 @@ background-opacity = 92
 renderer = auto
 ```
 
-Linux reloads valid changes in place. [Configuration](docs/configuration.md)
+Linux X11 reloads valid changes in place. [Configuration](docs/configuration.md)
 covers platform paths, colors, cursor behavior, bindings and renderer selection.
 
 ## Platforms and verification
 
 | Platform | Current source |
 | --- | --- |
-| Linux | X11/XWayland; shared sessions, tabs/splits, attach and MCP |
+| Linux X11/XWayland | GPU or Xft; shared sessions, tabs/splits, attach and MCP |
+| Linux native Wayland | Explicit experimental single window; EGL/GLES and XKB input |
 | macOS | Native AppKit/CoreText window and Darwin PTY; local sessions |
 | Windows | Native Win32/GDI and ConPTY; local tabs and splits |
 
 macOS runs without X11; Windows runs without WSL. Windows supports font and
 workspace shortcuts; macOS uses Command+C/V or Ctrl+Shift+C/V for copy/paste.
-Shared sessions, attach, search and MCP currently use the Linux runtime.
+Shared sessions, attach, search and MCP currently use the Linux X11 runtime.
 [Platform verification](docs/protocols.md#acceptance-coverage) records the tested scope.
+
+To try the experimental native Wayland window:
+
+```sh
+cargo build --locked --release --features wayland
+./target/release/ztty --backend wayland
+```
+
+The official Linux package build enables Wayland; startup still defaults to X11.
+[Wayland setup](docs/configuration.md#native-wayland-experimental) covers the extra
+dependencies and current limits, including clipboard, IME and workspace support.
 
 ## Performance and development
 
@@ -145,6 +160,9 @@ retain their original conditions.
 <!-- terminal-benchmark:end -->
 
 Run `sh tools/check.sh` for the local development checks.
+The UI core, [zgpui 0.1.0](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0),
+is published independently. This application candidate uses `zterm 0.5.0` and
+`zgraphics 0.2.0`; publication of those versions is still pending.
 The [architecture](docs/architecture.md) describes the reusable Project Z libraries;
 the [documentation index](docs/README.md) links usage guides and verification records.
 

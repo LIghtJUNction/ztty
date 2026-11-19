@@ -1,5 +1,64 @@
 # Changelog
 
+## 0.5.0 candidate — 2026-11-20 (Asia/Taipei)
+
+This is a source candidate. The ztty application release and device installation
+are pending; published application downloads remain 0.4.1. The candidate package
+versions are zterm 0.5.0, zgraphics 0.2.0 and ztty-plugin-api 0.1.0.
+
+### Added
+
+- Linux X11 EGL/GLES rendering with HarfBuzz shaping and FreeType/Fontconfig
+  font fallback. Text, images and interface overlays share complete frames;
+  `renderer = auto` selects hardware EGL with Xft fallback.
+- An explicit experimental native Wayland backend: build with `--features
+  wayland` and select `--backend wayland`. It provides one xdg-shell window,
+  a local PTY, XKB keyboard input, history scrolling and resizing. The official
+  Linux package build enables the feature; default startup still selects X11.
+- Kitty animation, Unicode placeholders and relative placement, with bounded
+  Linux file/shared-memory image transport. Linux X11 OSC 52 adds bounded
+  clipboard access with input ownership and cancellation checks.
+- The independent [zgpui 0.1.0 release](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0),
+  from source [`1d796d1`](https://github.com/LIghtJUNction/zgpui/commit/1d796d1fc63808dc099ed7b10c92e75835ae2814).
+  Its `no_std + alloc` scene, layout and renderer contracts have no Cargo
+  dependencies. This component release is separate from the application release.
+
+### Changed
+
+- Preserve complete graphemes through storage and copying, and reflow retained
+  logical lines when terminal width changes.
+- Replace the embedded ztty-ui implementation with the pinned zgpui submodule.
+  `zterm::ui` and the ZUI/1 wire format remain compatible. The native host uses
+  shared layout while retaining its lifecycle stamp, input ownership and
+  minimum-height rules for interactive buttons.
+- Require recursive submodules for source builds: use `git clone
+  --recurse-submodules` or `git submodule update --init --recursive` in an
+  existing checkout. zinput retains the existing 0.1.2 codec.
+
+### Fixed
+
+- Present resized X11 canvases only after a complete draw and resolve GPU font
+  size using the display's font metrics. Font and renderer reloads preserve the
+  existing window and PTY.
+- Clip Kitty Unicode placeholder images to their character regions on the GPU
+  path, preserving neighboring cells and the original sampling coordinates.
+- Retain XIM recovery across input-method server restarts and reject stale
+  native UI gestures after scene resets.
+
+### Scope and evidence
+
+The [X11 renderer report](docs/reports/x11-gpu-20261119/report.zh-CN.md),
+[Kitty/OSC 52 report](docs/reports/graphics-extensions-20261120/report.zh-CN.md)
+and [Wayland record](docs/measurements/native-wayland-2026-11-19/README.md)
+retain their tested source and environment. Native clipboard acceptance in
+this iteration is limited to Linux X11. Wayland shared sessions, workspace UI,
+system clipboard and text-input IME remain pending; complete Unicode
+bidirectional paragraph layout is outside the current shaping scope.
+
+The [candidate benchmark report](docs/benchmarks/resume-2026-11-20.md) records
+performance separately. No earlier measurement establishes this candidate's
+performance or its final native release acceptance.
+
 ## 0.4.1 — 2026-11-19 (Asia/Taipei)
 
 ### Fixed
