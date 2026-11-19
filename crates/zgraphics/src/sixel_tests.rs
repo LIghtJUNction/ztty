@@ -184,3 +184,27 @@ fn sixel_default_palette_and_embedded_controls() {
     let draw = graphics.draws(0).next().unwrap();
     assert_eq!(draw.image.pixels.as_slice(), [204, 33, 33, 255].repeat(12));
 }
+
+#[test]
+fn shared_sixel_snapshots_preserve_pixels_and_store_capacity_accounting() {
+    let mut graphics = Graphics::default();
+    send(&mut graphics, b"\"1;1;16;6#1;2;100;0;0!16~", true).unwrap();
+    let id = graphics.images[0].id;
+    // A decoded Vec may have spare capacity. Keep the store's initial
+    // accounting valid, then retain the public Arc as a renderer could do.
+    let pixels = &mut graphics.images[0].image.pixels;
+    let previous_capacity = pixels.capacity();
+    Arc::get_mut(pixels).unwrap().reserve_exact(128);
+    graphics.used = graphics.used - previous_capacity + pixels.capacity();
+    let snapshot = Arc::clone(pixels);
+
+    graphics.erase_sixel_cells(0, 0, 1, 1);
+    let current = graphics.image(id).unwrap();
+    assert_eq!(graphics.image_bytes(), current.pixels.capacity());
+    assert_eq!(snapshot.as_slice(), [255, 0, 0, 255].repeat(16 * 6));
+    assert_eq!(&current.pixels[..8 * 4], &[0; 8 * 4]);
+
+    graphics.erase_sixel_cells(1, 0, 1, 1);
+    assert_eq!((graphics.image_count(), graphics.image_bytes()), (0, 0));
+    assert_eq!(snapshot.as_slice(), [255, 0, 0, 255].repeat(16 * 6));
+}

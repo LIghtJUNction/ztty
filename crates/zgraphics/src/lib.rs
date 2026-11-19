@@ -281,7 +281,10 @@ impl Graphics {
                     + ((y1 - y) as u64 * u64::from(source.height)).div_ceil(u64::from(rect.height))
                         as usize;
                 let width = stored.image.width as usize;
+                let previous_capacity = stored.image.pixels.capacity();
                 let pixels = Arc::make_mut(&mut stored.image.pixels);
+                // A retained frame can make this clone a Vec with less spare capacity.
+                self.used = self.used - previous_capacity + pixels.capacity();
                 for source_row in sy0..sy1 {
                     let begin = (source_row * width + sx0) * 4;
                     let end = (source_row * width + sx1) * 4;
