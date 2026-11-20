@@ -1,5 +1,13 @@
 # Ten-window terminal benchmark
 
+## 2026-11-20 GPU text-run buffer reuse
+
+The [text-run buffer report](text-run-scratch-20261120/report.zh-CN.md) records
+zero warmed Rust allocation calls in three fixed 96×24 scenes, nine exact RGBA
+comparisons, bounded retention, error recovery, and five paired CPU-affinity
+timing checks. It follows the [search and row-buffer audit](performance-audit-20261120/report.zh-CN.md).
+Raw observations and the source revisions are included with each report.
+
 ## 2026-11-20 performance, reload and clipboard fixes
 
 The [current development report](performance-reload-2026-11-20.md) contains the

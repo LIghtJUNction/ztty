@@ -1,0 +1,695 @@
+{
+  "purpose": "Check submission variation after dependency integration",
+  "baseline": "22f337dac4c1c65287dae9cf32018e55a301f2f9",
+  "candidate": "9c0d8c3a4418dc684428daefd78ec77ae3de121e",
+  "cpu": 2,
+  "frames": 200,
+  "pairs": 5,
+  "environment": {
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LP_NUM_THREADS": "1"
+  },
+  "samples": [
+    {
+      "pair": 0,
+      "variant": "baseline",
+      "seconds": 5.687908367006457,
+      "load_average": [
+        7.92041015625,
+        6.29150390625,
+        6.74267578125
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 0,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 518400,
+          "submission_p50_ns": 371853,
+          "submission_p95_ns": 2205666,
+          "submission_max_ns": 3588629,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 9800,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 3321600,
+          "submission_p50_ns": 412833,
+          "submission_p95_ns": 493131,
+          "submission_max_ns": 1529064,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 40400,
+          "rust_reallocations": 5000,
+          "rust_deallocations": 40400,
+          "rust_requested_bytes": 4838400,
+          "submission_p50_ns": 305289,
+          "submission_p95_ns": 338508,
+          "submission_max_ns": 1532902,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 0,
+      "variant": "candidate",
+      "seconds": 6.31684498800314,
+      "load_average": [
+        7.45849609375,
+        6.24853515625,
+        6.7236328125
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 496142,
+          "submission_p95_ns": 3313060,
+          "submission_max_ns": 4717937,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 388367,
+          "submission_p95_ns": 414753,
+          "submission_max_ns": 1558755,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 360522,
+          "submission_p95_ns": 409411,
+          "submission_max_ns": 1684473,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "variant": "candidate",
+      "seconds": 5.635328168005799,
+      "load_average": [
+        7.02099609375,
+        6.177734375,
+        6.6982421875
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 416586,
+          "submission_p95_ns": 2235585,
+          "submission_max_ns": 3266102,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 445477,
+          "submission_p95_ns": 507870,
+          "submission_max_ns": 1315815,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 348896,
+          "submission_p95_ns": 383060,
+          "submission_max_ns": 1487661,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 1,
+      "variant": "baseline",
+      "seconds": 5.701050353993196,
+      "load_average": [
+        6.69873046875,
+        6.12451171875,
+        6.67822265625
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 0,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 518400,
+          "submission_p50_ns": 368466,
+          "submission_p95_ns": 1877645,
+          "submission_max_ns": 4579128,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 9800,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 3321600,
+          "submission_p50_ns": 410420,
+          "submission_p95_ns": 435685,
+          "submission_max_ns": 1290696,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 40400,
+          "rust_reallocations": 5000,
+          "rust_deallocations": 40400,
+          "rust_requested_bytes": 4838400,
+          "submission_p50_ns": 352147,
+          "submission_p95_ns": 392036,
+          "submission_max_ns": 1519376,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 2,
+      "variant": "baseline",
+      "seconds": 5.737026339993463,
+      "load_average": [
+        6.642578125,
+        6.1220703125,
+        6.67431640625
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 0,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 518400,
+          "submission_p50_ns": 563852,
+          "submission_p95_ns": 3384966,
+          "submission_max_ns": 4481870,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 9800,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 3321600,
+          "submission_p50_ns": 398518,
+          "submission_p95_ns": 418076,
+          "submission_max_ns": 1215695,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 40400,
+          "rust_reallocations": 5000,
+          "rust_deallocations": 40400,
+          "rust_requested_bytes": 4838400,
+          "submission_p50_ns": 359731,
+          "submission_p95_ns": 403082,
+          "submission_max_ns": 1743537,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 2,
+      "variant": "candidate",
+      "seconds": 5.469870386004914,
+      "load_average": [
+        6.3505859375,
+        6.06982421875,
+        6.654296875
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 402389,
+          "submission_p95_ns": 2207945,
+          "submission_max_ns": 3322907,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 388410,
+          "submission_p95_ns": 409002,
+          "submission_max_ns": 1248634,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 333147,
+          "submission_p95_ns": 370044,
+          "submission_max_ns": 1452104,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 3,
+      "variant": "candidate",
+      "seconds": 5.756950907991268,
+      "load_average": [
+        6.08203125,
+        6.0185546875,
+        6.63427734375
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 383628,
+          "submission_p95_ns": 2198954,
+          "submission_max_ns": 3273303,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 390540,
+          "submission_p95_ns": 414386,
+          "submission_max_ns": 1235602,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 343009,
+          "submission_p95_ns": 381877,
+          "submission_max_ns": 1509324,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 3,
+      "variant": "baseline",
+      "seconds": 5.322779584006639,
+      "load_average": [
+        5.9150390625,
+        5.98486328125,
+        6.6201171875
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 0,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 518400,
+          "submission_p50_ns": 384443,
+          "submission_p95_ns": 2383071,
+          "submission_max_ns": 3593706,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 9800,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 3321600,
+          "submission_p50_ns": 387139,
+          "submission_p95_ns": 407751,
+          "submission_max_ns": 1182165,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 40400,
+          "rust_reallocations": 5000,
+          "rust_deallocations": 40400,
+          "rust_requested_bytes": 4838400,
+          "submission_p50_ns": 326480,
+          "submission_p95_ns": 359942,
+          "submission_max_ns": 1406095,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 4,
+      "variant": "baseline",
+      "seconds": 5.626851879002061,
+      "load_average": [
+        5.46630859375,
+        5.88623046875,
+        6.5810546875
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 0,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 518400,
+          "submission_p50_ns": 384945,
+          "submission_p95_ns": 2195656,
+          "submission_max_ns": 3997428,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 5400,
+          "rust_reallocations": 9800,
+          "rust_deallocations": 5400,
+          "rust_requested_bytes": 3321600,
+          "submission_p50_ns": 567820,
+          "submission_p95_ns": 592185,
+          "submission_max_ns": 1823941,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 40400,
+          "rust_reallocations": 5000,
+          "rust_deallocations": 40400,
+          "rust_requested_bytes": 4838400,
+          "submission_p50_ns": 341140,
+          "submission_p95_ns": 382764,
+          "submission_max_ns": 1471104,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "pair": 4,
+      "variant": "candidate",
+      "seconds": 5.242034770009923,
+      "load_average": [
+        5.1884765625,
+        5.8212890625,
+        6.55615234375
+      ],
+      "driver": [
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)",
+        "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)",
+        "scenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)"
+      ],
+      "scenarios": [
+        {
+          "scenario": "ascii",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 373332,
+          "submission_p95_ns": 1375421,
+          "submission_max_ns": 3933836,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 393079,
+          "submission_p95_ns": 411454,
+          "submission_max_ns": 1409396,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 200,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 0,
+          "rust_reallocations": 0,
+          "rust_deallocations": 0,
+          "rust_requested_bytes": 0,
+          "submission_p50_ns": 327445,
+          "submission_p95_ns": 364770,
+          "submission_max_ns": 1402810,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

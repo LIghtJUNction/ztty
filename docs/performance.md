@@ -1,5 +1,9 @@
 # Performance and validation record
 
+Later source measurements: [GPU text-run buffer reuse](benchmarks/text-run-scratch-20261120/report.zh-CN.md)
+and [search/row-buffer improvements](benchmarks/performance-audit-20261120/report.zh-CN.md).
+The dated records below retain their original source and measurement scope.
+
 Report date: **2026-11-18, Asia/Taipei**. This report keeps measurements tied to
 their own source and workload. Native/graphics acceptance uses
 [`7535aa2`](https://github.com/LIghtJUNction/ztty/commit/7535aa29f1a2728a78a446ffea6784dcbc2aae92).

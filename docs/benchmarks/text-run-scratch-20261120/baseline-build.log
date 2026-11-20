@@ -1,0 +1,5 @@
+   Compiling zgpui v0.1.5 (<worktree>/crates/zgpui)
+   Compiling zinput v0.1.3 (<worktree>/crates/zinput)
+   Compiling zterm v0.5.2 (<worktree>/crates/zterm)
+   Compiling ztty v0.5.2 (<worktree>)
+    Finished `release` profile [optimized] target(s) in 38.50s

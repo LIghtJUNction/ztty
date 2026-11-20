@@ -1,0 +1,22 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (target/debug/build/ztty/953f83ebf03f9407/out/ztty-953f83ebf03f9407)
+
+running 8 tests
+test gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels ... MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+ok
+test gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics ... MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+ok
+test gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width ... MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+ok
+test gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters ... ok
+test gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas ... MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+ok
+test gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction ... MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+ok
+test gpu::tests::terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors ... MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+ok
+test gpu::tests::text_run_scratch_reuses_storage_and_recovers_from_shaping_errors ... MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.77s
+
