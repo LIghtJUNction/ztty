@@ -270,6 +270,7 @@ impl Pool {
         session.core.terminal.set_ui_host_enabled(false);
         session.persistent = true;
         let id = session.id;
+        let had_view = session.ui.is_some();
         if let Some(ui) = session.ui.take() {
             let token = format!("attachment:{}", ui.attachment);
             let status = session
@@ -283,6 +284,9 @@ impl Pool {
             drop(ui);
         }
         self.remove_from_layout(id);
+        if had_view {
+            os::release_unused_memory();
+        }
         self.sessions[index].info()
     }
 
