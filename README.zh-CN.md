@@ -5,7 +5,7 @@
 ztty 是面向 Linux、macOS 和 Windows 的原生终端，核心用不依赖标准库的
 Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令行或 MCP 客户端使用。
 
-本页说明 **0.5.0 源码**。已发布的二进制及对应变更记录见
+本页跟随 **0.5.0 之后尚未发布的 main 开发源码**。已发布的二进制及对应变更记录见
 [下载页](https://github.com/LIghtJUNction/ztty/releases)。
 
 ## Linux 安装
@@ -18,7 +18,7 @@ sh install.sh
 ztty
 ```
 
-安装器校验归档后安装到 `~/.local/bin`。
+安装器校验归档后安装到 `~/.local/bin`。下文的程序热替换尚未发布，需要构建当前源码。
 在 Wayland 桌面上，默认的 X11 后端通过 XWayland 运行。
 
 ## 从源码构建
@@ -48,8 +48,8 @@ sh install.sh --from-binary ./target/release/ztty
 已有克隆请先运行 `git submodule update --init --recursive`，再进行构建。
 
 Linux/macOS 使用 `SHELL`，缺省为 `/bin/sh`；Windows 使用 `COMSPEC`，
-缺省为 `cmd.exe`。用 `-e` 指定其他程序。安装更新会保留现有会话，
-[共享进程升级规则](docs/sessions.md#upgrading-a-running-broker)说明新旧会话的路由。
+缺省为 `cmd.exe`。用 `-e` 指定其他程序。安装更新后，已有共享进程仍运行原来的代码；
+[共享进程升级与热替换](docs/sessions.md#upgrading-a-running-broker)说明如何更新及路由新会话。
 macOS 和 Windows 的原生构建、打包入口见[发布说明](docs/releasing.md)。
 
 ## 核心能力
@@ -84,6 +84,10 @@ Linux X11 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使
 [日常操作](docs/daily-workflow.md)、[工作区](docs/workspaces.md)和
 [输入兼容性](docs/input-compatibility.md)说明自定义绑定、小键盘和其他操作。
 
+`Ctrl+Shift+V` 粘贴文本；`Ctrl+V` 默认交给前台应用，Codex CLI 0.170.0 用它
+添加剪贴板图片附件。当前开发源码会在终端文本粘贴时拒绝只有图片的剪贴板，
+避免把图片变成字符。详见[图片粘贴与格式检查](docs/input-compatibility.md#clipboard-images-and-application-paste-unreleased-main-2026-11-20)。
+
 ## 共享会话与 MCP（Linux）
 
 Linux X11 与原生 Wayland 窗口共用同一个会话进程；每个会话保留自己的
@@ -103,6 +107,26 @@ MCP 创建的会话在连接断开后保留，关闭附加视图也会保留它�
 HTTP 监听非回环地址时需要令牌。
 客户端配置、会话身份校验、JSON/SSE 响应与命令输出读取见[会话指南](docs/sessions.md)；
 ssmcp 等工具的接入见[观察模式](docs/ssmcp-observer.md)。
+
+## 替换运行中的程序（开发源码）
+
+由当前源码启动的 Linux X11/XWayland 或无窗口共享进程支持程序热替换。
+在要更新的会话内运行：
+
+```sh
+ztty reload
+ztty reload --binary /absolute/path/to/ztty
+```
+
+`ZTTY_SOCKET` 决定目标共享进程。不指定 `--binary` 时，目标就是本次调用的 CLI
+自身的可执行文件；命令不会下载更新。替换保留共享进程 PID、原 shell 和命令的 PTY、
+会话身份、输入队列与输出位置、终端屏幕和滚屏历史，以及 X11 标签页和分屏。
+窗口会重建，可能短暂消失。原生 Wayland、macOS 和 Windows 暂不支持此操作。
+
+已发布的 0.5.0 旧共享进程会安全拒绝，即使用新 CLI 请求也不能原地迁移。
+保留旧窗口直到工作结束，用新源码构建的共享进程开始新工作；后续可在该进程内热替换。
+[热替换指南](docs/sessions.md#reload-the-running-broker)说明验证过程、临时拒绝条件、
+显示恢复和首次过渡步骤。Ctrl+Shift+R 仍然只重载配置。
 
 ## 外观
 
@@ -148,10 +172,28 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 ## 性能与开发
 
 <!-- terminal-benchmark:start -->
-[本轮基准报告](docs/benchmarks/resume-2026-11-20.md)记录固定源码、
-原始测量及仍存在的性能差距。
-[复现方法](docs/benchmarks/README.md)说明如何运行同条件对比；
-[较早的性能记录](docs/performance.md)保留对应的测量环境。
+[2026-11-20 性能与热替换报告](docs/benchmarks/performance-reload-2026-11-20.md)
+提供固定源码、可执行文件哈希、全部原始样本和验收范围。与保留的旧版对照，
+软件渲染的 ASCII/彩色输出吞吐：单窗口从 171.7 提高到 257.5 MiB/s，
+10 窗口从 158.5 提高到 229.2 MiB/s；独立 Unicode 滚屏测试的三轮成对增益
+中位数为 53.4%。报告也保留无窗口 ASCII 路径的小幅负向结果。
+
+三应用比较使用私有 Xvfb，统一强制软件 OpenGL；ztty 实际驱动为 llvmpipe。
+10 个窗口保持打开，每次只测一个输出生产者。它测量 PTY/DSR 逻辑处理，
+不能代表物理帧率或真实 GPU 桌面排名。
+
+| 10 窗口共享实例 | 应用 PSS，MiB | 输出，MiB/s |
+| --- | ---: | ---: |
+| ztty | 326.9 | 150.4 |
+| Ghostty | 809.0 | 140.1 |
+| Kitty | 354.6 | 53.0 |
+
+![Xvfb 与 llvmpipe 下的十窗口比较](docs/benchmarks/performance-reload-20261120/final-terminals.svg)
+
+表中为三次独立运行的中位数；字体度量、像素尺寸、宿主内存压力与渲染器选择
+均限制结果的适用范围，报告保留全部波动。单窗口 ztty/Ghostty 吞吐区间重叠，
+不能据此声称稳定排名。软件与 GPU 路径也通过了记录中的标签切换完整帧、
+同步输出保持与提交检查；物理桌面及合成器行为仍需单独验证。
 <!-- terminal-benchmark:end -->
 
 本地开发检查使用 `sh tools/check.sh`。
@@ -165,6 +207,10 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY 进程管理 | 已发布 [0.2.2](https://crates.io/crates/zpty/0.2.2) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | 图片协议与放置 | 已发布 [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
 | [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.1](https://crates.io/crates/zterm/0.5.1) |
+
+上表保留各库已经发布的版本。当前 main 还通过固定 Git 子模块提交使用尚未发布的
+`zterm` checkpoint 与 `zpty` PTY 接管 API；上表的已发布版本不包含这些新增接口。
+构建时请使用仓库记录的子模块版本和 `Cargo.lock`。
 
 可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；
 使用指南与验收记录集中在[文档索引](docs/README.md)。

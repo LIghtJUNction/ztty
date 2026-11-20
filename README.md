@@ -6,8 +6,9 @@ ztty is a native terminal for Linux, macOS and Windows. Its terminal core is
 written in Rust without the standard library. On Linux, the same live session
 can be used from a window, the CLI or an MCP client.
 
-This page documents source version **0.5.0**. Published binaries and their release
-notes are available on the [download page](https://github.com/LIghtJUNction/ztty/releases).
+This page follows **unreleased development source on main after 0.5.0**.
+Published binaries and their release notes are available on the
+[download page](https://github.com/LIghtJUNction/ztty/releases).
 
 ## Install on Linux
 
@@ -20,6 +21,7 @@ ztty
 ```
 
 The installer verifies the archive and installs to `~/.local/bin`.
+For the unreleased process-reload support below, build the current source.
 On a Wayland desktop, the default X11 backend uses XWayland.
 
 ## Build and run
@@ -51,7 +53,8 @@ For an existing clone, run `git submodule update --init --recursive` before buil
 
 Linux/macOS use `SHELL` (falling back to `/bin/sh`); Windows uses `COMSPEC`
 (falling back to `cmd.exe`). `-e` chooses another program. Installing an update
-preserves running sessions; see [broker upgrades](docs/sessions.md#upgrading-a-running-broker).
+leaves existing brokers running their current code; see
+[broker upgrades and reload](docs/sessions.md#upgrading-a-running-broker).
 [Native build and packaging details](docs/releasing.md) cover macOS and Windows.
 
 ## What it does
@@ -88,6 +91,11 @@ button returns from history to current output.
 [Daily workflow](docs/daily-workflow.md), [workspaces](docs/workspaces.md) and
 [input compatibility](docs/input-compatibility.md) cover custom bindings and keypad behavior.
 
+`Ctrl+Shift+V` pastes text. `Ctrl+V` goes to the foreground application;
+Codex CLI 0.170.0 uses it to attach clipboard images. Current development source
+rejects image-only selections in terminal text paste. See
+[image paste and format checks](docs/input-compatibility.md#clipboard-images-and-application-paste-unreleased-main-2026-11-20).
+
 ## Shared sessions and MCP (Linux)
 
 Linux X11 and native Wayland windows use the same session broker. Each session
@@ -109,6 +117,29 @@ closing an attached view preserves their PTY. HTTP outside loopback needs a toke
 See [sessions and MCP](docs/sessions.md) for client setup, session identities,
 JSON/SSE replies and command-output reads; [observer mode](docs/ssmcp-observer.md)
 covers tools such as ssmcp.
+
+## Reload the running executable (development source)
+
+A broker started from the current source can replace its executable on Linux
+X11/XWayland or without windows. Run this inside the session you want to update:
+
+```sh
+ztty reload
+ztty reload --binary /absolute/path/to/ztty
+```
+
+`ZTTY_SOCKET` selects the broker. The default target is the executable of the CLI
+you invoked; the command does not download an update. It keeps the broker PID,
+existing shells and command PTYs, session identities, queued input, output byte
+cursors, terminal screens and history, and X11 tabs/splits. Windows are rebuilt and may
+briefly disappear. Native Wayland, macOS and Windows do not support this handover.
+
+A broker from the published 0.5.0 release safely refuses reload, even when asked
+by a newer CLI. Keep its windows until their work finishes and use a new source-built broker for new
+work; that broker can support later reloads. The
+[reload guide](docs/sessions.md#reload-the-running-broker) covers validation,
+temporary refusal, display recovery and the one-time transition.
+Ctrl+Shift+R continues to reload configuration only.
 
 ## Appearance
 
@@ -154,10 +185,30 @@ covers dependencies and the unverified physical GPU, desktop IME and scaling beh
 ## Performance and development
 
 <!-- terminal-benchmark:start -->
-The [benchmark report](docs/benchmarks/resume-2026-11-20.md) records fixed sources,
-raw measurements and the remaining performance gaps.
-[Benchmark instructions](docs/benchmarks/README.md) explain how to repeat the comparisons;
-[earlier results](docs/performance.md) retain their original conditions.
+The [2026-11-20 performance and reload report](docs/benchmarks/performance-reload-2026-11-20.md)
+includes fixed source and executable hashes, every raw sample, and test limits.
+Compared with the retained baseline, software-rendered ASCII/color throughput
+rose from 171.7 to 257.5 MiB/s with one window and from 158.5 to 229.2 MiB/s with
+ten windows. A separate scrolling Unicode test improved by 53.4% using the
+median of three paired ratios. Small negative headless ASCII results are also recorded.
+
+The three-terminal comparison uses a private Xvfb display and GPU code paths
+under a forced Mesa software-GL environment; ztty reports llvmpipe. Ten windows stay open, with one output producer
+measured at a time. These are logical PTY/DSR timings, not physical frame rates.
+
+| Ten-window shared session | Application PSS, MiB | Output, MiB/s |
+| --- | ---: | ---: |
+| ztty | 326.9 | 150.4 |
+| Ghostty | 809.0 | 140.1 |
+| Kitty | 354.6 | 53.0 |
+
+![Ten-window comparison under Xvfb and llvmpipe](docs/benchmarks/performance-reload-20261120/final-terminals.svg)
+
+Values are medians of three independent runs. Font metrics, pixel dimensions,
+host memory pressure and renderer choice limit generalization; the report keeps
+all ranges. Single-window ztty/Ghostty throughput overlaps and is not a stable
+ranking. Software and GPU paths also pass the recorded complete-frame tab-switch
+and synchronized-output checks; physical desktop compositors need separate validation.
 <!-- terminal-benchmark:end -->
 
 Run `sh tools/check.sh` for the local development checks.
@@ -171,6 +222,11 @@ Run `sh tools/check.sh` for the local development checks.
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY process ownership | Published [0.2.2](https://crates.io/crates/zpty/0.2.2) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | Image protocol and placement | Published [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
 | [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.1](https://crates.io/crates/zterm/0.5.1) |
+
+The table records published registry versions. Current main also uses pinned,
+unreleased `zterm` and `zpty` Git submodule commits for terminal checkpoints and
+PTY handover. Those APIs are not in the published versions above; build with the
+repository's submodule pins and `Cargo.lock`.
 
 The [architecture](docs/architecture.md) describes the reusable Project Z libraries;
 the [documentation index](docs/README.md) links usage guides and verification records.

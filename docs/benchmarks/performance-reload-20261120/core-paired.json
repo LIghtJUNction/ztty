@@ -1,0 +1,422 @@
+[
+  {
+    "round": 0,
+    "version": "before",
+    "elapsed_s": 4.876295132999076,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 239.446,
+      "ascii_full_history_mib_s": 155.238,
+      "sgr_mib_s": 141.686,
+      "unicode_mib_s": 24.749,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 98,
+        "p95": 105,
+        "p99": 107,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3605,
+        "p95": 3996,
+        "p99": 4127,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "2.94 4.01 4.38 4/4217 2554465\n",
+      "pressure/cpu": "some avg10=0.00 avg60=0.09 avg300=0.08 total=882897931\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.09 avg60=0.45 avg300=0.71 total=1195140354\nfull avg10=0.09 avg60=0.43 avg300=0.68 total=1128203026\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.11 4.02 4.38 7/4222 2555280\n",
+      "pressure/cpu": "some avg10=0.00 avg60=0.08 avg300=0.08 total=882914904\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.20 avg60=0.45 avg300=0.71 total=1195175045\nfull avg10=0.20 avg60=0.43 avg300=0.68 total=1128236466\n"
+    }
+  },
+  {
+    "round": 0,
+    "version": "after",
+    "elapsed_s": 6.029940713997348,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 205.998,
+      "ascii_full_history_mib_s": 113.194,
+      "sgr_mib_s": 103.94,
+      "unicode_mib_s": 26.091,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 99,
+        "p95": 103,
+        "p99": 105,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2952,
+        "p95": 3924,
+        "p99": 4241,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.11 4.02 4.38 6/4222 2555281\n",
+      "pressure/cpu": "some avg10=0.00 avg60=0.08 avg300=0.08 total=882914904\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.20 avg60=0.45 avg300=0.71 total=1195175045\nfull avg10=0.20 avg60=0.43 avg300=0.68 total=1128236466\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.26 4.04 4.39 2/4191 2557544\n",
+      "pressure/cpu": "some avg10=0.18 avg60=0.10 avg300=0.08 total=882952859\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.23 avg60=0.44 avg300=0.70 total=1195229380\nfull avg10=0.23 avg60=0.42 avg300=0.67 total=1128290313\n"
+    }
+  },
+  {
+    "round": 1,
+    "version": "after",
+    "elapsed_s": 4.576058306003688,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 216.638,
+      "ascii_full_history_mib_s": 137.881,
+      "sgr_mib_s": 135.32,
+      "unicode_mib_s": 27.902,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 93,
+        "p95": 104,
+        "p99": 105,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2970,
+        "p95": 3618,
+        "p99": 3842,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.26 4.04 4.39 3/4191 2557544\n",
+      "pressure/cpu": "some avg10=0.18 avg60=0.10 avg300=0.08 total=882952859\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.23 avg60=0.44 avg300=0.70 total=1195229380\nfull avg10=0.23 avg60=0.42 avg300=0.67 total=1128290313\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.24 4.02 4.38 3/4248 2558297\n",
+      "pressure/cpu": "some avg10=0.12 avg60=0.10 avg300=0.08 total=882967963\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.48 avg60=0.48 avg300=0.70 total=1195286956\nfull avg10=0.48 avg60=0.46 avg300=0.68 total=1128346118\n"
+    }
+  },
+  {
+    "round": 1,
+    "version": "before",
+    "elapsed_s": 5.9032018540019635,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 199.41,
+      "ascii_full_history_mib_s": 114.937,
+      "sgr_mib_s": 109.248,
+      "unicode_mib_s": 27.365,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 74,
+        "p95": 78,
+        "p99": 79,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2760,
+        "p95": 3452,
+        "p99": 3879,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.24 4.02 4.38 10/4248 2558297\n",
+      "pressure/cpu": "some avg10=0.12 avg60=0.10 avg300=0.08 total=882967963\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.48 avg60=0.48 avg300=0.70 total=1195286956\nfull avg10=0.48 avg60=0.46 avg300=0.68 total=1128346118\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.30 4.02 4.37 2/4250 2561123\n",
+      "pressure/cpu": "some avg10=0.42 avg60=0.15 avg300=0.09 total=883026676\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.99 avg60=0.56 avg300=0.72 total=1195399846\nfull avg10=0.99 avg60=0.55 avg300=0.69 total=1128453275\n"
+    }
+  },
+  {
+    "round": 2,
+    "version": "before",
+    "elapsed_s": 4.958184629009338,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 221.853,
+      "ascii_full_history_mib_s": 140.419,
+      "sgr_mib_s": 115.564,
+      "unicode_mib_s": 27.161,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 87,
+        "p95": 96,
+        "p99": 103,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3779,
+        "p95": 4384,
+        "p99": 4499,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.30 4.02 4.37 2/4250 2561123\n",
+      "pressure/cpu": "some avg10=0.42 avg60=0.15 avg300=0.09 total=883026676\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.99 avg60=0.56 avg300=0.72 total=1195399846\nfull avg10=0.99 avg60=0.55 avg300=0.69 total=1128453275\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.36 4.02 4.37 5/4242 2563758\n",
+      "pressure/cpu": "some avg10=0.38 avg60=0.17 avg300=0.10 total=883059355\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.96 avg60=0.60 avg300=0.72 total=1195451544\nfull avg10=0.96 avg60=0.59 avg300=0.70 total=1128503799\n"
+    }
+  },
+  {
+    "round": 2,
+    "version": "after",
+    "elapsed_s": 5.688980775012169,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 189.795,
+      "ascii_full_history_mib_s": 97.249,
+      "sgr_mib_s": 119.487,
+      "unicode_mib_s": 26.635,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 89,
+        "p95": 97,
+        "p99": 102,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 4089,
+        "p95": 4393,
+        "p99": 4525,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.36 4.02 4.37 8/4245 2563761\n",
+      "pressure/cpu": "some avg10=0.38 avg60=0.17 avg300=0.10 total=883059355\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.96 avg60=0.60 avg300=0.72 total=1195451544\nfull avg10=0.96 avg60=0.59 avg300=0.70 total=1128503799\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.65 4.07 4.39 5/4245 2564999\n",
+      "pressure/cpu": "some avg10=0.20 avg60=0.15 avg300=0.09 total=883074626\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.52 avg60=0.54 avg300=0.71 total=1195452414\nfull avg10=0.52 avg60=0.53 avg300=0.68 total=1128504610\n"
+    }
+  },
+  {
+    "round": 3,
+    "version": "after",
+    "elapsed_s": 5.217288102998282,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 177.464,
+      "ascii_full_history_mib_s": 140.134,
+      "sgr_mib_s": 101.11,
+      "unicode_mib_s": 25.871,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 112,
+        "p95": 115,
+        "p99": 115,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 4102,
+        "p95": 4476,
+        "p99": 4660,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.65 4.07 4.39 9/4244 2564999\n",
+      "pressure/cpu": "some avg10=0.20 avg60=0.15 avg300=0.09 total=883074626\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.52 avg60=0.54 avg300=0.71 total=1195452414\nfull avg10=0.52 avg60=0.53 avg300=0.68 total=1128504610\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.76 4.09 4.39 5/4236 2565745\n",
+      "pressure/cpu": "some avg10=0.14 avg60=0.14 avg300=0.09 total=883084851\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.35 avg60=0.51 avg300=0.70 total=1195464308\nfull avg10=0.35 avg60=0.50 avg300=0.67 total=1128515933\n"
+    }
+  },
+  {
+    "round": 3,
+    "version": "before",
+    "elapsed_s": 6.264356921994477,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 176.995,
+      "ascii_full_history_mib_s": 101.504,
+      "sgr_mib_s": 97.796,
+      "unicode_mib_s": 25.758,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 280,
+        "p95": 306,
+        "p99": 315,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 4250,
+        "p95": 12306,
+        "p99": 13369,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.76 4.09 4.39 6/4236 2565745\n",
+      "pressure/cpu": "some avg10=0.14 avg60=0.14 avg300=0.09 total=883084851\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.35 avg60=0.51 avg300=0.70 total=1195464308\nfull avg10=0.35 avg60=0.50 avg300=0.67 total=1128515933\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.86 4.10 4.39 4/4258 2568786\n",
+      "pressure/cpu": "some avg10=0.07 avg60=0.13 avg300=0.09 total=883102240\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.19 avg60=0.46 avg300=0.68 total=1195473796\nfull avg10=0.19 avg60=0.45 avg300=0.66 total=1128525215\n"
+    }
+  },
+  {
+    "round": 4,
+    "version": "before",
+    "elapsed_s": 5.693269222989329,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 240.624,
+      "ascii_full_history_mib_s": 130.715,
+      "sgr_mib_s": 116.423,
+      "unicode_mib_s": 27.318,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 68,
+        "p95": 83,
+        "p99": 86,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3984,
+        "p95": 25743,
+        "p99": 27745,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.86 4.10 4.39 5/4259 2568787\n",
+      "pressure/cpu": "some avg10=0.07 avg60=0.13 avg300=0.09 total=883102240\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.19 avg60=0.46 avg300=0.68 total=1195473796\nfull avg10=0.19 avg60=0.45 avg300=0.66 total=1128525215\n"
+    },
+    "pressure_after": {
+      "loadavg": "3.95 4.12 4.40 3/4276 2572589\n",
+      "pressure/cpu": "some avg10=0.04 avg60=0.11 avg300=0.09 total=883131862\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.10 avg60=0.41 avg300=0.67 total=1195500961\nfull avg10=0.10 avg60=0.40 avg300=0.64 total=1128551774\n"
+    }
+  },
+  {
+    "round": 4,
+    "version": "after",
+    "elapsed_s": 4.965370883001015,
+    "metrics": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 191.616,
+      "ascii_full_history_mib_s": 100.044,
+      "sgr_mib_s": 100.51,
+      "unicode_mib_s": 30.62,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 64,
+        "p95": 71,
+        "p99": 74,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3025,
+        "p95": 3641,
+        "p99": 4430,
+        "allocations": 0
+      }
+    },
+    "pressure_before": {
+      "loadavg": "3.95 4.12 4.40 4/4277 2572590\n",
+      "pressure/cpu": "some avg10=0.04 avg60=0.11 avg300=0.09 total=883131862\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.10 avg60=0.41 avg300=0.67 total=1195500961\nfull avg10=0.10 avg60=0.40 avg300=0.64 total=1128551774\n"
+    },
+    "pressure_after": {
+      "loadavg": "4.03 4.13 4.40 3/4258 2575288\n",
+      "pressure/cpu": "some avg10=0.02 avg60=0.10 avg300=0.08 total=883154345\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0\n",
+      "pressure/memory": "some avg10=0.05 avg60=0.37 avg300=0.65 total=1195516923\nfull avg10=0.05 avg60=0.36 avg300=0.63 total=1128567455\n"
+    }
+  }
+]

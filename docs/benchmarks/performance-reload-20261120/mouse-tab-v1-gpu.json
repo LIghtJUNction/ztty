@@ -1,0 +1,164 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-tab-v1",
+  "binary_sha256": "20c207e37fb48a234e011c6db5997c406fa75a4795c9003a8c6c29500de912f2",
+  "renderer": "gpu",
+  "expect": "missing-release",
+  "test_script_sha256": "dce4044a3e92b5696dd8c3b796a93e7d2bf00414deaef546656ecf4b088df74c",
+  "checks": [
+    "Ctrl+button8 release crossed a real XTEST-to-PTY input fence while the old native placeholder remained mapped",
+    "first button8 probe completed its input fence; a second probe delivered an exact complete SGR pair",
+    "same live broker and PTYs remained usable; timeout and exit were not treated as reproduction"
+  ],
+  "parse_markers": [
+    {
+      "stage": "begin synchronized target",
+      "session": "mouse-target-a",
+      "title": "mouse-target-a-1",
+      "before_write_ns": 93412393356995,
+      "parsed_ns": 93412393510364
+    },
+    {
+      "stage": "explicit synchronized end",
+      "session": "mouse-target-a",
+      "title": "mouse-target-a-2",
+      "before_write_ns": 93412409850263,
+      "parsed_ns": 93412415532202
+    },
+    {
+      "stage": "enable SGR button reporting",
+      "session": "mouse-target-a",
+      "title": "mouse-target-a-3",
+      "before_write_ns": 93412417971345,
+      "parsed_ns": 93412418120801
+    }
+  ],
+  "binding": "mousebind = ctrl+button8 = next-tab",
+  "scope": "Owned Xvfb, XTEST, same live PTYs, real visible placeholder and exact SGR input",
+  "helper_sha256": {
+    "tests/tab_switch_pixels.py": "bdfb709243f1f933c642416f2d05f7f52e997d80d3358aa31cbf610fd956e4f9",
+    "tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":1202",
+    "pid": 3097732,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X1202",
+        "inode": 110983931,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X1202",
+        "inode": 110983930,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderers": [
+    {
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    }
+  ],
+  "shortcut": {
+    "sync_begin_before_write_ns": 93412393350619,
+    "button_press_ns": 93412393512251,
+    "button_release_ns": 93412407714955,
+    "input_fence_received_ns": 93412408122413,
+    "explicit_end_parsed_ns": 93412415532202,
+    "begin_to_end_parsed_ms": 22.181583,
+    "old_native_mapped_before_and_after_release": true,
+    "old_native_mapped_after_input_fence": true,
+    "target_input_fence_hex": "78",
+    "old_input_hex": ""
+  },
+  "first_mouse_probe": {
+    "before_offset": 1,
+    "start_ns": 93412418290168,
+    "fence_received_ns": 93412418427418,
+    "fence": "z",
+    "raw_hex": "1b5b3c3132383b373b354d7a",
+    "mouse_payload_hex": "1b5b3c3132383b373b354d",
+    "events": [
+      {
+        "button_code": 128,
+        "column": 7,
+        "row": 5,
+        "kind": "press"
+      }
+    ]
+  },
+  "second_mouse_control": {
+    "before_offset": 13,
+    "start_ns": 93412418468848,
+    "fence_received_ns": 93412418577015,
+    "fence": "q",
+    "raw_hex": "1b5b3c3132383b373b354d1b5b3c3132383b373b356d71",
+    "mouse_payload_hex": "1b5b3c3132383b373b354d1b5b3c3132383b373b356d",
+    "events": [
+      {
+        "button_code": 128,
+        "column": 7,
+        "row": 5,
+        "kind": "press"
+      },
+      {
+        "button_code": 128,
+        "column": 7,
+        "row": 5,
+        "kind": "release"
+      }
+    ]
+  },
+  "observed": "missing-release",
+  "release_delivered": false,
+  "regression_detected": true,
+  "expected_mouse_events": [
+    {
+      "button_code": 128,
+      "column": 7,
+      "row": 5,
+      "kind": "press"
+    },
+    {
+      "button_code": 128,
+      "column": 7,
+      "row": 5,
+      "kind": "release"
+    }
+  ],
+  "remaining_owned_pids": [],
+  "stderr_tail": "",
+  "screenshots": {
+    "held-before-release": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/mouse-tab-v1-gpu/held-before-release.png",
+      "sha256": "5a73cf0de86bf90e1f3e0bd48a92fb7e76212369316bf8fd27d2e0636c502247"
+    },
+    "held-after-input-fence": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/mouse-tab-v1-gpu/held-after-input-fence.png",
+      "sha256": "5a73cf0de86bf90e1f3e0bd48a92fb7e76212369316bf8fd27d2e0636c502247"
+    },
+    "committed-target": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/mouse-tab-v1-gpu/committed-target.png",
+      "sha256": "8ab045800e94327c18e1cb7dce08afab6f8db96cfcb6903f76d84cbbed07bc9e"
+    }
+  }
+}

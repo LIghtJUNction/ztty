@@ -1,0 +1,126 @@
+{
+  "ok": false,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-final",
+  "binary_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted"
+  ],
+  "timings_ms": {
+    "initial-a": 0.09852700168266892,
+    "initial-b": 0.05097599932923913
+  },
+  "screenshots": {
+    "nonadjacent-frame": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu/nonadjacent-frame.png",
+      "sha256": "9fcb895518a24fe035294e28b4cdafec97b0f62689d050004d3dc77f58c28cc4",
+      "rgb_sha256": "78e869259fe8a0124192bfd5c706798244b3793bb7cf2046f1c042cd153cc861"
+    },
+    "failure-repaint-a": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu/failure-repaint-a.png",
+      "sha256": "37d6959b8ab9cdc4bbf6161c825eec9e42bae46f20eba092643f062d072b1e9a",
+      "rgb_sha256": "4156ce151edc47996946ff9e5fac8c15a91430e03e3f69d192d8d7deeb32521f"
+    },
+    "failure-repaint-b": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu/failure-repaint-b.png",
+      "sha256": "12fd9f9dd09d6d618b51221b10b9d0f784ec47d56b23009c06cec61e6bdd0b02",
+      "rgb_sha256": "9ac22b064888597f568cabefd2df793331d40a29f46033255380e9331adeaafd"
+    }
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "bab96c8612a6cf22810348c9136e60e663dc4b24c26296fd5dbe624d50e7e142",
+    "src/x11.rs": "eeccb3b7e99f26fc9a1a1124405c5a0b39234ca77f24e43c50d8d36550af1f1a",
+    "crates/zterm/src/terminal.rs": "cbb6a6b91f42612b69e85be7032f99411756478e3d64099c15e7e8acff2c677a",
+    "tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "src/x11/gpu.rs": "b653c6dbc28e38e8b864ce1c233cf15991b73bd4ec613c3d2e0c5f7ca6a56519",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "5b8aa4dc006956d547456dc1ea994227916f35693c1040dea430cd6d2d16594c",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "01ed1685a603c7f26a8f945c3bf12de86ba0fedcf4e8b9c6aa15bb4f9480a19f",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":10583",
+    "pid": 3057734,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X10583",
+        "inode": 110697228,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X10583",
+        "inode": 110697227,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderers_before": [
+    {
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    }
+  ],
+  "broker": {
+    "pid": 3057777,
+    "state": "R",
+    "user_ticks": 15,
+    "system_ticks": 6,
+    "threads": 50,
+    "start_ticks": 9318542,
+    "exe_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368"
+  },
+  "owned_processes": {
+    "3057775": 9318542,
+    "3057866": 9318556,
+    "3057777": 9318542,
+    "3057877": 9318563,
+    "3057878": 9318565
+  },
+  "startup_quiet_ms": 46.63395098759793,
+  "nonadjacent_start_ns": 93185757210472,
+  "nonadjacent_frame_copies": [
+    [
+      94186530056560,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "single_row_frame_copies": [],
+  "error": "AssertionError([])",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/tests/repaint_gui.py\", line 391, in main\n    assert len(copies) == 1, copies\n           ^^^^^^^^^^^^^^^^\nAssertionError: []\n",
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": ""
+}

@@ -1,0 +1,22 @@
+{
+  "ascii_mib_s": {
+    "before": 221.853,
+    "after": 191.616,
+    "paired_ratio": 0.8603108842912389
+  },
+  "ascii_full_history_mib_s": {
+    "before": 130.715,
+    "after": 113.194,
+    "paired_ratio": 0.765359752132502
+  },
+  "sgr_mib_s": {
+    "before": 115.564,
+    "after": 103.94,
+    "paired_ratio": 1.0338868665385086
+  },
+  "unicode_mib_s": {
+    "before": 27.161,
+    "after": 26.635,
+    "paired_ratio": 1.0196236067970035
+  }
+}

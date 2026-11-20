@@ -1,0 +1,759 @@
+{
+  "schema": 1,
+  "audit_ok": true,
+  "source_commit": "f7e019654684ceae4b0cb64d47d651ebed99bc35",
+  "baseline_source_commit": "755c2c01c2a3eb535088a6f06d1655aaef97d931",
+  "input_hashes": {
+    "final-throughput-ab.json": "911bf09b05abf0096813f000832b166bf6962e33f441ab3efc915fba1cb39c61",
+    "final-terminals.json": "e60e5cd4a0a75ee56e30cf51f99920227fd5910f113b43effd5ee22057484407",
+    "final-source-manifest.json": "bc6e53f5e50db395cd7a6f3481a335fff87f987b6b939467983638d83bce3247",
+    "final-pipeline-before-r0.json": "afb79f61af34651b1f10fe6acc09bacc15cab75d66f837b18a2f870d38dcd74b",
+    "final-pipeline-final-r0.json": "e0c11690c46997259f8eeec441700559bc66e7f5e72b257e09fe715251159877",
+    "final-pipeline-before-r1.json": "25e532cbc310a4136313e2ab6ae953665b5fa1b8e1ab5debf14051dc36a482b4",
+    "final-pipeline-final-r1.json": "783cc565bebc1098307b250429cf0c0b6b398f7f48c5c687a652465a9dd5dd58",
+    "final-pipeline-before-r2.json": "63fee5cf4fe1d8cf0d1a055cf741bab7205234daad3e6bc78d2e28c4429ee1c4",
+    "final-pipeline-final-r2.json": "147c9fe6938fa59f92a4a0f6a7951a362976f4d108631091bda33f0cadf7215b"
+  },
+  "audits": {
+    "audit-result.json": {
+      "sha256": "6b4fe3d719eaa2dac9458dc84c3840c4d4904f16fe87f14014545faf38ff3e59",
+      "file": "audit-result.json"
+    },
+    "audit-pipeline.json": {
+      "sha256": "a40228441d4668f16eff63784c5633daf1240e6b1f3f22031151c7f40bad69c8",
+      "file": "audit-pipeline.json"
+    },
+    "audit-report-review.json": {
+      "sha256": "f0a1a7c3ac3ca7ca9589270c41f2756f81c54994b0aac4217174aa3f7aa24c92",
+      "file": "audit-report-review.json"
+    }
+  },
+  "arithmetic_identity_and_scope_checks": 9614,
+  "scope": "Fixed f7e0196 performance batch only. Later clipboard code changes are outside these benchmark binary identities.",
+  "pipeline_summary": [
+    {
+      "kind": "ascii-log",
+      "mode": "headless",
+      "before_runs_mib_s": [
+        131.9206312044716,
+        125.17184099910601,
+        130.60986226374214
+      ],
+      "final_runs_mib_s": [
+        131.79211148110713,
+        129.24862049560784,
+        134.1756915561199
+      ],
+      "before_median_mib_s": 130.60986226374214,
+      "final_median_mib_s": 131.79211148110713,
+      "paired_ratios": [
+        0.9990257799542722,
+        1.0325694618211372,
+        1.0273013785526948
+      ],
+      "median_paired_ratio": 1.0273013785526948,
+      "median_paired_percent_change": 2.7301378552694766,
+      "ratio_of_medians": 1.0090517606930605,
+      "before_run_range_mib_s": [
+        125.17184099910601,
+        131.9206312044716
+      ],
+      "final_run_range_mib_s": [
+        129.24862049560784,
+        134.1756915561199
+      ],
+      "paired_repetitions_faster": 2,
+      "broker_cpu_before_ns": [
+        200000000,
+        190000000,
+        200000000
+      ],
+      "broker_cpu_final_ns": [
+        190000000,
+        180000000,
+        190000000
+      ]
+    },
+    {
+      "kind": "ascii-log",
+      "mode": "window",
+      "before_runs_mib_s": [
+        99.47578967563524,
+        93.35580645144421,
+        108.70826547748239
+      ],
+      "final_runs_mib_s": [
+        118.78922403474769,
+        123.01982497787343,
+        124.19015162159624
+      ],
+      "before_median_mib_s": 99.47578967563524,
+      "final_median_mib_s": 123.01982497787343,
+      "paired_ratios": [
+        1.1941521089914295,
+        1.3177522604537504,
+        1.1424168261365621
+      ],
+      "median_paired_ratio": 1.1941521089914295,
+      "median_paired_percent_change": 19.415210899142956,
+      "ratio_of_medians": 1.2366810595724766,
+      "before_run_range_mib_s": [
+        93.35580645144421,
+        108.70826547748239
+      ],
+      "final_run_range_mib_s": [
+        118.78922403474769,
+        124.19015162159624
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        250000000,
+        250000000,
+        230000000
+      ],
+      "broker_cpu_final_ns": [
+        220000000,
+        200000000,
+        210000000
+      ]
+    },
+    {
+      "kind": "unicode-log",
+      "mode": "headless",
+      "before_runs_mib_s": [
+        27.573950442348675,
+        22.043478478104447,
+        26.65244883074379
+      ],
+      "final_runs_mib_s": [
+        39.8941719249343,
+        40.05134742170547,
+        38.201112271652825
+      ],
+      "before_median_mib_s": 26.65244883074379,
+      "final_median_mib_s": 39.8941719249343,
+      "paired_ratios": [
+        1.4468065433113986,
+        1.816925013059443,
+        1.4333059042434995
+      ],
+      "median_paired_ratio": 1.4468065433113986,
+      "median_paired_percent_change": 44.680654331139856,
+      "ratio_of_medians": 1.4968295100492262,
+      "before_run_range_mib_s": [
+        22.043478478104447,
+        27.573950442348675
+      ],
+      "final_run_range_mib_s": [
+        38.201112271652825,
+        40.05134742170547
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        870000000,
+        1080000000,
+        890000000
+      ],
+      "broker_cpu_final_ns": [
+        600000000,
+        600000000,
+        630000000
+      ]
+    },
+    {
+      "kind": "unicode-log",
+      "mode": "window",
+      "before_runs_mib_s": [
+        24.656160421669664,
+        20.977691908197013,
+        24.50670929438746
+      ],
+      "final_runs_mib_s": [
+        35.9657616138087,
+        37.27643904446502,
+        37.598463326484215
+      ],
+      "before_median_mib_s": 24.50670929438746,
+      "final_median_mib_s": 37.27643904446502,
+      "paired_ratios": [
+        1.4586927160888896,
+        1.7769561688480746,
+        1.5342110144137155
+      ],
+      "median_paired_ratio": 1.5342110144137155,
+      "median_paired_percent_change": 53.421101441371555,
+      "ratio_of_medians": 1.5210707646090247,
+      "before_run_range_mib_s": [
+        20.977691908197013,
+        24.656160421669664
+      ],
+      "final_run_range_mib_s": [
+        35.9657616138087,
+        37.598463326484215
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        960000000,
+        1160000000,
+        1020000000
+      ],
+      "broker_cpu_final_ns": [
+        650000000,
+        650000000,
+        630000000
+      ]
+    },
+    {
+      "kind": "inplace-ascii",
+      "mode": "headless",
+      "before_runs_mib_s": [
+        196.4997852545673,
+        175.40981907677534,
+        202.00686364919798
+      ],
+      "final_runs_mib_s": [
+        189.25926386924434,
+        186.39482266061466,
+        185.95259595220216
+      ],
+      "before_median_mib_s": 196.4997852545673,
+      "final_median_mib_s": 186.39482266061466,
+      "paired_ratios": [
+        0.9631525226557229,
+        1.062624792851712,
+        0.9205261276424973
+      ],
+      "median_paired_ratio": 0.9631525226557229,
+      "median_paired_percent_change": -3.684747734427707,
+      "ratio_of_medians": 0.9485751977750939,
+      "before_run_range_mib_s": [
+        175.40981907677534,
+        202.00686364919798
+      ],
+      "final_run_range_mib_s": [
+        185.95259595220216,
+        189.25926386924434
+      ],
+      "paired_repetitions_faster": 1,
+      "broker_cpu_before_ns": [
+        130000000,
+        140000000,
+        120000000
+      ],
+      "broker_cpu_final_ns": [
+        130000000,
+        130000000,
+        130000000
+      ]
+    },
+    {
+      "kind": "inplace-ascii",
+      "mode": "window",
+      "before_runs_mib_s": [
+        138.4027376508775,
+        139.23328291193943,
+        128.38866751815343
+      ],
+      "final_runs_mib_s": [
+        179.0211168994674,
+        163.99431834625028,
+        148.56088592557018
+      ],
+      "before_median_mib_s": 138.4027376508775,
+      "final_median_mib_s": 163.99431834625028,
+      "paired_ratios": [
+        1.2934795939589736,
+        1.177838480257421,
+        1.1571183718731601
+      ],
+      "median_paired_ratio": 1.177838480257421,
+      "median_paired_percent_change": 17.78384802574211,
+      "ratio_of_medians": 1.184906607555176,
+      "before_run_range_mib_s": [
+        128.38866751815343,
+        139.23328291193943
+      ],
+      "final_run_range_mib_s": [
+        148.56088592557018,
+        179.0211168994674
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        180000000,
+        190000000,
+        190000000
+      ],
+      "broker_cpu_final_ns": [
+        140000000,
+        150000000,
+        170000000
+      ]
+    }
+  ],
+  "ab_summary": [
+    {
+      "windows": 1,
+      "before": {
+        "runs": 3,
+        "output_mib_per_second": [
+          178.21063566124354,
+          52.03995920203804,
+          171.72884706879768
+        ],
+        "median_output_mib_per_second": 171.72884706879768,
+        "output_range_mib_per_second": [
+          52.03995920203804,
+          178.21063566124354
+        ],
+        "median_latency_p50_us": 12.4195,
+        "median_latency_p95_us": 22.175,
+        "median_application_pss_bytes": 14140416
+      },
+      "after": {
+        "runs": 3,
+        "output_mib_per_second": [
+          190.57162554453012,
+          301.67529979689743,
+          257.4966472336427
+        ],
+        "median_output_mib_per_second": 257.4966472336427,
+        "output_range_mib_per_second": [
+          190.57162554453012,
+          301.67529979689743
+        ],
+        "median_latency_p50_us": 9.5955,
+        "median_latency_p95_us": 10.723,
+        "median_application_pss_bytes": 14384128
+      },
+      "ratio_of_median_throughputs": 1.4994373492211528,
+      "paired_throughput_ratios": [
+        1.0693616844888163,
+        5.796993395511404,
+        1.4994373492211528
+      ],
+      "median_paired_throughput_ratio": 1.4994373492211528
+    },
+    {
+      "windows": 10,
+      "before": {
+        "runs": 3,
+        "output_mib_per_second": [
+          133.71622667164468,
+          158.51620976534247,
+          174.6216563106849
+        ],
+        "median_output_mib_per_second": 158.51620976534247,
+        "output_range_mib_per_second": [
+          133.71622667164468,
+          174.6216563106849
+        ],
+        "median_latency_p50_us": 17.204,
+        "median_latency_p95_us": 29.909,
+        "median_application_pss_bytes": 23341056
+      },
+      "after": {
+        "runs": 3,
+        "output_mib_per_second": [
+          220.5262335916064,
+          229.21200388584515,
+          241.68025084620865
+        ],
+        "median_output_mib_per_second": 229.21200388584515,
+        "output_range_mib_per_second": [
+          220.5262335916064,
+          241.68025084620865
+        ],
+        "median_latency_p50_us": 14.4055,
+        "median_latency_p95_us": 21.941,
+        "median_application_pss_bytes": 23507968
+      },
+      "ratio_of_median_throughputs": 1.4459846360517725,
+      "paired_throughput_ratios": [
+        1.649210713469604,
+        1.4459846360517725,
+        1.3840222109462406
+      ],
+      "median_paired_throughput_ratio": 1.4459846360517725
+    }
+  ],
+  "three_app_summary": [
+    {
+      "app": "ghostty",
+      "windows": 1,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 356896768,
+      "median_pss_bytes": 328806400,
+      "median_private_bytes": 313917440,
+      "median_swap_bytes": 0,
+      "median_idle_cpu_percent": 27.98519991514506,
+      "median_app_plus_xserver_pss_bytes": 417647616,
+      "app_plus_xserver_pss_range_bytes": [
+        408451072,
+        424659968
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        -4935680,
+        -4923392
+      ],
+      "median_latency_p50_us": 42.175,
+      "median_latency_p95_us": 534.18,
+      "median_output_mib_per_second": 174.16717468214392,
+      "pss_range_bytes": [
+        319401984,
+        335469568
+      ],
+      "latency_p50_range_us": [
+        26.871000000000002,
+        46.734
+      ],
+      "output_range_mib_per_second": [
+        137.59394401758496,
+        275.2496329720747
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        1
+      ]
+    },
+    {
+      "app": "kitty",
+      "windows": 1,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 220389376,
+      "median_pss_bytes": 185987072,
+      "median_private_bytes": 170487808,
+      "median_swap_bytes": 0,
+      "median_idle_cpu_percent": 0.0,
+      "median_app_plus_xserver_pss_bytes": 273521664,
+      "app_plus_xserver_pss_range_bytes": [
+        271438848,
+        274484224
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        -6617088,
+        -6484992
+      ],
+      "median_latency_p50_us": 5296.3855,
+      "median_latency_p95_us": 8898.813,
+      "median_output_mib_per_second": 51.155921621294546,
+      "pss_range_bytes": [
+        184079360,
+        186846208
+      ],
+      "latency_p50_range_us": [
+        5128.635,
+        6105.737
+      ],
+      "output_range_mib_per_second": [
+        46.332358844220906,
+        56.18382190304093
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        2
+      ]
+    },
+    {
+      "app": "ztty",
+      "windows": 1,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 169996288,
+      "median_pss_bytes": 142838784,
+      "median_private_bytes": 128655360,
+      "median_swap_bytes": 0,
+      "median_idle_cpu_percent": 0.0,
+      "median_app_plus_xserver_pss_bytes": 232287232,
+      "app_plus_xserver_pss_range_bytes": [
+        232190976,
+        234778624
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        -4337664,
+        -4232192
+      ],
+      "median_latency_p50_us": 8.986,
+      "median_latency_p95_us": 11.911,
+      "median_output_mib_per_second": 263.5966398185677,
+      "pss_range_bytes": [
+        142575616,
+        144970752
+      ],
+      "latency_p50_range_us": [
+        8.594000000000001,
+        17.191499999999998
+      ],
+      "output_range_mib_per_second": [
+        111.67405347254045,
+        295.07235850270274
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        2
+      ]
+    },
+    {
+      "app": "ghostty",
+      "windows": 10,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 876482560,
+      "median_pss_bytes": 848321536,
+      "median_private_bytes": 833519616,
+      "median_swap_bytes": 0,
+      "median_idle_cpu_percent": 37.98504202216817,
+      "median_app_plus_xserver_pss_bytes": 963834880,
+      "app_plus_xserver_pss_range_bytes": [
+        961199104,
+        969165824
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        21665792,
+        21748736
+      ],
+      "median_latency_p50_us": 43.3485,
+      "median_latency_p95_us": 570.94,
+      "median_output_mib_per_second": 140.10987671074707,
+      "pss_range_bytes": [
+        845707264,
+        853412864
+      ],
+      "latency_p50_range_us": [
+        40.301500000000004,
+        47.583
+      ],
+      "output_range_mib_per_second": [
+        126.77237046378482,
+        141.81053274994036
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        1
+      ]
+    },
+    {
+      "app": "kitty",
+      "windows": 10,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 419512320,
+      "median_pss_bytes": 371815424,
+      "median_private_bytes": 344559616,
+      "median_swap_bytes": 0,
+      "median_idle_cpu_percent": 0.0,
+      "median_app_plus_xserver_pss_bytes": 473204736,
+      "app_plus_xserver_pss_range_bytes": [
+        473139200,
+        476442624
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        7117824,
+        7526400
+      ],
+      "median_latency_p50_us": 5121.8060000000005,
+      "median_latency_p95_us": 8818.017,
+      "median_output_mib_per_second": 53.00149621274201,
+      "pss_range_bytes": [
+        371697664,
+        375045120
+      ],
+      "latency_p50_range_us": [
+        4842.2654999999995,
+        5910.0205000000005
+      ],
+      "output_range_mib_per_second": [
+        48.04262120433218,
+        54.05846634152746
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        2
+      ]
+    },
+    {
+      "app": "ztty",
+      "windows": 10,
+      "mode": "shared",
+      "workload": "idle",
+      "successful_runs": 3,
+      "median_rss_bytes": 444624896,
+      "median_pss_bytes": 342739968,
+      "median_private_bytes": 325599232,
+      "median_swap_bytes": 0,
+      "median_idle_cpu_percent": 0.0,
+      "median_app_plus_xserver_pss_bytes": 462944256,
+      "app_plus_xserver_pss_range_bytes": [
+        461460480,
+        465579008
+      ],
+      "sampled_application_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_application_swap_bytes": 0,
+      "sampled_app_plus_xserver_swap_range_bytes": [
+        0,
+        0
+      ],
+      "max_sampled_app_plus_xserver_swap_bytes": 0,
+      "xserver_after_swap_range_bytes": [
+        0,
+        0
+      ],
+      "xserver_delta_pss_range_bytes": [
+        26303488,
+        26399744
+      ],
+      "median_latency_p50_us": 16.417,
+      "median_latency_p95_us": 29.262,
+      "median_output_mib_per_second": 150.40951119582212,
+      "pss_range_bytes": [
+        341281792,
+        345170944
+      ],
+      "latency_p50_range_us": [
+        14.052,
+        17.7625
+      ],
+      "output_range_mib_per_second": [
+        145.13066436402698,
+        158.93684785438774
+      ],
+      "gui_process_counts": [
+        1
+      ],
+      "application_process_counts": [
+        11
+      ]
+    }
+  ],
+  "report_numeric_review": {
+    "scope": "Numeric and scope review of root report; no new runtime testing",
+    "report": "ztty-performance-reload-2026-11-20.md",
+    "report_sha256_at_summary_time": "db0cf5aa0d827d4b2669d756017c53304f3bba9971f3af4cad8e105eb78e47cd",
+    "numeric_errors": [],
+    "cache_five_round_raw_to_summary_checked": true,
+    "diverse_raw_rates_and_all_fingerprints_checked": true,
+    "native_receipt_counts": {
+      "final-reload-software.json": {
+        "ok": true,
+        "checks": 9,
+        "remaining_owned_pids": []
+      },
+      "final-reload-gpu.json": {
+        "ok": true,
+        "checks": 9,
+        "remaining_owned_pids": []
+      },
+      "final-repaint-software-barrier.json": {
+        "ok": true,
+        "checks": 11,
+        "remaining_owned_pids": []
+      },
+      "final-repaint-gpu-barrier.json": {
+        "ok": true,
+        "checks": 11,
+        "remaining_owned_pids": []
+      },
+      "final-text-gpu.json": {
+        "ok": true,
+        "checks": 8,
+        "remaining_owned_pids": []
+      }
+    },
+    "recommendations": [
+      "State pipeline windows are consistently 1112x800, separately from 1112x768 in the other ztty collectors.",
+      "Say JSON preserves payload size/hash, expected screen fingerprint and actual full-text-equality result; it does not embed the full raw payload or screen.",
+      "Only ztty records actual driver per window; all three use a forced Mesa software-GL environment, with actual Kitty driver not independently recorded.",
+      "Render author confirmed default-broker selection separates different ELF images using FNV64+length, even when both --version strings are 0.5.0. The transition command may reuse an existing pool for the same new ELF; say separate from the old binary pool rather than guaranteed fresh broker.",
+      "window_error -> later attach is an implemented degradation/recovery path but was not exercised by the recorded native acceptance tests."
+    ]
+  }
+}

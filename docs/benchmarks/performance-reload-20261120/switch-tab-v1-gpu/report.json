@@ -1,0 +1,1448 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-tab-v1",
+  "binary_sha256": "20c207e37fb48a234e011c6db5997c406fa75a4795c9003a8c6c29500de912f2",
+  "test_script_sha256": "bdfb709243f1f933c642416f2d05f7f52e997d80d3358aa31cbf610fd956e4f9",
+  "renderer": "gpu",
+  "requested_scope": "all",
+  "expect": "clean",
+  "checks": [
+    "sampled workspace parent through first/repeated RPC and XTEST tab switches, hidden PTY updates and synchronized commit",
+    "separately sampled two independent overlapping top-level windows through real focus and stacking changes",
+    "all owned commands, PTYs, broker identity and launcher wait peers remain live"
+  ],
+  "scope": "Continuous real X11 pixels on private Xvfb; no physical compositor claim",
+  "gpu_environment": "LIBGL_ALWAYS_SOFTWARE=1; GPU mode uses the local Mesa software driver",
+  "colors": {
+    "A": [
+      215,
+      31,
+      49
+    ],
+    "B": [
+      22,
+      169,
+      203
+    ],
+    "C": [
+      47,
+      195,
+      83
+    ],
+    "D": [
+      211,
+      157,
+      23
+    ],
+    "calibration": [
+      241,
+      11,
+      239
+    ]
+  },
+  "stages": [
+    {
+      "name": "visible-pixel-calibration",
+      "scope": "tabs",
+      "kind": "calibration",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 7,
+      "invalid_samples": 3,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284": 3
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 10.128025,
+      "largest_sample_interval_ms": 2.262721,
+      "median_sample_interval_ms": 1.682639,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-tab-v1-gpu/report/tabs-00-unexpected-0.png",
+          "sha256": "a0e2af86691e8f82ecfa9fb439275f40edaea77f42501dff0e90600e84415eac",
+          "rgb_sha256": "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284",
+          "colors": [
+            [
+              238464,
+              [
+                241,
+                11,
+                239
+              ]
+            ]
+          ]
+        }
+      ],
+      "calibration_observed": true
+    },
+    {
+      "name": "first-return-to-hidden-tab",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92883522815034,
+          "observed_target_ns": 92883542125027,
+          "settled_ns": 92883562193840
+        }
+      ],
+      "samples": 37,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 16,
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 21
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 39.886244,
+      "largest_sample_interval_ms": 1.567829,
+      "median_sample_interval_ms": 1.060379,
+      "fault_screenshots": []
+    },
+    {
+      "name": "repeated-tab-rpc",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92883563228027,
+          "observed_target_ns": 92883581992801,
+          "settled_ns": 92883602009176
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92883602012500,
+          "observed_target_ns": 92883616996506,
+          "settled_ns": 92883637080825
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92883637084015,
+          "observed_target_ns": 92883652697394,
+          "settled_ns": 92883672772730
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92883672776000,
+          "observed_target_ns": 92883687297466,
+          "settled_ns": 92883707465388
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92883707468380,
+          "observed_target_ns": 92883725238473,
+          "settled_ns": 92883745306968
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92883745310297,
+          "observed_target_ns": 92883760457775,
+          "settled_ns": 92883780523911
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92883780526709,
+          "observed_target_ns": 92883796231750,
+          "settled_ns": 92883816338449
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92883816341799,
+          "observed_target_ns": 92883832685334,
+          "settled_ns": 92883852765488
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92883852769126,
+          "observed_target_ns": 92883866411039,
+          "settled_ns": 92883886512422
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92883886515434,
+          "observed_target_ns": 92883902726208,
+          "settled_ns": 92883922892730
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92883922897515,
+          "observed_target_ns": 92883946128361,
+          "settled_ns": 92883966205613
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92883966209782,
+          "observed_target_ns": 92883984392458,
+          "settled_ns": 92884004494254
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884004498361,
+          "observed_target_ns": 92884029095251,
+          "settled_ns": 92884049168323
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884049171815,
+          "observed_target_ns": 92884064557193,
+          "settled_ns": 92884084661696
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884084673495,
+          "observed_target_ns": 92884099811404,
+          "settled_ns": 92884119915227
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884119918142,
+          "observed_target_ns": 92884135832424,
+          "settled_ns": 92884155941897
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884155945588,
+          "observed_target_ns": 92884171903470,
+          "settled_ns": 92884191997687
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884192006086,
+          "observed_target_ns": 92884207309266,
+          "settled_ns": 92884227377339
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884227380493,
+          "observed_target_ns": 92884244142160,
+          "settled_ns": 92884264257744
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884264261947,
+          "observed_target_ns": 92884286889074,
+          "settled_ns": 92884306966490
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884306970749,
+          "observed_target_ns": 92884328162522,
+          "settled_ns": 92884348244980
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884348249737,
+          "observed_target_ns": 92884367718178,
+          "settled_ns": 92884387832116
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884387837010,
+          "observed_target_ns": 92884407210537,
+          "settled_ns": 92884427322282
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884427326339,
+          "observed_target_ns": 92884447141539,
+          "settled_ns": 92884467223335
+        }
+      ],
+      "samples": 784,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 396,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 388
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 904.95812,
+      "largest_sample_interval_ms": 2.248948,
+      "median_sample_interval_ms": 1.093999,
+      "fault_screenshots": []
+    },
+    {
+      "name": "repeated-tab-xtest",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884469072691,
+          "observed_target_ns": 92884485259374,
+          "settled_ns": 92884505354243
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884505357209,
+          "observed_target_ns": 92884522820966,
+          "settled_ns": 92884542893222
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884542896135,
+          "observed_target_ns": 92884558926201,
+          "settled_ns": 92884579032468
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884579035234,
+          "observed_target_ns": 92884594492478,
+          "settled_ns": 92884614675486
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884614679191,
+          "observed_target_ns": 92884630236116,
+          "settled_ns": 92884650556359
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884650560766,
+          "observed_target_ns": 92884669852038,
+          "settled_ns": 92884690158261
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884690162145,
+          "observed_target_ns": 92884709624261,
+          "settled_ns": 92884729728266
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884729731713,
+          "observed_target_ns": 92884747115491,
+          "settled_ns": 92884767173930
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884767176524,
+          "observed_target_ns": 92884781893874,
+          "settled_ns": 92884801977162
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884801986539,
+          "observed_target_ns": 92884817519570,
+          "settled_ns": 92884837597729
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884837606096,
+          "observed_target_ns": 92884852771298,
+          "settled_ns": 92884872853016
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884872862460,
+          "observed_target_ns": 92884888246435,
+          "settled_ns": 92884908357763
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884908363452,
+          "observed_target_ns": 92884923339041,
+          "settled_ns": 92884943520985
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92884943524386,
+          "observed_target_ns": 92884959022328,
+          "settled_ns": 92884979084347
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92884979087172,
+          "observed_target_ns": 92884995215501,
+          "settled_ns": 92885015284728
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885015289130,
+          "observed_target_ns": 92885035294463,
+          "settled_ns": 92885055408329
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885055412263,
+          "observed_target_ns": 92885072284845,
+          "settled_ns": 92885092436493
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885092439911,
+          "observed_target_ns": 92885108684665,
+          "settled_ns": 92885128856882
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885128859995,
+          "observed_target_ns": 92885147920284,
+          "settled_ns": 92885167993390
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885168019206,
+          "observed_target_ns": 92885184083759,
+          "settled_ns": 92885204241548
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885204245297,
+          "observed_target_ns": 92885220969890,
+          "settled_ns": 92885241063083
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885241066599,
+          "observed_target_ns": 92885256636245,
+          "settled_ns": 92885276740172
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885276743568,
+          "observed_target_ns": 92885290433254,
+          "settled_ns": 92885310513952
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885310522488,
+          "observed_target_ns": 92885325027082,
+          "settled_ns": 92885345208536
+        }
+      ],
+      "samples": 791,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 400,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 391
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 876.900193,
+      "largest_sample_interval_ms": 2.07686,
+      "median_sample_interval_ms": 1.046047,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885346706010,
+          "observed_target_ns": 92885366187479,
+          "settled_ns": 92885386277460
+        }
+      ],
+      "samples": 40,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 18,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 22
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 40.468325,
+      "largest_sample_interval_ms": 1.395844,
+      "median_sample_interval_ms": 0.999147,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885388262044,
+          "observed_target_ns": 92885408079018,
+          "settled_ns": 92885428169476
+        }
+      ],
+      "samples": 38,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 15,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 23
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 40.689612,
+      "largest_sample_interval_ms": 1.447862,
+      "median_sample_interval_ms": 1.018358,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885429661720,
+          "observed_target_ns": 92885446034450,
+          "settled_ns": 92885466099638
+        }
+      ],
+      "samples": 37,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 15,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 22
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 36.913127,
+      "largest_sample_interval_ms": 1.349927,
+      "median_sample_interval_ms": 1.007502,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "D"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885467622073,
+          "observed_target_ns": 92885484373544,
+          "settled_ns": 92885504439125
+        }
+      ],
+      "samples": 36,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 15,
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 21
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d"
+      },
+      "duration_ms": 37.177086,
+      "largest_sample_interval_ms": 1.278317,
+      "median_sample_interval_ms": 1.021336,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "D",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885505861864,
+          "observed_target_ns": 92885521761023,
+          "settled_ns": 92885541841065
+        }
+      ],
+      "samples": 30,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 10,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 20
+      },
+      "allowed_rgb_sha256": {
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 36.61917,
+      "largest_sample_interval_ms": 3.129032,
+      "median_sample_interval_ms": 1.105364,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885543245253,
+          "observed_target_ns": 92885558221831,
+          "settled_ns": 92885578293487
+        }
+      ],
+      "samples": 35,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 13,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 22
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 36.299603,
+      "largest_sample_interval_ms": 1.522301,
+      "median_sample_interval_ms": 1.001664,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-3",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885580087826,
+          "observed_target_ns": 92885594675212,
+          "settled_ns": 92885614763694
+        }
+      ],
+      "samples": 36,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 14,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 22
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 35.103699,
+      "largest_sample_interval_ms": 1.288148,
+      "median_sample_interval_ms": 0.97057,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-3",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "D"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92885616171146,
+          "observed_target_ns": 92885630827349,
+          "settled_ns": 92885650924699
+        }
+      ],
+      "samples": 36,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 13,
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 23
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d"
+      },
+      "duration_ms": 35.622279,
+      "largest_sample_interval_ms": 1.592362,
+      "median_sample_interval_ms": 0.97114,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "D",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885652529935,
+          "observed_target_ns": 92885668851370,
+          "settled_ns": 92885688963494
+        }
+      ],
+      "samples": 32,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 15,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 17
+      },
+      "allowed_rgb_sha256": {
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 37.751076,
+      "largest_sample_interval_ms": 1.74243,
+      "median_sample_interval_ms": 1.073716,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-held-tab-switch-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 31,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 31
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 40.512351,
+      "largest_sample_interval_ms": 1.70187,
+      "median_sample_interval_ms": 1.488293,
+      "fault_screenshots": [],
+      "hold_ms": 39.691689,
+      "sync_timing": {
+        "begin_before_write_ns": 92885690415047,
+        "begin_parsed_ns": 92885690559502,
+        "switch_requested_ns": 92885692090897,
+        "begin_to_hold_end_ms": 41.369035
+      }
+    },
+    {
+      "name": "sync-explicit-commit-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92885732794437,
+          "parsed_ns": 92885737309833,
+          "begin_before_write_ns": 92885690415047,
+          "begin_to_end_parsed_ms": 46.894786,
+          "settled_ns": 92885739451267
+        }
+      ],
+      "samples": 7,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 5,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 7.188684,
+      "largest_sample_interval_ms": 1.552768,
+      "median_sample_interval_ms": 1.017953,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885740730023,
+          "observed_target_ns": 92885754805178,
+          "settled_ns": 92885775114075
+        }
+      ],
+      "samples": 37,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 13,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 24
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 35.336894,
+      "largest_sample_interval_ms": 1.055779,
+      "median_sample_interval_ms": 0.973848,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-held-tab-switch-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 41,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 41
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 39.838053,
+      "largest_sample_interval_ms": 1.256196,
+      "median_sample_interval_ms": 0.96605,
+      "fault_screenshots": [],
+      "hold_ms": 39.53677,
+      "sync_timing": {
+        "begin_before_write_ns": 92885775991188,
+        "begin_parsed_ns": 92885776082433,
+        "switch_requested_ns": 92885777076293,
+        "begin_to_hold_end_ms": 40.623812
+      }
+    },
+    {
+      "name": "sync-explicit-commit-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92885817606516,
+          "parsed_ns": 92885822418091,
+          "begin_before_write_ns": 92885775991188,
+          "begin_to_end_parsed_ms": 46.426903,
+          "settled_ns": 92885824546338
+        }
+      ],
+      "samples": 7,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 5,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 7.370285,
+      "largest_sample_interval_ms": 1.494181,
+      "median_sample_interval_ms": 1.1145,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92885825771488,
+          "observed_target_ns": 92885839623579,
+          "settled_ns": 92885859828210
+        }
+      ],
+      "samples": 31,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 12,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 19
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 34.612092,
+      "largest_sample_interval_ms": 1.659834,
+      "median_sample_interval_ms": 1.048134,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-held-tab-switch-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 40,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 40
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 40.530748,
+      "largest_sample_interval_ms": 1.54668,
+      "median_sample_interval_ms": 1.014415,
+      "fault_screenshots": [],
+      "hold_ms": 39.660306,
+      "sync_timing": {
+        "begin_before_write_ns": 92885860467169,
+        "begin_parsed_ns": 92885860557758,
+        "switch_requested_ns": 92885862182006,
+        "begin_to_hold_end_ms": 41.378781
+      }
+    },
+    {
+      "name": "sync-explicit-commit-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92885902866587,
+          "parsed_ns": 92885907567870,
+          "begin_before_write_ns": 92885860467169,
+          "begin_to_end_parsed_ms": 47.100701,
+          "settled_ns": 92885909709407
+        }
+      ],
+      "samples": 8,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 6,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 7.329635,
+      "largest_sample_interval_ms": 1.104807,
+      "median_sample_interval_ms": 0.984917,
+      "fault_screenshots": []
+    },
+    {
+      "name": "visible-pixel-calibration",
+      "scope": "focus_raise",
+      "kind": "calibration",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 6,
+      "invalid_samples": 2,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 7.453481,
+      "largest_sample_interval_ms": 2.290618,
+      "median_sample_interval_ms": 1.306913,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-tab-v1-gpu/report/focus_raise-00-unexpected-0.png",
+          "sha256": "a0e2af86691e8f82ecfa9fb439275f40edaea77f42501dff0e90600e84415eac",
+          "rgb_sha256": "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284",
+          "colors": [
+            [
+              238464,
+              [
+                241,
+                11,
+                239
+              ]
+            ]
+          ]
+        }
+      ],
+      "calibration_observed": true
+    },
+    {
+      "name": "independent-top-level-focus-and-raise",
+      "scope": "focus_raise",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886106372983,
+          "observed_target_ns": 92886109121354,
+          "settled_ns": 92886129285250
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886129288265,
+          "observed_target_ns": 92886133104391,
+          "settled_ns": 92886153196064
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886153198395,
+          "observed_target_ns": 92886155742160,
+          "settled_ns": 92886175867475
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886175869098,
+          "observed_target_ns": 92886179335776,
+          "settled_ns": 92886199508765
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886199510777,
+          "observed_target_ns": 92886202015843,
+          "settled_ns": 92886222084399
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886222086535,
+          "observed_target_ns": 92886225790240,
+          "settled_ns": 92886245860926
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886245876810,
+          "observed_target_ns": 92886249803072,
+          "settled_ns": 92886269912745
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886269915439,
+          "observed_target_ns": 92886273433683,
+          "settled_ns": 92886293719353
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886293721794,
+          "observed_target_ns": 92886298411138,
+          "settled_ns": 92886318662627
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886318665450,
+          "observed_target_ns": 92886322202287,
+          "settled_ns": 92886342357151
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886342359378,
+          "observed_target_ns": 92886346027306,
+          "settled_ns": 92886366129056
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886366131524,
+          "observed_target_ns": 92886370025460,
+          "settled_ns": 92886390252748
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886390255592,
+          "observed_target_ns": 92886394035154,
+          "settled_ns": 92886414115388
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886414118272,
+          "observed_target_ns": 92886417906407,
+          "settled_ns": 92886437985244
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886437987714,
+          "observed_target_ns": 92886441263308,
+          "settled_ns": 92886461343977
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886461352592,
+          "observed_target_ns": 92886466289603,
+          "settled_ns": 92886486368417
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886486370708,
+          "observed_target_ns": 92886490085254,
+          "settled_ns": 92886510162192
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886510164999,
+          "observed_target_ns": 92886513946229,
+          "settled_ns": 92886534036914
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886534040460,
+          "observed_target_ns": 92886538919915,
+          "settled_ns": 92886559012452
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886559015545,
+          "observed_target_ns": 92886564028678,
+          "settled_ns": 92886584105244
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886584108028,
+          "observed_target_ns": 92886588713964,
+          "settled_ns": 92886608788811
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886608791777,
+          "observed_target_ns": 92886614574582,
+          "settled_ns": 92886634673688
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92886634676095,
+          "observed_target_ns": 92886639423336,
+          "settled_ns": 92886659536636
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92886659539837,
+          "observed_target_ns": 92886664560475,
+          "settled_ns": 92886684651414
+        }
+      ],
+      "samples": 474,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 231,
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 243
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 578.680954,
+      "largest_sample_interval_ms": 2.32413,
+      "median_sample_interval_ms": 1.169665,
+      "fault_screenshots": []
+    }
+  ],
+  "viewports": {
+    "tabs": {
+      "drawable": 2097167,
+      "kind": "workspace parent",
+      "box": [
+        0,
+        0,
+        576,
+        414
+      ]
+    },
+    "focus_raise": {
+      "drawable": 1135,
+      "kind": "root visible screen region",
+      "box": [
+        1604,
+        40,
+        576,
+        414
+      ],
+      "window_ids": [
+        2097559,
+        2097564
+      ]
+    }
+  },
+  "renderers": [
+    {
+      "session": "switch-tab-a",
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "session": "switch-tab-b",
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "session": "switch-focus-a",
+      "window_id": 2097559,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "session": "switch-focus-b",
+      "window_id": 2097564,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    }
+  ],
+  "process_cleanup_helper_sha256": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+  "helper_sha256": {
+    "isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":22464",
+    "pid": 3011383,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X22464",
+        "inode": 110057097,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X22464",
+        "inode": 110057096,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": "",
+  "sample_trace": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-tab-v1-gpu/report.samples.jsonl",
+    "sha256": "6e268714afd0f3a9a1388ef4561920a3b8737737b786bb6741394239907992f9"
+  },
+  "invalid_samples_by_scope": {
+    "tabs": 0,
+    "focus_raise": 0
+  },
+  "invalid_application_samples": 0
+}
