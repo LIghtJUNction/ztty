@@ -12,9 +12,11 @@
 | zgraphics | `0.2.0` | [`b296a58`](https://github.com/LIghtJUNction/zgraphics/commit/b296a58f09d6052f13c86dc09e9e7b7f7e87438f) |
 | zinput | `0.1.3` | [`003829a`](https://github.com/LIghtJUNction/zinput/commit/003829a5e7ea45d9827376d89e37c9e6cfbf4a12) |
 | zpty | `0.2.3` | [`d263f9a`](https://github.com/LIghtJUNction/zpty/commit/d263f9a8f0881d259e46c51a7b6753c61ab9be59) |
-| zterm | `0.5.2` | [`b5adc3d`](https://github.com/LIghtJUNction/zterm/commit/b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d) |
+| zterm | `0.5.2` | [`cd9abc5`](https://github.com/LIghtJUNction/zterm/commit/cd9abc560d28c2d8ad6ed2073e8d9a7c27810da1) |
 
 zterm `0.5.2` 的 `zgpui = "0.1.2"` 兼容范围允许本轮的 `0.1.5`；应用的精确约束把实际解析统一到 `0.1.5`。本轮同时检查了源码路径解析和 Cargo 包去除本地 patch 后的注册表解析。[源码与原生验证记录](reports/dependency-refresh-20261120/README.md) 保存固定输入、实际命令、二进制摘要和覆盖范围。
+
+随后补齐 zterm 独立仓库的已提交锁文件：其 zgpui 也固定为 `0.1.5`。ztty 在当前 GPU 优化基线上同步了该 gitlink，根锁文件与完整解析图保持相同；[锁文件传播记录](reports/dependency-lock-propagation-20261120/README.md) 单独保存这次检查。
 
 本轮完成源码消费与 Linux 本地验收。Project Z 聚合仓库继续按新的应用提交运行 `sync`、`check` 和 `resolve --all`；安装套件仍需遵守自己的正式制品与标签契约。下面的旧版本、性能数值和发行状态保留为历史证据。
 
@@ -264,3 +266,4 @@ artifacts/dependency-propagation-20261120/
 目录包含七个 `impact-*.repositories.txt`、工具 help、目录输入哈希与内部依赖 inventory、ztty manifest/lock/gitlink 快照、oh-my-ztty 消费方式、四个现有 owner 协调文件副本、发布工具探针与 zterm registry 来源证明；`SHA256.json` 校验各文件。协调文件来自 `/tmp/project-z-coordination-20261120`，后面的更新可取代早期状态。
 
 root 收到最终回执后，在本记录补充 ztty 消费者 SHA、实际依赖解析、完整 gate/发布/安装结果，以及 oh-my-ztty 和 Project Z 聚合仓库的最终提交。届时重新运行影响枚举，确认新仓库和新下游均已登记，再关闭对应项。
+

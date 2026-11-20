@@ -1,0 +1,226 @@
+{
+  "schema": "ztty.zterm-lock-followup.v1",
+  "started": 1795190656.3373904,
+  "status": "passed",
+  "base": "d9d4ce40b10dd427ce4b59c901c8b03e2fc0ed70",
+  "old_zterm": "b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d",
+  "new_zterm": "cd9abc560d28c2d8ad6ed2073e8d9a7c27810da1",
+  "new_zterm_tree": "285e5049ed53e674cd1c794ba904a72873a9d0b8",
+  "steps": [
+    {
+      "name": "restore-own-prior-pin",
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d"
+      ],
+      "state": "completed",
+      "started": 1795190656.3834152,
+      "output": "ztty-zterm-lock-current-main-restore-own-prior-pin.log",
+      "stderr": "ztty-zterm-lock-current-main-restore-own-prior-pin.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.007,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "f5bd88086bd5886117de679aa6096c0a8e69eeca3ab63772b72582eeecd6fdf5"
+    },
+    {
+      "name": "main-fetch",
+      "command": [
+        "git",
+        "-c",
+        "fetch.recurseSubmodules=false",
+        "fetch",
+        "--no-tags",
+        "origin",
+        "d9d4ce40b10dd427ce4b59c901c8b03e2fc0ed70"
+      ],
+      "state": "completed",
+      "started": 1795190656.3901844,
+      "output": "ztty-zterm-lock-current-main-main-fetch.log",
+      "stderr": "ztty-zterm-lock-current-main-main-fetch.stderr.log",
+      "exit_code": 0,
+      "seconds": 1.501,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d05719e9082fa6aca90cb7b245eb920e634f7683510ca1db1960152590236ada"
+    },
+    {
+      "name": "main-checkout",
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "d9d4ce40b10dd427ce4b59c901c8b03e2fc0ed70"
+      ],
+      "state": "completed",
+      "started": 1795190657.8957043,
+      "output": "ztty-zterm-lock-current-main-main-checkout.log",
+      "stderr": "ztty-zterm-lock-current-main-main-checkout.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.023,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "862a2fe38c37dae7f07a971dfe11960011d4c4c423b88738f7e4d63346cd47fd"
+    },
+    {
+      "name": "main-submodules",
+      "command": [
+        "git",
+        "submodule",
+        "update",
+        "--init",
+        "--recursive",
+        "--jobs",
+        "1"
+      ],
+      "state": "completed",
+      "started": 1795190657.919095,
+      "output": "ztty-zterm-lock-current-main-main-submodules.log",
+      "stderr": "ztty-zterm-lock-current-main-main-submodules.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.04,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "metadata-before",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "state": "completed",
+      "started": 1795190657.994454,
+      "output": "ztty-zterm-lock-current-main-metadata-before.json",
+      "stderr": "ztty-zterm-lock-current-main-metadata-before.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.165,
+      "output_sha256": "a2cecc628055467e2ef8c8950117ca1e8344b037d07a71d1264e4e99e7fd9aad",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fetch",
+      "command": [
+        "git",
+        "-c",
+        "fetch.recurseSubmodules=false",
+        "fetch",
+        "--no-tags",
+        "origin",
+        "cd9abc560d28c2d8ad6ed2073e8d9a7c27810da1"
+      ],
+      "state": "completed",
+      "started": 1795190658.1607754,
+      "output": "ztty-zterm-lock-current-main-fetch.log",
+      "stderr": "ztty-zterm-lock-current-main-fetch.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.007,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "391a4f833c7b17d6c3d071c2f6847ce52c27d3d53af3faaab17c1b7fa040b098"
+    },
+    {
+      "name": "checkout",
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "cd9abc560d28c2d8ad6ed2073e8d9a7c27810da1"
+      ],
+      "state": "completed",
+      "started": 1795190658.1820796,
+      "output": "ztty-zterm-lock-current-main-checkout.log",
+      "stderr": "ztty-zterm-lock-current-main-checkout.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.003,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "34b9d5b798a3909c198e0d0c4363b7ce2d56c492ca4f95e243d330577248cef1"
+    },
+    {
+      "name": "metadata-after",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--offline",
+        "--format-version",
+        "1"
+      ],
+      "state": "completed",
+      "started": 1795190658.1856027,
+      "output": "ztty-zterm-lock-current-main-metadata-after.json",
+      "stderr": "ztty-zterm-lock-current-main-metadata-after.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.048,
+      "output_sha256": "a2cecc628055467e2ef8c8950117ca1e8344b037d07a71d1264e4e99e7fd9aad",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "state": "completed",
+      "started": 1795190658.2616594,
+      "output": "ztty-zterm-lock-current-main-diff-check.log",
+      "stderr": "ztty-zterm-lock-current-main-diff-check.stderr.log",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "concurrent_main_movement": {
+    "previous": "22f337dac4c1c65287dae9cf32018e55a301f2f9",
+    "accepted_base": "d9d4ce40b10dd427ce4b59c901c8b03e2fc0ed70",
+    "tree": "bd7089966c10ecab1102e861095b89e581e35a38",
+    "runtime_delta": [
+      "src/gpu/mod.rs",
+      "src/gpu/tests.rs"
+    ],
+    "owner_receipt": "docs/benchmarks/text-run-scratch-20261120/report.zh-CN.md",
+    "preserved_in_full": true
+  },
+  "zterm_identity": {
+    "changed_paths": [
+      "Cargo.lock"
+    ],
+    "all_non_lock_entries_equal": true,
+    "non_lock_entry_count": 47,
+    "entries_sha256": "4e9c5013e7eefbc1defc701596e9981d47ee635d2002053da9745c887e0dee93",
+    "manifest_blob": "68f127626fdbd8e2dc86cf310019067ce2f462b0",
+    "source_tree": "4c8725c185cd4923fdba4933717a16974119081d",
+    "lock_diff": "diff --git a/Cargo.lock b/Cargo.lock\nindex dc5aacd..1b4d858 100644\n--- a/Cargo.lock\n+++ b/Cargo.lock\n@@ -22,9 +22,9 @@ checksum = \"ca718471876992059f251e33aafc334346ada08042b7661dd1fe313a9bced557\"\n \n [[package]]\n name = \"zgpui\"\n-version = \"0.1.2\"\n+version = \"0.1.5\"\n source = \"registry+https://github.com/rust-lang/crates.io-index\"\n-checksum = \"0c5cddf5d0ed86ccb9cf21e035585146cf5aff0e316301bc037684b3c51b1046\"\n+checksum = \"7a5597b9018e724bcab318e8e52de11f70e1686262692d32d84b1fce30044300\"\n \n [[package]]\n name = \"zgraphics\""
+  },
+  "dependency_graph": {
+    "before_after_equal": true,
+    "canonical_json_sha256": "e147a9c6a5f39d75361a1161ad3e95d8fe272f709c34853a299c644d410d301a",
+    "packages": 22,
+    "nodes": 22,
+    "zgpui_version": "0.1.5",
+    "zgpui_features": [],
+    "zgpui_manifest": "crates/zgpui/Cargo.toml",
+    "root_lock_sha256": "7a94d15480bc6a25b12f5ec9c619376b1330c0633162c62655061b1ec2cdc750",
+    "root_lock_unchanged": true
+  },
+  "application_identity": {
+    "root_manifest_blob": "48b2971bcbb9989bbb0e666f2e1c2276324e7c2c",
+    "root_lock_blob": "28651da9e2881e150df1f83a4426a2cb340bf984",
+    "implementation_unchanged": true,
+    "only_source_delta": "crates/zterm gitlink; its only delta is the child standalone Cargo.lock"
+  },
+  "prior_runtime_evidence": {
+    "dependency_report": "docs/reports/dependency-refresh-20261120/README.md",
+    "current_gpu_report": "docs/benchmarks/text-run-scratch-20261120/report.zh-CN.md",
+    "runtime_inputs_unchanged_from_followup_base": "d9d4ce40b10dd427ce4b59c901c8b03e2fc0ed70",
+    "ui_rerun": false,
+    "scope": "The earlier 22f337d dependency/UI checks remain historical. The new main includes the GPU owner's 9c0d8c3 implementation and its separate committed results. This follow-up preserves d9d4ce4 implementation inputs and proves complete locked Cargo metadata equivalence across the child Cargo.lock change; no fresh full runtime or binary claim is made."
+  },
+  "validated_source_tree": "28e46e60911950816cead4a2c0b4f822c3fa27f5",
+  "completed": true,
+  "finished": 1795190658.294217,
+  "index_preserved": true
+}
