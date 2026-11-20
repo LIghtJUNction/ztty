@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "created_utc": "2026-11-20T03:58:10.318784+00:00",
+  "scope": "audit-process receipts only; no product execution",
+  "attempts": [
+    {
+      "job": "59cd4366f811fed8854b09c698ca60d5-44b",
+      "exit_code": 1,
+      "reason": "gh job-log capture refused terminal escape sequences; existing artifact download had succeeded"
+    },
+    {
+      "job": "59cd4366f811fed8854b09c698ca60d5-454",
+      "exit_code": 0,
+      "reason": "Nine authoritative raw job logs captured to files with explicit --allow-escape-sequences"
+    },
+    {
+      "job": "59cd4366f811fed8854b09c698ca60d5-463",
+      "exit_code": 1,
+      "script": "audit-final.py",
+      "script_sha256": "86e81226427d6c2ae1b269a5ac20fea558d6e27ad3ed9cc6c5f48a6362329f9c",
+      "reason": "KeyError tag_name: used normalized release-api-public.json"
+    },
+    {
+      "job": "59cd4366f811fed8854b09c698ca60d5-464",
+      "exit_code": 0,
+      "script": "audit-final-v2.py",
+      "script_sha256": "479fc574d36fcf221d046b7c2d44c03031d7ef0e4a1b647cd500a395e5a267d4",
+      "reason": "Used full official release-final-raw.json; all audit assertions passed"
+    }
+  ]
+}

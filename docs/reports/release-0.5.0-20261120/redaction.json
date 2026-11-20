@@ -1,0 +1,1085 @@
+{
+  "schema": 1,
+  "source": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "release_id": 452238617,
+  "tag": "v0.5.0",
+  "files": [
+    {
+      "public_file": "release/original-api.json",
+      "source_scope": "GitHub connector response",
+      "source_relative_path": "https://api.github.com/repos/LIghtJUNction/ztty/releases/452238617",
+      "original_sha256": "56ff6d3249682f9c439088a0f4629bfb7acc568c895b718d715d73fea811afd0",
+      "original_bytes": 80270,
+      "public_sha256": "56ff6d3249682f9c439088a0f4629bfb7acc568c895b718d715d73fea811afd0",
+      "public_bytes": 80270,
+      "public_payload_sha256": "56ff6d3249682f9c439088a0f4629bfb7acc568c895b718d715d73fea811afd0",
+      "public_payload_bytes": 80270,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "release/original-body.md",
+      "source_scope": "GitHub connector response",
+      "source_relative_path": "https://api.github.com/repos/LIghtJUNction/ztty/releases/452238617#body",
+      "original_sha256": "b8cda59dc40303598e1db0e499fbb9a79b1ee73797730c35901ccc6958a6ac23",
+      "original_bytes": 458,
+      "public_sha256": "b8cda59dc40303598e1db0e499fbb9a79b1ee73797730c35901ccc6958a6ac23",
+      "public_bytes": 458,
+      "public_payload_sha256": "b8cda59dc40303598e1db0e499fbb9a79b1ee73797730c35901ccc6958a6ac23",
+      "public_payload_bytes": 458,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/download-script.stderr.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/download-script.stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0,
+      "public_payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_payload_bytes": 0,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/download-script.stdout.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/download-script.stdout.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0,
+      "public_payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_payload_bytes": 0,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/help.stderr.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/help.stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0,
+      "public_payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_payload_bytes": 0,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/help.stdout.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/help.stdout.log",
+      "original_sha256": "44febf2a365cea19c26ccba3428f787c20938ed4336bf072d07c6cf04fd8448b",
+      "original_bytes": 3275,
+      "public_sha256": "44febf2a365cea19c26ccba3428f787c20938ed4336bf072d07c6cf04fd8448b",
+      "public_bytes": 3275,
+      "public_payload_sha256": "44febf2a365cea19c26ccba3428f787c20938ed4336bf072d07c6cf04fd8448b",
+      "public_payload_bytes": 3275,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/install.sh",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/install.sh",
+      "original_sha256": "e078404f113ce6337c70f0878ab2be057f7135572a5e2c4ad19c6025206f2b08",
+      "original_bytes": 9889,
+      "public_sha256": "e078404f113ce6337c70f0878ab2be057f7135572a5e2c4ad19c6025206f2b08",
+      "public_bytes": 9889,
+      "public_payload_sha256": "e078404f113ce6337c70f0878ab2be057f7135572a5e2c4ad19c6025206f2b08",
+      "public_payload_bytes": 9889,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/install.stderr.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/install.stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0,
+      "public_payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_payload_bytes": 0,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/install.stdout.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/install.stdout.log",
+      "original_sha256": "e7f24593cd3072541a15605d4deb7b383868647c9bc9ce57824c028b5ff4bae2",
+      "original_bytes": 487,
+      "public_sha256": "bbb7a0a40750d3188facffcfc193805ea4a3400f74411d67a0c9f0b491951e45",
+      "public_bytes": 310,
+      "public_payload_sha256": "bbb7a0a40750d3188facffcfc193805ea4a3400f74411d67a0c9f0b491951e45",
+      "public_payload_bytes": 310,
+      "storage": "plain",
+      "modified_fields": [
+        {
+          "kind": "text_prefix",
+          "original_prefix_sha256": "90f6ce2c170b4e50f5fd1c46b840b1232ede8a01d30cf47535a42b58b2873352",
+          "replacement": "WORKTREE",
+          "occurrences": 3
+        },
+        {
+          "kind": "text_prefix",
+          "original_prefix_sha256": "cf956db5a4888f7bdeb9e3f66ebf02fff966abc5ec27b4d9ffb1ede3c09aec8d",
+          "replacement": "PROJECT_WORKTREE",
+          "occurrences": 3
+        },
+        {
+          "kind": "text_prefix",
+          "original_prefix_sha256": "ce9a5f916e75002650bc764f456dac3be56330a15a552d09b14c360f59e1cc52",
+          "replacement": "USER_WORKSPACE",
+          "occurrences": 3
+        }
+      ]
+    },
+    {
+      "public_file": "installer/installed-desktop.txt",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/installed-desktop.txt",
+      "original_sha256": "4876293e812ca38444782cb1a196955c5bec8f3ab09f13ac3033e392e541c1f6",
+      "original_bytes": 378,
+      "public_sha256": "3f6d9d11b72251eeda85eb7c74ef38f9350faf858b233dddd55d2b11c8d0edd2",
+      "public_bytes": 319,
+      "public_payload_sha256": "3f6d9d11b72251eeda85eb7c74ef38f9350faf858b233dddd55d2b11c8d0edd2",
+      "public_payload_bytes": 319,
+      "storage": "plain",
+      "modified_fields": [
+        {
+          "kind": "text_prefix",
+          "original_prefix_sha256": "90f6ce2c170b4e50f5fd1c46b840b1232ede8a01d30cf47535a42b58b2873352",
+          "replacement": "WORKTREE",
+          "occurrences": 1
+        },
+        {
+          "kind": "text_prefix",
+          "original_prefix_sha256": "cf956db5a4888f7bdeb9e3f66ebf02fff966abc5ec27b4d9ffb1ede3c09aec8d",
+          "replacement": "PROJECT_WORKTREE",
+          "occurrences": 1
+        },
+        {
+          "kind": "text_prefix",
+          "original_prefix_sha256": "ce9a5f916e75002650bc764f456dac3be56330a15a552d09b14c360f59e1cc52",
+          "replacement": "USER_WORKSPACE",
+          "occurrences": 1
+        }
+      ]
+    },
+    {
+      "public_file": "installer/verification.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/verification.json",
+      "original_sha256": "92bb4bcdbff7c40c3fdaad217ed0c678ac7e019e67ce44a56eb5f0920f64d0c7",
+      "original_bytes": 6617,
+      "public_sha256": "7dfad026fcedb63f3cf5952288dd20b1f90a94b7a4740f23fe75a5a17eee903c",
+      "public_bytes": 6055,
+      "public_payload_sha256": "7dfad026fcedb63f3cf5952288dd20b1f90a94b7a4740f23fe75a5a17eee903c",
+      "public_payload_bytes": 6055,
+      "storage": "plain",
+      "modified_fields": [
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.local~1bin~1ztty",
+          "original_value_sha256": "34f93bb62679108d9501a51110076326c95d50b6146a2048ea48e1c85d7aff52",
+          "public_value": "USER_WORKSPACE/.local/bin/ztty"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.local~1bin~1omztty",
+          "original_value_sha256": "699bcf73ed37900de07d504b715b535947e9f713abc11381c833a1e010979815",
+          "public_value": "USER_WORKSPACE/.local/bin/omztty"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.local~1bin~1omztty/target",
+          "original_value_sha256": "37eccb0d141a7550cccab52d1a5ad03cb90f7864aa2b9b9235d74a41daee46cc",
+          "public_value": "USER_WORKSPACE/.local/share/oh-my-ztty/current/bin/omztty"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.local~1bin~1oh-my-ztty",
+          "original_value_sha256": "2adc40493430eb80d19840e1a8f8a865ae475056422042d1d0ee4591c90d5ecc",
+          "public_value": "USER_WORKSPACE/.local/bin/oh-my-ztty"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.config~1xdg-terminals.list",
+          "original_value_sha256": "20b6ba4b473343ad593ff115a14896f0659926c0a33eb0714a1a3e290bd10e24",
+          "public_value": "USER_WORKSPACE/.config/xdg-terminals.list"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.config~1xdg-terminals.list/target",
+          "original_value_sha256": "9f3f5883251df511b2ee4c17fa0af2e59f1c50575baf19598d92b3763f42b04f",
+          "public_value": "USER_WORKSPACE/.config/oh-my-ztty/profile/files/.config/xdg-terminals.list"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.config~1mimeapps.list",
+          "original_value_sha256": "3cc919f82dcc758fbab601a9a66bbce1c10292c708e2ccae5f0187a9bc14e905",
+          "public_value": "USER_WORKSPACE/.config/mimeapps.list"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.local~1share~1applications~1oh-my-ztty.desktop",
+          "original_value_sha256": "39709379cb97ebebf159e6fc224b577178bd17933b74840c6eccbbc33d4be5b5",
+          "public_value": "USER_WORKSPACE/.local/share/applications/oh-my-ztty.desktop"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/guard_before/USER_WORKSPACE~1.local~1share~1applications~1oh-my-ztty.desktop/target",
+          "original_value_sha256": "57d111fbbd593e9b3de32139a1d9ef7360787c1f73d556933c153e2ed80530d2",
+          "public_value": "USER_WORKSPACE/.local/share/oh-my-ztty/oh-my-ztty.desktop"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/commands/0/argv/9",
+          "original_value_sha256": "5e7225ea97f23553e3ae0220785e64a0bd6ed1fdc7ae2baf82aad6f1dfb5436c",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/install.sh"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/commands/1/argv/1",
+          "original_value_sha256": "5e7225ea97f23553e3ae0220785e64a0bd6ed1fdc7ae2baf82aad6f1dfb5436c",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/install.sh"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/commands/2/argv/0",
+          "original_value_sha256": "318c70512924754d395e27056f0679cf854a15e0801b690ca61e7b02953b69bc",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin/ztty"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/commands/3/argv/0",
+          "original_value_sha256": "318c70512924754d395e27056f0679cf854a15e0801b690ca61e7b02953b69bc",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin/ztty"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/environment_overrides/ZTTY_INSTALL_DIR",
+          "original_value_sha256": "54b83a93bc49e30ae9e24a3faa824321427253ed27bde12d1155826115d4e598",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/environment_overrides/ZTTY_DESKTOP_DIR",
+          "original_value_sha256": "2ad16e1c4745192902a2618143e5da664937fe423d6d1ecfade82cf948941643",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/applications"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/environment_overrides/TMPDIR",
+          "original_value_sha256": "ad7267df902461a0e7bbd888338a1c4468203792656da6cabc0231e24c7e4539",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/tmp"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/installed_binary/path",
+          "original_value_sha256": "318c70512924754d395e27056f0679cf854a15e0801b690ca61e7b02953b69bc",
+          "public_value": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin/ztty"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.local~1bin~1ztty",
+          "original_value_sha256": "34f93bb62679108d9501a51110076326c95d50b6146a2048ea48e1c85d7aff52",
+          "public_value": "USER_WORKSPACE/.local/bin/ztty"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.local~1bin~1omztty",
+          "original_value_sha256": "699bcf73ed37900de07d504b715b535947e9f713abc11381c833a1e010979815",
+          "public_value": "USER_WORKSPACE/.local/bin/omztty"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.local~1bin~1omztty/target",
+          "original_value_sha256": "37eccb0d141a7550cccab52d1a5ad03cb90f7864aa2b9b9235d74a41daee46cc",
+          "public_value": "USER_WORKSPACE/.local/share/oh-my-ztty/current/bin/omztty"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.local~1bin~1oh-my-ztty",
+          "original_value_sha256": "2adc40493430eb80d19840e1a8f8a865ae475056422042d1d0ee4591c90d5ecc",
+          "public_value": "USER_WORKSPACE/.local/bin/oh-my-ztty"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.config~1xdg-terminals.list",
+          "original_value_sha256": "20b6ba4b473343ad593ff115a14896f0659926c0a33eb0714a1a3e290bd10e24",
+          "public_value": "USER_WORKSPACE/.config/xdg-terminals.list"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.config~1xdg-terminals.list/target",
+          "original_value_sha256": "9f3f5883251df511b2ee4c17fa0af2e59f1c50575baf19598d92b3763f42b04f",
+          "public_value": "USER_WORKSPACE/.config/oh-my-ztty/profile/files/.config/xdg-terminals.list"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.config~1mimeapps.list",
+          "original_value_sha256": "3cc919f82dcc758fbab601a9a66bbce1c10292c708e2ccae5f0187a9bc14e905",
+          "public_value": "USER_WORKSPACE/.config/mimeapps.list"
+        },
+        {
+          "kind": "object_key",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.local~1share~1applications~1oh-my-ztty.desktop",
+          "original_value_sha256": "39709379cb97ebebf159e6fc224b577178bd17933b74840c6eccbbc33d4be5b5",
+          "public_value": "USER_WORKSPACE/.local/share/applications/oh-my-ztty.desktop"
+        },
+        {
+          "kind": "string_value",
+          "json_pointer": "/guard_after/USER_WORKSPACE~1.local~1share~1applications~1oh-my-ztty.desktop/target",
+          "original_value_sha256": "57d111fbbd593e9b3de32139a1d9ef7360787c1f73d556933c153e2ed80530d2",
+          "public_value": "USER_WORKSPACE/.local/share/oh-my-ztty/oh-my-ztty.desktop"
+        }
+      ]
+    },
+    {
+      "public_file": "installer/version.stderr.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/version.stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0,
+      "public_payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_payload_bytes": 0,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "installer/version.stdout.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/published-installer-v050-20261120/version.stdout.log",
+      "original_sha256": "636de83b7532757d61b769e3b5b737ca46cc671b4096c488d8ceac528c3c29dd",
+      "original_bytes": 11,
+      "public_sha256": "636de83b7532757d61b769e3b5b737ca46cc671b4096c488d8ceac528c3c29dd",
+      "public_bytes": 11,
+      "public_payload_sha256": "636de83b7532757d61b769e3b5b737ca46cc671b4096c488d8ceac528c3c29dd",
+      "public_payload_bytes": 11,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/macos-cross-review.json",
+      "source_scope": "DOCUMENTATION_WORKTREE",
+      "source_relative_path": "artifacts/formal-macos-v050-review/review.json",
+      "original_sha256": "db6cf733b9f1fda4fc3add9ddc3d6c0658c3e0105d207b51483119a84c466466",
+      "original_bytes": 4591,
+      "public_sha256": "db6cf733b9f1fda4fc3add9ddc3d6c0658c3e0105d207b51483119a84c466466",
+      "public_bytes": 4591,
+      "public_payload_sha256": "db6cf733b9f1fda4fc3add9ddc3d6c0658c3e0105d207b51483119a84c466466",
+      "public_payload_bytes": 4591,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/verification.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/verification.json",
+      "original_sha256": "6bf85fefec7a104278eeb7f0b580db4fb4b19d9a8c7bee278f46c51b6ef40f7b",
+      "original_bytes": 6254,
+      "public_sha256": "6bf85fefec7a104278eeb7f0b580db4fb4b19d9a8c7bee278f46c51b6ef40f7b",
+      "public_bytes": 6254,
+      "public_payload_sha256": "6bf85fefec7a104278eeb7f0b580db4fb4b19d9a8c7bee278f46c51b6ef40f7b",
+      "public_payload_bytes": 6254,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/public-asset-index.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/public-asset-index.json",
+      "original_sha256": "1cc945d2420132d7aa4471cae712fd7c7f74e11d6647889324cd6c3f4cd6ae52",
+      "original_bytes": 16395,
+      "public_sha256": "1cc945d2420132d7aa4471cae712fd7c7f74e11d6647889324cd6c3f4cd6ae52",
+      "public_bytes": 16395,
+      "public_payload_sha256": "1cc945d2420132d7aa4471cae712fd7c7f74e11d6647889324cd6c3f4cd6ae52",
+      "public_payload_bytes": 16395,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/workflow-artifact-index.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/workflow-artifact-index.json",
+      "original_sha256": "8ea6756020c948229f45fa781e274e9ed299367d5b6878196e3302cde9aaa820",
+      "original_bytes": 1046,
+      "public_sha256": "8ea6756020c948229f45fa781e274e9ed299367d5b6878196e3302cde9aaa820",
+      "public_bytes": 1046,
+      "public_payload_sha256": "8ea6756020c948229f45fa781e274e9ed299367d5b6878196e3302cde9aaa820",
+      "public_payload_bytes": 1046,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/native-platforms.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/native-platforms.json",
+      "original_sha256": "b550e977a7f2d81d2f34d5f47abee63986a5d5af3823d5a7bf5c7672bdce593a",
+      "original_bytes": 21159,
+      "public_sha256": "b550e977a7f2d81d2f34d5f47abee63986a5d5af3823d5a7bf5c7672bdce593a",
+      "public_bytes": 21159,
+      "public_payload_sha256": "b550e977a7f2d81d2f34d5f47abee63986a5d5af3823d5a7bf5c7672bdce593a",
+      "public_payload_bytes": 21159,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/linux-nested-evidence-index.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/linux-nested-evidence-index.json",
+      "original_sha256": "92c5ee17ce5777550bf9bf6643de2b8b5785ba92fcfcf001eed7587362133466",
+      "original_bytes": 49964,
+      "public_sha256": "92c5ee17ce5777550bf9bf6643de2b8b5785ba92fcfcf001eed7587362133466",
+      "public_bytes": 49964,
+      "public_payload_sha256": "92c5ee17ce5777550bf9bf6643de2b8b5785ba92fcfcf001eed7587362133466",
+      "public_payload_bytes": 49964,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/native-evidence-verification.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/native-evidence-verification.json",
+      "original_sha256": "19609ec1188ba0bacb8d83ee8ee086b5803b2b5af70132e28d8bf0f697c30058",
+      "original_bytes": 687,
+      "public_sha256": "19609ec1188ba0bacb8d83ee8ee086b5803b2b5af70132e28d8bf0f697c30058",
+      "public_bytes": 687,
+      "public_payload_sha256": "19609ec1188ba0bacb8d83ee8ee086b5803b2b5af70132e28d8bf0f697c30058",
+      "public_payload_bytes": 687,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/source-archive-verification.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/source-archive-verification.json",
+      "original_sha256": "a3b0aff6dc15d59e5f6d03f0e6b54a804e4fc51d7bc92c7b9fb451b0be0fc25d",
+      "original_bytes": 548,
+      "public_sha256": "a3b0aff6dc15d59e5f6d03f0e6b54a804e4fc51d7bc92c7b9fb451b0be0fc25d",
+      "public_bytes": 548,
+      "public_payload_sha256": "a3b0aff6dc15d59e5f6d03f0e6b54a804e4fc51d7bc92c7b9fb451b0be0fc25d",
+      "public_payload_bytes": 548,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/summary.zh-CN.md",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/summary.zh-CN.md",
+      "original_sha256": "1a466f406455f0587eaae36fc70f0c3d8983abc04cdbfd8d67f1e81604f7f316",
+      "original_bytes": 7465,
+      "public_sha256": "1a466f406455f0587eaae36fc70f0c3d8983abc04cdbfd8d67f1e81604f7f316",
+      "public_bytes": 7465,
+      "public_payload_sha256": "1a466f406455f0587eaae36fc70f0c3d8983abc04cdbfd8d67f1e81604f7f316",
+      "public_payload_bytes": 7465,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "audit/audit-process-receipts.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/audit-process-receipts.json",
+      "original_sha256": "24e4636484b42addcbcd64cbb27cc934d15da55827b8441b6a2154c972b91abd",
+      "original_bytes": 1146,
+      "public_sha256": "24e4636484b42addcbcd64cbb27cc934d15da55827b8441b6a2154c972b91abd",
+      "public_bytes": 1146,
+      "public_payload_sha256": "24e4636484b42addcbcd64cbb27cc934d15da55827b8441b6a2154c972b91abd",
+      "public_payload_bytes": 1146,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/ztty-linux-x86_64.build.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.build.json",
+      "original_sha256": "c8b93eee2c906bf419c6190049cac3d45cfa0ad269ff971c9ae712d084312fef",
+      "original_bytes": 1532,
+      "public_sha256": "c8b93eee2c906bf419c6190049cac3d45cfa0ad269ff971c9ae712d084312fef",
+      "public_bytes": 1532,
+      "public_payload_sha256": "c8b93eee2c906bf419c6190049cac3d45cfa0ad269ff971c9ae712d084312fef",
+      "public_payload_bytes": 1532,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/ztty-linux-x86_64.native.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.json",
+      "original_sha256": "66b52e9ea8305cec5f860e8314df6a6812e16f034151f924e12826b0fa1b1c23",
+      "original_bytes": 27129,
+      "public_sha256": "66b52e9ea8305cec5f860e8314df6a6812e16f034151f924e12826b0fa1b1c23",
+      "public_bytes": 27129,
+      "public_payload_sha256": "66b52e9ea8305cec5f860e8314df6a6812e16f034151f924e12826b0fa1b1c23",
+      "public_payload_bytes": 27129,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/ztty-linux-aarch64.build.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.build.json",
+      "original_sha256": "9d5fa6b864d064e9c4d65c4f458e75f03bdaf12047019a426eab8cbbe5039bb9",
+      "original_bytes": 1546,
+      "public_sha256": "9d5fa6b864d064e9c4d65c4f458e75f03bdaf12047019a426eab8cbbe5039bb9",
+      "public_bytes": 1546,
+      "public_payload_sha256": "9d5fa6b864d064e9c4d65c4f458e75f03bdaf12047019a426eab8cbbe5039bb9",
+      "public_payload_bytes": 1546,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/ztty-linux-aarch64.native.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.json",
+      "original_sha256": "ffccf9297c896894f921155ec5fe37b85137243c0eab04aa591be3de394ad1c3",
+      "original_bytes": 27188,
+      "public_sha256": "ffccf9297c896894f921155ec5fe37b85137243c0eab04aa591be3de394ad1c3",
+      "public_bytes": 27188,
+      "public_payload_sha256": "ffccf9297c896894f921155ec5fe37b85137243c0eab04aa591be3de394ad1c3",
+      "public_payload_bytes": 27188,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-macos-x86_64/ztty-macos-x86_64.build.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-macos-x86_64/ztty-macos-x86_64.build.json",
+      "original_sha256": "37ab2a922aa6f3cb1e1000367701f25a08d4757ae9e2a36bf018887d10cefdfb",
+      "original_bytes": 11899,
+      "public_sha256": "37ab2a922aa6f3cb1e1000367701f25a08d4757ae9e2a36bf018887d10cefdfb",
+      "public_bytes": 11899,
+      "public_payload_sha256": "37ab2a922aa6f3cb1e1000367701f25a08d4757ae9e2a36bf018887d10cefdfb",
+      "public_payload_bytes": 11899,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-macos-x86_64/ztty-macos-x86_64.native.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-macos-x86_64/ztty-macos-x86_64.native.json",
+      "original_sha256": "d88c565ac9a3225450967c0e34306f79d279af803c0481aace725b3ca866daa3",
+      "original_bytes": 70033,
+      "public_sha256": "d88c565ac9a3225450967c0e34306f79d279af803c0481aace725b3ca866daa3",
+      "public_bytes": 70033,
+      "public_payload_sha256": "d88c565ac9a3225450967c0e34306f79d279af803c0481aace725b3ca866daa3",
+      "public_payload_bytes": 70033,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-macos-x86_64/ztty-macos-x86_64.manifest.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-macos-x86_64/ztty-macos-x86_64.manifest.json",
+      "original_sha256": "6b4d54f00ebc02d6421bb0ef6711dec7a275223bd947986f4f2b7745b3643da4",
+      "original_bytes": 2963,
+      "public_sha256": "6b4d54f00ebc02d6421bb0ef6711dec7a275223bd947986f4f2b7745b3643da4",
+      "public_bytes": 2963,
+      "public_payload_sha256": "6b4d54f00ebc02d6421bb0ef6711dec7a275223bd947986f4f2b7745b3643da4",
+      "public_payload_bytes": 2963,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-macos-aarch64/ztty-macos-aarch64.build.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-macos-aarch64/ztty-macos-aarch64.build.json",
+      "original_sha256": "c719414fec2ee673aac5a24e736831ba554e4ae62b7845cac3bde7dd6791abc1",
+      "original_bytes": 11956,
+      "public_sha256": "c719414fec2ee673aac5a24e736831ba554e4ae62b7845cac3bde7dd6791abc1",
+      "public_bytes": 11956,
+      "public_payload_sha256": "c719414fec2ee673aac5a24e736831ba554e4ae62b7845cac3bde7dd6791abc1",
+      "public_payload_bytes": 11956,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-macos-aarch64/ztty-macos-aarch64.native.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-macos-aarch64/ztty-macos-aarch64.native.json",
+      "original_sha256": "ed0c51596a22d4c12b3e56510e04a7699709daa0fbfb305bf21128b891865346",
+      "original_bytes": 69957,
+      "public_sha256": "ed0c51596a22d4c12b3e56510e04a7699709daa0fbfb305bf21128b891865346",
+      "public_bytes": 69957,
+      "public_payload_sha256": "ed0c51596a22d4c12b3e56510e04a7699709daa0fbfb305bf21128b891865346",
+      "public_payload_bytes": 69957,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-macos-aarch64/ztty-macos-aarch64.manifest.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-macos-aarch64/ztty-macos-aarch64.manifest.json",
+      "original_sha256": "6ca0c5d3f9b264556d64b24e6f17ab065a1d4722aeeed9dee8d5105d22067815",
+      "original_bytes": 2967,
+      "public_sha256": "6ca0c5d3f9b264556d64b24e6f17ab065a1d4722aeeed9dee8d5105d22067815",
+      "public_bytes": 2967,
+      "public_payload_sha256": "6ca0c5d3f9b264556d64b24e6f17ab065a1d4722aeeed9dee8d5105d22067815",
+      "public_payload_bytes": 2967,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-windows-x86_64/ztty-windows-x86_64.build.json.gz",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-windows-x86_64/ztty-windows-x86_64.build.json",
+      "original_sha256": "92044dd85f2e9025c8fc1fec4e6febf9bef5e7b8ee39c72fb21656bbc79a0254",
+      "original_bytes": 71829,
+      "public_sha256": "203d8ba00f15aafbc1a5abecd08f2a665e1920438b61321510a5a9817a28ad15",
+      "public_bytes": 3609,
+      "public_payload_sha256": "92044dd85f2e9025c8fc1fec4e6febf9bef5e7b8ee39c72fb21656bbc79a0254",
+      "public_payload_bytes": 71829,
+      "storage": "gzip",
+      "modified_fields": [],
+      "storage_reason": "lossless preservation of original CRLF/trailing whitespace"
+    },
+    {
+      "public_file": "native/ztty-windows-x86_64/ztty-windows-x86_64.native.json.gz",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-windows-x86_64/ztty-windows-x86_64.native.json",
+      "original_sha256": "1191cbe6f54baf6bcc3595fa36844283e969c794d608dcc81d503f0b5d8eddff",
+      "original_bytes": 336856,
+      "public_sha256": "742f5f2ec5824d141c9b8b416aa06268525e47cbb6b9e638245597d7f45ef5f3",
+      "public_bytes": 12710,
+      "public_payload_sha256": "1191cbe6f54baf6bcc3595fa36844283e969c794d608dcc81d503f0b5d8eddff",
+      "public_payload_bytes": 336856,
+      "storage": "gzip",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-windows-x86_64/ztty-windows-x86_64.manifest.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-windows-x86_64/ztty-windows-x86_64.manifest.json",
+      "original_sha256": "e36c4e2e2a4a6c604dd83d5ab542fc763208c190387910ebe8fe9ed620a4266d",
+      "original_bytes": 1255,
+      "public_sha256": "e36c4e2e2a4a6c604dd83d5ab542fc763208c190387910ebe8fe9ed620a4266d",
+      "public_bytes": 1255,
+      "public_payload_sha256": "e36c4e2e2a4a6c604dd83d5ab542fc763208c190387910ebe8fe9ed620a4266d",
+      "public_payload_bytes": 1255,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-windows-aarch64/ztty-windows-aarch64.build.json.gz",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-windows-aarch64/ztty-windows-aarch64.build.json",
+      "original_sha256": "5b4715ddc7582f03b7221674b8564451e465289139c80bf0f6d87b4eca851f4c",
+      "original_bytes": 72226,
+      "public_sha256": "62d6c5c713fc2dc40eefeaada6288683972336fa5311d6e07b0fa0f03460f7b5",
+      "public_bytes": 3591,
+      "public_payload_sha256": "5b4715ddc7582f03b7221674b8564451e465289139c80bf0f6d87b4eca851f4c",
+      "public_payload_bytes": 72226,
+      "storage": "gzip",
+      "modified_fields": [],
+      "storage_reason": "lossless preservation of original CRLF/trailing whitespace"
+    },
+    {
+      "public_file": "native/ztty-windows-aarch64/ztty-windows-aarch64.native.json.gz",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-windows-aarch64/ztty-windows-aarch64.native.json",
+      "original_sha256": "52d5248c5846aea0450254adea279f7c83eac9633080abccbd5ddbded94e66f5",
+      "original_bytes": 338582,
+      "public_sha256": "e8b8ca3084063dbf33d25b7e6732c3c89ac5ce1242ae1684e1023ceee815d914",
+      "public_bytes": 12695,
+      "public_payload_sha256": "52d5248c5846aea0450254adea279f7c83eac9633080abccbd5ddbded94e66f5",
+      "public_payload_bytes": 338582,
+      "storage": "gzip",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-windows-aarch64/ztty-windows-aarch64.manifest.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-windows-aarch64/ztty-windows-aarch64.manifest.json",
+      "original_sha256": "be044cc0ee156a0821136364b43046798ca7d96b14606f8e97a06f2bafd0f375",
+      "original_bytes": 1257,
+      "public_sha256": "be044cc0ee156a0821136364b43046798ca7d96b14606f8e97a06f2bafd0f375",
+      "public_bytes": 1257,
+      "public_payload_sha256": "be044cc0ee156a0821136364b43046798ca7d96b14606f8e97a06f2bafd0f375",
+      "public_payload_bytes": 1257,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "release/release-notes-edit.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-0.5.0-20261120/release-notes-edit.json",
+      "original_sha256": "4d82f94ece6bca4fd7bfa1f5408b3c8d03328eb3e3c8ca878c6e626fe7a345e7",
+      "original_bytes": 540,
+      "public_sha256": "4d82f94ece6bca4fd7bfa1f5408b3c8d03328eb3e3c8ca878c6e626fe7a345e7",
+      "public_bytes": 540,
+      "public_payload_sha256": "4d82f94ece6bca4fd7bfa1f5408b3c8d03328eb3e3c8ca878c6e626fe7a345e7",
+      "public_payload_bytes": 540,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "release/release-notes-first-readback-failure.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-0.5.0-20261120/release-notes-first-readback-failure.json",
+      "original_sha256": "3896ec2d894c17179e218960b451a9520db29b44d50b577becd1c5866391afab",
+      "original_bytes": 258,
+      "public_sha256": "3896ec2d894c17179e218960b451a9520db29b44d50b577becd1c5866391afab",
+      "public_bytes": 258,
+      "public_payload_sha256": "3896ec2d894c17179e218960b451a9520db29b44d50b577becd1c5866391afab",
+      "public_payload_bytes": 258,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "release/release-notes-edit.stdout.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-0.5.0-20261120/release-notes-edit.stdout.log",
+      "original_sha256": "cdda3a006d9448c42af62b53abd9580a7d2934cb7ad81d218a47d94fd6916746",
+      "original_bytes": 58,
+      "public_sha256": "cdda3a006d9448c42af62b53abd9580a7d2934cb7ad81d218a47d94fd6916746",
+      "public_bytes": 58,
+      "public_payload_sha256": "cdda3a006d9448c42af62b53abd9580a7d2934cb7ad81d218a47d94fd6916746",
+      "public_payload_bytes": 58,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "release/release-notes-edit.stderr.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/formal-release-0.5.0-20261120/release-notes-edit.stderr.log",
+      "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_bytes": 0,
+      "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_bytes": 0,
+      "public_payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_payload_bytes": 0,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "release/published-body.md",
+      "source_scope": "DOCUMENTATION_WORKTREE",
+      "source_relative_path": "artifacts/formal-release-document-validation/release-notes-0.5.0-full.md",
+      "original_sha256": "a2ef81f3444c822cb75789df8b72209e08fcb71d1e53d10cce99e9f58b3cf252",
+      "original_bytes": 3361,
+      "public_sha256": "a2ef81f3444c822cb75789df8b72209e08fcb71d1e53d10cce99e9f58b3cf252",
+      "public_bytes": 3361,
+      "public_payload_sha256": "a2ef81f3444c822cb75789df8b72209e08fcb71d1e53d10cce99e9f58b3cf252",
+      "public_payload_bytes": 3361,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/gpu-text.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/gpu-text.json",
+      "original_sha256": "7c447dbbc69161006f20f89154eaa5af5836a996339d9ab457de313db45ce087",
+      "original_bytes": 11750,
+      "public_sha256": "7c447dbbc69161006f20f89154eaa5af5836a996339d9ab457de313db45ce087",
+      "public_bytes": 11750,
+      "public_payload_sha256": "7c447dbbc69161006f20f89154eaa5af5836a996339d9ab457de313db45ce087",
+      "public_payload_bytes": 11750,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/gpu-ui.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/gpu-ui.json",
+      "original_sha256": "c272400b27b06c1d358ec5fd0a08ad5d8323b667d0dfa5cad98116d586d7c98b",
+      "original_bytes": 8783,
+      "public_sha256": "c272400b27b06c1d358ec5fd0a08ad5d8323b667d0dfa5cad98116d586d7c98b",
+      "public_bytes": 8783,
+      "public_payload_sha256": "c272400b27b06c1d358ec5fd0a08ad5d8323b667d0dfa5cad98116d586d7c98b",
+      "public_payload_bytes": 8783,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/gpu-repaint.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/gpu-repaint.json",
+      "original_sha256": "7ae9ef318e9d6e48f79dda8c3ebc902567f468aa815adab58397876bc679768e",
+      "original_bytes": 10940,
+      "public_sha256": "7ae9ef318e9d6e48f79dda8c3ebc902567f468aa815adab58397876bc679768e",
+      "public_bytes": 10940,
+      "public_payload_sha256": "7ae9ef318e9d6e48f79dda8c3ebc902567f468aa815adab58397876bc679768e",
+      "public_payload_bytes": 10940,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/retained-frame.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/retained-frame.json",
+      "original_sha256": "46805a943e05be076c44d1150d04a40386d3c682d914894515fc0221d59d5305",
+      "original_bytes": 13744,
+      "public_sha256": "46805a943e05be076c44d1150d04a40386d3c682d914894515fc0221d59d5305",
+      "public_bytes": 13744,
+      "public_payload_sha256": "46805a943e05be076c44d1150d04a40386d3c682d914894515fc0221d59d5305",
+      "public_payload_bytes": 13744,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/clipboard.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/clipboard.json",
+      "original_sha256": "c74b316bc501d532101bf8649f5c29ba4cb1e00931750bb48b2e4f011e85f50b",
+      "original_bytes": 12609,
+      "public_sha256": "c74b316bc501d532101bf8649f5c29ba4cb1e00931750bb48b2e4f011e85f50b",
+      "public_bytes": 12609,
+      "public_payload_sha256": "c74b316bc501d532101bf8649f5c29ba4cb1e00931750bb48b2e4f011e85f50b",
+      "public_payload_bytes": 12609,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/wayland/validation.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/wayland/validation.json",
+      "original_sha256": "d9eb627367fc17f89932af67e080bcb0819aaa4ff7a2b7b6fed34098e420d204",
+      "original_bytes": 9047,
+      "public_sha256": "d9eb627367fc17f89932af67e080bcb0819aaa4ff7a2b7b6fed34098e420d204",
+      "public_bytes": 9047,
+      "public_payload_sha256": "d9eb627367fc17f89932af67e080bcb0819aaa4ff7a2b7b6fed34098e420d204",
+      "public_payload_bytes": 9047,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/graphics-gpu/graphics-extensions.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/graphics-gpu/graphics-extensions.json",
+      "original_sha256": "497749eb391a8c016ec51c5a539b71f2a88504c8f1414494618c908272c992fb",
+      "original_bytes": 2389,
+      "public_sha256": "497749eb391a8c016ec51c5a539b71f2a88504c8f1414494618c908272c992fb",
+      "public_bytes": 2389,
+      "public_payload_sha256": "497749eb391a8c016ec51c5a539b71f2a88504c8f1414494618c908272c992fb",
+      "public_payload_bytes": 2389,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/osc52-gpu/osc52.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/osc52-gpu/osc52.json",
+      "original_sha256": "123e2968fcaac4d1add1cd32d0b1a84774cb932a75f072331abd963e03b7d8d2",
+      "original_bytes": 3177,
+      "public_sha256": "123e2968fcaac4d1add1cd32d0b1a84774cb932a75f072331abd963e03b7d8d2",
+      "public_bytes": 3177,
+      "public_payload_sha256": "123e2968fcaac4d1add1cd32d0b1a84774cb932a75f072331abd963e03b7d8d2",
+      "public_payload_bytes": 3177,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/graphics-software/graphics-extensions.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/graphics-software/graphics-extensions.json",
+      "original_sha256": "12a832437f579a8eeaf32026a7c353c52e3be0eeeb9be51a59dbc09678369efc",
+      "original_bytes": 2345,
+      "public_sha256": "12a832437f579a8eeaf32026a7c353c52e3be0eeeb9be51a59dbc09678369efc",
+      "public_bytes": 2345,
+      "public_payload_sha256": "12a832437f579a8eeaf32026a7c353c52e3be0eeeb9be51a59dbc09678369efc",
+      "public_payload_bytes": 2345,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-x86_64/extra/osc52-software/osc52.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-x86_64/ztty-linux-x86_64.native.tar.gz!ztty-linux-x86_64.native/osc52-software/osc52.json",
+      "original_sha256": "433f659186658963fa49365c928fc9daf16282b0fd8a7948cc2600153a9457b3",
+      "original_bytes": 3133,
+      "public_sha256": "433f659186658963fa49365c928fc9daf16282b0fd8a7948cc2600153a9457b3",
+      "public_bytes": 3133,
+      "public_payload_sha256": "433f659186658963fa49365c928fc9daf16282b0fd8a7948cc2600153a9457b3",
+      "public_payload_bytes": 3133,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/gpu-text.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/gpu-text.json",
+      "original_sha256": "0ebdf443c048307bb2d19affdb7492a0c3cd96ab19bc272d33fc83fb52716c80",
+      "original_bytes": 11963,
+      "public_sha256": "0ebdf443c048307bb2d19affdb7492a0c3cd96ab19bc272d33fc83fb52716c80",
+      "public_bytes": 11963,
+      "public_payload_sha256": "0ebdf443c048307bb2d19affdb7492a0c3cd96ab19bc272d33fc83fb52716c80",
+      "public_payload_bytes": 11963,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/gpu-ui.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/gpu-ui.json",
+      "original_sha256": "3c2e66e31527d3b941f4e2fb5a7f8d3f305cb9d3d37b12359a437817999b2453",
+      "original_bytes": 8786,
+      "public_sha256": "3c2e66e31527d3b941f4e2fb5a7f8d3f305cb9d3d37b12359a437817999b2453",
+      "public_bytes": 8786,
+      "public_payload_sha256": "3c2e66e31527d3b941f4e2fb5a7f8d3f305cb9d3d37b12359a437817999b2453",
+      "public_payload_bytes": 8786,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/gpu-repaint.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/gpu-repaint.json",
+      "original_sha256": "3a9ebb6c46f33e0293c5f8d199508899fd6f98a495e3b7ceb56262b009ecbc2d",
+      "original_bytes": 10770,
+      "public_sha256": "3a9ebb6c46f33e0293c5f8d199508899fd6f98a495e3b7ceb56262b009ecbc2d",
+      "public_bytes": 10770,
+      "public_payload_sha256": "3a9ebb6c46f33e0293c5f8d199508899fd6f98a495e3b7ceb56262b009ecbc2d",
+      "public_payload_bytes": 10770,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/retained-frame.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/retained-frame.json",
+      "original_sha256": "5e652e4141a42e025b756df11aa4e94865ff5558f443f89bd5ce6d64b7d5d983",
+      "original_bytes": 13746,
+      "public_sha256": "5e652e4141a42e025b756df11aa4e94865ff5558f443f89bd5ce6d64b7d5d983",
+      "public_bytes": 13746,
+      "public_payload_sha256": "5e652e4141a42e025b756df11aa4e94865ff5558f443f89bd5ce6d64b7d5d983",
+      "public_payload_bytes": 13746,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/clipboard.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/clipboard.json",
+      "original_sha256": "9827de37d603206eb9e2011d5febd9fca8d89cd05b959b01f3b7822a8f5d0fd0",
+      "original_bytes": 12609,
+      "public_sha256": "9827de37d603206eb9e2011d5febd9fca8d89cd05b959b01f3b7822a8f5d0fd0",
+      "public_bytes": 12609,
+      "public_payload_sha256": "9827de37d603206eb9e2011d5febd9fca8d89cd05b959b01f3b7822a8f5d0fd0",
+      "public_payload_bytes": 12609,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/wayland/validation.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/wayland/validation.json",
+      "original_sha256": "6bdfa50b55fe67df6703348a90f1a39ca06bc1f974747bd03c0b9b787a1bd929",
+      "original_bytes": 9045,
+      "public_sha256": "6bdfa50b55fe67df6703348a90f1a39ca06bc1f974747bd03c0b9b787a1bd929",
+      "public_bytes": 9045,
+      "public_payload_sha256": "6bdfa50b55fe67df6703348a90f1a39ca06bc1f974747bd03c0b9b787a1bd929",
+      "public_payload_bytes": 9045,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/graphics-gpu/graphics-extensions.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/graphics-gpu/graphics-extensions.json",
+      "original_sha256": "515a61613f7845c7006e86f0540a53f714a80aeb4353132e79fe964fcac59880",
+      "original_bytes": 2389,
+      "public_sha256": "515a61613f7845c7006e86f0540a53f714a80aeb4353132e79fe964fcac59880",
+      "public_bytes": 2389,
+      "public_payload_sha256": "515a61613f7845c7006e86f0540a53f714a80aeb4353132e79fe964fcac59880",
+      "public_payload_bytes": 2389,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/osc52-gpu/osc52.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/osc52-gpu/osc52.json",
+      "original_sha256": "4190891e93c0345748ec5e4a81c2117342f4f8c4b71181d2ff97742c1ee8d9cc",
+      "original_bytes": 3174,
+      "public_sha256": "4190891e93c0345748ec5e4a81c2117342f4f8c4b71181d2ff97742c1ee8d9cc",
+      "public_bytes": 3174,
+      "public_payload_sha256": "4190891e93c0345748ec5e4a81c2117342f4f8c4b71181d2ff97742c1ee8d9cc",
+      "public_payload_bytes": 3174,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/graphics-software/graphics-extensions.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/graphics-software/graphics-extensions.json",
+      "original_sha256": "59b4ab1ce3b27803e3bb98d4268dfecaeb558b13d7001e36223de5ddee753960",
+      "original_bytes": 2345,
+      "public_sha256": "59b4ab1ce3b27803e3bb98d4268dfecaeb558b13d7001e36223de5ddee753960",
+      "public_bytes": 2345,
+      "public_payload_sha256": "59b4ab1ce3b27803e3bb98d4268dfecaeb558b13d7001e36223de5ddee753960",
+      "public_payload_bytes": 2345,
+      "storage": "plain",
+      "modified_fields": []
+    },
+    {
+      "public_file": "native/ztty-linux-aarch64/extra/osc52-software/osc52.json",
+      "source_scope": "WORKTREE archive member",
+      "source_relative_path": "artifacts/formal-release-v050-44668398577/ztty-linux-aarch64/ztty-linux-aarch64.native.tar.gz!ztty-linux-aarch64.native/osc52-software/osc52.json",
+      "original_sha256": "a8ddd1efade239d87e2c254ddfe6ef4188f5faefcaaf5685951e26cef487c44c",
+      "original_bytes": 3130,
+      "public_sha256": "a8ddd1efade239d87e2c254ddfe6ef4188f5faefcaaf5685951e26cef487c44c",
+      "public_bytes": 3130,
+      "public_payload_sha256": "a8ddd1efade239d87e2c254ddfe6ef4188f5faefcaaf5685951e26cef487c44c",
+      "public_payload_bytes": 3130,
+      "storage": "plain",
+      "modified_fields": []
+    }
+  ],
+  "redaction_rules": [
+    {
+      "original_prefix_sha256": "90f6ce2c170b4e50f5fd1c46b840b1232ede8a01d30cf47535a42b58b2873352",
+      "replacement": "WORKTREE"
+    },
+    {
+      "original_prefix_sha256": "cf956db5a4888f7bdeb9e3f66ebf02fff966abc5ec27b4d9ffb1ede3c09aec8d",
+      "replacement": "PROJECT_WORKTREE"
+    },
+    {
+      "original_prefix_sha256": "ce9a5f916e75002650bc764f456dac3be56330a15a552d09b14c360f59e1cc52",
+      "replacement": "USER_WORKSPACE"
+    }
+  ],
+  "preservation": {
+    "numeric_json_values": true,
+    "array_order": true,
+    "object_key_order": true,
+    "json_whitespace": true,
+    "empty_logs": true,
+    "original_files_unmodified": true
+  },
+  "derived_files": [
+    {
+      "public_file": "README.md",
+      "public_bytes": 9268,
+      "public_sha256": "41cad4f5b46e7ca01e129969c956b9014ddec2b1d80b3582363e5ad19c95ea04",
+      "role": "derived explanation or offline verification; not original runtime data"
+    },
+    {
+      "public_file": "ASSETS.md",
+      "public_bytes": 10020,
+      "public_sha256": "57de5fa95dd853cbd512ec5525e30ce0eba5eb09d8b69657a90ba1ea09beb50d",
+      "role": "derived explanation or offline verification; not original runtime data"
+    },
+    {
+      "public_file": "summary.json",
+      "public_bytes": 24545,
+      "public_sha256": "7c1b1984c47c0b6d9ee15549448a00b8c65ab0ef93af1d09638be622aa86e565",
+      "role": "derived explanation or offline verification; not original runtime data"
+    },
+    {
+      "public_file": "verify-record.py",
+      "public_bytes": 15162,
+      "public_sha256": "0d3d202238a6ed2bbc51c9bdc4e79a2f297bc87e8a9bacf514cfdd6eedc9c013",
+      "role": "derived explanation or offline verification; not original runtime data"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "job_id": "59cd4366f811fed8854b09c698ca60d5-45c",
+  "wrapper_exit_code": 1,
+  "edit_step_exit_code": 0,
+  "failed_step": "post-edit gh api readback",
+  "error": "GitHub API read returned EOF after successful release edit",
+  "mutation_repeated": false
+}

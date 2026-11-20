@@ -1,0 +1,38 @@
+{
+  "ztty-macos-x86_64": {
+    "id": 14599161830,
+    "bytes": 659283,
+    "sha256": "a63433d4327d874e1d9ad3c07ca21bd62c4b46593c5f3939b3bb346b60be553e",
+    "files": 66
+  },
+  "ztty-linux-aarch64": {
+    "id": 14599002218,
+    "bytes": 1806233,
+    "sha256": "0dd3299483878cdb35673e3aff87205f34a60f7a2e2ff8c97f557998277eb0c4",
+    "files": 8
+  },
+  "ztty-macos-aarch64": {
+    "id": 14598937171,
+    "bytes": 605969,
+    "sha256": "86ecd03fa0dd0ebc9c2cf0b5bea5a5957009fb8a1ddf1fa784b03e88921ee8e5",
+    "files": 66
+  },
+  "ztty-windows-x86_64": {
+    "id": 14598747389,
+    "bytes": 1242168,
+    "sha256": "6911ae644fc5cb281148c52df53ad4028cc5cadf15283b0e536343c45792f869",
+    "files": 400
+  },
+  "ztty-linux-x86_64": {
+    "id": 14598119287,
+    "bytes": 1830205,
+    "sha256": "302fa90a6dde0bc8cb072335d3c5c4fd7a4ec9062e9a0d1a7ec4eb68e77fef06",
+    "files": 8
+  },
+  "ztty-windows-aarch64": {
+    "id": 14598073903,
+    "bytes": 1168471,
+    "sha256": "d0ff26f7ae594eb2fd561885d6099a1a714eb90f50e1e8b70dbbd0ea2e190a85",
+    "files": 400
+  }
+}
