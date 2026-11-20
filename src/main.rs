@@ -486,8 +486,9 @@ fn paste(
     terminal: &Terminal,
     queue: &mut InputQueue,
 ) -> Result<usize, &'static str> {
-    let text = String::from_utf8_lossy(&bytes);
-    let encoded = input::encode_paste(&text, &terminal.modes().input());
+    let text = core::str::from_utf8(&bytes)
+        .map_err(|_| "Clipboard text is not valid UTF-8; paste was not sent")?;
+    let encoded = input::encode_paste(text, &terminal.modes().input());
     let payload_len = encoded.len()
         - if terminal.modes().bracketed_paste {
             12

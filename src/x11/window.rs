@@ -288,6 +288,8 @@ impl Window {
                 ic,
                 clipboard: XInternAtom(display, c"CLIPBOARD".as_ptr(), 0),
                 utf8: XInternAtom(display, c"UTF8_STRING".as_ptr(), 0),
+                utf8_mime: XInternAtom(display, c"text/plain;charset=utf-8".as_ptr(), 0),
+                text_mime: XInternAtom(display, c"text/plain".as_ptr(), 0),
                 targets: XInternAtom(display, c"TARGETS".as_ptr(), 0),
                 transfer: XInternAtom(display, c"ZTTY_SELECTION".as_ptr(), 0),
                 osc_requestor: 0,

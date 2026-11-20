@@ -149,6 +149,8 @@ pub struct Window {
     ic: Rc<InputContext>,
     clipboard: Atom,
     utf8: Atom,
+    utf8_mime: Atom,
+    text_mime: Atom,
     targets: Atom,
     transfer: Atom,
     osc_requestor: Xid,
