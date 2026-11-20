@@ -8,6 +8,7 @@ installation is read or modified, and no window or network request is created.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 from pathlib import Path
 import platform
@@ -392,6 +393,67 @@ class InstallerTests(unittest.TestCase):
         while not launch.exists() and time.monotonic() < deadline:
             time.sleep(0.01)
         self.assertEqual(launch.read_text().splitlines(), ["0.2.1", str(destination / "ztty")])
+
+
+    def cargo_build_fixture(self, *, exit_code=0, executable=True):
+        binary = self.root / "shared target" / "native-triple" / "release" / "ztty"
+        binary.parent.mkdir(parents=True)
+        shutil.copyfile(self.new, binary)
+        binary.chmod(0o755)
+        messages = [{
+            "reason": "compiler-artifact", "executable": "/unrelated/other-program",
+            "target": {"name": "other-program", "kind": ["bin"]},
+        }]
+        if executable:
+            messages.append({
+                "reason": "compiler-artifact", "executable": str(binary),
+                "target": {"name": "ztty", "kind": ["bin"]},
+            })
+        messages.append({"reason": "build-finished", "success": exit_code == 0})
+        calls = self.root / "cargo.calls"
+        mock = self.mock_bin / "cargo"
+        mock.write_text(
+            "#!" + sys.executable + "\n"
+            "import pathlib, sys\n"
+            f"with pathlib.Path({str(calls)!r}).open('a') as log: log.write('build\\n')\n"
+            + "".join(f"print({json.dumps(message)!r})\n" for message in messages)
+            + f"raise SystemExit({exit_code})\n",
+        )
+        mock.chmod(0o755)
+        return calls
+
+    def test_make_install_uses_cargo_artifact_outside_the_workspace(self):
+        calls = self.cargo_build_fixture()
+        result = subprocess.run(
+            ["make", "install"], cwd=ROOT, env=self.env,
+            capture_output=True, text=True, timeout=20,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assert_installed(self.target)
+        self.assertEqual(calls.read_text().splitlines(), ["build"])
+        self.assertFalse(self.curl_log.exists())
+
+    def test_make_install_rejects_artifact_from_failed_cargo_build(self):
+        self.cargo_build_fixture(exit_code=7)
+        result = subprocess.run(
+            ["make", "install"], cwd=ROOT, env=self.env,
+            capture_output=True, text=True, timeout=20,
+        )
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse(self.target.exists())
+        self.assertFalse(self.desktop.exists())
+        self.assertFalse(self.curl_log.exists())
+
+    def test_make_install_rejects_missing_ztty_artifact(self):
+        self.cargo_build_fixture(executable=False)
+        result = subprocess.run(
+            ["make", "install"], cwd=ROOT, env=self.env,
+            capture_output=True, text=True, timeout=20,
+        )
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Cargo did not report exactly one ztty executable", result.stderr)
+        self.assertFalse(self.target.exists())
+        self.assertFalse(self.curl_log.exists())
 
     def test_make_install_and_uninstall_respect_prefix_and_destdir(self):
         prefix = self.root / "final prefix"

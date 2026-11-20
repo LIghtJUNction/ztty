@@ -13,4 +13,4 @@ categories = ["no-std", "api-bindings"]
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE"]
 
 [dependencies]
-zplugin = { version = "=0.3.1", default-features = false, features = ["macros"] }
+zplugin = { git = "https://github.com/LIghtJUNction/zplugin.git", version = "=0.3.1", default-features = false, features = ["macros"] }

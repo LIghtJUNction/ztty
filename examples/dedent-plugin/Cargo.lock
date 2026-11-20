@@ -40,8 +40,7 @@ checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
 [[package]]
 name = "zplugin"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "094cd57c6b7759cbbf7834e96aed75c9d025558a7d2cc4b742e78b33f8e7a448"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
 dependencies = [
  "zplugin-macros",
  "zsys",
@@ -50,8 +49,7 @@ dependencies = [
 [[package]]
 name = "zplugin-macros"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f39a8e67a3405ad54b2780d74360dabdbbcaa6f33fb44474e13433c0b34ca395"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -61,8 +59,7 @@ dependencies = [
 [[package]]
 name = "zsys"
 version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "929d282f08df7fbe2456414924e126a29dfde04e93eb2515721b596404610548"
+source = "git+https://github.com/LIghtJUNction/zsys.git#808fcfdb73584ca7ca122e20b76f0209f56ab0f7"
 
 [[package]]
 name = "ztty-dedent-plugin"

@@ -222,7 +222,8 @@ RSS 或硬件显存的同等降幅。大段粘贴进入 ZLE 后的编辑耗时�
 | [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.2](https://crates.io/crates/zterm/0.5.2) |
 
 这些正式库版本包含 ztty 0.5.2 使用的终端状态保存、恢复与 PTY 接管 API。
-源码构建使用对应子模块固定点；Cargo 包使用注册表版本与锁文件。
+开发源码通过 GitHub 默认分支消费这些库，由 Cargo.lock 记录本次提交；
+子模块固定点与这份源码快照一致，用于独立库检查。上表记录已发布的注册表版本。
 应用保持 zgpui 的 `std` 和 `native` 特性关闭。
 
 可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；

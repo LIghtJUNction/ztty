@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Check shipped Rust dependencies and the linked executable for std usage."""
+import argparse
 import json
 import pathlib
 import re
@@ -7,6 +8,9 @@ import subprocess
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", type=pathlib.Path)
+    args = parser.parse_args()
     metadata = json.loads(subprocess.check_output(
         ["cargo", "metadata", "--locked", "--format-version", "1"], text=True
     ))
@@ -38,7 +42,7 @@ def main():
             if any(kind["kind"] is None for kind in dep["dep_kinds"]):
                 pending.append(dep["pkg"])
         print(f'{package["name"]} {package["version"]}: no_std, features={node["features"]}')
-    binary = pathlib.Path(metadata["target_directory"]) / "release" / "ztty"
+    binary = args.binary or pathlib.Path(metadata["target_directory"]) / "release" / "ztty"
     symbols = subprocess.check_output(["nm", "-C", str(binary)], text=True)
     forbidden = [line for line in symbols.splitlines() if re.search(r"\bstd::", line)]
     assert not forbidden, forbidden[:10]

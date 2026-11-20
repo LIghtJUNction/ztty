@@ -30,6 +30,7 @@ documented in their own release notes.
 | --- | --- |
 | [Architecture](architecture.md) | Terminal model, libraries and resource ownership |
 | [Dependency propagation](dependency-propagation.md) | Consumer ownership, source pins and open integration handoffs |
+| [Default-branch source validation](reports/default-branch-sources-20261121/README.zh-CN.md) | Git dependency sources, shared Cargo outputs, plugins and runtime reload |
 | [Reusable libraries](../README.md#reusable-libraries) | Independent repositories, component responsibilities and release status |
 | [Protocols](protocols.md) | Implemented sequences, graphics and platform acceptance |
 | [Session core](session-core.md) | PTY reads, input queues, sizing and ownership |

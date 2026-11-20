@@ -19,8 +19,11 @@ for package in zgpui zinput zpty zgraphics zterm; do
 done
 cargo test --locked --workspace "$@"
 cargo clippy --locked --workspace --all-targets "$@" -- -D warnings
-cargo build --locked --release "$@"
-python3 tools/check_no_std.py
+ztty_build_json=$(cargo build --locked --release "$@" --message-format=json-render-diagnostics)
+ztty_binary=$(printf '%s\n' "$ztty_build_json" | python3 -c 'import json,sys; paths={m["executable"] for m in map(json.loads,sys.stdin) if m.get("reason")=="compiler-artifact" and m.get("executable") and m["target"]["name"]=="ztty" and "bin" in m["target"]["kind"]}; len(paths)==1 or sys.exit("Cargo did not report exactly one ztty executable"); print(paths.pop())')
+unset ztty_build_json
+printf 'Checking executable: %s\n' "$ztty_binary"
+python3 tools/check_no_std.py --binary "$ztty_binary"
 if [ "$(uname -s)" = Linux ]; then
     if [ "${ZTTY_WAYLAND:-0}" = 1 ]; then
         python3 tests/wayland_services.py --sanitize --output artifacts/wayland-services
@@ -28,11 +31,11 @@ if [ "$(uname -s)" = Linux ]; then
     fi
     python3 tests/install_test.py
     python3 tests/bash_integration.py --output artifacts/bash-integration/report.json
-    python3 tests/mcp_transport.py --binary ./target/release/ztty
-    python3 tests/mcp_sessions.py --binary ./target/release/ztty
-    python3 tests/mcp_security.py --binary ./target/release/ztty
-    python3 tests/mcp_wait.py --binary ./target/release/ztty --output artifacts/mcp-wait/report.json
-    python3 tests/mcp_sse.py --binary ./target/release/ztty --output artifacts/mcp-sse/report.json
+    python3 tests/mcp_transport.py --binary "$ztty_binary"
+    python3 tests/mcp_sessions.py --binary "$ztty_binary"
+    python3 tests/mcp_security.py --binary "$ztty_binary"
+    python3 tests/mcp_wait.py --binary "$ztty_binary" --output artifacts/mcp-wait/report.json
+    python3 tests/mcp_sse.py --binary "$ztty_binary" --output artifacts/mcp-sse/report.json
 else
     printf '%s\n' 'Shared-session MCP checks: skipped (Linux-only runtime).'
 fi

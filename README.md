@@ -240,8 +240,10 @@ Run `sh tools/check.sh` for the local development checks.
 | [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.2](https://crates.io/crates/zterm/0.5.2) |
 
 These published versions include the terminal checkpoint and PTY handover APIs
-used by ztty 0.5.2. Source builds use their matching submodule pins; Cargo packages
-use the registry versions and lockfile. The application keeps zgpui's `std` and
+used by ztty 0.5.2. Development builds use the libraries' GitHub default branches,
+with exact source commits recorded in Cargo.lock. Library submodule pins match
+that snapshot for independent checks; the table records published registry versions.
+The application keeps zgpui's `std` and
 `native` features disabled.
 
 The [architecture](docs/architecture.md) describes the reusable Project Z libraries;

@@ -2,15 +2,25 @@
 
 ## Current source dependency maintenance
 
-The current development source pins portable zgpui to `=0.1.5` and uses the
-immutable library sources in [dependency propagation](dependency-propagation.md).
-The [local consumer report](reports/dependency-refresh-20261120/README.md) records
-Linux validation and a verified registry package for that dependency graph.
-This source update has no new application release or installed-artifact claim.
-The candidate and publication records below retain their original versions;
-the next release must bind the complete native workflow to its own source and artifacts.
+Development dependencies between Project Z repositories use canonical GitHub Git
+URLs and their default branches. Cargo.lock records the exact tested commits;
+library submodule pins match the application graph for independent checks.
+Same-repository dependencies keep their workspace or path relationship.
 
-## 0.5.2 candidate — 2026-11-20
+The [2026-11-21 source report](reports/default-branch-sources-20261121/README.zh-CN.md)
+records the current graph, shared Cargo artifact handling, local gates, plugins
+and actual same-PID reload checks. The package version remains `0.5.2`; this
+iteration does not establish a new registry release or desktop installation.
+The [propagation record](dependency-propagation.md) identifies the remaining
+suite and aggregate owners.
+
+A later release must validate its own source, resolved dependencies and artifacts.
+If publishing a registry package, separately verify the generated archive and its
+registry dependency graph; the current Git-source checks do not establish that
+package's contents. The candidate and publication sections below describe their
+original historical inputs.
+
+## Historical 0.5.2 candidate — 2026-11-20
 
 This candidate starts from the fixed
 [0.5.1 source](https://github.com/LIghtJUNction/ztty/commit/1631db8a02e8627d5d35ac0e1d4bef93475f45dc)
