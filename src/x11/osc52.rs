@@ -60,19 +60,10 @@ impl Window {
         self.osc_requestor = requestor;
         self.paste_limit = zterm::MAX_CLIPBOARD_BYTES;
         self.paste_selection = if primary { 1 } else { self.clipboard };
-        self.paste_target = self.utf8;
         unsafe {
             XSelectInput(self.state.display, requestor, 1 << 22);
-            XConvertSelection(
-                self.state.display,
-                self.paste_selection,
-                self.utf8,
-                self.transfer,
-                requestor,
-                0,
-            );
-            XFlush(self.state.display);
         }
+        self.request_paste_target(self.targets);
         true
     }
 }

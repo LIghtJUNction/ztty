@@ -120,6 +120,7 @@ def main():
                 event_mask=X.PropertyChangeMask)
             clipboard = connection.intern_atom("CLIPBOARD")
             utf8 = connection.intern_atom("UTF8_STRING")
+            targets = connection.intern_atom("TARGETS")
             incr = connection.intern_atom("INCR")
             owner.set_selection_owner(clipboard, X.CurrentTime)
             connection.sync()
@@ -142,6 +143,17 @@ def main():
                     if event.type == X.SelectionRequest:
                         requestor = event.requestor
                         prop = event.property or event.target
+                        if event.target == targets:
+                            advertised = [] if state.get("mode") == "missing" else [
+                                Xatom.STRING if state.get("latin") else utf8]
+                            send_property(requestor, prop, Xatom.ATOM, 32, [targets, *advertised])
+                            requestor.send_event(protocol.event.SelectionNotify(
+                                time=event.time, requestor=requestor, selection=event.selection,
+                                target=event.target, property=prop), event_mask=0)
+                            state["requests"] = state.get("requests", 0) + 1
+                            state["last_event"] = time.monotonic()
+                            connection.flush()
+                            continue
                         reject = state.get("latin") and event.target == utf8
                         if state.get("mode") == "missing":
                             reject = True
