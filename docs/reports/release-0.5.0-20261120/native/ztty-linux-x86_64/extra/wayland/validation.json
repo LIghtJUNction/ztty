@@ -1,0 +1,378 @@
+{
+  "schema": 1,
+  "binary_sha256": "3ed8cead1c4ca20aedd4aa262de8fe992bcf9639546d95f89f7a782eeef7a491",
+  "source": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "source_worktree_dirty": true,
+  "scope": "Linux headless Sway, software Mesa EGL, private shared broker; no physical display",
+  "checks": [
+    {
+      "name": "native_surface_and_pty",
+      "passed": true,
+      "app_id": "org.project-z.ztty"
+    },
+    {
+      "name": "cwd_and_terminal_environment",
+      "passed": true,
+      "state": {
+        "cols": 78,
+        "rows": 22,
+        "term": "xterm-256color",
+        "program": "ztty",
+        "pwd_matches_cwd": true
+      }
+    },
+    {
+      "name": "actual_egl_pixels",
+      "passed": true,
+      "red_pixels": 3800
+    },
+    {
+      "name": "ascii_keyboard",
+      "passed": true,
+      "expected_hex": "48656c6c6f207a74747921",
+      "actual_hex": "48656c6c6f207a74747921"
+    },
+    {
+      "name": "unicode_keyboard",
+      "passed": true,
+      "expected_hex": "e4b8ade69687",
+      "actual_hex": "e4b8ade69687"
+    },
+    {
+      "name": "control_key",
+      "passed": true,
+      "expected_hex": "03",
+      "actual_hex": "03"
+    },
+    {
+      "name": "navigation_keys",
+      "passed": true,
+      "expected_hex": "1b5b411b5b44",
+      "actual_hex": "1b5b411b5b44"
+    },
+    {
+      "name": "alt_key",
+      "passed": true,
+      "expected_hex": "1b78",
+      "actual_hex": "1b78"
+    },
+    {
+      "name": "keyboard_repeat",
+      "passed": true,
+      "bytes": 8
+    },
+    {
+      "name": "repeat_stops_on_release",
+      "passed": true
+    },
+    {
+      "name": "kitty_press_release",
+      "passed": true,
+      "expected_hex": "1b5b39373b313a31751b5b39373b313a3375",
+      "actual_hex": "1b5b39373b313a31751b5b39373b313a3375"
+    },
+    {
+      "name": "osc_title_reaches_compositor",
+      "passed": true
+    },
+    {
+      "name": "configure_resizes_real_pty",
+      "passed": true,
+      "sizes": [
+        [
+          620,
+          330,
+          60,
+          16
+        ],
+        [
+          990,
+          550,
+          97,
+          28
+        ],
+        [
+          410,
+          240,
+          39,
+          11
+        ],
+        [
+          800,
+          450,
+          78,
+          22
+        ]
+      ]
+    },
+    {
+      "name": "text_survives_resize",
+      "passed": true
+    },
+    {
+      "name": "history_keyboard_scroll",
+      "passed": true
+    },
+    {
+      "name": "history_returns_live",
+      "passed": true
+    },
+    {
+      "name": "synchronized_full_frame",
+      "passed": true,
+      "capture_seconds": 0.08839671399999816
+    },
+    {
+      "name": "green_frame_visible",
+      "passed": true
+    },
+    {
+      "name": "native_window_uses_shared_broker",
+      "passed": true,
+      "backend": "wayland",
+      "pty_pid": 5374,
+      "broker_pid": 5364,
+      "launcher_pid": 5362
+    },
+    {
+      "name": "concurrent_native_windows_share_broker_not_pty",
+      "passed": true
+    },
+    {
+      "name": "closing_sibling_preserves_other_native_window",
+      "passed": true
+    },
+    {
+      "name": "mcp_reads_same_native_pty",
+      "passed": true
+    },
+    {
+      "name": "mcp_preserves_local_input_owner",
+      "passed": true
+    },
+    {
+      "name": "mcp_write_reaches_same_pty",
+      "passed": true
+    },
+    {
+      "name": "local_keyboard_blocked_while_mcp_owns",
+      "passed": true,
+      "expected_hex": "",
+      "actual_hex": ""
+    },
+    {
+      "name": "local_control_reacquired",
+      "passed": true,
+      "expected_hex": "79",
+      "actual_hex": "79"
+    },
+    {
+      "name": "native_clipboard_utf8_bracketed_paste",
+      "passed": true,
+      "expected_hex": "1b5b3230307e5761796c616e6420636c6970626f61726420c2b720e4b8ade696870a6c696e652074776f1b5b3230317e",
+      "actual_hex": "1b5b3230307e5761796c616e6420636c6970626f61726420c2b720e4b8ade696870a6c696e652074776f1b5b3230317e"
+    },
+    {
+      "name": "native_primary_paste",
+      "passed": true
+    },
+    {
+      "name": "native_clipboard_export",
+      "passed": true
+    },
+    {
+      "name": "primary_copy_uses_real_input_serial",
+      "passed": true,
+      "expected_hex": "",
+      "actual_hex": ""
+    },
+    {
+      "name": "native_primary_export",
+      "passed": true
+    },
+    {
+      "name": "native_osc52_reads_clipboard",
+      "passed": true
+    },
+    {
+      "name": "slow_clipboard_does_not_block_keyboard",
+      "passed": true,
+      "expected_hex": "6e",
+      "actual_hex": "6e"
+    },
+    {
+      "name": "slow_clipboard_input_latency",
+      "passed": true
+    },
+    {
+      "name": "stalled_clipboard_times_out_without_partial_paste",
+      "passed": true
+    },
+    {
+      "name": "clipboard_recovers_after_timeout",
+      "passed": true,
+      "expected_hex": "7265706c6163656d656e7420636c6970626f617264207375727669766573206c61746520777269746572",
+      "actual_hex": "7265706c6163656d656e7420636c6970626f617264207375727669766573206c61746520777269746572"
+    },
+    {
+      "name": "ime_requests_terminal_without_fake_surrounding",
+      "passed": true,
+      "state": "STATE 1 1 13 0"
+    },
+    {
+      "name": "ime_preedit_is_visible_without_pty_input",
+      "passed": true
+    },
+    {
+      "name": "ime_commit_exact_utf8_once",
+      "passed": true
+    },
+    {
+      "name": "ime_chunk_boundaries_preserve_utf8",
+      "passed": true
+    },
+    {
+      "name": "ime_cannot_delete_unowned_shell_buffer",
+      "passed": true
+    },
+    {
+      "name": "ime_recovers_after_invalid_delete",
+      "passed": true
+    },
+    {
+      "name": "ime_peer_clean_exit",
+      "passed": true
+    },
+    {
+      "name": "mixed-x11-first-x11_actual_x11_window",
+      "passed": true
+    },
+    {
+      "name": "x11_first_routes_both_backends_in_one_broker",
+      "passed": true
+    },
+    {
+      "name": "x11_first_keeps_separate_ptys",
+      "passed": true
+    },
+    {
+      "name": "x11_first_mixed_sessions_closed",
+      "passed": true
+    },
+    {
+      "name": "mixed-wayland-first-x11_actual_x11_window",
+      "passed": true
+    },
+    {
+      "name": "wayland_first_routes_both_backends_in_one_broker",
+      "passed": true
+    },
+    {
+      "name": "wayland_first_keeps_separate_ptys",
+      "passed": true
+    },
+    {
+      "name": "wayland_first_mixed_sessions_closed",
+      "passed": true
+    },
+    {
+      "name": "mixed_backend_tests_preserve_original_session",
+      "passed": true
+    },
+    {
+      "name": "detach_keeps_native_pty_alive",
+      "passed": true
+    },
+    {
+      "name": "native_observer_reuses_same_pty",
+      "passed": true
+    },
+    {
+      "name": "observer_keyboard_cannot_write",
+      "passed": true,
+      "expected_hex": "",
+      "actual_hex": ""
+    },
+    {
+      "name": "observer_detach_keeps_pty_alive",
+      "passed": true
+    },
+    {
+      "name": "reattached_native_view_controls_same_pty",
+      "passed": true,
+      "expected_hex": "7a",
+      "actual_hex": "7a"
+    },
+    {
+      "name": "reattach_identity_stays_stable",
+      "passed": true
+    },
+    {
+      "name": "persistent_native_window_close_detaches",
+      "passed": true
+    },
+    {
+      "name": "explicit_close_reaps_persistent_pty",
+      "passed": true
+    },
+    {
+      "name": "compositor_close_exits_cleanly",
+      "passed": true
+    },
+    {
+      "name": "closed_window_reaps_child",
+      "passed": true
+    },
+    {
+      "name": "child_exit_code_propagates",
+      "passed": true
+    },
+    {
+      "name": "lost_compositor_reports_error",
+      "passed": true
+    },
+    {
+      "name": "lost_compositor_reaps_child",
+      "passed": true
+    }
+  ],
+  "test_source_sha256": {
+    "tests/wayland_gui.py": "c38960db2d33e549d88781ebd524a21a1f402cea323f409dd13b238b05a4fea7",
+    "tests/wayland_child.py": "9d470a4ab9d3a32efd2a0b7c864551b95d013a1de156da139ccfcde597b06646",
+    "tests/build_wayland_ime_peer.py": "06617787aa89913f221a6cbd16aa62319fbc2316bc494d728ce9ee2b46a745b4",
+    "tests/wayland_ime_peer.c": "62023c5b5f64a7384d28b3f98617f19a7568a63f0b799757f7665a1cc93e5231",
+    "tests/protocols/input-method-unstable-v2.xml": "99414dbad9458e71aa1fa01bc45f94ca6685787bfcb4d98948f72c1b45b60703",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+  },
+  "compositor_version": "1.9",
+  "primary_export_before_new_input": "primary selection \u4e2d\u6587",
+  "ime_states": [
+    "STATE 1 1 13 0"
+  ],
+  "mixed_xvfb": {
+    "display": ":24809",
+    "pid": 5486,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X24809",
+        "inode": 280720,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X24809",
+        "inode": 280719,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "owned_brokers_remaining": [],
+  "owned_children_remaining": [],
+  "owned_helpers_remaining": [],
+  "passed": true,
+  "elapsed_seconds": 13.56662989800003
+}

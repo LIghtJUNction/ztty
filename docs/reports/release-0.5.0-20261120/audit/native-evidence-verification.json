@@ -1,0 +1,18 @@
+{
+  "files": 949,
+  "zip_entries": 950,
+  "empty_files": [
+    "ztty-macos-aarch64.native.application.stderr.log",
+    "ztty-macos-aarch64.native.application.stdout.log",
+    "ztty-macos-aarch64.native.stderr.log",
+    "ztty-macos-x86_64.native.application.stderr.log",
+    "ztty-macos-x86_64.native.application.stdout.log",
+    "ztty-macos-x86_64.native.stderr.log",
+    "ztty-windows-aarch64.native.desktop.stderr.log",
+    "ztty-windows-aarch64.native.stderr.log",
+    "ztty-windows-x86_64.native.desktop.stderr.log",
+    "ztty-windows-x86_64.native.stderr.log"
+  ],
+  "sha256": "e989afb67dacd1046e0620581023cff4701a88f4701c6d4b613dbefb494bce3d",
+  "all_original_bytes_equal": true
+}

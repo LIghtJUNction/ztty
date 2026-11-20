@@ -1,0 +1,152 @@
+{
+  "started_at": "2026-11-20T03:48:42.489886+00:00",
+  "source_sha": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "release_id": 452238617,
+  "release_tag": "v0.5.0",
+  "workflow_run": 44668398577,
+  "scope": "Published Linux x86_64 installer in private binary and desktop directories; version/help only, no GUI; user installation not changed",
+  "guard_before": {
+    "USER_WORKSPACE/.local/bin/ztty": {
+      "kind": "symlink",
+      "target": "/usr/bin/ztty",
+      "resolved_sha256": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704"
+    },
+    "USER_WORKSPACE/.local/bin/omztty": {
+      "kind": "symlink",
+      "target": "USER_WORKSPACE/.local/share/oh-my-ztty/current/bin/omztty",
+      "resolved_sha256": "f06de97aac0323f0f0de1b4df8236055a0ac749f4cb4fe4387b2ca10821af33c"
+    },
+    "USER_WORKSPACE/.local/bin/oh-my-ztty": {
+      "kind": "absent"
+    },
+    "USER_WORKSPACE/.config/xdg-terminals.list": {
+      "kind": "symlink",
+      "target": "USER_WORKSPACE/.config/oh-my-ztty/profile/files/.config/xdg-terminals.list",
+      "resolved_sha256": "1d014be28f65dded199129862e793b61920157b4aacf4a22f9a33a0fc0a40a6d"
+    },
+    "USER_WORKSPACE/.config/mimeapps.list": {
+      "kind": "file",
+      "bytes": 6241,
+      "sha256": "6a5be096b9ee4d20646972f253181c08e0b77f8fef9b034db56ef51f3ed37ddd"
+    },
+    "USER_WORKSPACE/.local/share/applications/oh-my-ztty.desktop": {
+      "kind": "symlink",
+      "target": "USER_WORKSPACE/.local/share/oh-my-ztty/oh-my-ztty.desktop",
+      "resolved_sha256": "7da085e7cd90491d31ca453824cb69b45ca2df8c1394e12f38a98f1f64dc2aea"
+    }
+  },
+  "commands": [
+    {
+      "label": "download-script",
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "60",
+        "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.0/install.sh",
+        "--output",
+        "WORKTREE/artifacts/published-installer-v050-20261120/install.sh"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.7353530309919734,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "install",
+      "argv": [
+        "/bin/sh",
+        "WORKTREE/artifacts/published-installer-v050-20261120/install.sh"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.8798888079909375,
+      "stdout_sha256": "e7f24593cd3072541a15605d4deb7b383868647c9bc9ce57824c028b5ff4bae2",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "version",
+      "argv": [
+        "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin/ztty",
+        "--version"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.003013010005815886,
+      "stdout_sha256": "636de83b7532757d61b769e3b5b737ca46cc671b4096c488d8ceac528c3c29dd",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "help",
+      "argv": [
+        "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin/ztty",
+        "--help"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.0028322190046310425,
+      "stdout_sha256": "44febf2a365cea19c26ccba3428f787c20938ed4336bf072d07c6cf04fd8448b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "checks": {
+    "published_installer_matches_tag": true,
+    "installed_binary_matches_formal_native_tested_elf": true,
+    "version_0_5_0": true,
+    "help_contains_new_public_flags": true,
+    "desktop_uses_private_absolute_path": true,
+    "installer_temp_directory_empty": true
+  },
+  "success": true,
+  "installer_sha256": "e078404f113ce6337c70f0878ab2be057f7135572a5e2c4ad19c6025206f2b08",
+  "environment_overrides": {
+    "ZTTY_VERSION": "v0.5.0",
+    "ZTTY_INSTALL_DIR": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin",
+    "ZTTY_DESKTOP_DIR": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/applications",
+    "TMPDIR": "WORKTREE/artifacts/published-installer-v050-20261120/tmp"
+  },
+  "installed_binary": {
+    "path": "WORKTREE/artifacts/published-installer-v050-20261120/private-prefix/bin/ztty",
+    "bytes": 1217232,
+    "sha256": "3ed8cead1c4ca20aedd4aa262de8fe992bcf9639546d95f89f7a782eeef7a491",
+    "mode": "0o755"
+  },
+  "desktop": {
+    "bytes": 378,
+    "sha256": "4876293e812ca38444782cb1a196955c5bec8f3ab09f13ac3033e392e541c1f6",
+    "exec_points_to_private_binary": true
+  },
+  "private_prefix_removed": true,
+  "guard_after": {
+    "USER_WORKSPACE/.local/bin/ztty": {
+      "kind": "symlink",
+      "target": "/usr/bin/ztty",
+      "resolved_sha256": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704"
+    },
+    "USER_WORKSPACE/.local/bin/omztty": {
+      "kind": "symlink",
+      "target": "USER_WORKSPACE/.local/share/oh-my-ztty/current/bin/omztty",
+      "resolved_sha256": "f06de97aac0323f0f0de1b4df8236055a0ac749f4cb4fe4387b2ca10821af33c"
+    },
+    "USER_WORKSPACE/.local/bin/oh-my-ztty": {
+      "kind": "absent"
+    },
+    "USER_WORKSPACE/.config/xdg-terminals.list": {
+      "kind": "symlink",
+      "target": "USER_WORKSPACE/.config/oh-my-ztty/profile/files/.config/xdg-terminals.list",
+      "resolved_sha256": "1d014be28f65dded199129862e793b61920157b4aacf4a22f9a33a0fc0a40a6d"
+    },
+    "USER_WORKSPACE/.config/mimeapps.list": {
+      "kind": "file",
+      "bytes": 6241,
+      "sha256": "6a5be096b9ee4d20646972f253181c08e0b77f8fef9b034db56ef51f3ed37ddd"
+    },
+    "USER_WORKSPACE/.local/share/applications/oh-my-ztty.desktop": {
+      "kind": "symlink",
+      "target": "USER_WORKSPACE/.local/share/oh-my-ztty/oh-my-ztty.desktop",
+      "resolved_sha256": "7da085e7cd90491d31ca453824cb69b45ca2df8c1394e12f38a98f1f64dc2aea"
+    }
+  },
+  "user_installation_and_default_files_unchanged": true,
+  "completed_at": "2026-11-20T03:48:46.122438+00:00"
+}

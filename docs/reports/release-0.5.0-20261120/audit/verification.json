@@ -1,0 +1,170 @@
+{
+  "ok": true,
+  "source_sha": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "run_id": 44668398577,
+  "attempt": 1,
+  "event": "workflow_dispatch",
+  "conclusion": "success",
+  "release_id": 452238617,
+  "release_published_at": "2026-11-20T03:41:44Z",
+  "annotated_tag": "4288d646b3273285483cf1fdad0ccc8e0c42b9ae",
+  "tag_commit": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "tag_signature": "unsigned",
+  "completed_utc": "2026-11-20T03:55:11.416525+00:00",
+  "verification_assertions": 13751,
+  "assertion_categories": {
+    "identity": 36,
+    "public_asset": 94,
+    "checksum": 40,
+    "workflow_artifact": 2856,
+    "build_files": 936,
+    "public_workflow": 43,
+    "evidence": 1900,
+    "linux": 694,
+    "windows": 88,
+    "audit_output": 7,
+    "source_archive": 7047,
+    "logs": 9,
+    "publication": 1
+  },
+  "public_assets": 47,
+  "public_asset_bytes": 28446629,
+  "workflow_artifacts": 6,
+  "original_evidence_files": 949,
+  "evidence_zip": {
+    "files": 949,
+    "zip_entries": 950,
+    "empty_files": [
+      "ztty-macos-aarch64.native.application.stderr.log",
+      "ztty-macos-aarch64.native.application.stdout.log",
+      "ztty-macos-aarch64.native.stderr.log",
+      "ztty-macos-x86_64.native.application.stderr.log",
+      "ztty-macos-x86_64.native.application.stdout.log",
+      "ztty-macos-x86_64.native.stderr.log",
+      "ztty-windows-aarch64.native.desktop.stderr.log",
+      "ztty-windows-aarch64.native.stderr.log",
+      "ztty-windows-x86_64.native.desktop.stderr.log",
+      "ztty-windows-x86_64.native.stderr.log"
+    ],
+    "sha256": "e989afb67dacd1046e0620581023cff4701a88f4701c6d4b613dbefb494bce3d",
+    "all_original_bytes_equal": true
+  },
+  "source_archive": {
+    "archive": {
+      "bytes": 6666022,
+      "sha256": "cca31ef869c0872e0fd4a772f008f5919bab85628c11824c13fe4908016d6059"
+    },
+    "files": 1700,
+    "gitlinks": {
+      "crates/zgpui": "1d796d1fc63808dc099ed7b10c92e75835ae2814",
+      "crates/zgraphics": "fe6357f98cf80fb6cc74739e45e8866ee17706ad",
+      "crates/zinput": "37617313dd7aaabcca9dd567344a76c4cbe03907",
+      "crates/zpty": "66919bc6dcb7757e0437fe955bfa809fb1282b68",
+      "crates/zterm": "a2074bac4c030cfd7c0b2514c852a89dcf54648f"
+    },
+    "all_blobs_match": true,
+    "exact_tracked_file_set": true
+  },
+  "job_conclusions": [
+    {
+      "id": 136063226867,
+      "name": "version",
+      "conclusion": "success"
+    },
+    {
+      "id": 136063324473,
+      "name": "macos (macos-15, aarch64, arm64, arm64, aarch64-apple-darwin)",
+      "conclusion": "success"
+    },
+    {
+      "id": 136063324479,
+      "name": "linux (ubuntu-24.04-arm, aarch64, arm64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 136063324499,
+      "name": "linux (ubuntu-24.04, x86_64, x64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 136063324509,
+      "name": "windows (windows-2025, x86_64, x64, x86_64-pc-windows-msvc, x86_64-pc-windows-gnullvm, 552191b575...",
+      "conclusion": "success"
+    },
+    {
+      "id": 136063324520,
+      "name": "macos (macos-15-intel, x86_64, x86_64, x64, x86_64-apple-darwin)",
+      "conclusion": "success"
+    },
+    {
+      "id": 136063324523,
+      "name": "windows (windows-11-arm, aarch64, arm64, aarch64-pc-windows-msvc, aarch64-pc-windows-gnullvm, 7d7...",
+      "conclusion": "success"
+    },
+    {
+      "id": 136063324575,
+      "name": "verify / checks",
+      "conclusion": "success"
+    },
+    {
+      "id": 136065459726,
+      "name": "publish",
+      "conclusion": "success"
+    }
+  ],
+  "aur": {
+    "pushed": true,
+    "commit_short": "70b24f3",
+    "previous_short": "15b4853",
+    "log_lines": [
+      "2026-11-20T03:41:50.2540743Z [master 70b24f3] Update ztty to 0.5.0",
+      "2026-11-20T03:41:58.7690377Z    15b4853..70b24f3  HEAD -> master"
+    ]
+  },
+  "install_sh_gate_boundary": "Formal publish copies and verifies install.sh bytes; Arch package is built and installed with pacman. A separate root-owned private-prefix installer smoke receipt exists and is not rerun by this audit.",
+  "outputs": {
+    "public-asset-index.json": {
+      "path": "public-asset-index.json",
+      "bytes": 16395,
+      "sha256": "1cc945d2420132d7aa4471cae712fd7c7f74e11d6647889324cd6c3f4cd6ae52"
+    },
+    "workflow-artifact-index.json": {
+      "path": "workflow-artifact-index.json",
+      "bytes": 1046,
+      "sha256": "8ea6756020c948229f45fa781e274e9ed299367d5b6878196e3302cde9aaa820"
+    },
+    "native-platforms.json": {
+      "path": "native-platforms.json",
+      "bytes": 21159,
+      "sha256": "b550e977a7f2d81d2f34d5f47abee63986a5d5af3823d5a7bf5c7672bdce593a"
+    },
+    "linux-nested-evidence-index.json": {
+      "path": "linux-nested-evidence-index.json",
+      "bytes": 49964,
+      "sha256": "92c5ee17ce5777550bf9bf6643de2b8b5785ba92fcfcf001eed7587362133466"
+    },
+    "native-evidence-verification.json": {
+      "path": "native-evidence-verification.json",
+      "bytes": 687,
+      "sha256": "19609ec1188ba0bacb8d83ee8ee086b5803b2b5af70132e28d8bf0f697c30058"
+    },
+    "source-archive-verification.json": {
+      "path": "source-archive-verification.json",
+      "bytes": 548,
+      "sha256": "a3b0aff6dc15d59e5f6d03f0e6b54a804e4fc51d7bc92c7b9fb451b0be0fc25d"
+    }
+  },
+  "macos_review": {
+    "path": "macos-independent-review.json",
+    "bytes": 4591,
+    "sha256": "db6cf733b9f1fda4fc3add9ddc3d6c0658c3e0105d207b51483119a84c466466",
+    "checks": 414
+  },
+  "auditor_actions": "Read/download/hash/parse only; no compilation, product execution, GUI, timing, installation, rerun, dispatch, tag or publication mutation.",
+  "limitations": [
+    "Semantic test success is evidenced by the original native reports and completed fixed-source jobs; this audit does not rerun the products.",
+    "SHA256SUMS binds only source tarball; all 47 assets are independently matched to GitHub asset digests and the indexed per-file verification.",
+    "10 original top-level empty logs remain in the public evidence ZIP; Linux nested empty logs remain inside each byte-identical native tarball.",
+    "Initial gh job-log capture was rejected by CLI ANSI protection. Original capture files remain; nine authoritative raw logs were subsequently saved with explicit raw-byte permission, not replayed in a terminal."
+  ]
+}

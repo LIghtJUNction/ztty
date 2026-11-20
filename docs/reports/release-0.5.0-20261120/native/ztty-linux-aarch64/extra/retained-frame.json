@@ -1,0 +1,493 @@
+{
+  "ok": true,
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "39ced58ddb1f3fd2abb2558d33949a24dc6bf8801e3809cbbda187090c10057d",
+  "scope": "Reproduce undefined retained-canvas publication through a real private X server.\n\nThe preload helper fills undefined newly allocated pixmaps with a visible marker.\nIt records actual source pixels at XCopyArea; it does not substitute presents.\nThis proves canvas initialization ordering, not physical compositor latency.\n",
+  "poisoned": true,
+  "stages": [
+    {
+      "name": "resize",
+      "iterations": 12,
+      "copies": 12,
+      "invalid_publications": [],
+      "all_publications": [
+        {
+          "kind": "copy",
+          "src": 2097161,
+          "dst": 2097155,
+          "w": 671,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 226798,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097164,
+          "dst": 2097155,
+          "w": 682,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 248248,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097167,
+          "dst": 2097155,
+          "w": 693,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 234234,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097170,
+          "dst": 2097155,
+          "w": 671,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 244244,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097173,
+          "dst": 2097155,
+          "w": 682,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 230516,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097176,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097179,
+          "dst": 2097155,
+          "w": 671,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 226798,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097182,
+          "dst": 2097155,
+          "w": 682,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 248248,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097185,
+          "dst": 2097155,
+          "w": 693,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 234234,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097188,
+          "dst": 2097155,
+          "w": 671,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 244244,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097191,
+          "dst": 2097155,
+          "w": 682,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 230516,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        }
+      ]
+    },
+    {
+      "name": "offscreen_return",
+      "iterations": 6,
+      "copies": 12,
+      "invalid_publications": [],
+      "all_publications": [
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        }
+      ]
+    },
+    {
+      "name": "external_unmap_map",
+      "iterations": 6,
+      "copies": 13,
+      "invalid_publications": [],
+      "all_publications": [
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        }
+      ]
+    }
+  ],
+  "checks": [
+    "expected canvas publication result observed from real X server source pixels",
+    "all resizes and visibility transitions preserve the owned PTY and broker"
+  ],
+  "source_sha256": {
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "src/x11/gpu.rs": "ad11e4046d018aea41d1520d7329810a70d4aba66ecd6cd203d7f418ab8c9ddf",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/retained_frame_gui.py": "d7cbf35b66f1f041810b86f2f2217469ec9d5b508c5fd877d2adbb31018aaf38",
+    "tests/retained_frame_trace.c": "5afdfd62438c53216a6aa2349a6264b78a92a485f8b1e9025026936c73d319a3",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9"
+  },
+  "helper_sha256": "9761c70e480e48563b1337ee22a48352de23428655972b0f4d4cb27485db6a4b",
+  "display_ownership": {
+    "display": ":18248",
+    "pid": 5629,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X18248",
+        "inode": 34256,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X18248",
+        "inode": 34255,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "initial_copies": 3,
+  "final_screenshot": {
+    "path": "dist/ztty-linux-aarch64.native/retained-frame.png",
+    "sha256": "9ef8d218fff983d8bcd1f70fd514d691336901d0b197b8468b0ff7843a061707"
+  },
+  "invalid_publications": 0,
+  "remaining_owned_pids": [],
+  "stderr_tail": "The XKEYBOARD keymap compiler (xkbcomp) reports:\n> Warning:          Could not resolve keysym XF86CameraAccessEnable\n> Warning:          Could not resolve keysym XF86CameraAccessDisable\n> Warning:          Could not resolve keysym XF86CameraAccessToggle\n> Warning:          Could not resolve keysym XF86NextElement\n> Warning:          Could not resolve keysym XF86PreviousElement\n> Warning:          Could not resolve keysym XF86AutopilotEngageToggle\n> Warning:          Could not resolve keysym XF86MarkWaypoint\n> Warning:          Could not resolve keysym XF86Sos\n> Warning:          Could not resolve keysym XF86NavChart\n> Warning:          Could not resolve keysym XF86FishingChart\n> Warning:          Could not resolve keysym XF86SingleRangeRadar\n> Warning:          Could not resolve keysym XF86DualRangeRadar\n> Warning:          Could not resolve keysym XF86RadarOverlay\n> Warning:          Could not resolve keysym XF86TraditionalSonar\n> Warning:          Could not resolve keysym XF86ClearvuSonar\n> Warning:          Could not resolve keysym XF86SidevuSonar\n> Warning:          Could not resolve keysym XF86NavInfo\nErrors from xkbcomp are not fatal to the X server\n",
+  "trace": {
+    "path": "dist/ztty-linux-aarch64.native/retained-frame.trace.jsonl",
+    "sha256": "9a0a3c0443c8c2d8ffe81e7c3ee7e52e44e6a5f3f1869522163b54b76955204f"
+  }
+}
