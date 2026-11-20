@@ -1,0 +1,41 @@
+{
+  "source": "7544a0d7a6d01bfe149d743ed3147baff188d67a",
+  "library_source": "13d5e2c74571d35cccd920b1204798211b70c79f",
+  "command": [
+    "rtk",
+    "cargo",
+    "build",
+    "--locked",
+    "--release",
+    "--manifest-path",
+    "crates/zterm/Cargo.toml",
+    "--example",
+    "benchmark",
+    "--config",
+    "profile.release.lto=\"fat\"",
+    "--config",
+    "profile.release.codegen-units=1",
+    "--config",
+    "profile.release.panic=\"abort\"",
+    "--config",
+    "profile.release.strip=\"debuginfo\""
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 9.86708950996399,
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+  "memory_peak_bytes": 233492480,
+  "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n",
+  "performance_measurements_executed": false,
+  "binary": "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark",
+  "sha256": "7c645edd3c7fe9feae80386c93be856003b1b938f8ad20b5f47dd0898b64d652",
+  "bytes": 791040,
+  "example_sha256": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "panic": "abort",
+    "strip": "debuginfo"
+  },
+  "source_after": "7544a0d7a6d01bfe149d743ed3147baff188d67a"
+}

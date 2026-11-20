@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "ok": false,
+  "scope": "parser and screen model, not PTY or renderer or physical input latency",
+  "timestamp_utc": "2026-11-19T23:37:30.878288+00:00",
+  "collector_source": "7544a0d7a6d01bfe149d743ed3147baff188d67a",
+  "before_source": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+  "after_application_source": "7544a0d7a6d01bfe149d743ed3147baff188d67a",
+  "after_library_source": "13d5e2c74571d35cccd920b1204798211b70c79f",
+  "binary_sha256": {
+    "before": "4b3f5d75d409cb697d46a41937e87d2123a59b67127dd2178c1e115423ee0d5d",
+    "after": "7c645edd3c7fe9feae80386c93be856003b1b938f8ad20b5f47dd0898b64d652"
+  },
+  "cpu": 23,
+  "nice": -4,
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "panic": "abort",
+    "strip": "debuginfo"
+  },
+  "example_sha256": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+  "runs": [],
+  "status": "deferred",
+  "defer_reasons": [
+    "one-minute load exceeds half the available logical CPUs"
+  ],
+  "host_at_defer": {
+    "MemTotal_bytes": 16476704768,
+    "MemAvailable_bytes": 4268576768,
+    "SwapTotal_bytes": 48676687872,
+    "SwapFree_bytes": 27031580672,
+    "swap_used_bytes": 21645107200,
+    "load_average": [
+      16.8857421875,
+      15.060546875,
+      14.0966796875
+    ],
+    "logical_cpus": 24,
+    "psi": {
+      "cpu": "some avg10=0.57 avg60=0.77 avg300=2.44 total=730877922\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+      "memory": "some avg10=0.38 avg60=1.06 avg300=1.91 total=1063556882\nfull avg10=0.38 avg60=0.97 avg300=1.70 total=1002277036",
+      "io": "some avg10=40.28 avg60=23.47 avg300=16.28 total=3769486566\nfull avg10=30.39 avg60=19.10 avg300=13.09 total=3232498844"
+    }
+  }
+}

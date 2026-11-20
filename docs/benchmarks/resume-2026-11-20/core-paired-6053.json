@@ -1,0 +1,583 @@
+{
+  "schema": 1,
+  "ok": true,
+  "scope": "parser and screen model, not PTY or renderer or physical input latency",
+  "timestamp_utc": "2026-11-20T00:23:30.521702+00:00",
+  "collector_source": "1a2f165983d7abff507c69b54c0c4ed225f49a45",
+  "collector_sha256": "2f155d3967ac1fadb6aa4dd0745f9a3a17c20b5b9ed6b5d078a61c7175a8a844",
+  "before_source": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+  "after_application_build_context": "7544a0d7a6d01bfe149d743ed3147baff188d67a",
+  "after_application_consumer_source": "6053a97920c29c852cd92d8b96e35f62cff92ecb",
+  "after_library_source": "13d5e2c74571d35cccd920b1204798211b70c79f",
+  "binary_sha256": {
+    "before": "4b3f5d75d409cb697d46a41937e87d2123a59b67127dd2178c1e115423ee0d5d",
+    "after": "7c645edd3c7fe9feae80386c93be856003b1b938f8ad20b5f47dd0898b64d652"
+  },
+  "cpu": 23,
+  "nice": -4,
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "panic": "abort",
+    "strip": "debuginfo"
+  },
+  "example_sha256": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+  "runs": [
+    {
+      "side": "before",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.430739164352417,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6100185088,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29736337408,
+        "swap_used_bytes": 18940350464,
+        "load_average": [
+          8.89453125,
+          7.61328125,
+          7.3291015625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.05 avg60=1.67 avg300=1.27 total=758524242\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.11 avg60=1.39 avg300=1.85 total=1103887975\nfull avg10=0.11 avg60=1.32 avg300=1.78 total=1041103658",
+          "io": "some avg10=3.25 avg60=10.31 avg300=7.83 total=3961398733\nfull avg10=3.01 avg60=9.27 avg300=6.96 total=3398561950"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6077108224,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29751443456,
+        "swap_used_bytes": 18925244416,
+        "load_average": [
+          8.89453125,
+          7.61328125,
+          7.3291015625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.04 avg60=1.61 avg300=1.26 total=758529481\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.09 avg60=1.34 avg300=1.84 total=1103889518\nfull avg10=0.09 avg60=1.28 avg300=1.77 total=1041105181",
+          "io": "some avg10=3.20 avg60=10.07 avg300=7.80 total=3961472801\nfull avg10=3.01 avg60=9.06 avg300=6.93 total=3398633468"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 282.146,
+        "ascii_full_history_mib_s": 156.887,
+        "sgr_mib_s": 160.36,
+        "unicode_mib_s": 99.452,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 61,
+          "p95": 66,
+          "p99": 67,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2520,
+          "p95": 2804,
+          "p99": 2976,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "after",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.127189874649048,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6077440000,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29751443456,
+        "swap_used_bytes": 18925244416,
+        "load_average": [
+          8.89453125,
+          7.61328125,
+          7.3291015625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.04 avg60=1.61 avg300=1.26 total=758529481\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.09 avg60=1.34 avg300=1.84 total=1103889518\nfull avg10=0.09 avg60=1.28 avg300=1.77 total=1041105181",
+          "io": "some avg10=3.20 avg60=10.07 avg300=7.80 total=3961472801\nfull avg10=3.01 avg60=9.06 avg300=6.93 total=3398633468"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5939441664,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29772201984,
+        "swap_used_bytes": 18904485888,
+        "load_average": [
+          8.29541015625,
+          7.52685546875,
+          7.3037109375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.03 avg60=1.51 avg300=1.24 total=758536812\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.06 avg60=1.25 avg300=1.81 total=1103892335\nfull avg10=0.06 avg60=1.20 avg300=1.75 total=1041107744",
+          "io": "some avg10=2.15 avg60=9.42 avg300=7.69 total=3961525432\nfull avg10=2.02 avg60=8.48 avg300=6.84 total=3398684391"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 252.769,
+        "ascii_full_history_mib_s": 152.703,
+        "sgr_mib_s": 125.587,
+        "unicode_mib_s": 23.133,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 59,
+          "p95": 61,
+          "p99": 64,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2909,
+          "p95": 3183,
+          "p99": 3357,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "after",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.269970178604126,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5939441664,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29772201984,
+        "swap_used_bytes": 18904485888,
+        "load_average": [
+          8.29541015625,
+          7.52685546875,
+          7.3037109375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.03 avg60=1.51 avg300=1.24 total=758536812\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.06 avg60=1.25 avg300=1.81 total=1103892335\nfull avg10=0.06 avg60=1.20 avg300=1.75 total=1041107744",
+          "io": "some avg10=2.15 avg60=9.42 avg300=7.69 total=3961525432\nfull avg10=2.02 avg60=8.48 avg300=6.84 total=3398684391"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6048636928,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29784342528,
+        "swap_used_bytes": 18892345344,
+        "load_average": [
+          7.951171875,
+          7.46826171875,
+          7.28564453125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=1.36 avg300=1.22 total=758545816\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.03 avg60=1.13 avg300=1.78 total=1103892944\nfull avg10=0.03 avg60=1.08 avg300=1.71 total=1041108342",
+          "io": "some avg10=1.75 avg60=8.65 avg300=7.56 total=3961605936\nfull avg10=1.68 avg60=7.80 avg300=6.73 total=3398761636"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 269.754,
+        "ascii_full_history_mib_s": 153.075,
+        "sgr_mib_s": 150.44,
+        "unicode_mib_s": 21.906,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 75,
+          "p95": 77,
+          "p99": 79,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3623,
+          "p95": 3934,
+          "p99": 4087,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "before",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.3336117267608643,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6048722944,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29784342528,
+        "swap_used_bytes": 18892345344,
+        "load_average": [
+          7.951171875,
+          7.46826171875,
+          7.28564453125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=1.36 avg300=1.22 total=758545816\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.03 avg60=1.13 avg300=1.78 total=1103892944\nfull avg10=0.03 avg60=1.08 avg300=1.71 total=1041108342",
+          "io": "some avg10=1.75 avg60=8.65 avg300=7.56 total=3961605936\nfull avg10=1.68 avg60=7.80 avg300=6.73 total=3398761636"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6045274112,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29791109120,
+        "swap_used_bytes": 18885578752,
+        "load_average": [
+          7.951171875,
+          7.46826171875,
+          7.28564453125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=1.32 avg300=1.21 total=758548899\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=1.10 avg300=1.76 total=1103892960\nfull avg10=0.02 avg60=1.05 avg300=1.70 total=1041108357",
+          "io": "some avg10=1.61 avg60=8.40 avg300=7.52 total=3961620961\nfull avg10=1.37 avg60=7.54 avg300=6.68 total=3398775532"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 312.81,
+        "ascii_full_history_mib_s": 170.027,
+        "sgr_mib_s": 172.237,
+        "unicode_mib_s": 104.584,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 67,
+          "p95": 69,
+          "p99": 71,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3029,
+          "p95": 3241,
+          "p99": 3402,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "before",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.3451263904571533,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6045274112,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29791109120,
+        "swap_used_bytes": 18885578752,
+        "load_average": [
+          7.951171875,
+          7.46826171875,
+          7.28564453125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=1.32 avg300=1.21 total=758548899\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=1.10 avg300=1.76 total=1103892960\nfull avg10=0.02 avg60=1.05 avg300=1.70 total=1041108357",
+          "io": "some avg10=1.61 avg60=8.40 avg300=7.52 total=3961620961\nfull avg10=1.37 avg60=7.54 avg300=6.68 total=3398775532"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6003298304,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29816123392,
+        "swap_used_bytes": 18860564480,
+        "load_average": [
+          7.951171875,
+          7.46826171875,
+          7.28564453125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=1.27 avg300=1.20 total=758553620\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=1.06 avg300=1.75 total=1103898134\nfull avg10=0.02 avg60=1.01 avg300=1.69 total=1041113451",
+          "io": "some avg10=1.32 avg60=8.13 avg300=7.47 total=3961686770\nfull avg10=1.12 avg60=7.30 avg300=6.63 total=3398839108"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 305.179,
+        "ascii_full_history_mib_s": 170.255,
+        "sgr_mib_s": 147.432,
+        "unicode_mib_s": 106.602,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 57,
+          "p95": 58,
+          "p99": 59,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2592,
+          "p95": 2723,
+          "p99": 2793,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "after",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.483790159225464,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6002966528,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29816135680,
+        "swap_used_bytes": 18860552192,
+        "load_average": [
+          7.951171875,
+          7.46826171875,
+          7.28564453125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=1.27 avg300=1.20 total=758553620\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=1.06 avg300=1.75 total=1103898134\nfull avg10=0.02 avg60=1.01 avg300=1.69 total=1041113451",
+          "io": "some avg10=1.32 avg60=8.13 avg300=7.47 total=3961686770\nfull avg10=1.12 avg60=7.30 avg300=6.63 total=3398839108"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6110654464,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 29832855552,
+        "swap_used_bytes": 18843832320,
+        "load_average": [
+          7.638671875,
+          7.41943359375,
+          7.271484375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=1.11 avg300=1.17 total=758574223\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.10 avg60=0.96 avg300=1.71 total=1103926990\nfull avg10=0.10 avg60=0.91 avg300=1.65 total=1041141660",
+          "io": "some avg10=2.94 avg60=7.67 avg300=7.38 total=3961989597\nfull avg10=2.48 avg60=6.85 avg300=6.56 total=3399123316"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 249.508,
+        "ascii_full_history_mib_s": 151.374,
+        "sgr_mib_s": 114.86,
+        "unicode_mib_s": 20.544,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 60,
+          "p95": 62,
+          "p99": 66,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2877,
+          "p95": 3223,
+          "p99": 3444,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    }
+  ],
+  "status": "complete",
+  "summary": {
+    "ascii_mib_s": {
+      "before_median": 305.179,
+      "after_median": 252.769,
+      "after_over_before": 0.8282647233263102,
+      "before_samples": [
+        282.146,
+        312.81,
+        305.179
+      ],
+      "after_samples": [
+        252.769,
+        269.754,
+        249.508
+      ]
+    },
+    "ascii_full_history_mib_s": {
+      "before_median": 170.027,
+      "after_median": 152.703,
+      "after_over_before": 0.8981103001288031,
+      "before_samples": [
+        156.887,
+        170.027,
+        170.255
+      ],
+      "after_samples": [
+        152.703,
+        153.075,
+        151.374
+      ]
+    },
+    "sgr_mib_s": {
+      "before_median": 160.36,
+      "after_median": 125.587,
+      "after_over_before": 0.7831566475430282,
+      "before_samples": [
+        160.36,
+        172.237,
+        147.432
+      ],
+      "after_samples": [
+        125.587,
+        150.44,
+        114.86
+      ]
+    },
+    "unicode_mib_s": {
+      "before_median": 104.584,
+      "after_median": 21.906,
+      "after_over_before": 0.209458425763023,
+      "before_samples": [
+        99.452,
+        104.584,
+        106.602
+      ],
+      "after_samples": [
+        23.133,
+        21.906,
+        20.544
+      ]
+    },
+    "initial_core_heap_bytes": {
+      "before_median": 107932,
+      "after_median": 123292,
+      "after_over_before": 1.1423118259644962,
+      "before_samples": [
+        107932,
+        107932,
+        107932
+      ],
+      "after_samples": [
+        123292,
+        123292,
+        123292
+      ]
+    },
+    "steady_state_allocations": {
+      "before_median": 0,
+      "after_median": 0,
+      "after_over_before": null,
+      "before_samples": [
+        0,
+        0,
+        0
+      ],
+      "after_samples": [
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}
