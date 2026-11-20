@@ -71,7 +71,7 @@ tar.gz 与 zip 中的五个 bundle 文件逐字相同并匹配 manifest；原生
 官方 [native-evidence.zip](https://github.com/LIghtJUNction/ztty/releases/download/v0.5.0/ztty-0.5.0-native-evidence.zip)
 为 16,732,253 B，SHA-256 `e989afb67dacd1046e0620581023cff4701a88f4701c6d4b613dbefb494bce3d`。
 [归档核验](audit/native-evidence-verification.json)确认 949 个文件与六个 Actions 原件及 install.sh 逐字相同。
-ZIP 共 950 entries，其中 949 为文件；10 个顶层空日志仍保留。
+ZIP 包含 949 份原文件和 1 份 manifest.json，共 950 个文件条目；10 个顶层空日志仍保留。
 两个 Linux 嵌套 native tar 各有 146 个文件、75 张 PNG、24 个空文件；“10”不是全部层级的空文件总数。
 
 源码 [ztty-0.5.0.tar.gz](https://github.com/LIghtJUNction/ztty/releases/download/v0.5.0/ztty-0.5.0.tar.gz)
