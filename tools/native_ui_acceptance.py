@@ -17,7 +17,8 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = Path(os.environ.get("ZTTY_ACCEPTANCE_OUTPUT", str(ROOT / "artifacts/native-ui-acceptance"))).resolve()
-BINARY = ROOT / "target/release/ztty"
+# Match Cargo for both absolute and repository-relative target overrides.
+BINARY = (ROOT / (os.environ.get("CARGO_TARGET_DIR") or "target")).resolve() / "release/ztty"
 CARGO = ["cargo", "+" + os.environ.get("RUST_TOOLCHAIN", "1.100.0")]
 GATES = {
     "fmt": (CARGO + ["fmt", "--all", "--", "--check"], 120),
