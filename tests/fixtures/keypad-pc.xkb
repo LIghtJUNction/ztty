@@ -1,0 +1,32 @@
+// Private GUI fixture: explicit PC keypad selection on every supported XKB data version.
+// Only this test's owned Xvfb server receives the map.
+xkb_keymap {
+    xkb_keycodes { include "evdev+aliases(qwerty)" };
+    xkb_types {
+        include "complete"
+        type "ZTTY_TEST_PC_KEYPAD" {
+            modifiers = Shift+NumLock;
+            map[None] = Level1;
+            map[Shift] = Level2;
+            map[NumLock] = Level2;
+            map[Shift+NumLock] = Level1;
+            level_name[Level1] = "Navigation";
+            level_name[Level2] = "Number";
+        };
+    };
+    xkb_compatibility { include "complete" };
+    xkb_symbols {
+        include "pc+us+inet(evdev)"
+        key <KP0>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Insert, KP_0 ] };
+        key <KP1>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_End, KP_1 ] };
+        key <KP2>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Down, KP_2 ] };
+        key <KP3>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Next, KP_3 ] };
+        key <KP4>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Left, KP_4 ] };
+        key <KP5>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Begin, KP_5 ] };
+        key <KP6>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Right, KP_6 ] };
+        key <KP7>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Home, KP_7 ] };
+        key <KP8>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Up, KP_8 ] };
+        key <KP9>  { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Prior, KP_9 ] };
+        key <KPDL> { type[Group1] = "ZTTY_TEST_PC_KEYPAD", [ KP_Delete, KP_Decimal ] };
+    };
+};
