@@ -2,29 +2,34 @@
 
 ## 0.5.0 candidate — 2026-11-20
 
-The current checkout is a **0.5.0 source candidate**. Publication and device
-installation are not complete. A successful library test, candidate build or
+The current checkout is a **0.5.0 source candidate**. Application publication
+and device installation are not complete. A successful library test, candidate build or
 cross-compilation check establishes only its recorded source and scope.
 
 ### Source and dependency order
 
-| Stage | Package | Candidate version | Required before publication or release |
+| Stage | Package | Version | Required before publication or release |
 | --- | --- | --- | --- |
 | 1 | `zgpui` | `0.1.0` | Its independent repository's candidate checks |
 | 1 | `zgraphics` | `0.2.0` | Package verification and existing registry dependencies |
-| 1 | `ztty-plugin-api` | `0.1.0` | Package verification and `zplugin 0.3.0` |
-| 2 | `zterm` | `0.5.0` | Published `zgpui 0.1.0` and `zgraphics 0.2.0` |
-| 3 | `ztty` application | `0.5.0` | Published `zterm 0.5.0`, `ztty-plugin-api 0.1.0` and complete application gates |
+| 1 | `zinput` | `0.1.3` | Its independent repository's release checks |
+| 1 | `zpty` | `0.2.2` | Its independent repository's release checks |
+| 1 | `ztty-plugin-api` | `0.1.0` | Package verification and `zplugin =0.3.1` |
+| 2 | `zterm` | `0.5.0` | Published `zgpui 0.1.0`, `zgraphics 0.2.0` and `zinput 0.1.3` |
+| 3 | `ztty` application | `0.5.0` | Published `zterm 0.5.0`, `zpty 0.2.2`, `ztty-plugin-api 0.1.0` and complete application gates |
 
-`zinput` stays at `0.1.2`; this candidate does not change its source.
-The `zpty` dependency remains `0.2.1`. Reuse the existing registry versions
-when preparing the dependent packages.
+`zgpui 0.1.0`, `zgraphics 0.2.0`, `zinput 0.1.3`, `zpty 0.2.2` and
+`zterm 0.5.0` are published from their independent repositories. Reuse these
+versions and the candidate's fixed submodule commits and lockfile.
+`zterm 0.5.1` is still under performance investigation and is not published.
+`ztty-plugin-api 0.1.0` and the application remain unpublished.
 
 [zgpui](https://github.com/LIghtJUNction/zgpui) is an independent repository,
 included at `crates/zgpui` as a Git submodule pinned to
 [`1d796d1fc63808dc099ed7b10c92e75835ae2814`](https://github.com/LIghtJUNction/zgpui/commit/1d796d1fc63808dc099ed7b10c92e75835ae2814).
-Initialize the submodule before building a fresh checkout. It replaces the
-former `ztty-ui` package; `zterm::ui` remains the public re-export and the
+Initialize all five library submodules with
+`git submodule update --init --recursive` before building a fresh checkout.
+`zgpui` replaces the former `ztty-ui` package; `zterm::ui` remains the public re-export and the
 ZUI/1 wire format is retained. Its scene, layout and renderer contracts are
 platform-independent; native windows and graphics remain host responsibilities.
 
@@ -33,15 +38,16 @@ platform-independent; native windows and graphics remain host responsibilities.
 1. Commit the versioned source, lockfile and submodule pin, then record the
    candidate SHA. Run the local gates and required native checks against that
    fixed source; any source change creates a new candidate.
-2. Publish `zgpui` through its own
+2. Release changed `zgpui` versions through its own
    [release workflow](https://github.com/LIghtJUNction/zgpui/blob/main/.github/workflows/release.yml).
-   For its first `0.1.0`, use `bump=none`. A retry supplies the same full
+   Use `bump=none` for an already versioned candidate. A retry supplies the same full
    candidate SHA. The workflow requires `CARGO_REGISTRY_TOKEN`, validates that
    exact candidate, and checks any existing tag and archive before continuing.
-3. Verify and publish the remaining changed libraries in the order above from
-   a clean committed checkout. Confirm the registry versions and package
-   contents before verifying downstream packages without workspace path
-   overrides.
+3. Verify and publish changed independent libraries from their own repositories
+   in the order above; this candidate reuses the published versions listed here.
+   Publish the remaining `ztty-plugin-api` from the root manifest path below.
+   Confirm registry versions and package contents before verifying consumers
+   without workspace path overrides.
 4. Run the [application Release workflow](../.github/workflows/release.yml) for
    `v0.5.0`. Formal publication requires Verify and all six native architecture
    gates on that tagged source, plus source and artifact readback. Retain the
@@ -49,6 +55,29 @@ platform-independent; native windows and graphics remain host responsibilities.
    artifacts.
 5. Install the accepted application artifact and record the installed version
    and executable hash. Publication alone does not establish device installation.
+
+### API publication and registry verification
+
+The native application gates build `ztty-plugin-api` through its local `path`
+dependency. Passing those gates does not verify the registry package and does
+not require the API to have been published first. Publish it from the approved,
+clean candidate checkout:
+
+```sh
+cargo package --locked --manifest-path crates/ztty-plugin-api/Cargo.toml
+cargo publish --locked --manifest-path crates/ztty-plugin-api/Cargo.toml
+```
+
+After `ztty-plugin-api 0.1.0` is available in the registry, run the default
+verification for all six libraries and their combined consumer:
+
+```sh
+python3 tools/verify_registry.py --output artifacts/registry-consumer.json
+```
+
+This verification uses exact registry versions without local path overrides.
+Record registry closure only when all six consumers and the combined consumer
+pass. The verification tool does not publish crates.
 
 ## Historical records: 0.4.1 and earlier
 
