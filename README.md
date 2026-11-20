@@ -222,7 +222,7 @@ Run `sh tools/check.sh` for the local development checks.
 
 | Library | Role in ztty | Status |
 | --- | --- | --- |
-| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI scenes and layout | Published [0.1.2](https://crates.io/crates/zgpui/0.1.2) |
+| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI scenes and layout | Published [0.1.5](https://crates.io/crates/zgpui/0.1.5) |
 | [zinput](https://github.com/LIghtJUNction/zinput) | Keyboard, mouse and paste encoding | Published [0.1.3](https://crates.io/crates/zinput/0.1.3) |
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY process ownership | Published [0.2.3](https://crates.io/crates/zpty/0.2.3) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | Image protocol and placement | Published [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
