@@ -1,0 +1,47 @@
+{
+  "all_plugin_exact": true,
+  "logs": [
+    {
+      "job_id": 136023011114,
+      "sha256": "f453a187e660df758295906ef4a16bfdd12c774581912d21d1a5d7bffa71505b",
+      "bytes": 18626,
+      "plugin_exact_match": true
+    },
+    {
+      "job_id": 136023085448,
+      "sha256": "3dc2c5e27ac6ddf1da39c5eb43059f9dea8c23376f0d2658415571e012d5f49d",
+      "bytes": 766417,
+      "plugin_exact_match": true
+    },
+    {
+      "job_id": 136023085456,
+      "sha256": "7cc659fa28685f46fb99ed57cbef86567e67ea84306aa4589716517e4f893427",
+      "bytes": 767580,
+      "plugin_exact_match": true
+    },
+    {
+      "job_id": 136023085472,
+      "sha256": "75cc946429e7d6def088cf5c2363dfd00c42dff7282c9062300f915f6aade2af",
+      "bytes": 149856,
+      "plugin_exact_match": true
+    },
+    {
+      "job_id": 136023085474,
+      "sha256": "64d7cfe976246eb400ac010b97e6794cbc9dba627030ed3977e9abf6d6f33112",
+      "bytes": 204271,
+      "plugin_exact_match": true
+    },
+    {
+      "job_id": 136023085505,
+      "sha256": "b9f2122d0efc82c3ad3cfc9a3b8aed9fcbf2c1ad7f66815275a5b0adc78b4f85",
+      "bytes": 204128,
+      "plugin_exact_match": true
+    },
+    {
+      "job_id": 136023085569,
+      "sha256": "e60a1342c4721ded5cd6889d67976636c789f11baf4032f643ec4c8280f07494",
+      "bytes": 129154,
+      "plugin_exact_match": true
+    }
+  ]
+}

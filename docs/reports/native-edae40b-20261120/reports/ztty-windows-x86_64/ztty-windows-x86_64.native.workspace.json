@@ -1,0 +1,4429 @@
+{
+  "passed": true,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "native_architecture_and_initial_pty",
+      "passed": true,
+      "pid": 9312,
+      "child": {
+        "pid": 6332,
+        "parent_pid": 9312,
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+        "cols": 64,
+        "rows": 20,
+        "monotonic": 195.528419
+      },
+      "gdi_objects": 19
+    },
+    {
+      "name": "split_right_distinct_pty",
+      "passed": true,
+      "child": {
+        "pid": 9964,
+        "parent_pid": 8460,
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+        "cols": 30,
+        "rows": 20,
+        "monotonic": 196.032668
+      }
+    },
+    {
+      "name": "split_viewport_pixels",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            275,
+            53
+          ],
+          "screen": [
+            291,
+            92
+          ],
+          "rgb": [
+            255,
+            255,
+            255
+          ],
+          "expected": [
+            255,
+            255,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            283,
+            53
+          ],
+          "screen": [
+            299,
+            92
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            299,
+            53
+          ],
+          "screen": [
+            315,
+            92
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            303,
+            53
+          ],
+          "screen": [
+            319,
+            92
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ],
+      "synchronized_layout": {
+        "focus": {
+          "elapsed_seconds": 0.05294600000001992,
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        },
+        "resize": {
+          "elapsed_seconds": 0.055227800000011484,
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "pane_keyboard_focus_isolation",
+      "passed": true,
+      "received": {
+        "a": "1b5f47693d313838353430353138343b4f4b1b5c1b5f47693d313838353430353138353b4f4b1b5c1b5f47693d313838353430353138363b4f4b1b5c1b5f47693d313838353430353138373b4f4b1b5c1b5f47693d313838353430353138383b4f4b1b5c1b5f47693d313838353430353138393b4f4b1b5c1b5f47693d313838353430353139303b4f4b1b5c1b5f47693d313838353430353139313b4f4b1b5c1b5f47693d313838353430353139323b4f4b1b5c1b5f47693d313838353430353139333b4f4b1b5c776f726b73706163652d612d696e7075742d3932",
+        "b": "1b5f47693d313838353437303732303b4f4b1b5c776f726b73706163652d622d696e7075742d3734"
+      },
+      "custom_binding": "ctrl+shift+f6 = next-pane"
+    },
+    {
+      "name": "inactive_pane_mouse_tracking",
+      "passed": true,
+      "response": "1b5f47693d313838353437303732303b4f4b1b5c776f726b73706163652d622d696e7075742d37341b5b363b35521b5f47693d313838353437303732313b4f4b1b5c1b5b3c36343b333b334d1b5f47693d313838353437303732323b4f4b1b5c1b5f47693d313838353437303732333b4f4b1b5c1b5f47693d313838353437303732343b4f4b1b5c1b5f47693d313838353437303732353b4f4b1b5c",
+      "drag_events": "1b5b3c303b333b334d1b5b3c33323b33303b334d1b5b3c303b33303b336d1b5f47693d313838353430353139353b4f4b1b5c",
+      "cancelled_drag_recipient": "1b5f47693d313838353437303732343b4f4b1b5c1b5f47693d313838353437303732353b4f4b1b5c",
+      "active_title": "ztty workspace a"
+    },
+    {
+      "name": "pane_history_isolation",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            59,
+            15
+          ],
+          "screen": [
+            75,
+            54
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ],
+      "silent_modifiers": [
+        "shift",
+        "control"
+      ],
+      "actual_input": "0d",
+      "live_pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "pane_selection_isolation",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            351,
+            91
+          ],
+          "screen": [
+            367,
+            130
+          ],
+          "rgb": [
+            34,
+            68,
+            102
+          ],
+          "expected": [
+            34,
+            68,
+            102
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            50,
+            91
+          ],
+          "screen": [
+            66,
+            130
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "split_down_distinct_pty",
+      "passed": true,
+      "child": {
+        "pid": 8996,
+        "parent_pid": 5376,
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+        "cols": 30,
+        "rows": 9,
+        "monotonic": 197.4257458
+      }
+    },
+    {
+      "name": "three_pane_pixels_and_shared_window",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            219
+          ],
+          "screen": [
+            333,
+            258
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            305,
+            201
+          ],
+          "screen": [
+            321,
+            240
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ],
+      "gdi_objects": 19,
+      "windows": [
+        2425316
+      ]
+    },
+    {
+      "name": "maximize_restore_keeps_pty_identity",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "grow_shrink_updates_child_geometry",
+      "passed": true,
+      "restored": {
+        "a": {
+          "pid": 6332,
+          "parent_pid": 9312,
+          "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+          "cols": 30,
+          "rows": 20,
+          "monotonic": 197.6861764
+        },
+        "b": {
+          "pid": 9964,
+          "parent_pid": 8460,
+          "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+          "cols": 30,
+          "rows": 9,
+          "monotonic": 197.6919034
+        },
+        "c": {
+          "pid": 8996,
+          "parent_pid": 5376,
+          "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+          "cols": 30,
+          "rows": 9,
+          "monotonic": 197.6893795
+        }
+      }
+    },
+    {
+      "name": "swap_keeps_session_identity",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            219
+          ],
+          "screen": [
+            333,
+            258
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "window_resize_coordinates_all_ptys",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            281,
+            16
+          ],
+          "screen": [
+            297,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            281,
+            181
+          ],
+          "screen": [
+            297,
+            220
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "new_tab_distinct_pty",
+      "passed": true,
+      "child": {
+        "pid": 808,
+        "parent_pid": 7368,
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+        "cols": 64,
+        "rows": 20,
+        "monotonic": 197.9492938
+      },
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "expected": [
+            255,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "hidden_tab_output_and_response",
+      "passed": true,
+      "response": "612d696e7075742d39321b5f47693d313838353430353139343b4f4b1b5c1b5b3c303b333b334d1b5b3c33323b33303b334d1b5b3c303b33303b336d1b5f47693d313838353430353139353b4f4b1b5c1b5b3c303b333b334d1b5f47693d313838353430353139363b4f4b1b5c1b5f47693d313838353430353139373b4f4b1b5c1b5f47693d313838353430353139383b4f4b1b5c1b5f47693d313838353430353139393b4f4b1b5c0d1b5f47693d313838353430353230303b4f4b1b5c1b5f47693d313838353430353230313b4f4b1b5c1b5b373b39521b5f47693d313838353430353230323b4f4b1b5c1b5f47693d313838353430353230333b4f4b1b5c",
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "expected": [
+            255,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "tab_switch_restores_pane_images",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            219
+          ],
+          "screen": [
+            333,
+            258
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ],
+      "control_tab_pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "expected": [
+            255,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ],
+      "control_shift_tab_pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            219
+          ],
+          "screen": [
+            333,
+            258
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "font_increase_coordinates_all_ptys",
+      "passed": true,
+      "original_cell": [
+        9,
+        19
+      ],
+      "enlarged_cell": [
+        9,
+        20
+      ],
+      "trial": {
+        "shortcut_vk": 187,
+        "control": true,
+        "shift": true,
+        "cell_pixels": [
+          9,
+          20
+        ],
+        "panes": {
+          "a": {
+            "pid": 6332,
+            "parent_pid": 9312,
+            "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+            "cols": 30,
+            "rows": 19,
+            "monotonic": 198.4421483
+          },
+          "b": {
+            "pid": 9964,
+            "parent_pid": 8460,
+            "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+            "cols": 30,
+            "rows": 8,
+            "monotonic": 198.4350891
+          },
+          "c": {
+            "pid": 8996,
+            "parent_pid": 5376,
+            "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+            "cols": 30,
+            "rows": 8,
+            "monotonic": 198.4352693
+          },
+          "d": {
+            "pid": 808,
+            "parent_pid": 7368,
+            "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+            "cols": 64,
+            "rows": 20,
+            "monotonic": 198.4381104
+          }
+        },
+        "window": {
+          "client": [
+            0,
+            0,
+            600,
+            404
+          ],
+          "outer": [
+            8,
+            8,
+            624,
+            451
+          ],
+          "monitor": [
+            0,
+            0,
+            1024,
+            768
+          ],
+          "work": [
+            0,
+            0,
+            1024,
+            720
+          ],
+          "dpi": 96,
+          "hwnd": 2425316,
+          "pid": 9312,
+          "foreground": 2425316,
+          "visible": true,
+          "minimized": false
+        },
+        "pixels": [
+          {
+            "client": [
+              16,
+              16
+            ],
+            "screen": [
+              32,
+              55
+            ],
+            "rgb": [
+              255,
+              0,
+              0
+            ],
+            "expected": [
+              255,
+              0,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              43,
+              82
+            ],
+            "screen": [
+              59,
+              121
+            ],
+            "rgb": [
+              255,
+              0,
+              0
+            ],
+            "expected": [
+              255,
+              0,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              49,
+              82
+            ],
+            "screen": [
+              65,
+              121
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              317,
+              16
+            ],
+            "screen": [
+              333,
+              55
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "expected": [
+              0,
+              255,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              344,
+              82
+            ],
+            "screen": [
+              360,
+              121
+            ],
+            "rgb": [
+              0,
+              255,
+              0
+            ],
+            "expected": [
+              0,
+              255,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              350,
+              82
+            ],
+            "screen": [
+              366,
+              121
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              317,
+              219
+            ],
+            "screen": [
+              333,
+              258
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "expected": [
+              0,
+              0,
+              255
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              344,
+              285
+            ],
+            "screen": [
+              360,
+              324
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "expected": [
+              0,
+              0,
+              255
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              350,
+              285
+            ],
+            "screen": [
+              366,
+              324
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          }
+        ]
+      },
+      "revealed_hidden_tab": {
+        "pid": 808,
+        "parent_pid": 7368,
+        "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+        "cols": 64,
+        "rows": 19,
+        "monotonic": 198.6123852
+      },
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            43,
+            82
+          ],
+          "screen": [
+            59,
+            121
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            49,
+            82
+          ],
+          "screen": [
+            65,
+            121
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            344,
+            82
+          ],
+          "screen": [
+            360,
+            121
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            350,
+            82
+          ],
+          "screen": [
+            366,
+            121
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            219
+          ],
+          "screen": [
+            333,
+            258
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            344,
+            285
+          ],
+          "screen": [
+            360,
+            324
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            350,
+            285
+          ],
+          "screen": [
+            366,
+            324
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "font_decrease_and_keypad_zoom",
+      "passed": true,
+      "original_cell": [
+        9,
+        19
+      ],
+      "smaller_cell": [
+        8,
+        18
+      ],
+      "trials": [
+        {
+          "shortcut_vk": 189,
+          "control": true,
+          "shift": true,
+          "cell_pixels": [
+            9,
+            19
+          ],
+          "panes": {
+            "a": {
+              "pid": 6332,
+              "parent_pid": 9312,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 20,
+              "monotonic": 198.8596708
+            },
+            "b": {
+              "pid": 9964,
+              "parent_pid": 8460,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 198.8566142
+            },
+            "c": {
+              "pid": 8996,
+              "parent_pid": 5376,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 198.8491507
+            },
+            "d": {
+              "pid": 808,
+              "parent_pid": 7368,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 64,
+              "rows": 19,
+              "monotonic": 198.8535363
+            }
+          },
+          "window": {
+            "client": [
+              0,
+              0,
+              600,
+              404
+            ],
+            "outer": [
+              8,
+              8,
+              624,
+              451
+            ],
+            "monitor": [
+              0,
+              0,
+              1024,
+              768
+            ],
+            "work": [
+              0,
+              0,
+              1024,
+              720
+            ],
+            "dpi": 96,
+            "hwnd": 2425316,
+            "pid": 9312,
+            "foreground": 2425316,
+            "visible": true,
+            "minimized": false
+          },
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                43,
+                78
+              ],
+              "screen": [
+                59,
+                117
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                49,
+                78
+              ],
+              "screen": [
+                65,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                16
+              ],
+              "screen": [
+                333,
+                55
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                78
+              ],
+              "screen": [
+                360,
+                117
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                78
+              ],
+              "screen": [
+                366,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                219
+              ],
+              "screen": [
+                333,
+                258
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                281
+              ],
+              "screen": [
+                360,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                281
+              ],
+              "screen": [
+                366,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "shortcut_vk": 189,
+          "control": true,
+          "shift": false,
+          "cell_pixels": [
+            8,
+            18
+          ],
+          "panes": {
+            "a": {
+              "pid": 6332,
+              "parent_pid": 9312,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 34,
+              "rows": 21,
+              "monotonic": 199.1463879
+            },
+            "b": {
+              "pid": 9964,
+              "parent_pid": 8460,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 34,
+              "rows": 9,
+              "monotonic": 199.1393197
+            },
+            "c": {
+              "pid": 8996,
+              "parent_pid": 5376,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 34,
+              "rows": 9,
+              "monotonic": 199.1313955
+            },
+            "d": {
+              "pid": 808,
+              "parent_pid": 7368,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 64,
+              "rows": 19,
+              "monotonic": 199.1332597
+            }
+          },
+          "window": {
+            "client": [
+              0,
+              0,
+              600,
+              404
+            ],
+            "outer": [
+              8,
+              8,
+              624,
+              451
+            ],
+            "monitor": [
+              0,
+              0,
+              1024,
+              768
+            ],
+            "work": [
+              0,
+              0,
+              1024,
+              720
+            ],
+            "dpi": 96,
+            "hwnd": 2425316,
+            "pid": 9312,
+            "foreground": 2425316,
+            "visible": true,
+            "minimized": false
+          },
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                40,
+                75
+              ],
+              "screen": [
+                56,
+                114
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                45,
+                75
+              ],
+              "screen": [
+                61,
+                114
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                16
+              ],
+              "screen": [
+                333,
+                55
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                341,
+                75
+              ],
+              "screen": [
+                357,
+                114
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                346,
+                75
+              ],
+              "screen": [
+                362,
+                114
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                219
+              ],
+              "screen": [
+                333,
+                258
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                341,
+                278
+              ],
+              "screen": [
+                357,
+                317
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                346,
+                278
+              ],
+              "screen": [
+                362,
+                317
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "shortcut_vk": 107,
+          "control": true,
+          "shift": false,
+          "cell_pixels": [
+            9,
+            19
+          ],
+          "panes": {
+            "a": {
+              "pid": 6332,
+              "parent_pid": 9312,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 20,
+              "monotonic": 199.4103091
+            },
+            "b": {
+              "pid": 9964,
+              "parent_pid": 8460,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 199.4057665
+            },
+            "c": {
+              "pid": 8996,
+              "parent_pid": 5376,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 199.401467
+            },
+            "d": {
+              "pid": 808,
+              "parent_pid": 7368,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 64,
+              "rows": 19,
+              "monotonic": 199.393374
+            }
+          },
+          "window": {
+            "client": [
+              0,
+              0,
+              600,
+              404
+            ],
+            "outer": [
+              8,
+              8,
+              624,
+              451
+            ],
+            "monitor": [
+              0,
+              0,
+              1024,
+              768
+            ],
+            "work": [
+              0,
+              0,
+              1024,
+              720
+            ],
+            "dpi": 96,
+            "hwnd": 2425316,
+            "pid": 9312,
+            "foreground": 2425316,
+            "visible": true,
+            "minimized": false
+          },
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                43,
+                78
+              ],
+              "screen": [
+                59,
+                117
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                49,
+                78
+              ],
+              "screen": [
+                65,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                16
+              ],
+              "screen": [
+                333,
+                55
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                78
+              ],
+              "screen": [
+                360,
+                117
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                78
+              ],
+              "screen": [
+                366,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                219
+              ],
+              "screen": [
+                333,
+                258
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                281
+              ],
+              "screen": [
+                360,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                281
+              ],
+              "screen": [
+                366,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "shortcut_vk": 109,
+          "control": true,
+          "shift": false,
+          "cell_pixels": [
+            8,
+            18
+          ],
+          "panes": {
+            "a": {
+              "pid": 6332,
+              "parent_pid": 9312,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 34,
+              "rows": 21,
+              "monotonic": 199.7439743
+            },
+            "b": {
+              "pid": 9964,
+              "parent_pid": 8460,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 34,
+              "rows": 9,
+              "monotonic": 199.7307524
+            },
+            "c": {
+              "pid": 8996,
+              "parent_pid": 5376,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 34,
+              "rows": 9,
+              "monotonic": 199.736425
+            },
+            "d": {
+              "pid": 808,
+              "parent_pid": 7368,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 64,
+              "rows": 19,
+              "monotonic": 199.7276631
+            }
+          },
+          "window": {
+            "client": [
+              0,
+              0,
+              600,
+              404
+            ],
+            "outer": [
+              8,
+              8,
+              624,
+              451
+            ],
+            "monitor": [
+              0,
+              0,
+              1024,
+              768
+            ],
+            "work": [
+              0,
+              0,
+              1024,
+              720
+            ],
+            "dpi": 96,
+            "hwnd": 2425316,
+            "pid": 9312,
+            "foreground": 2425316,
+            "visible": true,
+            "minimized": false
+          },
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                40,
+                75
+              ],
+              "screen": [
+                56,
+                114
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                45,
+                75
+              ],
+              "screen": [
+                61,
+                114
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                16
+              ],
+              "screen": [
+                333,
+                55
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                341,
+                75
+              ],
+              "screen": [
+                357,
+                114
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                346,
+                75
+              ],
+              "screen": [
+                362,
+                114
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                219
+              ],
+              "screen": [
+                333,
+                258
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                341,
+                278
+              ],
+              "screen": [
+                357,
+                317
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                346,
+                278
+              ],
+              "screen": [
+                362,
+                317
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            40,
+            75
+          ],
+          "screen": [
+            56,
+            114
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            45,
+            75
+          ],
+          "screen": [
+            61,
+            114
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            341,
+            75
+          ],
+          "screen": [
+            357,
+            114
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            346,
+            75
+          ],
+          "screen": [
+            362,
+            114
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            219
+          ],
+          "screen": [
+            333,
+            258
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            341,
+            278
+          ],
+          "screen": [
+            357,
+            317
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            346,
+            278
+          ],
+          "screen": [
+            362,
+            317
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "font_reset_restores_configured_metrics",
+      "passed": true,
+      "configured_size": 12,
+      "original_cell": [
+        9,
+        19
+      ],
+      "reset_shortcut": "Ctrl+0",
+      "ctrl_shift_zero_native_verified": false,
+      "trials": [
+        {
+          "shortcut_vk": 48,
+          "control": true,
+          "shift": false,
+          "cell_pixels": [
+            9,
+            19
+          ],
+          "panes": {
+            "a": {
+              "pid": 6332,
+              "parent_pid": 9312,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 20,
+              "monotonic": 199.9835361
+            },
+            "b": {
+              "pid": 9964,
+              "parent_pid": 8460,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 199.9746743
+            },
+            "c": {
+              "pid": 8996,
+              "parent_pid": 5376,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 199.9789386
+            },
+            "d": {
+              "pid": 808,
+              "parent_pid": 7368,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 64,
+              "rows": 19,
+              "monotonic": 199.9855639
+            }
+          },
+          "window": {
+            "client": [
+              0,
+              0,
+              600,
+              404
+            ],
+            "outer": [
+              8,
+              8,
+              624,
+              451
+            ],
+            "monitor": [
+              0,
+              0,
+              1024,
+              768
+            ],
+            "work": [
+              0,
+              0,
+              1024,
+              720
+            ],
+            "dpi": 96,
+            "hwnd": 2425316,
+            "pid": 9312,
+            "foreground": 2425316,
+            "visible": true,
+            "minimized": false
+          },
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                43,
+                78
+              ],
+              "screen": [
+                59,
+                117
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                49,
+                78
+              ],
+              "screen": [
+                65,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                16
+              ],
+              "screen": [
+                333,
+                55
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                78
+              ],
+              "screen": [
+                360,
+                117
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                78
+              ],
+              "screen": [
+                366,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                219
+              ],
+              "screen": [
+                333,
+                258
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                281
+              ],
+              "screen": [
+                360,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                281
+              ],
+              "screen": [
+                366,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "shortcut_vk": 107,
+          "control": true,
+          "shift": false,
+          "cell_pixels": [
+            9,
+            20
+          ],
+          "panes": {
+            "a": {
+              "pid": 6332,
+              "parent_pid": 9312,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 19,
+              "monotonic": 200.2262019
+            },
+            "b": {
+              "pid": 9964,
+              "parent_pid": 8460,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 8,
+              "monotonic": 200.2347814
+            },
+            "c": {
+              "pid": 8996,
+              "parent_pid": 5376,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 8,
+              "monotonic": 200.2202702
+            },
+            "d": {
+              "pid": 808,
+              "parent_pid": 7368,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 64,
+              "rows": 19,
+              "monotonic": 200.2261953
+            }
+          },
+          "window": {
+            "client": [
+              0,
+              0,
+              600,
+              404
+            ],
+            "outer": [
+              8,
+              8,
+              624,
+              451
+            ],
+            "monitor": [
+              0,
+              0,
+              1024,
+              768
+            ],
+            "work": [
+              0,
+              0,
+              1024,
+              720
+            ],
+            "dpi": 96,
+            "hwnd": 2425316,
+            "pid": 9312,
+            "foreground": 2425316,
+            "visible": true,
+            "minimized": false
+          },
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                43,
+                82
+              ],
+              "screen": [
+                59,
+                121
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                49,
+                82
+              ],
+              "screen": [
+                65,
+                121
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                16
+              ],
+              "screen": [
+                333,
+                55
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                82
+              ],
+              "screen": [
+                360,
+                121
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                82
+              ],
+              "screen": [
+                366,
+                121
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                219
+              ],
+              "screen": [
+                333,
+                258
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                285
+              ],
+              "screen": [
+                360,
+                324
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                285
+              ],
+              "screen": [
+                366,
+                324
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        },
+        {
+          "shortcut_vk": 96,
+          "control": true,
+          "shift": false,
+          "cell_pixels": [
+            9,
+            19
+          ],
+          "panes": {
+            "a": {
+              "pid": 6332,
+              "parent_pid": 9312,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 20,
+              "monotonic": 200.4670104
+            },
+            "b": {
+              "pid": 9964,
+              "parent_pid": 8460,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 200.4741188
+            },
+            "c": {
+              "pid": 8996,
+              "parent_pid": 5376,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 30,
+              "rows": 9,
+              "monotonic": 200.4621268
+            },
+            "d": {
+              "pid": 808,
+              "parent_pid": 7368,
+              "cwd": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf",
+              "cols": 64,
+              "rows": 19,
+              "monotonic": 200.4690672
+            }
+          },
+          "window": {
+            "client": [
+              0,
+              0,
+              600,
+              404
+            ],
+            "outer": [
+              8,
+              8,
+              624,
+              451
+            ],
+            "monitor": [
+              0,
+              0,
+              1024,
+              768
+            ],
+            "work": [
+              0,
+              0,
+              1024,
+              720
+            ],
+            "dpi": 96,
+            "hwnd": 2425316,
+            "pid": 9312,
+            "foreground": 2425316,
+            "visible": true,
+            "minimized": false
+          },
+          "pixels": [
+            {
+              "client": [
+                16,
+                16
+              ],
+              "screen": [
+                32,
+                55
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                43,
+                78
+              ],
+              "screen": [
+                59,
+                117
+              ],
+              "rgb": [
+                255,
+                0,
+                0
+              ],
+              "expected": [
+                255,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                49,
+                78
+              ],
+              "screen": [
+                65,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                16
+              ],
+              "screen": [
+                333,
+                55
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                78
+              ],
+              "screen": [
+                360,
+                117
+              ],
+              "rgb": [
+                0,
+                255,
+                0
+              ],
+              "expected": [
+                0,
+                255,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                78
+              ],
+              "screen": [
+                366,
+                117
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                317,
+                219
+              ],
+              "screen": [
+                333,
+                258
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                344,
+                281
+              ],
+              "screen": [
+                360,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                255
+              ],
+              "expected": [
+                0,
+                0,
+                255
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            },
+            {
+              "client": [
+                350,
+                281
+              ],
+              "screen": [
+                366,
+                320
+              ],
+              "rgb": [
+                0,
+                0,
+                0
+              ],
+              "expected": [
+                0,
+                0,
+                0
+              ],
+              "window_from_point": 2425316,
+              "pid_at_point": 9312,
+              "owned": true,
+              "visible": true
+            }
+          ]
+        }
+      ],
+      "input_kind": "virtual-key",
+      "numlock_changed": false,
+      "physical_numlock_state_verified": false,
+      "shortcut_input_bytes": {
+        "a": "",
+        "b": "",
+        "c": "",
+        "d": ""
+      },
+      "gdi_objects": 21,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            43,
+            78
+          ],
+          "screen": [
+            59,
+            117
+          ],
+          "rgb": [
+            255,
+            0,
+            0
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            49,
+            78
+          ],
+          "screen": [
+            65,
+            117
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            16
+          ],
+          "screen": [
+            333,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            344,
+            78
+          ],
+          "screen": [
+            360,
+            117
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            350,
+            78
+          ],
+          "screen": [
+            366,
+            117
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            317,
+            219
+          ],
+          "screen": [
+            333,
+            258
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            344,
+            281
+          ],
+          "screen": [
+            360,
+            320
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            350,
+            281
+          ],
+          "screen": [
+            366,
+            320
+          ],
+          "rgb": [
+            0,
+            0,
+            0
+          ],
+          "expected": [
+            0,
+            0,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "natural_exit_keeps_siblings",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            0,
+            255,
+            0
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        },
+        {
+          "client": [
+            16,
+            219
+          ],
+          "screen": [
+            32,
+            258
+          ],
+          "rgb": [
+            0,
+            0,
+            255
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "close_keeps_other_tab",
+      "passed": true,
+      "pixels": [
+        {
+          "client": [
+            16,
+            16
+          ],
+          "screen": [
+            32,
+            55
+          ],
+          "rgb": [
+            255,
+            255,
+            0
+          ],
+          "expected": [
+            255,
+            255,
+            0
+          ],
+          "window_from_point": 2425316,
+          "pid_at_point": 9312,
+          "owned": true,
+          "visible": true
+        }
+      ]
+    },
+    {
+      "name": "last_pane_closes_window",
+      "passed": true,
+      "returncode": 0
+    }
+  ],
+  "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "binary": "D:\\a\\_temp\\ztty-windows-native\\ztty.exe",
+  "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+  "transport": "real independent ConPTY children",
+  "renderer": "one HWND and retained DIB",
+  "report_file": "ztty-windows-x86_64.native.workspace.json",
+  "architecture": "x64",
+  "python_process": {
+    "process_machine": 0,
+    "native_machine": 34404,
+    "emulated": false
+  },
+  "window_stages": [
+    {
+      "client": [
+        0,
+        0,
+        600,
+        404
+      ],
+      "outer": [
+        8,
+        8,
+        624,
+        451
+      ],
+      "monitor": [
+        0,
+        0,
+        1024,
+        768
+      ],
+      "work": [
+        0,
+        0,
+        1024,
+        720
+      ],
+      "dpi": 96,
+      "hwnd": 2425316,
+      "pid": 9312,
+      "foreground": 2425316,
+      "visible": true,
+      "minimized": false
+    },
+    {
+      "client": [
+        0,
+        0,
+        528,
+        328
+      ],
+      "outer": [
+        8,
+        8,
+        552,
+        375
+      ],
+      "monitor": [
+        0,
+        0,
+        1024,
+        768
+      ],
+      "work": [
+        0,
+        0,
+        1024,
+        720
+      ],
+      "dpi": 96,
+      "hwnd": 2425316,
+      "pid": 9312,
+      "foreground": 2425316,
+      "visible": true,
+      "minimized": false
+    },
+    {
+      "client": [
+        0,
+        0,
+        600,
+        404
+      ],
+      "outer": [
+        8,
+        8,
+        624,
+        451
+      ],
+      "monitor": [
+        0,
+        0,
+        1024,
+        768
+      ],
+      "work": [
+        0,
+        0,
+        1024,
+        720
+      ],
+      "dpi": 96,
+      "hwnd": 2425316,
+      "pid": 9312,
+      "foreground": 2425316,
+      "visible": true,
+      "minimized": false
+    }
+  ],
+  "desktop": {
+    "thread": {
+      "name": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915"
+    },
+    "input": {
+      "name": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915"
+    }
+  },
+  "cell_pixels": [
+    9,
+    19
+  ],
+  "active_check": "other tab survives",
+  "screenshots": {
+    "hold-focus": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.hold-focus.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "b9db68d4fff065d7102deb7b13f468d53e5da36d786b44cd21399ddbc90819f9",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "hold-resize": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.hold-resize.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "6d0327ea5c493f674b16965145a644d0c80fcd27eeed17a7e1ada44a9ba9d44f",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "split-right": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.split-right.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "b8cfbe54d53741478cb4f676beecfececf50a2eed9ec74c69dd64ac06d45718e",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "three-panes": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.three-panes.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "cabb89c75274136f8832498bb9ca94dd53ea9a8b963855a1293c53779c6ec441",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "resized": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.resized.png",
+      "width": 528,
+      "height": 328,
+      "window_pid": 9312,
+      "sha256": "a93302c74648a45f0a53b926dac70ee4556af4b056111f9a0295d95941f4b290",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "tab-restored": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.tab-restored.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "ccf7dec33d1f03a0d35abe33556cae7e4fd39bd1e00d9e3c2137324d5e00a357",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "font-increased": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.font-increased.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "adbf24592421fd30ae4a3b1a1e60e792a33b527ac0a2ef1688ccc9f1ee937ada",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "font-reset": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.font-reset.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "dab9fac45f72c6a1a44311839097e512d645ac2cc0942dcd91eb0a2fe853f4b4",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    },
+    "surviving-tab": {
+      "path": "D:\\a\\ztty\\ztty\\dist\\ztty-windows-x86_64.native.workspace.surviving-tab.png",
+      "width": 600,
+      "height": 404,
+      "window_pid": 9312,
+      "sha256": "5c6f6503c6defd604e0a2eb041d197011bfdf8076e79692cad83c98031bc14cb",
+      "capture": "owned Win32 client DC via BitBlt/GetDIBits"
+    }
+  },
+  "probe_file_read_retries": [
+    {
+      "path": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf\\c\\state.json",
+      "attempts": 2,
+      "retries": 1,
+      "elapsed_seconds": 0.005467,
+      "retry_timeout_seconds": 1.0,
+      "retry_interval_seconds": 0.005,
+      "first_error": {
+        "type": "PermissionError",
+        "errno": 13,
+        "winerror": null
+      },
+      "outcome": "read"
+    },
+    {
+      "path": "C:\\Users\\RUNNER~1\\AppData\\Local\\Temp\\ztty workspace 会话 2ss1kvhf\\a\\state.json",
+      "attempts": 2,
+      "retries": 1,
+      "elapsed_seconds": 0.005575,
+      "retry_timeout_seconds": 1.0,
+      "retry_interval_seconds": 0.005,
+      "first_error": {
+        "type": "PermissionError",
+        "errno": 13,
+        "winerror": null
+      },
+      "outcome": "read"
+    }
+  ],
+  "visible_pixel_checks_completed": 15,
+  "pixel_readback": "GetPixel with WindowFromPoint/PtVisible guards; owned BitBlt/GetDIBits PNGs",
+  "probe_processes": {
+    "a": {
+      "pid": 6332,
+      "exited": true
+    },
+    "b": {
+      "pid": 9964,
+      "exited": true
+    },
+    "c": {
+      "pid": 8996,
+      "exited": true
+    },
+    "d": {
+      "pid": 808,
+      "exited": true
+    }
+  },
+  "cleanup": {
+    "process_exited": true,
+    "temporary_directory_removed": true,
+    "returncode": 0,
+    "directory_removal": {
+      "attempts": 1,
+      "elapsed_seconds": 0.08541369999997528,
+      "retry_timeout_seconds": 2.0
+    },
+    "all_probe_processes_exited": true
+  }
+}

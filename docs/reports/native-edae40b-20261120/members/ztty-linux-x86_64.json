@@ -1,0 +1,42 @@
+[
+  {
+    "name": "ztty-linux-x86_64.build.json",
+    "bytes": 1548,
+    "sha256": "75cd1160881ab62b7f8afa2778902646e13e0c88b76781ddfd01614551d7b836"
+  },
+  {
+    "name": "ztty-linux-x86_64.build.json.sha256",
+    "bytes": 95,
+    "sha256": "cbb4772d7e7e86628287c5e2ea06917af20a09c3031085d7e8501d2e45abb0bd"
+  },
+  {
+    "name": "ztty-linux-x86_64.gate-tests.log",
+    "bytes": 2573,
+    "sha256": "6d102954b1e87569675308ac76ed005539a64db956b59fcb31dfb6eea350a86d"
+  },
+  {
+    "name": "ztty-linux-x86_64.native.json",
+    "bytes": 27130,
+    "sha256": "2e842d82acb29cb388bf2d1fd9aa3f0c80f3dd5fa7a50b6ae578052720b35d28"
+  },
+  {
+    "name": "ztty-linux-x86_64.native.tar.gz",
+    "bytes": 1252859,
+    "sha256": "75e0303cfb30d37ceb817fcc59feeb75083705dc6b8ce6f3e45e5af0120b9abd"
+  },
+  {
+    "name": "ztty-linux-x86_64.tar.gz",
+    "bytes": 580996,
+    "sha256": "5017513c488382d38f1b8f30a4f11647916046eec78ee0ea0b9959c84d748640"
+  },
+  {
+    "name": "ztty-linux-x86_64.tar.gz.sha256",
+    "bytes": 91,
+    "sha256": "94ff01702da1a2a5147dc0f36679cf90abb6a9abb4ef37eccceafad21651b35b"
+  },
+  {
+    "name": "ztty-linux-x86_64.working-directory.log",
+    "bytes": 1550,
+    "sha256": "6b96627333a2d3d9633ec6d24a42b7a9a0e7755b0caf222d709c2644e46beaea"
+  }
+]

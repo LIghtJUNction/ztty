@@ -1,0 +1,22 @@
+test_32_bit_and_truncated_headers_are_rejected (__main__.ArchitectureTests.test_32_bit_and_truncated_headers_are_rejected) ... ok
+test_headers_identify_each_architecture (__main__.ArchitectureTests.test_headers_identify_each_architecture) ... ok
+test_wrong_architecture_is_rejected_before_execution (__main__.ArchitectureTests.test_wrong_architecture_is_rejected_before_execution) ... ok
+test_native_ui_is_required_and_receives_the_pinned_source_tree (__main__.CaseContractTests.test_native_ui_is_required_and_receives_the_pinned_source_tree) ... ok
+test_markerless_owned_identity_still_blocks_cleanup_success (__main__.CleanupMarkerTests.test_markerless_owned_identity_still_blocks_cleanup_success) ... ok
+test_reused_pid_after_marker_disappears_is_not_signalled (__main__.CleanupMarkerTests.test_reused_pid_after_marker_disappears_is_not_signalled) ... ok
+test_already_closed_process_disappearing_during_read_is_gone (__main__.ClosedIdentityTests.test_already_closed_process_disappearing_during_read_is_gone) ... ok
+test_permission_and_other_read_errors_remain_failures (__main__.ClosedIdentityTests.test_permission_and_other_read_errors_remain_failures) ... ok
+test_reused_pid_does_not_keep_old_identity_alive (__main__.ClosedIdentityTests.test_reused_pid_does_not_keep_old_identity_alive) ... ok
+test_same_live_identity_still_requires_waiting (__main__.ClosedIdentityTests.test_same_live_identity_still_requires_waiting) ... ok
+test_existing_archive_is_preserved_without_removing_evidence (__main__.EvidenceArchiveTests.test_existing_archive_is_preserved_without_removing_evidence) ... ok
+test_linked_evidence_is_rejected_without_removing_other_files (__main__.EvidenceArchiveTests.test_linked_evidence_is_rejected_without_removing_other_files) ... ok
+test_nested_gui_evidence_obeys_actual_flat_release_contract (__main__.EvidenceArchiveTests.test_nested_gui_evidence_obeys_actual_flat_release_contract) ... ok
+test_external_sigterm_unwinds_cleanup_before_driver_exits (__main__.ProcessTests.test_external_sigterm_unwinds_cleanup_before_driver_exits) ... ok
+test_nonzero_exit_is_not_accepted (__main__.ProcessTests.test_nonzero_exit_is_not_accepted) ... ok
+test_timeout_reaps_owned_xvfb_and_preserves_unrelated_process (__main__.ProcessTests.test_timeout_reaps_owned_xvfb_and_preserves_unrelated_process) ... ok
+test_pinned_checkout_rejects_wrong_commit_and_both_dirty_states (__main__.SourceTests.test_pinned_checkout_rejects_wrong_commit_and_both_dirty_states) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 3.484s
+
+OK

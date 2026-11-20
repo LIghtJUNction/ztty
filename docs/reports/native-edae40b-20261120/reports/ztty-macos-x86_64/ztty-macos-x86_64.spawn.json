@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "status": "passed",
+  "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "suite": "darwin-threaded-spawn",
+  "command": [
+    "cargo",
+    "+1.100.0",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "crates/zpty/Cargo.toml",
+    "--test",
+    "darwin_spawn",
+    "--target",
+    "x86_64-apple-darwin"
+  ],
+  "timeout_seconds": 120,
+  "host_machine": "x86_64",
+  "architecture": "x86_64",
+  "exit_code": 0,
+  "test": {
+    "suite": "darwin-threaded-spawn",
+    "passed": true,
+    "checks": [
+      "Apple SDK ABI constants, layout and prototypes",
+      "worker-active spawn: controlling tty, session/group, exact argv/env/cwd, input and resize",
+      "nine concurrent PTY spawns drain READY/DONE through EOF, exit, and exclude peer handshakes and a non-CLOEXEC sentinel",
+      "missing/non-executable helper and target errors preserve ENOENT/EACCES without descriptors or owned children",
+      "empty/partial readiness and early helper death cannot report successful handoff",
+      "stalled helper reaches the bounded handshake failure and is reaped",
+      "hangup targets the owned session and wait/drop release its child and master",
+      "seven isolated closed-stdio masks preserve control stdio and cannot collide with helper fd sources"
+    ],
+    "worker_iterations": 1894,
+    "timeout_seconds": 5.001855702,
+    "duration_seconds": 6.350905015,
+    "architecture": "x86_64"
+  },
+  "source_files_sha256": {
+    "crates/zpty/src/macos/spawn.rs": "1bef2a4f4dd6118b0afa1fa900d7b46a3a8a1cfe40e3878dc699c16914789b4e",
+    "crates/zpty/src/macos.rs": "1cf31df4950c11ee5819134fe4b311d609977f93a5e015af55d98035ee358bdb",
+    "crates/zpty/tests/darwin_spawn.rs": "afed17de0cc250c0f9315a3dadee40d6242edd7e53a6766aaa59ea3e75525cac",
+    "crates/zpty/tests/darwin_spawn_abi.c": "629a40ccd7f3a3809503bd90f222dd453f0e0a47eafa6442a96492098c01084f"
+  }
+}
