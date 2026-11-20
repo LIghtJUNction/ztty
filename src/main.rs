@@ -35,6 +35,8 @@ mod plugin_host;
 #[cfg(target_os = "linux")]
 mod repaint;
 #[cfg(target_os = "linux")]
+mod runtime_reload;
+#[cfg(target_os = "linux")]
 mod search;
 #[cfg(target_os = "linux")]
 mod session;
@@ -98,6 +100,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty plugin check|run /absolute/library.so\n\
        ztty save-layout NAME > workspace.json\n\
        ztty restore-layout workspace.json\n\
+       ztty reload [--binary /absolute/path/to/ztty]\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
   --backend x11|wayland Select Linux host (default: x11; Wayland is experimental)\n\
   --name NAME          Name this local session\n\
@@ -581,6 +584,9 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
         Some(b"__plugin-worker") => plugin_host::worker(&args[2..]),
         Some(b"shell-integration") => shell_integration(&args[2..]),
         Some(b"attach") => platform::attach(&args[2..]),
+        Some(b"reload") => runtime_reload::command(&args[2..]),
+        Some(b"__validate-reload") => runtime_reload::internal(&args[2..], false),
+        Some(b"__restore-reload") => runtime_reload::internal(&args[2..], true),
         Some(
             b"list" | b"info" | b"detach" | b"close" | b"rename" | b"action" | b"move" | b"control"
             | b"commands" | b"command-output" | b"save-layout" | b"restore-layout",

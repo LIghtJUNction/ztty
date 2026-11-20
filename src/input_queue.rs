@@ -8,6 +8,18 @@ pub struct InputQueue {
 }
 
 impl InputQueue {
+    pub(crate) fn checkpoint(&self) -> (&[u8], usize) {
+        (&self.bytes[self.offset..], self.limit)
+    }
+
+    pub(crate) fn restore_checkpoint(bytes: Vec<u8>, limit: usize) -> Self {
+        Self {
+            bytes,
+            offset: 0,
+            limit,
+        }
+    }
+
     pub fn new(limit: usize) -> Self {
         Self {
             bytes: Vec::new(),

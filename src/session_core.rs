@@ -5,6 +5,7 @@ use crate::{
     session_control::SessionControl,
 };
 use alloc::string::String;
+use alloc::vec::Vec;
 use zterm::{ResizeAnchor, Terminal};
 
 #[derive(Debug, Eq, PartialEq)]
@@ -30,7 +31,76 @@ pub struct SessionCore {
     control_epoch: u64,
 }
 
+/// Process-independent session state beside the terminal model. Raw descriptors
+/// are transferred separately; creating this value performs no PTY I/O.
+pub struct CoreCheckpoint {
+    pub input: Vec<u8>,
+    pub input_limit: usize,
+    pub output: Vec<u8>,
+    pub output_end: u64,
+    pub owner: Option<String>,
+    pub eof: bool,
+    pub control_epoch: u64,
+}
+
+impl CoreCheckpoint {
+    pub fn validate(&self) -> Result<(), &'static str> {
+        if self.input_limit > 8 * 1024 * 1024 || self.input.len() > self.input_limit {
+            return Err("reload input queue exceeds its budget");
+        }
+        if self.output.len() > 256 * 1024 || self.output.len() as u64 > self.output_end {
+            return Err("reload output cursors are invalid");
+        }
+        if self
+            .owner
+            .as_deref()
+            .is_some_and(|s| !crate::session_control::valid_actor(s))
+        {
+            return Err("reload input owner is invalid");
+        }
+        Ok(())
+    }
+}
+
 impl SessionCore {
+    pub fn checkpoint(&self) -> CoreCheckpoint {
+        let (input, input_limit) = self.input.checkpoint();
+        let (output, output_end) = self.output.checkpoint();
+        CoreCheckpoint {
+            input: input.to_vec(),
+            input_limit,
+            output,
+            output_end,
+            owner: self.owner().map(String::from),
+            eof: self.eof,
+            control_epoch: self.control_epoch,
+        }
+    }
+
+    /// Restore already validated state using the inherited, uniquely owned PTY.
+    /// The caller checks `state.validate()` before taking ownership of any FD.
+    pub fn restore_checkpoint(
+        pty: zpty::Pty,
+        mut terminal: Terminal,
+        state: CoreCheckpoint,
+    ) -> Self {
+        terminal.set_graphics_reader(crate::graphics_io::reader());
+        let mut control =
+            SessionControl::new(state.owner.clone().unwrap_or_else(|| "local".into()));
+        if state.owner.is_none() {
+            let _ = control.release("local");
+        }
+        Self {
+            pty,
+            terminal,
+            input: InputQueue::restore_checkpoint(state.input, state.input_limit),
+            control,
+            output: OutputTail::restore_checkpoint(state.output, state.output_end),
+            eof: state.eof,
+            control_epoch: state.control_epoch,
+        }
+    }
+
     pub fn new(pty: zpty::Pty, mut terminal: Terminal, owner: String, input_limit: usize) -> Self {
         terminal.set_graphics_reader(crate::graphics_io::reader());
         Self {
