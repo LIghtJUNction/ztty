@@ -1,0 +1,1456 @@
+{
+  "audited_at": "2026-11-20T09:47:52.355001+00:00",
+  "passed": true,
+  "platforms": [
+    {
+      "actions_zip": {
+        "bytes": 2035162,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/artifact.zip",
+        "sha256": "89e0e249d5cb10021381ee28cc49b154116dcf48312e7b9bf14e37aacb01daf6"
+      },
+      "architecture": "x86_64",
+      "artifact_digest_matches_api": true,
+      "artifact_id": 14618540132,
+      "build_manifest": {
+        "bytes": 1534,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/zip/ztty-linux-x86_64.build.json",
+        "sha256": "58a8e00b589eadad03ba4e30cc8250be9279397bbeb69a570bb63f3f86034c4b"
+      },
+      "build_manifest_files_verified": 6,
+      "elf": {
+        "bytes": 1365456,
+        "class_bits": 64,
+        "machine": 62,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/bundle/ztty",
+        "sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19"
+      },
+      "image_guard_checks": 10,
+      "image_guard_zero_bytes_verified": true,
+      "json_report_checks": 312,
+      "native_cases": [
+        {
+          "checks": 17,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "workspaces"
+        },
+        {
+          "checks": 19,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "daily_workflow"
+        },
+        {
+          "checks": 6,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "session_switcher"
+        },
+        {
+          "checks": 10,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "sixel_gui"
+        },
+        {
+          "checks": 14,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "input_gui"
+        },
+        {
+          "checks": 11,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "repaint_gui"
+        },
+        {
+          "checks": 24,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "native_ui_gui"
+        }
+      ],
+      "native_evidence_tar": {
+        "bytes": 1375768,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/zip/ztty-linux-x86_64.native.tar.gz",
+        "sha256": "2a8c1eb9bb35735d4850d2a82aaccea65623f6ef3ccf6ff3983cac82bb709454"
+      },
+      "native_wrapper": {
+        "bytes": 27130,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/zip/ztty-linux-x86_64.native.json",
+        "sha256": "272fc0bcdb005bf6bf70b566242091dab320254ea5e62cc4e9cbdffe482b6e08"
+      },
+      "outside_release_harness_receipt_verified": true,
+      "package": {
+        "bytes": 652986,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/zip/ztty-linux-x86_64.tar.gz",
+        "sha256": "a69a4df53b3856d57c3a6f5e9a2109cd7727e5a7f02be902f133a137b186546f"
+      },
+      "package_digest_matches_public_release": true,
+      "public_asset": {
+        "browser_download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-x86_64.tar.gz",
+        "digest": "sha256:a69a4df53b3856d57c3a6f5e9a2109cd7727e5a7f02be902f133a137b186546f",
+        "id": 771258312,
+        "name": "ztty-linux-x86_64.tar.gz",
+        "size": 652986
+      },
+      "reloads": [
+        {
+          "checks": 9,
+          "final_running_image_sha256": "4ed48c1847f99e896b4efa6145ed05881ffc89c4022f98fa462f834f65f94348",
+          "fixture_images_reconstructed_from_shipped_elf": {
+            "after": "7ad6f39ec4c7cd2f8fbc04838cc0bac38fd4d31f079dbdb7846c6b174bf9af95",
+            "before": "4ed48c1847f99e896b4efa6145ed05881ffc89c4022f98fa462f834f65f94348"
+          },
+          "original_and_target_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "remaining_owned_pids": [],
+          "renderer": "gpu",
+          "successful_execs": 2
+        },
+        {
+          "checks": 9,
+          "final_running_image_sha256": "4ed48c1847f99e896b4efa6145ed05881ffc89c4022f98fa462f834f65f94348",
+          "fixture_images_reconstructed_from_shipped_elf": {
+            "after": "7ad6f39ec4c7cd2f8fbc04838cc0bac38fd4d31f079dbdb7846c6b174bf9af95",
+            "before": "4ed48c1847f99e896b4efa6145ed05881ffc89c4022f98fa462f834f65f94348"
+          },
+          "original_and_target_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "remaining_owned_pids": [],
+          "renderer": "software",
+          "successful_execs": 2
+        }
+      ],
+      "reports_verified": [
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 10,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "clipboard-image-guard.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 7289,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/clipboard-image-guard.json",
+            "sha256": "bfd47a7af0a6c545b0e88e41fad68b45ebeeac9a7186918b2ebf8041173ed2bc"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 25,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "clipboard.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 12609,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/clipboard.json",
+            "sha256": "e4cbe02bc6504f2edba3334eb53e77a96a6ae258782acba026b5ebdeb62e742e"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 19,
+          "cleanup": {},
+          "name": "daily_workflow/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 10164,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/daily_workflow/report.json",
+            "sha256": "e9b088e331c53edd5172b2a7d3a3e4c23e63c4db9253bbe269d6bd4919353fe0"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 11,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "gpu-repaint.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097158
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097158
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 10902,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/gpu-repaint.json",
+            "sha256": "305c76685cf9236bdb016e66aceb51ecda61891d468d9468186f77945fb7aaf3"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 8,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "gpu-text.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 11749,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/gpu-text.json",
+            "sha256": "099590bc2dd2908faa64283f4130a5741e6a0ce284d868064d06c2a264dc25c4"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 24,
+          "cleanup": {
+            "cleanup.owned_processes_remaining": []
+          },
+          "name": "gpu-ui.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097270
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 8782,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/gpu-ui.json",
+            "sha256": "3b485dc6d23ccf06fbdded224151889d3c6625fb73ff08a106d48d295c1962b3"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 8,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "graphics-gpu/graphics-extensions.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 2389,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/graphics-gpu/graphics-extensions.json",
+            "sha256": "a49004bd53894b19b06fc205e8b32c5898a6ecd42081d7bd1865f8c21031e865"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 8,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "graphics-software/graphics-extensions.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 2345,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/graphics-software/graphics-extensions.json",
+            "sha256": "db6a3a90640cdc8cff911af63767b39471d7cedd807de9637a20389dc848eb66"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 14,
+          "cleanup": {
+            "cleanup.owned_processes_remaining": []
+          },
+          "name": "input_gui/report.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097154
+            }
+          ],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 62218,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/input_gui/report.json",
+            "sha256": "ae7cb6be6222b69680a3ba01c9b59cb8d753595809af887e0991e8ae4e6650f8"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 24,
+          "cleanup": {
+            "cleanup.owned_processes_remaining": []
+          },
+          "name": "native_ui_gui/report.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097233
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 8895,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/native_ui_gui/report.json",
+            "sha256": "f003d86404235c45bbfa14fe8a2305705ced9d6ba32be6bfbe42540bc1bc690d"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 13,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "osc52-gpu/osc52.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 3177,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/osc52-gpu/osc52.json",
+            "sha256": "e0bfd0774b037a328be56e70d4c9fba626daed35951a9272d903579049fc7115"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 13,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "osc52-software/osc52.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 3133,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/osc52-software/osc52.json",
+            "sha256": "00d5acb4f9b4a67baf57e5878b3646e3e08544aa4eaf4c2eb0d78c67d9702b0f"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 9,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "reload-gpu.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 23922,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/reload-gpu.json",
+            "sha256": "1cbc3882beffdd372d213e51de3aa75780e4a3dafca43dfcf125c4789ee7398d"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 9,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "reload-software.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 23954,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/reload-software.json",
+            "sha256": "3fec1e14fd11409bcae102a691fac1f34f7026cb09d5bd2e4fbc20673043548d"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 11,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "repaint_gui/report.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097161
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": null,
+              "window_id": 2097161
+            }
+          ],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 11559,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/repaint_gui/report.json",
+            "sha256": "fe129b9866bc4b7e7db0da4818091cccddcfa1e7b33a4c7146bfe639916addfd"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 2,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "retained-frame.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 13744,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/retained-frame.json",
+            "sha256": "f2452bab7da91e21d7cf0da54ad9f370dd80a07c1e911dd71f5daaf710b739bb"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 6,
+          "cleanup": {},
+          "name": "session_switcher/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 12427,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/session_switcher/report.json",
+            "sha256": "b4ee224d40b33fee31b70b9a7bb4f3b85f7e36ea042f7e87c53f46ba633d01c1"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 10,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "sixel_gui/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 7017,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/sixel_gui/report.json",
+            "sha256": "cb33ad1e6b8d89a3a8739b5d6eee593400e75338b67349cc64bfc3d45e9c1800"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 3,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "tab-switch-gpu.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "session": "switch-tab-a",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "session": "switch-tab-b",
+              "window_id": 2097158
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "session": "switch-focus-a",
+              "window_id": 2097559
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 256 bits)",
+              "requested": "gpu",
+              "session": "switch-focus-b",
+              "window_id": 2097564
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 45519,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/tab-switch-gpu.json",
+            "sha256": "7d94d78fb00f2b28f6700ac7acd04c6d45249d2739d690e8c782d69add9bb8c6"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 3,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "tab-switch-software.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-tab-a",
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-tab-b",
+              "window_id": 2097159
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-focus-a",
+              "window_id": 2097354
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-focus-b",
+              "window_id": 2097358
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 45423,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/tab-switch-software.json",
+            "sha256": "0671cad8f36b9fbdab17c3ac8426cb6a2736f6f90f3e110fd22bec7eec9753f9"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 65,
+          "cleanup": {
+            "owned_brokers_remaining": [],
+            "owned_children_remaining": [],
+            "owned_helpers_remaining": []
+          },
+          "name": "wayland/validation.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 9047,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/wayland/validation.json",
+            "sha256": "063cb67807721da61a5941d9eba68428b91b1147adb5b90e05abdbef2f0d9a65"
+          }
+        },
+        {
+          "binary_sha256": "9e8f1c084376df913087c10d4b10d11e2c0172a2eb63a31e64813742067dab19",
+          "checks": 17,
+          "cleanup": {},
+          "name": "workspaces/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 8675,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-x86_64/native/ztty-linux-x86_64.native/workspaces/report.json",
+            "sha256": "f7170ec0a05f4093c60367c9b2e162fe2915874432423a1d6a83fc3efa93df3b"
+          }
+        }
+      ],
+      "source_notes": {
+        "gpu_ui_source_changes": [
+          "?? dist/"
+        ],
+        "tracked_changes_in_native_wrapper_snapshots": [],
+        "wayland_dirty_flag_includes_untracked_files": true,
+        "wayland_source_worktree_dirty": true
+      },
+      "tab_switch": [
+        {
+          "checks": 3,
+          "invalid_application_samples": 0,
+          "invalid_samples_by_scope": {
+            "focus_raise": 0,
+            "tabs": 0
+          },
+          "remaining_owned_pids": [],
+          "renderer": "gpu"
+        },
+        {
+          "checks": 3,
+          "invalid_application_samples": 0,
+          "invalid_samples_by_scope": {
+            "focus_raise": 0,
+            "tabs": 0
+          },
+          "remaining_owned_pids": [],
+          "renderer": "software"
+        }
+      ]
+    },
+    {
+      "actions_zip": {
+        "bytes": 2009679,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/artifact.zip",
+        "sha256": "4cbf2fe6e8313bbcc7eeaa38ad9b55cfdbee8b874955fa302e224047d599d0fc"
+      },
+      "architecture": "aarch64",
+      "artifact_digest_matches_api": true,
+      "artifact_id": 14618720338,
+      "build_manifest": {
+        "bytes": 1546,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/zip/ztty-linux-aarch64.build.json",
+        "sha256": "116ad718073c8fd3c7cb08732d9e606a789587284ef6e54258ecefbff6bbc0c1"
+      },
+      "build_manifest_files_verified": 6,
+      "elf": {
+        "bytes": 1299432,
+        "class_bits": 64,
+        "machine": 183,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/bundle/ztty",
+        "sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c"
+      },
+      "image_guard_checks": 10,
+      "image_guard_zero_bytes_verified": true,
+      "json_report_checks": 312,
+      "native_cases": [
+        {
+          "checks": 17,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "workspaces"
+        },
+        {
+          "checks": 19,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "daily_workflow"
+        },
+        {
+          "checks": 6,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "session_switcher"
+        },
+        {
+          "checks": 10,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "sixel_gui"
+        },
+        {
+          "checks": 14,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "input_gui"
+        },
+        {
+          "checks": 11,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "repaint_gui"
+        },
+        {
+          "checks": 24,
+          "cleanup": {
+            "cleanup.leftover_owned_pids": [],
+            "cleanup.remaining_owned_pids": []
+          },
+          "name": "native_ui_gui"
+        }
+      ],
+      "native_evidence_tar": {
+        "bytes": 1387504,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/zip/ztty-linux-aarch64.native.tar.gz",
+        "sha256": "5827138b27c375bbd3cf8455314d731a818ecafe533d766193a68370211d8967"
+      },
+      "native_wrapper": {
+        "bytes": 27188,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/zip/ztty-linux-aarch64.native.json",
+        "sha256": "c94ee3e91ea215768c2ffefdbfdbe20f39ba48d7fb23df5bbfb5a984d74fce9b"
+      },
+      "outside_release_harness_receipt_verified": true,
+      "package": {
+        "bytes": 617800,
+        "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/zip/ztty-linux-aarch64.tar.gz",
+        "sha256": "24d1d7cc638291bf5746f5dbe4deb2d9aef9727bead31339d6048d0e1da2c700"
+      },
+      "package_digest_matches_public_release": true,
+      "public_asset": {
+        "browser_download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-aarch64.tar.gz",
+        "digest": "sha256:24d1d7cc638291bf5746f5dbe4deb2d9aef9727bead31339d6048d0e1da2c700",
+        "id": 771257699,
+        "name": "ztty-linux-aarch64.tar.gz",
+        "size": 617800
+      },
+      "reloads": [
+        {
+          "checks": 9,
+          "final_running_image_sha256": "aae0a926ff35841471bed0902cc0d02774e4d586dc603aba4f0d9b2eda5ad6bd",
+          "fixture_images_reconstructed_from_shipped_elf": {
+            "after": "cada9a02d67718f6d054083db8afd762d3c7223b0ab563893f24e1dc2493028c",
+            "before": "aae0a926ff35841471bed0902cc0d02774e4d586dc603aba4f0d9b2eda5ad6bd"
+          },
+          "original_and_target_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "remaining_owned_pids": [],
+          "renderer": "gpu",
+          "successful_execs": 2
+        },
+        {
+          "checks": 9,
+          "final_running_image_sha256": "aae0a926ff35841471bed0902cc0d02774e4d586dc603aba4f0d9b2eda5ad6bd",
+          "fixture_images_reconstructed_from_shipped_elf": {
+            "after": "cada9a02d67718f6d054083db8afd762d3c7223b0ab563893f24e1dc2493028c",
+            "before": "aae0a926ff35841471bed0902cc0d02774e4d586dc603aba4f0d9b2eda5ad6bd"
+          },
+          "original_and_target_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "remaining_owned_pids": [],
+          "renderer": "software",
+          "successful_execs": 2
+        }
+      ],
+      "reports_verified": [
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 10,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "clipboard-image-guard.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 7290,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/clipboard-image-guard.json",
+            "sha256": "418d6cd3e214fafa88b05ef369ca82ffcb13292961d252951c6d04d720ebfa39"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 25,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "clipboard.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 12606,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/clipboard.json",
+            "sha256": "2c3358eeef6efe2954f7cb67df58947a735acba884deaaaa2b7fc739c61d94ef"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 19,
+          "cleanup": {},
+          "name": "daily_workflow/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 10176,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/daily_workflow/report.json",
+            "sha256": "3fc2d38dd1601a0756fd5bc5dc85264856b3b63dcfdab14e77835c83bdc04fe3"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 11,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "gpu-repaint.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097158
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097158
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 10736,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/gpu-repaint.json",
+            "sha256": "fe068306d0efe17ca9aa299381c3b1b5ea3d8f00d91f8cdb66c72974096ced2a"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 8,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "gpu-text.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 11966,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/gpu-text.json",
+            "sha256": "d8df9a3cd77066349cee6968384b556be073406002a3541e3fa283ea49cfb1dd"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 24,
+          "cleanup": {
+            "cleanup.owned_processes_remaining": []
+          },
+          "name": "gpu-ui.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097270
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 8786,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/gpu-ui.json",
+            "sha256": "bea8cfd84f61fdf3a9dbfadab99ef24195222031725d4a8c22b5e1dcc545846d"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 8,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "graphics-gpu/graphics-extensions.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 2386,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/graphics-gpu/graphics-extensions.json",
+            "sha256": "e22adacba36c9d4213812d70f935a07717703abc413ef1ef1cd8eb2f8e5dad41"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 8,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "graphics-software/graphics-extensions.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 2342,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/graphics-software/graphics-extensions.json",
+            "sha256": "c42df0471f64be3b8c4547d9c28976ff24cc1c1ce00e7254becaf41fe88a0948"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 14,
+          "cleanup": {
+            "cleanup.owned_processes_remaining": []
+          },
+          "name": "input_gui/report.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097154
+            }
+          ],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 62216,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/input_gui/report.json",
+            "sha256": "a46cd9f5520c64b9e4ca166914bd2af03d1e1e2a75e4c40ee2bb883a1cdc1eb5"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 24,
+          "cleanup": {
+            "cleanup.owned_processes_remaining": []
+          },
+          "name": "native_ui_gui/report.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097233
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 8898,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/native_ui_gui/report.json",
+            "sha256": "fe41485002ddd7283f902914688e9f6c6ff4a8fc064ae19e023eabdc4f045fe6"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 13,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "osc52-gpu/osc52.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 3177,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/osc52-gpu/osc52.json",
+            "sha256": "42f9cd27849f3da2b9d505cca358208ce3bcd81138721f97613132f4d82e1c9a"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 13,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "osc52-software/osc52.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 3130,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/osc52-software/osc52.json",
+            "sha256": "7dfcf59aa3c68c31197f541e485594c2cc64f9e37794a070c8c021edb077b5f0"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 9,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "reload-gpu.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 23940,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/reload-gpu.json",
+            "sha256": "7b014fd4aa43dd74e9defeabf020441682dd481f7c35d5b09704f3db82480c9a"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 9,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "reload-software.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 23963,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/reload-software.json",
+            "sha256": "87858e6fe8ba1fae4f3279f465182195c1a78c81912df2f91e1767a9f310e50a"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 11,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "repaint_gui/report.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097161
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": null,
+              "window_id": 2097161
+            }
+          ],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 11615,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/repaint_gui/report.json",
+            "sha256": "d102ede1fee2d6d7b4e3754f2b79b9938163592bd3a020ea87127ac8626d97e6"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 2,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "retained-frame.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "window_id": 2097155
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 13743,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/retained-frame.json",
+            "sha256": "f24a192d72e73a9380946bd04c99117eba24d43003db62f7a3eb104932365091"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 6,
+          "cleanup": {},
+          "name": "session_switcher/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 12434,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/session_switcher/report.json",
+            "sha256": "91b37d5a72323623ac9e49ab68f43bd57f8e63004dad372f014ac00444a62a99"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 10,
+          "cleanup": {
+            "cleanup_errors": []
+          },
+          "name": "sixel_gui/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 7022,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/sixel_gui/report.json",
+            "sha256": "db4147c89192608b50ccf377a97f921a170d833befa938599cc3c2e6ada160e0"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 3,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "tab-switch-gpu.json",
+          "renderer_readbacks": [
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "session": "switch-tab-a",
+              "window_id": 2097154
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "session": "switch-tab-b",
+              "window_id": 2097158
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "session": "switch-focus-a",
+              "window_id": 2097556
+            },
+            {
+              "actual": "gpu",
+              "driver": "llvmpipe (LLVM 20.1.2, 128 bits)",
+              "requested": "gpu",
+              "session": "switch-focus-b",
+              "window_id": 2097561
+            }
+          ],
+          "renderer_requested": "gpu",
+          "report": {
+            "bytes": 45517,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/tab-switch-gpu.json",
+            "sha256": "510952d62d51a09ea0a18b5a1795c83c82d3e10babc125c42dc08dd50793dacc"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 3,
+          "cleanup": {
+            "remaining_owned_pids": []
+          },
+          "name": "tab-switch-software.json",
+          "renderer_readbacks": [
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-tab-a",
+              "window_id": 2097154
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-tab-b",
+              "window_id": 2097159
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-focus-a",
+              "window_id": 2097354
+            },
+            {
+              "actual": "software",
+              "driver": "",
+              "requested": "software",
+              "session": "switch-focus-b",
+              "window_id": 2097358
+            }
+          ],
+          "renderer_requested": "software",
+          "report": {
+            "bytes": 45428,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/tab-switch-software.json",
+            "sha256": "2bd4253491fbfb8f2af05cece08aa393a315e8092f4dfd288297e9d94beed5d5"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 65,
+          "cleanup": {
+            "owned_brokers_remaining": [],
+            "owned_children_remaining": [],
+            "owned_helpers_remaining": []
+          },
+          "name": "wayland/validation.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 9043,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/wayland/validation.json",
+            "sha256": "dd3dfb49185ebf83afbe826f0d61857c5e3ceb9d685e56ab971b9a73b36c5ea4"
+          }
+        },
+        {
+          "binary_sha256": "db5ababbd79dde74959051c2b9e210df98d64f0410eac78e92e33856c242757c",
+          "checks": 17,
+          "cleanup": {},
+          "name": "workspaces/report.json",
+          "renderer_readbacks": [],
+          "renderer_requested": null,
+          "report": {
+            "bytes": 8681,
+            "path": "/workspace/scratch/87c2ba7ec53f/ztty-052-run44712216777/ztty-linux-aarch64/native/ztty-linux-aarch64.native/workspaces/report.json",
+            "sha256": "7af5e6f56489156dd294f34926b30510090524b947cb56d68a6e5f1195907ea8"
+          }
+        }
+      ],
+      "source_notes": {
+        "gpu_ui_source_changes": [
+          "?? dist/"
+        ],
+        "tracked_changes_in_native_wrapper_snapshots": [],
+        "wayland_dirty_flag_includes_untracked_files": true,
+        "wayland_source_worktree_dirty": true
+      },
+      "tab_switch": [
+        {
+          "checks": 3,
+          "invalid_application_samples": 0,
+          "invalid_samples_by_scope": {
+            "focus_raise": 0,
+            "tabs": 0
+          },
+          "remaining_owned_pids": [],
+          "renderer": "gpu"
+        },
+        {
+          "checks": 3,
+          "invalid_application_samples": 0,
+          "invalid_samples_by_scope": {
+            "focus_raise": 0,
+            "tabs": 0
+          },
+          "remaining_owned_pids": [],
+          "renderer": "software"
+        }
+      ]
+    }
+  ],
+  "release": {
+    "assets": [
+      {
+        "browser_download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-aarch64.tar.gz",
+        "digest": "sha256:24d1d7cc638291bf5746f5dbe4deb2d9aef9727bead31339d6048d0e1da2c700",
+        "id": 771257699,
+        "name": "ztty-linux-aarch64.tar.gz",
+        "size": 617800
+      },
+      {
+        "browser_download_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-x86_64.tar.gz",
+        "digest": "sha256:a69a4df53b3856d57c3a6f5e9a2109cd7727e5a7f02be902f133a137b186546f",
+        "id": 771258312,
+        "name": "ztty-linux-x86_64.tar.gz",
+        "size": 652986
+      }
+    ],
+    "draft": false,
+    "html_url": "https://github.com/LIghtJUNction/ztty/releases/tag/v0.5.2",
+    "id": 452506520,
+    "published_at": "2026-11-20T09:45:17Z",
+    "tag_name": "v0.5.2"
+  },
+  "run_attempt": 1,
+  "run_id": 44712216777,
+  "schema": "ztty.published-linux-artifact-audit.v1",
+  "scope": "Read-only audit of existing published Linux artifacts and CI reports; no tests, builds, execution, CI reruns, refs or publication performed.",
+  "source_sha": "6e2ce246b0b50e6b82da99756832feae6e966f21"
+}

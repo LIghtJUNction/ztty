@@ -1,0 +1,547 @@
+{
+  "schema": "ztty.release-0.5.2.publication-evidence.v1",
+  "source_sha": "6e2ce246b0b50e6b82da99756832feae6e966f21",
+  "source_tree": "57c38b1e962578a29dae65c4e54adab65fd6b1bf",
+  "tag": {
+    "name": "v0.5.2",
+    "object_sha": "8b2fd0c22b3d53f630f0377ca5a9d225df1a089b",
+    "peeled_commit": "6e2ce246b0b50e6b82da99756832feae6e966f21",
+    "immutable": true
+  },
+  "workflow": {
+    "id": 44712216777,
+    "attempt": 1,
+    "event": "push",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44712216777",
+    "finished_at": "2026-11-20T09:45:31Z",
+    "verify": "success",
+    "platforms": [
+      "linux-x86_64",
+      "linux-aarch64",
+      "macos-x86_64",
+      "macos-aarch64",
+      "windows-x86_64",
+      "windows-aarch64"
+    ],
+    "arch_package_build_install": "success",
+    "release_upload_and_readback": "success",
+    "aur_push": "success"
+  },
+  "github_release": {
+    "id": 452506520,
+    "tag_name": "v0.5.2",
+    "draft": false,
+    "prerelease": false,
+    "published_at": "2026-11-20T09:45:17Z",
+    "url": "https://github.com/LIghtJUNction/ztty/releases/tag/v0.5.2",
+    "assets": [
+      {
+        "id": 771257294,
+        "name": "install.sh",
+        "bytes": 9889,
+        "digest": "sha256:e078404f113ce6337c70f0878ab2be057f7135572a5e2c4ad19c6025206f2b08",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/install.sh"
+      },
+      {
+        "id": 771257214,
+        "name": "SHA256SUMS",
+        "bytes": 84,
+        "digest": "sha256:a8a22b47de10b2d9af1f21c620ac98175d0387829a2ae1058f2f2d0a54c1f587",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/SHA256SUMS"
+      },
+      {
+        "id": 771262293,
+        "name": "ztty-0.5.2-native-evidence.zip",
+        "bytes": 17140483,
+        "digest": "sha256:95967bb333dbf0e417b8c7bc264006a891b29a3d390116562970a3bec0385020",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-0.5.2-native-evidence.zip"
+      },
+      {
+        "id": 771262495,
+        "name": "ztty-0.5.2-native-evidence.zip.sha256",
+        "bytes": 97,
+        "digest": "sha256:7167d405c07bd63394868ba88dfc2e108378e6a007778193407f5e2508aa96e0",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-0.5.2-native-evidence.zip.sha256"
+      },
+      {
+        "id": 771257140,
+        "name": "ztty-0.5.2.tar.gz",
+        "bytes": 8092432,
+        "digest": "sha256:85a77183e74d359bd02980f309a1f0d50ff1c65405bec5d21b016723720a0da3",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-0.5.2.tar.gz"
+      },
+      {
+        "id": 771257394,
+        "name": "ztty-linux-aarch64.build.json",
+        "bytes": 1546,
+        "digest": "sha256:116ad718073c8fd3c7cb08732d9e606a789587284ef6e54258ecefbff6bbc0c1",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-aarch64.build.json"
+      },
+      {
+        "id": 771257498,
+        "name": "ztty-linux-aarch64.build.json.sha256",
+        "bytes": 96,
+        "digest": "sha256:717e33f764a8f39e0b5ab7f0186944ee6ee92d9c11862bddb2b0871eb0f2bda5",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-aarch64.build.json.sha256"
+      },
+      {
+        "id": 771257602,
+        "name": "ztty-linux-aarch64.native.json",
+        "bytes": 27188,
+        "digest": "sha256:c94ee3e91ea215768c2ffefdbfdbe20f39ba48d7fb23df5bbfb5a984d74fce9b",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-aarch64.native.json"
+      },
+      {
+        "id": 771257699,
+        "name": "ztty-linux-aarch64.tar.gz",
+        "bytes": 617800,
+        "digest": "sha256:24d1d7cc638291bf5746f5dbe4deb2d9aef9727bead31339d6048d0e1da2c700",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-aarch64.tar.gz"
+      },
+      {
+        "id": 771257830,
+        "name": "ztty-linux-aarch64.tar.gz.sha256",
+        "bytes": 92,
+        "digest": "sha256:32b53942f8b9c86463612a617ccb0ac7758efb1cf1991ea7aca6ba73a1bb9db3",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-aarch64.tar.gz.sha256"
+      },
+      {
+        "id": 771257984,
+        "name": "ztty-linux-x86_64.build.json",
+        "bytes": 1534,
+        "digest": "sha256:58a8e00b589eadad03ba4e30cc8250be9279397bbeb69a570bb63f3f86034c4b",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-x86_64.build.json"
+      },
+      {
+        "id": 771258090,
+        "name": "ztty-linux-x86_64.build.json.sha256",
+        "bytes": 95,
+        "digest": "sha256:c00b4539c1a0398ca0f0e86f7c527c820f11282aac62fbf7e24fe807028087cc",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-x86_64.build.json.sha256"
+      },
+      {
+        "id": 771258177,
+        "name": "ztty-linux-x86_64.native.json",
+        "bytes": 27130,
+        "digest": "sha256:272fc0bcdb005bf6bf70b566242091dab320254ea5e62cc4e9cbdffe482b6e08",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-x86_64.native.json"
+      },
+      {
+        "id": 771258312,
+        "name": "ztty-linux-x86_64.tar.gz",
+        "bytes": 652986,
+        "digest": "sha256:a69a4df53b3856d57c3a6f5e9a2109cd7727e5a7f02be902f133a137b186546f",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-x86_64.tar.gz"
+      },
+      {
+        "id": 771258432,
+        "name": "ztty-linux-x86_64.tar.gz.sha256",
+        "bytes": 91,
+        "digest": "sha256:5eeb58b3016307d13cab195ce902e998871f61e9f9db6e1a3e16aa9918914507",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-linux-x86_64.tar.gz.sha256"
+      },
+      {
+        "id": 771258520,
+        "name": "ztty-macos-aarch64.build.json",
+        "bytes": 11956,
+        "digest": "sha256:33ca902944a133aaf4ece6fdd4af0ec1ba33496ad10ace8f212c27e14416e859",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.build.json"
+      },
+      {
+        "id": 771258649,
+        "name": "ztty-macos-aarch64.build.json.sha256",
+        "bytes": 96,
+        "digest": "sha256:8b2860f785c11af5fe990e0f4c6f36f4d7294557f825eaa7fbd2437c22d7e254",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.build.json.sha256"
+      },
+      {
+        "id": 771258766,
+        "name": "ztty-macos-aarch64.manifest.json",
+        "bytes": 2967,
+        "digest": "sha256:1a7882f360a8de1aab25a297c962fa521ce0d0ddf0ea4fcb1285ba10e2eb518a",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.manifest.json"
+      },
+      {
+        "id": 771258899,
+        "name": "ztty-macos-aarch64.manifest.json.sha256",
+        "bytes": 99,
+        "digest": "sha256:b5b96dd429965df3c8c367534be3a2f14e4964027340c58af38415ac9a525b7b",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.manifest.json.sha256"
+      },
+      {
+        "id": 771258996,
+        "name": "ztty-macos-aarch64.native.json",
+        "bytes": 69956,
+        "digest": "sha256:3ea126162b10da9f6ac2257703533421827cd5117a0635caf8f14f03c8701f4f",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.native.json"
+      },
+      {
+        "id": 771259100,
+        "name": "ztty-macos-aarch64.tar.gz",
+        "bytes": 252035,
+        "digest": "sha256:b5053acf77052a7d829c458477ac022f93124f6518ec5969f311f84c98329a91",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.tar.gz"
+      },
+      {
+        "id": 771259249,
+        "name": "ztty-macos-aarch64.tar.gz.sha256",
+        "bytes": 92,
+        "digest": "sha256:18c643f5ee5ba464ee045d5186009cccd8bfa1c210dd16dfd4f2c337c5f3ec01",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.tar.gz.sha256"
+      },
+      {
+        "id": 771259340,
+        "name": "ztty-macos-aarch64.zip",
+        "bytes": 252545,
+        "digest": "sha256:15043b7582537da4554b368cee114fe6e62892d09ba57db20932b67205fbe583",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.zip"
+      },
+      {
+        "id": 771259428,
+        "name": "ztty-macos-aarch64.zip.sha256",
+        "bytes": 89,
+        "digest": "sha256:8b1fd5efe51943332d44f1c0ab44d08fd87041b03913d4b70f75ad79630806ab",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-aarch64.zip.sha256"
+      },
+      {
+        "id": 771259518,
+        "name": "ztty-macos-x86_64.build.json",
+        "bytes": 11899,
+        "digest": "sha256:63f13dab9b778f99402bba8682f3117cabb3d9f3828a1823480832004239dbea",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.build.json"
+      },
+      {
+        "id": 771259607,
+        "name": "ztty-macos-x86_64.build.json.sha256",
+        "bytes": 95,
+        "digest": "sha256:7a2cdcdc889694fa80f93edcbd004398a228b30b5303d5b7d6ee6b43b2608ff8",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.build.json.sha256"
+      },
+      {
+        "id": 771259687,
+        "name": "ztty-macos-x86_64.manifest.json",
+        "bytes": 2963,
+        "digest": "sha256:a9a2a441fb16ee6e430696c507933a7223e168932f43b04eaf3460c0c9ca8ff2",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.manifest.json"
+      },
+      {
+        "id": 771259800,
+        "name": "ztty-macos-x86_64.manifest.json.sha256",
+        "bytes": 98,
+        "digest": "sha256:1fbc32f48bf2cee2172b7965ee2d471dfd31ad988928cb0d369198c8926fcdc3",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.manifest.json.sha256"
+      },
+      {
+        "id": 771259940,
+        "name": "ztty-macos-x86_64.native.json",
+        "bytes": 70032,
+        "digest": "sha256:53366ea577b699bad9478bf1c64a3322cc120d5107ba70990bdbdcfcd31fca6e",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.native.json"
+      },
+      {
+        "id": 771260050,
+        "name": "ztty-macos-x86_64.tar.gz",
+        "bytes": 278119,
+        "digest": "sha256:fa48af9a10cb05376985100dea227e13b34a1b4e8900908b2c8545a4b1195b06",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.tar.gz"
+      },
+      {
+        "id": 771260251,
+        "name": "ztty-macos-x86_64.tar.gz.sha256",
+        "bytes": 91,
+        "digest": "sha256:686e17a2917d27343ec8ac6e0e90d962f778bf521195a3edc2026e3cd016d7f4",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.tar.gz.sha256"
+      },
+      {
+        "id": 771260429,
+        "name": "ztty-macos-x86_64.zip",
+        "bytes": 278826,
+        "digest": "sha256:2238a4a91ce58a3870f0daee904841f524e8489f0b32177c5ffdac2032d7b287",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.zip"
+      },
+      {
+        "id": 771260538,
+        "name": "ztty-macos-x86_64.zip.sha256",
+        "bytes": 88,
+        "digest": "sha256:8f8a68e12b9115d4e406e27cbf671204b9a43919f520825f33a0122d99263c01",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-macos-x86_64.zip.sha256"
+      },
+      {
+        "id": 771260639,
+        "name": "ztty-windows-aarch64.build.json",
+        "bytes": 72226,
+        "digest": "sha256:f65715a7390624e1561a672524d4b0fcbf4e8b2e58af9c63e2fad87dde09d51c",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-aarch64.build.json"
+      },
+      {
+        "id": 771260743,
+        "name": "ztty-windows-aarch64.build.json.sha256",
+        "bytes": 99,
+        "digest": "sha256:e365ffa3b25c52d9ef15ca17d3db1624a54e559d356cd97c750574e1a2f51fc3",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-aarch64.build.json.sha256"
+      },
+      {
+        "id": 771260860,
+        "name": "ztty-windows-aarch64.manifest.json",
+        "bytes": 1257,
+        "digest": "sha256:d60a78cfe5a8bd05d3e556eacc10a1f2906c678c14e27b95a20ba23a289ebdc2",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-aarch64.manifest.json"
+      },
+      {
+        "id": 771260961,
+        "name": "ztty-windows-aarch64.manifest.json.sha256",
+        "bytes": 102,
+        "digest": "sha256:af5129811d6023ab9db52e20b80d42e2a62d268e726e076d0bce2d1e5a3b7f62",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-aarch64.manifest.json.sha256"
+      },
+      {
+        "id": 771261050,
+        "name": "ztty-windows-aarch64.native.json",
+        "bytes": 337226,
+        "digest": "sha256:a6d82592a69a7525d99442510049fca72f8bbab207faff26b490ef7dcdad330f",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-aarch64.native.json"
+      },
+      {
+        "id": 771261175,
+        "name": "ztty-windows-aarch64.zip",
+        "bytes": 858744,
+        "digest": "sha256:402ff4bf426d303ada1625fc50a00d1b29a573bf80053e3b4558dc33dc505283",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-aarch64.zip"
+      },
+      {
+        "id": 771261267,
+        "name": "ztty-windows-aarch64.zip.sha256",
+        "bytes": 92,
+        "digest": "sha256:1cd99f00b65d62d5171ddd899c755c68c9e4aca645c617339d5f171f0f091483",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-aarch64.zip.sha256"
+      },
+      {
+        "id": 771261392,
+        "name": "ztty-windows-x86_64.build.json",
+        "bytes": 71829,
+        "digest": "sha256:8e159b40fe03b8e163b8732744d02e9615208a7e871fa906a0e763d41452b42f",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-x86_64.build.json"
+      },
+      {
+        "id": 771261503,
+        "name": "ztty-windows-x86_64.build.json.sha256",
+        "bytes": 98,
+        "digest": "sha256:e60c640cd1c3d68a09d80f5cc77b4470f03f2997dc621721213443875f20f40b",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-x86_64.build.json.sha256"
+      },
+      {
+        "id": 771261669,
+        "name": "ztty-windows-x86_64.manifest.json",
+        "bytes": 1255,
+        "digest": "sha256:d00b09bda77a428d4b6c602d5cf15757eaad780a0dd2e175a72e0ca93a4920c4",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-x86_64.manifest.json"
+      },
+      {
+        "id": 771261790,
+        "name": "ztty-windows-x86_64.manifest.json.sha256",
+        "bytes": 101,
+        "digest": "sha256:6b1235647a48aa908c4b8f6d96f344808988b1a075170dc2a6823fa8b768681e",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-x86_64.manifest.json.sha256"
+      },
+      {
+        "id": 771261906,
+        "name": "ztty-windows-x86_64.native.json",
+        "bytes": 336176,
+        "digest": "sha256:30a4eb35862041de46092ab8ced8b31643ad65ade3bec537b8d56d1852da47de",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-x86_64.native.json"
+      },
+      {
+        "id": 771262012,
+        "name": "ztty-windows-x86_64.zip",
+        "bytes": 932844,
+        "digest": "sha256:13c292fb292b4dfe175dfc2a8aba075f0ce0d708bdfacf6192f732832ec1d2dc",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-x86_64.zip"
+      },
+      {
+        "id": 771262097,
+        "name": "ztty-windows-x86_64.zip.sha256",
+        "bytes": 91,
+        "digest": "sha256:555d752be150655b64b2fc3c629aa5e678a72f0d691647498b272c3179eb16c9",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-windows-x86_64.zip.sha256"
+      }
+    ]
+  },
+  "registry": {
+    "version": "0.5.2",
+    "pubtime": "2026-11-20T09:45:34Z",
+    "yanked": false,
+    "checksum": "75e3c82bbd2ca39334f554169027ae9a16c12f326af225faec7907d8cb664025",
+    "actual_crate_sha256": "75e3c82bbd2ca39334f554169027ae9a16c12f326af225faec7907d8cb664025",
+    "actual_crate_bytes": 7791804,
+    "project_z_versions": {
+      "zgpui": "0.1.2",
+      "zgraphics": "0.2.0",
+      "zinput": "0.1.3",
+      "zpty": "0.2.3",
+      "zterm": "0.5.2",
+      "ztty-plugin-api": "0.1.0"
+    },
+    "vcs": {
+      "git": {
+        "sha1": "6e2ce246b0b50e6b82da99756832feae6e966f21"
+      },
+      "path_in_vcs": ""
+    },
+    "dependencies": {
+      "zgpui": {
+        "checksum": "0c5cddf5d0ed86ccb9cf21e035585146cf5aff0e316301bc037684b3c51b1046",
+        "name": "zgpui",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "version": "0.1.2"
+      },
+      "zgraphics": {
+        "checksum": "cc775cfedeae7a0563bb11e51e25b32e9d4a72757fb2935221ab7bc6f2c88e54",
+        "dependencies": [
+          "zune-core",
+          "zune-inflate",
+          "zune-png"
+        ],
+        "name": "zgraphics",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "version": "0.2.0"
+      },
+      "zinput": {
+        "checksum": "d854f1abbf3a1b2fe2ce8ac2e9ac9ccf05452e6561cf8e8fc70f9f252c0914bd",
+        "name": "zinput",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "version": "0.1.3"
+      },
+      "zpty": {
+        "checksum": "a08f84625627fc124c4971e728d370a06b6c03fd1098c623a124aad80472aa17",
+        "name": "zpty",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "version": "0.2.3"
+      },
+      "zterm": {
+        "checksum": "50845a461c4a11de2eceee265183e3e9e2a0d2ad8063266d234d22a25551e4bb",
+        "dependencies": [
+          "unicode-segmentation",
+          "unicode-width",
+          "zgpui",
+          "zgraphics",
+          "zinput",
+          "zvte"
+        ],
+        "name": "zterm",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "version": "0.5.2"
+      },
+      "ztty-plugin-api": {
+        "checksum": "e00adc5df1eefa237ea1ccd8d837ceecabef1976141b78918901d95cb8e9d4a6",
+        "dependencies": [
+          "zplugin"
+        ],
+        "name": "ztty-plugin-api",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "version": "0.1.0"
+      }
+    },
+    "public_index_url": "https://index.crates.io/zt/ty/ztty",
+    "crate_url": "https://static.crates.io/crates/ztty/ztty-0.5.2.crate",
+    "verified_at": "2026-11-20T09:46:28.769116+00:00"
+  },
+  "aur": {
+    "git_url": "https://aur.archlinux.org/ztty.git",
+    "head": "1bcb8f01463f29210beb3080ee557758db027080",
+    "version": "0.5.2-1",
+    "source_url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.5.2/ztty-0.5.2.tar.gz",
+    "source_sha256": "85a77183e74d359bd02980f309a1f0d50ff1c65405bec5d21b016723720a0da3",
+    "pkgbuild_sha256": "fa8df0f448e5718ff31b0e4a664b78cb22fa64bc2f1f499cd67d9ca437d3d7b0",
+    "observed_at": "2026-11-20T09:47:45.926206+00:00"
+  },
+  "installation": {
+    "path": "/home/lightjunction/.cargo/bin/ztty",
+    "version": "ztty 0.5.2",
+    "sha256": "0d697554c280ddc51631874d67a4ce729c709cce861d400e052e00e9f95b174a",
+    "bytes": 1367376,
+    "elf_machine": 62,
+    "cargo_source": "ztty 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
+    "features": [
+      "wayland"
+    ],
+    "target": "x86_64-unknown-linux-gnu",
+    "other_crate_count": 37,
+    "status": "passed_installed",
+    "shell": "interactive zsh with existing user configuration",
+    "cargo_command": [
+      "/home/lightjunction/.cargo/bin/cargo",
+      "+1.100.0",
+      "install",
+      "ztty",
+      "--version",
+      "=0.5.2",
+      "--registry",
+      "crates-io",
+      "--locked",
+      "--features",
+      "wayland",
+      "--bin",
+      "ztty",
+      "--root",
+      "/home/lightjunction/.cargo",
+      "--jobs",
+      "1",
+      "--force"
+    ],
+    "cargo_exit_code": 0,
+    "completed_at": "2026-11-20T09:48:03.090108+00:00",
+    "other_tracking_differences": {
+      ".crates.toml": {
+        "added_names": [],
+        "after_count": 37,
+        "before_count": 37,
+        "changed": {},
+        "missing_names": []
+      },
+      ".crates2.json": {
+        "added_names": [],
+        "after_count": 37,
+        "before_count": 37,
+        "changed": {},
+        "missing_names": []
+      }
+    },
+    "registry_cache_sha256": "75e3c82bbd2ca39334f554169027ae9a16c12f326af225faec7907d8cb664025",
+    "noninteractive_system_path": {
+      "path": "/home/lightjunction/.local/bin/ztty",
+      "realpath": "/usr/bin/ztty",
+      "version": "ztty 0.5.0",
+      "observed_before_user_install": true
+    }
+  },
+  "root_independent_readback": {
+    "passed": true,
+    "observed_at": "2026-11-20T09:49:53.473700+00:00"
+  },
+  "local_codex": {
+    "read_only_review": {
+      "exit_code": 0,
+      "report_sha256": "7ba71653d0dd2e94796b932663074616b37cd1cba9d3ced16205d921801a0159"
+    },
+    "tag_operator": {
+      "exit_code": 0,
+      "receipt_sha256": "d7eb0eeeb2aac0c25041c37bec053b0f1e6ce894bfbced7670ad3df9d98dce69"
+    },
+    "publish_install_operator": {
+      "exit_code": 0
+    }
+  },
+  "scope_limits": [
+    "Input queue allocation capacity was measured; whole-process RSS/PSS and throughput were not measured.",
+    "Local GPU tests used llvmpipe.",
+    "Existing user sessions were not reloaded by installation."
+  ],
+  "evidence_files": {
+    "source_gui_summary_sha256": "d20311822bb8fc637b51c146e7215675c8cb74cfc1a793be0297e68378b75c02",
+    "package_install_summary_sha256": "98d1f582968b67da52a6b45dfd18eb893c6a2e913b39864745b998df05d4b67e",
+    "package_install_full_evidence_sha256": "e26853c3bae7a461bf390b8482902771da070ed97cdd1bdebd187fb7e4e1e4aa",
+    "published_linux_artifact_audit_sha256": "e4acffc59a1f4d2498df8ca32303eda08ada2db6e3bb929018cd11636c8de414"
+  }
+}
