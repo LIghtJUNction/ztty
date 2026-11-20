@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/usr/bin/python3",
+    "-u",
+    "PERF_WORKTREE/artifacts/run-three-way-borrowed.py",
+    "--root-source-sha",
+    "36b367ffda4cea9b3b3dfbf38dc6375567912323",
+    "--candidate-sha256",
+    "e6721b2bc2eece65993521695dbb9f2819cef68902ea8e510aaa02157d350bc6",
+    "--output",
+    "PERF_WORKTREE/artifacts/core-three-way-a2074ba",
+    "--expected-nice",
+    "-4"
+  ],
+  "time": 1795137923.6481051,
+  "pid": 3822099,
+  "nice": -4,
+  "native_direct": true,
+  "task_systemd_unit": null
+}
