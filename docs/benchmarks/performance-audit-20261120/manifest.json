@@ -1,0 +1,206 @@
+{
+  "created_at": "2026-11-20T22:05:32.575044+08:00",
+  "scope": "Local source validation, paired search measurements, Rust allocation counts and software EGL pixel parity; not a new release",
+  "baseline_commit": "76fa2cfd13b776c027d5a86fadafde8e035f88f2",
+  "gpu_baseline_runtime_commit": "1c23d97d050360eadaf3b551afc9c0d7f2e1a4f3",
+  "gpu_measured_candidate_commit": "dfa072bb024ce73885c3f6d62ea9eef000d4b2d3",
+  "validated_runtime_commit": "acd11a337004a190ad4818e9bf3e5c4297bfcec6",
+  "gpu_sources_byte_identical_to_measured_candidate": true,
+  "search_benchmark_lock_package_records_equal_production": true,
+  "cpu_model": "12th Gen Intel(R) Core(TM) i9-12900HX",
+  "cpu_logical_count": 24,
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "submodules": {
+    "zgpui": "5b268da910639abd2fb8e581acb4f6eed50b7516",
+    "zgraphics": "fe6357f98cf80fb6cc74739e45e8866ee17706ad",
+    "zinput": "37617313dd7aaabcca9dd567344a76c4cbe03907",
+    "zpty": "d263f9a8f0881d259e46c51a7b6753c61ab9be59",
+    "zterm": "b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d"
+  },
+  "build_environment": {
+    "CARGO_BUILD_JOBS": "2",
+    "CARGO_NET_OFFLINE": "true"
+  },
+  "gpu_environment": {
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LP_NUM_THREADS": "2"
+  },
+  "test_counts": {
+    "workspace_passed": 193,
+    "workspace_failed": 0,
+    "workspace_ignored_then_explicitly_run": 7,
+    "native_egl_passed": 7,
+    "sessioncore_custom_checks_passed": 10,
+    "search_passed_included_in_workspace": 20
+  },
+  "commands": [
+    "cargo test --locked --offline --workspace --features wayland",
+    "LIBGL_ALWAYS_SOFTWARE=1 LP_NUM_THREADS=2 cargo test --locked --offline --lib --features wayland gpu::tests -- --ignored --nocapture",
+    "cargo clippy --locked --offline --workspace --all-targets --features wayland -- -D warnings",
+    "cargo build --locked --offline --release --features wayland",
+    "python3 tools/check_no_std.py",
+    "cargo fmt --all -- --check",
+    "git diff --check",
+    "python3 tools/benchmark_search.py --baseline-ref 76fa2cfd13b776c027d5a86fadafde8e035f88f2 --lines 100000 --samples 7 --iterations 25 --cpu 2 --lockfile artifacts/performance-audit/exploratory-guard/search-ab.Cargo.lock --output artifacts/performance-audit/search-ab.json",
+    "cargo build --locked --offline --release --features wayland --example gpu_row_scratch_benchmark",
+    "LIBGL_ALWAYS_SOFTWARE=1 LP_NUM_THREADS=2 gpu-{before,after} 100 <per-sample-output-directory>"
+  ],
+  "runtime_sources": {
+    "src/search.rs": {
+      "baseline_sha256": "e1d6d09ceeec056449dd93625c386ecb52577c41e435e140ab3db71671c560fc",
+      "candidate_sha256": "184adb60e87d8c85aa0d849973d983e50f1879308432dc8cce6b2b8258332bf2"
+    },
+    "src/gpu/grid.rs": {
+      "baseline_sha256": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+      "candidate_sha256": "652824f869c6bb3c93129fcae0b3fecb8d52c411aa99c0f4bb7e1a75bb22021f"
+    },
+    "src/gpu/mod.rs": {
+      "baseline_sha256": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+      "candidate_sha256": "8fbd2b7970cb84586181c1182951682fc99a21d7b62c77adade44c7bb5762d51"
+    },
+    "src/gpu/font.rs": {
+      "baseline_sha256": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+      "candidate_sha256": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05"
+    },
+    "src/gpu/tests.rs": {
+      "baseline_sha256": "f9c2dc0e82b7fa491cb814a83cbcaf8e771bea31127c5302804302033e54792a",
+      "candidate_sha256": "55d02a58826c62ea1b37b40941fc59803cd6d8e6c75ff0a653069ac7e2d876ca"
+    },
+    "tests/search.rs": {
+      "baseline_sha256": "c15838d92fbdd108ad818b56280554459684d8e25afc17ef94dd6ecaf1bc04ef",
+      "candidate_sha256": "afeebeacd4e40b4a641e2094d822f6b5c2445729eb723300f7529ef23e9781e1"
+    },
+    "Cargo.toml": {
+      "baseline_sha256": "6cb703e0525cc732972e3a7da03338c0c3076d1952c6b166d0067395a11c48d1",
+      "candidate_sha256": "6cb703e0525cc732972e3a7da03338c0c3076d1952c6b166d0067395a11c48d1"
+    },
+    "Cargo.lock": {
+      "baseline_sha256": "247a6a11f00a0cb16d840c6d1edf7e553d0cbb80e08313d7900e316a0bca2c89",
+      "candidate_sha256": "247a6a11f00a0cb16d840c6d1edf7e553d0cbb80e08313d7900e316a0bca2c89"
+    }
+  },
+  "gpu_harness_sources": {
+    "before_commit": "1585d6ff1a8ad40d06072f772d7876ea3093ff39",
+    "before_sha256": "451a747da2091238edd1648e4fe0592be4f39f98ef77e9e33493c88b2b3e0004",
+    "after_sha256": "80cdc0a78f8430a216500a4382fc73a106f6af56790ec6be9eee0037e45eac36",
+    "difference": "rustfmt only; benchmark behavior unchanged"
+  },
+  "release_binary": {
+    "bytes": 1386536,
+    "sha256": "ada1c9203a70f3ef68d53cb7e00e7de6d75db1dcaff2dac64f3593355236d58e"
+  },
+  "evidence_files": {
+    "search-ab.json": {
+      "bytes": 6903,
+      "sha256": "0a4d605f97da3c9a724dfbba2aad4412166236576de66d614fb4c88b0e7613c9"
+    },
+    "search-ab.Cargo.lock": {
+      "bytes": 2007,
+      "sha256": "c2d3ae393dacaac5101bc1a16dd0a05c306091dc3dddc136d953ba9baa556535"
+    },
+    "search-ab-initial.json": {
+      "bytes": 6238,
+      "sha256": "2cda142369c31ac29bba79768b570a7bfc49c393df202bab584982518f96f23d"
+    },
+    "gpu-ab.json": {
+      "bytes": 14305,
+      "sha256": "a8f62425ced8801e53aecf0515a4e1f7dafeb8461671049c02f185508869a11b"
+    },
+    "gates.json": {
+      "bytes": 788,
+      "sha256": "f41d8ddc3e0465096f95f911ac6fe9e595bc4059856046a477ea3e0e19c568b9"
+    },
+    "workspace-tests.log": {
+      "bytes": 20868,
+      "sha256": "5059c9aba73cf5e1bd654fa20b976566b073370494b1d11c9e8c0cb043a014e6"
+    },
+    "gpu-native-tests.log": {
+      "bytes": 1352,
+      "sha256": "17c5a9733ededbef10c6587e45ade4f4c8a77f645ed14733f9844ad09fb4ea54"
+    },
+    "search-tests.log": {
+      "bytes": 1893,
+      "sha256": "91ca008b13eedcfe6bc4f4ea0a9755c8d2531818c4dae9d1486c74641dc04f86"
+    },
+    "clippy.log": {
+      "bytes": 178,
+      "sha256": "e1def8a042dcb87f4337a742c219a7d541e0d87e491a87dbe64667ed949c79b3"
+    },
+    "release-build.log": {
+      "bytes": 169,
+      "sha256": "eebc94a6a3dc8ba28c4c94d3b87724d005dae2889698144d69b46ca57e20d15b"
+    },
+    "no-std.log": {
+      "bytes": 1106,
+      "sha256": "b5dbd210426e80e9c3875e15394fd6203b881038431f75628cc502d9e5181c2a"
+    },
+    "fmt-check.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "diff-check.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ascii.png": {
+      "bytes": 185581,
+      "sha256": "3fb0ba51c232cd3a5c8960f5e2b74883ac07d865a1f35dfb8b243a6864281ca1"
+    },
+    "unicode.png": {
+      "bytes": 84271,
+      "sha256": "72645d6d166982d4bcbb57d65ce8a0180c2b044e337c3f13af31cd963b3c1f7b"
+    },
+    "styled.png": {
+      "bytes": 76450,
+      "sha256": "1420b49ace8b67962f432846ceae890cfc7d157e106479805cdcc0e2dbd44147"
+    },
+    "exploratory-registry/search-ab.json": {
+      "bytes": 6482,
+      "sha256": "465ff8912bf20c958e586223ee220a6cde04ec838ad2d90dcd45125ffcba5b80"
+    },
+    "exploratory-registry/search-ab.Cargo.lock": {
+      "bytes": 2436,
+      "sha256": "5e3693e9f15f47988108bded4c6901ae37718c42b93d3ef8d1e50f4d40a55326"
+    },
+    "exploratory-registry/search-lock-replay.json": {
+      "bytes": 4765,
+      "sha256": "3a978efd385ad07c599bafc5df217aa0416a87762a6e082b69d97e29d5619609"
+    },
+    "exploratory-registry/search-lock-replay.Cargo.lock": {
+      "bytes": 2436,
+      "sha256": "5e3693e9f15f47988108bded4c6901ae37718c42b93d3ef8d1e50f4d40a55326"
+    },
+    "exploratory-guard/search-ab.json": {
+      "bytes": 6942,
+      "sha256": "a133bbe0956a698b94de5cdcd5c9c2cc7617e49d300da18ca4d1ad78ba7fcdfd"
+    },
+    "exploratory-guard/search-ab.Cargo.lock": {
+      "bytes": 2007,
+      "sha256": "c2d3ae393dacaac5101bc1a16dd0a05c306091dc3dddc136d953ba9baa556535"
+    },
+    "exploratory-guard/search-lock-replay.json": {
+      "bytes": 5219,
+      "sha256": "62f3ca83f6ad10ee2ef150067519dee31a360b4b3a980606ef13b09a3bee7c8a"
+    },
+    "exploratory-guard/search-lock-replay.Cargo.lock": {
+      "bytes": 2007,
+      "sha256": "c2d3ae393dacaac5101bc1a16dd0a05c306091dc3dddc136d953ba9baa556535"
+    }
+  },
+  "limitations": [
+    "GPU timings retain allocator-wrapper overhead even when counting is disabled.",
+    "Rust allocation requests do not measure RSS, live bytes, native allocations or VRAM.",
+    "Search injected 100000 logical lines but retained only 3249 physical rows.",
+    "Dense repeated search has contradictory paired and independent-median trends; stable improvement is not established.",
+    "Host load changed between exploratory and final runs, so cross-run differences cannot all be attributed to code.",
+    "Static warmed frames and software EGL do not establish physical GPU FPS or input-to-display latency."
+  ],
+  "log_storage_normalization": {
+    "operation": "Remove redundant trailing empty lines to satisfy git diff --check; log records unchanged",
+    "files": [
+      "workspace-tests.log",
+      "gpu-native-tests.log",
+      "search-tests.log"
+    ]
+  }
+}

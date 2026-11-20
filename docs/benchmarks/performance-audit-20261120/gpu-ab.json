@@ -1,0 +1,433 @@
+{
+  "source_head": "dfa072bb024ce73885c3f6d62ea9eef000d4b2d3",
+  "baseline_gpu_source": "76fa2cfd13b776c027d5a86fadafde8e035f88f2",
+  "scope": "Rust allocation activity and offscreen EGL pixel parity; submission timings retain allocator wrapper overhead",
+  "frames_per_scenario": 100,
+  "environment": {
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "LP_NUM_THREADS": "2"
+  },
+  "load_before": [
+    6.68017578125,
+    6.37890625,
+    5.3359375
+  ],
+  "binaries": {
+    "before": {
+      "sha256": "590a0e6d512bc1124d845613eb925c26cd93d71e14ff846c6215a0b9306ee6aa",
+      "bytes": 905272
+    },
+    "after": {
+      "sha256": "03bd25977ed7f737fa48d553974dd9b15dccd68f471cd686f36526951ee3a63f",
+      "bytes": 905208
+    }
+  },
+  "runs": [
+    {
+      "variant": "before",
+      "sample": 0,
+      "exit_code": 0,
+      "driver_log": "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)\n",
+      "measurements": [
+        {
+          "scenario": "ascii",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 7700,
+          "rust_reallocations": 22500,
+          "rust_deallocations": 7700,
+          "rust_requested_bytes": 8439200,
+          "submission_p50_ns": 460126,
+          "submission_p95_ns": 510063,
+          "submission_max_ns": 2131629,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 7700,
+          "rust_reallocations": 29800,
+          "rust_deallocations": 7700,
+          "rust_requested_bytes": 10455200,
+          "submission_p50_ns": 374986,
+          "submission_p95_ns": 450397,
+          "submission_max_ns": 1048845,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 25200,
+          "rust_reallocations": 25000,
+          "rust_deallocations": 25200,
+          "rust_requested_bytes": 10599200,
+          "submission_p50_ns": 331165,
+          "submission_p95_ns": 397317,
+          "submission_max_ns": 1120635,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "variant": "after",
+      "sample": 0,
+      "exit_code": 0,
+      "driver_log": "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)\n",
+      "measurements": [
+        {
+          "scenario": "ascii",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 2700,
+          "rust_reallocations": 0,
+          "rust_deallocations": 2700,
+          "rust_requested_bytes": 259200,
+          "submission_p50_ns": 543865,
+          "submission_p95_ns": 743270,
+          "submission_max_ns": 2295379,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 2700,
+          "rust_reallocations": 4900,
+          "rust_deallocations": 2700,
+          "rust_requested_bytes": 1660800,
+          "submission_p50_ns": 401399,
+          "submission_p95_ns": 427911,
+          "submission_max_ns": 910293,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 20200,
+          "rust_reallocations": 2500,
+          "rust_deallocations": 20200,
+          "rust_requested_bytes": 2419200,
+          "submission_p50_ns": 319053,
+          "submission_p95_ns": 351556,
+          "submission_max_ns": 1239021,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "variant": "after",
+      "sample": 1,
+      "exit_code": 0,
+      "driver_log": "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)\n",
+      "measurements": [
+        {
+          "scenario": "ascii",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 2700,
+          "rust_reallocations": 0,
+          "rust_deallocations": 2700,
+          "rust_requested_bytes": 259200,
+          "submission_p50_ns": 485553,
+          "submission_p95_ns": 624525,
+          "submission_max_ns": 1950218,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 2700,
+          "rust_reallocations": 4900,
+          "rust_deallocations": 2700,
+          "rust_requested_bytes": 1660800,
+          "submission_p50_ns": 372675,
+          "submission_p95_ns": 412138,
+          "submission_max_ns": 979980,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 20200,
+          "rust_reallocations": 2500,
+          "rust_deallocations": 20200,
+          "rust_requested_bytes": 2419200,
+          "submission_p50_ns": 324233,
+          "submission_p95_ns": 396447,
+          "submission_max_ns": 1334700,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "variant": "before",
+      "sample": 1,
+      "exit_code": 0,
+      "driver_log": "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)\n",
+      "measurements": [
+        {
+          "scenario": "ascii",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 7700,
+          "rust_reallocations": 22500,
+          "rust_deallocations": 7700,
+          "rust_requested_bytes": 8439200,
+          "submission_p50_ns": 606968,
+          "submission_p95_ns": 957740,
+          "submission_max_ns": 3023971,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 7700,
+          "rust_reallocations": 29800,
+          "rust_deallocations": 7700,
+          "rust_requested_bytes": 10455200,
+          "submission_p50_ns": 388046,
+          "submission_p95_ns": 442085,
+          "submission_max_ns": 1124375,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 25200,
+          "rust_reallocations": 25000,
+          "rust_deallocations": 25200,
+          "rust_requested_bytes": 10599200,
+          "submission_p50_ns": 309192,
+          "submission_p95_ns": 351410,
+          "submission_max_ns": 1228934,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "variant": "before",
+      "sample": 2,
+      "exit_code": 0,
+      "driver_log": "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)\n",
+      "measurements": [
+        {
+          "scenario": "ascii",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 7700,
+          "rust_reallocations": 22500,
+          "rust_deallocations": 7700,
+          "rust_requested_bytes": 8439200,
+          "submission_p50_ns": 640230,
+          "submission_p95_ns": 781906,
+          "submission_max_ns": 3643676,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 7700,
+          "rust_reallocations": 29800,
+          "rust_deallocations": 7700,
+          "rust_requested_bytes": 10455200,
+          "submission_p50_ns": 392518,
+          "submission_p95_ns": 459513,
+          "submission_max_ns": 1309488,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 25200,
+          "rust_reallocations": 25000,
+          "rust_deallocations": 25200,
+          "rust_requested_bytes": 10599200,
+          "submission_p50_ns": 337846,
+          "submission_p95_ns": 393038,
+          "submission_max_ns": 710448,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    },
+    {
+      "variant": "after",
+      "sample": 2,
+      "exit_code": 0,
+      "driver_log": "MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=ascii driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=unicode driver=llvmpipe (LLVM 23.1.5, 256 bits)\nMESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)\nscenario=styled driver=llvmpipe (LLVM 23.1.5, 256 bits)\n",
+      "measurements": [
+        {
+          "scenario": "ascii",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 2700,
+          "rust_reallocations": 0,
+          "rust_deallocations": 2700,
+          "rust_requested_bytes": 259200,
+          "submission_p50_ns": 995929,
+          "submission_p95_ns": 1373757,
+          "submission_max_ns": 5862133,
+          "rgba_fnv1a64": "92fa427ea4846c5b"
+        },
+        {
+          "scenario": "unicode",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 2700,
+          "rust_reallocations": 4900,
+          "rust_deallocations": 2700,
+          "rust_requested_bytes": 1660800,
+          "submission_p50_ns": 314511,
+          "submission_p95_ns": 374294,
+          "submission_max_ns": 781753,
+          "rgba_fnv1a64": "5614a9cb922bf113"
+        },
+        {
+          "scenario": "styled",
+          "frames": 100,
+          "cols": 96,
+          "rows": 24,
+          "width": 864,
+          "height": 432,
+          "rust_allocations": 20200,
+          "rust_reallocations": 2500,
+          "rust_deallocations": 20200,
+          "rust_requested_bytes": 2419200,
+          "submission_p50_ns": 320616,
+          "submission_p95_ns": 477888,
+          "submission_max_ns": 1470233,
+          "rgba_fnv1a64": "021f75bea415d6a4"
+        }
+      ]
+    }
+  ],
+  "pixel_comparisons": [
+    {
+      "sample": 0,
+      "scenario": "ascii",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "9d2e03d10c5aa156f88a37c3b91cbbbd93421df5ac826b0eafb6613b248a3c55"
+    },
+    {
+      "sample": 0,
+      "scenario": "unicode",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "becfa7f87e754b436fefc06938227fc70c1aa4eb22b12dffe3affef897dc18f2"
+    },
+    {
+      "sample": 0,
+      "scenario": "styled",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "236e884a6004e7196cede123a86a1a8c2f9457986eda84d79f81d3f51e1dc1a8"
+    },
+    {
+      "sample": 1,
+      "scenario": "ascii",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "9d2e03d10c5aa156f88a37c3b91cbbbd93421df5ac826b0eafb6613b248a3c55"
+    },
+    {
+      "sample": 1,
+      "scenario": "unicode",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "becfa7f87e754b436fefc06938227fc70c1aa4eb22b12dffe3affef897dc18f2"
+    },
+    {
+      "sample": 1,
+      "scenario": "styled",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "236e884a6004e7196cede123a86a1a8c2f9457986eda84d79f81d3f51e1dc1a8"
+    },
+    {
+      "sample": 2,
+      "scenario": "ascii",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "9d2e03d10c5aa156f88a37c3b91cbbbd93421df5ac826b0eafb6613b248a3c55"
+    },
+    {
+      "sample": 2,
+      "scenario": "unicode",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "becfa7f87e754b436fefc06938227fc70c1aa4eb22b12dffe3affef897dc18f2"
+    },
+    {
+      "sample": 2,
+      "scenario": "styled",
+      "equal": true,
+      "bytes": 1492992,
+      "sha256": "236e884a6004e7196cede123a86a1a8c2f9457986eda84d79f81d3f51e1dc1a8"
+    }
+  ],
+  "load_after": [
+    6.97119140625,
+    6.45849609375,
+    5.37939453125
+  ]
+}

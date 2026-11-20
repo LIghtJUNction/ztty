@@ -1,0 +1,27 @@
+   Compiling ztty v0.5.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/performance-audit-20261120)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.05s
+     Running tests/search.rs (target/debug/build/ztty/316d9ed24c47ea0c/out/search-316d9ed24c47ea0c)
+
+running 20 tests
+test explicit_line_breaks_never_create_a_cross_row_match ... ok
+test partial_matches_at_both_viewport_edges_are_highlighted_and_copy_in_full ... ok
+test copied_matches_reject_stale_history_and_resized_coordinates ... ok
+test visible_non_overlapping_matches_keep_the_offscreen_logical_line_alignment ... ok
+test unicode_matches_select_complete_wide_and_combining_cells ... ok
+test wide_wrap_padding_is_skipped_but_real_spaces_are_retained ... ok
+test emoji_substring_search_selects_and_copies_the_complete_cluster ... ok
+test case_switching_keeps_counts_navigation_and_original_text_consistent ... ok
+test visible_highlights_use_the_selected_scrollback_page ... ok
+test history_search_wraps_both_directions_and_counts_all_matches ... ok
+test sparse_unicode_lowercase_and_graphemes_keep_positions_after_idle_bytes ... ok
+test empty_absent_and_oversized_queries_allocate_no_highlight_map ... ok
+test wrapped_unicode_and_combining_matches_select_complete_cells ... ok
+test reflowed_history_preserves_text_without_inventing_a_contiguous_match ... ok
+test lowercase_expansion_search_and_viewport_suffix_use_normalized_bytes ... ok
+test soft_wrapped_matches_count_and_navigate_across_history_and_screen ... ok
+test unicode_lowercase_matches_preserve_wide_and_combining_cell_coordinates ... ok
+test ignore_case_keeps_line_boundaries_and_query_limits ... ok
+test maximum_query_spans_many_rows_without_building_a_logical_line ... ok
+test sparse_and_repetitive_ascii_search_matches_literal_string_oracle ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s

@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "schema": 1,
+    "scope": "synchronous full-history literal search; excludes terminal feed/build time",
+    "baseline_commit": "76fa2cfd13b776c027d5a86fadafde8e035f88f2",
+    "candidate_commit": "d0161ffae8769a92a9db1084a37707a1805f5bce",
+    "candidate_worktree_status": "",
+    "baseline_search_sha256": "e1d6d09ceeec056449dd93625c386ecb52577c41e435e140ab3db71671c560fc",
+    "candidate_search_sha256": "b586628198adc88fa7c120997e25b942d656b1449bc04c47ebc0c55545ddaa8e",
+    "harness_sha256": "d5320740befa7787379b730735253cff9486e0bda016ac0454ae64c571376fa9",
+    "runner_sha256": "b529b28464b63dd5cee1805e57b380241feb1b37bc9c263da4faf670fb7efb0f",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "machine": "x86_64",
+    "system": "Linux",
+    "kernel": "7.3.4-arch1-1",
+    "samples": 7,
+    "iterations_per_sample": 25,
+    "logical_lines_per_scenario": 100000,
+    "load_average_before": [
+      8.25146484375,
+      9.419921875,
+      7.46142578125
+    ],
+    "zterm_commit": "b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d",
+    "zterm_worktree_status": "",
+    "cpu_affinity": [
+      2
+    ],
+    "cargo_lockfile": "search-ab.Cargo.lock",
+    "cargo_lockfile_sha256": "5e3693e9f15f47988108bded4c6901ae37718c42b93d3ef8d1e50f4d40a55326",
+    "cargo_lockfile_reused": false,
+    "elapsed_seconds_including_build": 16.624577045440674,
+    "load_average_after": [
+      8.34765625,
+      9.375,
+      7.48876953125
+    ]
+  },
+  "measurements": [
+    {
+      "scenario": "failed_ascii_prefix",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 0,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        92326912,
+        92293352,
+        97355408,
+        97032771,
+        95245959,
+        89205514,
+        89041755
+      ],
+      "candidate_ns": [
+        94595953,
+        90613833,
+        94474865,
+        98265112,
+        91296920,
+        89267704,
+        88724404
+      ],
+      "baseline_median_ms": 3.6930764799999998,
+      "candidate_median_ms": 3.6518767999999997,
+      "paired_speedup_median": 1.003576817489808,
+      "paired_latency_change_percent_median": -0.3564069463815045
+    },
+    {
+      "scenario": "no_match_ascii",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 0,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        87487171,
+        89170771,
+        88415463,
+        89441394,
+        91575565,
+        90904351,
+        83542190
+      ],
+      "candidate_ns": [
+        77268213,
+        77790898,
+        80647108,
+        79077975,
+        89964869,
+        82543488,
+        80495177
+      ],
+      "baseline_median_ms": 3.5668308399999997,
+      "candidate_median_ms": 3.2198070800000003,
+      "paired_speedup_median": 1.1012904010065578,
+      "paired_latency_change_percent_median": -9.19742884474254
+    },
+    {
+      "scenario": "sparse_ascii",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 33,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        93945534,
+        82643009,
+        83812057,
+        85657247,
+        87054205,
+        96090117,
+        95049785
+      ],
+      "candidate_ns": [
+        89747237,
+        77666692,
+        85096153,
+        77231692,
+        78047482,
+        77734412,
+        79975040
+      ],
+      "baseline_median_ms": 3.4821682000000003,
+      "candidate_median_ms": 3.1218992799999996,
+      "paired_speedup_median": 1.1090945281892828,
+      "paired_latency_change_percent_median": -9.836359788681982
+    },
+    {
+      "scenario": "repetitive_ascii",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 64960,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        86403232,
+        101493290,
+        110601647,
+        99972183,
+        108384791,
+        116198711,
+        116009235
+      ],
+      "candidate_ns": [
+        91370953,
+        89282361,
+        109746453,
+        97045148,
+        87283122,
+        105197425,
+        113700398
+      ],
+      "baseline_median_ms": 4.33539164,
+      "candidate_median_ms": 3.88180592,
+      "paired_speedup_median": 1.0301615800513797,
+      "paired_latency_change_percent_median": -2.9278494398786936
+    },
+    {
+      "scenario": "utf8_wide_combining",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 33,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        125775481,
+        92339093,
+        101649875,
+        96625796,
+        97005293,
+        103029638,
+        106956546
+      ],
+      "candidate_ns": [
+        110104000,
+        74082791,
+        84862897,
+        84496968,
+        86449724,
+        85290745,
+        88930439
+      ],
+      "baseline_median_ms": 4.065995,
+      "candidate_median_ms": 3.4116297999999996,
+      "paired_speedup_median": 1.1978129264194222,
+      "paired_latency_change_percent_median": -16.514509240665564
+    },
+    {
+      "scenario": "unicode_lowercase_expansion",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 33,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        144034426,
+        145153489,
+        150619739,
+        150790491,
+        148247896,
+        147245679,
+        155140857
+      ],
+      "candidate_ns": [
+        141129166,
+        135485440,
+        144745432,
+        133134534,
+        131626894,
+        129317509,
+        138745845
+      ],
+      "baseline_median_ms": 5.92991584,
+      "candidate_median_ms": 5.4194176,
+      "paired_speedup_median": 1.1181657872349258,
+      "paired_latency_change_percent_median": -10.56782353600122
+    },
+    {
+      "scenario": "soft_wrap_wide_padding",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 16,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        92015407,
+        89529829,
+        87860574,
+        88656118,
+        88093936,
+        100048193,
+        93697292
+      ],
+      "candidate_ns": [
+        81312706,
+        80678355,
+        78703340,
+        80620223,
+        82413209,
+        86506623,
+        87578434
+      ],
+      "baseline_median_ms": 3.58119316,
+      "candidate_median_ms": 3.25250824,
+      "paired_speedup_median": 1.1097131194606038,
+      "paired_latency_change_percent_median": -9.886620022473181
+    }
+  ]
+}

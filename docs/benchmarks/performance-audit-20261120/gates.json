@@ -1,0 +1,42 @@
+[
+  {
+    "step": "search-tests",
+    "exit_code": 0,
+    "elapsed_seconds": 1.134042378005688
+  },
+  {
+    "step": "workspace-tests",
+    "exit_code": 0,
+    "elapsed_seconds": 0.7705125950014917
+  },
+  {
+    "step": "gpu-native-tests",
+    "exit_code": 0,
+    "elapsed_seconds": 0.6028797170001781
+  },
+  {
+    "step": "clippy",
+    "exit_code": 0,
+    "elapsed_seconds": 0.5286467479891144
+  },
+  {
+    "step": "release-build",
+    "exit_code": 0,
+    "elapsed_seconds": 14.199360228012665
+  },
+  {
+    "step": "no-std",
+    "exit_code": 0,
+    "elapsed_seconds": 0.11998034499993082
+  },
+  {
+    "step": "fmt-check",
+    "exit_code": 0,
+    "elapsed_seconds": 0.4886563030013349
+  },
+  {
+    "step": "diff-check",
+    "exit_code": 0,
+    "elapsed_seconds": 0.012998629987123422
+  }
+]

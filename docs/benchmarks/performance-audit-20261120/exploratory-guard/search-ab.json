@@ -1,0 +1,259 @@
+{
+  "metadata": {
+    "schema": 1,
+    "scope": "synchronous full-history literal search; excludes terminal feed/build time",
+    "baseline_commit": "76fa2cfd13b776c027d5a86fadafde8e035f88f2",
+    "candidate_commit": "4f403aa1491f39eb2ad978bb99540a2d66a43b93",
+    "candidate_worktree_status": "",
+    "baseline_search_sha256": "e1d6d09ceeec056449dd93625c386ecb52577c41e435e140ab3db71671c560fc",
+    "candidate_search_sha256": "b586628198adc88fa7c120997e25b942d656b1449bc04c47ebc0c55545ddaa8e",
+    "harness_sha256": "d5320740befa7787379b730735253cff9486e0bda016ac0454ae64c571376fa9",
+    "runner_sha256": "df564af383bfa2a2e459dc64c851827704c08b35611f5026821efd4de3105210",
+    "production_cargo_lock_sha256": "247a6a11f00a0cb16d840c6d1edf7e553d0cbb80e08313d7900e316a0bca2c89",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "machine": "x86_64",
+    "system": "Linux",
+    "kernel": "7.3.4-arch1-1",
+    "samples": 7,
+    "iterations_per_sample": 25,
+    "logical_lines_per_scenario": 100000,
+    "load_average_before": [
+      17.4619140625,
+      10.82275390625,
+      8.32958984375
+    ],
+    "zterm_commit": "b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d",
+    "zterm_worktree_status": "",
+    "zgpui_commit": "5b268da910639abd2fb8e581acb4f6eed50b7516",
+    "zgpui_worktree_status": "",
+    "zgraphics_commit": "fe6357f98cf80fb6cc74739e45e8866ee17706ad",
+    "zgraphics_worktree_status": "",
+    "zinput_commit": "37617313dd7aaabcca9dd567344a76c4cbe03907",
+    "zinput_worktree_status": "",
+    "cpu_affinity": [
+      2
+    ],
+    "cargo_lockfile": "search-ab.Cargo.lock",
+    "cargo_lockfile_sha256": "c2d3ae393dacaac5101bc1a16dd0a05c306091dc3dddc136d953ba9baa556535",
+    "cargo_lockfile_reused": false,
+    "cargo_lockfile_seed": "production",
+    "elapsed_seconds_including_build": 111.98006796836853,
+    "load_average_after": [
+      19.263671875,
+      13.05615234375,
+      9.38330078125
+    ]
+  },
+  "measurements": [
+    {
+      "scenario": "failed_ascii_prefix",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 0,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        100352644,
+        96293953,
+        93289063,
+        137150567,
+        143365745,
+        179725042,
+        112213478
+      ],
+      "candidate_ns": [
+        101523713,
+        110773117,
+        133599313,
+        150341045,
+        670618204,
+        387161336,
+        97654812
+      ],
+      "baseline_median_ms": 4.48853912,
+      "candidate_median_ms": 5.3439725199999994,
+      "paired_speedup_median": 0.8692899108363991,
+      "paired_latency_change_percent_median": 15.03642082281116
+    },
+    {
+      "scenario": "no_match_ascii",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 0,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        83669984,
+        98846532,
+        93943367,
+        126119829,
+        132014434,
+        110806841,
+        84227378
+      ],
+      "candidate_ns": [
+        79580042,
+        80121656,
+        81250251,
+        88393833,
+        119069407,
+        109674310,
+        76282254
+      ],
+      "baseline_median_ms": 3.95386128,
+      "candidate_median_ms": 3.25001004,
+      "paired_speedup_median": 1.1087183293018332,
+      "paired_latency_change_percent_median": -9.805766390666037
+    },
+    {
+      "scenario": "sparse_ascii",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 33,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        87521993,
+        90667128,
+        88682911,
+        88400755,
+        86680936,
+        86708018,
+        85759508
+      ],
+      "candidate_ns": [
+        78455631,
+        80578421,
+        78678115,
+        78875225,
+        78595918,
+        76631536,
+        76447093
+      ],
+      "baseline_median_ms": 3.5008797200000004,
+      "candidate_median_ms": 3.1438367200000004,
+      "paired_speedup_median": 1.1218151617616121,
+      "paired_latency_change_percent_median": -10.858755159836042
+    },
+    {
+      "scenario": "repetitive_ascii",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 64960,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        93943711,
+        97724912,
+        90847410,
+        87056664,
+        88170903,
+        87415735,
+        90070208
+      ],
+      "candidate_ns": [
+        93290504,
+        92436852,
+        90363588,
+        89514303,
+        90027109,
+        88327487,
+        93402812
+      ],
+      "baseline_median_ms": 3.60280832,
+      "candidate_median_ms": 3.6145435200000002,
+      "paired_speedup_median": 0.9896775960579519,
+      "paired_latency_change_percent_median": 1.0430067309964208
+    },
+    {
+      "scenario": "utf8_wide_combining",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 33,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        93381649,
+        94157272,
+        94177943,
+        103012940,
+        103143320,
+        104480794,
+        105082559
+      ],
+      "candidate_ns": [
+        91147946,
+        91454716,
+        108867798,
+        102911285,
+        99885948,
+        96834975,
+        94661905
+      ],
+      "baseline_median_ms": 4.1205176,
+      "candidate_median_ms": 3.873399,
+      "paired_speedup_median": 1.029550756026622,
+      "paired_latency_change_percent_median": -2.8702573286107924
+    },
+    {
+      "scenario": "unicode_lowercase_expansion",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 33,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        161877987,
+        149947204,
+        146268255,
+        150819716,
+        149414225,
+        174757868,
+        144431323
+      ],
+      "candidate_ns": [
+        154702178,
+        163667638,
+        139035431,
+        135378461,
+        132099680,
+        162976989,
+        132845114
+      ],
+      "baseline_median_ms": 5.9978881600000005,
+      "candidate_median_ms": 5.56141724,
+      "paired_speedup_median": 1.0722855359660621,
+      "paired_latency_change_percent_median": -6.7412581389468595
+    },
+    {
+      "scenario": "soft_wrap_wide_padding",
+      "logical_lines": 100000,
+      "physical_rows": 3249,
+      "columns": 80,
+      "matches": 16,
+      "iterations_per_sample": 25,
+      "baseline_ns": [
+        84702541,
+        85767041,
+        88346167,
+        87482585,
+        86892597,
+        87658686,
+        85294480
+      ],
+      "candidate_ns": [
+        82871408,
+        79713995,
+        78936973,
+        77200311,
+        78656813,
+        79756560,
+        77981759
+      ],
+      "baseline_median_ms": 3.4757038799999997,
+      "candidate_median_ms": 3.15747892,
+      "paired_speedup_median": 1.0990780695656883,
+      "paired_latency_change_percent_median": -9.014652581034577
+    }
+  ]
+}
