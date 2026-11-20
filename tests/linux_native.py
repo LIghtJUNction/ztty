@@ -163,8 +163,17 @@ def owned_leases(harness_pid, started_ns):
 def cleanup_marker(marker, harness_pid, started_ns):
     observed = marked_processes(marker)
     leases = owned_leases(harness_pid, started_ns)
+
+    def remaining_identities():
+        # An exiting child loses /proc/PID/environ before its zombie is reaped.
+        # Retain observed birth identities until waitpid removes them; a reused
+        # PID is no longer ours even when the numeric PID remains present.
+        observed.update(marked_processes(marker))
+        return {pid: started for pid, started in observed.items()
+                if process_identity(pid) == started}
+
     for signum, grace in ((signal.SIGTERM, 3), (signal.SIGKILL, 2)):
-        current = marked_processes(marker)
+        current = remaining_identities()
         for pid, started in current.items():
             if process_identity(pid) == started:
                 with contextlib.suppress(ProcessLookupError):
@@ -172,11 +181,11 @@ def cleanup_marker(marker, harness_pid, started_ns):
         deadline = time.monotonic() + grace
         while time.monotonic() < deadline:
             reap_children()
-            if not marked_processes(marker):
+            if not remaining_identities():
                 break
             time.sleep(0.05)
     reap_children()
-    remaining = marked_processes(marker)
+    remaining = remaining_identities()
     removed = []
     if not remaining:
         # A killed harness cannot run its helper's finally block. Only remove

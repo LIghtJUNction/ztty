@@ -51,6 +51,31 @@ class ClosedIdentityTests(unittest.TestCase):
                 read_start.assert_called_once_with(41)
 
 
+class CleanupMarkerTests(unittest.TestCase):
+    def cleanup_after_marker_disappears(self, current_identity):
+        observations = iter([{41: "900"}])
+        clock = iter(range(0, 1000, 10))
+        with (mock.patch.object(linux_native, "marked_processes", side_effect=lambda _: next(observations, {})),
+              mock.patch.object(linux_native, "process_identity", return_value=current_identity),
+              mock.patch.object(linux_native, "owned_leases", return_value=[]),
+              mock.patch.object(linux_native, "reap_children"),
+              mock.patch.object(linux_native.os, "kill") as kill,
+              mock.patch.object(linux_native.time, "monotonic", side_effect=lambda: next(clock))):
+            result = linux_native.cleanup_marker("private-test-marker", 40, 0)
+        return result, kill
+
+    def test_markerless_owned_identity_still_blocks_cleanup_success(self):
+        result, _ = self.cleanup_after_marker_disappears("900")
+        self.assertEqual(result["leftover_owned_pids"], [41])
+        self.assertEqual(result["remaining_owned_pids"], [41])
+        self.assertEqual(result["removed_owned_leases"], [])
+
+    def test_reused_pid_after_marker_disappears_is_not_signalled(self):
+        result, kill = self.cleanup_after_marker_disappears("901")
+        self.assertEqual(result["remaining_owned_pids"], [])
+        kill.assert_not_called()
+
+
 class ArchitectureTests(unittest.TestCase):
     def header(self, machine, elf_class=2):
         header = bytearray(64)
