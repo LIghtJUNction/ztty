@@ -6,6 +6,10 @@
   sent or explicitly cancelled. Smaller allocations remain available for reuse.
 - Keep unsent input intact after partial writes, `WouldBlock` and write errors.
   The existing input-ownership rules still decide when pending input is cancelled.
+- Keep the application's Project Z versions exact when Cargo converts local
+  dependencies to registry dependencies in the published crate. The three
+  libraries supplied through local patches now have direct version constraints
+  with their default features disabled.
 
 The [input-buffer report](docs/benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
 records an 8 MiB queue retaining 0 bytes after clearing, compared with 8 MiB
