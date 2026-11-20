@@ -23,4 +23,5 @@ jobs:
         run: |
           ZTTY_WAYLAND=1 ZTTY_BARE_METAL=1 make check
           cargo test --locked --workspace --doc
+          cargo clippy --locked --workspace --all-targets --features wayland -- -D warnings
           /usr/bin/python3 tests/gui_smoke.py
