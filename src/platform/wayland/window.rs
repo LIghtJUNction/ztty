@@ -95,6 +95,7 @@ impl Window {
             suspended: false,
             notice: None,
             last_cursor: None,
+            ime_cursor: None,
             text_blink_visible: [true; 2],
             search_cols: 0,
             search_bits: Vec::new(),
@@ -296,7 +297,9 @@ impl Window {
             return;
         }
         self.drawing = true;
-        if let Some(((col, row), _)) = cursor {
+        // IME geometry follows the terminal cursor, not its visible blink phase.
+        self.ime_cursor = (history == 0 && t.modes().cursor_visible).then(|| t.cursor());
+        if let Some((col, row)) = self.ime_cursor {
             unsafe {
                 ztty_wl_ime_cursor(
                     self.native.ptr(),
