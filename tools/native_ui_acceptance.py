@@ -17,9 +17,13 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = Path(os.environ.get("ZTTY_ACCEPTANCE_OUTPUT", str(ROOT / "artifacts/native-ui-acceptance"))).resolve()
-# Match Cargo for both absolute and repository-relative target overrides.
-BINARY = (ROOT / (os.environ.get("CARGO_TARGET_DIR") or "target")).resolve() / "release/ztty"
 CARGO = ["cargo", "+" + os.environ.get("RUST_TOOLCHAIN", "1.100.0")]
+# Ask the same Cargo toolchain to resolve config and environment overrides.
+TARGET_DIRECTORY = Path(json.loads(subprocess.check_output(
+    CARGO + ["metadata", "--locked", "--no-deps", "--format-version", "1"],
+    cwd=ROOT, text=True,
+))["target_directory"])
+BINARY = TARGET_DIRECTORY / "release/ztty"
 GATES = {
     "fmt": (CARGO + ["fmt", "--all", "--", "--check"], 120),
     "clippy": (CARGO + ["clippy", "--locked", "--workspace", "--all-targets", "--features", "wayland", "--", "-D", "warnings"], 1800),
