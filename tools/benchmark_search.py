@@ -28,7 +28,7 @@ def command(args, cwd=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline-ref", default="HEAD")
-    parser.add_argument("--lines", type=int, default=100000)
+    parser.add_argument("--lines", type=int, default=100000, help="Logical lines injected before measurement; the history budget may retain fewer rows")
     parser.add_argument("--samples", type=int, default=7)
     parser.add_argument("--iterations", type=int, default=1)
     parser.add_argument("--cpu", type=int, help="Pin the benchmark process to one available CPU")
@@ -83,7 +83,7 @@ def main():
             '[workspace]\n[dependencies]\nzterm = { path = '
             + json.dumps(str(root / "crates/zterm"))
             + ', default-features = false }\n'
-            '[profile.release]\nlto = "fat"\ncodegen-units = 1\n'
+            '[profile.release]\nlto = "fat"\ncodegen-units = 1\npanic = "abort"\n'
         )
         (project / "Cargo.toml").write_text(manifest)
         target = root / "target/search-benchmark"
