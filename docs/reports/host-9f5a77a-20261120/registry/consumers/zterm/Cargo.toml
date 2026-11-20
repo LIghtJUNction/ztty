@@ -1,0 +1,9 @@
+[package]
+name = "ztty-registry-check-zterm"
+version = "0.0.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+zterm = { version = "=0.5.1", default-features = false }

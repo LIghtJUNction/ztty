@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "closed_utc": "2026-11-20T02:28:25.633158+00:00",
+  "source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "source_clean": true,
+  "passed": true,
+  "stages": 21,
+  "checks_total": 365,
+  "groups": [
+    {
+      "name": "xim-all",
+      "checks": 37,
+      "passed": true
+    },
+    {
+      "name": "input-software",
+      "checks": 14,
+      "passed": true
+    },
+    {
+      "name": "clipboard-transfer",
+      "checks": 25,
+      "passed": true
+    },
+    {
+      "name": "copy-paste",
+      "checks": 13,
+      "passed": true
+    },
+    {
+      "name": "osc52-gpu",
+      "checks": 13,
+      "passed": true
+    },
+    {
+      "name": "graphics-software",
+      "checks": 8,
+      "passed": true
+    },
+    {
+      "name": "graphics-gpu",
+      "checks": 8,
+      "passed": true
+    },
+    {
+      "name": "text-software",
+      "checks": 8,
+      "passed": true
+    },
+    {
+      "name": "text-gpu",
+      "checks": 8,
+      "passed": true
+    },
+    {
+      "name": "retained-frame-software",
+      "checks": 2,
+      "passed": true
+    },
+    {
+      "name": "repaint-software",
+      "checks": 11,
+      "passed": true
+    },
+    {
+      "name": "repaint-gpu",
+      "checks": 11,
+      "passed": true
+    },
+    {
+      "name": "native-ui-software",
+      "checks": 24,
+      "passed": true
+    },
+    {
+      "name": "native-ui-gpu",
+      "checks": 24,
+      "passed": true
+    },
+    {
+      "name": "workspaces",
+      "checks": 17,
+      "passed": true
+    },
+    {
+      "name": "shared-gui",
+      "checks": 9,
+      "passed": true
+    },
+    {
+      "name": "plugin-cli-current",
+      "checks": 22,
+      "passed": true
+    },
+    {
+      "name": "plugin-cli-legacy",
+      "checks": 22,
+      "passed": true
+    },
+    {
+      "name": "plugin-gui-current",
+      "checks": 10,
+      "passed": true
+    },
+    {
+      "name": "wayland-shared-gui",
+      "checks": 65,
+      "passed": true
+    },
+    {
+      "name": "wayland-cli",
+      "checks": 14,
+      "passed": true
+    }
+  ],
+  "all_stage_exit_codes_zero": true,
+  "all_stage_owned_remaining_empty": true,
+  "all_stage_runtime_removed": true,
+  "final_identity_check": true,
+  "binary_before": {
+    "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+    "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+    "bytes": 1237696
+  },
+  "binary_after": {
+    "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+    "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+    "bytes": 1237696
+  },
+  "supporting_after": {
+    "no_wayland_binary": {
+      "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+      "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+      "bytes": 1144288
+    },
+    "ime_peer": {
+      "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+      "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+      "bytes": 22704
+    }
+  },
+  "acceptance_path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/acceptance.json",
+  "acceptance_sha256": "b1fd96e9879f999493383fbd1545729315c114de46ba33b5bc6dc45480cfcee8",
+  "unit": {
+    "LoadState": "not-found",
+    "ActiveState": "inactive",
+    "SubState": "dead",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "[not set]",
+    "CPUQuotaPerSecUSec": "infinity",
+    "MemoryMax": "infinity",
+    "MemorySwapMax": "infinity",
+    "Nice": "0"
+  },
+  "unit_command_exit": 0,
+  "unit_journal_sha256": "4f5b125d69bf449f84ccd91465d7eec71f29e6bffa54d8dfdb33d26072aa112b",
+  "unit_journal_exit_code": 0,
+  "unit_journal_messages": [
+    {
+      "__REALTIME_TIMESTAMP": "1795141467655929",
+      "MESSAGE": "Starting [systemd-run] /usr/bin/python3 -u WORKTREE/artifacts/shared-gui-20261120/run.py --repo WORKTREE --binary WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland --sha256 c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807 --source-sha 9f5a77a1299093d0ba609bfafa2cec3b0ba931dd --no-wayland-binary WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default --no-wayland-sha256 8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46 --ime-peer WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97 --ime-peer-sha256 521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d --fixtures WORKTREE/artifacts/final-plugins-20261120 --output WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a..."
+    },
+    {
+      "__REALTIME_TIMESTAMP": "1795141467678706",
+      "MESSAGE": "Started [systemd-run] /usr/bin/python3 -u WORKTREE/artifacts/shared-gui-20261120/run.py --repo WORKTREE --binary WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland --sha256 c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807 --source-sha 9f5a77a1299093d0ba609bfafa2cec3b0ba931dd --no-wayland-binary WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default --no-wayland-sha256 8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46 --ime-peer WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97 --ime-peer-sha256 521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d --fixtures WORKTREE/artifacts/final-plugins-20261120 --output WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a."
+    },
+    {
+      "__REALTIME_TIMESTAMP": "1795141555168793",
+      "MESSAGE": "Process 305290 (exe) of user 1000 terminated abnormally without generating a coredump."
+    },
+    {
+      "__REALTIME_TIMESTAMP": "1795141562558931",
+      "MESSAGE": "Process 306559 (exe) of user 1000 terminated abnormally without generating a coredump."
+    },
+    {
+      "__REALTIME_TIMESTAMP": "1795141573239420",
+      "MESSAGE": "Process 308022 (exe) of user 1000 terminated abnormally without generating a coredump."
+    },
+    {
+      "__REALTIME_TIMESTAMP": "1795141590503647",
+      "MESSAGE": "ztty-gui-final-zterm051-9f5a77a-20261120.service: Consumed 27.878s CPU time over 2min 2.847s wall clock time, 503.7M memory peak."
+    }
+  ],
+  "unit_properties_note": "Transient unit may be unloaded after success. If LoadState=not-found, default/infinity values returned by systemctl are not the execution limits; retain launch command and observed active-unit receipt.",
+  "launch_path": "WORKTREE/artifacts/shared-gui-20261120/final-zterm051-9f5a77a.launch.json",
+  "launch_sha256": "36ca44883be1a5a8eeee64eba17405fe2864209abaaa5b6ce82ba1f5d8c3100f",
+  "default_egl_verified_path": "WORKTREE/artifacts/integration-validation-zterm051-20261120/default-egl/default-egl-verified.json",
+  "default_egl_verified_sha256": "ade83d7a11cf5c4ee63eabea23196bba6234c71be7cdaed101e15cc6883dade6"
+}

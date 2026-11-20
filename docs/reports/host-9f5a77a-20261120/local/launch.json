@@ -1,0 +1,31 @@
+{
+  "command": [
+    "systemd-run",
+    "--user",
+    "--quiet",
+    "--no-ask-password",
+    "--unit=ztty-final-core-9f5a77a-20261120",
+    "--collect",
+    "--wait",
+    "--pipe",
+    "--property=MemoryMax=768M",
+    "--property=MemorySwapMax=0",
+    "--property=CPUQuota=100%",
+    "--property=Nice=10",
+    "--property=OOMPolicy=stop",
+    "--working-directory=WORKTREE",
+    "--setenv=RUSTC_WRAPPER=",
+    "--setenv=CARGO_BUILD_JOBS=1",
+    "--setenv=RUSTUP_TOOLCHAIN=1.100.0",
+    "--setenv=CARGO_NET_OFFLINE=true",
+    "--setenv=CARGO_TARGET_DIR=WORKTREE/target",
+    "--setenv=CARGO_HOME=WORKTREE/artifacts/cargo-home-20261120",
+    "--setenv=PATH=USER_WORKSPACE/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "--setenv=ZTTY_WAYLAND=1",
+    "--setenv=ZTTY_BARE_METAL=1",
+    "/usr/bin/python3",
+    "WORKTREE/artifacts/integration-validation-zterm051-20261120/run-local-gate.py"
+  ],
+  "source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "helper_sha256": "223f30f915b38ed4e2efc8898ed0741c6227bad5af17f3fe9b8276a664b2754b"
+}

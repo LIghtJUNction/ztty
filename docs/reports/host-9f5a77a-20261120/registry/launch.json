@@ -1,0 +1,33 @@
+{
+  "unit": "ztty-registry-zterm051-9f5a77a-20261120.service",
+  "argv": [
+    "systemd-run",
+    "--user",
+    "--unit=ztty-registry-zterm051-9f5a77a-20261120",
+    "--property=Type=exec",
+    "--property=RemainAfterExit=yes",
+    "--property=MemoryMax=768M",
+    "--property=MemorySwapMax=0",
+    "--property=CPUQuota=100%",
+    "--property=Nice=10",
+    "--property=WorkingDirectory=WORKTREE",
+    "--property=StandardOutput=append:WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/runner.log",
+    "--property=StandardError=append:WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/runner.log",
+    "--setenv=CARGO_HOME=WORKTREE/artifacts/cargo-home-20261120",
+    "--setenv=CARGO_TARGET_DIR=WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/target",
+    "--setenv=CARGO_BUILD_JOBS=1",
+    "--setenv=RUSTC_WRAPPER=",
+    "--setenv=RUSTFLAGS=",
+    "--setenv=CARGO_ENCODED_RUSTFLAGS=",
+    "--setenv=CARGO_NET_OFFLINE=false",
+    "--setenv=PYTHONDONTWRITEBYTECODE=1",
+    "/usr/bin/python3",
+    "-u",
+    "WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/run.py"
+  ],
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "Running as unit: ztty-registry-zterm051-9f5a77a-20261120.service; invocation ID: 70b6ecf9cfa746be9fe5c60ba049b3f2\n",
+  "runner_sha256": "007cc13f922982dcdce945519ca679db88e22614b619fefae776b6edbf5f0042",
+  "timestamp_utc": "2026-11-20T02:24:31.268005+00:00"
+}

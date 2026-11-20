@@ -1,0 +1,15 @@
+   Compiling ztty v0.5.0 (WORKTREE)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.74s
+     Running unittests src/lib.rs (target/debug/build/ztty/bf9fa9527fb0a8a2/out/ztty-bf9fa9527fb0a8a2)
+
+running 6 tests
+test gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels ... OpenGL renderer: NVIDIA GeForce RTX 4060 Laptop GPU/PCIe/SSE2
+ok
+test gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics ... ok
+test gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width ... ok
+test gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters ... ok
+test gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas ... ok
+test gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 24 filtered out; finished in 1.39s
+

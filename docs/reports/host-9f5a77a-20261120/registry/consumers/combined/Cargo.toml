@@ -1,0 +1,14 @@
+[package]
+name = "ztty-registry-check-zinput-zgraphics-zpty-zgpui-ztty-plugin-api-zterm"
+version = "0.0.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+zinput = { version = "=0.1.3", default-features = false }
+zgraphics = { version = "=0.2.0", default-features = false }
+zpty = { version = "=0.2.2", default-features = false }
+zgpui = { version = "=0.1.0", default-features = false }
+ztty-plugin-api = { version = "=0.1.0", default-features = false }
+zterm = { version = "=0.5.1", default-features = false }

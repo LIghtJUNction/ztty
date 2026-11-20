@@ -1,0 +1,3641 @@
+{
+  "schema": 1,
+  "passed": true,
+  "status": "completed",
+  "started_utc": "2026-11-20T02:24:27.737577+00:00",
+  "steps": [
+    {
+      "name": "xim-all",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/xim_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--scenario",
+        "all",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all/report.json"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all/report.json",
+      "timeout_seconds": 420,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 1,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all/raw.log",
+      "started_utc": "2026-11-20T02:24:27.994179+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/xim_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--scenario",
+          "all",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all/report.json"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-5qmvv3jd/runtime",
+          "temporary_directory": "/tmp/zfg-5qmvv3jd",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 290180,
+          "start_ticks": 7723402,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 290180,
+              "start_ticks": 7723402,
+              "state": "S"
+            },
+            {
+              "pid": 290181,
+              "start_ticks": 7723402,
+              "state": "Z"
+            },
+            {
+              "pid": 290182,
+              "start_ticks": 7723405,
+              "state": "S"
+            },
+            {
+              "pid": 290192,
+              "start_ticks": 7723416,
+              "state": "S"
+            },
+            {
+              "pid": 290206,
+              "start_ticks": 7723430,
+              "state": "S"
+            },
+            {
+              "pid": 290282,
+              "start_ticks": 7723444,
+              "state": "S"
+            },
+            {
+              "pid": 290284,
+              "start_ticks": 7723445,
+              "state": "Z"
+            },
+            {
+              "pid": 290368,
+              "start_ticks": 7723536,
+              "state": "S"
+            },
+            {
+              "pid": 290509,
+              "start_ticks": 7723583,
+              "state": "S"
+            },
+            {
+              "pid": 290339,
+              "start_ticks": 7723457,
+              "state": "S"
+            },
+            {
+              "pid": 290524,
+              "start_ticks": 7723586,
+              "state": "S"
+            },
+            {
+              "pid": 290704,
+              "start_ticks": 7723713,
+              "state": "S"
+            },
+            {
+              "pid": 290706,
+              "start_ticks": 7723713,
+              "state": "Z"
+            },
+            {
+              "pid": 290823,
+              "start_ticks": 7723751,
+              "state": "S"
+            },
+            {
+              "pid": 290982,
+              "start_ticks": 7723797,
+              "state": "S"
+            },
+            {
+              "pid": 290758,
+              "start_ticks": 7723720,
+              "state": "S"
+            },
+            {
+              "pid": 290984,
+              "start_ticks": 7723799,
+              "state": "S"
+            },
+            {
+              "pid": 291153,
+              "start_ticks": 7723930,
+              "state": "S"
+            },
+            {
+              "pid": 291155,
+              "start_ticks": 7723930,
+              "state": "S"
+            },
+            {
+              "pid": 291219,
+              "start_ticks": 7723937,
+              "state": "S"
+            },
+            {
+              "pid": 291756,
+              "start_ticks": 7724184,
+              "state": "Z"
+            },
+            {
+              "pid": 291765,
+              "start_ticks": 7724188,
+              "state": "S"
+            },
+            {
+              "pid": 291767,
+              "start_ticks": 7724188,
+              "state": "S"
+            },
+            {
+              "pid": 291817,
+              "start_ticks": 7724197,
+              "state": "S"
+            },
+            {
+              "pid": 292191,
+              "start_ticks": 7724362,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 10.220546939002816,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 37,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/01-xim-all/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "input-software",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/input_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--source-root",
+        "WORKTREE",
+        "--renderer",
+        "software",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/report.json",
+        "--screenshot",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/input.png"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/report.json",
+      "timeout_seconds": 420,
+      "renderer": "software",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 2,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/raw.log",
+      "started_utc": "2026-11-20T02:24:38.243441+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/input_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--source-root",
+          "WORKTREE",
+          "--renderer",
+          "software",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/report.json",
+          "--screenshot",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/input.png"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-jtp0di5_/runtime",
+          "temporary_directory": "/tmp/zfg-jtp0di5_",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 292382,
+          "start_ticks": 7724427,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 292382,
+              "start_ticks": 7724427,
+              "state": "S"
+            },
+            {
+              "pid": 292384,
+              "start_ticks": 7724427,
+              "state": "Z"
+            },
+            {
+              "pid": 292386,
+              "start_ticks": 7724427,
+              "state": "S"
+            },
+            {
+              "pid": 292405,
+              "start_ticks": 7724438,
+              "state": "S"
+            },
+            {
+              "pid": 292426,
+              "start_ticks": 7724446,
+              "state": "S"
+            },
+            {
+              "pid": 292429,
+              "start_ticks": 7724446,
+              "state": "S"
+            },
+            {
+              "pid": 292430,
+              "start_ticks": 7724450,
+              "state": "S"
+            },
+            {
+              "pid": 296701,
+              "start_ticks": 7727004,
+              "state": "S"
+            },
+            {
+              "pid": 296702,
+              "start_ticks": 7727004,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 26.829253981995862,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 14,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/02-input-software/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "clipboard-transfer",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/clipboard_transfer_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer/report.json"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer/report.json",
+      "timeout_seconds": 300,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 3,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer/raw.log",
+      "started_utc": "2026-11-20T02:25:05.126392+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/clipboard_transfer_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer/report.json"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-o9dh5kxn/runtime",
+          "temporary_directory": "/tmp/zfg-o9dh5kxn",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 296863,
+          "start_ticks": 7727115,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 296863,
+              "start_ticks": 7727115,
+              "state": "S"
+            },
+            {
+              "pid": 296864,
+              "start_ticks": 7727115,
+              "state": "Z"
+            },
+            {
+              "pid": 296865,
+              "start_ticks": 7727116,
+              "state": "S"
+            },
+            {
+              "pid": 296867,
+              "start_ticks": 7727123,
+              "state": "S"
+            },
+            {
+              "pid": 296875,
+              "start_ticks": 7727129,
+              "state": "S"
+            },
+            {
+              "pid": 296877,
+              "start_ticks": 7727129,
+              "state": "S"
+            },
+            {
+              "pid": 296929,
+              "start_ticks": 7727139,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 7.610674342999118,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 25,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/03-clipboard-transfer/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "copy-paste",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/copy_paste_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--artifacts",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste/acceptance.json",
+      "timeout_seconds": 300,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 4,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste/raw.log",
+      "started_utc": "2026-11-20T02:25:12.770239+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/copy_paste_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--artifacts",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-hznc2bcf/runtime",
+          "temporary_directory": "/tmp/zfg-hznc2bcf",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 298067,
+          "start_ticks": 7727879,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 298067,
+              "start_ticks": 7727879,
+              "state": "S"
+            },
+            {
+              "pid": 298068,
+              "start_ticks": 7727880,
+              "state": "Z"
+            },
+            {
+              "pid": 298069,
+              "start_ticks": 7727880,
+              "state": "S"
+            },
+            {
+              "pid": 298108,
+              "start_ticks": 7727888,
+              "state": "S"
+            },
+            {
+              "pid": 298115,
+              "start_ticks": 7727894,
+              "state": "S"
+            },
+            {
+              "pid": 298117,
+              "start_ticks": 7727894,
+              "state": "S"
+            },
+            {
+              "pid": 298168,
+              "start_ticks": 7727903,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 11.215818740005489,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 13,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste/acceptance.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/04-copy-paste/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "osc52-gpu",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/osc52_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "gpu",
+        "--artifacts",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu/osc52.json",
+      "timeout_seconds": 300,
+      "renderer": "gpu",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 5,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu/raw.log",
+      "started_utc": "2026-11-20T02:25:24.030742+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/osc52_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "gpu",
+          "--artifacts",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-6cn4hrf5/runtime",
+          "temporary_directory": "/tmp/zfg-6cn4hrf5",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 299796,
+          "start_ticks": 7729006,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 299796,
+              "start_ticks": 7729006,
+              "state": "S"
+            },
+            {
+              "pid": 299809,
+              "start_ticks": 7729021,
+              "state": "Z"
+            },
+            {
+              "pid": 299861,
+              "start_ticks": 7729030,
+              "state": "R"
+            },
+            {
+              "pid": 299797,
+              "start_ticks": 7729006,
+              "state": "Z"
+            },
+            {
+              "pid": 299798,
+              "start_ticks": 7729006,
+              "state": "S"
+            },
+            {
+              "pid": 299799,
+              "start_ticks": 7729014,
+              "state": "S"
+            },
+            {
+              "pid": 299807,
+              "start_ticks": 7729020,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 4.208413437998388,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 13,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu/osc52.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/05-osc52-gpu/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "graphics-software",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/graphics_extensions_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "software",
+        "--artifacts",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software/graphics-extensions.json",
+      "timeout_seconds": 300,
+      "renderer": "software",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 6,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software/raw.log",
+      "started_utc": "2026-11-20T02:25:28.292536+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/graphics_extensions_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "software",
+          "--artifacts",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-0q2wph12/runtime",
+          "temporary_directory": "/tmp/zfg-0q2wph12",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 300574,
+          "start_ticks": 7729432,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 300574,
+              "start_ticks": 7729432,
+              "state": "S"
+            },
+            {
+              "pid": 300590,
+              "start_ticks": 7729445,
+              "state": "Z"
+            },
+            {
+              "pid": 300591,
+              "start_ticks": 7729450,
+              "state": "S"
+            },
+            {
+              "pid": 300575,
+              "start_ticks": 7729432,
+              "state": "Z"
+            },
+            {
+              "pid": 300576,
+              "start_ticks": 7729432,
+              "state": "S"
+            },
+            {
+              "pid": 300577,
+              "start_ticks": 7729439,
+              "state": "S"
+            },
+            {
+              "pid": 300588,
+              "start_ticks": 7729445,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 2.605386997995083,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 8,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software/graphics-extensions.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/06-graphics-software/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "graphics-gpu",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/graphics_extensions_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "gpu",
+        "--artifacts",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu/graphics-extensions.json",
+      "timeout_seconds": 300,
+      "renderer": "gpu",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 7,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu/raw.log",
+      "started_utc": "2026-11-20T02:25:30.933829+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/graphics_extensions_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "gpu",
+          "--artifacts",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-7eeahhu3/runtime",
+          "temporary_directory": "/tmp/zfg-7eeahhu3",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 300884,
+          "start_ticks": 7729696,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 300884,
+              "start_ticks": 7729696,
+              "state": "S"
+            },
+            {
+              "pid": 300901,
+              "start_ticks": 7729711,
+              "state": "Z"
+            },
+            {
+              "pid": 300996,
+              "start_ticks": 7729720,
+              "state": "S"
+            },
+            {
+              "pid": 300885,
+              "start_ticks": 7729696,
+              "state": "Z"
+            },
+            {
+              "pid": 300887,
+              "start_ticks": 7729697,
+              "state": "S"
+            },
+            {
+              "pid": 300890,
+              "start_ticks": 7729705,
+              "state": "S"
+            },
+            {
+              "pid": 300899,
+              "start_ticks": 7729710,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 2.6052375880099135,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 8,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu/graphics-extensions.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/07-graphics-gpu/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "text-software",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/text_gpu_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "software",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/report.json",
+        "--screenshots",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/screenshots"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/report.json",
+      "timeout_seconds": 300,
+      "renderer": "software",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 8,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/raw.log",
+      "started_utc": "2026-11-20T02:25:33.942713+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/text_gpu_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "software",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/report.json",
+          "--screenshots",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/screenshots"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-vdg92dcl/runtime",
+          "temporary_directory": "/tmp/zfg-vdg92dcl",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 301428,
+          "start_ticks": 7729997,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 301428,
+              "start_ticks": 7729997,
+              "state": "S"
+            },
+            {
+              "pid": 301429,
+              "start_ticks": 7729997,
+              "state": "Z"
+            },
+            {
+              "pid": 301430,
+              "start_ticks": 7729997,
+              "state": "S"
+            },
+            {
+              "pid": 301431,
+              "start_ticks": 7730005,
+              "state": "S"
+            },
+            {
+              "pid": 301443,
+              "start_ticks": 7730011,
+              "state": "S"
+            },
+            {
+              "pid": 301445,
+              "start_ticks": 7730011,
+              "state": "S"
+            },
+            {
+              "pid": 301446,
+              "start_ticks": 7730015,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 2.6036893559939926,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 8,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "text-gpu",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/text_gpu_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "gpu",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/report.json",
+        "--screenshots",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/screenshots"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/report.json",
+      "timeout_seconds": 300,
+      "renderer": "gpu",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 9,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/raw.log",
+      "started_utc": "2026-11-20T02:25:36.583138+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/text_gpu_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "gpu",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/report.json",
+          "--screenshots",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/screenshots"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-tka59muu/runtime",
+          "temporary_directory": "/tmp/zfg-tka59muu",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 301771,
+          "start_ticks": 7730261,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 301771,
+              "start_ticks": 7730261,
+              "state": "S"
+            },
+            {
+              "pid": 301772,
+              "start_ticks": 7730261,
+              "state": "Z"
+            },
+            {
+              "pid": 301773,
+              "start_ticks": 7730262,
+              "state": "S"
+            },
+            {
+              "pid": 301795,
+              "start_ticks": 7730271,
+              "state": "S"
+            },
+            {
+              "pid": 301802,
+              "start_ticks": 7730277,
+              "state": "S"
+            },
+            {
+              "pid": 301804,
+              "start_ticks": 7730277,
+              "state": "S"
+            },
+            {
+              "pid": 301886,
+              "start_ticks": 7730286,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 2.6082860820024507,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 8,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/09-text-gpu/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "retained-frame-software",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/retained_frame_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "software",
+        "--expect",
+        "clean",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/report.json"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/report.json",
+      "timeout_seconds": 300,
+      "renderer": "software",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 10,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/raw.log",
+      "started_utc": "2026-11-20T02:25:39.400570+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/retained_frame_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "software",
+          "--expect",
+          "clean",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/report.json"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-fhrao2a8/runtime",
+          "temporary_directory": "/tmp/zfg-fhrao2a8",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 302376,
+          "start_ticks": 7730542,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 302376,
+              "start_ticks": 7730542,
+              "state": "R"
+            },
+            {
+              "pid": 302378,
+              "start_ticks": 7730543,
+              "state": "Z"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 0.6014480390003882,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 2,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "repaint-software",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/repaint_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "software",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/report.json",
+        "--screenshots",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/report.json",
+      "timeout_seconds": 420,
+      "renderer": "software",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 11,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/raw.log",
+      "started_utc": "2026-11-20T02:25:40.025021+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/repaint_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "software",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/report.json",
+          "--screenshots",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-3ridt7ct/runtime",
+          "temporary_directory": "/tmp/zfg-3ridt7ct",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 302589,
+          "start_ticks": 7730605,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 302589,
+              "start_ticks": 7730605,
+              "state": "R"
+            },
+            {
+              "pid": 302590,
+              "start_ticks": 7730605,
+              "state": "Z"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 1.6026988540106686,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 11,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "repaint-gpu",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/repaint_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--renderer",
+        "gpu",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/report.json",
+        "--screenshots",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/screenshots"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/report.json",
+      "timeout_seconds": 420,
+      "renderer": "gpu",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 12,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/raw.log",
+      "started_utc": "2026-11-20T02:25:41.668793+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/repaint_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--renderer",
+          "gpu",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/report.json",
+          "--screenshots",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/screenshots"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-7v0eo9o4/runtime",
+          "temporary_directory": "/tmp/zfg-7v0eo9o4",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 302844,
+          "start_ticks": 7730769,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 302844,
+              "start_ticks": 7730769,
+              "state": "S"
+            },
+            {
+              "pid": 302845,
+              "start_ticks": 7730769,
+              "state": "Z"
+            },
+            {
+              "pid": 302846,
+              "start_ticks": 7730770,
+              "state": "R"
+            },
+            {
+              "pid": 302875,
+              "start_ticks": 7730778,
+              "state": "S"
+            },
+            {
+              "pid": 302902,
+              "start_ticks": 7730790,
+              "state": "S"
+            },
+            {
+              "pid": 302904,
+              "start_ticks": 7730790,
+              "state": "S"
+            },
+            {
+              "pid": 302988,
+              "start_ticks": 7730811,
+              "state": "S"
+            },
+            {
+              "pid": 302956,
+              "start_ticks": 7730801,
+              "state": "S"
+            },
+            {
+              "pid": 302994,
+              "start_ticks": 7730814,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 2.218389155998011,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 11,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/12-repaint-gpu/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "native-ui-software",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/native_ui_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--source-root",
+        "WORKTREE",
+        "--renderer",
+        "software",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/report.json",
+        "--screenshot",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/native-ui.png"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/report.json",
+      "timeout_seconds": 420,
+      "renderer": "software",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 13,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/raw.log",
+      "started_utc": "2026-11-20T02:25:43.915109+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/native_ui_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--source-root",
+          "WORKTREE",
+          "--renderer",
+          "software",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/report.json",
+          "--screenshot",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/native-ui.png"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-qctw1j6z/runtime",
+          "temporary_directory": "/tmp/zfg-qctw1j6z",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 303271,
+          "start_ticks": 7730994,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 303271,
+              "start_ticks": 7730994,
+              "state": "S"
+            },
+            {
+              "pid": 303272,
+              "start_ticks": 7730994,
+              "state": "Z"
+            },
+            {
+              "pid": 303273,
+              "start_ticks": 7730994,
+              "state": "S"
+            },
+            {
+              "pid": 303291,
+              "start_ticks": 7731011,
+              "state": "S"
+            },
+            {
+              "pid": 303302,
+              "start_ticks": 7731017,
+              "state": "S"
+            },
+            {
+              "pid": 303304,
+              "start_ticks": 7731017,
+              "state": "S"
+            },
+            {
+              "pid": 303305,
+              "start_ticks": 7731021,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 3.4054189509915886,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 24,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/13-native-ui-software/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "native-ui-gpu",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/native_ui_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--source-root",
+        "WORKTREE",
+        "--renderer",
+        "gpu",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/report.json",
+        "--screenshot",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/native-ui.png"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/report.json",
+      "timeout_seconds": 420,
+      "renderer": "gpu",
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 14,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/raw.log",
+      "started_utc": "2026-11-20T02:25:47.360026+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/native_ui_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--source-root",
+          "WORKTREE",
+          "--renderer",
+          "gpu",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/report.json",
+          "--screenshot",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/native-ui.png"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-l_pzya1n/runtime",
+          "temporary_directory": "/tmp/zfg-l_pzya1n",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 303834,
+          "start_ticks": 7731339,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 303834,
+              "start_ticks": 7731339,
+              "state": "S"
+            },
+            {
+              "pid": 303835,
+              "start_ticks": 7731339,
+              "state": "Z"
+            },
+            {
+              "pid": 303836,
+              "start_ticks": 7731339,
+              "state": "S"
+            },
+            {
+              "pid": 303856,
+              "start_ticks": 7731358,
+              "state": "S"
+            },
+            {
+              "pid": 303864,
+              "start_ticks": 7731364,
+              "state": "S"
+            },
+            {
+              "pid": 303866,
+              "start_ticks": 7731364,
+              "state": "R"
+            },
+            {
+              "pid": 303917,
+              "start_ticks": 7731374,
+              "state": "S"
+            },
+            {
+              "pid": 304386,
+              "start_ticks": 7731687,
+              "state": "S"
+            },
+            {
+              "pid": 304388,
+              "start_ticks": 7731689,
+              "state": "Z"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 5.030464755007415,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 24,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "workspaces",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/workspaces.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/report.json",
+        "--screenshot",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/workspaces.png"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/report.json",
+      "timeout_seconds": 420,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 15,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/raw.log",
+      "started_utc": "2026-11-20T02:25:52.458813+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/workspaces.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/report.json",
+          "--screenshot",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/workspaces.png"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-o93tw626/runtime",
+          "temporary_directory": "/tmp/zfg-o93tw626",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 304726,
+          "start_ticks": 7731848,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 304726,
+              "start_ticks": 7731848,
+              "state": "R"
+            },
+            {
+              "pid": 304746,
+              "start_ticks": 7731867,
+              "state": "Z"
+            },
+            {
+              "pid": 304727,
+              "start_ticks": 7731849,
+              "state": "Z"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 1.605389689997537,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 17,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "shared-gui",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/shared_gui_smoke.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui/report.json"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui/report.json",
+      "timeout_seconds": 420,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 16,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui/raw.log",
+      "started_utc": "2026-11-20T02:25:54.100544+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/shared_gui_smoke.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui/report.json"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-l9lii9yb/runtime",
+          "temporary_directory": "/tmp/zfg-l9lii9yb",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 305028,
+          "start_ticks": 7732013,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 305028,
+              "start_ticks": 7732013,
+              "state": "R"
+            },
+            {
+              "pid": 305062,
+              "start_ticks": 7732027,
+              "state": "Z"
+            },
+            {
+              "pid": 305029,
+              "start_ticks": 7732013,
+              "state": "Z"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 0.8026080370036652,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 9,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/16-shared-gui/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "plugin-cli-current",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/plugin_cli.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--example",
+        "WORKTREE/artifacts/final-plugins-20261120/example.so",
+        "--fixtures",
+        "WORKTREE/artifacts/final-plugins-20261120",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current/report.json"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current/report.json",
+      "timeout_seconds": 300,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 17,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current/raw.log",
+      "started_utc": "2026-11-20T02:25:54.922866+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/plugin_cli.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--example",
+          "WORKTREE/artifacts/final-plugins-20261120/example.so",
+          "--fixtures",
+          "WORKTREE/artifacts/final-plugins-20261120",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current/report.json"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-qqzbnypd/runtime",
+          "temporary_directory": "/tmp/zfg-qqzbnypd",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 305257,
+          "start_ticks": 7732095,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 305257,
+              "start_ticks": 7732095,
+              "state": "S"
+            },
+            {
+              "pid": 305258,
+              "start_ticks": 7732095,
+              "state": "Z"
+            },
+            {
+              "pid": 305259,
+              "start_ticks": 7732095,
+              "state": "S"
+            },
+            {
+              "pid": 305328,
+              "start_ticks": 7732120,
+              "state": "S"
+            },
+            {
+              "pid": 305329,
+              "start_ticks": 7732120,
+              "state": "S"
+            },
+            {
+              "pid": 305908,
+              "start_ticks": 7732422,
+              "state": "S"
+            },
+            {
+              "pid": 305909,
+              "start_ticks": 7732423,
+              "state": "S"
+            },
+            {
+              "pid": 305910,
+              "start_ticks": 7732423,
+              "state": "S"
+            },
+            {
+              "pid": 306193,
+              "start_ticks": 7732624,
+              "state": "S"
+            },
+            {
+              "pid": 306195,
+              "start_ticks": 7732624,
+              "state": "S"
+            },
+            {
+              "pid": 306194,
+              "start_ticks": 7732624,
+              "state": "Z"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 7.41148054698715,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 22,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/17-plugin-cli-current/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "plugin-cli-legacy",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/plugin_cli.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--example",
+        "WORKTREE/artifacts/final-plugins-20261120/before-example.so",
+        "--fixtures",
+        "WORKTREE/artifacts/final-plugins-20261120",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy/report.json"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy/report.json",
+      "timeout_seconds": 300,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 18,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy/raw.log",
+      "started_utc": "2026-11-20T02:26:02.355905+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/plugin_cli.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--example",
+          "WORKTREE/artifacts/final-plugins-20261120/before-example.so",
+          "--fixtures",
+          "WORKTREE/artifacts/final-plugins-20261120",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy/report.json"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-bakmncqh/runtime",
+          "temporary_directory": "/tmp/zfg-bakmncqh",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 306534,
+          "start_ticks": 7732838,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 306534,
+              "start_ticks": 7732838,
+              "state": "S"
+            },
+            {
+              "pid": 306535,
+              "start_ticks": 7732838,
+              "state": "Z"
+            },
+            {
+              "pid": 306536,
+              "start_ticks": 7732838,
+              "state": "S"
+            },
+            {
+              "pid": 306569,
+              "start_ticks": 7732858,
+              "state": "S"
+            },
+            {
+              "pid": 306570,
+              "start_ticks": 7732859,
+              "state": "S"
+            },
+            {
+              "pid": 307078,
+              "start_ticks": 7733161,
+              "state": "S"
+            },
+            {
+              "pid": 307079,
+              "start_ticks": 7733161,
+              "state": "S"
+            },
+            {
+              "pid": 307080,
+              "start_ticks": 7733161,
+              "state": "S"
+            },
+            {
+              "pid": 307336,
+              "start_ticks": 7733362,
+              "state": "S"
+            },
+            {
+              "pid": 307338,
+              "start_ticks": 7733363,
+              "state": "S"
+            },
+            {
+              "pid": 307337,
+              "start_ticks": 7733362,
+              "state": "Z"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 7.410999453000841,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 22,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/18-plugin-cli-legacy/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "plugin-gui-current",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/plugin_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--example",
+        "WORKTREE/artifacts/final-plugins-20261120/example.so",
+        "--fixture",
+        "WORKTREE/artifacts/final-plugins-20261120/fixture-valid.so",
+        "--artifacts",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/plugin-gui.json",
+      "timeout_seconds": 420,
+      "renderer": null,
+      "expected_checks": null,
+      "required_check_names": [],
+      "strict_checks": false,
+      "index": 19,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/raw.log",
+      "started_utc": "2026-11-20T02:26:09.834367+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/plugin_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--example",
+          "WORKTREE/artifacts/final-plugins-20261120/example.so",
+          "--fixture",
+          "WORKTREE/artifacts/final-plugins-20261120/fixture-valid.so",
+          "--artifacts",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current"
+        ],
+        "timeout_seconds": 420,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-5frooca_/runtime",
+          "temporary_directory": "/tmp/zfg-5frooca_",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 307599,
+          "start_ticks": 7733586,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 307599,
+              "start_ticks": 7733586,
+              "state": "S"
+            },
+            {
+              "pid": 307600,
+              "start_ticks": 7733586,
+              "state": "Z"
+            },
+            {
+              "pid": 307601,
+              "start_ticks": 7733587,
+              "state": "S"
+            },
+            {
+              "pid": 307603,
+              "start_ticks": 7733594,
+              "state": "S"
+            },
+            {
+              "pid": 307612,
+              "start_ticks": 7733599,
+              "state": "S"
+            },
+            {
+              "pid": 307614,
+              "start_ticks": 7733600,
+              "state": "R"
+            },
+            {
+              "pid": 307671,
+              "start_ticks": 7733610,
+              "state": "S"
+            },
+            {
+              "pid": 308213,
+              "start_ticks": 7733978,
+              "state": "S"
+            },
+            {
+              "pid": 308225,
+              "start_ticks": 7733979,
+              "state": "S"
+            },
+            {
+              "pid": 308232,
+              "start_ticks": 7733985,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 4.6114684349886375,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 10,
+        "expected_checks": null,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/plugin-gui.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "wayland-shared-gui",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/wayland_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--sway",
+        "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/sway",
+        "--swaymsg",
+        "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/swaymsg",
+        "--ime-peer",
+        "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui/validation.json",
+      "timeout_seconds": 300,
+      "renderer": "Wayland EGL on software Mesa",
+      "expected_checks": 65,
+      "required_check_names": [
+        "ime_requests_terminal_without_fake_surrounding",
+        "ime_preedit_is_visible_without_pty_input",
+        "ime_commit_exact_utf8_once",
+        "ime_chunk_boundaries_preserve_utf8",
+        "ime_cannot_delete_unowned_shell_buffer",
+        "ime_recovers_after_invalid_delete",
+        "ime_peer_clean_exit",
+        "x11_first_routes_both_backends_in_one_broker",
+        "x11_first_keeps_separate_ptys",
+        "x11_first_mixed_sessions_closed",
+        "wayland_first_routes_both_backends_in_one_broker",
+        "wayland_first_keeps_separate_ptys",
+        "wayland_first_mixed_sessions_closed",
+        "mixed-x11-first-x11_actual_x11_window",
+        "mixed-wayland-first-x11_actual_x11_window",
+        "mixed_backend_tests_preserve_original_session",
+        "mcp_reads_same_native_pty",
+        "native_observer_reuses_same_pty",
+        "reattach_identity_stays_stable"
+      ],
+      "strict_checks": true,
+      "index": 20,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui/raw.log",
+      "started_utc": "2026-11-20T02:26:14.489368+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/tests/wayland_gui.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--sway",
+          "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/sway",
+          "--swaymsg",
+          "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/swaymsg",
+          "--ime-peer",
+          "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui"
+        ],
+        "timeout_seconds": 300,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-w9ljx9fh/runtime",
+          "temporary_directory": "/tmp/zfg-w9ljx9fh",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 308317,
+          "start_ticks": 7734051,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 308317,
+              "start_ticks": 7734051,
+              "state": "S"
+            },
+            {
+              "pid": 308318,
+              "start_ticks": 7734052,
+              "state": "Z"
+            },
+            {
+              "pid": 308319,
+              "start_ticks": 7734052,
+              "state": "S"
+            },
+            {
+              "pid": 308329,
+              "start_ticks": 7734060,
+              "state": "S"
+            },
+            {
+              "pid": 308337,
+              "start_ticks": 7734079,
+              "state": "S"
+            },
+            {
+              "pid": 308339,
+              "start_ticks": 7734079,
+              "state": "S"
+            },
+            {
+              "pid": 308828,
+              "start_ticks": 7734238,
+              "state": "S"
+            },
+            {
+              "pid": 308392,
+              "start_ticks": 7734089,
+              "state": "S"
+            },
+            {
+              "pid": 308335,
+              "start_ticks": 7734068,
+              "state": "S"
+            },
+            {
+              "pid": 309292,
+              "start_ticks": 7734516,
+              "state": "S"
+            },
+            {
+              "pid": 309331,
+              "start_ticks": 7734548,
+              "state": "Z"
+            },
+            {
+              "pid": 309381,
+              "start_ticks": 7734567,
+              "state": "Z"
+            },
+            {
+              "pid": 309455,
+              "start_ticks": 7734611,
+              "state": "Z"
+            },
+            {
+              "pid": 309783,
+              "start_ticks": 7734844,
+              "state": "S"
+            },
+            {
+              "pid": 309784,
+              "start_ticks": 7734844,
+              "state": "S"
+            },
+            {
+              "pid": 309786,
+              "start_ticks": 7734844,
+              "state": "Z"
+            },
+            {
+              "pid": 310042,
+              "start_ticks": 7734967,
+              "state": "Z"
+            },
+            {
+              "pid": 310170,
+              "start_ticks": 7735007,
+              "state": "Z"
+            },
+            {
+              "pid": 310281,
+              "start_ticks": 7735041,
+              "state": "Z"
+            },
+            {
+              "pid": 310300,
+              "start_ticks": 7735052,
+              "state": "S"
+            }
+          ],
+          "signals": [],
+          "remaining": []
+        },
+        "seconds": 14.623560298001394,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 65,
+        "expected_checks": 65,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui/validation.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/20-wayland-shared-gui/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    },
+    {
+      "name": "wayland-cli",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/artifacts/shared-gui-20261120/wayland_cli.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--no-wayland-binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+        "--output",
+        "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli/report.json"
+      ],
+      "directory": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli",
+      "report": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli/report.json",
+      "timeout_seconds": 120,
+      "renderer": null,
+      "expected_checks": 14,
+      "required_check_names": [
+        "invalid_backend",
+        "missing_backend",
+        "attach_invalid_backend",
+        "attach_missing_backend",
+        "feature_disabled",
+        "feature_disabled_no_child",
+        "missing_compositor_named",
+        "missing_compositor_named_no_child",
+        "missing_compositor_observe",
+        "missing_compositor_observe_no_child",
+        "software_renderer_requires_gpu",
+        "software_renderer_requires_gpu_no_child",
+        "wayland_workspace_rejected",
+        "wayland_workspace_rejected_no_child"
+      ],
+      "strict_checks": true,
+      "index": 21,
+      "status": "passed",
+      "raw_log": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli/raw.log",
+      "started_utc": "2026-11-20T02:26:29.137187+00:00",
+      "execution": {
+        "command": [
+          "dbus-run-session",
+          "--",
+          "/usr/bin/python3",
+          "WORKTREE/artifacts/shared-gui-20261120/wayland_cli.py",
+          "--binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+          "--no-wayland-binary",
+          "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "--output",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli/report.json"
+        ],
+        "timeout_seconds": 120,
+        "environment": {
+          "removed_session_variables": [
+            "DBUS_SESSION_BUS_ADDRESS",
+            "DESKTOP_SESSION",
+            "DISPLAY",
+            "GDK_BACKEND",
+            "HYPRLAND_INSTANCE_SIGNATURE",
+            "QT_IM_MODULE",
+            "QT_QPA_PLATFORM",
+            "WAYLAND_DISPLAY",
+            "XDG_CURRENT_DESKTOP",
+            "XDG_SESSION_ID",
+            "XDG_SESSION_TYPE"
+          ],
+          "runtime": "/tmp/zfg-rltnv863/runtime",
+          "temporary_directory": "/tmp/zfg-rltnv863",
+          "private_dbus": true,
+          "LIBGL_ALWAYS_SOFTWARE": "1",
+          "note": "Mesa software driver selection is distinct from ztty renderer selection"
+        },
+        "launcher": {
+          "pid": 311316,
+          "start_ticks": 7735516,
+          "state": "R"
+        },
+        "exit_code": 0,
+        "cleanup": {
+          "observed": [
+            {
+              "pid": 311316,
+              "start_ticks": 7735516,
+              "state": "R"
+            },
+            {
+              "pid": 311350,
+              "start_ticks": 7735522,
+              "state": "Z"
+            },
+            {
+              "pid": 311365,
+              "start_ticks": 7735524,
+              "state": "Z"
+            },
+            {
+              "pid": 311380,
+              "start_ticks": 7735527,
+              "state": "Z"
+            },
+            {
+              "pid": 311397,
+              "start_ticks": 7735529,
+              "state": "Z"
+            },
+            {
+              "pid": 311317,
+              "start_ticks": 7735516,
+              "state": "Z"
+            }
+          ],
+          "signals": [
+            {
+              "pid": 311350,
+              "start_ticks": 7735522,
+              "state": "S",
+              "signal": "SIGTERM"
+            },
+            {
+              "pid": 311365,
+              "start_ticks": 7735524,
+              "state": "S",
+              "signal": "SIGTERM"
+            },
+            {
+              "pid": 311380,
+              "start_ticks": 7735527,
+              "state": "S",
+              "signal": "SIGTERM"
+            },
+            {
+              "pid": 311397,
+              "start_ticks": 7735529,
+              "state": "S",
+              "signal": "SIGTERM"
+            }
+          ],
+          "remaining": []
+        },
+        "seconds": 1.2664912930049468,
+        "runtime_removed": true
+      },
+      "receipt": {
+        "ok": true,
+        "reported_success": true,
+        "checks": 14,
+        "expected_checks": 14,
+        "missing_required_checks": [],
+        "strict_check_results": true,
+        "error": null,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli/report.json"
+      },
+      "compact_log": {
+        "command": [
+          "rtk",
+          "log",
+          "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli/raw.log"
+        ],
+        "exit_code": 0,
+        "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/21-wayland-cli/rtk.log"
+      },
+      "passed": true,
+      "binary_after": {
+        "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "bytes": 1237696
+      },
+      "supporting_after": {
+        "no_wayland_binary": {
+          "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+          "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+          "bytes": 1144288
+        },
+        "ime_peer": {
+          "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+          "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+          "bytes": 22704
+        }
+      }
+    }
+  ],
+  "expected_source_sha": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "expected_binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "planned_stages": 21,
+  "expected_no_wayland_sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+  "expected_ime_peer_sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+  "binary_before": {
+    "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+    "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+    "bytes": 1237696
+  },
+  "supporting_before": {
+    "no_wayland_binary": {
+      "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+      "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+      "bytes": 1144288
+    },
+    "ime_peer": {
+      "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+      "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+      "bytes": 22704
+    }
+  },
+  "source_before": {
+    "sha": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+    "tree": "42e8396aa5f5110dd44495a697ebb3427c6b4eca",
+    "clean": true,
+    "submodules": [
+      "1d796d1fc63808dc099ed7b10c92e75835ae2814 crates/zgpui (v0.1.0)",
+      " fe6357f98cf80fb6cc74739e45e8866ee17706ad crates/zgraphics (v0.2.0)",
+      " 37617313dd7aaabcca9dd567344a76c4cbe03907 crates/zinput (v0.1.3)",
+      " 66919bc6dcb7757e0437fe955bfa809fb1282b68 crates/zpty (v0.2.2)",
+      " a2074bac4c030cfd7c0b2514c852a89dcf54648f crates/zterm (v0.5.0-3-ga2074ba)"
+    ]
+  },
+  "plugins_before": {
+    "manifest": "WORKTREE/artifacts/final-plugins-20261120/libraries.json",
+    "manifest_sha256": "fd2b54c03b0e111679bfecfc6092c23e42e53e3f4ef8e7b7931987aa7835b1d8",
+    "libraries": [
+      {
+        "name": "example",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/example.so",
+        "sha256": "1edc4d45b41285eb8e3bb1b2214fac17b54967ff0136e90fef8706e8aa3cd825"
+      },
+      {
+        "name": "fixture-valid",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/fixture-valid.so",
+        "sha256": "7691b12af5ba68883b05d27b8571bd07fc8660363a4d01576dc9545b373222b7"
+      },
+      {
+        "name": "fixture-wrong-interface",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/fixture-wrong-interface.so",
+        "sha256": "d90fe227db2942da65767d98b35ebda56463a61d231d4ef998648f5ed52f688b"
+      },
+      {
+        "name": "fixture-pinned",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/fixture-pinned.so",
+        "sha256": "3543b67dc6d4931132cbfcff5879b059542e26875f63d5dcd4ffad3170f46a96"
+      },
+      {
+        "name": "before-example",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/before-example.so",
+        "sha256": "d697728a36ade14d0caac9c4997576f5454dd69b4af4964c35ae8710d0c52f20"
+      }
+    ],
+    "old_plugin_source": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+    "old_plugin_zplugin": "0.3.0",
+    "new_plugin_zplugin": "0.3.1"
+  },
+  "tools": {
+    "executables": {
+      "rtk": "/usr/bin/rtk",
+      "git": "/usr/bin/git",
+      "Xvfb": "/usr/bin/Xvfb",
+      "cc": "/usr/bin/cc",
+      "fcitx5": "/usr/bin/fcitx5",
+      "qdbus6": "/usr/bin/qdbus6",
+      "dbus-daemon": "/usr/bin/dbus-daemon",
+      "dbus-run-session": "/usr/bin/dbus-run-session",
+      "setxkbmap": "/usr/bin/setxkbmap",
+      "wtype": "/usr/bin/wtype",
+      "grim": "/usr/bin/grim",
+      "wl-copy": "/usr/bin/wl-copy",
+      "wl-paste": "/usr/bin/wl-paste",
+      "touch": "/usr/bin/touch",
+      "sway": "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/sway",
+      "swaymsg": "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/swaymsg"
+    },
+    "sway": {
+      "path": "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/sway",
+      "sha256": "7ba78b7531a3b3cb1852b3b1e464b4458cce1749c6c0fe3c6fb4b16ece9d5b9c"
+    },
+    "swaymsg": {
+      "path": "PROJECT_WORKTREE/artifacts/native-wayland-20261119/artifacts/wayland-test-tools/root/usr/bin/swaymsg",
+      "sha256": "8cde6e424950be9be0e7916202fca2a60806460b970a533c39d2ed2b9e2cad66"
+    },
+    "private_library_path": null
+  },
+  "harness_before": {
+    "WORKTREE/artifacts/shared-gui-20261120/identities.py": "d204e2e5443e755f5a9f794113b6cc028335b3eb47031626c501b76d530a3ecb",
+    "WORKTREE/artifacts/shared-gui-20261120/owned_process.py": "e17b1aa0f5a1fbde443698ae6f615296d46ba78e39dfb2bd9679f94a7cc686a7",
+    "WORKTREE/artifacts/shared-gui-20261120/plan.py": "57941e9d17576e3edf0c3d744b780f7ec8437ef04fec69c62fa1e79b611d99b2",
+    "WORKTREE/artifacts/shared-gui-20261120/prepare_check.py": "e788d621e45b21c41137a54cca298d0dee8a059527c38971e6314225aa316aca",
+    "WORKTREE/artifacts/shared-gui-20261120/run.py": "6d525c5e965388eae6fdef8e136e92efec16cae5564c117ac0edbe6bcd1d3ac4",
+    "WORKTREE/artifacts/shared-gui-20261120/wayland_cli.py": "f2e74153c89a8b04ffeae38cfdb7dac0b5148bb6d3609271763cea9c570f5f53",
+    "WORKTREE/examples/native_ui.py": "50a049231e6879333d58aaa2c0ed8a1212247583c70c8e2f51e13049fd4c0577",
+    "WORKTREE/tests/bash_integration.py": "87c7619a3fde7411ef2e334c8f9b57bdac27aca59326744a93ded67e7c7a2590",
+    "WORKTREE/tests/broker_upgrade.py": "044b856131c6f4a8d20b76da7a01d2336e3e865834a4ecc8514b5de4b18b3722",
+    "WORKTREE/tests/build_text_plugins.py": "a12a525522ab0d63418a2f517853f814c673082110aa70e17c62bb1bcdc52b37",
+    "WORKTREE/tests/build_wayland_ime_peer.py": "06617787aa89913f221a6cbd16aa62319fbc2316bc494d728ce9ee2b46a745b4",
+    "WORKTREE/tests/clipboard_transfer_gui.py": "f25ca20f820d215a2173827c5bd660f5a1dbe43a0a15309cc743eb45dc6f82de",
+    "WORKTREE/tests/copy_paste_gui.py": "6d0c268174c76b61efae46a57d57ae099cc90446626763fb14d90979afa4ccbd",
+    "WORKTREE/tests/daily_workflow.py": "738f9201764b65b348f18122d80e214896b16353fba06a48ddbe4bd7a064ef44",
+    "WORKTREE/tests/darwin_spawn_gate_test.py": "151f1cc00836214cc012749342db41050bae25b0b767f17fb2b2aae1730db520",
+    "WORKTREE/tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "WORKTREE/tests/graphics_extensions_gui.py": "76999f247496cddcf64453af444059c0e2dd560060b14a8a238986987701eb31",
+    "WORKTREE/tests/graphics_smoke.py": "f1679fefa5e32f1cabd0bb87ce758d1b2aa9fa3cdf6996a0436f765d20fc2482",
+    "WORKTREE/tests/gui_child.py": "6424f5b893f2b83d77cf3102a3ae27e720e57c2fb14816f254dceba5d94685a7",
+    "WORKTREE/tests/gui_smoke.py": "92f2948c82d1309586f0cc567ba7cf115669c46a004232ba73051bc5644c535f",
+    "WORKTREE/tests/hyprland_graphics.py": "aa8b8e265fd263cac16142f077168edc02d937cd60b41ea4ea9c069852fce909",
+    "WORKTREE/tests/input_gui.py": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+    "WORKTREE/tests/install_test.py": "d5feef910ee91f970d2021e6d88bacbd03ff5ba17f07e32ea86ffc2758d7c1ac",
+    "WORKTREE/tests/ioctl_resize_fault.c": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "WORKTREE/tests/isolated_xvfb_test.py": "879d4b1dadc00d622191225e1214808cd90aa8973606e86e94abfcfd514c4132",
+    "WORKTREE/tests/linux_native.py": "e89c3228bddd2ae491be2defbfbdf893ad6c9c41462e522f0b9344d8f06a1fd3",
+    "WORKTREE/tests/linux_native_test.py": "7c1e94486994e073ecaebdf04de0531dfb6231dcf5ee13422b2a440b27cb782a",
+    "WORKTREE/tests/macos_native.py": "3fe94f4a0887603f53b06599a456bdd2ee92a12772c1185beb000d6b396a2ca5",
+    "WORKTREE/tests/macos_native_test.py": "b65b6ece6369d6f3f61ba0ebdd151b14c788f772443e25352f48b7f9378e6148",
+    "WORKTREE/tests/macos_smoke.py": "659f2b2df732c4f8d4056f0ee68584e52778d545a6abc7faabf17209b0b2fbb3",
+    "WORKTREE/tests/mcp_raw_output.py": "efc28f6f0e0da9fcb58eb6307a98ff252483e72789d96a6670613fb8c44b6975",
+    "WORKTREE/tests/mcp_security.py": "f9bf0e3f545497429b5a2e5bcc210f905e0884fd41f0279bf1b1462f511a6d82",
+    "WORKTREE/tests/mcp_sessions.py": "67f816de02385fc483dd2e665079703f102dea479c54d5bcfafceaa437264bee",
+    "WORKTREE/tests/mcp_sse.py": "79b82afb8605dbb5857cfa776065a1408962ea12ffa87749ba0e05080ebc16cf",
+    "WORKTREE/tests/mcp_transport.py": "6b9ea9c13b04ac2bcce36b6168f428e7f8f3628a0df05f2ecf85c0073678873a",
+    "WORKTREE/tests/mcp_wait.py": "e0ddb7e511779784ff106e34f8fe2af76be76007f1a9aef91bfe6332c4714f1c",
+    "WORKTREE/tests/native_ui_gui.py": "202367aee225c2ad8eaf569d436084af7a1d879cca0955874df190f060743a22",
+    "WORKTREE/tests/osc52_gui.py": "50dcaf314c29fe5534640dc2adecf916a018b27b997feb71b9f3cb09a310bb4a",
+    "WORKTREE/tests/plugin_cli.py": "b23c4be83c90e7ef6d5c05fc76f2c94bfb0fd06a0d792eab0385c3b2412df024",
+    "WORKTREE/tests/plugin_gui.py": "670abfe443071e5404329bbc55c16251e2b598ef2e235a791c0830ce4943196b",
+    "WORKTREE/tests/protocols/input-method-unstable-v2.xml": "99414dbad9458e71aa1fa01bc45f94ca6685787bfcb4d98948f72c1b45b60703",
+    "WORKTREE/tests/pty_probe.py": "6d5c2ae2518a7f296d569c8202f42a469eb0c6e99b4be0abb31893aae1bd106b",
+    "WORKTREE/tests/registry_versions_test.py": "0b3f81ad6a0841311a48328c06c4eec3d0c970f56e0d74e57381200a7e0e5c50",
+    "WORKTREE/tests/release_assets_test.py": "baf22a1925c1b99a6aafeabcce1fa97f693b6193a16b484a7f3dde970657725d",
+    "WORKTREE/tests/release_scope_test.py": "c034a6fcdbeceb835cf9a24f0cb4de6b8b3f007572f1ead0bd2f54f53f39d63a",
+    "WORKTREE/tests/release_upload_test.py": "0ffb127fb645c919495e2140cc5d024f242e2536b6076bacda91183ce8cc0fa5",
+    "WORKTREE/tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "WORKTREE/tests/retained_frame_gui.py": "d7cbf35b66f1f041810b86f2f2217469ec9d5b508c5fd877d2adbb31018aaf38",
+    "WORKTREE/tests/retained_frame_trace.c": "5afdfd62438c53216a6aa2349a6264b78a92a485f8b1e9025026936c73d319a3",
+    "WORKTREE/tests/scrollback_gui.py": "dbceba5c7990d22f856da80b4b955a8c03eea72461f3b7b633261700e2dfa237",
+    "WORKTREE/tests/session_switcher.py": "aa2d638ff24cb679a02023e707ee13bb05a6cef732c219b05d7ba62285e2acd5",
+    "WORKTREE/tests/shared_gui_smoke.py": "73faa61463d612a7df7f691889b87c27f25657c63891db4e85662112c44d36c0",
+    "WORKTREE/tests/shell_integration.py": "2c68289ada254bb8429fa964c7c6350830187d9a5a42dcfe861167379ec74086",
+    "WORKTREE/tests/sixel_gui.py": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+    "WORKTREE/tests/sixel_preview_gui.py": "dba9b0d2e04c974be5ed5d9eb77023239da53c5ee75a36d21f069b2d92884277",
+    "WORKTREE/tests/sixel_reference.py": "104537d07f055d64a9512ee1a06571aa617069b4739244c836faa445e1539fa0",
+    "WORKTREE/tests/source_archive_test.py": "a6008685e235af1da5381858eea879a05be803427eae4ee93eadef2179dd3b78",
+    "WORKTREE/tests/ssmcp_observer.py": "370abf802ea5edddaf93106f2b45f6b7291787b775d0e3d42587a1722a764d0d",
+    "WORKTREE/tests/test_benchmark_terminals.py": "e0579af1379dd405cde4a03734649e9d6cc5b55ef5c2a5ff9a3f745cd0ccf6d9",
+    "WORKTREE/tests/test_throughput_benchmark.py": "14afd3c19ea158b93ff3be29910e7656133b41c95d05b7c6e2e271e88c92fd3b",
+    "WORKTREE/tests/text_gpu_gui.py": "4c04070ff0b1e9dbc4fc5f98647deaa89bc0917f1462139625b837bc20aa7928",
+    "WORKTREE/tests/wayland_child.py": "9d470a4ab9d3a32efd2a0b7c864551b95d013a1de156da139ccfcde597b06646",
+    "WORKTREE/tests/wayland_gui.py": "c38960db2d33e549d88781ebd524a21a1f402cea323f409dd13b238b05a4fea7",
+    "WORKTREE/tests/wayland_ime_peer.c": "62023c5b5f64a7384d28b3f98617f19a7568a63f0b799757f7665a1cc93e5231",
+    "WORKTREE/tests/wayland_services.py": "da4bee3923d212d956d6b6ecad3d401f6372ce86c5d6f2b6e9e38bd63996aea1",
+    "WORKTREE/tests/wayland_services_budget.c": "491f25f06714a3aa820137a3f1c893ce0683632576b4132e50d9339e4fe20410",
+    "WORKTREE/tests/windows_desktop.py": "c05c9a8a0045418a1750f08e5039c0b1ae960036627e34d09dbc187f0d1dfd5b",
+    "WORKTREE/tests/windows_desktop_test.py": "ee5c41855ab1a9cd8df04c56b8e4a2fab60a634532332e6c7ea1250b33d90c97",
+    "WORKTREE/tests/windows_native.py": "3eaa8841e37ddb2286d85db73c4d9ab010853b1b60489a1518db0250090ff699",
+    "WORKTREE/tests/windows_native_test.py": "affa87319456d66edcb25aec7fc3866b6300d08dd71ad6ae8088d1e61ff8d402",
+    "WORKTREE/tests/windows_resize_control.c": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+    "WORKTREE/tests/windows_resize_control.py": "5e4d523c36c2d966f7335feab341ccf57dbd15de697d2e45be775264d20662d3",
+    "WORKTREE/tests/windows_workspace_native.py": "4847abdb3b7ecfb47afa26ba308fc9142461283be5f5c51fff0cba99aac98ca8",
+    "WORKTREE/tests/windows_workspace_test.py": "19bcd2388ffad985e9468a5547b6c56941d9b18cf3133ef4f68145e1f623bb0c",
+    "WORKTREE/tests/workspaces.py": "1142af21d5c012d0157b201f59337a7714bfa030d4f98043ee8281042f7411b8",
+    "WORKTREE/tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "WORKTREE/tests/xim_gui.py": "427c68a18b6fbf0de70090d06bbc8847489605c159835c1bebcc3bfea3372a27",
+    "WORKTREE/tools/benchmark_terminals.py": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+    "WORKTREE/tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "WORKTREE/tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "WORKTREE/tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25",
+    "WORKTREE/tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3"
+  },
+  "binary_after": {
+    "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+    "sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+    "bytes": 1237696
+  },
+  "supporting_after": {
+    "no_wayland_binary": {
+      "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+      "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+      "bytes": 1144288
+    },
+    "ime_peer": {
+      "path": "WORKTREE/artifacts/final-elf-20261120/wayland-ime-peer-6053a97",
+      "sha256": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d",
+      "bytes": 22704
+    }
+  },
+  "source_after": {
+    "sha": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+    "tree": "42e8396aa5f5110dd44495a697ebb3427c6b4eca",
+    "clean": true,
+    "submodules": [
+      "1d796d1fc63808dc099ed7b10c92e75835ae2814 crates/zgpui (v0.1.0)",
+      " fe6357f98cf80fb6cc74739e45e8866ee17706ad crates/zgraphics (v0.2.0)",
+      " 37617313dd7aaabcca9dd567344a76c4cbe03907 crates/zinput (v0.1.3)",
+      " 66919bc6dcb7757e0437fe955bfa809fb1282b68 crates/zpty (v0.2.2)",
+      " a2074bac4c030cfd7c0b2514c852a89dcf54648f crates/zterm (v0.5.0-3-ga2074ba)"
+    ]
+  },
+  "plugins_after": {
+    "manifest": "WORKTREE/artifacts/final-plugins-20261120/libraries.json",
+    "manifest_sha256": "fd2b54c03b0e111679bfecfc6092c23e42e53e3f4ef8e7b7931987aa7835b1d8",
+    "libraries": [
+      {
+        "name": "example",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/example.so",
+        "sha256": "1edc4d45b41285eb8e3bb1b2214fac17b54967ff0136e90fef8706e8aa3cd825"
+      },
+      {
+        "name": "fixture-valid",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/fixture-valid.so",
+        "sha256": "7691b12af5ba68883b05d27b8571bd07fc8660363a4d01576dc9545b373222b7"
+      },
+      {
+        "name": "fixture-wrong-interface",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/fixture-wrong-interface.so",
+        "sha256": "d90fe227db2942da65767d98b35ebda56463a61d231d4ef998648f5ed52f688b"
+      },
+      {
+        "name": "fixture-pinned",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/fixture-pinned.so",
+        "sha256": "3543b67dc6d4931132cbfcff5879b059542e26875f63d5dcd4ffad3170f46a96"
+      },
+      {
+        "name": "before-example",
+        "path": "WORKTREE/artifacts/final-plugins-20261120/before-example.so",
+        "sha256": "d697728a36ade14d0caac9c4997576f5454dd69b4af4964c35ae8710d0c52f20"
+      }
+    ],
+    "old_plugin_source": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+    "old_plugin_zplugin": "0.3.0",
+    "new_plugin_zplugin": "0.3.1"
+  },
+  "harness_after": {
+    "WORKTREE/artifacts/shared-gui-20261120/identities.py": "d204e2e5443e755f5a9f794113b6cc028335b3eb47031626c501b76d530a3ecb",
+    "WORKTREE/artifacts/shared-gui-20261120/owned_process.py": "e17b1aa0f5a1fbde443698ae6f615296d46ba78e39dfb2bd9679f94a7cc686a7",
+    "WORKTREE/artifacts/shared-gui-20261120/plan.py": "57941e9d17576e3edf0c3d744b780f7ec8437ef04fec69c62fa1e79b611d99b2",
+    "WORKTREE/artifacts/shared-gui-20261120/prepare_check.py": "e788d621e45b21c41137a54cca298d0dee8a059527c38971e6314225aa316aca",
+    "WORKTREE/artifacts/shared-gui-20261120/run.py": "6d525c5e965388eae6fdef8e136e92efec16cae5564c117ac0edbe6bcd1d3ac4",
+    "WORKTREE/artifacts/shared-gui-20261120/wayland_cli.py": "f2e74153c89a8b04ffeae38cfdb7dac0b5148bb6d3609271763cea9c570f5f53",
+    "WORKTREE/examples/native_ui.py": "50a049231e6879333d58aaa2c0ed8a1212247583c70c8e2f51e13049fd4c0577",
+    "WORKTREE/tests/bash_integration.py": "87c7619a3fde7411ef2e334c8f9b57bdac27aca59326744a93ded67e7c7a2590",
+    "WORKTREE/tests/broker_upgrade.py": "044b856131c6f4a8d20b76da7a01d2336e3e865834a4ecc8514b5de4b18b3722",
+    "WORKTREE/tests/build_text_plugins.py": "a12a525522ab0d63418a2f517853f814c673082110aa70e17c62bb1bcdc52b37",
+    "WORKTREE/tests/build_wayland_ime_peer.py": "06617787aa89913f221a6cbd16aa62319fbc2316bc494d728ce9ee2b46a745b4",
+    "WORKTREE/tests/clipboard_transfer_gui.py": "f25ca20f820d215a2173827c5bd660f5a1dbe43a0a15309cc743eb45dc6f82de",
+    "WORKTREE/tests/copy_paste_gui.py": "6d0c268174c76b61efae46a57d57ae099cc90446626763fb14d90979afa4ccbd",
+    "WORKTREE/tests/daily_workflow.py": "738f9201764b65b348f18122d80e214896b16353fba06a48ddbe4bd7a064ef44",
+    "WORKTREE/tests/darwin_spawn_gate_test.py": "151f1cc00836214cc012749342db41050bae25b0b767f17fb2b2aae1730db520",
+    "WORKTREE/tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "WORKTREE/tests/graphics_extensions_gui.py": "76999f247496cddcf64453af444059c0e2dd560060b14a8a238986987701eb31",
+    "WORKTREE/tests/graphics_smoke.py": "f1679fefa5e32f1cabd0bb87ce758d1b2aa9fa3cdf6996a0436f765d20fc2482",
+    "WORKTREE/tests/gui_child.py": "6424f5b893f2b83d77cf3102a3ae27e720e57c2fb14816f254dceba5d94685a7",
+    "WORKTREE/tests/gui_smoke.py": "92f2948c82d1309586f0cc567ba7cf115669c46a004232ba73051bc5644c535f",
+    "WORKTREE/tests/hyprland_graphics.py": "aa8b8e265fd263cac16142f077168edc02d937cd60b41ea4ea9c069852fce909",
+    "WORKTREE/tests/input_gui.py": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+    "WORKTREE/tests/install_test.py": "d5feef910ee91f970d2021e6d88bacbd03ff5ba17f07e32ea86ffc2758d7c1ac",
+    "WORKTREE/tests/ioctl_resize_fault.c": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "WORKTREE/tests/isolated_xvfb_test.py": "879d4b1dadc00d622191225e1214808cd90aa8973606e86e94abfcfd514c4132",
+    "WORKTREE/tests/linux_native.py": "e89c3228bddd2ae491be2defbfbdf893ad6c9c41462e522f0b9344d8f06a1fd3",
+    "WORKTREE/tests/linux_native_test.py": "7c1e94486994e073ecaebdf04de0531dfb6231dcf5ee13422b2a440b27cb782a",
+    "WORKTREE/tests/macos_native.py": "3fe94f4a0887603f53b06599a456bdd2ee92a12772c1185beb000d6b396a2ca5",
+    "WORKTREE/tests/macos_native_test.py": "b65b6ece6369d6f3f61ba0ebdd151b14c788f772443e25352f48b7f9378e6148",
+    "WORKTREE/tests/macos_smoke.py": "659f2b2df732c4f8d4056f0ee68584e52778d545a6abc7faabf17209b0b2fbb3",
+    "WORKTREE/tests/mcp_raw_output.py": "efc28f6f0e0da9fcb58eb6307a98ff252483e72789d96a6670613fb8c44b6975",
+    "WORKTREE/tests/mcp_security.py": "f9bf0e3f545497429b5a2e5bcc210f905e0884fd41f0279bf1b1462f511a6d82",
+    "WORKTREE/tests/mcp_sessions.py": "67f816de02385fc483dd2e665079703f102dea479c54d5bcfafceaa437264bee",
+    "WORKTREE/tests/mcp_sse.py": "79b82afb8605dbb5857cfa776065a1408962ea12ffa87749ba0e05080ebc16cf",
+    "WORKTREE/tests/mcp_transport.py": "6b9ea9c13b04ac2bcce36b6168f428e7f8f3628a0df05f2ecf85c0073678873a",
+    "WORKTREE/tests/mcp_wait.py": "e0ddb7e511779784ff106e34f8fe2af76be76007f1a9aef91bfe6332c4714f1c",
+    "WORKTREE/tests/native_ui_gui.py": "202367aee225c2ad8eaf569d436084af7a1d879cca0955874df190f060743a22",
+    "WORKTREE/tests/osc52_gui.py": "50dcaf314c29fe5534640dc2adecf916a018b27b997feb71b9f3cb09a310bb4a",
+    "WORKTREE/tests/plugin_cli.py": "b23c4be83c90e7ef6d5c05fc76f2c94bfb0fd06a0d792eab0385c3b2412df024",
+    "WORKTREE/tests/plugin_gui.py": "670abfe443071e5404329bbc55c16251e2b598ef2e235a791c0830ce4943196b",
+    "WORKTREE/tests/protocols/input-method-unstable-v2.xml": "99414dbad9458e71aa1fa01bc45f94ca6685787bfcb4d98948f72c1b45b60703",
+    "WORKTREE/tests/pty_probe.py": "6d5c2ae2518a7f296d569c8202f42a469eb0c6e99b4be0abb31893aae1bd106b",
+    "WORKTREE/tests/registry_versions_test.py": "0b3f81ad6a0841311a48328c06c4eec3d0c970f56e0d74e57381200a7e0e5c50",
+    "WORKTREE/tests/release_assets_test.py": "baf22a1925c1b99a6aafeabcce1fa97f693b6193a16b484a7f3dde970657725d",
+    "WORKTREE/tests/release_scope_test.py": "c034a6fcdbeceb835cf9a24f0cb4de6b8b3f007572f1ead0bd2f54f53f39d63a",
+    "WORKTREE/tests/release_upload_test.py": "0ffb127fb645c919495e2140cc5d024f242e2536b6076bacda91183ce8cc0fa5",
+    "WORKTREE/tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "WORKTREE/tests/retained_frame_gui.py": "d7cbf35b66f1f041810b86f2f2217469ec9d5b508c5fd877d2adbb31018aaf38",
+    "WORKTREE/tests/retained_frame_trace.c": "5afdfd62438c53216a6aa2349a6264b78a92a485f8b1e9025026936c73d319a3",
+    "WORKTREE/tests/scrollback_gui.py": "dbceba5c7990d22f856da80b4b955a8c03eea72461f3b7b633261700e2dfa237",
+    "WORKTREE/tests/session_switcher.py": "aa2d638ff24cb679a02023e707ee13bb05a6cef732c219b05d7ba62285e2acd5",
+    "WORKTREE/tests/shared_gui_smoke.py": "73faa61463d612a7df7f691889b87c27f25657c63891db4e85662112c44d36c0",
+    "WORKTREE/tests/shell_integration.py": "2c68289ada254bb8429fa964c7c6350830187d9a5a42dcfe861167379ec74086",
+    "WORKTREE/tests/sixel_gui.py": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+    "WORKTREE/tests/sixel_preview_gui.py": "dba9b0d2e04c974be5ed5d9eb77023239da53c5ee75a36d21f069b2d92884277",
+    "WORKTREE/tests/sixel_reference.py": "104537d07f055d64a9512ee1a06571aa617069b4739244c836faa445e1539fa0",
+    "WORKTREE/tests/source_archive_test.py": "a6008685e235af1da5381858eea879a05be803427eae4ee93eadef2179dd3b78",
+    "WORKTREE/tests/ssmcp_observer.py": "370abf802ea5edddaf93106f2b45f6b7291787b775d0e3d42587a1722a764d0d",
+    "WORKTREE/tests/test_benchmark_terminals.py": "e0579af1379dd405cde4a03734649e9d6cc5b55ef5c2a5ff9a3f745cd0ccf6d9",
+    "WORKTREE/tests/test_throughput_benchmark.py": "14afd3c19ea158b93ff3be29910e7656133b41c95d05b7c6e2e271e88c92fd3b",
+    "WORKTREE/tests/text_gpu_gui.py": "4c04070ff0b1e9dbc4fc5f98647deaa89bc0917f1462139625b837bc20aa7928",
+    "WORKTREE/tests/wayland_child.py": "9d470a4ab9d3a32efd2a0b7c864551b95d013a1de156da139ccfcde597b06646",
+    "WORKTREE/tests/wayland_gui.py": "c38960db2d33e549d88781ebd524a21a1f402cea323f409dd13b238b05a4fea7",
+    "WORKTREE/tests/wayland_ime_peer.c": "62023c5b5f64a7384d28b3f98617f19a7568a63f0b799757f7665a1cc93e5231",
+    "WORKTREE/tests/wayland_services.py": "da4bee3923d212d956d6b6ecad3d401f6372ce86c5d6f2b6e9e38bd63996aea1",
+    "WORKTREE/tests/wayland_services_budget.c": "491f25f06714a3aa820137a3f1c893ce0683632576b4132e50d9339e4fe20410",
+    "WORKTREE/tests/windows_desktop.py": "c05c9a8a0045418a1750f08e5039c0b1ae960036627e34d09dbc187f0d1dfd5b",
+    "WORKTREE/tests/windows_desktop_test.py": "ee5c41855ab1a9cd8df04c56b8e4a2fab60a634532332e6c7ea1250b33d90c97",
+    "WORKTREE/tests/windows_native.py": "3eaa8841e37ddb2286d85db73c4d9ab010853b1b60489a1518db0250090ff699",
+    "WORKTREE/tests/windows_native_test.py": "affa87319456d66edcb25aec7fc3866b6300d08dd71ad6ae8088d1e61ff8d402",
+    "WORKTREE/tests/windows_resize_control.c": "9d6ab4b3f4fde560c217d535d1fe44bb9476d41aa004bc6cd5ab431c04db53b9",
+    "WORKTREE/tests/windows_resize_control.py": "5e4d523c36c2d966f7335feab341ccf57dbd15de697d2e45be775264d20662d3",
+    "WORKTREE/tests/windows_workspace_native.py": "4847abdb3b7ecfb47afa26ba308fc9142461283be5f5c51fff0cba99aac98ca8",
+    "WORKTREE/tests/windows_workspace_test.py": "19bcd2388ffad985e9468a5547b6c56941d9b18cf3133ef4f68145e1f623bb0c",
+    "WORKTREE/tests/workspaces.py": "1142af21d5c012d0157b201f59337a7714bfa030d4f98043ee8281042f7411b8",
+    "WORKTREE/tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "WORKTREE/tests/xim_gui.py": "427c68a18b6fbf0de70090d06bbc8847489605c159835c1bebcc3bfea3372a27",
+    "WORKTREE/tools/benchmark_terminals.py": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+    "WORKTREE/tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "WORKTREE/tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "WORKTREE/tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25",
+    "WORKTREE/tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3"
+  },
+  "final_identity_check": true,
+  "stopped_signal": null,
+  "finished_utc": "2026-11-20T02:26:30.494821+00:00"
+}

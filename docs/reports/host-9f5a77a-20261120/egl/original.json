@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "zterm": "a2074bac4c030cfd7c0b2514c852a89dcf54648f",
+  "started_utc": "2026-11-20T02:22:06.012999+00:00",
+  "status": "failed",
+  "passed": false,
+  "steps": [
+    {
+      "name": "default-build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "--release",
+        "--bin",
+        "ztty",
+        "--no-default-features",
+        "-j",
+        "1"
+      ],
+      "started_utc": "2026-11-20T02:22:06.333104+00:00",
+      "log": "WORKTREE/artifacts/integration-validation-zterm051-20261120/default-egl/default-build.log",
+      "exit_code": 0,
+      "finished_utc": "2026-11-20T02:22:17.799587+00:00",
+      "log_sha256": "42ddc8c1643362f84711413c928e06adac413638b0cb62603513c2a89f4e2b28"
+    },
+    {
+      "name": "egl-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--lib",
+        "--no-default-features",
+        "-j",
+        "1",
+        "gpu::tests::",
+        "--",
+        "--ignored",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "started_utc": "2026-11-20T02:22:17.905482+00:00",
+      "log": "WORKTREE/artifacts/integration-validation-zterm051-20261120/default-egl/egl-tests.log",
+      "exit_code": 0,
+      "finished_utc": "2026-11-20T02:22:21.084253+00:00",
+      "log_sha256": "026ad8a2a686b12c4053587b7ea20afb176643d08549070fc2d13e8e4a9c7dae"
+    }
+  ],
+  "script_sha256": "3c65489c43a0608898cadc61e04df1e6dbf8eb41ce01368ee56a2d3a2aa05e96",
+  "scope": "Default-feature release ELF plus the six explicitly ignored headless EGL/native-font tests; no performance measurements",
+  "root_gate_unit": "inactive",
+  "limits": {
+    "memory.max": "805306368",
+    "memory.swap.max": "0",
+    "cpu.max": "100000 100000"
+  },
+  "nice": 10,
+  "source_before": {
+    "root": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+    "zterm": "a2074bac4c030cfd7c0b2514c852a89dcf54648f",
+    "cargo_lock_sha256": "b86e3438a14ff8710a28b09bafa33ab1861f8cf116b722dc94be83133d4543b5",
+    "wayland_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807"
+  },
+  "root_gate_receipt_sha256": "ce7f2aa4ac05f0f49f1b1488eef1c25fc4f435a45d2401ee0bade55efe1e815c",
+  "environment": {
+    "CARGO_HOME": "WORKTREE/artifacts/cargo-home-20261120",
+    "CARGO_TARGET_DIR": "WORKTREE/target",
+    "RUSTUP_TOOLCHAIN": "1.100.0",
+    "RUSTC_WRAPPER": "",
+    "CARGO_BUILD_JOBS": "1"
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+  "default_binary": {
+    "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+    "sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+    "bytes": 1144288,
+    "features": []
+  },
+  "error": "AssertionError({'expected': ['gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels', 'gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics', 'gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width', 'gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters', 'gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas', 'gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction'], 'observed': ['gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics', 'gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width', 'gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters', 'gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas', 'gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction']})",
+  "finished_utc": "2026-11-20T02:22:21.153419+00:00",
+  "memory_peak_bytes": 805306368,
+  "memory_events": "low 0\nhigh 0\nmax 108\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+  "swap_peak_bytes": 0
+}

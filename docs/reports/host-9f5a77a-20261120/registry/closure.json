@@ -1,0 +1,84 @@
+{
+  "source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "ok": true,
+  "timestamp_utc": "2026-11-20T02:27:18.292572+00:00",
+  "unit": "ztty-registry-zterm051-9f5a77a-20261120.service",
+  "unit_before_stop": {
+    "ActiveState": "active",
+    "SubState": "exited",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "358707200",
+    "MemorySwapPeak": "0",
+    "CPUQuotaPerSecUSec": "1s",
+    "MemoryMax": "805306368",
+    "MemorySwapMax": "0",
+    "Nice": "10"
+  },
+  "unit_after_stop": {
+    "ActiveState": "inactive",
+    "SubState": "dead",
+    "MainPID": "0",
+    "Result": "success",
+    "ExecMainStatus": "0",
+    "ControlGroup": "",
+    "MemoryPeak": "[not set]",
+    "MemorySwapPeak": "[not set]",
+    "CPUQuotaPerSecUSec": "infinity",
+    "MemoryMax": "infinity",
+    "MemorySwapMax": "infinity",
+    "Nice": "0"
+  },
+  "owned_cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ztty-registry-zterm051-9f5a77a-20261120.service",
+  "owned_cgroup_present_after_exit": false,
+  "owned_remaining_pids": [],
+  "stop_exit": 0,
+  "result_sha256": "424cab026a959bce33ae8caa771e5689e0b535e298079d92903944a83d42f94a",
+  "runner_sha256": "007cc13f922982dcdce945519ca679db88e22614b619fefae776b6edbf5f0042",
+  "tool_sha256": "b1bae659a7f125309f8060e9cb3d8894a14665651770cbe3f5af18223925f51c",
+  "lock_sha256": "b86e3438a14ff8710a28b09bafa33ab1861f8cf116b722dc94be83133d4543b5",
+  "log_sha256": "c9f2d5a994bc4e5a4969a65aace4f26535054c077d248061026f6d262fec62f6",
+  "elapsed_seconds": 12.001569275002112,
+  "resources_before": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ztty-registry-zterm051-9f5a77a-20261120.service",
+    "nice": 10,
+    "files": {
+      "cpu.max": "100000 100000",
+      "memory.max": "805306368",
+      "memory.swap.max": "0",
+      "memory.peak": "13725696",
+      "memory.swap.peak": "0",
+      "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    }
+  },
+  "resources_after": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/ztty-registry-zterm051-9f5a77a-20261120.service",
+    "nice": 10,
+    "files": {
+      "cpu.max": "100000 100000",
+      "memory.max": "805306368",
+      "memory.swap.max": "0",
+      "memory.peak": "358707200",
+      "memory.swap.peak": "0",
+      "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    }
+  },
+  "source_clean_after": true,
+  "historical_full_graph_preserved": true,
+  "historical_receipt": {
+    "path": "WORKTREE/artifacts/registry-consumers-36b367f-20261120/result.json",
+    "sha256": "d4803771883b01f6c2cbcffede8db1937dabd9e3c8c3ed90b88df7161de6b4e7",
+    "source": "36b367ffda4cea9b3b3dfbf38dc6375567912323",
+    "repeated_in_this_run": false
+  },
+  "closure_helper_error": {
+    "job": "59cd4366f811fed8854b09c698ca60d5-3b8",
+    "stage": "post-processing closure only",
+    "test_results_unchanged": true,
+    "reason": "Empty post-exit ControlGroup was mistakenly resolved to root cgroup; a read-only assertion stopped before any stop or process action.",
+    "resolution": "Use recorded exact owned-unit cgroup with strict prefix/suffix validation; never operate on observed root PIDs."
+  },
+  "scope": "One standalone zterm graph and one six-crate combined graph; six Cargo commands, no repeated prior five standalone checks."
+}

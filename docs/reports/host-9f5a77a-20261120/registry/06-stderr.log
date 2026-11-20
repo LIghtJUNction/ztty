@@ -1,0 +1,7 @@
+   Compiling zsys v0.1.1
+   Compiling zplugin v0.3.1
+   Compiling ztty-plugin-api v0.1.0
+   Compiling zpty v0.2.2
+   Compiling ztty-registry-check-zinput-zgraphics-zpty-zgpui-ztty-plugin-api-zterm v0.0.0 (WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/consumers/combined)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.61s
+     Running `WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/target/debug/ztty-registry-check-zinput-zgraphics-zpty-zgpui-ztty-plugin-api-zterm`

@@ -1,0 +1,346 @@
+{
+  "ok": true,
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted",
+    "one-row software updates still copy only one row",
+    "terminal content and search overlay share one visible copy",
+    "bulk output ending in silence publishes the final real pixels without an external wakeup",
+    "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+    "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+    "a force/expose paint of the old screen does not lose the subsequent interactive response",
+    "synchronized output and Expose retain the committed pixels until explicit release",
+    "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+    "a synchronized begin/end in one small write publishes its complete final pixels",
+    "scrollback and its return-to-live prompt share one visible copy"
+  ],
+  "timings_ms": {
+    "initial-a": 0.10188699525315315,
+    "initial-b": 0.05023699486628175,
+    "quiet-final-frame": 4.1540570091456175,
+    "old-frame-expose": 0.20923899137414992,
+    "xtest-visible-echo": 49.06253999797627,
+    "broker-write-during-flood": 0.29146799352020025,
+    "rpc-visible-echo": 0.5242850020295009,
+    "sync-initial": 0.06484099139925092,
+    "sync-expose-retained": 0.03300300159025937,
+    "sync-explicit-release": 0.08414700278081,
+    "sync-quiet-timeout": 48.60628000460565,
+    "sync-total-from-first-begin": 152.53605200268794,
+    "sync-same-feed": 0.06679000216536224,
+    "scroll-history-ready": 0.061728002037853
+  },
+  "screenshots": {
+    "nonadjacent-frame": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/nonadjacent-frame.png",
+      "sha256": "9fcb895518a24fe035294e28b4cdafec97b0f62689d050004d3dc77f58c28cc4",
+      "rgb_sha256": "78e869259fe8a0124192bfd5c706798244b3793bb7cf2046f1c042cd153cc861"
+    },
+    "single-publish-overlay": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/single-publish-overlay.png",
+      "sha256": "a78403703c7322923d4c3f6823f1b21271f88c3ba47fe98106704d934a26a388",
+      "rgb_sha256": "9298c5cf12c6df5f0384813187c4777b8f0df812d19850bec33faea63a957683"
+    },
+    "quiet-final-frame": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/quiet-final-frame.png",
+      "sha256": "6a077c67991b8b33da2afa055046ef88435019da871c67b5a3b35eb57362bafc",
+      "rgb_sha256": "3ca4e8ba665135b81a7fd1f26e6b1fb96a44a010d3087f75c716c15f8f4fb1ce"
+    },
+    "fairness-flood": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/fairness-flood.png",
+      "sha256": "6fa77c219390a88d142414912ef8bd0acba896a9356b974c8ebc0c2d9c4c6ff7",
+      "rgb_sha256": "f0d6853dd7215954456226e09264f682758094b5575b12b3e6b44caf069de017"
+    },
+    "fairness-interaction": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/fairness-interaction.png",
+      "sha256": "b0cb1e3a4249677812b67680889a4b4b143393c60be3fd1a21f2b1d188d0a097",
+      "rgb_sha256": "5e65a4d8c18ebfc49b72d19f48cc99cb66eb6cf3f7063b5d3012dbc607596f8e"
+    },
+    "sync-release": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/sync-release.png",
+      "sha256": "adc5c4cb460e19ab8b3f9bb7b5483d0649f6a8fd80e3648bf60c55c3db6539f2",
+      "rgb_sha256": "8c1e51d883ae7d83e8d22dd893cf5dd5b96ceadd13658c0e60bf4963575d6763"
+    },
+    "sync-timeout": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/sync-timeout.png",
+      "sha256": "4bc401daaca8ab4e6d1ce86c5287bdac29e6def7f1b8ef63f7e2f55a32a74c06",
+      "rgb_sha256": "c4c2af48285a9d387da56bff8bb8ea7ee59c76123280343c53505bd27a7e9b49"
+    },
+    "sync-same-feed": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/sync-same-feed.png",
+      "sha256": "13364cf21c78e5aeb8e8f010b938bcebfefdff1cfcba3fdbef3f9b14904ebf4a",
+      "rgb_sha256": "3348902948e537517045c60fc4115203bde850e48cecc55c0bd00b12908f6299"
+    },
+    "single-publish-scroll": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/11-repaint-software/screenshots/single-publish-scroll.png",
+      "sha256": "eee56550c0eabd62660324278161afd28c4a346bfa79fd8083643badd0f4c08f",
+      "rgb_sha256": "5d14c2e9cd38f77aeb65b0fd9d7b0708bb6fe25f56ea30fc767dc72c2c2fc22c"
+    }
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "crates/zterm/src/terminal.rs": "0700d43aab0cd6b39eadb336b6b97cc7f0e6b733efa8ff11d55dce78038e5b54",
+    "tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "src/x11/gpu.rs": "b23437f52c5acda0a2212e793fab99141be1cc1df022b287bc1c8323fd90d82e",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "0478c66d0049a005397de450072a66ee5bf8fb45be96249825f8fdd73adea644",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":6226",
+    "pid": 302650,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X6226",
+        "inode": 92396548,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X6226",
+        "inode": 92396547,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderers_before": [
+    {
+      "window_id": 2097154,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    },
+    {
+      "window_id": 2097159,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    }
+  ],
+  "broker": {
+    "pid": 302671,
+    "state": "S",
+    "user_ticks": 1,
+    "system_ticks": 0,
+    "threads": 1,
+    "start_ticks": 7730623,
+    "exe_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807"
+  },
+  "owned_processes": {
+    "302669": 7730623,
+    "302672": 7730626,
+    "302671": 7730623,
+    "302675": 7730632,
+    "302676": 7730632
+  },
+  "startup_quiet_ms": 41.36510299576912,
+  "nonadjacent_start_ns": 77306430549005,
+  "nonadjacent_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      16,
+      1112,
+      736,
+      0,
+      16
+    ]
+  ],
+  "single_row_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      729,
+      1112,
+      23,
+      0,
+      729
+    ]
+  ],
+  "overlay_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "payload": {
+    "bytes": 1050937,
+    "sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+  },
+  "idle_context_switches": {
+    "seconds": 0.35,
+    "before": {
+      "voluntary_ctxt_switches": 80,
+      "nonvoluntary_ctxt_switches": 4
+    },
+    "after": {
+      "voluntary_ctxt_switches": 80,
+      "nonvoluntary_ctxt_switches": 4
+    },
+    "delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "flood_visible_colors": [
+    [
+      32,
+      24,
+      80
+    ],
+    [
+      38,
+      102,
+      58
+    ],
+    [
+      41,
+      141,
+      191
+    ],
+    [
+      53,
+      105,
+      115
+    ],
+    [
+      76,
+      212,
+      196
+    ],
+    [
+      80,
+      72,
+      160
+    ],
+    [
+      110,
+      78,
+      178
+    ],
+    [
+      117,
+      169,
+      179
+    ],
+    [
+      121,
+      29,
+      175
+    ],
+    [
+      128,
+      120,
+      144
+    ],
+    [
+      143,
+      123,
+      137
+    ],
+    [
+      164,
+      204,
+      204
+    ],
+    [
+      168,
+      64,
+      104
+    ],
+    [
+      169,
+      77,
+      127
+    ],
+    [
+      177,
+      181,
+      183
+    ],
+    [
+      180,
+      28,
+      156
+    ],
+    [
+      188,
+      132,
+      116
+    ],
+    [
+      196,
+      44,
+      76
+    ],
+    [
+      203,
+      135,
+      109
+    ],
+    [
+      215,
+      99,
+      97
+    ]
+  ],
+  "scroll_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "renderers_after": [
+    {
+      "window_id": 2097154,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    },
+    {
+      "window_id": 2097159,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    }
+  ],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": ""
+}
