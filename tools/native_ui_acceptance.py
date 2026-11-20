@@ -86,8 +86,19 @@ def git(*args):
 
 
 def snapshot():
-    paths = subprocess.check_output(["git", "ls-files", "-z"], cwd=ROOT).split(b"\0")
-    return {os.fsdecode(path): digest(ROOT / os.fsdecode(path)) for path in paths if path}
+    from source_archive import archives, git as source_git
+
+    result = {}
+    for prefix, _ in archives(ROOT, "HEAD"):
+        for entry in source_git(ROOT / prefix, "ls-files", "--stage", "-z").split(b"\0"):
+            if not entry:
+                continue
+            metadata, path = entry.split(b"\t", 1)
+            if metadata.split()[0] == b"160000":
+                continue
+            name = prefix + os.fsdecode(path)
+            result[name] = digest(ROOT / name)
+    return result
 
 
 def initialize():
