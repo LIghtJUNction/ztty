@@ -317,12 +317,10 @@ impl Window {
         if kind == self.incr {
             self.receiving = true;
             self.incoming.clear();
+            // read_property used delete=True and consumed the entire INCR
+            // header. XGetWindowProperty already acknowledged it; deleting
+            // again could erase the owner's first payload before we read it.
             unsafe {
-                XDeleteProperty(
-                    self.state.display,
-                    self.selection_requestor(),
-                    self.transfer,
-                );
                 XFlush(self.state.display);
             }
             None
