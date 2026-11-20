@@ -1059,8 +1059,8 @@
   "derived_files": [
     {
       "public_file": "README.md",
-      "public_bytes": 9268,
-      "public_sha256": "41cad4f5b46e7ca01e129969c956b9014ddec2b1d80b3582363e5ad19c95ea04",
+      "public_bytes": 9302,
+      "public_sha256": "7f63021092e438a24b9ff243a9ae0dc60761253165ec04d3d61aa184befdf045",
       "role": "derived explanation or offline verification; not original runtime data"
     },
     {
