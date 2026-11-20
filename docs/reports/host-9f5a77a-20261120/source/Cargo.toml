@@ -1,0 +1,67 @@
+[workspace]
+members = ["crates/ztty-plugin-api"]
+exclude = ["crates/zgpui", "crates/zinput", "crates/zpty", "crates/zgraphics", "crates/zterm"]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.100"
+license = "MIT"
+authors = ["LIghtJUNction"]
+repository = "https://github.com/LIghtJUNction/ztty"
+
+[package]
+name = "ztty"
+version = "0.5.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+description = "A lean native no_std Rust terminal with Kitty graphics, built on Project Z"
+readme = "README.md"
+categories = ["command-line-utilities", "no-std"]
+keywords = ["terminal", "linux", "no-std", "x11", "pty"]
+
+[[bin]]
+name = "ztty"
+path = "src/main.rs"
+test = false
+bench = false
+
+[[test]]
+name = "session_core"
+path = "tests/session_core.rs"
+harness = false
+
+[features]
+default = []
+wayland = []
+
+[dependencies]
+unicode-segmentation = { version = "=1.13.3", default-features = false }
+zterm = { path = "crates/zterm", version = "0.5.1", default-features = false }
+zpty = { path = "crates/zpty", version = "0.2.2", default-features = false }
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = "fat"
+codegen-units = 1
+strip = "debuginfo"
+
+[profile.bench]
+lto = "fat"
+codegen-units = 1
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = { version = "=0.2.191", default-features = false }
+zplugin = { version = "=0.3.1", default-features = false }
+ztty-plugin-api = { path = "crates/ztty-plugin-api", version = "0.1.0" }
+
+[patch.crates-io]
+zgpui = { path = "crates/zgpui" }
+zgraphics = { path = "crates/zgraphics" }
+zinput = { path = "crates/zinput" }

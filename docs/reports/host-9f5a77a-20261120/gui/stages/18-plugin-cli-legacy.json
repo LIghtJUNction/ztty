@@ -1,0 +1,354 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "example-load-and-unload",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 5.633736989693716,
+      "input_bytes": 0,
+      "output_bytes": 103,
+      "output_sha256": "906660fdea0b413f7124a423e542e8bded1aff2dfe002ce8e8c1b7f1f8527c6b",
+      "stderr": "",
+      "lifecycle": [],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "example-unicode-relative-indent",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 15.393925990792923,
+      "input_bytes": 33,
+      "output_bytes": 21,
+      "output_sha256": "feed48ff8f016171068dbdfb2c264a2304c5ebd9fb537dce087d67f32f7790da",
+      "stderr": "",
+      "lifecycle": [],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "instance-lifecycle",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 14.38475500617642,
+      "input_bytes": 5,
+      "output_bytes": 5,
+      "output_sha256": "a116c9ed46d6207734a43317d30fd88f52ac8634c37d904bbf4e41d865f90475",
+      "stderr": "",
+      "lifecycle": [
+        "create 306545",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "one-mib-roundtrip",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 20.410602999618277,
+      "input_bytes": 1048576,
+      "output_bytes": 1048576,
+      "output_sha256": "15d414601da8558309434ed89fe9bf86cef3d99f864a26b225c04b49f3653a7a",
+      "stderr": "",
+      "lifecycle": [
+        "create 306547",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "oversized-input-before-load",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 3.813214003457688,
+      "input_bytes": 1048577,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension input exceeds 1 MiB\n",
+      "lifecycle": [],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "invalid-input-before-load",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 1.912671999889426,
+      "input_bytes": 1,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension input must be UTF-8\n",
+      "lifecycle": [],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "empty-output",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 14.40564199583605,
+      "input_bytes": 5,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "",
+      "lifecycle": [
+        "create 306551",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "invalid-result-count",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 5.874739988939837,
+      "input_bytes": 13,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension output exceeds 1 MiB\n",
+      "lifecycle": [
+        "create 306553",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "invalid-output-utf8",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 5.498694008565508,
+      "input_bytes": 12,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension returned invalid UTF-8\n",
+      "lifecycle": [
+        "create 306555",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "caught-plugin-panic",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 15.156369001488201,
+      "input_bytes": 5,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension failed: Panicked\n",
+      "lifecycle": [
+        "create 306557",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "native-plugin-crash",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 47.00035099813249,
+      "input_bytes": 5,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension worker exited abnormally\n",
+      "lifecycle": [
+        "create 306559",
+        "transform"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "wall-clock-timeout",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 2013.5060009924928,
+      "input_bytes": 7,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension timed out after 2 seconds\n",
+      "lifecycle": [
+        "create 306570",
+        "transform"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "cpu-limit",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 1009.112751999055,
+      "input_bytes": 3,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension worker exited abnormally\n",
+      "lifecycle": [
+        "create 306958",
+        "transform"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "child-timeout-process-group",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 2013.679891009815,
+      "input_bytes": 13,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension timed out after 2 seconds\n",
+      "lifecycle": [
+        "create 307079",
+        "transform",
+        "child 307080"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 1
+    },
+    {
+      "name": "leaked-channel-process-group",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 2004.504337994149,
+      "input_bytes": 14,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension timed out after 2 seconds\n",
+      "lifecycle": [
+        "create 307337",
+        "transform",
+        "child 307338",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 1
+    },
+    {
+      "name": "closed-channel-process-group",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 14.16708598844707,
+      "input_bytes": 20,
+      "output_bytes": 5,
+      "output_sha256": "ddc9e669194254cef019a29d3619a2c16592e5d52e1a81e98b01bd52319149a3",
+      "stderr": "",
+      "lifecycle": [
+        "create 307583",
+        "transform",
+        "child 307584",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 1
+    },
+    {
+      "name": "unsolicited-stdout-rejected",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 20.189668008242734,
+      "input_bytes": 11,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: invalid extension response\n",
+      "lifecycle": [
+        "create 307586",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "interface-version-mismatch",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 13.27577600022778,
+      "input_bytes": 0,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: extension interface rejected: InterfaceVersion { expected: 1, actual: 2 }\n",
+      "lifecycle": [],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "noncooperative-library-rejected",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 12.240986994584091,
+      "input_bytes": 0,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: cannot load extension: Unsupported\n",
+      "lifecycle": [],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "missing-library",
+      "ok": true,
+      "exit_code": 1,
+      "duration_ms": 20.591081003658473,
+      "input_bytes": 0,
+      "output_bytes": 0,
+      "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "ztty: cannot load extension: LoadFailed\n",
+      "lifecycle": [],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "resource-and-descriptor-limits",
+      "ok": true,
+      "exit_code": 0,
+      "duration_ms": 11.155543004861102,
+      "input_bytes": 6,
+      "output_bytes": 1329,
+      "output_sha256": "ed79a28dd896e6689db8a779964fb677aba9129ecef467ed0d5b3ad13d74af77",
+      "stderr": "",
+      "lifecycle": [
+        "create 307594",
+        "transform",
+        "destroy"
+      ],
+      "worker_reaped": true,
+      "descendants_reaped": 0
+    },
+    {
+      "name": "parent-death-terminates-worker",
+      "ok": true,
+      "worker_reaped": true
+    }
+  ],
+  "cleanup_errors": [],
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "example_sha256": "d697728a36ade14d0caac9c4997576f5454dd69b4af4964c35ae8710d0c52f20",
+  "library_sha256": {
+    "valid": "7691b12af5ba68883b05d27b8571bd07fc8660363a4d01576dc9545b373222b7",
+    "wrong-interface": "d90fe227db2942da65767d98b35ebda56463a61d231d4ef998648f5ed52f688b",
+    "pinned": "3543b67dc6d4931132cbfcff5879b059542e26875f63d5dcd4ffad3170f46a96"
+  },
+  "source_commit": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "source_sha256": {
+    "src/plugin_host.rs": "73b9bc9ad09c8cbb1de4c952cf2984334ec7f8f14b94c00bd4c898bb234ad950",
+    "crates/ztty-plugin-api/src/lib.rs": "edf7482a3af57c379f6f3e9bc7ddcf2326ac030da858fb4fbbbddab78552371e",
+    "tests/fixtures/text-plugin/src/lib.rs": "7e6f6967d2e24bca80b77967b0b2867074c567f39867047a5d68328cf47a378b",
+    "tests/plugin_cli.py": "b23c4be83c90e7ef6d5c05fc76f2c94bfb0fd06a0d792eab0385c3b2412df024"
+  }
+}

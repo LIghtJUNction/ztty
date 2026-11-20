@@ -1,0 +1,187 @@
+{
+  "ok": true,
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "source_root": "WORKTREE",
+  "source_commit": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "source_changes": [],
+  "source_sha256": {
+    "src/x11/gpu.rs": "b23437f52c5acda0a2212e793fab99141be1cc1df022b287bc1c8323fd90d82e",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "0478c66d0049a005397de450072a66ee5bf8fb45be96249825f8fdd73adea644",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "src/native_ui.rs": "dfef8f29306efe5e0c8927e9f3eb9153ee3ca496c25d3484bf5303cf4fec075d",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/session_core.rs": "643c5c8b4b0d3fb93bef829998813707bfdc1b8401673eee0bee46cf434796bc",
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "crates/zgpui/src/lib.rs": "84c62fc9d738b5636c8671a01605bb71bfb849b0834c3529b6cc4db925838471",
+    "crates/zgpui/src/wire.rs": "2c6e7794044e3815b2ae07f42e57bdfa9621b479ceb8eda77e7b176cc034172f",
+    "crates/zgpui/src/layout.rs": "99d9fffa22d8700697265dadb76fe2f654f087771c0eed555784cb49a1e2c7c9",
+    "crates/zgpui/Cargo.toml": "85aca0047f4b79be8f316b6718a70f591635c02dafe4ad573b937b11eecb5ac8",
+    "crates/zterm/src/terminal.rs": "0700d43aab0cd6b39eadb336b6b97cc7f0e6b733efa8ff11d55dce78038e5b54",
+    "Cargo.toml": "ae6f4b7d97483e2bb31fbbe8d49881bfb3f1354e624512fc8525f7193f23e7e7",
+    "Cargo.lock": "b86e3438a14ff8710a28b09bafa33ab1861f8cf116b722dc94be83133d4543b5",
+    "tests/input_gui.py": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+    "tests/native_ui_gui.py": "202367aee225c2ad8eaf569d436084af7a1d879cca0955874df190f060743a22",
+    "examples/native_ui.py": "50a049231e6879333d58aaa2c0ed8a1212247583c70c8e2f51e13049fd4c0577",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+  },
+  "checks": [
+    "unsupported producer fallback uses plain text, never changes screen/cursor modes, and restores termios",
+    "one transmitted KGP image renders correct red/blue pixels at two native scene references",
+    "GPU images allocate no X server pixmaps for either reference",
+    "mouse click emits only a surface/revision/node-bound action, with no PTY mouse bytes",
+    "button focus consumes ordinary text and Tab; Enter emits one structured action",
+    "Escape returns ordinary typing to the PTY and consumes its own gesture",
+    "view-only font zoom works during button focus, cancels captured geometry and consumes release",
+    "drag/release outside a button never activates or leaks a mouse gesture",
+    "focus loss cancels a captured click while still consuming its release",
+    "a revision change between press and release cancels activation and consumes release",
+    "malformed and oversized payloads preserve revision 2 and recover for the following VT traffic",
+    "retransmitting the same KGP ID refreshes both scene references without a scene update",
+    "pane resize invalidates the captured hit and relayout restores actual image pixels",
+    "alternate-screen transition clears the surface and cancels a pending gesture",
+    "RIS clears surface/actions; revision floor survives and a fresh scene can be drawn",
+    "explicit clear removes image UI and cancels the captured click",
+    "events:false previews the scene but never emits an action",
+    "narrow text leaf renders visible glyphs while clipping combining ink at both horizontal bounds",
+    "native press -> tab change -> other-view motion/release never reaches either PTY; reporting resumes after release",
+    "release outside every ztty view is observed by a separate X client; return motion retires stale capture and reaches the PTY",
+    "an observer cannot emit action intents or ordinary PTY input",
+    "PTY EOF clears the surface and leaves no actionable retained UI",
+    "shipped Python producer negotiates supported ZUI/1 and renders its actual generated image",
+    "real click -> producer action decoder -> revision update reaches 100% native progress pixels"
+  ],
+  "actions": [
+    {
+      "v": 1,
+      "type": "action",
+      "surface": 9,
+      "rev": 1,
+      "node": 7,
+      "action": "confirm",
+      "event_id": 1
+    },
+    {
+      "v": 1,
+      "type": "action",
+      "surface": 9,
+      "rev": 1,
+      "node": 7,
+      "action": "confirm",
+      "event_id": 2
+    },
+    {
+      "v": 1,
+      "type": "action",
+      "surface": 9,
+      "rev": 2,
+      "node": 7,
+      "action": "confirm",
+      "event_id": 3
+    }
+  ],
+  "xvfb": {
+    "display": ":9813",
+    "pid": 303856,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X9813",
+        "inode": 92388694,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X9813",
+        "inode": 92388693,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097154,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+  },
+  "grid": {
+    "cell_width": 9,
+    "cell_height": 24,
+    "width": 900,
+    "height": 672
+  },
+  "capabilities": {
+    "v": 1,
+    "type": "capabilities",
+    "supported": true,
+    "last_rev": 0,
+    "max_frame": 65536,
+    "max_nodes": 256,
+    "max_depth": 8,
+    "max_text": 32768,
+    "max_string": 4096,
+    "max_action": 64,
+    "surfaces": 1,
+    "events": true,
+    "components": [
+      "column",
+      "row",
+      "text",
+      "progress",
+      "button",
+      "image"
+    ]
+  },
+  "image_server_pixmap_bytes": {
+    "before": 2419200,
+    "after": 2419200,
+    "delta": 0,
+    "rgba_image_bytes": 2048,
+    "references": 2
+  },
+  "update_round_trip_ms": {
+    "samples": 24,
+    "median": 4.299216998333577,
+    "max": 86.9953139917925,
+    "scope": "PTY JSON update through DSR parser/event-loop barrier; excludes native display latency"
+  },
+  "screenshot": {
+    "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/native-ui.png",
+    "sha256": "339ba9fdb1fd943ffc234b5d1ac390eb121a1e6e7b310ec1e38949ded8e0e89c"
+  },
+  "cross_view_gesture": {
+    "tab_binding": "Ctrl+Shift+PageDown",
+    "mouse_mode": "1003 + SGR 1006 on both raw PTYs",
+    "origin_held_gesture_hex": "",
+    "other_held_gesture_hex": "",
+    "other_after_release_hex": "1b5b3c33353b32323b374d",
+    "origin_after_release_hex": "1b5b3c33353b3130303b32384d"
+  },
+  "outside_release": {
+    "received_by_harness": true,
+    "button": 1,
+    "return_motion_hex": "1b5b3c33353b32343b384d"
+  },
+  "demo_screenshot": {
+    "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/14-native-ui-gpu/native-ui-demo.png",
+    "sha256": "dbf7093c0f882306829403bf12f1c8f621d5df2181106777c0b51429702a9b17"
+  },
+  "renderer_after": {
+    "window_id": 2097268,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+  },
+  "cleanup": {
+    "owned_processes_remaining": []
+  },
+  "stderr": ""
+}

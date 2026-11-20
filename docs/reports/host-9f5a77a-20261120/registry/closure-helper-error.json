@@ -1,0 +1,7 @@
+{
+  "job": "59cd4366f811fed8854b09c698ca60d5-3b8",
+  "stage": "post-processing closure only",
+  "test_results_unchanged": true,
+  "reason": "Empty post-exit ControlGroup was mistakenly resolved to root cgroup; a read-only assertion stopped before any stop or process action.",
+  "resolution": "Use recorded exact owned-unit cgroup with strict prefix/suffix validation; never operate on observed root PIDs."
+}

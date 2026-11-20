@@ -1,0 +1,101 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "config registration reaches broker; CLI case-normalized override loads the real example; no selection uses visible text",
+      "ok": true
+    },
+    {
+      "name": "explicit selected text preserves wide and combining characters and hard newline; result only enters clipboard",
+      "ok": true
+    },
+    {
+      "name": "soft-wrapped selection is a single logical input line",
+      "ok": true
+    },
+    {
+      "name": "empty leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "invalid-utf8 leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "panic leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "crash leaves clipboard and PTY unchanged and reaps worker",
+      "ok": true
+    },
+    {
+      "name": "hung plugin does not block another window; Escape cancels without reaching source PTY",
+      "ok": true,
+      "other_window_input_ms": 10.222672004601918
+    },
+    {
+      "name": "live configuration removal cancels the owning call and preserves clipboard",
+      "ok": true
+    },
+    {
+      "name": "closing the owning view reaps only its worker; another live PTY remains responsive",
+      "ok": true
+    }
+  ],
+  "cleanup_errors": [],
+  "screenshots": {
+    "registered-actions": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/registered-actions.png",
+      "sha256": "cd88f8c60da1472eafad275475f056cc1142153ee6ad3ccfac87bcf88a592cae"
+    },
+    "copied-visible-text": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/copied-visible-text.png",
+      "sha256": "d4f7caf4e4b8a55b788934881528599d095a68f52ea9235abc4b5662505ee071"
+    },
+    "copied-selection": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/copied-selection.png",
+      "sha256": "893e994bbf09cdb29e4dfe66406879784dab0c5349400905d2ceae7c591581df"
+    },
+    "extension-error": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/19-plugin-gui-current/extension-error.png",
+      "sha256": "20840e7286ac08fd055a7a79d1333769df8e6b5ac3efdb460ff5919577ba8678"
+    }
+  },
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "example_sha256": "1edc4d45b41285eb8e3bb1b2214fac17b54967ff0136e90fef8706e8aa3cd825",
+  "fixture_sha256": "7691b12af5ba68883b05d27b8571bd07fc8660363a4d01576dc9545b373222b7",
+  "source_commit": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "source_sha256": {
+    "src/main.rs": "6b59e64dfb6aefc581ca87b5e44d693b63535296ab6cf6f3044cf03e502e807d",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "src/plugin_host.rs": "73b9bc9ad09c8cbb1de4c952cf2984334ec7f8f14b94c00bd4c898bb234ad950",
+    "src/text_plugins.rs": "dc998a3a14176d2a5e4384fe5c2ba8efb7fc4ec3206df8c391304097d6db23bf",
+    "tests/plugin_gui.py": "670abfe443071e5404329bbc55c16251e2b598ef2e235a791c0830ce4943196b",
+    "tests/copy_paste_gui.py": "6d0c268174c76b61efae46a57d57ae099cc90446626763fb14d90979afa4ccbd"
+  },
+  "scope": "Owned Xvfb, explicit private broker, synthetic text, native clipboard and raw PTYs",
+  "display_ownership": {
+    "display": ":10763",
+    "pid": 307603,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X10763",
+        "inode": 92422811,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X10763",
+        "inode": 92422810,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "stderr": ""
+}
