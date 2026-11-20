@@ -1,0 +1,23 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling simd-adler32 v0.3.10
+   Compiling zune-inflate v0.2.54
+   Compiling zune-core v0.5.3
+   Compiling zgpui v0.1.2 (<worktree>/crates/zgpui)
+   Compiling zune-png v0.5.2
+   Compiling syn v2.0.119
+   Compiling libc v0.2.191
+   Compiling zplugin-macros v0.3.1
+   Compiling zsys v0.1.1
+   Compiling zplugin v0.3.1
+   Compiling zgraphics v0.2.0 (<worktree>/crates/zgraphics)
+   Compiling ztty v0.5.2 (<worktree>)
+   Compiling unicode-segmentation v1.13.3
+   Compiling zinput v0.1.3 (<worktree>/crates/zinput)
+   Compiling unicode-width v0.2.3
+   Compiling zvte v0.1.3
+   Compiling zterm v0.5.2 (<worktree>/crates/zterm)
+   Compiling ztty-plugin-api v0.1.0 (<worktree>/crates/ztty-plugin-api)
+   Compiling zpty v0.2.3 (<worktree>/crates/zpty)
+    Finished `release` profile [optimized] target(s) in 1m 26s
