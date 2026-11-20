@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.5.1 changes — 2026-11-20 (Asia/Taipei)
+
+- Use published zgpui 0.1.2, zpty 0.2.3 and zterm 0.5.2. Their matching
+  source pins and registry versions provide the same checkpoint and PTY
+  handover interfaces. zgpui remains on its portable `no_std` core.
+- Add explicit Linux X11/XWayland and headless executable reload while
+  retaining the broker PID, PTYs, terminal state and workspace layout.
+  Existing 0.5.0 brokers refuse this operation safely; installing a new
+  executable alone does not replace their running code.
+- Switch tabs only after a complete frame is ready, and preserve mouse-release
+  delivery across the switch. The release workflow checks actual reloads and
+  sampled complete frames with both software and GPU rendering.
+- Negotiate advertised clipboard text formats before requesting paste data,
+  require matching property types and validate complete UTF-8 transfers.
+  Image-only selections are rejected by terminal text paste; `Ctrl+V` continues
+  to reach the foreground application.
+- Require the PNG paste guard, runtime reload and tab-frame checks on both
+  formal Linux architectures, with reports bound to the shipped executable.
+
+The [fixed-source performance report](docs/benchmarks/performance-reload-2026-11-20.md)
+retains its measured binaries, host conditions and limitations. The
+[release procedure](docs/releasing.md) covers the six native architecture gates,
+Cargo publication and installed-artifact checks. Older candidate entries below
+retain the status recorded at the time; the earlier 0.5.0 release has its own
+[publication receipt](docs/reports/release-0.5.0-20261120/summary.json).
+
 ## 0.5.0 candidate — 2026-11-20 (Asia/Taipei)
 
 This entry covers `iter/resume-20261120` at

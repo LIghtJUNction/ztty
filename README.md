@@ -20,7 +20,6 @@ ztty
 ```
 
 The installer verifies the archive and installs to `~/.local/bin`.
-For the unreleased process-reload support below, build the current source.
 On a Wayland desktop, the default X11 backend uses XWayland.
 
 ## Build and run
@@ -91,9 +90,9 @@ button returns from history to current output.
 [input compatibility](docs/input-compatibility.md) cover custom bindings and keypad behavior.
 
 `Ctrl+Shift+V` pastes text. `Ctrl+V` goes to the foreground application;
-Codex CLI 0.170.0 uses it to attach clipboard images. Current development source
+Codex CLI 0.170.0 uses it to attach clipboard images. ztty 0.5.1
 rejects image-only selections in terminal text paste. See
-[image paste and format checks](docs/input-compatibility.md#clipboard-images-and-application-paste-unreleased-main-2026-11-20).
+[image paste and format checks](docs/input-compatibility.md#clipboard-images-and-application-paste).
 
 ## Shared sessions and MCP (Linux)
 
@@ -117,9 +116,9 @@ See [sessions and MCP](docs/sessions.md) for client setup, session identities,
 JSON/SSE replies and command-output reads; [observer mode](docs/ssmcp-observer.md)
 covers tools such as ssmcp.
 
-## Reload the running executable (development source)
+## Reload the running executable
 
-A broker started from the current source can replace its executable on Linux
+A broker started from ztty 0.5.1 can replace its executable on Linux
 X11/XWayland or without windows. Run this inside the session you want to update:
 
 ```sh
@@ -216,16 +215,16 @@ Run `sh tools/check.sh` for the local development checks.
 
 | Library | Role in ztty | Status |
 | --- | --- | --- |
-| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI scenes and layout | Published [0.1.0](https://crates.io/crates/zgpui/0.1.0) |
+| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI scenes and layout | Published [0.1.2](https://crates.io/crates/zgpui/0.1.2) |
 | [zinput](https://github.com/LIghtJUNction/zinput) | Keyboard, mouse and paste encoding | Published [0.1.3](https://crates.io/crates/zinput/0.1.3) |
-| [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY process ownership | Published [0.2.2](https://crates.io/crates/zpty/0.2.2) |
+| [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY process ownership | Published [0.2.3](https://crates.io/crates/zpty/0.2.3) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | Image protocol and placement | Published [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
-| [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.1](https://crates.io/crates/zterm/0.5.1) |
+| [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.2](https://crates.io/crates/zterm/0.5.2) |
 
-The table records published registry versions. Current main also uses pinned,
-unreleased `zterm` and `zpty` Git submodule commits for terminal checkpoints and
-PTY handover. Those APIs are not in the published versions above; build with the
-repository's submodule pins and `Cargo.lock`.
+These published versions include the terminal checkpoint and PTY handover APIs
+used by ztty 0.5.1. Source builds use their matching submodule pins; Cargo packages
+use the registry versions and lockfile. The application keeps zgpui's `std` and
+`native` features disabled.
 
 The [architecture](docs/architecture.md) describes the reusable Project Z libraries;
 the [documentation index](docs/README.md) links usage guides and verification records.

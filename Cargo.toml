@@ -40,8 +40,8 @@ wayland = []
 
 [dependencies]
 unicode-segmentation = { version = "=1.13.3", default-features = false }
-zterm = { path = "crates/zterm", version = "0.5.1", default-features = false }
-zpty = { path = "crates/zpty", version = "0.2.2", default-features = false }
+zterm = { path = "crates/zterm", version = "0.5.2", default-features = false }
+zpty = { path = "crates/zpty", version = "0.2.3", default-features = false }
 
 [profile.dev]
 panic = "abort"
