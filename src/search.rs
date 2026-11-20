@@ -104,6 +104,11 @@ impl<'a> Matcher<'a> {
     }
 
     fn push(&mut self, byte: u8, position: Position) -> Option<Hit> {
+        // No active prefix can use this byte. A later complete match supplies
+        // query.len() consecutive positions and overwrites the entire ring.
+        if self.matched == 0 && byte != self.query[0] {
+            return None;
+        }
         self.positions[self.next] = position;
         self.next += 1;
         if self.next == self.positions.len() {
