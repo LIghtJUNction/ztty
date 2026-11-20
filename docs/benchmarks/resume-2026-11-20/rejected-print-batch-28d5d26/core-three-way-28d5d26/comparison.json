@@ -1,0 +1,1016 @@
+{
+  "schema": 1,
+  "ok": true,
+  "scope": "Parser and screen model only; no PTY, renderer, display or physical input latency.",
+  "timestamp_utc": "2026-11-20T02:07:51.635368+00:00",
+  "collector_sha256": "b615db6147ea6dfaf52d0b98ec6a6180c058bfa9d4b8d7e91a4e07463f887cf8",
+  "host_pressure_helper_sha256": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+  "root_source": "da8b697d6ca3b3948810ee632e3f5d90cbd60913",
+  "sources": {
+    "legacy_0_4": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+    "published_0_5": "13d5e2c74571d35cccd920b1204798211b70c79f",
+    "candidate_0_5_1": "28d5d266375ff67562e16652a3eef10bd36b4756"
+  },
+  "binary_sha256": {
+    "legacy_0_4": "4b3f5d75d409cb697d46a41937e87d2123a59b67127dd2178c1e115423ee0d5d",
+    "published_0_5": "7c645edd3c7fe9feae80386c93be856003b1b938f8ad20b5f47dd0898b64d652",
+    "candidate_0_5_1": "0ad515013c182f9edcd4ffac152f0646659507e7676679504ee6ba80cfd6e2d5"
+  },
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "panic": "abort",
+    "strip": "debuginfo"
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+  "example_sha256": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+  "cpu": 23,
+  "nice": -4,
+  "order": [
+    [
+      "legacy_0_4",
+      "published_0_5",
+      "candidate_0_5_1"
+    ],
+    [
+      "published_0_5",
+      "candidate_0_5_1",
+      "legacy_0_4"
+    ],
+    [
+      "candidate_0_5_1",
+      "legacy_0_4",
+      "published_0_5"
+    ]
+  ],
+  "order_note": "Three rotated orders give each version each position once; previous six samples remain separate.",
+  "original_six_samples_sha256": "bd01c057f00745fe5e186fd13d9ab4422eb4484b4027f8738193edd4263c43f6",
+  "runs": [
+    {
+      "side": "legacy_0_4",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.6762208938598633,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3557658624,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27946414080,
+        "swap_used_bytes": 20730273792,
+        "load_average": [
+          2.28076171875,
+          2.513671875,
+          3.15625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.06 avg60=0.16 avg300=0.25 total=801290307\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=0.06 avg300=0.20 total=1137732691\nfull avg10=0.02 avg60=0.06 avg300=0.19 total=1073717804",
+          "io": "some avg10=1.53 avg60=1.61 avg300=2.21 total=4168613130\nfull avg10=1.32 avg60=1.43 avg300=1.97 total=3582539965"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3542237184,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27949715456,
+        "swap_used_bytes": 20726972416,
+        "load_average": [
+          2.2578125,
+          2.5048828125,
+          3.14990234375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.05 avg60=0.15 avg300=0.25 total=801295227\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=0.06 avg300=0.19 total=1137735148\nfull avg10=0.02 avg60=0.06 avg300=0.18 total=1073720112",
+          "io": "some avg10=1.43 avg60=1.59 avg300=2.20 total=4168632563\nfull avg10=1.26 avg60=1.41 avg300=1.97 total=3582558440"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 274.406,
+        "ascii_full_history_mib_s": 135.231,
+        "sgr_mib_s": 138.776,
+        "unicode_mib_s": 99.15,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 64,
+          "p95": 68,
+          "p99": 72,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2847,
+          "p95": 3506,
+          "p99": 3950,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "published_0_5",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.519681930541992,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3542237184,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27949715456,
+        "swap_used_bytes": 20726972416,
+        "load_average": [
+          2.2578125,
+          2.5048828125,
+          3.14990234375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.05 avg60=0.15 avg300=0.25 total=801295227\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=0.06 avg300=0.19 total=1137735148\nfull avg10=0.02 avg60=0.06 avg300=0.18 total=1073720112",
+          "io": "some avg10=1.43 avg60=1.59 avg300=2.20 total=4168632563\nfull avg10=1.26 avg60=1.41 avg300=1.97 total=3582558440"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3571490816,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27959869440,
+        "swap_used_bytes": 20716818432,
+        "load_average": [
+          2.23681640625,
+          2.49609375,
+          3.1435546875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.02 avg60=0.14 avg300=0.24 total=801303207\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.01 avg60=0.05 avg300=0.19 total=1137736808\nfull avg10=0.01 avg60=0.05 avg300=0.18 total=1073721453",
+          "io": "some avg10=0.79 avg60=1.44 avg300=2.16 total=4168667592\nfull avg10=0.69 avg60=1.28 avg300=1.93 total=3582591709"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 185.728,
+        "ascii_full_history_mib_s": 147.8,
+        "sgr_mib_s": 148.091,
+        "unicode_mib_s": 19.997,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 77,
+          "p95": 82,
+          "p99": 87,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3016,
+          "p95": 3770,
+          "p99": 3876,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "candidate_0_5_1",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.389124870300293,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3571490816,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27959869440,
+        "swap_used_bytes": 20716818432,
+        "load_average": [
+          2.23681640625,
+          2.49609375,
+          3.1435546875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.02 avg60=0.14 avg300=0.24 total=801303207\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.01 avg60=0.05 avg300=0.19 total=1137736808\nfull avg10=0.01 avg60=0.05 avg300=0.18 total=1073721453",
+          "io": "some avg10=0.79 avg60=1.44 avg300=2.16 total=4168667592\nfull avg10=0.69 avg60=1.28 avg300=1.93 total=3582591709"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3552899072,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27962097664,
+        "swap_used_bytes": 20714590208,
+        "load_average": [
+          2.2177734375,
+          2.48779296875,
+          3.13720703125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=0.13 avg300=0.24 total=801309148\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.05 avg300=0.19 total=1137737201\nfull avg10=0.00 avg60=0.05 avg300=0.18 total=1073721839",
+          "io": "some avg10=0.52 avg60=1.35 avg300=2.13 total=4168691344\nfull avg10=0.46 avg60=1.19 avg300=1.90 total=3582614285"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 260.071,
+        "ascii_full_history_mib_s": 146.613,
+        "sgr_mib_s": 141.555,
+        "unicode_mib_s": 31.316,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 73,
+          "p95": 77,
+          "p99": 83,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3574,
+          "p95": 3758,
+          "p99": 3908,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "published_0_5",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.276594877243042,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3552899072,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27962097664,
+        "swap_used_bytes": 20714590208,
+        "load_average": [
+          2.2177734375,
+          2.48779296875,
+          3.13720703125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.01 avg60=0.13 avg300=0.24 total=801309148\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.05 avg300=0.19 total=1137737201\nfull avg10=0.00 avg60=0.05 avg300=0.18 total=1073721839",
+          "io": "some avg10=0.52 avg60=1.35 avg300=2.13 total=4168691344\nfull avg10=0.46 avg60=1.19 avg300=1.90 total=3582614285"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3489120256,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27962896384,
+        "swap_used_bytes": 20713791488,
+        "load_average": [
+          2.60107421875,
+          2.56298828125,
+          3.158203125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.12 avg300=0.23 total=801318972\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.04 avg300=0.18 total=1137738479\nfull avg10=0.00 avg60=0.04 avg300=0.17 total=1073723097",
+          "io": "some avg10=0.58 avg60=1.28 avg300=2.10 total=4168769248\nfull avg10=0.55 avg60=1.14 avg300=1.87 total=3582688407"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 270.293,
+        "ascii_full_history_mib_s": 150.653,
+        "sgr_mib_s": 145.637,
+        "unicode_mib_s": 22.39,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 61,
+          "p95": 65,
+          "p99": 67,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3443,
+          "p95": 4308,
+          "p99": 4447,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "candidate_0_5_1",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.36899733543396,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3489120256,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27962896384,
+        "swap_used_bytes": 20713791488,
+        "load_average": [
+          2.60107421875,
+          2.56298828125,
+          3.158203125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.12 avg300=0.23 total=801318972\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.04 avg300=0.18 total=1137738479\nfull avg10=0.00 avg60=0.04 avg300=0.17 total=1073723097",
+          "io": "some avg10=0.58 avg60=1.28 avg300=2.10 total=4168769248\nfull avg10=0.55 avg60=1.14 avg300=1.87 total=3582688407"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3444858880,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27993862144,
+        "swap_used_bytes": 20682825728,
+        "load_average": [
+          2.63330078125,
+          2.5703125,
+          3.1572265625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.11 avg300=0.23 total=801328780\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.04 avg300=0.18 total=1137739090\nfull avg10=0.00 avg60=0.04 avg300=0.17 total=1073723599",
+          "io": "some avg10=2.76 avg60=1.70 avg300=2.18 total=4169130386\nfull avg10=2.44 avg60=1.51 avg300=1.94 total=3583009112"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 215.927,
+        "ascii_full_history_mib_s": 113.107,
+        "sgr_mib_s": 123.79,
+        "unicode_mib_s": 23.302,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 74,
+          "p95": 76,
+          "p99": 77,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3909,
+          "p95": 4953,
+          "p99": 5090,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "legacy_0_4",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.4038069248199463,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3444858880,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27993890816,
+        "swap_used_bytes": 20682797056,
+        "load_average": [
+          2.63330078125,
+          2.5703125,
+          3.1572265625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.11 avg300=0.23 total=801328780\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.04 avg300=0.18 total=1137739090\nfull avg10=0.00 avg60=0.04 avg300=0.17 total=1073723599",
+          "io": "some avg10=2.76 avg60=1.70 avg300=2.18 total=4169130386\nfull avg10=2.44 avg60=1.51 avg300=1.94 total=3583009112"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3328036864,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28366389248,
+        "swap_used_bytes": 20310298624,
+        "load_average": [
+          2.63330078125,
+          2.5703125,
+          3.1572265625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.10 avg300=0.22 total=801341668\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.04 avg300=0.18 total=1137753481\nfull avg10=0.00 avg60=0.04 avg300=0.17 total=1073737769",
+          "io": "some avg10=2.51 avg60=1.72 avg300=2.17 total=4169211860\nfull avg10=2.29 avg60=1.54 avg300=1.94 total=3583084320"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 217.953,
+        "ascii_full_history_mib_s": 82.212,
+        "sgr_mib_s": 120.397,
+        "unicode_mib_s": 78.674,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 82,
+          "p95": 84,
+          "p99": 85,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3338,
+          "p95": 3778,
+          "p99": 3945,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "candidate_0_5_1",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.357863903045654,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3327692800,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28366389248,
+        "swap_used_bytes": 20310298624,
+        "load_average": [
+          2.63330078125,
+          2.5703125,
+          3.1572265625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.10 avg300=0.22 total=801341668\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.04 avg300=0.18 total=1137753481\nfull avg10=0.00 avg60=0.04 avg300=0.17 total=1073737769",
+          "io": "some avg10=2.51 avg60=1.72 avg300=2.17 total=4169211860\nfull avg10=2.29 avg60=1.54 avg300=1.94 total=3583084320"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3733606400,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28375015424,
+        "swap_used_bytes": 20301672448,
+        "load_average": [
+          2.58251953125,
+          2.560546875,
+          3.15087890625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.09 avg300=0.22 total=801349687\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.03 avg300=0.17 total=1137754831\nfull avg10=0.00 avg60=0.03 avg300=0.16 total=1073739112",
+          "io": "some avg10=1.68 avg60=1.61 avg300=2.14 total=4169247697\nfull avg10=1.54 avg60=1.44 avg300=1.92 total=3583117205"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 193.84,
+        "ascii_full_history_mib_s": 149.998,
+        "sgr_mib_s": 137.364,
+        "unicode_mib_s": 32.001,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 59,
+          "p95": 61,
+          "p99": 62,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2899,
+          "p95": 3144,
+          "p99": 3232,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "legacy_0_4",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.213106870651245,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3733606400,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28375015424,
+        "swap_used_bytes": 20301672448,
+        "load_average": [
+          2.58251953125,
+          2.560546875,
+          3.15087890625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.09 avg300=0.22 total=801349687\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.03 avg300=0.17 total=1137754831\nfull avg10=0.00 avg60=0.03 avg300=0.16 total=1073739112",
+          "io": "some avg10=1.68 avg60=1.61 avg300=2.14 total=4169247697\nfull avg10=1.54 avg60=1.44 avg300=1.92 total=3583117205"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3735056384,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28375470080,
+        "swap_used_bytes": 20301217792,
+        "load_average": [
+          2.45556640625,
+          2.5341796875,
+          3.13916015625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.09 avg300=0.22 total=801352200\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.03 avg300=0.17 total=1137754852\nfull avg10=0.00 avg60=0.03 avg300=0.16 total=1073739132",
+          "io": "some avg10=1.37 avg60=1.56 avg300=2.13 total=4169259296\nfull avg10=1.26 avg60=1.40 avg300=1.90 total=3583127814"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 310.932,
+        "ascii_full_history_mib_s": 170.093,
+        "sgr_mib_s": 172.424,
+        "unicode_mib_s": 123.433,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 55,
+          "p95": 61,
+          "p99": 63,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2744,
+          "p95": 2922,
+          "p99": 3254,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "published_0_5",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.05627703666687,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3734724608,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28375470080,
+        "swap_used_bytes": 20301217792,
+        "load_average": [
+          2.45556640625,
+          2.5341796875,
+          3.13916015625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.09 avg300=0.22 total=801352200\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.03 avg300=0.17 total=1137754852\nfull avg10=0.00 avg60=0.03 avg300=0.16 total=1073739132",
+          "io": "some avg10=1.37 avg60=1.56 avg300=2.13 total=4169259296\nfull avg10=1.26 avg60=1.40 avg300=1.90 total=3583127814"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 3687165952,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28380200960,
+        "swap_used_bytes": 20296486912,
+        "load_average": [
+          2.49951171875,
+          2.5419921875,
+          3.13818359375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.08 avg300=0.21 total=801364800\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.03 avg300=0.17 total=1137754961\nfull avg10=0.00 avg60=0.03 avg300=0.16 total=1073739236",
+          "io": "some avg10=0.90 avg60=1.44 avg300=2.09 total=4169306143\nfull avg10=0.84 avg60=1.29 avg300=1.87 total=3583172784"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 247.662,
+        "ascii_full_history_mib_s": 141.354,
+        "sgr_mib_s": 140.762,
+        "unicode_mib_s": 20.536,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 59,
+          "p95": 60,
+          "p99": 62,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3044,
+          "p95": 3476,
+          "p99": 3665,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    }
+  ],
+  "status": "complete",
+  "execution_context_before": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ],
+    "nice": -4,
+    "execution": "Direct native exec; no task-created systemd build unit or CPU quota."
+  },
+  "previous_nine_samples_sha256": "16e8662c14c0f92bcbfe0ebc75982802b066e28552ef5a66b01381c40a30080a",
+  "previous_borrowed_nine_samples_sha256": "765ffc3b74c2191795ed0b587de27a7164a339d5271678663e9ecbe3570abc43",
+  "build_record_sha256": "b79dcc18291ebffc361178709b718ec60a62ef9644be00720ca7113c9f4db558",
+  "candidate_strategy": "Bounded print-run segmentation; complete scalar fallback remains the reference.",
+  "summary": {
+    "ascii_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          274.406,
+          217.953,
+          310.932
+        ],
+        "published_0_5": [
+          185.728,
+          270.293,
+          247.662
+        ],
+        "candidate_0_5_1": [
+          260.071,
+          215.927,
+          193.84
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 274.406,
+        "published_0_5": 247.662,
+        "candidate_0_5_1": 215.927
+      },
+      "candidate_over_published": 0.8718616501522235,
+      "candidate_over_legacy": 0.7868887706537029
+    },
+    "ascii_full_history_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          135.231,
+          82.212,
+          170.093
+        ],
+        "published_0_5": [
+          147.8,
+          150.653,
+          141.354
+        ],
+        "candidate_0_5_1": [
+          146.613,
+          113.107,
+          149.998
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 135.231,
+        "published_0_5": 147.8,
+        "candidate_0_5_1": 146.613
+      },
+      "candidate_over_published": 0.9919688768606224,
+      "candidate_over_legacy": 1.084167091865031
+    },
+    "sgr_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          138.776,
+          120.397,
+          172.424
+        ],
+        "published_0_5": [
+          148.091,
+          145.637,
+          140.762
+        ],
+        "candidate_0_5_1": [
+          141.555,
+          123.79,
+          137.364
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 138.776,
+        "published_0_5": 145.637,
+        "candidate_0_5_1": 137.364
+      },
+      "candidate_over_published": 0.943194380548899,
+      "candidate_over_legacy": 0.9898253300282469
+    },
+    "unicode_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          99.15,
+          78.674,
+          123.433
+        ],
+        "published_0_5": [
+          19.997,
+          22.39,
+          20.536
+        ],
+        "candidate_0_5_1": [
+          31.316,
+          23.302,
+          32.001
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 99.15,
+        "published_0_5": 20.536,
+        "candidate_0_5_1": 31.316
+      },
+      "candidate_over_published": 1.5249318270354497,
+      "candidate_over_legacy": 0.3158446797781139
+    },
+    "cell_bytes": {
+      "samples": {
+        "legacy_0_4": [
+          28,
+          28,
+          28
+        ],
+        "published_0_5": [
+          32,
+          32,
+          32
+        ],
+        "candidate_0_5_1": [
+          32,
+          32,
+          32
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 28,
+        "published_0_5": 32,
+        "candidate_0_5_1": 32
+      },
+      "candidate_over_published": 1.0,
+      "candidate_over_legacy": 1.1428571428571428
+    },
+    "initial_core_heap_bytes": {
+      "samples": {
+        "legacy_0_4": [
+          107932,
+          107932,
+          107932
+        ],
+        "published_0_5": [
+          123292,
+          123292,
+          123292
+        ],
+        "candidate_0_5_1": [
+          123292,
+          123292,
+          123292
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 107932,
+        "published_0_5": 123292,
+        "candidate_0_5_1": 123292
+      },
+      "candidate_over_published": 1.0,
+      "candidate_over_legacy": 1.1423118259644962
+    },
+    "steady_state_allocations": {
+      "samples": {
+        "legacy_0_4": [
+          0,
+          0,
+          0
+        ],
+        "published_0_5": [
+          0,
+          0,
+          0
+        ],
+        "candidate_0_5_1": [
+          0,
+          0,
+          0
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 0,
+        "published_0_5": 0,
+        "candidate_0_5_1": 0
+      },
+      "candidate_over_published": null,
+      "candidate_over_legacy": null
+    }
+  },
+  "previous_nine_samples_and_candidate_unchanged": true,
+  "source_and_binary_identities_preserved": true,
+  "original_six_samples_unchanged": true,
+  "execution_context_after": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ],
+    "nice": -4,
+    "execution": "Direct native exec; no task-created systemd build unit or CPU quota."
+  }
+}

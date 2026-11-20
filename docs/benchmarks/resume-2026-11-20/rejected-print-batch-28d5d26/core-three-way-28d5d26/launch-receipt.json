@@ -1,0 +1,10 @@
+{
+  "job_id": "59cd4366f811fed8854b09c698ca60d5-387",
+  "job_observed_exit": 0,
+  "collector": "PERF_WORKTREE/artifacts/run-three-way-print-batch.py",
+  "collector_sha256": "b615db6147ea6dfaf52d0b98ec6a6180c058bfa9d4b8d7e91a4e07463f887cf8",
+  "root_source": "da8b697d6ca3b3948810ee632e3f5d90cbd60913",
+  "candidate_source": "28d5d266375ff67562e16652a3eef10bd36b4756",
+  "performance_commands_executed": 9,
+  "recorded_after_completion": true
+}

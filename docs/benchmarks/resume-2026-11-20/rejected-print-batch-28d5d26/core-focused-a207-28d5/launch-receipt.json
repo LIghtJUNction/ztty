@@ -1,0 +1,21 @@
+{
+  "job_id": "59cd4366f811fed8854b09c698ca60d5-392",
+  "job_observed_exit": 0,
+  "collector": "PERF_WORKTREE/artifacts/run-focused-print-batch.py",
+  "collector_sha256": "a4aa9bd773c94716f60377c383d3f129108a2c741ba49db6e794bae579f10257",
+  "command": [
+    "/usr/bin/python3",
+    "PERF_WORKTREE/artifacts/run-focused-print-batch.py",
+    "--root-source",
+    "da8b697d6ca3b3948810ee632e3f5d90cbd60913",
+    "--output",
+    "PERF_WORKTREE/artifacts/core-focused-a207-28d5",
+    "--expected-nice",
+    "-4"
+  ],
+  "performance_commands_executed": 12,
+  "recorded_after_completion": true,
+  "attempts_started": 1,
+  "prior_deferred_or_failed_attempts_for_this_focused_collection": 0,
+  "source_of_launch_information": "Observed native exec submission and completed job; this receipt was written afterward."
+}

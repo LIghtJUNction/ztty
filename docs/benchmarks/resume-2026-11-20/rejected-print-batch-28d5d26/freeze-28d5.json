@@ -1,0 +1,12 @@
+{
+  "source": "28d5d266375ff67562e16652a3eef10bd36b4756",
+  "binary": "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark",
+  "binary_sha256": "0ad515013c182f9edcd4ffac152f0646659507e7676679504ee6ba80cfd6e2d5",
+  "build_sha256": "b79dcc18291ebffc361178709b718ec60a62ef9644be00720ca7113c9f4db558",
+  "gate_sha256": "06e29bbd27db2d3236a1fe29386a36a391cc729e4dfb9b2cec4cb70a74e2a4d9",
+  "collector": "PERF_WORKTREE/artifacts/run-three-way-print-batch.py",
+  "collector_sha256": "b615db6147ea6dfaf52d0b98ec6a6180c058bfa9d4b8d7e91a4e07463f887cf8",
+  "owned_units_closed": true,
+  "source_clean": true,
+  "timing_started": false
+}
