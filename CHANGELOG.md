@@ -1,5 +1,87 @@
 # Changelog
 
+## 0.5.0 candidate — 2026-11-20 (Asia/Taipei)
+
+This entry covers `iter/resume-20261120` at
+[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb).
+
+This is a source candidate. The ztty application release and device installation
+are pending; published application downloads remain 0.4.1.
+[zterm 0.5.0](https://github.com/LIghtJUNction/zterm/releases/tag/v0.5.0) is published
+from [13d5e2c](https://github.com/LIghtJUNction/zterm/commit/13d5e2c74571d35cccd920b1204798211b70c79f).
+Its application integration and remaining release gates are tracked in
+[dependency propagation](docs/dependency-propagation.md).
+
+### Added
+
+- Linux X11 EGL/GLES rendering with HarfBuzz shaping and FreeType/Fontconfig
+  font fallback. Text, images and interface overlays share complete frames;
+  `renderer = auto` selects hardware EGL with Xft fallback.
+- An opt-in native Wayland backend: build with `--features wayland` and select
+  `--backend wayland`. It shares the Linux broker, PTY ownership and attach/MCP
+  path with X11, including mixed-backend sessions, bounded clipboard/primary
+  selection transfers and text-input-v3 preedit/commit. The official Linux
+  package build enables the feature; runtime startup still defaults to X11.
+- Kitty animation, Unicode placeholders and relative placement, with bounded
+  Linux file/shared-memory image transport. Linux X11 OSC 52 adds bounded
+  clipboard access with input ownership and cancellation checks.
+- The independent [zgpui 0.1.0 release](https://github.com/LIghtJUNction/zgpui/releases/tag/v0.1.0),
+  from source [`1d796d1`](https://github.com/LIghtJUNction/zgpui/commit/1d796d1fc63808dc099ed7b10c92e75835ae2814).
+  Its `no_std + alloc` scene, layout and renderer contracts have no Cargo
+  dependencies. This component release is separate from the application release.
+
+### Changed
+
+- Preserve complete graphemes through storage and copying, and reflow retained
+  logical lines when terminal width changes.
+- Replace the embedded ztty-ui implementation with the pinned zgpui submodule.
+  `zterm::ui` and the ZUI/1 wire format remain compatible. The native host uses
+  shared layout while retaining its lifecycle stamp, input ownership and
+  minimum-height rules for interactive buttons.
+- Require recursive submodules for source builds: use `git clone
+  --recurse-submodules` or `git submodule update --init --recursive` in an
+  existing checkout.
+- Consume published [zinput 0.1.3](https://github.com/LIghtJUNction/zinput/commit/3761731),
+  [zpty 0.2.2](https://github.com/LIghtJUNction/zpty/commit/66919bc) and
+  [zgraphics 0.2.0](https://github.com/LIghtJUNction/zgraphics/commit/fe6357f).
+  Their canonical implementations live in independent repositories; the
+  application consumes pinned submodules and versioned dependencies.
+- Align the text-plugin host, shared API and active example on `zplugin 0.3.1`,
+  with `zsys 0.1.1` in the locked graph. `ztty-plugin-api` 0.1.0 remains a source
+  candidate awaiting its first registry release.
+- Separate the Linux session broker and macOS/Windows frontends into modules
+  for requests, input, drawing and system bindings. Public entry points and
+  data layouts remain unchanged.
+
+### Fixed
+
+- Present resized X11 canvases only after a complete draw and resolve GPU font
+  size using the display's font metrics. Font and renderer reloads preserve the
+  existing window and PTY.
+- Clip Kitty Unicode placeholder images to their character regions on the GPU
+  path, preserving neighboring cells and the original sampling coordinates.
+- Retain XIM recovery across input-method server restarts and reject stale
+  native UI gestures after scene resets.
+
+### Scope and evidence
+
+The [X11 renderer report](docs/reports/x11-gpu-20261119/report.zh-CN.md),
+[Kitty/OSC 52 report](docs/reports/graphics-extensions-20261120/report.zh-CN.md)
+and [shared Wayland report](docs/reports/native-wayland-shared-20261119/README.zh-CN.md)
+retain their tested source and environment. The feature owner's 65 Wayland
+checks belong to its recorded source and ELF, not the later integrated candidate.
+
+At `6053a97`, the default release build, default/Wayland strict Clippy and full
+local check gate have passed, as have six additional software EGL unit tests.
+Fresh integrated GUI and formal native release gates remain pending. Wayland rejects tabs, splits and workspace containers;
+physical GPU behavior, desktop IME combinations and HiDPI/fractional scaling
+remain unverified. Complete Unicode bidirectional paragraph layout is outside
+the current shaping scope.
+
+Fresh measurements for the [candidate benchmark report](docs/benchmarks/resume-2026-11-20.md)
+remain pending. Earlier measurements do not establish this candidate's
+performance or final native release acceptance.
+
 ## 0.4.1 — 2026-11-19 (Asia/Taipei)
 
 ### Fixed

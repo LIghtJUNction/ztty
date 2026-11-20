@@ -1,81 +1,102 @@
 # 原生 Wayland（实验性）
 
-Linux 可以通过 `--backend wayland` 打开独立的原生 Wayland 窗口。这个路径使用 xdg-shell、系统 XKB 和现有 EGL/GLES 渲染器；默认启动仍使用 X11/XWayland 的共享会话后端。
+本文对应统一候选 [6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb)。
+原生 Wayland 已使用与 X11 相同的 Linux 会话进程、PTY 管理和输入控制。
+默认启动仍选 X11；构建时启用 `wayland` feature，运行时用 `--backend wayland` 选择原生窗口。
+
+ztty 0.5.0 仍是源码候选，正式下载保持 0.4.1。下面说明当前源码的使用方式；
+本地检查、原生 GUI 验收和正式发布的状态分别记录。
 
 ## 构建与启动
 
-Wayland 支持是显式启用的 Cargo feature。它没有增加第三方 Rust 依赖；生产 Rust 代码继续使用 `no_std`。需要系统的 `wayland-client`、`wayland-egl`、`wayland-cursor`、`xkbcommon` 开发文件，以及 `wayland-protocols` 和 `wayland-scanner`。原有的 EGL、GLES、FreeType、Fontconfig、HarfBuzz 依赖仍然需要。
+先取得递归子模块；已有克隆运行 `git submodule update --init --recursive`。
+除 [Linux 基础依赖](../README.zh-CN.md#从源码构建)外，还需要：
 
 ```sh
-cargo build --release --features wayland
-./target/release/ztty --backend wayland --config ./wayland.conf
+# Arch Linux
+sudo pacman -S --needed wayland wayland-protocols libxkbcommon
+
+# Debian / Ubuntu
+sudo apt install libwayland-dev libwayland-bin wayland-protocols libxkbcommon-dev
 ```
 
-一个最小配置文件：
+当前官方 Linux 打包配置启用 Wayland；这不改变默认运行前端。
+可用独立配置文件 `wayland.conf` 试用：
 
 ```ini
-font=monospace:pixelsize=16
-renderer=gpu
-window-padding=8
-background-opacity=100
+font = monospace:pixelsize=16
+renderer = gpu
+window-padding = 8
+background-opacity = 100
 ```
-
-`--geometry`、`--scrollback`、`--font`、`--cwd` 和 `-e COMMAND [ARG...]` 可用于该路径。子进程在指定目录启动，`PWD` 与实际目录一致，退出状态传回调用者。没有 Wayland feature 的构建会明确提示重新构建；不会悄悄转到另一个后端。
-
-## 本轮实现范围
-
-| 能力 | 状态与边界 |
-| --- | --- |
-| 原生窗口 | xdg-shell 创建、尺寸配置确认、标题、关闭；不连接 X 服务器 |
-| 绘制 | 复用完整帧 GPU 渲染器，包括终端字符、颜色和现有图像模型；窗口可由硬件或 Mesa 软件 GLES 驱动 |
-| 键盘 | 系统 XKB 布局、UTF-8、compose、修饰键、按下/释放和受控重复；编码使用现有 zinput，要求 wl_seat 版本至少为 5 |
-| 滚动与缩放 | Shift+PageUp/PageDown 浏览历史；窗口尺寸更新真实 PTY，复用已保留文本的回流 |
-| 鼠标 | 已接入 wl_pointer、终端鼠标上报和滚动；本轮没有物理鼠标或完整指针协议验收 |
-| 帧调度 | 仅在完整画面准备好后 swap；通过 frame callback 限制排队；同步输出超过 250 ms 可结束停滞帧 |
-| 生命周期 | 合成器断连报告错误，关闭已创建的 PTY 会话并有界等待自己的子进程 |
-| 共享会话与 MCP | 此路径不进入 X11 broker；标签、分屏、attach/observe、会话名称与共享输入控制尚未接入 |
-| 输入法和剪贴板 | 尚未接入 Wayland text-input/输入法、系统剪贴板、primary selection；XKB 的 Unicode 输入不等于输入法验收 |
-| 扩展与界面 | 尚未接入自定义按键、文本插件、原生 UI 场景或搜索/命令面板；配置了自定义按键或文本插件时会明确拒绝启动 |
-| 显示缩放与装饰 | 尚未接入 fractional scale/HiDPI、客户端装饰、模糊协议；使用合成器提供的窗口布局 |
-
-实验路径的边界独立于默认后端的功能。没有必要为试用 Wayland 改动现有 X11 会话配置；建议使用独立配置文件，避免无声忽略自定义扩展或按键。
-
-## 实现机制与系统边界
-
-`native/wayland_bridge.c` 只处理平台对象和事件。它拥有 `wl_display`、registry、xdg-shell surface/toplevel、seat/keyboard/pointer、`wl_egl_window` 和光标主题。协议代码由系统的 xdg-shell XML 在构建目录中生成，不把生成代码或协议定义复制成新的实现。
-
-`src/platform/wayland.rs` 处理终端策略。它复用 `SessionCore` 管理 PTY、`zterm` 解析和回流、`zinput` 编码以及共享 `gpu::Renderer` 绘制。新后端在初始化 EGL/字体驱动前创建子进程，避免在驱动可能启动线程之后调用 `forkpty`。析构先释放渲染器和 EGL，再销毁原生 Wayland 对象。
-
-平台事件和 PTY 使用同一次 `poll` 等待。C 边界遵守 `wl_display_prepare_read` 后必须配对 `read_events` 或 `cancel_read` 的规则，避免 EGL 已消费事件后再次阻塞分发。每轮最多读取 64 KiB PTY 输出，随后处理输入和窗口事件；这只是工作量上限，不是吞吐提升声明。
-
-输入事件队列固定为 512 项，XKB keymap 上限 16 MiB，PTY 输入队列上限 1 MiB，单帧沿用渲染器的 8192 边长和 16 Megapixel 上限。超限、连接错误和资源创建失败向调用者返回错误。关闭时只处理本进程创建的 PTY 会话，不扫描或停止其他终端。
-
-后续若统一到 zsys，可分别抽取下面的边界，不需要把终端模型搬到系统层：
-
-| 边界 | 当前系统接口 |
-| --- | --- |
-| 连接与窗口 | libwayland-client、xdg-shell、registry 生命周期 |
-| 原生呈现目标 | libwayland-egl 的 create/resize/destroy，指针交给公共 EGL 渲染器 |
-| 键盘 | libxkbcommon keymap/state/compose、键盘重复时间 |
-| 指针与光标 | wl_pointer、libwayland-cursor、wl_shm |
-| 等待 | poll、CLOCK_MONOTONIC、Wayland prepare/read/cancel |
-| 终端子进程 | 现有 zpty；不属于 Wayland C 边界 |
-
-## 验证方法
-
-实际 GUI 测试启动独立的 headless Sway，使用独立 `XDG_RUNTIME_DIR` 和 Wayland socket，禁用 XWayland，不访问物理输入设备。测试通过 wtype 的 virtual-keyboard 协议输入，并通过 grim 读取合成后的屏幕像素。每次新建虚拟键盘后先等待 100 ms 完成 seat 能力通知和 `wl_keyboard` 订阅；这段设备建立时间不作为终端输入延迟测量。
 
 ```sh
-cargo clippy --features wayland --bin ztty -- -D warnings
-cargo check --workspace --no-default-features
-python3 tests/wayland_gui.py \
-  --binary target/release/ztty \
-  --sway /path/to/sway \
-  --output artifacts/wayland-validation/gui
+cargo build --locked --release --features wayland --bin ztty
+./target/release/ztty --backend wayland --config ./wayland.conf --name work
+./target/release/ztty attach --backend wayland --observe work
+./target/release/ztty attach --backend wayland work
 ```
 
-测试保留窗口截图、合成器日志、子进程输入字节、PTY 尺寸和 `validation.json`。结果绑定二进制 SHA-256；失败或异常不会写成通过。测试使用软件 Mesa EGL，不能证明物理显示器的延迟、显卡驱动兼容性、输入法完成度或比其他终端更快。
+`renderer = auto` 和 `gpu` 都使用 EGL/GLES，`software` 会明确报错。
+Mesa 软件 GL 也走 EGL/GLES，并非 Xft 后端；渲染器通过配置选择，没有 `--renderer` 参数。
+未编入 Wayland feature 的二进制会提示重新构建。
 
-协议和事件循环依据：[Wayland Client API](https://wayland.freedesktop.org/docs/html/apb.html)；构建使用系统 `wayland-protocols/stable/xdg-shell/xdg-shell.xml`。
+## 会话与输入
 
-本轮已保存的源码绑定结果与截图：[2026-11-19 原生 Wayland 验收](measurements/native-wayland-2026-11-19/README.md)。
+| 能力 | 当前实现 |
+| --- | --- |
+| 多窗口与会话 | 各会话有独立 PTY；detach 后 attach 同一会话保留原 PTY |
+| X11 / Wayland 混用 | 同一个 broker 按创建或附着请求选择前端，不由第一个窗口决定后续窗口类型 |
+| MCP 与观察模式 | 使用既有会话身份和输入控制权检查；只读观察不会取得输入权 |
+| 绘制与调整尺寸 | xdg-shell 原生窗口、EGL/GLES 完整帧、真实 PTY 尺寸调整与保留文本重排 |
+| 键盘 | 系统 XKB、compose、修饰键、受控重复及已有 zinput 编码 |
+| 剪贴板 | 原生 clipboard、primary selection、有界异步传输与原有 OSC 52 策略 |
+| 输入法 | text-input-v3 焦点、光标矩形、可见预编辑和 UTF-8 提交 |
+
+显示后端负责窗口、输入事件和呈现目标；会话进程继续保存 PTY、终端屏幕、历史和控制权。
+同一个会话因此可以重新附着到窗口，MCP 也仍经过原来的权限检查。
+每个原生窗口持有自己的 Wayland/EGL 资源；这里没有跨窗口共享字形或纹理缓存的承诺。
+
+剪贴板单份文本上限为 4 MiB，存活 source 总量上限为 8 MiB，最多 16 个发送流。
+读写工作有界，超时为 2 秒；超限或传输失败不会把半份文本注入终端。
+Primary selection 需要合成器给出的有效输入 serial；程序不会伪造输入或绕过合成器规则。
+
+预编辑只显示候选文字；提交后才把 UTF-8 送入原输入路径。
+终端不拥有 shell 的编辑缓冲，因此不伪造 surrounding text，也不把删除周围文本请求
+转换成任意退格。无效删除批次会拒绝，之后的正常输入仍可继续。
+
+## 当前边界
+
+- Wayland 明确拒绝窗口内标签页、分屏和工作区容器；使用独立会话窗口。
+- 不提供 X11 子窗口嵌入。窗口置前服从合成器，尚无 xdg-activation token 流程。
+- HiDPI、分数缩放及跨显示器缩放变化尚未完成验收。
+- 物理 GPU 呈现延迟、显卡驱动组合和真实桌面输入法尚未实机验证。
+  已有 IME 证据来自私有协议 peer，不能代替全部 fcitx/IBus 配置的测试。
+- 本文的 Linux 验收不覆盖 macOS/Windows。
+
+## 验证与复现
+
+[共享 Wayland 报告](reports/native-wayland-shared-20261119/README.zh-CN.md)
+保留 feature owner 的冻结源码、ELF、逐文件摘要和实际结果。
+其生产提交为 `8b9f566`，65 项 Wayland GUI 检查使用报告中的 `7fbaf994…` ELF；
+环境为私有 headless Sway 1.12、pixman 与 Mesa 软件 EGL。
+IME 使用真实 input-method-v2 peer，经合成器转发到终端的 text-input-v3。
+
+统一候选 `6053a97` 已合入该实现，并通过默认 release 构建、默认/Wayland 严格 Clippy、
+完整本地检查及随后单独执行的 6 项软件 EGL 单元测试。
+新整合 GUI 与六架构正式原生发布门禁仍待完成；旧 owner 的 65 项不能转记为新 ELF 的通过结果。
+后续回执集中在[依赖传播维护记录](dependency-propagation.md#统一候选与验收归属)。
+
+复现 GUI 还需要 `sway wtype grim wl-clipboard xvfb python3-pil python3-xlib`，
+以及 C 编译器和 pkg-config。先构建要测试的二进制，再运行：
+
+```sh
+python3 tests/wayland_gui.py --binary target/release/ztty \
+  --output artifacts/wayland-acceptance
+python3 tests/wayland_services.py --sanitize \
+  --output artifacts/wayland-source-budget
+```
+
+GUI 入口会构建固定协议版本的 IME peer，并创建私有运行目录、显示服务和 broker socket。
+自定义 Sway 可加 `--sway /absolute/path/to/sway`，必要时显式指定 `--swaymsg`。
+保存的结果必须绑定实际源码与二进制摘要；软件 EGL 的像素、协议和输入检查不构成硬件性能测量。
