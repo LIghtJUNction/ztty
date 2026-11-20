@@ -82,16 +82,18 @@ class RegistryVersions(unittest.TestCase):
                     directory = root / ("registry-" + name)
                     directory.mkdir(exist_ok=True)
                     source = directory / "lib.rs"
-                    source.write_text("#![no_std]\\n")
+                    source.write_text(os.environ.get("ZTTY_TEST_NO_STD_ATTRIBUTE", "#![no_std]") + "\\n")
                     packages.append({
-                        "name": name, "version": version,
+                        "id": name + "@" + version, "name": name, "version": version,
                         "source": "registry+https://github.com/rust-lang/crates.io-index",
                         "manifest_path": str(directory / "Cargo.toml"),
                         "targets": [{"kind": ["lib"], "src_path": str(source)}],
                     })
                     lock.append(f'[[package]]\\nname = "{name}"\\nversion = "{version}"\\n')
                 (root / "Cargo.lock").write_text("\\n".join(lock))
-                print(json.dumps({"packages": packages}))
+                features = json.loads(os.environ.get("ZTTY_TEST_ENABLED_FEATURES", "[]"))
+                nodes = [{"id": package["id"], "features": features} for package in packages]
+                print(json.dumps({"packages": packages, "resolve": {"nodes": nodes}}))
             elif stage == "run":
                 print("registry consumer passed")
         """))
@@ -142,6 +144,27 @@ class RegistryVersions(unittest.TestCase):
                 self.assertEqual(result["cargo_timeout_seconds"], expected)
                 self.assertTrue(all(command["timeout_seconds"] == expected
                                     for command in result["individual_checks"][0]["commands"]))
+
+    @unittest.skipUnless(os.name == "posix", "fake Cargo executable uses a POSIX shebang")
+    def test_no_std_attribute_is_evaluated_against_resolved_features(self):
+        attribute = '#![cfg_attr(not(feature = "std"), no_std)]'
+        for source, features, expected in (
+            (attribute, [], True), (attribute, ["portable"], True),
+            (attribute, ["std"], False), (attribute, ["native", "std"], False),
+            ("#![no_std]", ["std"], False), ("pub fn example() {}", [], False),
+        ):
+            with self.subTest(source=source, features=features), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                environment = self.cargo_fixture(root)
+                environment.update(ZTTY_TEST_NO_STD_ATTRIBUTE=source,
+                                   ZTTY_TEST_ENABLED_FEATURES=json.dumps(features))
+                completed, result = self.invoke_verifier(
+                    root, environment, ["--packages", "zgpui", "--cargo-timeout", "2"])
+                self.assertEqual(completed.returncode, 0 if expected else 1, completed.stderr)
+                self.assertEqual(result["ok"], expected)
+                package = result["individual_checks"][0]["packages"][0]
+                self.assertEqual(package["enabled_features"], features)
+                self.assertEqual(package["library_source_has_no_std"], expected)
 
     @unittest.skipUnless(os.name == "posix", "fake Cargo executable uses a POSIX shebang")
     def test_cli_rejects_nonpositive_or_unbounded_timeout(self):
