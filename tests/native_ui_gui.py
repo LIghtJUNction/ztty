@@ -538,14 +538,21 @@ def main():
             report["checks"].append("native press -> tab change -> other-view motion/release never reaches either PTY; reporting resumes after release")
             control(clear=True, path=other_control)
             rpc({"op": "action", "session": "ui-other", "action": "previous-tab"})
-            wait(lambda: view.get_attributes().map_state == X.IsViewable, "origin for outside-release probe")
+            # Full-frame tab staging maps the incoming view before hiding the old one.
+            # Wait for the completed switch so this press belongs to the visible origin.
+            wait(lambda: view.get_attributes().map_state == X.IsViewable
+                         and other_view.get_attributes().map_state == X.IsUnmapped,
+                 "origin shown and previous tab unmapped for outside-release probe")
             view.set_input_focus(X.RevertToParent, X.CurrentTime)
             connection.sync()
             control(clear=True)
             move(700, 40)
             button_event(True)
             chord("Control_L", "Shift_L", "Next")
-            wait(lambda: other_view.get_attributes().map_state == X.IsViewable, "origin unmaps before outside release")
+            # The actual unmap cancels X11's implicit pointer grab before outside release.
+            wait(lambda: other_view.get_attributes().map_state == X.IsViewable
+                         and view.get_attributes().map_state == X.IsUnmapped,
+                 "origin unmaps before outside release")
             outside = connection.screen().root.create_window(
                 1050, 100, 200, 200, 0, connection.screen().root_depth,
                 X.InputOutput, X.CopyFromParent, background_pixel=0,
