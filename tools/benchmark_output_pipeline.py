@@ -25,12 +25,13 @@ import time
 import tty
 
 from isolated_xvfb import start_xvfb
+from gui_renderer import record_renderer
 from benchmark_terminals import output_payload, output_screen
 
 COLS, ROWS = 120, 32
 KINDS = ("ascii-log", "color-log", "unicode-log", "progress", "inplace-ascii")
 APPEARANCE = {"font": "monospace:size=11", "background-opacity": "100",
-              "background-blur": "false", "cursor-blink": "false"}
+              "background-blur": "false", "cursor-blink": "false", "renderer": "software"}
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -265,6 +266,7 @@ def measure(args, kind, mode):
                 result["mapped_window"] = info["window_id"]
                 size = view.get_geometry()
                 result["window_pixels"] = [size.width, size.height]
+                result["renderer_before"] = record_renderer(xconnection, view, "software")
             send(channel, {"op": "prepare", "payload": str(payload_file), "cursor": cursor})
             prepared = receive(stream)
             assert prepared["ready"] and prepared["sha256"] == result["payload_sha256"]
@@ -277,6 +279,9 @@ def measure(args, kind, mode):
             result.update(measured)
             result["broker_cpu_ns"] = cpu_ns(result["broker_pid"]) - before
             result["xserver_cpu_ns"] = cpu_ns(server.process.pid) - x_before
+            if mode == "window":
+                xconnection.sync()
+                result["renderer_after"] = record_renderer(xconnection, view, "software")
             result["median_mib_s"] = statistics.median(s["mib_s"] for s in result["output"])
             ordered = sorted(result["idle_dsr_latency_ns"])
             result["idle_dsr_p50_ns"], result["idle_dsr_p95_ns"] = ordered[len(ordered)//2], ordered[int(len(ordered)*.95)]
@@ -384,7 +389,7 @@ def main():
               "binary_source_commit": args.binary_source,
               "collector_sha256": digest(Path(__file__).read_bytes()),
               "collector_source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
-              "scope": "PTY write through logical cursor reply; software X11 rendering is concurrent, not a display fence",
+              "scope": "PTY write through logical cursor reply; window mode requires software X11, headless mode has no window; not a display fence",
               "geometry": [COLS, ROWS], "history": args.history, "appearance": APPEARANCE,
               "settings": {"mib": args.mib, "samples": args.samples, "kinds": kinds, "modes": modes,
                            "origin": "local", "perf_seconds": args.perf_seconds,
