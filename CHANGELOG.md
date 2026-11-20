@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Pin the portable zgpui dependency to 0.1.5 and align its source with the
+  Project Z snapshot, together with the zinput and zgraphics submodules.
+- Record Linux no_std, native UI, GPU path, plugin and registry-package
+  verification in the [dependency refresh report](docs/reports/dependency-refresh-20261120/README.md).
+
 ## 0.5.2 candidate — 2026-11-20 (Asia/Taipei)
 
 - Release input-queue allocations larger than 64 KiB after the input is fully

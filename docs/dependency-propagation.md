@@ -1,8 +1,26 @@
 # 依赖传播维护记录
 
+## 当前源码快照：2026-11-20
+
+本轮在应用基线 `2410064eef530400f750225b0561262445a3fa66` 上，把 zgpui 的精确版本推进到 `0.1.5`，并统一三个共享子模块的固定源码。ztty 保留既有性能改动，继续关闭 zgpui 的 `std` 和 `native` 特性；应用窗口与字体仍由自身平台实现提供。[依赖声明](../Cargo.toml)、[锁文件](../Cargo.lock)
+
+下表记录当前源码构建选中的库版本与不可变提交。源码快照可以包含可选适配器和验证改动；它不建立新的应用发行标签或已安装二进制身份。
+
+| 库 | 包版本 | 固定源码 |
+| --- | --- | --- |
+| zgpui | `0.1.5` | [`b4d5493`](https://github.com/LIghtJUNction/zgpui/commit/b4d5493e0cd985d00558c7be0b5726965ab5163a) |
+| zgraphics | `0.2.0` | [`b296a58`](https://github.com/LIghtJUNction/zgraphics/commit/b296a58f09d6052f13c86dc09e9e7b7f7e87438f) |
+| zinput | `0.1.3` | [`003829a`](https://github.com/LIghtJUNction/zinput/commit/003829a5e7ea45d9827376d89e37c9e6cfbf4a12) |
+| zpty | `0.2.3` | [`d263f9a`](https://github.com/LIghtJUNction/zpty/commit/d263f9a8f0881d259e46c51a7b6753c61ab9be59) |
+| zterm | `0.5.2` | [`b5adc3d`](https://github.com/LIghtJUNction/zterm/commit/b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d) |
+
+zterm `0.5.2` 的 `zgpui = "0.1.2"` 兼容范围允许本轮的 `0.1.5`；应用的精确约束把实际解析统一到 `0.1.5`。本轮同时检查了源码路径解析和 Cargo 包去除本地 patch 后的注册表解析。[源码与原生验证记录](reports/dependency-refresh-20261120/README.md) 保存固定输入、实际命令、二进制摘要和覆盖范围。
+
+本轮完成源码消费与 Linux 本地验收。Project Z 聚合仓库继续按新的应用提交运行 `sync`、`check` 和 `resolve --all`；安装套件仍需遵守自己的正式制品与标签契约。下面的旧版本、性能数值和发行状态保留为历史证据。
+
 更新：2026-11-20。0.5.1 源码已接收下面的正式库版本；应用发布仍由完整原生门禁和 Cargo 包验证决定，实际安装另记回执。
 
-## 当前：0.5.1 的正式依赖
+## 历史：0.5.1 的正式依赖
 
 | 库 | 注册表版本 | 固定发布源码 |
 | --- | --- | --- |
