@@ -486,12 +486,19 @@ def terminal_command(app, binary, directory, tag, mode="shared"):
 
 
 def measure(app, binary, repetition, settle, count=None, mode="shared", workload="idle",
-            purpose="comparison", ztty_renderer="auto"):
+            purpose="comparison", ztty_renderer="auto",
+            ztty_application_default_renderer=False):
+    if ztty_application_default_renderer and (app != "ztty" or ztty_renderer != "auto"):
+        raise ValueError("application-default renderer requires ztty with auto")
+    renderer_requested = "application-default" if ztty_application_default_renderer else ztty_renderer
     from Xlib import X, display
     count = WINDOWS if count is None else count
     result = {"app": app, "windows": count, "mode": mode, "workload": workload,
               "repetition": repetition, "ok": False,
               "load_average_at_start": list(os.getloadavg())}
+    if app == "ztty":
+        result.update(renderer_requested=renderer_requested,
+                      renderer_config_emitted=not ztty_application_default_renderer)
     result["host_at_start"] = host_pressure()
     result["host_contention"] = comparison_pressure_reasons(result["host_at_start"])
     if purpose == "comparison" and result["host_contention"]:
@@ -503,7 +510,9 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
         directory = Path(temporary)
         tag = directory.name
         prefix = "terminal-benchmark-" + tag + "-"
-        ztty_config = ZTTY_CONFIG + f"renderer = {ztty_renderer}\n"
+        ztty_config = ZTTY_CONFIG
+        if not ztty_application_default_renderer:
+            ztty_config += f"renderer = {ztty_renderer}\n"
         (directory / "ztty.conf").write_text(ztty_config)
         ghostty_config = GHOSTTY_CONFIG.replace(
             "gtk-single-instance = true",
@@ -637,11 +646,11 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
                 if app == "ztty":
                     from gui_renderer import record_renderer
                     result["renderers"] = [
-                        record_renderer(xconnection, row["window"], ztty_renderer)
+                        record_renderer(xconnection, row["window"], renderer_requested)
                         for row in windows.values()
                     ]
-                    # Older baseline ELFs predate these properties. Auto mode
-                    # records that gap; an explicit GPU/software request is
+                    # Older baseline ELFs predate these properties. Auto and
+                    # application-default record that gap; explicit GPU/software is
                     # still enforced by record_renderer above.
                     result["renderer_identity_available"] = all(
                         row["actual"] in ("gpu", "software") for row in result["renderers"])
@@ -759,7 +768,7 @@ def measure(app, binary, repetition, settle, count=None, mode="shared", workload
                     row["median_output_mib_per_second"] for row in performance)
                 if app == "ztty":
                     result["renderers_after"] = [
-                        record_renderer(xconnection, row["window"], ztty_renderer)
+                        record_renderer(xconnection, row["window"], renderer_requested)
                         for row in windows.values()
                     ]
                     if result["renderers_after"] != result["renderers"]:

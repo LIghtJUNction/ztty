@@ -198,6 +198,8 @@ def main():
     parser.add_argument("--after", type=Path, required=True)
     parser.add_argument("--before-source", help="known source revision for the old executable")
     parser.add_argument("--after-source", help="known source revision for the new executable")
+    parser.add_argument("--before-application-default-renderer", action="store_true", default=False,
+                        help="use the before executable default without writing a renderer option")
     parser.add_argument("--counts", type=parse_counts, default=(1, 10))
     parser.add_argument("--rounds", type=int, default=3)
     parser.add_argument("--settle-seconds", type=float, default=1.0)
@@ -236,6 +238,14 @@ def main():
             "counts": list(args.counts), "rounds": args.rounds, "geometry": [bench.COLS, bench.ROWS],
             "sharing": "shared ztty broker plus every waiting launcher",
             "memory_settle_seconds": args.settle_seconds,
+            "before_application_default_renderer": args.before_application_default_renderer,
+            "renderers": {
+                "before": {
+                    "requested": "application-default" if args.before_application_default_renderer else "auto",
+                    "config_emitted": not args.before_application_default_renderer,
+                },
+                "after": {"requested": "auto", "config_emitted": True},
+            },
             "output_bytes_per_sample": len(payload),
             "output_sha256": hashlib.sha256(payload).hexdigest(),
             "output_warmup_per_window": bench.OUTPUT_WARMUP,
@@ -270,7 +280,10 @@ def main():
             before = host_state()
             started = utc()
             bench.WINDOWS = count
-            run = bench.measure("ztty", binary, repetition, args.settle_seconds)
+            run = bench.measure(
+                "ztty", binary, repetition, args.settle_seconds,
+                ztty_application_default_renderer=(
+                    variant == "before" and args.before_application_default_renderer))
             run.update(variant=variant, started_at=started, completed_at=utc(),
                        host_at_start=before, host_at_end=host_state(),
                        binary_sha256_before=digest, binary_sha256_after=bench.sha256(binary))
