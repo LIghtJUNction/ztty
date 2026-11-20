@@ -1,0 +1,216 @@
+{
+  "schema": 1,
+  "scope": "Evidence copy only; no benchmark execution or numeric/statistical rewriting.",
+  "transformation": "Literal replacement of absolute home worktree prefixes only. JSON whitespace, key and array order, numeric tokens, timestamps, source/binary hashes and all measured values are preserved.",
+  "placeholders": {
+    "WORKTREE": {
+      "meaning": "candidate integration worktree",
+      "private_prefix_sha256": "90f6ce2c170b4e50f5fd1c46b840b1232ede8a01d30cf47535a42b58b2873352"
+    },
+    "BASELINE_WORKTREE": {
+      "meaning": "baseline detached worktree",
+      "private_prefix_sha256": "a4122ac4a1f3eedeaf596f1b6ea80a31dc5e2c76789ee0a47f1aa056ab29c282"
+    },
+    "BASELINE_TARGET": {
+      "meaning": "baseline build output directory",
+      "private_prefix_sha256": "a4ebeb011c0f1571bef8122eb108fa59513ea1767e10bc24f65b8a5d792d65b1"
+    },
+    "REPOSITORY": {
+      "meaning": "outer ztty repository",
+      "private_prefix_sha256": "cf956db5a4888f7bdeb9e3f66ebf02fff966abc5ec27b4d9ffb1ede3c09aec8d"
+    }
+  },
+  "files": [
+    {
+      "source_relative_path": "artifacts/benchmark-final/core-paired-6053.json",
+      "output_file": "core-paired-6053.json",
+      "original_sha256": "bd01c057f00745fe5e186fd13d9ab4422eb4484b4027f8738193edd4263c43f6",
+      "original_bytes": 18695,
+      "redacted_sha256": "eda861319bbc18278da03d659e33a3e803e1893ed459e4de4e0a55cd81b7ead2",
+      "redacted_bytes": 18341,
+      "changed_fields": [
+        {
+          "json_pointer": "/runs/0/command/3",
+          "original_value_sha256": "00e2a83b5ccc698f17b3e6fb969790569e67a199406166e93ee866e8705200e9",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+        },
+        {
+          "json_pointer": "/runs/1/command/3",
+          "original_value_sha256": "0cc2aaff4d08c20e341a16ec611762832624efcb00aa29767baa827043fce2ad",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+        },
+        {
+          "json_pointer": "/runs/2/command/3",
+          "original_value_sha256": "0cc2aaff4d08c20e341a16ec611762832624efcb00aa29767baa827043fce2ad",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+        },
+        {
+          "json_pointer": "/runs/3/command/3",
+          "original_value_sha256": "00e2a83b5ccc698f17b3e6fb969790569e67a199406166e93ee866e8705200e9",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+        },
+        {
+          "json_pointer": "/runs/4/command/3",
+          "original_value_sha256": "00e2a83b5ccc698f17b3e6fb969790569e67a199406166e93ee866e8705200e9",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+        },
+        {
+          "json_pointer": "/runs/5/command/3",
+          "original_value_sha256": "0cc2aaff4d08c20e341a16ec611762832624efcb00aa29767baa827043fce2ad",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+        }
+      ],
+      "preserved_numeric_values_and_order": true
+    },
+    {
+      "source_relative_path": "artifacts/benchmark-final/core-paired.json",
+      "output_file": "core-paired-initial-deferred.json",
+      "original_sha256": "eb70c433093101aaf014bea5d34e0248a36acb2f429b8809ef97d0ca9d2224f9",
+      "original_bytes": 1727,
+      "redacted_sha256": "eb70c433093101aaf014bea5d34e0248a36acb2f429b8809ef97d0ca9d2224f9",
+      "redacted_bytes": 1727,
+      "changed_fields": [],
+      "preserved_numeric_values_and_order": true
+    },
+    {
+      "source_relative_path": "artifacts/benchmark-final/baseline.json",
+      "output_file": "baseline.json",
+      "original_sha256": "1667e97ca37d123e61ce9298259488a69d36c18b71d3ea01c02505e7b3bec4f5",
+      "original_bytes": 5684,
+      "redacted_sha256": "7a19735b6e24ad0d09dd137d479745104ae048b7140fead743750823a06611c2",
+      "redacted_bytes": 4791,
+      "changed_fields": [
+        {
+          "json_pointer": "/source/repository",
+          "original_value_sha256": "cf956db5a4888f7bdeb9e3f66ebf02fff966abc5ec27b4d9ffb1ede3c09aec8d",
+          "redacted_value": "REPOSITORY"
+        },
+        {
+          "json_pointer": "/source/worktree",
+          "original_value_sha256": "a4122ac4a1f3eedeaf596f1b6ea80a31dc5e2c76789ee0a47f1aa056ab29c282",
+          "redacted_value": "BASELINE_WORKTREE"
+        },
+        {
+          "json_pointer": "/installed_binary/frozen_path",
+          "original_value_sha256": "2db758ae867b01e4872d8dd4e69797e3acd1a0ce129f342fde05e751e31d7e1e",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/before-ztty"
+        },
+        {
+          "json_pointer": "/packages/ztty/manifest",
+          "original_value_sha256": "381071df9e0eb71541e318e7164ce69ce8b57fc51c455e726ec18e66a8f4e6cb",
+          "redacted_value": "BASELINE_WORKTREE/Cargo.toml"
+        },
+        {
+          "json_pointer": "/packages/zterm/manifest",
+          "original_value_sha256": "75defade2f247f3d4eb17f06b8d41c96c4fa862ea0ea997cbadc5342349f1cb1",
+          "redacted_value": "BASELINE_WORKTREE/crates/zterm/Cargo.toml"
+        },
+        {
+          "json_pointer": "/benchmark_build/cwd",
+          "original_value_sha256": "a4122ac4a1f3eedeaf596f1b6ea80a31dc5e2c76789ee0a47f1aa056ab29c282",
+          "redacted_value": "BASELINE_WORKTREE"
+        },
+        {
+          "json_pointer": "/benchmark_build/target_dir",
+          "original_value_sha256": "a4ebeb011c0f1571bef8122eb108fa59513ea1767e10bc24f65b8a5d792d65b1",
+          "redacted_value": "BASELINE_TARGET"
+        },
+        {
+          "json_pointer": "/benchmark_build/environment/CARGO_TARGET_DIR",
+          "original_value_sha256": "a4ebeb011c0f1571bef8122eb108fa59513ea1767e10bc24f65b8a5d792d65b1",
+          "redacted_value": "BASELINE_TARGET"
+        },
+        {
+          "json_pointer": "/benchmark_build/stdout_log",
+          "original_value_sha256": "486addabfa9ad50ba5a41b53f0fb26af8fefac7c08ce9b216502c47c61e7353d",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/baseline-build.stdout.jsonl"
+        },
+        {
+          "json_pointer": "/benchmark_build/stderr_log",
+          "original_value_sha256": "a32aecf5108c3763f0655c28de6ede45094033a45fa42cbdf063ad57d01a793d",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/baseline-build.stderr.log"
+        },
+        {
+          "json_pointer": "/benchmark_build/executable",
+          "original_value_sha256": "5c1bcefde8e3d386e0c514b40417af656d5f75d4625bd9bd686e2ba89e62fc30",
+          "redacted_value": "BASELINE_TARGET/release/examples/benchmark"
+        },
+        {
+          "json_pointer": "/benchmark_build/frozen_executable",
+          "original_value_sha256": "00e2a83b5ccc698f17b3e6fb969790569e67a199406166e93ee866e8705200e9",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+        },
+        {
+          "json_pointer": "/benchmark_build/package_id",
+          "original_value_sha256": "9186d31c9a06939489dfce45eb2eee389e835e2c579c8f1fb3de2299d94a5e4b",
+          "redacted_value": "path+file://BASELINE_WORKTREE/crates/zterm#0.4.0"
+        },
+        {
+          "json_pointer": "/benchmark_build/target/src_path",
+          "original_value_sha256": "1044be306cad9edd6f49d10db899d873c15b4327827766ad058c781bdd147192",
+          "redacted_value": "BASELINE_WORKTREE/crates/zterm/examples/benchmark.rs"
+        },
+        {
+          "json_pointer": "/static_collector_review/path",
+          "original_value_sha256": "2d0c5e047fecc369c9f72f90427c27ef8f77ae2e51b7e8b58ece2f0c11a254c8",
+          "redacted_value": "WORKTREE/tools/benchmark_output_pipeline.py"
+        }
+      ],
+      "preserved_numeric_values_and_order": true
+    },
+    {
+      "source_relative_path": "artifacts/benchmark-final/after-core-build.json",
+      "output_file": "after-core-build.json",
+      "original_sha256": "901700b953d73d9ec2a0158e4f28cf30599ed7afd78d4a38ed8b17b65c25fc63",
+      "original_bytes": 1486,
+      "redacted_sha256": "90681542cadebfbf57affff5ac2a4c7a1c0a678765d02712b5ba760fd292b5d4",
+      "redacted_bytes": 1427,
+      "changed_fields": [
+        {
+          "json_pointer": "/binary",
+          "original_value_sha256": "0cc2aaff4d08c20e341a16ec611762832624efcb00aa29767baa827043fce2ad",
+          "redacted_value": "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+        }
+      ],
+      "preserved_numeric_values_and_order": true
+    },
+    {
+      "source_relative_path": "artifacts/benchmark-final/run-core-paired-6053.py",
+      "output_file": "run-core-paired-6053.py",
+      "original_sha256": "2f155d3967ac1fadb6aa4dd0745f9a3a17c20b5b9ed6b5d078a61c7175a8a844",
+      "original_bytes": 4005,
+      "redacted_sha256": "2f155d3967ac1fadb6aa4dd0745f9a3a17c20b5b9ed6b5d078a61c7175a8a844",
+      "redacted_bytes": 4005,
+      "changed_fields": [],
+      "preserved_numeric_values_and_order": true
+    }
+  ],
+  "validated_run_order": [
+    {
+      "side": "before",
+      "round": 1
+    },
+    {
+      "side": "after",
+      "round": 1
+    },
+    {
+      "side": "after",
+      "round": 2
+    },
+    {
+      "side": "before",
+      "round": 2
+    },
+    {
+      "side": "before",
+      "round": 3
+    },
+    {
+      "side": "after",
+      "round": 3
+    }
+  ],
+  "workload_sha256_before": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+  "workload_sha256_after": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624"
+}

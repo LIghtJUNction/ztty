@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "prepared_at_utc": "2026-11-19T21:30:57.492229+00:00",
+  "purpose": "Frozen installed ztty and release zterm core benchmark baseline; no performance measurements executed",
+  "performance_measurements_executed": false,
+  "source": {
+    "repository": "REPOSITORY",
+    "worktree": "BASELINE_WORKTREE",
+    "commit": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+    "tree": "db82e262a7073a2b2b803bef778b32022c4429eb",
+    "detached": true,
+    "status_porcelain": "",
+    "cargo_lock_sha256": "1a8ce57cee1e9d8c477105d5facf3b2ec3c84e1fdd4aaed7bf14a6695f4cdc27",
+    "status_porcelain_after_build": ""
+  },
+  "installed_binary": {
+    "source_path": "/usr/bin/ztty",
+    "frozen_path": "WORKTREE/artifacts/benchmark-final/before-ztty",
+    "expected_sha256": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704",
+    "source_sha256_before_copy": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704",
+    "frozen_sha256": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704",
+    "source_sha256_after_copy": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704",
+    "size_bytes": 871784,
+    "source_commit": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+    "source_commit_basis": "Task-specified known installed-source revision; ELF hash independently verified",
+    "frozen_sha256_after_build": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704"
+  },
+  "toolchain": {
+    "rustc_verbose": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5",
+    "cargo": "cargo 1.100.0 (3acc79c0c 2026-11-05)"
+  },
+  "packages": {
+    "ztty": {
+      "version": "0.4.1",
+      "manifest": "BASELINE_WORKTREE/Cargo.toml",
+      "manifest_sha256": "408be2b57a1a938cf63025dcdae52965cb4bb56e86fb8619b31b225d93a21729"
+    },
+    "zterm": {
+      "version": "0.4.0",
+      "manifest": "BASELINE_WORKTREE/crates/zterm/Cargo.toml",
+      "manifest_sha256": "7582afe0bb6ebe6df0b0434a5c6435958381f896041f768a1e2a1378b44b5845"
+    }
+  },
+  "benchmark_build": {
+    "state": "built_not_executed",
+    "cwd": "BASELINE_WORKTREE",
+    "target_dir": "BASELINE_TARGET",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--release",
+      "-p",
+      "zterm",
+      "--example",
+      "benchmark",
+      "--message-format=json-render-diagnostics"
+    ],
+    "environment": {
+      "CARGO_TARGET_DIR": "BASELINE_TARGET"
+    },
+    "stdout_log": "WORKTREE/artifacts/benchmark-final/baseline-build.stdout.jsonl",
+    "stderr_log": "WORKTREE/artifacts/benchmark-final/baseline-build.stderr.log",
+    "started_at_utc": "2026-11-19T21:31:23.571075+00:00",
+    "exit_code": 0,
+    "finished_at_utc": "2026-11-19T21:31:41.993742+00:00",
+    "executable": "BASELINE_TARGET/release/examples/benchmark",
+    "executable_sha256": "4b3f5d75d409cb697d46a41937e87d2123a59b67127dd2178c1e115423ee0d5d",
+    "frozen_executable": "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark",
+    "frozen_executable_sha256": "4b3f5d75d409cb697d46a41937e87d2123a59b67127dd2178c1e115423ee0d5d",
+    "size_bytes": 695104,
+    "package_id": "path+file://BASELINE_WORKTREE/crates/zterm#0.4.0",
+    "profile": {
+      "opt_level": "3",
+      "debuginfo": 0,
+      "debug_assertions": false,
+      "overflow_checks": false,
+      "test": false
+    },
+    "target": {
+      "kind": [
+        "example"
+      ],
+      "crate_types": [
+        "bin"
+      ],
+      "name": "benchmark",
+      "src_path": "BASELINE_WORKTREE/crates/zterm/examples/benchmark.rs",
+      "edition": "2024",
+      "doc": false,
+      "doctest": false,
+      "test": false
+    },
+    "fresh": false,
+    "source_status_after_build": "",
+    "executed": false
+  },
+  "static_collector_review": {
+    "path": "WORKTREE/tools/benchmark_output_pipeline.py",
+    "sha256": "4621fcec1e00dbd4c34772671704e8d09afde27fc60ca35b6655a88bdf604fe7",
+    "performance_run": false,
+    "suggested_minimum_args": [
+      "--kinds",
+      "ascii-log,inplace-ascii,unicode-log",
+      "--modes",
+      "headless,window",
+      "--mib",
+      "8",
+      "--samples",
+      "3",
+      "--history",
+      "2000"
+    ],
+    "scope": "Complements the 1/10-window throughput collector with sustained ASCII logs, in-place refresh and Unicode logs; timed completion is logical PTY processing through DSR, not physical presentation.",
+    "available_cpu_affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "default_cpus_available": true
+  }
+}
