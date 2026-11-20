@@ -247,7 +247,7 @@ impl Window {
                     1,
                 );
             }
-            let pixmap = XCreatePixmap(display, id, width as u32, height as u32, depth);
+            let pixmap = XCreatePixmap(display, id, 1, 1, depth);
             let gc = XCreateGC(display, id, 0, core::ptr::null_mut());
             let draw = XftDrawCreate(display, pixmap, visual, colormap);
             let ic = connection.input_context(id, events);
@@ -271,6 +271,7 @@ impl Window {
                 owns_colormap: alpha.is_some(),
                 requested_opacity: appearance.opacity,
                 pixmap,
+                pixmap_size: (1, 1),
                 retained_valid: false,
                 reveal_pending: false,
                 pending_damage: None,
@@ -335,7 +336,7 @@ impl Window {
                 search_bits: Vec::new(),
             };
             out.title("ztty");
-            out.fill_background(background, true, 0, 0, width as u32, height as u32);
+            out.fill_background(background, true, 0, 0, 1, 1);
             XMapWindow(display, id);
             XFlush(display);
             out.configure_gpu(appearance);
@@ -471,6 +472,35 @@ impl Window {
         }
     }
 
+    pub(super) fn resize_pixmap(&mut self, width: i32, height: i32) {
+        let size = (width.max(1), height.max(1));
+        if self.pixmap_size == size {
+            return;
+        }
+        unsafe {
+            let pixmap = XCreatePixmap(
+                self.state.display,
+                self.state.id,
+                size.0 as u32,
+                size.1 as u32,
+                self.depth,
+            );
+            // The visual and depth do not change. Rebind Xft's drawable and
+            // discard any old UI clip; the window GC remains compatible.
+            XftDrawChange(self.draw, pixmap);
+            XftDrawSetClip(self.draw, core::ptr::null_mut());
+            XFreePixmap(self.state.display, self.pixmap);
+            self.pixmap = pixmap;
+        }
+        self.pixmap_size = size;
+        self.retained_valid = false;
+        self.pending_damage = None;
+    }
+
+    pub(super) fn ensure_software_pixmap(&mut self) {
+        self.resize_pixmap(self.state.width, self.state.height);
+    }
+
     pub fn resize(&mut self, width: i32, height: i32) -> (usize, usize) {
         if self.state.width != width.max(1) || self.state.height != height.max(1) {
             self.state.width = width.max(1);
@@ -478,19 +508,8 @@ impl Window {
             self.retained_valid = false;
             self.pending_damage = None;
             self.resize_gpu();
-            if !self.suspended {
-                unsafe {
-                    let pixmap = XCreatePixmap(
-                        self.state.display,
-                        self.state.id,
-                        self.state.width as u32,
-                        self.state.height as u32,
-                        self.depth,
-                    );
-                    XftDrawChange(self.draw, pixmap);
-                    XFreePixmap(self.state.display, self.pixmap);
-                    self.pixmap = pixmap;
-                }
+            if !self.suspended && self.gpu.is_none() {
+                self.ensure_software_pixmap();
             }
         }
         (
@@ -559,16 +578,6 @@ impl Window {
         self.pending_damage = None;
         unsafe {
             if visible {
-                let pixmap = XCreatePixmap(
-                    self.state.display,
-                    self.state.id,
-                    self.state.width as u32,
-                    self.state.height as u32,
-                    self.depth,
-                );
-                XftDrawChange(self.draw, pixmap);
-                XFreePixmap(self.state.display, self.pixmap);
-                self.pixmap = pixmap;
                 self.last_cursor = None;
                 if self.reveal_pending {
                     XLowerWindow(self.state.display, self.state.id);
@@ -582,14 +591,14 @@ impl Window {
                 while !self.images.is_empty() {
                     self.discard_upload(self.images.len() - 1);
                 }
-                let pixmap = XCreatePixmap(self.state.display, self.state.id, 1, 1, self.depth);
-                XftDrawChange(self.draw, pixmap);
-                XFreePixmap(self.state.display, self.pixmap);
-                self.pixmap = pixmap;
+                self.resize_pixmap(1, 1);
                 self.focus(false);
             }
             self.suspended = !visible;
             self.visible_gpu(visible);
+            if visible && self.gpu.is_none() {
+                self.ensure_software_pixmap();
+            }
             XFlush(self.state.display);
         }
     }

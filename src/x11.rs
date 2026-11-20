@@ -130,6 +130,8 @@ pub struct Window {
     owns_colormap: bool,
     requested_opacity: u8,
     pixmap: Xid,
+    // GPU views keep only a placeholder; software frames require this exact size.
+    pixmap_size: (i32, i32),
     // Only a completed software frame may be copied on an Expose event.
     retained_valid: bool,
     // A workspace keeps its previous tab above this mapped view until paint.

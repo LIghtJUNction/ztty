@@ -4,6 +4,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 import contextlib
 import ctypes
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -77,6 +78,8 @@ def main():
         with open(sys.argv[3],"wb") as written: written.write(b"1")''')
     assert ctypes.CDLL(None).prctl(36, 1, 0, 0, 0) == 0
     report = {"ok": False, "binary": str(binary), "cases": [], "screenshots": {},
+              "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
+              "test_script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
               "scope": "Owned Linux X11 windows and PTYs; queued output plus ConfigureNotify; software renderer"}
     identities, launchers, sessions = {}, [], []
     server = connection = None
@@ -221,6 +224,8 @@ def main():
                     report["ok"] = False
                 log.flush()
                 report["stderr_tail"] = (root / "stderr.log").read_text(errors="replace")[-4000:]
+    if hashlib.sha256(binary.read_bytes()).hexdigest() != report["binary_sha256"]:
+        report["ok"], report["error"] = False, "Binary changed during verification"
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps({"ok": report["ok"], "cases": len(report["cases"]), "output": str(args.output),
                       "failed_cases": [f"padding-{case['padding']}:{case['name']}" for case in report["cases"] if not case["ok"]],

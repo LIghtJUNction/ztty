@@ -30,6 +30,10 @@ impl Window {
             return;
         }
         if let Some((top, bottom)) = self.pending_damage.take() {
+            if self.pixmap_size != (self.state.width, self.state.height) {
+                self.retained_valid = false;
+                return;
+            }
             // render() rebuilds every pixel after allocation or backend changes;
             // publish only after its overlays are complete too.
             self.retained_valid = true;
@@ -39,7 +43,11 @@ impl Window {
     }
 
     fn present_region(&self, top: i32, bottom: i32) {
-        if self.suspended || self.state.id == 0 || !self.retained_valid {
+        if self.suspended
+            || self.state.id == 0
+            || !self.retained_valid
+            || self.pixmap_size != (self.state.width, self.state.height)
+        {
             return;
         }
         unsafe {
@@ -141,6 +149,9 @@ impl Window {
         if self.render_gpu(terminal, offset, selection, cursor) {
             return;
         }
+        // Initial software views and GPU fallbacks allocate their backing
+        // storage before deciding whether this frame needs a complete redraw.
+        self.ensure_software_pixmap();
         // A scene change can remove pixels outside the new placement. Rebuild
         // the visible frame on structural changes; ordinary text still damages
         // only its own rows and re-composites the images intersecting those rows.

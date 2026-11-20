@@ -183,6 +183,7 @@ impl Window {
                     return;
                 }
                 self.gpu = Some(renderer);
+                self.resize_pixmap(1, 1);
                 self.gpu_repaint = false;
                 self.renderer_property(c"_ZTTY_RENDERER", "gpu");
             }
@@ -206,6 +207,11 @@ impl Window {
         self.pending_damage = None;
         self.last_cursor = None;
         self.graphics_revision = 0;
+        // A later overlay in this discarded GPU frame may already fall back
+        // to Xft. Its drawable must be valid before the next full repaint.
+        if !self.suspended {
+            self.ensure_software_pixmap();
+        }
         self.renderer_property(c"_ZTTY_RENDERER", "software");
     }
 

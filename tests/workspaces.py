@@ -20,6 +20,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 from isolated_xvfb import start_xvfb
+from gui_renderer import record_renderer
 
 CHILD = r'''import os,sys,tty,urllib.parse
 tty.setraw(0)
@@ -50,6 +51,7 @@ def main():
     from PIL import Image
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
+    parser.add_argument("--renderer", choices=("auto", "gpu", "software"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/workspaces.json"))
     parser.add_argument("--screenshot", type=Path, default=Path("artifacts/workspaces.png"))
     args = parser.parse_args()
@@ -99,6 +101,8 @@ def main():
             env = dict(os.environ, DISPLAY=xvfb.display, XMODIFIERS="@im=none", LC_ALL="C.UTF-8",
                        XDG_RUNTIME_DIR=temporary, ZTTY_SOCKET="@ztty-workspaces-" + root.name)
             env.pop("WAYLAND_DISPLAY", None)
+            if args.renderer == "gpu":
+                env.update(LIBGL_ALWAYS_SOFTWARE="1", LP_NUM_THREADS="2")
             # Never alter the parent environment. Only our first launcher and
             # its broker subtree load this shim; its marker targets one PID.
             env.pop("LD_PRELOAD", None)
@@ -122,7 +126,8 @@ def main():
                 "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
             }
             config = root / "config"
-            config.write_text("background = #000000\nbackground-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 20\n")
+            config.write_text("background = #000000\nbackground-opacity = 100\nbackground-blur = false\ncursor-blink = false\nwindow-padding = 20\n"
+                              + (f"renderer = {args.renderer}\n" if args.renderer else ""))
 
             def rpc(request, success=True):
                 with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as channel:
@@ -156,7 +161,10 @@ def main():
                 owned.append(process)
                 wait(lambda: process.poll() is None and any(s["name"] == name for s in rpc({"op": "list"})["sessions"]), name + " startup")
                 wait(lambda: name in rpc({"op":"read", "session":name})["screen"], name + " screen")
-                return info(name)
+                view = info(name)
+                report.setdefault("renderers_at_create", []).append(record_renderer(
+                    connection, connection.create_resource_object("window", view["window_id"]), args.renderer))
+                return view
 
             def action(name, value):
                 return rpc({"op": "action", "session": name, "action": value})
@@ -218,6 +226,10 @@ def main():
             wait(lambda: info("alpha")["visible"] and info("beta")["visible"] and not info("gamma")["visible"], "real tab shortcut")
             assert input_bytes("gamma") == b"", input_bytes("gamma")
             report["checks"].append("tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell")
+
+            report["renderers_after_tab_reveal"] = [record_renderer(
+                connection, connection.create_resource_object("window", info(name)["window_id"]), args.renderer)
+                for name in ("alpha", "beta")]
 
             # Capture the actual split surface, not a mock or screenshot of text.
             # A fixed delay can capture a blank surface under CPU pressure.
