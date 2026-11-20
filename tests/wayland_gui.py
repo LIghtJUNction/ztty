@@ -108,8 +108,6 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
                WLR_HEADLESS_OUTPUTS="1", WLR_RENDERER="pixman",
                WLR_LIBINPUT_NO_DEVICES="1", LIBGL_ALWAYS_SOFTWARE="1",
                XDG_CONFIG_HOME=str(runtime / "config"), XKB_DEFAULT_LAYOUT="us", ZTTY_SOCKET="@ztty-wayland-test-" + secrets.token_hex(12))
-    if args.ime_cursor_only:
-        env["WAYLAND_DEBUG"] = "client"
     config = runtime / "sway.conf"
     config.write_text("xwayland disable\noutput HEADLESS-1 mode 1280x720\n"
                       "output * bg #111111 solid_color\nseat seat0 fallback true\n"
@@ -380,13 +378,15 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
         report["caret_samples"] = samples
         rectangles = []
 
-        def geometry(row, col):
-            log = (root / "terminal.log").read_text(errors="replace")
-            values = re.findall(r"set_cursor_rectangle\((-?\d+), (-?\d+), (\d+), (\d+)\)", log)
-            if not values:
+        def geometry(before_query, row, col):
+            # The daemon intentionally redirects stderr. Query the real PTY's
+            # cell metrics instead of expecting its protocol log in the launcher.
+            response = re.search(rb"\x1b\[6;(\d+);(\d+)t", input_bytes(root)[before_query:])
+            if response is None:
                 return None
-            x, y, cw, ch = map(int, values[-1])
-            return (x, y, cw, ch) if (x, y) == (8 + col * cw, 8 + row * ch) else None
+            ch, cw = map(int, response.groups())
+            assert 0 < cw <= 256 and 0 < ch <= 256, (cw, ch)
+            return 8 + col * cw, 8 + row * ch, cw, ch
 
         def viewport():
             node = window(proc)
@@ -402,10 +402,10 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
             before_query = len(input_bytes(root))
             command(root, b"\x1b[?25h\x1b[2J\x1b[H\x1b[48;2;192;32;48m"
                     + b" " * 20 + b"\x1b[0m"
-                    + f"\x1b[{row + 1};2Hanchor>\x1b[{row + 1};{col + 1}H\x1b[6n".encode())
+                    + f"\x1b[{row + 1};2Hanchor>\x1b[{row + 1};{col + 1}H\x1b[6n\x1b[16t".encode())
             dsr = f"\x1b[{row + 1};{col + 1}R".encode()
             wait(lambda: dsr in input_bytes(root)[before_query:])
-            x, y, cw, ch = wait(lambda: geometry(row, col))
+            x, y, cw, ch = wait(lambda: geometry(before_query, row, col))
             rectangles.append({"phase": phase, "row": row, "col": col, "rectangle": [x, y, cw, ch]})
             vx, vy = viewport()
             cell = (vx + x, vy + y, vx + x + cw, vy + y + ch)
@@ -429,7 +429,9 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
             prompt_pixels = before.crop(prompt).tobytes()
             check("caret_" + phase + "_rendered_prompt_and_cursor_phase", True,
                   row=row, col=col, cursor_pixels=cursor_pixels,
-                  geometry=[x, y, cw, ch], dsr_hex=dsr.hex())
+                  geometry=[x, y, cw, ch], dsr_hex=dsr.hex(),
+                  geometry_source="actual PTY DSR and CSI16t cell-size response",
+                  query_response_hex=input_bytes(root)[before_query:].hex())
             before_input = len(input_bytes(root))
             ime_command(peer, "preedit CARET")
             wait(lambda: count(screenshot("caret-" + phase + "-first"), underline) >= 4 * cw)
@@ -454,7 +456,7 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
             check("caret_" + phase + "_preedit_does_not_write_pty",
                   input_bytes(root)[before_input:] == b"")
 
-        report["caret_rectangles"] = rectangles
+        report["caret_geometry_from_pty"] = rectangles
         command(root, b"\x1b[?25l")
         wait(lambda: count(screenshot("caret-mode-hidden"), underline) == 0)
         check("caret_hidden_mode_suppresses_overlay",
