@@ -1,4 +1,4 @@
-use super::{Rect, Renderer, Style, TextCell};
+use super::{MAX_TEXT_BYTES, Rect, Renderer, Style, TextCell};
 use alloc::{string::String, vec::Vec};
 use zterm::{
     BLINK, BOLD, Cell, CursorShape, DIM, EXPLICIT_BG, HIDDEN, INVERSE, ITALIC, RAPID_BLINK, STRIKE,
@@ -299,91 +299,110 @@ impl Renderer {
         selected: &impl Fn(usize, usize) -> bool,
         override_color: Option<u32>,
     ) -> Result<(), &'static str> {
-        let mut column = 0;
-        let mut text = String::new();
-        let mut cells = Vec::new();
-        let y = style.padding + row as f32 * style.cell_height;
-        while column < terminal.cols() {
-            let first = terminal.view_cell(column, row, offset);
-            if first.width == 0 || hidden(first, style) {
-                column += 1;
-                continue;
-            }
-            let (rgb, _, _) = colors(first, selected(column, row), style);
-            let start = column;
-            let flags = first.flags;
-            let link = first.link_id;
-            text.clear();
-            cells.clear();
+        // Own the buffers while drawing so draw_cells can borrow the renderer.
+        // Keep them between rows and frames, including fallible shaping/GL paths.
+        let mut text = core::mem::take(&mut self.row_text);
+        let mut cells = core::mem::take(&mut self.row_cells);
+        let result = (|| {
+            let mut column = 0;
+            let y = style.padding + row as f32 * style.cell_height;
             while column < terminal.cols() {
-                let cell = terminal.view_cell(column, row, offset);
-                if cell.width == 0 {
+                let first = terminal.view_cell(column, row, offset);
+                if first.width == 0 || hidden(first, style) {
                     column += 1;
                     continue;
                 }
-                if cell.flags != flags
-                    || cell.link_id != link
-                    || colors(cell, selected(column, row), style).0 != rgb
-                    || hidden(cell, style)
-                {
-                    break;
+                let (rgb, _, _) = colors(first, selected(column, row), style);
+                let start = column;
+                let flags = first.flags;
+                let link = first.link_id;
+                text.clear();
+                cells.clear();
+                while column < terminal.cols() {
+                    let cell = terminal.view_cell(column, row, offset);
+                    if cell.width == 0 {
+                        column += 1;
+                        continue;
+                    }
+                    if cell.flags != flags
+                        || cell.link_id != link
+                        || colors(cell, selected(column, row), style).0 != rgb
+                        || hidden(cell, style)
+                    {
+                        break;
+                    }
+                    let byte_count = terminal.grapheme(cell).map(str::len).unwrap_or(12);
+                    if !text.is_empty() && text.len() + byte_count > MAX_TEXT_BYTES {
+                        break;
+                    }
+                    cells.push(TextCell {
+                        byte: text.len() as u32,
+                        x: (column - start) as f32 * style.cell_width,
+                        width: cell.width as f32 * style.cell_width,
+                    });
+                    let old_len = text.len();
+                    for character in terminal.cell_chars(cell) {
+                        text.push(if character == '\0' { ' ' } else { character });
+                    }
+                    if text.len() == old_len {
+                        text.push(' ');
+                    }
+                    column += 1;
                 }
-                let byte_count = terminal.grapheme(cell).map(str::len).unwrap_or(12);
-                if !text.is_empty() && text.len() + byte_count > 16_384 {
-                    break;
-                }
-                cells.push(TextCell {
-                    byte: text.len() as u32,
-                    x: (column - start) as f32 * style.cell_width,
-                    width: cell.width as f32 * style.cell_width,
-                });
-                let old_len = text.len();
-                for character in terminal.cell_chars(cell) {
-                    text.push(if character == '\0' { ' ' } else { character });
-                }
-                if text.len() == old_len {
-                    text.push(' ');
-                }
-                column += 1;
-            }
-            let foreground = override_color.unwrap_or(rgb);
-            self.draw_cells(
-                &text,
-                &cells,
-                style.padding + start as f32 * style.cell_width,
-                y + style.ascent,
-                foreground,
-                Style {
-                    bold: flags & BOLD != 0,
-                    italic: flags & ITALIC != 0,
-                },
-            )?;
-            let width = (column - start) as f32 * style.cell_width;
-            if flags & UNDERLINE != 0 || link != 0 {
-                self.draw_rect(
-                    Rect {
-                        x: style.padding + start as f32 * style.cell_width,
-                        y: y + style.ascent + 2.0,
-                        width,
-                        height: 1.0,
-                    },
+                let foreground = override_color.unwrap_or(rgb);
+                self.draw_cells(
+                    &text,
+                    &cells,
+                    style.padding + start as f32 * style.cell_width,
+                    y + style.ascent,
                     foreground,
-                    255,
-                )?;
-            }
-            if flags & STRIKE != 0 {
-                self.draw_rect(
-                    Rect {
-                        x: style.padding + start as f32 * style.cell_width,
-                        y: y + style.cell_height / 2.0,
-                        width,
-                        height: 1.0,
+                    Style {
+                        bold: flags & BOLD != 0,
+                        italic: flags & ITALIC != 0,
                     },
-                    foreground,
-                    255,
                 )?;
+                let width = (column - start) as f32 * style.cell_width;
+                if flags & UNDERLINE != 0 || link != 0 {
+                    self.draw_rect(
+                        Rect {
+                            x: style.padding + start as f32 * style.cell_width,
+                            y: y + style.ascent + 2.0,
+                            width,
+                            height: 1.0,
+                        },
+                        foreground,
+                        255,
+                    )?;
+                }
+                if flags & STRIKE != 0 {
+                    self.draw_rect(
+                        Rect {
+                            x: style.padding + start as f32 * style.cell_width,
+                            y: y + style.cell_height / 2.0,
+                            width,
+                            height: 1.0,
+                        },
+                        foreground,
+                        255,
+                    )?;
+                }
             }
-        }
-        Ok(())
+            Ok(())
+        })();
+        text.clear();
+        cells.clear();
+        // Bound retained text to one shaping run and release cell capacity from
+        // a larger terminal after a resize. Vec's smallest capacity is four.
+        self.row_text = if text.capacity() <= MAX_TEXT_BYTES {
+            text
+        } else {
+            String::new()
+        };
+        self.row_cells = if cells.capacity() <= terminal.cols().max(4).next_power_of_two() {
+            cells
+        } else {
+            Vec::new()
+        };
+        result
     }
 }
