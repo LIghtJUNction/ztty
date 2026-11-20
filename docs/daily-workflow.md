@@ -76,11 +76,14 @@ cells remain whole within the 4 MiB selection limit. An active search can copy
 its complete match even when it spans more than a viewport. Output or a resize
 invalidates saved match coordinates; copying refreshes the search first.
 
-Search does not provide regular expressions. Current column width bounds the
-searchable part of older rows; a clipped soft wrap stops being a logical link.
-Match counts refresh when editing, navigating or copying the query. Full history
-reflow remains separate work. Native macOS and Windows share the selection-copy
-rules, while their search and command palette interfaces remain unimplemented.
+Search does not provide regular expressions. Retained primary-screen text
+reflows across width changes using recorded soft wraps; hard line boundaries
+remain intact. Narrowing the screen can still evict history under the existing
+row and byte limits. Match counts refresh when editing, navigating or copying
+the query. Native macOS and Windows share the selection-copy rules, while their
+search and command palette interfaces remain unimplemented. See the
+[core reflow contract](https://github.com/LIghtJUNction/zterm/blob/b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d/src/terminal/reflow.rs)
+and [0.5.2 release evidence](releases/0.5.2/report.zh-CN.md).
 
 ## Returning to live output
 
@@ -180,7 +183,7 @@ Font validation and PTY resizing precede the live appearance commit. A window
 created with an opaque visual needs detach/attach before enabling a supported
 transparent visual; an X server without an alpha visual retains its opaque
 fallback. Theme changes preserve explicit RGB colors and update default/ANSI
-colors using compact source flags in the existing 28-byte cell.
+colors using source flags in the existing cell.
 
 Font reset returns to the latest successfully loaded config font. A font change
 preserves the PTY PID and window. Observing views cannot resize the child; their

@@ -1,16 +1,18 @@
 # Protocol scope
 
-Version 0.2 implements the following subset of public terminal protocols.
+ztty 0.5.2 implements the following subset of public terminal protocols.
 The shared core is used by Linux, macOS, and Windows; native window integration
-and its verification status are described separately below.
+and its verification status are described separately below. The
+[0.5.2 release report](releases/0.5.2/report.zh-CN.md) binds the current release's
+six-platform acceptance to its source and artifacts.
 
 ## Text and input protocols
 
 | Protocol / behavior | Scope |
 | --- | --- |
 | ANSI / VT controls | Cursor motion, save/restore, tabs, scrolling regions, erase, insert/delete, main/alternate screen, DEC line drawing |
-| SGR | 16/256/RGB colors, semicolon and colon parameters, core attributes; renderer uses its configured font face |
-| UTF-8 | Streaming decode across arbitrary chunks; CJK widths; two inline combining scalars |
+| SGR | 16/256/RGB colors, semicolon and colon parameters, core attributes; font shaping and style rendering depend on the frontend |
+| UTF-8 | Streaming decode across arbitrary chunks; CJK widths; complete extended grapheme clusters within bounded storage |
 | Kitty keyboard | Flags 1/2/4/8/16, event reports, shifted alternatives, associated text, independent screen stacks; the Linux frontend does not supply a base-layout alternative |
 | Mouse | DEC 9 (X10)/1000/1002/1003 tracking; legacy and SGR 1006 encoding |
 | Focus | DEC 1004 |
@@ -24,14 +26,21 @@ and its verification status are described separately below.
 | DSR / DA / DECRQM | Implemented state reports; unknown modes report unsupported |
 | Window and cell size | CSI 14 t reports text-area pixels; CSI 16 t reports cell pixels; CSI 18 t reports character dimensions |
 | XTGETTCAP | TN=xterm-256color, Co=256, Tc; unknown capabilities report failure |
-| X11 clipboard | Clipboard and primary selection, UTF-8 and Latin-1 fallback, INCR receiving |
+| X11 clipboard | Clipboard and primary selection, advertised text formats, UTF-8 and Latin-1 fallback, bounded INCR receiving |
+| OSC 52 | Bounded clipboard requests with frontend policy; Linux enforces visible-view and input-ownership checks |
+| Native Wayland input | XKB/compose and text-input-v3 preedit/commit; see [Wayland configuration and limits](configuration.md#native-wayland-experimental) |
 
-Each cell can retain two combining scalars; additional scalars are ignored.
-Core state retains italic attributes, while the Linux renderer uses its configured
-font face. Text blink attributes are not animated. Cursor blinking is separate
-and runs while the cursor is focused and visible. Resizing preserves and crops
-rows, keeps the cursor visible, and can move displaced primary-screen rows into
-history; it does not reflow historical lines.
+The shared core retains extended grapheme clusters, including emoji ZWJ sequences,
+with at most 256 UTF-8 bytes per cluster and a bounded pool; this is separate from
+font rendering. Width changes reflow retained primary-screen soft wraps while
+preserving hard line boundaries. Alternate screens retain fixed-grid resize
+semantics, and history limits can evict content. See the
+[core storage and reflow contract](https://github.com/LIghtJUNction/zterm/blob/b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d/README.md#current-boundaries).
+
+Linux GPU text uses HarfBuzz run shaping; the Xft fallback draws Unicode cells
+without that complete-run shaping path. Linux supports italic glyphs and SGR 5/6
+text blink. Cursor blinking remains separate. These capabilities do not establish
+identical complex-script or emoji presentation across every renderer.
 
 Primary DA uses `CSI ? 62 ; 4 c`: a VT220-style identification with the Sixel
 feature field. No other optional DA features are asserted. This also satisfies
@@ -40,7 +49,7 @@ Kitty graphics support and transport choices are established by their own querie
 
 ## Kitty graphics
 
-[`zgraphics`](../crates/zgraphics/README.md) implements the static image lifecycle:
+[`zgraphics`](../crates/zgraphics/README.md) implements the bounded image lifecycle:
 receive image data, store decoded pixels, place an image, and delete its placements
 or data. [`zterm`](../crates/zterm/src/terminal.rs) frames APC sequences and attaches
 placements to terminal content. The native frontend composites the resulting
@@ -48,10 +57,11 @@ RGBA images; no Kitty renderer is embedded.
 
 | Feature | Implemented scope |
 | --- | --- |
-| Transport | Direct PTY data, `t=d`; base64 encoded |
+| Transport | Direct PTY data, `t=d`; base64 encoded. The Linux host also supplies bounded file (`t=f`), temporary-file (`t=t`) and shared-memory (`t=s`) reads |
 | Pixel formats | `f=24` RGB, `f=32` RGBA, `f=100` PNG; canonical storage is straight-alpha RGBA8 |
 | Compression | Optional zlib, `o=z`, with bounded output |
-| Actions | Capability query `a=q`, transmit `a=t`, transmit and display `a=T`, place `a=p`, delete `a=d` |
+| Static actions | Capability query `a=q`, transmit `a=t`, transmit and display `a=T`, place `a=p`, delete `a=d` |
+| Extensions | Linux X11 integrates Kitty animation, Unicode placeholders and relative placements; [extension acceptance](reports/graphics-extensions-20261120/report.zh-CN.md) records GPU and Xft coverage |
 | Transfer chunks | `m=1` continuation and `m=0` final chunk; arbitrary PTY read boundaries; larger single APCs and repeated-action continuation headers from current clients |
 | Base64 endings | Padded or unpadded final payload; nonfinal protocol chunks must contain complete groups without padding |
 | Identity | Explicit image IDs `i`, image numbers `I`, automatic IDs, placement IDs `p`, replacement under an existing ID |
@@ -109,18 +119,17 @@ new valid image after rejection. The test sources are
 [`zterm` tests](../crates/zterm/src/tests.rs), and
 [the graphics acceptance suite](../tests/graphics_smoke.py).
 
-### Deferred capabilities
+### Remaining boundaries
 
-| Area | Outside the current scope |
+| Area | Current boundary |
 | --- | --- |
-| Kitty transport | File paths, temporary files, shared memory |
-| Kitty rendering extensions | Animation, Unicode placeholders, relative placements |
-| Other image protocols | ReGIS |
-| Clipboard and window protocols | OSC 52, native Wayland text-input protocols |
-| Text layout | Full complex-script shaping, complete emoji ZWJ layout, history reflow |
+| External Kitty transport | The file/temporary-file/shared-memory host reader is Linux-only; macOS and Windows use direct transmission |
+| Image decoding and protocols | APNG and ReGIS remain unsupported; Kitty frame animation is a separate implemented protocol |
+| Native Wayland | No tabs, splits, workspace containers or runtime reload; desktop scaling and real IME/GPU acceptance remain separate work |
+| Text layout | Complex-script and emoji presentation depend on the font and renderer; Xft does not provide the GPU path's complete-run HarfBuzz shaping |
 
-Applications should use direct transmission and query capabilities instead of
-inferring full Kitty compatibility from successful static-image display.
+Applications should query the required transport and extension capabilities.
+Successful static-image display alone does not establish full Kitty compatibility.
 
 ## Sixel
 
@@ -134,29 +143,38 @@ on the following text row; display mode preserves the cursor. Details and
 resource limits are in [zgraphics](../crates/zgraphics/README.md#sixel).
 
 Sixel images use the scene's behind-text layer and remain anchored to cell rows.
-The implementation does not emulate a VT340's framebuffer for later mixed text
-and image overpainting: text remains visible over images, and partial-region
-scrolling follows the existing anchor policy. Shared palettes seed subsequent
+Text writes and partial erases clear intersecting Sixel source pixels; Kitty
+placements are unaffected. At scaled boundaries, a whole intersecting source
+pixel is cleared, as documented in the
+[Sixel erasure regression](performance-function-2026-11-19.zh-CN.md#sixel文字覆盖与局部清除不再留下旧图片).
+Partial-region scrolling follows the anchor policy. Shared palettes seed later
 images; changing a register does not recolor an already completed RGBA image.
-These are explicit rendering limits, so successful decoding does not establish
-complete VT340 compatibility.
+These limits remain distinct from complete VT340 framebuffer compatibility.
 
 Decoder validation uses the [DEC manual](https://vt100.net/docs/vt3xx-gp/chapter14.html),
 the modern [xterm control reference](https://invisible-island.net/xterm/ctlseqs/ctlseqs.html),
 and an independent [libsixel pixel comparison](../tests/sixel_reference.py).
 The [measurement](measurements/sixel-linux.json) records source/binary hashes,
-chunk sizes, exact pixel results and reference-decoder discrepancies. Native GUI
-presentation and macOS/Windows acceptance must be recorded separately.
+chunk sizes, exact pixel results and reference-decoder discrepancies. These
+decoder results are distinct from the native GUI acceptance below.
 
 ## Acceptance coverage
 
-Newer roadmap candidates are tracked separately in the
-[native acceptance record](native-candidates-2026-11-18.md). At `2dc6769`,
-Linux x86_64 passed four guarded GUI suites and Windows x86_64 passed 25 checks,
-including six Sixel groups. The two ARM64 gates still failed; macOS only
-completed its eight protocol checks. Historical tables and their immutable
-source reports below retain their original scope. The new macOS capture gate
-and native startup-directory additions require their own subsequent execution.
+The [0.5.2 release report](releases/0.5.2/report.zh-CN.md) records successful
+Verify and native Linux, macOS and Windows jobs on x86_64 and AArch64 for source
+`6e2ce246b0b50e6b82da99756832feae6e966f21`. Each Linux artifact has 22 reports
+with 312 recorded checks, including 65 Wayland checks, bound to that artifact's
+ELF. The Linux GPU-path tests use software Mesa; they do not measure physical
+GPU performance, display latency or general desktop IME compatibility.
+This documentation update adds no new test execution.
+
+### Historical acceptance snapshots
+
+The reports below retain their original source, binary and test scope. For
+example, the [earlier native record](native-candidates-2026-11-18.md) at `2dc6769`
+passed four Linux x86_64 GUI suites and 25 Windows x86_64 checks, while its ARM64
+gates failed and macOS completed eight protocol checks. Those historical
+outcomes are not the current 0.5.2 release status.
 
 The [GUI suite](../tests/gui_smoke.py) has passed 12 checks under an isolated Xvfb/X11 server,
 as recorded in [the GUI result](measurements/gui-graphics-2026-11-18.json):
@@ -170,7 +188,8 @@ output across writes and Expose events. The large-paste assertion includes the
 Unit tests also cover screen state and query semantics. The optional
 `--fcitx` test runs Fcitx 5 with Pinyin on Xvfb and a private D-Bus session,
 checking ordinary key forwarding and Chinese text committed to the PTY.
-IBus and deliberately fragmented INCR transfers remain separate integration tests.
+That run did not establish IBus or deliberately fragmented INCR coverage;
+current clipboard-transfer results are recorded in the 0.5.2 release report.
 
 The [graphics suite](../tests/graphics_smoke.py) has passed all seven groups on
 Linux/Xvfb through a real PTY and window-pixel readback, recorded in
@@ -208,8 +227,11 @@ on source `7535aa29f1a2728a78a446ffea6784dcbc2aae92`:
 | macOS Apple Silicon | The same 8 session/protocol checks through a native application | [Native report](measurements/ztty-macos-aarch64.native-7535aa2.json) |
 | Windows x86_64 | 17 checks: native child/Unicode arguments, ConPTY query round trip, RGB/RGBA/PNG pixel readback, alpha, scrolling, clipping, resize, alternate screen, deletion, keyboard recovery | [Native report](measurements/ztty-windows-x86_64.native-7535aa2.json) |
 
-Both macOS reports explicitly record `pixel_readback: not_performed` and
-`ime_keyboard: not_performed`; those checks remain open. The Windows result uses
+Both historical macOS reports explicitly record `pixel_readback: not_performed`
+and `ime_keyboard: not_performed`; they do not establish either capability.
+Later native window-pixel acceptance is recorded in the
+[six-platform candidate report](reports/native-edae40b-20261120/README.md) and the
+0.5.2 release report; those results do not turn the earlier runs into pixel tests. The Windows result uses
 the actual packaged ConPTY runtime and native window pixels, with the binary
 hash recorded in its report. This final native run includes the DA1 serialization
 fix described above.
