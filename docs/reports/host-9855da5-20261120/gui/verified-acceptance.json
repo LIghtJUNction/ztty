@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "started": "2026-11-20T03:17:40.445276+00:00",
+  "before": {
+    "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+    "source_clean": true,
+    "binary_sha256": "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66"
+  },
+  "runs": [
+    {
+      "name": "native-ui-auto",
+      "checks": 24,
+      "product_exit_code": 0,
+      "ok": true,
+      "raw_sha256": "80ce004845467e2df85f0c0aa9615ca94becbd9e34a92ca12f599cf3e2a12035",
+      "renderer_before": {
+        "window_id": 2097154,
+        "requested": "auto",
+        "actual": "software",
+        "driver": ""
+      },
+      "renderer_after": {
+        "window_id": 2097215,
+        "requested": "auto",
+        "actual": "software",
+        "driver": ""
+      },
+      "owned_remaining": [],
+      "display_cleanup": {
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      }
+    },
+    {
+      "name": "text-gpu",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/text_gpu_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+        "--renderer",
+        "gpu",
+        "--output",
+        "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/text-gpu.json",
+        "--screenshots",
+        "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/text-gpu"
+      ],
+      "checks": 8,
+      "product_exit_code": 0,
+      "ok": true,
+      "raw_sha256": "394b77008983e0de21d39f7726888db7e9c2dcae96a4740995939c178967d321",
+      "renderer_before": {
+        "window_id": 2097155,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "renderer_after": {
+        "window_id": 2097155,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+      },
+      "owned_remaining": [],
+      "display_cleanup": {
+        "exit_code": 0,
+        "pid_lock_exists": false,
+        "socket_exists": false,
+        "lease_exists": false
+      },
+      "backend_font_boxes": {
+        "software": [
+          1,
+          5,
+          43,
+          19
+        ],
+        "gpu": [
+          1,
+          5,
+          44,
+          19
+        ]
+      }
+    }
+  ],
+  "ok": true,
+  "original_wrapper_receipt": {
+    "path": "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/acceptance.json",
+    "sha256": "2ef3b60aad2c6b6b6d6248b665def7e80d4cbeaeac8e06284be241a2a2765c2f",
+    "status": "preserved exit 1: native UI report uses xvfb, not display_ownership; passed product stage was not rerun",
+    "legitimate_window_recreation": "Native UI closes the first view and creates its producer view, so compare renderer semantics without requiring the same window_id."
+  },
+  "after": {
+    "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+    "source_clean": true,
+    "binary_sha256": "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66"
+  },
+  "resources": {
+    "memory.max": "805306368",
+    "memory.swap.max": "0",
+    "memory.peak": "178135040",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "cpu.max": "100000 100000"
+  },
+  "finished": "2026-11-20T03:17:43.250563+00:00"
+}

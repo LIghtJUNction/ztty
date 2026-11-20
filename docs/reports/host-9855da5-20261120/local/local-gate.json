@@ -1,0 +1,84 @@
+{
+  "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "command": [
+    "make",
+    "check"
+  ],
+  "limits": {
+    "memory.max": "805306368",
+    "memory.swap.max": "0",
+    "cpu.max": "100000 100000"
+  },
+  "wrapper_override_scope": "this bounded systemd user unit only",
+  "started_at_unix": 1795144312.5569477,
+  "cargo_home": "WORKTREE/artifacts/cargo-home-20261120",
+  "cargo_target_dir": "WORKTREE/target",
+  "features": [
+    "wayland"
+  ],
+  "bare_metal_required": true,
+  "passed": true,
+  "historical_outputs": {
+    "wayland-services": {
+      "existed": true,
+      "sha256": {
+        "primary-selection-client-protocol.h": "eff85d730c0829d69368f0e024252dd2c330bdaafd5669d273db58adade3f1a1",
+        "primary-selection-protocol.c": "30a18d99429ae41b7d823b7200021336ada8d5ab252db125f75d62bd1cdc99f7",
+        "text-input-client-protocol.h": "03969f5133032824dfbffa4d92317a8907880726094636380f3e94c14875d0e3",
+        "text-input-protocol.c": "19b2f4dcde0db9cd3088004e0bbc6ae51efd37811803ad55003ca6139103efc9",
+        "wayland-services-budget": "1d37335aaa80b70c5c204fdd417f405049b4b6ac02676155400ea4b0098d1e8e",
+        "validation.json": "083244750939472e1c8232c87b1c7eac204b7213b8fca41f1b4064c6732f7f93"
+      }
+    },
+    "wayland-ime-peer": {
+      "existed": true,
+      "sha256": {
+        "input-method-client-protocol.h": "caffb647a23b7020566bdaedd0dd10f6031153d14f86e09177bf3a7f93a77659",
+        "input-method-protocol.c": "ab62c406d41c972d4e627539d637f81a4f0b79a79c2beec097090c4caab9ee9c",
+        "ime-peer": "521fe34ee30e65aab7fb940939a623d94b8e7a86bb38743bb5caaac87ddb7f2d"
+      }
+    },
+    "bash-integration": {
+      "existed": true,
+      "sha256": {
+        "report.json": "6c5147c0bed4b711db3239a68536244f5dbf6300610efcf12a6affc804e58100",
+        "bash-pty/array.pty": "d004f4e85a6612f8e526183b5f9956c89495dd8b04435b14034574d581a1159d",
+        "bash-pty/string.pty": "8050c1c0556e007220a885837bd14fb6694522475c9fc3c19e9106801cb51758",
+        "bash-pty/unset.pty": "1a21c181f2b17928617a4c76edd38a1e8dbdf4d0b03ed873bf8f5fcef0c4244f"
+      }
+    },
+    "mcp-wait": {
+      "existed": true,
+      "sha256": {
+        "report.json": "753e80e0caecd8e8065b9cacddf3e41352cbae21c5aa617e52c23ba865261f1a"
+      }
+    },
+    "mcp-sse": {
+      "existed": true,
+      "sha256": {
+        "report.json": "a2894ee545440e29e8885f38706ab6157537a3ad15bcdfdfab1b53828f01911d"
+      }
+    }
+  },
+  "exit_code": 0,
+  "source_after": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "dirty_after": "",
+  "wayland_elf": {
+    "path": "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+    "sha256": "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66",
+    "bytes": 1237824,
+    "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+    "features": [
+      "wayland"
+    ]
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+  "cargo_lock_sha256": "b86e3438a14ff8710a28b09bafa33ab1861f8cf116b722dc94be83133d4543b5",
+  "gitlinks": "160000 commit 1d796d1fc63808dc099ed7b10c92e75835ae2814\tcrates/zgpui\n160000 commit fe6357f98cf80fb6cc74739e45e8866ee17706ad\tcrates/zgraphics\n160000 commit 37617313dd7aaabcca9dd567344a76c4cbe03907\tcrates/zinput\n160000 commit 66919bc6dcb7757e0437fe955bfa809fb1282b68\tcrates/zpty\n160000 commit a2074bac4c030cfd7c0b2514c852a89dcf54648f\tcrates/zterm\n",
+  "historical_outputs_preserved": true,
+  "elapsed_seconds": 47.163,
+  "memory_peak_bytes": 805306368,
+  "memory_events": "low 0\nhigh 0\nmax 2856\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0\n",
+  "swap_peak_bytes": 0,
+  "log_sha256": "1493382cbcd74b3ff3f20affdf7ca0cb89839d045a545a63ad1d4187b5e3a372"
+}

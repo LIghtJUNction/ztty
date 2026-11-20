@@ -1,0 +1,21 @@
+{
+  "previous_source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "scope": [
+    "src",
+    "native",
+    "build",
+    "build.rs",
+    ".cargo",
+    "Cargo.toml",
+    "Cargo.lock",
+    "crates"
+  ],
+  "changed_paths": [
+    "src/x11/gpu.rs"
+  ],
+  "gitlinks_unchanged": true,
+  "cargo_manifests_lock_unchanged": true,
+  "source_blob": "82c4e6e6e0cc35a93feffed59b427bd0801e7c18",
+  "method": "read-only git diff of fixed objects; no product command executed"
+}

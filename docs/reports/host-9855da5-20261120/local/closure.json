@@ -1,0 +1,28 @@
+{
+  "recorded_at": "2026-11-20T03:15:08.522844+00:00",
+  "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "rust_passed": 472,
+  "rust_failed": 0,
+  "rust_ignored": 6,
+  "unit": "ztty-final-auto-9855da5-20261120.service",
+  "post_unit": {
+    "LoadState": "not-found",
+    "ActiveState": "inactive",
+    "SubState": "dead",
+    "MainPID": "0",
+    "ControlGroup": ""
+  },
+  "runtime_limits_source": "local-gate.json execution cgroup, not post-collection systemd defaults",
+  "gate_sha256": "42a6580e0972b717cb87d728ddb9f97829cbd1a2f5d355d311dbf0a8d760b842",
+  "log_sha256": "1493382cbcd74b3ff3f20affdf7ca0cb89839d045a545a63ad1d4187b5e3a372",
+  "elf": {
+    "path": "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+    "sha256": "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66",
+    "bytes": 1237824,
+    "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+    "features": [
+      "wayland"
+    ]
+  },
+  "historical_outputs_preserved": true
+}

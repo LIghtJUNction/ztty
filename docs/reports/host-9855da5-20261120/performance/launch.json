@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "started": "2026-11-20T03:19:39.418959+00:00",
+  "collector_source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "binary_source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "wrapper_sha256": "2a0e6f52d43404c8d2764d87ea14a71aea7e0d15c544bdf192f5b585ce961a2c",
+  "commands": {
+    "throughput": [
+      "/usr/bin/python3",
+      "WORKTREE/artifacts/performance-preparation-20261120/run-final-performance.py",
+      "--phase",
+      "throughput",
+      "--source",
+      "9855da563f3038adee2fa88e1e24e20eafb77010",
+      "--binary-source",
+      "9855da563f3038adee2fa88e1e24e20eafb77010",
+      "--binary",
+      "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+      "--binary-sha256",
+      "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66",
+      "--output",
+      "WORKTREE/artifacts/final-performance-9855da5-20261120/throughput",
+      "--expected-nice",
+      "-4"
+    ],
+    "output": [
+      "/usr/bin/python3",
+      "WORKTREE/artifacts/performance-preparation-20261120/run-final-performance.py",
+      "--phase",
+      "output",
+      "--source",
+      "9855da563f3038adee2fa88e1e24e20eafb77010",
+      "--binary-source",
+      "9855da563f3038adee2fa88e1e24e20eafb77010",
+      "--binary",
+      "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+      "--binary-sha256",
+      "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66",
+      "--output",
+      "WORKTREE/artifacts/final-performance-9855da5-20261120/output",
+      "--expected-nice",
+      "-4"
+    ],
+    "terminals": [
+      "/usr/bin/python3",
+      "WORKTREE/artifacts/performance-preparation-20261120/run-final-performance.py",
+      "--phase",
+      "terminals",
+      "--source",
+      "9855da563f3038adee2fa88e1e24e20eafb77010",
+      "--binary-source",
+      "9855da563f3038adee2fa88e1e24e20eafb77010",
+      "--binary",
+      "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+      "--binary-sha256",
+      "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66",
+      "--output",
+      "WORKTREE/artifacts/final-performance-9855da5-20261120/terminals",
+      "--expected-nice",
+      "-4"
+    ]
+  },
+  "parent_pid": 857128,
+  "prior_cohorts": [
+    {
+      "path": "artifacts/final-performance-9f5a77a-20261120",
+      "outcome": "legacy baseline configuration rejection before any timing sample; preserved"
+    },
+    {
+      "path": "artifacts/final-performance-9f5a77a-attempt2-20261120",
+      "outcome": "all three phases passed; measured PSS and throughput regression retained"
+    }
+  ],
+  "product_change": "X11 Auto with exact LIBGL_ALWAYS_SOFTWARE=1 selects existing software branch before EGL initialization; explicit GPU unchanged",
+  "policy": "identical workload, rounds, guards, baseline, and explicit compatibility flag; stop after first failed phase; no automatic retry"
+}

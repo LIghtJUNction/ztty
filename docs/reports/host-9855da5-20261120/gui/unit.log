@@ -1,0 +1,6 @@
+{"name": "native-ui-auto", "command": ["/usr/bin/python3", "WORKTREE/tests/native_ui_gui.py", "--binary", "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland", "--source-root", "WORKTREE", "--renderer", "auto", "--output", "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/native-ui-auto.json", "--screenshot", "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/native-ui-auto.png"], "exit_code": 0, "report": "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/native-ui-auto.json", "report_sha256": "80ce004845467e2df85f0c0aa9615ca94becbd9e34a92ca12f599cf3e2a12035", "log_sha256": "80ce004845467e2df85f0c0aa9615ca94becbd9e34a92ca12f599cf3e2a12035", "checks": 24, "ok": true, "renderer_before": {"window_id": 2097154, "requested": "auto", "actual": "software", "driver": ""}, "renderer_after": {"window_id": 2097215, "requested": "auto", "actual": "software", "driver": ""}, "display_ownership": null, "display_cleanup": null, "cleanup": {"owned_processes_remaining": []}}
+Traceback (most recent call last):
+  File "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/run.py", line 46, in <module>
+    own=raw["display_ownership"];assert own["pid_lock_verified"] and own["filesystem_peer_pid_verified"]
+        ~~~^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'display_ownership'

@@ -1,0 +1,62 @@
+{
+  "passed": true,
+  "sanitizers": true,
+  "commands": [
+    [
+      "wayland-scanner",
+      "client-header",
+      "/usr/share/wayland-protocols/unstable/primary-selection/primary-selection-unstable-v1.xml",
+      "WORKTREE/artifacts/wayland-services/primary-selection-client-protocol.h"
+    ],
+    [
+      "wayland-scanner",
+      "private-code",
+      "/usr/share/wayland-protocols/unstable/primary-selection/primary-selection-unstable-v1.xml",
+      "WORKTREE/artifacts/wayland-services/primary-selection-protocol.c"
+    ],
+    [
+      "wayland-scanner",
+      "client-header",
+      "/usr/share/wayland-protocols/unstable/text-input/text-input-unstable-v3.xml",
+      "WORKTREE/artifacts/wayland-services/text-input-client-protocol.h"
+    ],
+    [
+      "wayland-scanner",
+      "private-code",
+      "/usr/share/wayland-protocols/unstable/text-input/text-input-unstable-v3.xml",
+      "WORKTREE/artifacts/wayland-services/text-input-protocol.c"
+    ],
+    [
+      "cc",
+      "-std=c11",
+      "-O1",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-I",
+      "WORKTREE/artifacts/wayland-services",
+      "WORKTREE/tests/wayland_services_budget.c",
+      "WORKTREE/artifacts/wayland-services/primary-selection-protocol.c",
+      "WORKTREE/artifacts/wayland-services/text-input-protocol.c",
+      "-lwayland-client",
+      "-lm",
+      "-o",
+      "WORKTREE/artifacts/wayland-services/wayland-services-budget",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer"
+    ],
+    [
+      "WORKTREE/artifacts/wayland-services/wayland-services-budget"
+    ]
+  ],
+  "source_sha256": {
+    "native/wayland_services.c": "56b40c13395e6a3e6f31fa447e835b195d43390426f3f3537460c8b0bd4cba25",
+    "native/wayland_services.h": "e79bb9e9e37eda3b30e33bee132df26c0b3033c0b0ec65690062632915e3ff4f",
+    "tests/wayland_services_budget.c": "491f25f06714a3aa820137a3f1c893ce0683632576b4132e50d9339e4fe20410",
+    "tests/wayland_services.py": "da4bee3923d212d956d6b6ecad3d401f6372ce86c5d6f2b6e9e38bd63996aea1"
+  },
+  "stdout": "PASS: full-budget replacement, oversize rejection, live-writer preservation, cancelled-writer lifetime, final accounting\n",
+  "stderr": "",
+  "finished": 1795144336.9459078
+}
