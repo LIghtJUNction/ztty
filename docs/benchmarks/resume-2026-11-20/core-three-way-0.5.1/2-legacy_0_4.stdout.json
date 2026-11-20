@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "scope": "parser plus screen model; no PTY, renderer or display",
+  "geometry": [120, 32],
+  "cell_bytes": 28,
+  "initial_core_heap_bytes": 107932,
+  "ascii_mib_s": 312.195,
+  "ascii_full_history_mib_s": 162.234,
+  "sgr_mib_s": 168.917,
+  "unicode_mib_s": 102.710,
+  "steady_state_allocations": 0,
+  "edit_ns": {"p50": 60, "p95": 63, "p99": 63, "allocations": 0},
+  "burst_1024_ns": {"p50": 2663, "p95": 3137, "p99": 3257, "allocations": 0}
+}

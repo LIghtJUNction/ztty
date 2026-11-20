@@ -1,0 +1,1011 @@
+{
+  "schema": 1,
+  "ok": true,
+  "scope": "Parser and screen model only; no PTY, renderer, display or physical input latency.",
+  "timestamp_utc": "2026-11-20T00:45:16.143068+00:00",
+  "collector_sha256": "6d7ce5689394f725cbe467a1cea19a7ee0fa5d6d2c1bcbb23ef6c9f6427c4f62",
+  "host_pressure_helper_sha256": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+  "root_source": "29bec5c9a9fa6afafe3fd034f63ee0bfe465b736",
+  "sources": {
+    "legacy_0_4": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+    "published_0_5": "13d5e2c74571d35cccd920b1204798211b70c79f",
+    "candidate_0_5_1": "85f51c04aa40dd6f1788a9bde9f3e00beb16ea6d"
+  },
+  "binary_sha256": {
+    "legacy_0_4": "4b3f5d75d409cb697d46a41937e87d2123a59b67127dd2178c1e115423ee0d5d",
+    "published_0_5": "7c645edd3c7fe9feae80386c93be856003b1b938f8ad20b5f47dd0898b64d652",
+    "candidate_0_5_1": "aaa2720f2988d571f85978402102bf1ba0f7aa05147c215ecbd2fa18ecd469ed"
+  },
+  "profile": {
+    "opt_level": 3,
+    "lto": "fat",
+    "codegen_units": 1,
+    "panic": "abort",
+    "strip": "debuginfo"
+  },
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)\nbinary: rustc\ncommit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a\ncommit-date: 2026-11-09\nhost: x86_64-unknown-linux-gnu\nrelease: 1.100.0\nLLVM version: 23.1.5\n",
+  "example_sha256": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+  "cpu": 23,
+  "nice": -4,
+  "order": [
+    [
+      "legacy_0_4",
+      "published_0_5",
+      "candidate_0_5_1"
+    ],
+    [
+      "published_0_5",
+      "candidate_0_5_1",
+      "legacy_0_4"
+    ],
+    [
+      "candidate_0_5_1",
+      "legacy_0_4",
+      "published_0_5"
+    ]
+  ],
+  "order_note": "Three rotated orders give each version each position once; previous six samples remain separate.",
+  "original_six_samples_sha256": "bd01c057f00745fe5e186fd13d9ab4422eb4484b4027f8738193edd4263c43f6",
+  "runs": [
+    {
+      "side": "legacy_0_4",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.1962084770202637,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6390038528,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30091468800,
+        "swap_used_bytes": 18585219072,
+        "load_average": [
+          7.818359375,
+          7.46337890625,
+          6.41162109375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=1.03 avg300=0.75 total=770249992\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.65 avg300=1.17 total=1116045877\nfull avg10=0.00 avg60=0.61 avg300=1.12 total=1052856078",
+          "io": "some avg10=0.76 avg60=4.26 avg300=5.47 total=4039367866\nfull avg10=0.55 avg60=3.27 avg300=4.50 total=3467343409"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6408142848,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30091960320,
+        "swap_used_bytes": 18584727552,
+        "load_average": [
+          7.59228515625,
+          7.42236328125,
+          6.40380859375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=1.00 avg300=0.75 total=770253272\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.63 avg300=1.16 total=1116045912\nfull avg10=0.00 avg60=0.59 avg300=1.11 total=1052856114",
+          "io": "some avg10=0.62 avg60=4.12 avg300=5.44 total=4039375266\nfull avg10=0.45 avg60=3.17 avg300=4.47 total=3467350565"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 312.162,
+        "ascii_full_history_mib_s": 170.22,
+        "sgr_mib_s": 170.018,
+        "unicode_mib_s": 122.889,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 56,
+          "p95": 56,
+          "p99": 57,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2523,
+          "p95": 2770,
+          "p99": 3133,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "published_0_5",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 6.040552377700806,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6408142848,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30091960320,
+        "swap_used_bytes": 18584727552,
+        "load_average": [
+          7.59228515625,
+          7.42236328125,
+          6.40380859375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=1.00 avg300=0.75 total=770253272\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.63 avg300=1.16 total=1116045912\nfull avg10=0.00 avg60=0.59 avg300=1.11 total=1052856114",
+          "io": "some avg10=0.62 avg60=4.12 avg300=5.44 total=4039375266\nfull avg10=0.45 avg60=3.17 avg300=4.47 total=3467350565"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6298218496,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30124601344,
+        "swap_used_bytes": 18552086528,
+        "load_average": [
+          7.22412109375,
+          7.3486328125,
+          6.38525390625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.90 avg300=0.73 total=770275956\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.57 avg300=1.13 total=1116047422\nfull avg10=0.00 avg60=0.54 avg300=1.09 total=1052857608",
+          "io": "some avg10=0.34 avg60=3.73 avg300=5.32 total=4039423197\nfull avg10=0.24 avg60=2.86 avg300=4.38 total=3467388176"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 208.567,
+        "ascii_full_history_mib_s": 151.463,
+        "sgr_mib_s": 142.509,
+        "unicode_mib_s": 20.993,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 71,
+          "p95": 76,
+          "p99": 79,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 4682,
+          "p95": 14430,
+          "p99": 17299,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "candidate_0_5_1",
+      "round": 1,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-append-benchmark-bounded"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.15417218208313,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6298218496,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30124601344,
+        "swap_used_bytes": 18552086528,
+        "load_average": [
+          7.22412109375,
+          7.3486328125,
+          6.38525390625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.90 avg300=0.73 total=770275956\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.57 avg300=1.13 total=1116047422\nfull avg10=0.00 avg60=0.54 avg300=1.09 total=1052857608",
+          "io": "some avg10=0.34 avg60=3.73 avg300=5.32 total=4039423197\nfull avg10=0.24 avg60=2.86 avg300=4.38 total=3467388176"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6323609600,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30132957184,
+        "swap_used_bytes": 18543730688,
+        "load_average": [
+          7.0458984375,
+          7.3095703125,
+          6.37744140625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.82 avg300=0.72 total=770295114\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.52 avg300=1.11 total=1116048041\nfull avg10=0.00 avg60=0.48 avg300=1.06 total=1052858136",
+          "io": "some avg10=0.87 avg60=3.53 avg300=5.25 total=4039527060\nfull avg10=0.55 avg60=2.68 avg300=4.31 total=3467477591"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 246.815,
+        "ascii_full_history_mib_s": 140.176,
+        "sgr_mib_s": 116.447,
+        "unicode_mib_s": 23.092,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 58,
+          "p95": 65,
+          "p99": 69,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2858,
+          "p95": 3441,
+          "p99": 4109,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "published_0_5",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.192576169967651,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6323609600,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30132957184,
+        "swap_used_bytes": 18543730688,
+        "load_average": [
+          7.0458984375,
+          7.3095703125,
+          6.37744140625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.82 avg300=0.72 total=770295114\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.52 avg300=1.11 total=1116048041\nfull avg10=0.00 avg60=0.48 avg300=1.06 total=1052858136",
+          "io": "some avg10=0.87 avg60=3.53 avg300=5.25 total=4039527060\nfull avg10=0.55 avg60=2.68 avg300=4.31 total=3467477591"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6339198976,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30140002304,
+        "swap_used_bytes": 18536685568,
+        "load_average": [
+          6.7216796875,
+          7.23779296875,
+          6.35888671875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.76 avg300=0.70 total=770303728\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.48 avg300=1.09 total=1116048061\nfull avg10=0.00 avg60=0.45 avg300=1.05 total=1052858156",
+          "io": "some avg10=0.58 avg60=3.30 avg300=5.18 total=4039567084\nfull avg10=0.37 avg60=2.51 avg300=4.25 total=3467516187"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 262.269,
+        "ascii_full_history_mib_s": 151.004,
+        "sgr_mib_s": 152.245,
+        "unicode_mib_s": 22.316,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 60,
+          "p95": 63,
+          "p99": 65,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2888,
+          "p95": 4156,
+          "p99": 4340,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "candidate_0_5_1",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-append-benchmark-bounded"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.566060781478882,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6339198976,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30140002304,
+        "swap_used_bytes": 18536685568,
+        "load_average": [
+          6.7216796875,
+          7.23779296875,
+          6.35888671875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.76 avg300=0.70 total=770303728\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.48 avg300=1.09 total=1116048061\nfull avg10=0.00 avg60=0.45 avg300=1.05 total=1052858156",
+          "io": "some avg10=0.58 avg60=3.30 avg300=5.18 total=4039567084\nfull avg10=0.37 avg60=2.51 avg300=4.25 total=3467516187"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6365958144,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30142763008,
+        "swap_used_bytes": 18533924864,
+        "load_average": [
+          6.50341796875,
+          7.18359375,
+          6.34619140625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.69 avg300=0.69 total=770309879\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.43 avg300=1.07 total=1116048064\nfull avg10=0.00 avg60=0.41 avg300=1.03 total=1052858159",
+          "io": "some avg10=0.44 avg60=3.02 avg300=5.08 total=4039603161\nfull avg10=0.32 avg60=2.30 avg300=4.17 total=3467549993"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 233.192,
+        "ascii_full_history_mib_s": 151.036,
+        "sgr_mib_s": 145.0,
+        "unicode_mib_s": 28.522,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 71,
+          "p95": 72,
+          "p99": 72,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2891,
+          "p95": 3706,
+          "p99": 3991,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "legacy_0_4",
+      "round": 2,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.333798885345459,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6365958144,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30142763008,
+        "swap_used_bytes": 18533924864,
+        "load_average": [
+          6.50341796875,
+          7.18359375,
+          6.34619140625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.69 avg300=0.69 total=770309879\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.43 avg300=1.07 total=1116048064\nfull avg10=0.00 avg60=0.41 avg300=1.03 total=1052858159",
+          "io": "some avg10=0.44 avg60=3.02 avg300=5.08 total=4039603161\nfull avg10=0.32 avg60=2.30 avg300=4.17 total=3467549993"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6358835200,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30146322432,
+        "swap_used_bytes": 18530365440,
+        "load_average": [
+          6.50341796875,
+          7.18359375,
+          6.34619140625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.67 avg300=0.68 total=770313583\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.42 avg300=1.06 total=1116048361\nfull avg10=0.00 avg60=0.39 avg300=1.02 total=1052858448",
+          "io": "some avg10=0.36 avg60=2.92 avg300=5.04 total=4039619272\nfull avg10=0.26 avg60=2.23 avg300=4.14 total=3467565834"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 312.195,
+        "ascii_full_history_mib_s": 162.234,
+        "sgr_mib_s": 168.917,
+        "unicode_mib_s": 102.71,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 60,
+          "p95": 63,
+          "p99": 63,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2663,
+          "p95": 3137,
+          "p99": 3257,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "candidate_0_5_1",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-append-benchmark-bounded"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.487843751907349,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6358851584,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30146322432,
+        "swap_used_bytes": 18530365440,
+        "load_average": [
+          6.50341796875,
+          7.18359375,
+          6.34619140625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.67 avg300=0.68 total=770313583\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.42 avg300=1.06 total=1116048361\nfull avg10=0.00 avg60=0.39 avg300=1.02 total=1052858448",
+          "io": "some avg10=0.36 avg60=2.92 avg300=5.04 total=4039619272\nfull avg10=0.26 avg60=2.23 avg300=4.14 total=3467565834"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6356078592,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30147186688,
+        "swap_used_bytes": 18529501184,
+        "load_average": [
+          6.302734375,
+          7.13037109375,
+          6.33349609375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.62 avg300=0.68 total=770319646\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.39 avg300=1.05 total=1116048383\nfull avg10=0.00 avg60=0.37 avg300=1.01 total=1052858471",
+          "io": "some avg10=0.24 avg60=2.73 avg300=4.97 total=4039634677\nfull avg10=0.17 avg60=2.08 avg300=4.08 total=3467580077"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 270.757,
+        "ascii_full_history_mib_s": 151.205,
+        "sgr_mib_s": 143.22,
+        "unicode_mib_s": 29.408,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 59,
+          "p95": 61,
+          "p99": 66,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3066,
+          "p95": 3590,
+          "p99": 3829,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "legacy_0_4",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/before-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.430246591567993,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6356078592,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30147186688,
+        "swap_used_bytes": 18529501184,
+        "load_average": [
+          6.302734375,
+          7.13037109375,
+          6.33349609375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.62 avg300=0.68 total=770319646\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.39 avg300=1.05 total=1116048383\nfull avg10=0.00 avg60=0.37 avg300=1.01 total=1052858471",
+          "io": "some avg10=0.24 avg60=2.73 avg300=4.97 total=4039634677\nfull avg10=0.17 avg60=2.08 avg300=4.08 total=3467580077"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6351286272,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30147575808,
+        "swap_used_bytes": 18529112064,
+        "load_average": [
+          6.35888671875,
+          7.1279296875,
+          6.33740234375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.60 avg300=0.67 total=770324407\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.38 avg300=1.04 total=1116048384\nfull avg10=0.00 avg60=0.36 avg300=1.00 total=1052858471",
+          "io": "some avg10=0.74 avg60=2.74 avg300=4.96 total=4039791327\nfull avg10=0.50 avg60=2.08 avg300=4.07 total=3467732136"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 28,
+        "initial_core_heap_bytes": 107932,
+        "ascii_mib_s": 254.488,
+        "ascii_full_history_mib_s": 140.62,
+        "sgr_mib_s": 171.131,
+        "unicode_mib_s": 113.286,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 60,
+          "p95": 61,
+          "p99": 61,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2923,
+          "p95": 3642,
+          "p99": 3822,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    },
+    {
+      "side": "published_0_5",
+      "round": 3,
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "WORKTREE/artifacts/benchmark-final/after-zterm-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.233571767807007,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6351286272,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30147575808,
+        "swap_used_bytes": 18529112064,
+        "load_average": [
+          6.35888671875,
+          7.1279296875,
+          6.33740234375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.60 avg300=0.67 total=770324407\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.38 avg300=1.04 total=1116048384\nfull avg10=0.00 avg60=0.36 avg300=1.00 total=1052858471",
+          "io": "some avg10=0.74 avg60=2.74 avg300=4.96 total=4039791327\nfull avg10=0.50 avg60=2.08 avg300=4.07 total=3467732136"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 6422441984,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 30160396288,
+        "swap_used_bytes": 18516291584,
+        "load_average": [
+          6.009765625,
+          7.04248046875,
+          6.31396484375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.54 avg300=0.66 total=770331508\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.34 avg300=1.02 total=1116048448\nfull avg10=0.00 avg60=0.32 avg300=0.98 total=1052858535",
+          "io": "some avg10=1.60 avg60=2.76 avg300=4.92 total=4039906121\nfull avg10=1.47 avg60=2.16 avg300=4.05 total=3467843711"
+        }
+      },
+      "stderr": "",
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 221.1,
+        "ascii_full_history_mib_s": 144.584,
+        "sgr_mib_s": 150.756,
+        "unicode_mib_s": 22.421,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 59,
+          "p95": 64,
+          "p99": 66,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2871,
+          "p95": 3044,
+          "p99": 3208,
+          "allocations": 0
+        }
+      },
+      "host_contention_after": []
+    }
+  ],
+  "status": "complete",
+  "execution_context_before": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ],
+    "nice": -4,
+    "execution": "Direct native exec; no task-created systemd build unit or CPU quota."
+  },
+  "summary": {
+    "ascii_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          312.162,
+          312.195,
+          254.488
+        ],
+        "published_0_5": [
+          208.567,
+          262.269,
+          221.1
+        ],
+        "candidate_0_5_1": [
+          246.815,
+          233.192,
+          270.757
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 312.162,
+        "published_0_5": 221.1,
+        "candidate_0_5_1": 246.815
+      },
+      "candidate_over_published": 1.116304839439168,
+      "candidate_over_legacy": 0.7906631812968907
+    },
+    "ascii_full_history_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          170.22,
+          162.234,
+          140.62
+        ],
+        "published_0_5": [
+          151.463,
+          151.004,
+          144.584
+        ],
+        "candidate_0_5_1": [
+          140.176,
+          151.036,
+          151.205
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 162.234,
+        "published_0_5": 151.004,
+        "candidate_0_5_1": 151.036
+      },
+      "candidate_over_published": 1.0002119149161612,
+      "candidate_over_legacy": 0.9309762441904902
+    },
+    "sgr_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          170.018,
+          168.917,
+          171.131
+        ],
+        "published_0_5": [
+          142.509,
+          152.245,
+          150.756
+        ],
+        "candidate_0_5_1": [
+          116.447,
+          145.0,
+          143.22
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 170.018,
+        "published_0_5": 150.756,
+        "candidate_0_5_1": 143.22
+      },
+      "candidate_over_published": 0.9500119398232906,
+      "candidate_over_legacy": 0.8423813949111271
+    },
+    "unicode_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          122.889,
+          102.71,
+          113.286
+        ],
+        "published_0_5": [
+          20.993,
+          22.316,
+          22.421
+        ],
+        "candidate_0_5_1": [
+          23.092,
+          28.522,
+          29.408
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 113.286,
+        "published_0_5": 22.316,
+        "candidate_0_5_1": 28.522
+      },
+      "candidate_over_published": 1.2780964330525184,
+      "candidate_over_legacy": 0.25176985682255526
+    },
+    "cell_bytes": {
+      "samples": {
+        "legacy_0_4": [
+          28,
+          28,
+          28
+        ],
+        "published_0_5": [
+          32,
+          32,
+          32
+        ],
+        "candidate_0_5_1": [
+          32,
+          32,
+          32
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 28,
+        "published_0_5": 32,
+        "candidate_0_5_1": 32
+      },
+      "candidate_over_published": 1.0,
+      "candidate_over_legacy": 1.1428571428571428
+    },
+    "initial_core_heap_bytes": {
+      "samples": {
+        "legacy_0_4": [
+          107932,
+          107932,
+          107932
+        ],
+        "published_0_5": [
+          123292,
+          123292,
+          123292
+        ],
+        "candidate_0_5_1": [
+          123292,
+          123292,
+          123292
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 107932,
+        "published_0_5": 123292,
+        "candidate_0_5_1": 123292
+      },
+      "candidate_over_published": 1.0,
+      "candidate_over_legacy": 1.1423118259644962
+    },
+    "steady_state_allocations": {
+      "samples": {
+        "legacy_0_4": [
+          0,
+          0,
+          0
+        ],
+        "published_0_5": [
+          0,
+          0,
+          0
+        ],
+        "candidate_0_5_1": [
+          0,
+          0,
+          0
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 0,
+        "published_0_5": 0,
+        "candidate_0_5_1": 0
+      },
+      "candidate_over_published": null,
+      "candidate_over_legacy": null
+    }
+  },
+  "source_and_binary_identities_preserved": true,
+  "original_six_samples_unchanged": true,
+  "execution_context_after": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ],
+    "nice": -4,
+    "execution": "Direct native exec; no task-created systemd build unit or CPU quota."
+  }
+}
