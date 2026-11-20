@@ -517,6 +517,114 @@ fn kernel_errors_preserve_pending_input_and_terminal_size() {
     assert_eq!(fs::read_dir("/dev/fd").unwrap().count(), descriptors_before);
 }
 
+#[cfg(target_os = "linux")]
+fn large_input_survives_backpressure_and_cancellation() {
+    use std::{
+        io::{ErrorKind, Read},
+        os::fd::{AsRawFd, FromRawFd, OwnedFd},
+    };
+
+    const INPUT_BYTES: usize = 2 * 1024 * 1024;
+
+    let mut fixture = Fixture::new("exit", 8 * 1024 * 1024);
+    assert!(
+        fixture
+            .core
+            .pty
+            .wait_timeout(1000)
+            .unwrap()
+            .unwrap()
+            .success()
+    );
+    let mut descriptors = [-1; 2];
+    assert_eq!(
+        unsafe { libc::pipe2(descriptors.as_mut_ptr(), libc::O_NONBLOCK | libc::O_CLOEXEC) },
+        0
+    );
+    let mut reader = unsafe { fs::File::from_raw_fd(descriptors[0]) };
+    let writer = unsafe { OwnedFd::from_raw_fd(descriptors[1]) };
+    let pipe_capacity = unsafe { libc::fcntl(writer.as_raw_fd(), libc::F_SETPIPE_SZ, 4096) };
+    assert!(
+        pipe_capacity > 0 && (pipe_capacity as usize) < INPUT_BYTES,
+        "pipe must be smaller than the input payload: {pipe_capacity}"
+    );
+    println!("input backpressure pipe capacity: {pipe_capacity} bytes");
+    // The fixture's child has exited. Replace only its owned master fd with a
+    // real bounded kernel pipe, so partial writes and WouldBlock are repeatable.
+    assert_eq!(
+        unsafe { dup2(writer.as_raw_fd(), fixture.core.pty.fd()) },
+        fixture.core.pty.fd()
+    );
+    drop(writer);
+
+    let drain = |core: &mut SessionCore, reader: &mut fs::File, expected: &[u8]| {
+        let start = Instant::now();
+        let mut received = 0;
+        let mut buffer = [0; 4093];
+        while received < expected.len() {
+            assert!(start.elapsed() < DEADLINE, "input transfer did not finish");
+            core.flush_input().unwrap();
+            match reader.read(&mut buffer) {
+                Ok(0) => panic!("pipe closed before all input was read"),
+                Ok(count) => {
+                    assert_eq!(&buffer[..count], &expected[received..received + count]);
+                    received += count;
+                }
+                Err(error) if error.kind() == ErrorKind::WouldBlock => {}
+                Err(error) => panic!("input read failed: {error}"),
+            }
+        }
+        core.flush_input().unwrap();
+        assert!(!core.input.pending());
+        assert_eq!(
+            reader.read(&mut buffer).unwrap_err().kind(),
+            ErrorKind::WouldBlock
+        );
+    };
+
+    for round in 0..3u8 {
+        let mut input: Vec<u8> = (0..INPUT_BYTES + 31)
+            .map(|index| (index as u8).wrapping_mul(37).wrapping_add(round))
+            .collect();
+        assert!(fixture.core.input.push(&input));
+        fixture.core.flush_input().unwrap();
+        let pending = fixture.core.input.pending_len();
+        assert!(
+            pending > 0 && pending < input.len(),
+            "partial write was not exercised"
+        );
+        fixture.core.flush_input().unwrap();
+        assert_eq!(
+            fixture.core.input.pending_len(),
+            pending,
+            "WouldBlock lost input"
+        );
+        assert!(fixture.core.input.push(b"after partial write"));
+        input.extend_from_slice(b"after partial write");
+        drain(&mut fixture.core, &mut reader, &input);
+    }
+
+    let input = vec![b'c'; INPUT_BYTES];
+    assert!(fixture.core.input.push(&input));
+    fixture.core.flush_input().unwrap();
+    let written = input.len() - fixture.core.input.pending_len();
+    assert!(written > 0 && written < input.len());
+    assert_eq!(fixture.core.acquire("local", false), Ok(false));
+    assert_eq!(fixture.core.input.pending_len(), input.len() - written);
+    assert_eq!(fixture.core.acquire("agent:queue", true), Ok(true));
+    assert!(!fixture.core.input.pending());
+    // Control changes cancel only the suffix not yet accepted by the kernel.
+    drain(&mut fixture.core, &mut reader, &input[..written]);
+    assert!(fixture.core.input.push(&input));
+    fixture.core.release("agent:queue").unwrap();
+    assert!(!fixture.core.input.pending());
+    let mut byte = [0];
+    assert_eq!(
+        reader.read(&mut byte).unwrap_err().kind(),
+        ErrorKind::WouldBlock
+    );
+}
+
 fn main() {
     let arguments: Vec<_> = std::env::args_os().collect();
     if arguments
@@ -535,6 +643,11 @@ fn main() {
         println!("ok");
     };
     run("bounded atomic input", queue_is_bounded_and_atomic);
+    #[cfg(target_os = "linux")]
+    run(
+        "large input partial writes, backpressure and cancellation",
+        large_input_survives_backpressure_and_cancellation,
+    );
     run(
         "control and queue cancellation",
         ownership_cancels_only_on_change,
