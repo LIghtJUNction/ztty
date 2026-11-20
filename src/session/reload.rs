@@ -7,6 +7,19 @@ use ztty::session_core::CoreCheckpoint;
 
 type ReloadCheckpoint = (Value, Vec<Vec<u8>>, Vec<i32>);
 
+fn last_view_backend(value: &Value) -> Result<Option<Backend>, String> {
+    let previous = match value.get("last_view_backend") {
+        None | Some(Value::Null) => None,
+        Some(value) => Some(value.as_str().ok_or("invalid reload last view backend")?),
+    };
+    let current = value
+        .get("ui")
+        .filter(|ui| **ui != Value::Null)
+        .map(|ui| text(ui, "backend"))
+        .transpose()?;
+    Backend::from_checkpoint(previous, current).map_err(String::from)
+}
+
 fn optional_text(value: &Value, key: &str) -> Result<Option<String>, String> {
     match value.get(key) {
         Some(Value::Null) => Ok(None),
@@ -343,6 +356,12 @@ impl Pool {
                 ),
                 ("base_font", session.base_font.clone().into()),
                 (
+                    "last_view_backend",
+                    session
+                        .last_view_backend
+                        .map_or(Value::Null, |backend| Value::from(backend.name())),
+                ),
+                (
                     "ui",
                     session
                         .ui
@@ -454,6 +473,7 @@ pub(crate) fn validate_reload(meta: &Value, terminals: &[zterm::Terminal]) -> Re
         process_id(session)?;
         raw_status(session)?;
         boolean(session, "persistent")?;
+        last_view_backend(session)?;
         Appearance::from_json(
             session
                 .get("appearance")
@@ -604,6 +624,7 @@ impl Pool {
             }
             ui.window.visible(ui.visible);
             session.core.terminal.mark_all_dirty();
+            session.last_view_backend = Some(Backend::X11);
             session.ui = Some(ui);
         }
         for layout in list(meta, "layouts")? {
@@ -665,6 +686,7 @@ pub(crate) fn serve_reloaded(meta: Value, terminals: Vec<zterm::Terminal>) -> Re
                 .map_err(String::from)?,
             core: SessionCore::restore_checkpoint(pty, terminal, core),
             ui: None,
+            last_view_backend: last_view_backend(saved)?,
             persistent: boolean(saved, "persistent")?,
             launch_env: environment(saved)?,
             initial_cwd: broker::unhex(text(saved, "cwd")?)?,

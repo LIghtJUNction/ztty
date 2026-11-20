@@ -1,9 +1,9 @@
 //! Broker request validation, session creation and input ownership.
-use super::{Pool, Session, Ui, pty_size};
+use super::{Pool, Session, Ui, ViewSelection, pty_size};
 use crate::{
     Appearance,
+    backend::{Backend, Preference},
     broker::{self, Reply},
-    display::Window,
     json::{self, Value},
     os, session_control,
     session_core::SessionCore,
@@ -44,9 +44,8 @@ impl Pool {
     }
 
     pub(super) fn create(&mut self, request: &Value) -> Result<Value, String> {
-        if request.get("_backend").and_then(Value::as_str) == Some("wayland")
-            && request.get("target").is_some()
-        {
+        let backend = backend_preference(request)?;
+        if backend == Preference::Wayland && request.get("target").is_some() {
             return Err(
                 "Wayland workspaces are not available; use independent session windows".into(),
             );
@@ -175,26 +174,61 @@ impl Pool {
             .get("headless")
             .and_then(Value::as_bool)
             .unwrap_or(true);
+        let layout = request
+            .get("layout")
+            .and_then(Value::as_str)
+            .unwrap_or("tab");
+        // Check workspace capability, destination and capacity before starting
+        // a child. Later native/PTY errors retain their existing cleanup path;
+        // they must never trigger backend fallback or replay the command.
+        let target = if let Some(target) = request.get("target") {
+            if headless {
+                return Err("workspace launches require a window".into());
+            }
+            let target = target.as_str().ok_or("target must be a session selector")?;
+            let index = self.selector(&json::object([("session", Value::from(target))]))?;
+            let session = &self.sessions[index];
+            let ui = session.ui.as_ref().ok_or("target has no window")?;
+            ui.window.x11().map_err(String::from)?;
+            if !ui.open || ui.window.id == 0 {
+                return Err("target window is closing".into());
+            }
+            self.group_layout(session.id, id, layout)?;
+            Some((session.id, ui.window.display))
+        } else {
+            None
+        };
         let ui = if headless {
             None
         } else {
-            let c = self.connection(
+            let window = self.open_window(
                 &env,
-                request.get("_backend").and_then(Value::as_str) == Some("wayland"),
+                ViewSelection {
+                    preference: backend,
+                    previous: None,
+                    workspace: target.is_some(),
+                },
+                (cols, rows),
+                &appearance,
+                !observe,
             )?;
+            if let Some((_, display)) = target
+                && window.display != display
+            {
+                return Err("sessions on different displays cannot share a window".into());
+            }
             let attachment = self.next_attachment;
             self.next_attachment += 1;
-            let window = if observe {
-                Window::new_view(cols, rows, &appearance, &c, false)
-            } else {
-                Window::new_shared(cols, rows, &appearance, &c)
-            }
-            .map_err(String::from)?;
             let mut ui = Ui::new(window, attachment);
             ui.read_only = observe;
             ui.owns_child = true;
             Some(ui)
         };
+        let last_view_backend = ui
+            .as_ref()
+            .map(|ui| Backend::parse(ui.window.backend()))
+            .transpose()
+            .map_err(String::from)?;
         let directory = WorkingDirectory::enter(&cwd)?;
         env.retain(|e| !e.to_bytes().starts_with(b"PWD="));
         let mut actual = [0u8; 4096];
@@ -242,6 +276,7 @@ impl Pool {
             appearance,
             core: SessionCore::new(pty, terminal, input_owner, 8 * 1024 * 1024),
             ui,
+            last_view_backend,
             persistent: origin != "local",
             launch_env: env,
             initial_cwd: cwd,
@@ -251,22 +286,11 @@ impl Pool {
             self.watcher.watch(path);
         }
         self.sessions.push(session);
-        if let Some(target) = request.get("target").and_then(Value::as_str) {
-            let target_request = json::object([("session", Value::from(target))]);
-            let result = self.selector(&target_request).and_then(|target_index| {
-                self.group(
-                    self.sessions[target_index].id,
-                    id,
-                    request
-                        .get("layout")
-                        .and_then(Value::as_str)
-                        .unwrap_or("tab"),
-                )
-            });
-            if let Err(error) = result {
-                self.retire(self.sessions.len() - 1);
-                return Err(error);
-            }
+        if let Some((target, _)) = target
+            && let Err(error) = self.group(target, id, layout)
+        {
+            self.retire(self.sessions.len() - 1);
+            return Err(error);
         }
         Ok(self.sessions.last().expect("created session").info())
     }
@@ -600,7 +624,9 @@ impl Pool {
                 Ok(Reply::Value(session.info()))
             }
             "attach" => {
-                if let Some(requested) = request.get("_backend").and_then(Value::as_str)
+                let backend = backend_preference(request)?;
+                if backend != Preference::Auto
+                    && let Some(requested) = request.get("_backend").and_then(Value::as_str)
                     && self.sessions[index]
                         .ui
                         .as_ref()
@@ -632,11 +658,24 @@ impl Pool {
                     return Ok(Reply::Value(self.sessions[index].info()));
                 }
                 let env = environment(request)?;
-                let connection = self.connection(
-                    &env,
-                    request.get("_backend").and_then(Value::as_str) == Some("wayland"),
-                )?;
-                self.attach_view(index, read_only, &connection, request.get("_appearance"))?;
+                let session = &self.sessions[index];
+                let appearance = request
+                    .get("_appearance")
+                    .map(Appearance::from_json)
+                    .transpose()
+                    .map_err(String::from)?
+                    .unwrap_or_else(|| session.appearance.clone());
+                let size = (session.core.terminal.cols(), session.core.terminal.rows());
+                let observing = read_only || !session.core.owns("local");
+                let selection = ViewSelection {
+                    preference: backend,
+                    previous: session.last_view_backend,
+                    workspace: false,
+                };
+                let window = self.open_window(&env, selection, size, &appearance, !observing)?;
+                // Updating an existing PTY is outside the initialization retry
+                // closure, exactly as spawning a new PTY is in create().
+                self.commit_view(index, read_only, window, appearance)?;
                 Ok(Reply::Value(self.sessions[index].info()))
             }
             "wait" => {
@@ -655,6 +694,25 @@ impl Pool {
             _ => Err(format!("unknown session operation: {op}")),
         }
     }
+}
+
+fn backend_preference(request: &Value) -> Result<Preference, String> {
+    if let Some(value) = request.get("_backend_auto")
+        && value.as_bool().ok_or("_backend_auto must be a boolean")?
+    {
+        return Ok(Preference::Auto);
+    }
+    request
+        .get("_backend")
+        .map_or(Ok(Preference::X11), |value| {
+            Preference::parse(
+                value
+                    .as_str()
+                    .ok_or("_backend must be a string")?
+                    .as_bytes(),
+            )
+            .map_err(String::from)
+        })
 }
 
 pub(super) fn bounded(

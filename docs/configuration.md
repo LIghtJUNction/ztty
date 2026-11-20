@@ -84,8 +84,35 @@ artifacts and acceptance are recorded in the
 
 Native Wayland uses xdg-shell, EGL/GLES and XKB, with the same Linux session
 broker and PTY ownership as X11. Enable the Cargo feature when building from
-source. The official Linux package build enables it; runtime startup defaults
-to X11.
+source. The official Linux package build enables it. Current development builds
+default to `--backend auto`: they initialize the complete X11 view first, which
+retains tabs, splits and executable reload on X11 and XWayland desktops. If X11
+initialization fails, Auto can initialize a native Wayland view before starting
+the command. This selects the best supported path; it is not a claim that one
+backend is faster on every machine.
+
+Automatic native fallback is allowed for a new broker or a pool that already
+has a native Wayland view. It is refused for an existing pool of only X11 or
+headless sessions, because adding a Wayland view would remove executable reload
+from that pool. Workspace launches require X11 and validate their target before
+starting a child. Explicit `--backend x11` and `--backend wayland` do not fall
+back. Neither a later display failure nor a request timeout replays the command.
+
+`ztty attach` also defaults to Auto and keeps an existing view's backend. Each
+session remembers its last successfully attached backend across detach. Auto
+reattaches that backend to the same PTY, including restoring the last native
+Wayland view when no X11 display is available. It does not migrate a known view
+to another backend after an initialization failure; an explicit backend can
+request that change. A headless session that has never had a view still uses
+the new-view selection and compatibility checks above.
+
+New clients use a concrete backend name plus an optional Auto flag on the
+broker protocol; an older broker retains its legacy concrete-backend behavior
+until it is updated. The optional `last_view_backend` checkpoint field preserves
+detached-view provenance across executable reload. Older checkpoints without
+this field infer X11 only from an attached X11 view; detached provenance stays
+unknown. Reload of active native Wayland views remains unsupported. The default
+Cargo feature set remains unchanged.
 
 Install these dependencies in addition to the Linux build dependencies in the
 [README](../README.md#build-and-run):

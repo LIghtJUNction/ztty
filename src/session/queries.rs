@@ -28,6 +28,11 @@ impl Session {
                     .map_or(Value::Null, |ui| Value::from(ui.window.backend())),
             ),
             (
+                "last_view_backend",
+                self.last_view_backend
+                    .map_or(Value::Null, |backend| Value::from(backend.name())),
+            ),
+            (
                 "read_only",
                 Value::Bool(self.ui.as_ref().is_some_and(|ui| ui.read_only)),
             ),

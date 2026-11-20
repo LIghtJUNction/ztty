@@ -1,6 +1,8 @@
 //! Shared PTYs and desktop windows, driven by one poll loop.
 use crate::{
-    Appearance, actions, broker, config_watch,
+    Appearance, actions,
+    backend::{self, Backend, Preference, Requirements},
+    broker, config_watch,
     display::{Connection, Window},
     json::{self, Value},
     layout::Layout,
@@ -136,6 +138,7 @@ struct Session {
     appearance: Appearance,
     core: SessionCore,
     ui: Option<Ui>,
+    last_view_backend: Option<Backend>,
     persistent: bool,
     launch_env: Vec<CString>,
     initial_cwd: CString,
@@ -216,6 +219,12 @@ struct Pool {
     watcher: config_watch::Watcher,
 }
 
+struct ViewSelection {
+    preference: Preference,
+    previous: Option<Backend>,
+    workspace: bool,
+}
+
 // Jobs outlive a disappearing view until their direct worker has been reaped.
 // Session and attachment identities prevent an old result reaching a new view.
 struct PluginRun {
@@ -275,6 +284,57 @@ impl Pool {
         let connection = Connection::new_for_display(name.as_deref()).map_err(String::from)?;
         self.connections.push((key, connection.clone()));
         Ok(connection)
+    }
+
+    fn open_window(
+        &mut self,
+        env: &[CString],
+        selection: ViewSelection,
+        size: (usize, usize),
+        appearance: &Appearance,
+        activate: bool,
+    ) -> Result<Window, String> {
+        // A native view currently prevents executable handover for the whole
+        // pool. Auto must not remove reload from an existing X11/headless pool.
+        let native_compatible = self.sessions.is_empty()
+            || self.sessions.iter().any(|session| {
+                session
+                    .ui
+                    .as_ref()
+                    .is_some_and(|ui| ui.window.backend() == "wayland")
+            });
+        backend::initialize(
+            selection.preference.for_attachment(selection.previous),
+            Requirements {
+                workspace: selection.workspace,
+                native_compatible,
+                native_compiled: cfg!(feature = "wayland"),
+            },
+            |backend| {
+                // XOpenDisplay(NULL) reads the broker's process environment.
+                // Auto must use the requesting client's display, not borrow a
+                // stale DISPLAY from the process that first started the pool.
+                if selection.preference == Preference::Auto
+                    && backend == Backend::X11
+                    && env
+                        .iter()
+                        .find_map(|entry| entry.to_bytes().strip_prefix(b"DISPLAY="))
+                        .is_none_or(|value| value.is_empty())
+                {
+                    return Err("DISPLAY is not set in the requesting client".into());
+                }
+                let connection = self.connection(env, backend == Backend::Wayland)?;
+                // Include renderer/font/native-surface setup in this attempt;
+                // obtaining a logical connection alone does not prove that a
+                // usable window exists. No PTY operation belongs in this closure.
+                if activate {
+                    Window::new_shared(size.0, size.1, appearance, &connection)
+                } else {
+                    Window::new_view(size.0, size.1, appearance, &connection, false)
+                }
+                .map_err(String::from)
+            },
+        )
     }
 
     fn open_palette(&mut self, index: usize, sessions: bool) -> Result<(), String> {
@@ -385,9 +445,7 @@ impl Pool {
         connection: &Rc<Connection>,
         appearance: Option<&Value>,
     ) -> Result<(), String> {
-        let attachment = self.next_attachment;
-        self.next_attachment += 1;
-        let session = &mut self.sessions[index];
+        let session = &self.sessions[index];
         let appearance = appearance
             .map(Appearance::from_json)
             .transpose()
@@ -402,6 +460,21 @@ impl Pool {
             !observing,
         )
         .map_err(String::from)?;
+        self.commit_view(index, read_only, window, appearance)
+    }
+
+    fn commit_view(
+        &mut self,
+        index: usize,
+        read_only: bool,
+        window: Window,
+        appearance: Appearance,
+    ) -> Result<(), String> {
+        let backend = Backend::parse(window.backend()).map_err(String::from)?;
+        let attachment = self.next_attachment;
+        self.next_attachment += 1;
+        let session = &mut self.sessions[index];
+        let observing = read_only || !session.core.owns("local");
         if !observing {
             session
                 .core
@@ -419,6 +492,7 @@ impl Pool {
         let mut ui = Ui::new(window, attachment);
         ui.read_only = read_only;
         session.appearance = appearance;
+        session.last_view_backend = Some(backend);
         session.ui = Some(ui);
         session.core.terminal.set_ui_host_enabled(true);
         Ok(())

@@ -181,7 +181,12 @@ impl Pool {
         }
     }
 
-    pub(super) fn group(&mut self, target: u64, moved: u64, mode: &str) -> Result<(), String> {
+    pub(super) fn group_layout(
+        &self,
+        target: u64,
+        moved: u64,
+        mode: &str,
+    ) -> Result<Layout, String> {
         if target == moved {
             return Err("cannot put a session beside itself".into());
         }
@@ -191,6 +196,21 @@ impl Pool {
             "down" => Some(Axis::Horizontal),
             _ => return Err("layout must be tab, right or down".into()),
         };
+        let mut layout = self
+            .workspace(target)
+            .map(|index| self.workspaces[index].layout.clone())
+            .unwrap_or_else(|| Layout::new(target));
+        layout.focus(target);
+        if let Some(axis) = axis {
+            layout.split(moved, axis)?;
+        } else {
+            layout.add_tab(moved)?;
+        }
+        Ok(layout)
+    }
+
+    pub(super) fn group(&mut self, target: u64, moved: u64, mode: &str) -> Result<(), String> {
+        let layout = self.group_layout(target, moved, mode)?;
         let a = self
             .sessions
             .iter()
@@ -206,21 +226,8 @@ impl Pool {
         if a.window.display != b.window.display {
             return Err("sessions on different displays cannot share a window".into());
         }
-        if self
-            .workspace(target)
-            .is_some_and(|i| self.workspaces[i].layout.contains(moved))
-        {
-            return Err("session already belongs to this workspace".into());
-        }
         let index = self.ensure_workspace(target)?;
         let parent = self.workspaces[index].window.id;
-        let mut layout = self.workspaces[index].layout.clone();
-        layout.focus(target);
-        if let Some(axis) = axis {
-            layout.split(moved, axis)?;
-        } else {
-            layout.add_tab(moved)?;
-        }
         // Reparent before destroying an emptied old container. X11 destroys a
         // parent's children, so reversing these operations would kill the view.
         let ui = self

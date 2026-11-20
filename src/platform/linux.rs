@@ -1,5 +1,5 @@
 //! Linux shared-session frontend. The broker owns PTYs and native windows.
-use crate::{Config, appearance::Appearance, broker, json, os};
+use crate::{Config, appearance::Appearance, backend::Preference, broker, json, os};
 use alloc::string::String;
 use core::ffi::CStr;
 
@@ -12,10 +12,7 @@ pub fn run(cfg: Config) -> Result<i32, String> {
         ("op", Value::from("create")),
         ("origin", Value::from("local")),
         ("headless", Value::Bool(false)),
-        (
-            "_backend",
-            Value::from(if cfg.wayland { "wayland" } else { "x11" }),
-        ),
+        ("_backend", Value::from(cfg.backend.legacy_backend().name())),
         ("observe", Value::Bool(cfg.observe)),
         ("cols", Value::from(cfg.cols)),
         ("rows", Value::from(cfg.rows)),
@@ -31,6 +28,9 @@ pub fn run(cfg: Config) -> Result<i32, String> {
             ),
         ),
     ]);
+    if cfg.backend == Preference::Auto {
+        request.set("_backend_auto", Value::Bool(true));
+    }
     if let Some(name) = cfg.name {
         request.set("name", Value::from(name));
     }
@@ -103,7 +103,7 @@ pub fn attach(args: &[&CStr]) -> Result<i32, String> {
         return Ok(0);
     }
     let mut observe = false;
-    let mut backend = "x11";
+    let mut backend = Preference::Auto;
     let mut args = args;
     while let Some(first) = args.first() {
         match first.to_bytes() {
@@ -112,13 +112,11 @@ pub fn attach(args: &[&CStr]) -> Result<i32, String> {
                 args = &args[1..];
             }
             b"--backend" => {
-                backend = args
-                    .get(1)
-                    .and_then(|s| s.to_str().ok())
-                    .ok_or("--backend needs x11 or wayland")?;
-                if !matches!(backend, "x11" | "wayland") {
-                    return Err("--backend needs x11 or wayland".into());
-                }
+                backend = Preference::parse(
+                    args.get(1)
+                        .ok_or("--backend needs auto, x11 or wayland")?
+                        .to_bytes(),
+                )?;
                 args = &args[2..];
             }
             _ => break,
@@ -126,20 +124,37 @@ pub fn attach(args: &[&CStr]) -> Result<i32, String> {
     }
     if args.len() != 1 {
         return Err(
-            "usage: ztty attach [--observe] [--backend x11|wayland] [NAME | ztty://ADDRESS]".into(),
+            "usage: ztty attach [--observe] [--backend auto|x11|wayland] [NAME | ztty://ADDRESS]"
+                .into(),
         );
     }
     let name = args[0]
         .to_str()
         .map_err(|_| "session selector must be UTF-8")?;
     let appearance = Appearance::load(None)?;
-    let value = broker::request(&object([
+    let mut request = object([
         ("op", Value::from("attach")),
         ("session", Value::from(name)),
         ("observe", Value::Bool(observe)),
-        ("_backend", Value::from(backend)),
+        ("_backend", Value::from(backend.legacy_backend().name())),
         ("_appearance", appearance.to_json()),
-    ]))?;
+    ]);
+    if backend == Preference::Auto {
+        // Old brokers ignore `_backend_auto`. Supply the existing concrete
+        // backend as well, so attaching their native view remains compatible.
+        let current = broker::request(&object([
+            ("op", Value::from("info")),
+            ("session", Value::from(name)),
+        ]))?;
+        if current.get("attached").and_then(Value::as_bool) == Some(true)
+            && let Some(existing @ ("x11" | "wayland")) =
+                current.get("backend").and_then(Value::as_str)
+        {
+            request.set("_backend", Value::from(existing));
+        }
+        request.set("_backend_auto", Value::Bool(true));
+    }
+    let value = broker::request(&request)?;
     wait_session(&value)
 }
 

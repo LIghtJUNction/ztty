@@ -6,6 +6,8 @@ extern crate alloc;
 
 mod appearance;
 #[cfg(target_os = "linux")]
+mod backend;
+#[cfg(target_os = "linux")]
 mod broker;
 #[cfg(target_os = "linux")]
 mod config_watch;
@@ -102,7 +104,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty restore-layout workspace.json\n\
        ztty reload [--binary /absolute/path/to/ztty]\n\
        ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]\n\n\
-  --backend x11|wayland Select Linux host (default: x11; Wayland is experimental)\n\
+  --backend auto|x11|wayland Select Linux host (default: auto; prefer full X11 support)\n\
   --name NAME          Name this local session\n\
   --observe            Open a standalone read-only view without requesting focus\n\
   --tab NAME           Open a new tab in NAME's window\n\
@@ -167,7 +169,7 @@ struct Config {
     #[cfg(target_os = "linux")]
     name: Option<String>,
     #[cfg(target_os = "linux")]
-    wayland: bool,
+    backend: backend::Preference,
     #[cfg(target_os = "linux")]
     observe: bool,
     #[cfg(target_os = "linux")]
@@ -195,7 +197,7 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         #[cfg(target_os = "linux")]
         name: None,
         #[cfg(target_os = "linux")]
-        wayland: false,
+        backend: backend::Preference::Auto,
         #[cfg(target_os = "linux")]
         observe: false,
         #[cfg(target_os = "linux")]
@@ -245,15 +247,11 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
             #[cfg(target_os = "linux")]
             b"--backend" => {
                 i += 1;
-                cfg.wayland = match args
-                    .get(i)
-                    .ok_or("--backend needs x11 or wayland")?
-                    .to_bytes()
-                {
-                    b"x11" => false,
-                    b"wayland" => true,
-                    _ => return Err("--backend must be x11 or wayland".into()),
-                };
+                cfg.backend = backend::Preference::parse(
+                    args.get(i)
+                        .ok_or("--backend needs auto, x11 or wayland")?
+                        .to_bytes(),
+                )?;
             }
             #[cfg(target_os = "linux")]
             b"--tab" | b"--split-right" | b"--split-down" => {
@@ -510,7 +508,7 @@ fn launch(args: &[&CStr]) -> Result<i32, String> {
         if let Some(cfg) = cfg {
             #[cfg(target_os = "linux")]
             {
-                if cfg.wayland {
+                if cfg.backend == backend::Preference::Wayland {
                     #[cfg(not(feature = "wayland"))]
                     {
                         return Err(
