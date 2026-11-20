@@ -1,0 +1,482 @@
+{
+  "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "run_id": 44656228400,
+  "run_attempt": 1,
+  "native_platforms": [
+    {
+      "platform": "linux",
+      "architecture": "aarch64",
+      "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "binary_sha256": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4",
+      "passed": true,
+      "primary_report": "reports/ztty-linux-aarch64/ztty-linux-aarch64.native.json",
+      "driver_tests": 17,
+      "working_directory_tests": 4,
+      "egl_tests": 6,
+      "gui_protocol_reports": 17,
+      "gui_protocol_checks": 278,
+      "input_vectors": 198,
+      "wayland_checks": 65,
+      "physical_gpu_or_desktop_ime": false
+    },
+    {
+      "platform": "linux",
+      "architecture": "x86_64",
+      "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "binary_sha256": "d1275e8ffbceb5ca3e4d3d501ffa33e2564a8a1a75609ed56ce7ac3270018cb5",
+      "passed": true,
+      "primary_report": "reports/ztty-linux-x86_64/ztty-linux-x86_64.native.json",
+      "driver_tests": 17,
+      "working_directory_tests": 4,
+      "egl_tests": 6,
+      "gui_protocol_reports": 17,
+      "gui_protocol_checks": 278,
+      "input_vectors": 198,
+      "wayland_checks": 65,
+      "physical_gpu_or_desktop_ime": false
+    },
+    {
+      "platform": "macos",
+      "architecture": "aarch64",
+      "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "binary_sha256": "1ac4c93ba32042a245d06ac4bae9749eecf6e5e499b586042f5e48c62983482b",
+      "passed": true,
+      "primary_report": "reports/ztty-macos-aarch64/ztty-macos-aarch64.native.json",
+      "contract_tests": 10,
+      "native_checks": 24,
+      "darwin_spawn_check_groups": 8,
+      "ime_keyboard": "not_performed",
+      "native_tested_before_ad_hoc_signature": true,
+      "signed_app_gui_rerun": false
+    },
+    {
+      "platform": "macos",
+      "architecture": "x86_64",
+      "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "binary_sha256": "b8ec52a9b8e61552a74a5302fa9efbfbee7af5e42dbbc427bbc46ec0c9cb6190",
+      "passed": true,
+      "primary_report": "reports/ztty-macos-x86_64/ztty-macos-x86_64.native.json",
+      "contract_tests": 10,
+      "native_checks": 24,
+      "darwin_spawn_check_groups": 8,
+      "ime_keyboard": "not_performed",
+      "native_tested_before_ad_hoc_signature": true,
+      "signed_app_gui_rerun": false
+    },
+    {
+      "platform": "windows",
+      "architecture": "aarch64",
+      "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+      "passed": true,
+      "primary_report": "reports/ztty-windows-aarch64/ztty-windows-aarch64.native.json",
+      "contract_tests": 41,
+      "native_checks": 31,
+      "cold_start": {
+        "required": 8,
+        "completed": 8,
+        "passed": true,
+        "runs": [
+          {
+            "number": 1,
+            "report": "ztty-windows-aarch64.native.cold-01.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "ea864a0bdc8bcdf6933bcaa5b5b773d7b0b64fa0e8e2f69a87da59662e9b2b7c",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.006887099999858037,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 2,
+            "report": "ztty-windows-aarch64.native.cold-02.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "91bc32c77d50a31fbcf8e3b3bcc4ed069df36914d7e410f8b39a9140e11bb30b",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.0066518999997242645,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 3,
+            "report": "ztty-windows-aarch64.native.cold-03.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "ecf208e078f74891331bcdfa18bf8c6593c2e07a0229e875353e28da4a502627",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.006149700000150915,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 4,
+            "report": "ztty-windows-aarch64.native.cold-04.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "7ae40868cae34e04df65d09afffde3cd2569fb66e0ecd9cbef945adc376e17d3",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.006424299999707728,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 5,
+            "report": "ztty-windows-aarch64.native.cold-05.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "469776e51f5684b4313f82ed1d2b5c3d6811e5accc100cd3fee907af5c89e4a8",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.006407200000012381,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 6,
+            "report": "ztty-windows-aarch64.native.cold-06.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "c7e63838c034d812bfd8cd51bd28042de4222d4e1e50a5f6192f9c5f7d8f4538",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.006708399999752146,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 7,
+            "report": "ztty-windows-aarch64.native.cold-07.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "0eb6d18423d757d8e0eeca60a5909474a4a862ec237307b57a3e541578651009",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.006615400000100635,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 8,
+            "report": "ztty-windows-aarch64.native.cold-08.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+            "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b",
+            "report_sha256": "b342ec8c2c896cfcdb6731474d44dae59b0dafc4f8e09a07f23d311cc91ef566",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.006684100000256876,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          }
+        ],
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+        "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b"
+      },
+      "workspace_checks": 22,
+      "paint_diagnostics": false,
+      "nc_rendering_diagnostics": false
+    },
+    {
+      "platform": "windows",
+      "architecture": "x86_64",
+      "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+      "passed": true,
+      "primary_report": "reports/ztty-windows-x86_64/ztty-windows-x86_64.native.json",
+      "contract_tests": 41,
+      "native_checks": 31,
+      "cold_start": {
+        "required": 8,
+        "completed": 8,
+        "passed": true,
+        "runs": [
+          {
+            "number": 1,
+            "report": "ztty-windows-x86_64.native.cold-01.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "37453e793852e6146132ace1d9fa5332094f506ecef3a32a6074b7f6657f994f",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.010721099999983608,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 2,
+            "report": "ztty-windows-x86_64.native.cold-02.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "2d48f1f077736c0878fec363a67c3341ec4df1294b3dd7fb5298957112481abc",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.010158700000005183,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 3,
+            "report": "ztty-windows-x86_64.native.cold-03.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "06ae330b1f377da03db5793df8646bbb4241af8969371fe233f236c3540d13d9",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.009930599999989909,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 4,
+            "report": "ztty-windows-x86_64.native.cold-04.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "120083f8a5cb06fa566a3637329e64c36b70d6bc85c10185f6b15011fffa6f03",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.010178500000023405,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 5,
+            "report": "ztty-windows-x86_64.native.cold-05.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "71b91a00bb0be0d444f926b3a3b10e0a787e57688e0fc721422bce9a3bcf5200",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.010512700000020914,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 6,
+            "report": "ztty-windows-x86_64.native.cold-06.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "e72a71a1d76d48b105cebdf33b58ed9ff659014899522fbd262035864e8be65f",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.00948169999998072,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 7,
+            "report": "ztty-windows-x86_64.native.cold-07.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "753605e7ef1da52a80024139c5170692cfe133d221937e9ea3162af0c9d14b00",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.012971300000003794,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          },
+          {
+            "number": 8,
+            "report": "ztty-windows-x86_64.native.cold-08.json",
+            "passed": true,
+            "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+            "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+            "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915",
+            "report_sha256": "8eaa7aef50f608c2723ca5f606c896d875a6fac86bb83e09646eaf894d3db31c",
+            "checks_completed": 31,
+            "rapid_resizes_completed": 10,
+            "back_to_back_resizes_completed": 10,
+            "cleanup": {
+              "process_exited": true,
+              "temporary_directory_removed": true,
+              "returncode": 0,
+              "directory_removal": {
+                "attempts": 1,
+                "elapsed_seconds": 0.009648999999996022,
+                "retry_timeout_seconds": 2.0
+              }
+            }
+          }
+        ],
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+        "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915"
+      },
+      "workspace_checks": 22,
+      "paint_diagnostics": false,
+      "nc_rendering_diagnostics": false
+    }
+  ],
+  "application_published": false,
+  "application_installed": false,
+  "zterm_version": "0.5.0",
+  "verify_job": "skipped by build_only",
+  "publish_job": "skipped by build_only",
+  "all_six_native_jobs_passed": true,
+  "public_report_generation_executed_product_code": false,
+  "limitations": [
+    "Software Mesa/headless protocol fixtures do not prove physical GPU latency or desktop IME.",
+    "macOS signed packaging is traceable to the pre-signing tested Mach-O; signed .app GUI was not rerun.",
+    "This record does not transfer acceptance to a changed core/app candidate."
+  ],
+  "prior_failure": {
+    "source": "6fec99c682f05642c5e8447985b359a1ee6bd131",
+    "run_id": 44652114344,
+    "original_archives_and_logs_preserved": true
+  }
+}

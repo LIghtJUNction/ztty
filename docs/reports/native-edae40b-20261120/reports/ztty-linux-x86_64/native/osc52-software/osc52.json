@@ -1,0 +1,130 @@
+{
+  "schema": 1,
+  "ok": true,
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "d1275e8ffbceb5ca3e4d3d501ffa33e2564a8a1a75609ed56ce7ac3270018cb5",
+  "checks": [
+    {
+      "name": "writes",
+      "ok": true,
+      "clipboard_and_primary_utf8": true
+    },
+    {
+      "name": "queries",
+      "ok": true,
+      "BEL_and_ST": true,
+      "no_bracketed_paste_markers": true
+    },
+    {
+      "name": "latin_and_incr",
+      "ok": true,
+      "latin1_converted_once": true,
+      "INCR_bytes": 28800,
+      "split_inside_utf8": true
+    },
+    {
+      "name": "exact_budget",
+      "ok": true,
+      "decoded_bytes": 1048576,
+      "encoded_reply_bytes": 1398113,
+      "sha256": "8f990ba0b577b51cf009ea049368c16bbda1b21e1b93be07a824758bb253c39b"
+    },
+    {
+      "name": "over_budget",
+      "ok": true,
+      "oversize_write_preserved_clipboard": true,
+      "oversize_read_empty_not_partial": true
+    },
+    {
+      "name": "invalid_text",
+      "ok": true,
+      "invalid_utf8_and_nul_rejected": true,
+      "invalid_base64_cleared_per_xterm": true
+    },
+    {
+      "name": "denied_owner",
+      "ok": true,
+      "nonlocal_writes_ignored": true,
+      "nonlocal_query_empty": true
+    },
+    {
+      "name": "headless_denied",
+      "ok": true,
+      "local_owner": true,
+      "headless": true,
+      "observe": false,
+      "empty_query_and_unchanged_clipboard": true
+    },
+    {
+      "name": "observer_denied",
+      "ok": true,
+      "local_owner": true,
+      "headless": false,
+      "observe": true,
+      "empty_query_and_unchanged_clipboard": true
+    },
+    {
+      "name": "cancelled_owner",
+      "ok": true,
+      "requestor_distinct_from_window": true,
+      "generation_change_destroyed_requestor": true,
+      "new_query_fresh": true
+    },
+    {
+      "name": "cancelled_by_manual_paste",
+      "ok": true,
+      "manual_paste_preempted_query": true,
+      "no_OSC_reply_in_user_text": true
+    },
+    {
+      "name": "query_during_manual_transfer",
+      "ok": true,
+      "busy_query_empty": true,
+      "manual_transfer_preserved": true
+    },
+    {
+      "name": "query_timeout",
+      "ok": true,
+      "timeout_empty_reply": true,
+      "owned_requestor_destroyed": true,
+      "next_request_recovered": true
+    }
+  ],
+  "cleanup_errors": [],
+  "display_ownership": {
+    "display": ":7293",
+    "pid": 5241,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X7293",
+        "inode": 34228,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X7293",
+        "inode": 34227,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "renderer_after": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "expected_cancelled_x_errors": 1,
+  "stderr_tail": "",
+  "passed": 13
+}

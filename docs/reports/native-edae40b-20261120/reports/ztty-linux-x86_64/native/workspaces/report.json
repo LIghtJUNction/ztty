@@ -1,0 +1,225 @@
+{
+  "ok": true,
+  "checks": [
+    "two PTYs share one workspace and only the focused pane receives real keyboard input",
+    "split resize, swap, maximize and restore change real window geometry",
+    "tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell",
+    "moving panes between native windows and layouts preserves the PTY process",
+    "versioned CLI layout snapshots restore tabs/splits/geometry with unchanged PTY PIDs; unknown sessions and nonlocal restores fail before mutation",
+    "injected ioctl EIO keeps both containers, every view, PTY identity and old dimensions alive; retrying the same snapshot repairs actual PTY sizes",
+    "rename keeps the URI stable; detach and observe reattach preserve PTY/output and enforce read-only input",
+    "per-request input ownership rejects old operators and permits multiple observers",
+    "a stale layout cannot adopt a new PTY that reuses the closed session's origin/name; rejection preserves the replacement view and process",
+    "new tab inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "right split inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "lower split inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "new window inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "remote OSC 7 uses initial launch directory: actual child cwd/PWD and shortcut isolation",
+    "bad-escape OSC 7 uses initial launch directory: actual child cwd/PWD and shortcut isolation",
+    "nul OSC 7 uses initial launch directory: actual child cwd/PWD and shortcut isolation",
+    "all launch/attach waiters complete and sessions release their views and PTYs"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "d1275e8ffbceb5ca3e4d3d501ffa33e2564a8a1a75609ed56ce7ac3270018cb5",
+  "test_script_sha256": "1142af21d5c012d0157b201f59337a7714bfa030d4f98043ee8281042f7411b8",
+  "display": ":4883",
+  "xserver_pid": 4776,
+  "xserver_ownership": {
+    "display": ":4883",
+    "pid": 4776,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X4883",
+        "inode": 23300,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X4883",
+        "inode": 23299,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "fault_injection": {
+    "source": "/home/runner/work/ztty/ztty/tests/ioctl_resize_fault.c",
+    "source_sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "library_sha256": "5591894343f8a96efe0d16d1fa6a8957ad67d48c862a4e96810b1e56369866df",
+    "compile_command": [
+      "/usr/bin/cc",
+      "-shared",
+      "-fPIC",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-o",
+      "/tmp/ztty-workspaces-vsfzbrg4/ioctl_resize_fault.so",
+      "/home/runner/work/ztty/ztty/tests/ioctl_resize_fault.c"
+    ],
+    "compiler_stdout": "",
+    "compiler_stderr": "",
+    "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
+    "attempts": [
+      {
+        "pid": 4787,
+        "fd": 15,
+        "rows": 26,
+        "cols": 100,
+        "errno": 5
+      },
+      {
+        "pid": 4787,
+        "fd": 9,
+        "rows": 12,
+        "cols": 100,
+        "errno": 5
+      }
+    ],
+    "error_response": {
+      "ok": false,
+      "error": "cannot resize split PTY: Resize: OS error 5"
+    },
+    "child_pids": {
+      "alpha": 4797,
+      "beta": 4799,
+      "gamma": 4801,
+      "delta": 4806
+    },
+    "pty_sizes_before": {
+      "alpha": [
+        47,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        47,
+        12
+      ]
+    },
+    "old_container": 2097219,
+    "restored_container_after_error": 2097233,
+    "child_start_ticks": {
+      "alpha": 15170,
+      "beta": 15174,
+      "gamma": 15181,
+      "delta": 15194
+    },
+    "child_window_ids": {
+      "alpha": 2097154,
+      "beta": 2097162,
+      "gamma": 2097190,
+      "delta": 2097223
+    },
+    "pty_sizes_recovered": {
+      "alpha": [
+        100,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        100,
+        26
+      ]
+    }
+  },
+  "broker_pid": 4787,
+  "broker_start_ticks": 15152,
+  "screenshot_glyph_pixels": {
+    "alpha": 1643,
+    "beta": 1309
+  },
+  "screenshot": "/home/runner/work/ztty/ztty/dist/ztty-linux-x86_64.native/workspaces/screenshot.png",
+  "incarnation_reuse": {
+    "uri": "ztty://local/incarnation",
+    "previous_id": 5,
+    "replacement_id": 6,
+    "previous_pid": 4809,
+    "replacement_pid": 4811,
+    "previous_created_at": 1795139369762,
+    "replacement_created_at": 1795139369808,
+    "rejected_restore": {
+      "ok": false,
+      "error": "workspace session identity is no longer available"
+    }
+  },
+  "cwd_inheritance": [
+    {
+      "case": "new tab inherits encoded local OSC 7",
+      "child_id": 8,
+      "uri": "ztty://local/session-8",
+      "pid": 4814,
+      "cwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+",
+      "pwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+"
+    },
+    {
+      "case": "right split inherits encoded local OSC 7",
+      "child_id": 9,
+      "uri": "ztty://local/session-9",
+      "pid": 4815,
+      "cwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+",
+      "pwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+"
+    },
+    {
+      "case": "lower split inherits encoded local OSC 7",
+      "child_id": 10,
+      "uri": "ztty://local/session-10",
+      "pid": 4816,
+      "cwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+",
+      "pwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+"
+    },
+    {
+      "case": "new window inherits encoded local OSC 7",
+      "child_id": 11,
+      "uri": "ztty://local/session-11",
+      "pid": 4817,
+      "cwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+",
+      "pwd": "/tmp/ztty-workspaces-vsfzbrg4/shell directory 中文 #?%+"
+    },
+    {
+      "case": "remote OSC 7 uses initial launch directory",
+      "child_id": 12,
+      "uri": "ztty://local/session-12",
+      "pid": 4818,
+      "cwd": "/tmp/ztty-workspaces-vsfzbrg4/launch-directory",
+      "pwd": "/tmp/ztty-workspaces-vsfzbrg4/launch-directory"
+    },
+    {
+      "case": "bad-escape OSC 7 uses initial launch directory",
+      "child_id": 13,
+      "uri": "ztty://local/session-13",
+      "pid": 4819,
+      "cwd": "/tmp/ztty-workspaces-vsfzbrg4/launch-directory",
+      "pwd": "/tmp/ztty-workspaces-vsfzbrg4/launch-directory"
+    },
+    {
+      "case": "nul OSC 7 uses initial launch directory",
+      "child_id": 14,
+      "uri": "ztty://local/session-14",
+      "pid": 4820,
+      "cwd": "/tmp/ztty-workspaces-vsfzbrg4/launch-directory",
+      "pwd": "/tmp/ztty-workspaces-vsfzbrg4/launch-directory"
+    }
+  ],
+  "cwd_screenshot": "/home/runner/work/ztty/ztty/dist/ztty-linux-x86_64.native/workspaces/workspace-cwd.png",
+  "stderr": "The XKEYBOARD keymap compiler (xkbcomp) reports:\n> Warning:          Could not resolve keysym XF86CameraAccessEnable\n> Warning:          Could not resolve keysym XF86CameraAccessDisable\n> Warning:          Could not resolve keysym XF86CameraAccessToggle\n> Warning:          Could not resolve keysym XF86NextElement\n> Warning:          Could not resolve keysym XF86PreviousElement\n> Warning:          Could not resolve keysym XF86AutopilotEngageToggle\n> Warning:          Could not resolve keysym XF86MarkWaypoint\n> Warning:          Could not resolve keysym XF86Sos\n> Warning:          Could not resolve keysym XF86NavChart\n> Warning:          Could not resolve keysym XF86FishingChart\n> Warning:          Could not resolve keysym XF86SingleRangeRadar\n> Warning:          Could not resolve keysym XF86DualRangeRadar\n> Warning:          Could not resolve keysym XF86RadarOverlay\n> Warning:          Could not resolve keysym XF86TraditionalSonar\n> Warning:          Could not resolve keysym XF86ClearvuSonar\n> Warning:          Could not resolve keysym XF86SidevuSonar\n> Warning:          Could not resolve keysym XF86NavInfo\nErrors from xkbcomp are not fatal to the X server\n"
+}

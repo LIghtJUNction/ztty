@@ -1,0 +1,366 @@
+{
+  "ok": true,
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted",
+    "one-row software updates still copy only one row",
+    "terminal content and search overlay share one visible copy",
+    "bulk output ending in silence publishes the final real pixels without an external wakeup",
+    "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+    "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+    "a force/expose paint of the old screen does not lose the subsequent interactive response",
+    "synchronized output and Expose retain the committed pixels until explicit release",
+    "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+    "a synchronized begin/end in one small write publishes its complete final pixels",
+    "scrollback and its return-to-live prompt share one visible copy"
+  ],
+  "timings_ms": {
+    "initial-a": 0.1803410000036365,
+    "initial-b": 0.09515400000736918,
+    "quiet-final-frame": 3.6554680000051576,
+    "old-frame-expose": 0.09421099997553029,
+    "xtest-visible-echo": 1.1098539999920831,
+    "broker-write-during-flood": 0.44315799999594674,
+    "rpc-visible-echo": 0.45419700001048113,
+    "sync-initial": 0.11264900001606293,
+    "sync-expose-retained": 0.083379000017203,
+    "sync-explicit-release": 0.08480299999291674,
+    "sync-quiet-timeout": 50.245111999998926,
+    "sync-total-from-first-begin": 151.1536650000096,
+    "sync-same-feed": 0.1046579999979258,
+    "scroll-history-ready": 0.11824099999557802
+  },
+  "screenshots": {
+    "nonadjacent-frame": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/nonadjacent-frame.png",
+      "sha256": "4688914495ecb8e3b73a8f9b69e9bef46c40141e12ddc33de149f2147a49cafd",
+      "rgb_sha256": "c07c6c50136b0a1dc1b3d3958250a39c5170d02162d99f7479a18c7163a50e44"
+    },
+    "single-publish-overlay": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/single-publish-overlay.png",
+      "sha256": "1fb36082b3b45bc1a624172cd3ef18c824ba09b1b15bf9413dbef9825583cb92",
+      "rgb_sha256": "8075c287997e683c581063b5371972d73397dbff3b08f98e2cd416b892e1113d"
+    },
+    "quiet-final-frame": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/quiet-final-frame.png",
+      "sha256": "14127cac5e09f547f3431473c785b1c8b80c8abf1e450a2fc8ffb7cc0f4e670d",
+      "rgb_sha256": "f36c46585eeab1512f250a37192a7afb2a7791d15ad22c128080258805f9cc03"
+    },
+    "fairness-flood": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/fairness-flood.png",
+      "sha256": "322ee8fec7e569be5cec721bf4cd81f30597949e028ae18618e60a411be39b6f",
+      "rgb_sha256": "d6e932db88d9afb2a99acab80b9bab0efd2fdf477b84567a9ef5714a8fdc1d25"
+    },
+    "fairness-interaction": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/fairness-interaction.png",
+      "sha256": "9f14539a5c2e5310eb4a640d3d1ef2f026ce0c63757265e25ad3996a8d102434",
+      "rgb_sha256": "3411d9279a09022b484781d675737cdca6fe35164334b7edc5ed3d09271524c5"
+    },
+    "sync-release": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/sync-release.png",
+      "sha256": "1941230443cb358ab9f140da6da4018e4e8be654714cef4fd5e7397c12309e14",
+      "rgb_sha256": "cb53a3717f554aae3e0d50b6af3d5a735aefe82f54d11b8c9ea731622fc88983"
+    },
+    "sync-timeout": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/sync-timeout.png",
+      "sha256": "23eec4a21e93fd7bf0460f9dcc6af617f0d6a8086380fc9a9473b35ca646149b",
+      "rgb_sha256": "01879668757c5746948728d6c463898132989c4aa5447d2b0db46df211493cc9"
+    },
+    "sync-same-feed": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/sync-same-feed.png",
+      "sha256": "9effebee909c05371ad490cb9b19744e034e457ef5522834096122140529b973",
+      "rgb_sha256": "f8fa7859a19030623b0d2c165baa95437c51abed94aaa2b21337a02deea9996d"
+    },
+    "single-publish-scroll": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots/single-publish-scroll.png",
+      "sha256": "0b693ee790e288e6b5a960062d675b7b8830350730887a3243bdb1cff9aa427f",
+      "rgb_sha256": "5f9618b01462c8a171f1883d4a816e26e6cd733ee4213c00217a1b4cd3291bbe"
+    }
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "crates/zterm/src/terminal.rs": "0700d43aab0cd6b39eadb336b6b97cc7f0e6b733efa8ff11d55dce78038e5b54",
+    "tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "src/x11/gpu.rs": "b23437f52c5acda0a2212e793fab99141be1cc1df022b287bc1c8323fd90d82e",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "0478c66d0049a005397de450072a66ee5bf8fb45be96249825f8fdd73adea644",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":19303",
+    "pid": 5398,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X19303",
+        "inode": 30605,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X19303",
+        "inode": 30604,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderers_before": [
+    {
+      "window_id": 2097154,
+      "requested": null,
+      "actual": "software",
+      "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+    },
+    {
+      "window_id": 2097161,
+      "requested": null,
+      "actual": "software",
+      "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+    }
+  ],
+  "broker": {
+    "pid": 5409,
+    "state": "S",
+    "user_ticks": 5,
+    "system_ticks": 3,
+    "threads": 10,
+    "start_ticks": 13065,
+    "exe_sha256": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4"
+  },
+  "owned_processes": {
+    "5407": 13065,
+    "5419": 13074,
+    "5409": 13065,
+    "5420": 13080,
+    "5421": 13082
+  },
+  "startup_quiet_ms": 41.107846000016934,
+  "nonadjacent_start_ns": 130925196128,
+  "nonadjacent_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      16,
+      1112,
+      672,
+      0,
+      16
+    ]
+  ],
+  "single_row_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      667,
+      1112,
+      21,
+      0,
+      667
+    ]
+  ],
+  "overlay_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      704,
+      0,
+      0
+    ]
+  ],
+  "payload": {
+    "bytes": 1050937,
+    "sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+  },
+  "idle_context_switches": {
+    "seconds": 0.35,
+    "before": {
+      "voluntary_ctxt_switches": 83,
+      "nonvoluntary_ctxt_switches": 1
+    },
+    "after": {
+      "voluntary_ctxt_switches": 83,
+      "nonvoluntary_ctxt_switches": 1
+    },
+    "delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "flood_visible_colors": [
+    [
+      33,
+      37,
+      71
+    ],
+    [
+      36,
+      76,
+      140
+    ],
+    [
+      37,
+      89,
+      163
+    ],
+    [
+      53,
+      105,
+      179
+    ],
+    [
+      59,
+      183,
+      189
+    ],
+    [
+      65,
+      69,
+      103
+    ],
+    [
+      79,
+      59,
+      137
+    ],
+    [
+      84,
+      124,
+      60
+    ],
+    [
+      91,
+      215,
+      93
+    ],
+    [
+      97,
+      101,
+      135
+    ],
+    [
+      117,
+      169,
+      83
+    ],
+    [
+      126,
+      94,
+      98
+    ],
+    [
+      141,
+      97,
+      123
+    ],
+    [
+      145,
+      149,
+      87
+    ],
+    [
+      146,
+      162,
+      174
+    ],
+    [
+      154,
+      74,
+      102
+    ],
+    [
+      154,
+      74,
+      198
+    ],
+    [
+      165,
+      25,
+      195
+    ],
+    [
+      173,
+      129,
+      91
+    ],
+    [
+      184,
+      80,
+      152
+    ],
+    [
+      187,
+      119,
+      93
+    ],
+    [
+      188,
+      132,
+      84
+    ],
+    [
+      209,
+      213,
+      151
+    ],
+    [
+      215,
+      99,
+      97
+    ]
+  ],
+  "scroll_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      704,
+      0,
+      0
+    ]
+  ],
+  "renderers_after": [
+    {
+      "window_id": 2097154,
+      "requested": null,
+      "actual": "software",
+      "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+    },
+    {
+      "window_id": 2097161,
+      "requested": null,
+      "actual": "software",
+      "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+    }
+  ],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": "The XKEYBOARD keymap compiler (xkbcomp) reports:\n> Warning:          Could not resolve keysym XF86CameraAccessEnable\n> Warning:          Could not resolve keysym XF86CameraAccessDisable\n> Warning:          Could not resolve keysym XF86CameraAccessToggle\n> Warning:          Could not resolve keysym XF86NextElement\n> Warning:          Could not resolve keysym XF86PreviousElement\n> Warning:          Could not resolve keysym XF86AutopilotEngageToggle\n> Warning:          Could not resolve keysym XF86MarkWaypoint\n> Warning:          Could not resolve keysym XF86Sos\n> Warning:          Could not resolve keysym XF86NavChart\n> Warning:          Could not resolve keysym XF86FishingChart\n> Warning:          Could not resolve keysym XF86SingleRangeRadar\n> Warning:          Could not resolve keysym XF86DualRangeRadar\n> Warning:          Could not resolve keysym XF86RadarOverlay\n> Warning:          Could not resolve keysym XF86TraditionalSonar\n> Warning:          Could not resolve keysym XF86ClearvuSonar\n> Warning:          Could not resolve keysym XF86SidevuSonar\n> Warning:          Could not resolve keysym XF86NavInfo\nErrors from xkbcomp are not fatal to the X server\n"
+}

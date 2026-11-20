@@ -1,0 +1,31 @@
+{
+  "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "run_id": 44656228400,
+  "timestamp_utc": "2026-11-20T01:48:02.290520+00:00",
+  "build_only": true,
+  "candidate_platform": "all",
+  "windows_paint_diagnostics": false,
+  "windows_nc_rendering_diagnostics": false,
+  "command": [
+    "/usr/bin/rtk",
+    "gh",
+    "workflow",
+    "run",
+    "release.yml",
+    "--repo",
+    "LIghtJUNction/ztty",
+    "--ref",
+    "iter/resume-20261120",
+    "-f",
+    "build_only=true",
+    "-f",
+    "candidate_platform=all",
+    "-f",
+    "windows_paint_diagnostics=false",
+    "-f",
+    "windows_nc_rendering_diagnostics=false"
+  ],
+  "original_dispatch_sha256": "78f39f8a77ba744fc6277924fb5a20aa6a951a6ff57f8abc408aa1420058135c",
+  "original_preserved": true,
+  "original_contains_prior_run_history": true
+}

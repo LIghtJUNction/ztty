@@ -1,0 +1,82 @@
+{
+  "version": "0.5.0",
+  "bundle_identifier": "com.lightjunction.ztty",
+  "architecture": "x86_64",
+  "minimum_macos": "11.0",
+  "source_slices": [
+    {
+      "architecture": "x86_64",
+      "cpu_type": 16777223,
+      "cpu_subtype": 3,
+      "minimum_macos": "11.0.0",
+      "libraries": [
+        "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+        "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText",
+        "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+        "/usr/lib/libSystem.B.dylib",
+        "/usr/lib/libobjc.A.dylib"
+      ],
+      "has_code_signature_command": false
+    }
+  ],
+  "packaged_slices": [
+    {
+      "architecture": "x86_64",
+      "cpu_type": 16777223,
+      "cpu_subtype": 3,
+      "minimum_macos": "11.0.0",
+      "libraries": [
+        "/System/Library/Frameworks/AppKit.framework/Versions/C/AppKit",
+        "/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation",
+        "/System/Library/Frameworks/CoreGraphics.framework/Versions/A/CoreGraphics",
+        "/System/Library/Frameworks/CoreText.framework/Versions/A/CoreText",
+        "/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation",
+        "/usr/lib/libSystem.B.dylib",
+        "/usr/lib/libobjc.A.dylib"
+      ],
+      "has_code_signature_command": true
+    }
+  ],
+  "signature": "ad-hoc-verified",
+  "notarized": false,
+  "files": {
+    "ztty.app/Contents/Info.plist": {
+      "bytes": 1290,
+      "sha256": "f30675b58abbe74d03c2fb840dd661cfc35a4063e5c9fd367bccf0946719ec74",
+      "mode": "0644"
+    },
+    "ztty.app/Contents/MacOS/ztty": {
+      "bytes": 551936,
+      "sha256": "a284c47329ee0bea8bcfecd3d1fb4924a226f99aaa53e82fe6b46892398c6442",
+      "mode": "0755"
+    },
+    "ztty.app/Contents/Resources/BUILD.json": {
+      "bytes": 238,
+      "sha256": "9dd881ce92ab9544125a4fb0a5581b29e8f7da06a53de0d8460e08a02dd5d502",
+      "mode": "0644"
+    },
+    "ztty.app/Contents/Resources/LICENSE": {
+      "bytes": 1070,
+      "sha256": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+      "mode": "0644"
+    },
+    "ztty.app/Contents/_CodeSignature/CodeResources": {
+      "bytes": 2662,
+      "sha256": "1f961aa8fb92195fc400030485a1da0ca2100e3b426cf1d11c1813ea7b67352d",
+      "mode": "0644"
+    }
+  },
+  "archives": {
+    "ztty-macos-x86_64.zip": {
+      "sha256": "101d65e3aeada9d1bb8bb2843a5940bce0434fa031abc7702140972e82e60d9c",
+      "bytes": 275501
+    },
+    "ztty-macos-x86_64.tar.gz": {
+      "sha256": "1b5e8b7384ac8f1e94396d2560337ef1eda9560c21a800616da162376816560f",
+      "bytes": 274740
+    }
+  },
+  "validation": "Mach-O structure, bundle metadata, file hashes and archive round trips checked; runtime and displayed pixels are separate tests."
+}

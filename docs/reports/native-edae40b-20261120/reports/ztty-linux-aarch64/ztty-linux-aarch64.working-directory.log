@@ -1,0 +1,33 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling simd-adler32 v0.3.10
+   Compiling libc v0.2.191
+   Compiling zune-inflate v0.2.54
+   Compiling zune-core v0.5.3
+   Compiling zune-png v0.5.2
+   Compiling ztty v0.5.0 (/home/runner/work/ztty/ztty)
+   Compiling zsys v0.1.1
+   Compiling syn v2.0.119
+   Compiling zgraphics v0.2.0 (/home/runner/work/ztty/ztty/crates/zgraphics)
+   Compiling unicode-width v0.2.3
+   Compiling zinput v0.1.3 (/home/runner/work/ztty/ztty/crates/zinput)
+   Compiling zvte v0.1.3
+   Compiling zgpui v0.1.0 (/home/runner/work/ztty/ztty/crates/zgpui)
+   Compiling unicode-segmentation v1.13.3
+   Compiling zterm v0.5.0 (/home/runner/work/ztty/ztty/crates/zterm)
+   Compiling zpty v0.2.2 (/home/runner/work/ztty/ztty/crates/zpty)
+   Compiling zplugin-macros v0.3.1
+   Compiling zplugin v0.3.1
+   Compiling ztty-plugin-api v0.1.0 (/home/runner/work/ztty/ztty/crates/ztty-plugin-api)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.52s
+     Running tests/working_directory.rs (target/debug/build/ztty/957d0ddc0b472851/out/working_directory-957d0ddc0b472851)
+
+running 4 tests
+test failed_target_preserves_cwd_errno_and_descriptor_count ... ok
+test saved_directory_failure_reports_original_emfile_before_target_lookup ... ok
+test search_only_original_directory_can_be_saved_and_restored ... ok
+test switches_restores_and_closes_a_cloexec_path_handle ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,331 @@
+{
+  "ok": true,
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "d1275e8ffbceb5ca3e4d3d501ffa33e2564a8a1a75609ed56ce7ac3270018cb5",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted",
+    "one-row GPU updates publish one complete surface swap",
+    "terminal content and search overlay share one visible copy",
+    "bulk output ending in silence publishes the final real pixels without an external wakeup",
+    "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+    "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+    "a force/expose paint of the old screen does not lose the subsequent interactive response",
+    "synchronized output and Expose retain the committed pixels until explicit release",
+    "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+    "a synchronized begin/end in one small write publishes its complete final pixels",
+    "scrollback and its return-to-live prompt share one visible copy"
+  ],
+  "timings_ms": {
+    "initial-a": 5.87004299998739,
+    "initial-b": 0.09117800001945398,
+    "quiet-final-frame": 7.339403999992555,
+    "old-frame-expose": 0.14588999999887164,
+    "xtest-visible-echo": 6.7786679999812804,
+    "broker-write-during-flood": 8.878259999988813,
+    "rpc-visible-echo": 0.1896549999855779,
+    "sync-initial": 2.683281000003035,
+    "sync-expose-retained": 0.08101199998122866,
+    "sync-explicit-release": 3.957988999985673,
+    "sync-quiet-timeout": 51.16569500000878,
+    "sync-total-from-first-begin": 154.38686699999948,
+    "sync-same-feed": 3.7732099999914226,
+    "scroll-history-ready": 2.341270999977496
+  },
+  "screenshots": {
+    "nonadjacent-frame": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/nonadjacent-frame.png",
+      "sha256": "4688914495ecb8e3b73a8f9b69e9bef46c40141e12ddc33de149f2147a49cafd",
+      "rgb_sha256": "c07c6c50136b0a1dc1b3d3958250a39c5170d02162d99f7479a18c7163a50e44"
+    },
+    "single-publish-overlay": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/single-publish-overlay.png",
+      "sha256": "73312ab72233904c7c64df01b8411b079d955a77f7179619c742aa0ce36b853a",
+      "rgb_sha256": "93975e3a6716a6396b7746553d19442be803f4a9e17777fbd42656c5f714604f"
+    },
+    "quiet-final-frame": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/quiet-final-frame.png",
+      "sha256": "d940492fc27bf5b18f93d015e4854a3ed0867d8400b1cf3326d416b6987c74df",
+      "rgb_sha256": "01d2d0ad2560caf3337a18e98287544ba8e4f752d04a3ba35ce6d05cf7c48905"
+    },
+    "fairness-flood": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/fairness-flood.png",
+      "sha256": "0bf7b669725a39a3da3423099505ed7320db2712ce084540f57e297a4ce3523b",
+      "rgb_sha256": "e0c858f5fe525b8b5df3ff7cce617e6eafcafd3d804d65718b2563b0b71281ed"
+    },
+    "fairness-interaction": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/fairness-interaction.png",
+      "sha256": "7763c3cc05f2c16553763ab81842759ac2f775289837c4f29986750fcd32f0c2",
+      "rgb_sha256": "a9adc874d94acb0fc3671ba1aab4228d0496ed7c3d697e3bb5fb51c3ecc5b8ac"
+    },
+    "sync-release": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/sync-release.png",
+      "sha256": "b7a9c894fe017bb464db4640ee262c0b6d1ee0e7817f62a211fc620d2ded1593",
+      "rgb_sha256": "a4e4758f18fcdb61282183b13dc29ddc2fb04a5191faf65e2617a3968fd8df3b"
+    },
+    "sync-timeout": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/sync-timeout.png",
+      "sha256": "c48a8b624f3337ee2d3d68d08f000061fbc6f7ff5ee7b2e4821ef05965fd6521",
+      "rgb_sha256": "90e922d0ba9cd47dc2b8fbf776e75a0376ab88754658a6b8d3335cb1e2d76c6e"
+    },
+    "sync-same-feed": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/sync-same-feed.png",
+      "sha256": "6c791bb513d16a9edca4d59bf589d7453a5875f7a23d829bd9ab621dce7eaaa0",
+      "rgb_sha256": "15b4657ff4c9ffcad1646c377535cc7a27a4d3ba6a56473a4a5ba171a9d7cb62"
+    },
+    "single-publish-scroll": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-repaint/single-publish-scroll.png",
+      "sha256": "87349d50395dbfe17388f8fb028322b0e0d188f84d55f0e71f98fcd317b32b6d",
+      "rgb_sha256": "b1be359a0c9095226a2a0e8fd8769119f49e7c75e9e0e5d47f61a3a601131a23"
+    }
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "crates/zterm/src/terminal.rs": "0700d43aab0cd6b39eadb336b6b97cc7f0e6b733efa8ff11d55dce78038e5b54",
+    "tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "src/x11/gpu.rs": "b23437f52c5acda0a2212e793fab99141be1cc1df022b287bc1c8323fd90d82e",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "0478c66d0049a005397de450072a66ee5bf8fb45be96249825f8fdd73adea644",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":13970",
+    "pid": 5153,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X13970",
+        "inode": 33862,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X13970",
+        "inode": 33861,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderers_before": [
+    {
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+    },
+    {
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+    }
+  ],
+  "broker": {
+    "pid": 5164,
+    "state": "S",
+    "user_ticks": 9,
+    "system_ticks": 6,
+    "threads": 10,
+    "start_ticks": 19524,
+    "exe_sha256": "d1275e8ffbceb5ca3e4d3d501ffa33e2564a8a1a75609ed56ce7ac3270018cb5"
+  },
+  "owned_processes": {
+    "5162": 19524,
+    "5174": 19533,
+    "5164": 19524,
+    "5175": 19538,
+    "5176": 19540
+  },
+  "startup_quiet_ms": 46.213406000020996,
+  "nonadjacent_start_ns": 195513132516,
+  "nonadjacent_frame_copies": [
+    [
+      94690129435760,
+      2097154,
+      0,
+      0,
+      1112,
+      704,
+      0,
+      0
+    ]
+  ],
+  "single_row_frame_copies": [
+    [
+      94690129435760,
+      2097154,
+      0,
+      0,
+      1112,
+      704,
+      0,
+      0
+    ]
+  ],
+  "overlay_frame_copies": [
+    [
+      94690129435760,
+      2097154,
+      0,
+      0,
+      1112,
+      704,
+      0,
+      0
+    ]
+  ],
+  "payload": {
+    "bytes": 1050937,
+    "sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+  },
+  "idle_context_switches": {
+    "seconds": 0.35,
+    "before": {
+      "voluntary_ctxt_switches": 248,
+      "nonvoluntary_ctxt_switches": 33
+    },
+    "after": {
+      "voluntary_ctxt_switches": 248,
+      "nonvoluntary_ctxt_switches": 33
+    },
+    "delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "flood_visible_colors": [
+    [
+      33,
+      37,
+      103
+    ],
+    [
+      51,
+      79,
+      69
+    ],
+    [
+      62,
+      30,
+      130
+    ],
+    [
+      63,
+      43,
+      121
+    ],
+    [
+      71,
+      147,
+      177
+    ],
+    [
+      115,
+      143,
+      197
+    ],
+    [
+      127,
+      107,
+      185
+    ],
+    [
+      128,
+      120,
+      48
+    ],
+    [
+      130,
+      146,
+      62
+    ],
+    [
+      136,
+      32,
+      104
+    ],
+    [
+      143,
+      123,
+      169
+    ],
+    [
+      151,
+      35,
+      97
+    ],
+    [
+      155,
+      87,
+      61
+    ],
+    [
+      155,
+      87,
+      93
+    ],
+    [
+      158,
+      126,
+      194
+    ],
+    [
+      174,
+      142,
+      178
+    ],
+    [
+      178,
+      194,
+      142
+    ]
+  ],
+  "scroll_frame_copies": [
+    [
+      94690129435760,
+      2097154,
+      0,
+      0,
+      1112,
+      704,
+      0,
+      0
+    ]
+  ],
+  "renderers_after": [
+    {
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+    },
+    {
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+    }
+  ],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": "The XKEYBOARD keymap compiler (xkbcomp) reports:\n> Warning:          Could not resolve keysym XF86CameraAccessEnable\n> Warning:          Could not resolve keysym XF86CameraAccessDisable\n> Warning:          Could not resolve keysym XF86CameraAccessToggle\n> Warning:          Could not resolve keysym XF86NextElement\n> Warning:          Could not resolve keysym XF86PreviousElement\n> Warning:          Could not resolve keysym XF86AutopilotEngageToggle\n> Warning:          Could not resolve keysym XF86MarkWaypoint\n> Warning:          Could not resolve keysym XF86Sos\n> Warning:          Could not resolve keysym XF86NavChart\n> Warning:          Could not resolve keysym XF86FishingChart\n> Warning:          Could not resolve keysym XF86SingleRangeRadar\n> Warning:          Could not resolve keysym XF86DualRangeRadar\n> Warning:          Could not resolve keysym XF86RadarOverlay\n> Warning:          Could not resolve keysym XF86TraditionalSonar\n> Warning:          Could not resolve keysym XF86ClearvuSonar\n> Warning:          Could not resolve keysym XF86SidevuSonar\n> Warning:          Could not resolve keysym XF86NavInfo\nErrors from xkbcomp are not fatal to the X server\n"
+}
