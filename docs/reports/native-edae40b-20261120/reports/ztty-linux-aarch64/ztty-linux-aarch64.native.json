@@ -1,0 +1,697 @@
+{
+  "schema": 1,
+  "passed": true,
+  "status": "passed",
+  "cases": [
+    {
+      "name": "workspaces",
+      "passed": true,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.18/arm64/bin/python",
+        "/home/runner/work/ztty/ztty/tests/workspaces.py",
+        "--binary",
+        "/home/runner/work/ztty/ztty/target/release/ztty",
+        "--output",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/workspaces/report.json",
+        "--screenshot",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/workspaces/screenshot.png"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/workspaces/stdout.log",
+      "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/workspaces/stderr.log",
+      "harness_pid": 5235,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.676,
+      "checks_completed": 17,
+      "report": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/workspaces/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "3a579b7f43e83fa723a712da9dd602440d54f90a53d5b2bbc932b59107c2a35e"
+        },
+        "workspace-cwd.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "90ff50b097312f2fb71f7100f452b27914114996796f5f9442b3df3fe9bfd111"
+        }
+      }
+    },
+    {
+      "name": "daily_workflow",
+      "passed": true,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.18/arm64/bin/python",
+        "/home/runner/work/ztty/ztty/tests/daily_workflow.py",
+        "--binary",
+        "/home/runner/work/ztty/ztty/target/release/ztty",
+        "--output",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/report.json",
+        "--screenshots",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/stdout.log",
+      "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/stderr.log",
+      "harness_pid": 5281,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.976,
+      "checks_completed": 19,
+      "report": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/report.json",
+      "screenshots": {
+        "screenshots/command-palette.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "5d4c8899fbbf32632c25ac6e20f07a266f3800181646587e04071500218c44d5"
+        },
+        "screenshots/history-search-ignore-case.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "95531a6037e28cc8bf00b019fceb03d20a6290fba9ca52aa33d7d9fae5500196"
+        },
+        "screenshots/history-search-match-case.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "71e62610529df12817e03638ddbc603b27e346d20c4b1832463290bf53ca2a88"
+        },
+        "screenshots/history-search.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "1a34acd2ee81ff6c126b73c402dde57ab8deac66860a06b2d49fb229da50ce7f"
+        },
+        "screenshots/invalid-config-diagnostic.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "e6b0bb6ac6b795f32beb5a254d56e076ec9abea71bffbe761327bb932f83f9c0"
+        },
+        "screenshots/reloaded-terminal.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "fa5168281b21c4e66edd94dbf7941674403fd1f52a053aa70ba3175c8b8bb935"
+        },
+        "screenshots/scrollback-live.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "eee8ea672ed3a123331810ec87bdaf2b528fe82c4c3b8a2505108800e9d609c3"
+        },
+        "screenshots/scrollback-new-output.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "9fb091282e25836a0993cf77222b1587f0d4b43d7136a305215c2f715f4af8bd"
+        },
+        "screenshots/scrollback-observer.png": {
+          "width": 932,
+          "height": 604,
+          "sha256": "0e54fce52ec99bae30d8f14ed25e276a90ed8c85bb7b01b560130bf5144f927f"
+        },
+        "screenshots/scrollback-palette.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "1b4a4ef8fd4e8283f0fd1c4b433f145e2608e912e134b3254c4d575610c1bab2"
+        },
+        "screenshots/scrollback-return.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "1d6dc99e72a73ac5f0a2f67a7842f93b9c3f18f166716c1ff4936f3908db15fe"
+        },
+        "screenshots/scrollback-search.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "cbf7c1ce634f687cb37461f3ad8155050cd8f1c4c26e72b59bb476d105a112d6"
+        }
+      }
+    },
+    {
+      "name": "session_switcher",
+      "passed": true,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.18/arm64/bin/python",
+        "/home/runner/work/ztty/ztty/tests/session_switcher.py",
+        "--binary",
+        "/home/runner/work/ztty/ztty/target/release/ztty",
+        "--output",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/session_switcher/report.json",
+        "--screenshots",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/session_switcher/screenshots"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/session_switcher/stdout.log",
+      "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/session_switcher/stderr.log",
+      "harness_pid": 5309,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 0.924,
+      "checks_completed": 6,
+      "report": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/session_switcher/report.json",
+      "screenshots": {
+        "screenshots/attach-read-only.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "de3fa14bd89e75e6f121c768ab43d48cb60ee1fa671a790af3a705df97ea6708"
+        },
+        "screenshots/command-palette.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "f81859ece0350c2c04dc2d9524139b2de19527eec7205f8ffbc48a748416cb00"
+        },
+        "screenshots/observer-attach.png": {
+          "width": 932,
+          "height": 604,
+          "sha256": "b79c10957cdcc3f93afa71ae6d6aa0200a5fd88611d90dd19e453eb78567642b"
+        },
+        "screenshots/sessions.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "13986751073854c9090fb4dbf87fa289b894773029e8ee167f4d79275bdf834f"
+        },
+        "screenshots/soft-wrap-search.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "e97458d36daa04c4ae498c10ddec1cf44ff56fdfb8722c0c7f9274b53d47f7d6"
+        },
+        "screenshots/stale-focus-before-enter.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "f79f960bdb6b06df4755cb06002e95563fdd036a7c6c233d66ff6d6d8614691f"
+        },
+        "screenshots/stale-focus-rejected.png": {
+          "width": 940,
+          "height": 612,
+          "sha256": "5610044610cf4d16a19c93fc6977113ea6d304e7c5987b0e16d7a2a7c8032eee"
+        }
+      }
+    },
+    {
+      "name": "sixel_gui",
+      "passed": true,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.18/arm64/bin/python",
+        "/home/runner/work/ztty/ztty/tests/sixel_gui.py",
+        "--binary",
+        "/home/runner/work/ztty/ztty/target/release/ztty",
+        "--output",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/sixel_gui/report.json",
+        "--screenshot",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/sixel_gui/screenshot.png",
+        "--source-root",
+        "/home/runner/work/ztty/ztty"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/sixel_gui/stdout.log",
+      "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/sixel_gui/stderr.log",
+      "harness_pid": 5332,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 0.724,
+      "checks_completed": 10,
+      "report": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/sixel_gui/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 948,
+          "height": 784,
+          "sha256": "19a1bc3921e28ed7ca73e626e9310b54df96403f40c383148439e0b26fe2d590"
+        }
+      }
+    },
+    {
+      "name": "input_gui",
+      "passed": true,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.18/arm64/bin/python",
+        "/home/runner/work/ztty/ztty/tests/input_gui.py",
+        "--binary",
+        "/home/runner/work/ztty/ztty/target/release/ztty",
+        "--output",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/input_gui/report.json",
+        "--screenshot",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/input_gui/screenshot.png",
+        "--source-root",
+        "/home/runner/work/ztty/ztty"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/input_gui/stdout.log",
+      "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/input_gui/stderr.log",
+      "harness_pid": 5363,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 26.983,
+      "checks_completed": 14,
+      "report": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/input_gui/report.json",
+      "screenshots": {
+        "screenshot.png": {
+          "width": 900,
+          "height": 616,
+          "sha256": "be64223b1a36282397f214a3bff4f0933123806a11fcdc9c2fed1b61f0ce9172"
+        }
+      }
+    },
+    {
+      "name": "repaint_gui",
+      "passed": true,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.18/arm64/bin/python",
+        "/home/runner/work/ztty/ztty/tests/repaint_gui.py",
+        "--binary",
+        "/home/runner/work/ztty/ztty/target/release/ztty",
+        "--output",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/report.json",
+        "--screenshots",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/screenshots"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/stdout.log",
+      "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/stderr.log",
+      "harness_pid": 5397,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 1.726,
+      "checks_completed": 11,
+      "report": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/repaint_gui/report.json",
+      "screenshots": {
+        "screenshots/fairness-flood.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "322ee8fec7e569be5cec721bf4cd81f30597949e028ae18618e60a411be39b6f"
+        },
+        "screenshots/fairness-interaction.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "9f14539a5c2e5310eb4a640d3d1ef2f026ce0c63757265e25ad3996a8d102434"
+        },
+        "screenshots/nonadjacent-frame.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "4688914495ecb8e3b73a8f9b69e9bef46c40141e12ddc33de149f2147a49cafd"
+        },
+        "screenshots/quiet-final-frame.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "14127cac5e09f547f3431473c785b1c8b80c8abf1e450a2fc8ffb7cc0f4e670d"
+        },
+        "screenshots/single-publish-overlay.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "1fb36082b3b45bc1a624172cd3ef18c824ba09b1b15bf9413dbef9825583cb92"
+        },
+        "screenshots/single-publish-scroll.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "0b693ee790e288e6b5a960062d675b7b8830350730887a3243bdb1cff9aa427f"
+        },
+        "screenshots/sync-release.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "1941230443cb358ab9f140da6da4018e4e8be654714cef4fd5e7397c12309e14"
+        },
+        "screenshots/sync-same-feed.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "9effebee909c05371ad490cb9b19744e034e457ef5522834096122140529b973"
+        },
+        "screenshots/sync-timeout.png": {
+          "width": 1112,
+          "height": 704,
+          "sha256": "23eec4a21e93fd7bf0460f9dcc6af617f0d6a8086380fc9a9473b35ca646149b"
+        }
+      }
+    },
+    {
+      "name": "native_ui_gui",
+      "passed": true,
+      "command": [
+        "/opt/hostedtoolcache/Python/3.13.18/arm64/bin/python",
+        "/home/runner/work/ztty/ztty/tests/native_ui_gui.py",
+        "--binary",
+        "/home/runner/work/ztty/ztty/target/release/ztty",
+        "--output",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/native_ui_gui/report.json",
+        "--screenshot",
+        "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/native_ui_gui/screenshot.png",
+        "--source-root",
+        "/home/runner/work/ztty/ztty"
+      ],
+      "timeout_seconds": 180,
+      "timed_out": false,
+      "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/native_ui_gui/stdout.log",
+      "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/native_ui_gui/stderr.log",
+      "harness_pid": 5422,
+      "exit_code": 0,
+      "cleanup": {
+        "leftover_owned_pids": [],
+        "remaining_owned_pids": [],
+        "removed_owned_leases": []
+      },
+      "duration_seconds": 3.43,
+      "checks_completed": 24,
+      "report": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/native_ui_gui/report.json",
+      "screenshots": {
+        "screenshot-demo.png": {
+          "width": 900,
+          "height": 616,
+          "sha256": "9c65b58fbe8a1ded0225bb599c2426f293c6596ce7acf65169d6f06406e3de6b"
+        },
+        "screenshot.png": {
+          "width": 900,
+          "height": 616,
+          "sha256": "59d9ad4b7ccbd6f164b304d4fc15fa7113b0b036fc8d4332ad368f17cdb0de51"
+        }
+      }
+    }
+  ],
+  "timestamp_utc": "2026-11-20T01:49:38.740782+00:00",
+  "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "architecture": "aarch64",
+  "host_machine": "aarch64",
+  "platform": "Linux-7.0.0-1017-azure-aarch64-with-glibc2.39",
+  "python": "3.13.18 (main, Oct 26 2026, 14:17:38) [GCC 13.3.0]",
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "evidence_dir": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native",
+  "scope": "Native Linux ELF and real PTY/X11 GUI acceptance under guarded private Xvfb",
+  "pixel_readback": "Actual XGetImage captures from owned X11 windows in private Xvfb",
+  "ime_keyboard": "synthetic XTEST input; no hardware IME acceptance",
+  "limitations": [
+    "No native Wayland or hardware GPU/scanout acceptance.",
+    "No physical input-to-display latency measurement."
+  ],
+  "wrapper_sha256": "e89c3228bddd2ae491be2defbfbdf893ad6c9c41462e522f0b9344d8f06a1fd3",
+  "elf": {
+    "class_bits": 64,
+    "byte_order": "little",
+    "machine": 183,
+    "architecture": "aarch64",
+    "type": 3
+  },
+  "binary_sha256": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4",
+  "source_before": {
+    "commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+    "tracked_changes": []
+  },
+  "source_files_sha256": {
+    "tests/workspaces.py": "1142af21d5c012d0157b201f59337a7714bfa030d4f98043ee8281042f7411b8",
+    "tests/daily_workflow.py": "738f9201764b65b348f18122d80e214896b16353fba06a48ddbe4bd7a064ef44",
+    "tests/session_switcher.py": "aa2d638ff24cb679a02023e707ee13bb05a6cef732c219b05d7ba62285e2acd5",
+    "tests/sixel_gui.py": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+    "tests/input_gui.py": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+    "tests/repaint_gui.py": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+    "tests/native_ui_gui.py": "202367aee225c2ad8eaf569d436084af7a1d879cca0955874df190f060743a22",
+    "tests/ioctl_resize_fault.c": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tests/linux_native.py": "e89c3228bddd2ae491be2defbfbdf893ad6c9c41462e522f0b9344d8f06a1fd3"
+  },
+  "dependencies": {
+    "python-xlib": "0.33",
+    "Pillow": "13.0.0"
+  },
+  "programs": {
+    "Xvfb": "/usr/bin/Xvfb",
+    "cc": "/usr/bin/cc",
+    "fc-match": "/usr/bin/fc-match"
+  },
+  "version_check": {
+    "command": [
+      "/home/runner/work/ztty/ztty/target/release/ztty",
+      "--version"
+    ],
+    "timeout_seconds": 30,
+    "timed_out": false,
+    "stdout": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/version/stdout.log",
+    "stderr": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/version/stderr.log",
+    "harness_pid": 5234,
+    "exit_code": 0,
+    "cleanup": {
+      "leftover_owned_pids": [],
+      "remaining_owned_pids": [],
+      "removed_owned_leases": []
+    },
+    "duration_seconds": 0.024,
+    "stdout_text": "ztty 0.5.0\n",
+    "passed": true
+  },
+  "source_after": {
+    "commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+    "tracked_changes": []
+  },
+  "binary_sha256_after": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4",
+  "evidence_files": {
+    "daily_workflow/report.json": {
+      "bytes": 10176,
+      "sha256": "e1e7d9603a887f0b864f355f569e47a0137bf5a44940456b753cac0efb07b350"
+    },
+    "daily_workflow/screenshots/command-palette.png": {
+      "bytes": 77166,
+      "sha256": "5d4c8899fbbf32632c25ac6e20f07a266f3800181646587e04071500218c44d5"
+    },
+    "daily_workflow/screenshots/history-search-ignore-case.png": {
+      "bytes": 79721,
+      "sha256": "95531a6037e28cc8bf00b019fceb03d20a6290fba9ca52aa33d7d9fae5500196"
+    },
+    "daily_workflow/screenshots/history-search-match-case.png": {
+      "bytes": 81911,
+      "sha256": "71e62610529df12817e03638ddbc603b27e346d20c4b1832463290bf53ca2a88"
+    },
+    "daily_workflow/screenshots/history-search.png": {
+      "bytes": 81468,
+      "sha256": "1a34acd2ee81ff6c126b73c402dde57ab8deac66860a06b2d49fb229da50ce7f"
+    },
+    "daily_workflow/screenshots/invalid-config-diagnostic.png": {
+      "bytes": 86224,
+      "sha256": "e6b0bb6ac6b795f32beb5a254d56e076ec9abea71bffbe761327bb932f83f9c0"
+    },
+    "daily_workflow/screenshots/reloaded-terminal.png": {
+      "bytes": 76736,
+      "sha256": "fa5168281b21c4e66edd94dbf7941674403fd1f52a053aa70ba3175c8b8bb935"
+    },
+    "daily_workflow/screenshots/scrollback-live.png": {
+      "bytes": 72713,
+      "sha256": "eee8ea672ed3a123331810ec87bdaf2b528fe82c4c3b8a2505108800e9d609c3"
+    },
+    "daily_workflow/screenshots/scrollback-new-output.png": {
+      "bytes": 82443,
+      "sha256": "9fb091282e25836a0993cf77222b1587f0d4b43d7136a305215c2f715f4af8bd"
+    },
+    "daily_workflow/screenshots/scrollback-observer.png": {
+      "bytes": 86572,
+      "sha256": "0e54fce52ec99bae30d8f14ed25e276a90ed8c85bb7b01b560130bf5144f927f"
+    },
+    "daily_workflow/screenshots/scrollback-palette.png": {
+      "bytes": 77051,
+      "sha256": "1b4a4ef8fd4e8283f0fd1c4b433f145e2608e912e134b3254c4d575610c1bab2"
+    },
+    "daily_workflow/screenshots/scrollback-return.png": {
+      "bytes": 81583,
+      "sha256": "1d6dc99e72a73ac5f0a2f67a7842f93b9c3f18f166716c1ff4936f3908db15fe"
+    },
+    "daily_workflow/screenshots/scrollback-search.png": {
+      "bytes": 82811,
+      "sha256": "cbf7c1ce634f687cb37461f3ad8155050cd8f1c4c26e72b59bb476d105a112d6"
+    },
+    "daily_workflow/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "daily_workflow/stdout.log": {
+      "bytes": 10176,
+      "sha256": "e1e7d9603a887f0b864f355f569e47a0137bf5a44940456b753cac0efb07b350"
+    },
+    "input_gui/report.json": {
+      "bytes": 62219,
+      "sha256": "a992f792f70350c1c4e3b078d91485a15c3982fc61993a0898b72c1a1d73aa31"
+    },
+    "input_gui/screenshot.png": {
+      "bytes": 17745,
+      "sha256": "be64223b1a36282397f214a3bff4f0933123806a11fcdc9c2fed1b61f0ce9172"
+    },
+    "input_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "input_gui/stdout.log": {
+      "bytes": 62219,
+      "sha256": "a992f792f70350c1c4e3b078d91485a15c3982fc61993a0898b72c1a1d73aa31"
+    },
+    "native_ui_gui/report.json": {
+      "bytes": 8898,
+      "sha256": "5cbf6b09ae9f2954d0e1bfbaee7b42ef68710f68e88abdb6ffc8cb970ab48683"
+    },
+    "native_ui_gui/screenshot-demo.png": {
+      "bytes": 24072,
+      "sha256": "9c65b58fbe8a1ded0225bb599c2426f293c6596ce7acf65169d6f06406e3de6b"
+    },
+    "native_ui_gui/screenshot.png": {
+      "bytes": 14827,
+      "sha256": "59d9ad4b7ccbd6f164b304d4fc15fa7113b0b036fc8d4332ad368f17cdb0de51"
+    },
+    "native_ui_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "native_ui_gui/stdout.log": {
+      "bytes": 8898,
+      "sha256": "5cbf6b09ae9f2954d0e1bfbaee7b42ef68710f68e88abdb6ffc8cb970ab48683"
+    },
+    "repaint_gui/report.json": {
+      "bytes": 11606,
+      "sha256": "7e77202a08a40004c84e2b47e6537b0195663983e82162cd5c23a18accde24fd"
+    },
+    "repaint_gui/screenshots/fairness-flood.png": {
+      "bytes": 66443,
+      "sha256": "322ee8fec7e569be5cec721bf4cd81f30597949e028ae18618e60a411be39b6f"
+    },
+    "repaint_gui/screenshots/fairness-interaction.png": {
+      "bytes": 5647,
+      "sha256": "9f14539a5c2e5310eb4a640d3d1ef2f026ce0c63757265e25ad3996a8d102434"
+    },
+    "repaint_gui/screenshots/nonadjacent-frame.png": {
+      "bytes": 3881,
+      "sha256": "4688914495ecb8e3b73a8f9b69e9bef46c40141e12ddc33de149f2147a49cafd"
+    },
+    "repaint_gui/screenshots/quiet-final-frame.png": {
+      "bytes": 5852,
+      "sha256": "14127cac5e09f547f3431473c785b1c8b80c8abf1e450a2fc8ffb7cc0f4e670d"
+    },
+    "repaint_gui/screenshots/single-publish-overlay.png": {
+      "bytes": 7632,
+      "sha256": "1fb36082b3b45bc1a624172cd3ef18c824ba09b1b15bf9413dbef9825583cb92"
+    },
+    "repaint_gui/screenshots/single-publish-scroll.png": {
+      "bytes": 65490,
+      "sha256": "0b693ee790e288e6b5a960062d675b7b8830350730887a3243bdb1cff9aa427f"
+    },
+    "repaint_gui/screenshots/sync-release.png": {
+      "bytes": 4399,
+      "sha256": "1941230443cb358ab9f140da6da4018e4e8be654714cef4fd5e7397c12309e14"
+    },
+    "repaint_gui/screenshots/sync-same-feed.png": {
+      "bytes": 5096,
+      "sha256": "9effebee909c05371ad490cb9b19744e034e457ef5522834096122140529b973"
+    },
+    "repaint_gui/screenshots/sync-timeout.png": {
+      "bytes": 4848,
+      "sha256": "23eec4a21e93fd7bf0460f9dcc6af617f0d6a8086380fc9a9473b35ca646149b"
+    },
+    "repaint_gui/stderr.log": {
+      "bytes": 383,
+      "sha256": "ddb1a3d5d0b87ed35f5313ddb777529a8b7b40b34c21916735b45adb65f09fad"
+    },
+    "repaint_gui/stdout.log": {
+      "bytes": 138,
+      "sha256": "118e387d627a07e1d02540dbd29f34e16cff1d8ff392c6da739872f7ccbc82bb"
+    },
+    "session_switcher/report.json": {
+      "bytes": 12434,
+      "sha256": "cf6b7984628c4ee8eede48d4a4c47d2b1e22cb94c7b52be03e5ca3c74ab80b0a"
+    },
+    "session_switcher/screenshots/attach-read-only.png": {
+      "bytes": 19919,
+      "sha256": "de3fa14bd89e75e6f121c768ab43d48cb60ee1fa671a790af3a705df97ea6708"
+    },
+    "session_switcher/screenshots/command-palette.png": {
+      "bytes": 15441,
+      "sha256": "f81859ece0350c2c04dc2d9524139b2de19527eec7205f8ffbc48a748416cb00"
+    },
+    "session_switcher/screenshots/observer-attach.png": {
+      "bytes": 22848,
+      "sha256": "b79c10957cdcc3f93afa71ae6d6aa0200a5fd88611d90dd19e453eb78567642b"
+    },
+    "session_switcher/screenshots/sessions.png": {
+      "bytes": 26324,
+      "sha256": "13986751073854c9090fb4dbf87fa289b894773029e8ee167f4d79275bdf834f"
+    },
+    "session_switcher/screenshots/soft-wrap-search.png": {
+      "bytes": 9203,
+      "sha256": "e97458d36daa04c4ae498c10ddec1cf44ff56fdfb8722c0c7f9274b53d47f7d6"
+    },
+    "session_switcher/screenshots/stale-focus-before-enter.png": {
+      "bytes": 18073,
+      "sha256": "f79f960bdb6b06df4755cb06002e95563fdd036a7c6c233d66ff6d6d8614691f"
+    },
+    "session_switcher/screenshots/stale-focus-rejected.png": {
+      "bytes": 12263,
+      "sha256": "5610044610cf4d16a19c93fc6977113ea6d304e7c5987b0e16d7a2a7c8032eee"
+    },
+    "session_switcher/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "session_switcher/stdout.log": {
+      "bytes": 12434,
+      "sha256": "cf6b7984628c4ee8eede48d4a4c47d2b1e22cb94c7b52be03e5ca3c74ab80b0a"
+    },
+    "sixel_gui/report.json": {
+      "bytes": 7019,
+      "sha256": "a94b16704f769b941ea20980e9c89f351d6798bd2cff92f714f5373f38d5c547"
+    },
+    "sixel_gui/screenshot.png": {
+      "bytes": 12646,
+      "sha256": "19a1bc3921e28ed7ca73e626e9310b54df96403f40c383148439e0b26fe2d590"
+    },
+    "sixel_gui/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "sixel_gui/stdout.log": {
+      "bytes": 259,
+      "sha256": "860ac6ab45ba88099d8cd6ca983fa2841585615bf189a801bf2cff05825aa6b1"
+    },
+    "version/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "version/stdout.log": {
+      "bytes": 11,
+      "sha256": "636de83b7532757d61b769e3b5b737ca46cc671b4096c488d8ceac528c3c29dd"
+    },
+    "workspaces/report.json": {
+      "bytes": 8791,
+      "sha256": "76f74ef80a363d439a5329edb185659ddfa54443494d2ccf61db95fd4cf7efe6"
+    },
+    "workspaces/screenshot.png": {
+      "bytes": 11008,
+      "sha256": "3a579b7f43e83fa723a712da9dd602440d54f90a53d5b2bbc932b59107c2a35e"
+    },
+    "workspaces/stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "workspaces/stdout.log": {
+      "bytes": 8791,
+      "sha256": "76f74ef80a363d439a5329edb185659ddfa54443494d2ccf61db95fd4cf7efe6"
+    },
+    "workspaces/workspace-cwd.png": {
+      "bytes": 15750,
+      "sha256": "90ff50b097312f2fb71f7100f452b27914114996796f5f9442b3df3fe9bfd111"
+    }
+  }
+}

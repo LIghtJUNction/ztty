@@ -1,0 +1,732 @@
+[
+  {
+    "name": "ztty-linux-aarch64.native/clipboard.json",
+    "bytes": 12609,
+    "sha256": "c73554ff389f7cfdc2ca765b418ca44acdfe3faf879eba68dfc4f5806532d3a6"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/report.json",
+    "bytes": 10176,
+    "sha256": "e1e7d9603a887f0b864f355f569e47a0137bf5a44940456b753cac0efb07b350"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/command-palette.png",
+    "bytes": 77166,
+    "sha256": "5d4c8899fbbf32632c25ac6e20f07a266f3800181646587e04071500218c44d5"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/history-search-ignore-case.png",
+    "bytes": 79721,
+    "sha256": "95531a6037e28cc8bf00b019fceb03d20a6290fba9ca52aa33d7d9fae5500196"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/history-search-match-case.png",
+    "bytes": 81911,
+    "sha256": "71e62610529df12817e03638ddbc603b27e346d20c4b1832463290bf53ca2a88"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/history-search.png",
+    "bytes": 81468,
+    "sha256": "1a34acd2ee81ff6c126b73c402dde57ab8deac66860a06b2d49fb229da50ce7f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/invalid-config-diagnostic.png",
+    "bytes": 86224,
+    "sha256": "e6b0bb6ac6b795f32beb5a254d56e076ec9abea71bffbe761327bb932f83f9c0"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/reloaded-terminal.png",
+    "bytes": 76736,
+    "sha256": "fa5168281b21c4e66edd94dbf7941674403fd1f52a053aa70ba3175c8b8bb935"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-live.png",
+    "bytes": 72713,
+    "sha256": "eee8ea672ed3a123331810ec87bdaf2b528fe82c4c3b8a2505108800e9d609c3"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-new-output.png",
+    "bytes": 82443,
+    "sha256": "9fb091282e25836a0993cf77222b1587f0d4b43d7136a305215c2f715f4af8bd"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-observer.png",
+    "bytes": 86572,
+    "sha256": "0e54fce52ec99bae30d8f14ed25e276a90ed8c85bb7b01b560130bf5144f927f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-palette.png",
+    "bytes": 77051,
+    "sha256": "1b4a4ef8fd4e8283f0fd1c4b433f145e2608e912e134b3254c4d575610c1bab2"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-return.png",
+    "bytes": 81583,
+    "sha256": "1d6dc99e72a73ac5f0a2f67a7842f93b9c3f18f166716c1ff4936f3908db15fe"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-search.png",
+    "bytes": 82811,
+    "sha256": "cbf7c1ce634f687cb37461f3ad8155050cd8f1c4c26e72b59bb476d105a112d6"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/daily_workflow/stdout.log",
+    "bytes": 10176,
+    "sha256": "e1e7d9603a887f0b864f355f569e47a0137bf5a44940456b753cac0efb07b350"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/fairness-flood.png",
+    "bytes": 22571,
+    "sha256": "172aa41d6cdb0492b520163d0227e6cc83d080377f9731b7c0cfe307486faaa6"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/fairness-interaction.png",
+    "bytes": 5480,
+    "sha256": "7763c3cc05f2c16553763ab81842759ac2f775289837c4f29986750fcd32f0c2"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/nonadjacent-frame.png",
+    "bytes": 3881,
+    "sha256": "4688914495ecb8e3b73a8f9b69e9bef46c40141e12ddc33de149f2147a49cafd"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/quiet-final-frame.png",
+    "bytes": 5544,
+    "sha256": "d940492fc27bf5b18f93d015e4854a3ed0867d8400b1cf3326d416b6987c74df"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/single-publish-overlay.png",
+    "bytes": 7262,
+    "sha256": "73312ab72233904c7c64df01b8411b079d955a77f7179619c742aa0ce36b853a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/single-publish-scroll.png",
+    "bytes": 60281,
+    "sha256": "87349d50395dbfe17388f8fb028322b0e0d188f84d55f0e71f98fcd317b32b6d"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/sync-release.png",
+    "bytes": 4273,
+    "sha256": "b7a9c894fe017bb464db4640ee262c0b6d1ee0e7817f62a211fc620d2ded1593"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/sync-same-feed.png",
+    "bytes": 4995,
+    "sha256": "6c791bb513d16a9edca4d59bf589d7453a5875f7a23d829bd9ab621dce7eaaa0"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint/sync-timeout.png",
+    "bytes": 4695,
+    "sha256": "c48a8b624f3337ee2d3d68d08f000061fbc6f7ff5ee7b2e4821ef05965fd6521"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-repaint.json",
+    "bytes": 10822,
+    "sha256": "1c4588585a4f60c2d9473d15904b5eeaf96f43b2e32aeabdf5828e3f5c3f9df9"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-tests.log",
+    "bytes": 1580,
+    "sha256": "e8845aa225286ee3652a20a1640e5dfddb1046978d1d9f26008cd042d41c3523"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-text/complete-graphemes.png",
+    "bytes": 4501,
+    "sha256": "7a0d8f2bb70e92114b9adee6fe7b3e464bb42e1abb1768323a752d0bbe0c3412"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-text/completed.png",
+    "bytes": 4439,
+    "sha256": "0d467a304ce945e626e05c3b3486981e99494cc74fc0f0c905e4cb15710e956d"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-text/font-reload.png",
+    "bytes": 4737,
+    "sha256": "139a5f1d29d4d96a219735b0fa09e8886909265b1be909d67c40547edbc87f1a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-text.json",
+    "bytes": 11863,
+    "sha256": "57aeb054a4967b7147e3e1c25729b3269f13d83a00551bbe580f51feefa24f41"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-ui-demo.png",
+    "bytes": 20038,
+    "sha256": "84ca372b58bd589f51d1bb9af0ef96f856cc3266fbcb8c2abc40379719379dc3"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-ui.json",
+    "bytes": 8786,
+    "sha256": "6edecdf39af8af19a4a73580dd220de517025956e831c25f3b60d264647670c5"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/gpu-ui.png",
+    "bytes": 12439,
+    "sha256": "66a856c6a08850eb3a23f04e84c0ef100c34e3b203b07306cf69a07922efcb9d"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/animation.png",
+    "bytes": 4004,
+    "sha256": "a8a442fdd60337b965b5f6596e96bcd1ed65eeb4188933c78784bd4b5ea3516f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/compressed_files.png",
+    "bytes": 4040,
+    "sha256": "a878e3065d36515609b25be658474b9d5706d757376f07d88b47f4b567cdd204"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/file_and_symlink.png",
+    "bytes": 4028,
+    "sha256": "ed37053d5b35ce352c5eea5c0a22991950a8632d23507038dfb25fd22228c280"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/graphics-extensions.json",
+    "bytes": 2386,
+    "sha256": "78fc134d367fbd12f99f83a656d5334eda6eb052d4173bb9bf14a20e329822af"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/invalid_sources.png",
+    "bytes": 4004,
+    "sha256": "a8a442fdd60337b965b5f6596e96bcd1ed65eeb4188933c78784bd4b5ea3516f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/placeholders.png",
+    "bytes": 4096,
+    "sha256": "3fa9624c707ddfefef2fd7c53b51b80f27cade2782f5cadfc6b387176c5ec9cb"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/relative_placements.png",
+    "bytes": 4004,
+    "sha256": "a8a442fdd60337b965b5f6596e96bcd1ed65eeb4188933c78784bd4b5ea3516f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/shared_memory.png",
+    "bytes": 4034,
+    "sha256": "42be8f0e7d17efb62af0da88fffe8233f998dacc179756d3beb1ecaf1f1c67a5"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-gpu/temporary_file.png",
+    "bytes": 4031,
+    "sha256": "fea2f04e362468b499583ed9993da66ae7b498a397ab7daabcb918b8cd79c0a3"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/animation.png",
+    "bytes": 4004,
+    "sha256": "a8a442fdd60337b965b5f6596e96bcd1ed65eeb4188933c78784bd4b5ea3516f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/compressed_files.png",
+    "bytes": 4040,
+    "sha256": "a878e3065d36515609b25be658474b9d5706d757376f07d88b47f4b567cdd204"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/file_and_symlink.png",
+    "bytes": 4028,
+    "sha256": "ed37053d5b35ce352c5eea5c0a22991950a8632d23507038dfb25fd22228c280"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/graphics-extensions.json",
+    "bytes": 2345,
+    "sha256": "0550335cc58872248257f0f53405cc09cd5eaf27abd2190bbca7062c681ed9ca"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/invalid_sources.png",
+    "bytes": 4004,
+    "sha256": "a8a442fdd60337b965b5f6596e96bcd1ed65eeb4188933c78784bd4b5ea3516f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/placeholders.png",
+    "bytes": 4070,
+    "sha256": "e5d611319a405af810f028138679840be6506eb7abd76fc81951183fe431aa3a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/relative_placements.png",
+    "bytes": 4004,
+    "sha256": "a8a442fdd60337b965b5f6596e96bcd1ed65eeb4188933c78784bd4b5ea3516f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/shared_memory.png",
+    "bytes": 4034,
+    "sha256": "42be8f0e7d17efb62af0da88fffe8233f998dacc179756d3beb1ecaf1f1c67a5"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/graphics-software/temporary_file.png",
+    "bytes": 4031,
+    "sha256": "fea2f04e362468b499583ed9993da66ae7b498a397ab7daabcb918b8cd79c0a3"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/input_gui/report.json",
+    "bytes": 62219,
+    "sha256": "a992f792f70350c1c4e3b078d91485a15c3982fc61993a0898b72c1a1d73aa31"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/input_gui/screenshot.png",
+    "bytes": 17745,
+    "sha256": "be64223b1a36282397f214a3bff4f0933123806a11fcdc9c2fed1b61f0ce9172"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/input_gui/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/input_gui/stdout.log",
+    "bytes": 62219,
+    "sha256": "a992f792f70350c1c4e3b078d91485a15c3982fc61993a0898b72c1a1d73aa31"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/native_ui_gui/report.json",
+    "bytes": 8898,
+    "sha256": "5cbf6b09ae9f2954d0e1bfbaee7b42ef68710f68e88abdb6ffc8cb970ab48683"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/native_ui_gui/screenshot-demo.png",
+    "bytes": 24072,
+    "sha256": "9c65b58fbe8a1ded0225bb599c2426f293c6596ce7acf65169d6f06406e3de6b"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/native_ui_gui/screenshot.png",
+    "bytes": 14827,
+    "sha256": "59d9ad4b7ccbd6f164b304d4fc15fa7113b0b036fc8d4332ad368f17cdb0de51"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/native_ui_gui/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/native_ui_gui/stdout.log",
+    "bytes": 8898,
+    "sha256": "5cbf6b09ae9f2954d0e1bfbaee7b42ef68710f68e88abdb6ffc8cb970ab48683"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/osc52-gpu/osc52.json",
+    "bytes": 3177,
+    "sha256": "06755eba03c2fea993ca61d78c2624e9d94d1daf4bc14af05601dda4886e9baf"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/osc52-software/osc52.json",
+    "bytes": 3133,
+    "sha256": "c3150f6896c527a488400a9118a27b1ab6f8492d916c5de89493c3d5ab7c14d0"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/report.json",
+    "bytes": 11606,
+    "sha256": "7e77202a08a40004c84e2b47e6537b0195663983e82162cd5c23a18accde24fd"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/fairness-flood.png",
+    "bytes": 66443,
+    "sha256": "322ee8fec7e569be5cec721bf4cd81f30597949e028ae18618e60a411be39b6f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/fairness-interaction.png",
+    "bytes": 5647,
+    "sha256": "9f14539a5c2e5310eb4a640d3d1ef2f026ce0c63757265e25ad3996a8d102434"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/nonadjacent-frame.png",
+    "bytes": 3881,
+    "sha256": "4688914495ecb8e3b73a8f9b69e9bef46c40141e12ddc33de149f2147a49cafd"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/quiet-final-frame.png",
+    "bytes": 5852,
+    "sha256": "14127cac5e09f547f3431473c785b1c8b80c8abf1e450a2fc8ffb7cc0f4e670d"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/single-publish-overlay.png",
+    "bytes": 7632,
+    "sha256": "1fb36082b3b45bc1a624172cd3ef18c824ba09b1b15bf9413dbef9825583cb92"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/single-publish-scroll.png",
+    "bytes": 65490,
+    "sha256": "0b693ee790e288e6b5a960062d675b7b8830350730887a3243bdb1cff9aa427f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/sync-release.png",
+    "bytes": 4399,
+    "sha256": "1941230443cb358ab9f140da6da4018e4e8be654714cef4fd5e7397c12309e14"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/sync-same-feed.png",
+    "bytes": 5096,
+    "sha256": "9effebee909c05371ad490cb9b19744e034e457ef5522834096122140529b973"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/screenshots/sync-timeout.png",
+    "bytes": 4848,
+    "sha256": "23eec4a21e93fd7bf0460f9dcc6af617f0d6a8086380fc9a9473b35ca646149b"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/stderr.log",
+    "bytes": 383,
+    "sha256": "ddb1a3d5d0b87ed35f5313ddb777529a8b7b40b34c21916735b45adb65f09fad"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/repaint_gui/stdout.log",
+    "bytes": 138,
+    "sha256": "118e387d627a07e1d02540dbd29f34e16cff1d8ff392c6da739872f7ccbc82bb"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/retained-frame.json",
+    "bytes": 13743,
+    "sha256": "e5b11753a0c7ffaf55e177f0035b89596f8de8b17b423527080b014a2dfcd9c5"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/retained-frame.png",
+    "bytes": 6196,
+    "sha256": "9ef8d218fff983d8bcd1f70fd514d691336901d0b197b8468b0ff7843a061707"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/retained-frame.trace.jsonl",
+    "bytes": 5903,
+    "sha256": "9a0a3c0443c8c2d8ffe81e7c3ee7e52e44e6a5f3f1869522163b54b76955204f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/report.json",
+    "bytes": 12434,
+    "sha256": "cf6b7984628c4ee8eede48d4a4c47d2b1e22cb94c7b52be03e5ca3c74ab80b0a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/screenshots/attach-read-only.png",
+    "bytes": 19919,
+    "sha256": "de3fa14bd89e75e6f121c768ab43d48cb60ee1fa671a790af3a705df97ea6708"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/screenshots/command-palette.png",
+    "bytes": 15441,
+    "sha256": "f81859ece0350c2c04dc2d9524139b2de19527eec7205f8ffbc48a748416cb00"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/screenshots/observer-attach.png",
+    "bytes": 22848,
+    "sha256": "b79c10957cdcc3f93afa71ae6d6aa0200a5fd88611d90dd19e453eb78567642b"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/screenshots/sessions.png",
+    "bytes": 26324,
+    "sha256": "13986751073854c9090fb4dbf87fa289b894773029e8ee167f4d79275bdf834f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/screenshots/soft-wrap-search.png",
+    "bytes": 9203,
+    "sha256": "e97458d36daa04c4ae498c10ddec1cf44ff56fdfb8722c0c7f9274b53d47f7d6"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/screenshots/stale-focus-before-enter.png",
+    "bytes": 18073,
+    "sha256": "f79f960bdb6b06df4755cb06002e95563fdd036a7c6c233d66ff6d6d8614691f"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/screenshots/stale-focus-rejected.png",
+    "bytes": 12263,
+    "sha256": "5610044610cf4d16a19c93fc6977113ea6d304e7c5987b0e16d7a2a7c8032eee"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/session_switcher/stdout.log",
+    "bytes": 12434,
+    "sha256": "cf6b7984628c4ee8eede48d4a4c47d2b1e22cb94c7b52be03e5ca3c74ab80b0a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/sixel_gui/report.json",
+    "bytes": 7019,
+    "sha256": "a94b16704f769b941ea20980e9c89f351d6798bd2cff92f714f5373f38d5c547"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/sixel_gui/screenshot.png",
+    "bytes": 12646,
+    "sha256": "19a1bc3921e28ed7ca73e626e9310b54df96403f40c383148439e0b26fe2d590"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/sixel_gui/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/sixel_gui/stdout.log",
+    "bytes": 259,
+    "sha256": "860ac6ab45ba88099d8cd6ca983fa2841585615bf189a801bf2cff05825aa6b1"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/version/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/version/stdout.log",
+    "bytes": 11,
+    "sha256": "636de83b7532757d61b769e3b5b737ca46cc671b4096c488d8ceac528c3c29dd"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/appearance.conf",
+    "bytes": 106,
+    "sha256": "353d7fbb10ae7067db71245adb1a501830b19f86a29263602ea7822158c483c1"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/attach-6.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/attach-7.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/child-exit/command.json",
+    "bytes": 35,
+    "sha256": "fd15dc47ba8c5245cf0aa4756030fa317e96a76789eaf0ef99ee0279be954927"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/child-exit/state.json",
+    "bytes": 163,
+    "sha256": "6bdfa6427f706f66e8ebcb95337c7254175543ebdc0e5146af53a70559708650"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/child-exit/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/clipboard-owner-1.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/clipboard-owner-2.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/clipboard-owner-3.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/clipboard-owner-4.log",
+    "bytes": 33,
+    "sha256": "be44c233843835991dd575d228132c1b26219ca7c14e4d605c98348e372036c8"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/compositor.log",
+    "bytes": 57197,
+    "sha256": "a869263c28b9588b05060ebc2fd1011fcef402345a000b9566e1e50ee535307e"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/disconnect/state.json",
+    "bytes": 163,
+    "sha256": "04197a6da1bb651654c88f9d8f66188afdecef60c852e8964931e7773a6f9625"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/disconnect/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/history-live.png",
+    "bytes": 43507,
+    "sha256": "4a7dfd7f9a6ae4e2691b3bdaf200b109d6bedbdd4a72a50c85291206ebf0a6d7"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/history-return.png",
+    "bytes": 43507,
+    "sha256": "4a7dfd7f9a6ae4e2691b3bdaf200b109d6bedbdd4a72a50c85291206ebf0a6d7"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/history-scrolled.png",
+    "bytes": 46457,
+    "sha256": "070ac060cb49f32862daf6171c65294904f357d0b2c89607b999ccdaea7e95d4"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ime-before.png",
+    "bytes": 6286,
+    "sha256": "54cb2fd7c0d922fe84cca9e268db2f9cffaa063b4e17d68f1f788b6091a1b811"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ime-keyboard.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ime-peer/ime-peer",
+    "bytes": 72952,
+    "sha256": "03e6719e30fac64576a1911ae2158dca787f3a65372126245067c67869b72030"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ime-peer/input-method-client-protocol.h",
+    "bytes": 35192,
+    "sha256": "3bf98c597aa4100329d05b67f532e2b719bd88ba79fe7153062ecd4f83cbabbc"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ime-peer/input-method-protocol.c",
+    "bytes": 5118,
+    "sha256": "47f0fe2006a540e96e0142f8639daa218d1a65527e411921656b5da2ac2c87e1"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ime-preedit.png",
+    "bytes": 8909,
+    "sha256": "d44aeedca25615c60bd87217a6dbedb7c854c6fe742b1e607bebdc8b35e68dc1"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/initial.png",
+    "bytes": 9532,
+    "sha256": "c90e00c360fe5403494d7eb03e58d906b20c77008a9e89ab2050db704db0772a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/input-method.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/interaction/command.json",
+    "bytes": 43,
+    "sha256": "6803bd1942bb3d667675a40f9f492809b723811acd326ee340b7bf3e1a3ba477"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/interaction/input.bin",
+    "bytes": 491,
+    "sha256": "88b5104c58760876e195ce5ae0f793618a16cbe008e35fbd191faee0fd7a641a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/interaction/state.json",
+    "bytes": 165,
+    "sha256": "afb6c3ec89b5a44c4c7c0cc12734ed988fe7adb1a7548e3625fcfd9801cd5c65"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/interaction/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mcp.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-wayland-first-wayland/state.json",
+    "bytes": 163,
+    "sha256": "5371ec521c95432288aff69a36b5cf531e424ce7423065565cd4afa5bdedb243"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-wayland-first-wayland/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-wayland-first-x11/state.json",
+    "bytes": 163,
+    "sha256": "d1217b710394d7a30442c5e112e200902966b969f76c524d230bac822aa3f664"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-wayland-first-x11/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-x11-first-wayland/state.json",
+    "bytes": 163,
+    "sha256": "91ef583b09a61fb941b75dd357421b3467e74842f893ee95c59a1d00a38abf0b"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-x11-first-wayland/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-x11-first-x11/state.json",
+    "bytes": 163,
+    "sha256": "b69d7bd5cc488bfeb9cd11d8db8b6fa05c5b10212a9b161995bf27c9f0787913"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-x11-first-x11/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/mixed-xvfb.log",
+    "bytes": 1174,
+    "sha256": "f172a1b0f5cf2a0d462c51dfc335af1a1dfc8e873cb66f61d018c8b1b35fe416"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ordinary-close/state.json",
+    "bytes": 163,
+    "sha256": "676ffa8f02d32a18ed667edce86e6549fac703b62a7f0ee6ba183faeb4d6eaa8"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/ordinary-close/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/resized.png",
+    "bytes": 9532,
+    "sha256": "c90e00c360fe5403494d7eb03e58d906b20c77008a9e89ab2050db704db0772a"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/sibling/state.json",
+    "bytes": 163,
+    "sha256": "2730536e65502a9df9fd330308ae8c6d846d7d0d2900c77abef0a2eddc86e383"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/sibling/terminal.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/sync-after.png",
+    "bytes": 4382,
+    "sha256": "874d7ab66559089a1e50ca02c2f18fa60a80fcf5a79adea2e063464cca49c3df"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/sync-before.png",
+    "bytes": 4382,
+    "sha256": "8d847c95f0aab6099c6aa4e4eb5b2ca83c445e75b3d7dc0494d63614d98bebcf"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/sync-during.png",
+    "bytes": 4382,
+    "sha256": "8d847c95f0aab6099c6aa4e4eb5b2ca83c445e75b3d7dc0494d63614d98bebcf"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/wayland/validation.json",
+    "bytes": 9048,
+    "sha256": "760829ddd7af25034fc64ad6c04c8c5249e4d372591f277bf2cfc4fd76b52581"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/workspaces/report.json",
+    "bytes": 8791,
+    "sha256": "76f74ef80a363d439a5329edb185659ddfa54443494d2ccf61db95fd4cf7efe6"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/workspaces/screenshot.png",
+    "bytes": 11008,
+    "sha256": "3a579b7f43e83fa723a712da9dd602440d54f90a53d5b2bbc932b59107c2a35e"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/workspaces/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/workspaces/stdout.log",
+    "bytes": 8791,
+    "sha256": "76f74ef80a363d439a5329edb185659ddfa54443494d2ccf61db95fd4cf7efe6"
+  },
+  {
+    "name": "ztty-linux-aarch64.native/workspaces/workspace-cwd.png",
+    "bytes": 15750,
+    "sha256": "90ff50b097312f2fb71f7100f452b27914114996796f5f9442b3df3fe9bfd111"
+  }
+]

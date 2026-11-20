@@ -1,0 +1,116 @@
+[
+  {
+    "id": 14593402344,
+    "name": "ztty-linux-x86_64",
+    "size_in_bytes": 1840836,
+    "url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14593402344",
+    "archive_download_url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14593402344/zip",
+    "expired": false,
+    "created_at": "2026-11-20T01:50:49Z",
+    "expires_at": "2026-12-04T01:50:49Z",
+    "updated_at": "2026-11-20T01:50:49Z",
+    "digest": "sha256:ea4fb60cd7303c39261508a4ec51949f2bffada465ba5d35257c9e486464b3b9",
+    "workflow_run": {
+      "id": 44656228400,
+      "repository_id": 1461427790,
+      "head_repository_id": 1461427790,
+      "head_branch": "iter/resume-20261120",
+      "head_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0"
+    }
+  },
+  {
+    "id": 14593397287,
+    "name": "ztty-windows-x86_64",
+    "size_in_bytes": 1238909,
+    "url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14593397287",
+    "archive_download_url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14593397287/zip",
+    "expired": false,
+    "created_at": "2026-11-20T01:49:54Z",
+    "expires_at": "2026-12-04T01:49:53Z",
+    "updated_at": "2026-11-20T01:49:54Z",
+    "digest": "sha256:5f98d6153c9e8faa02d152c0cae36b54098eaa752b0f07c330b7bc908916c443",
+    "workflow_run": {
+      "id": 44656228400,
+      "repository_id": 1461427790,
+      "head_repository_id": 1461427790,
+      "head_branch": "iter/resume-20261120",
+      "head_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0"
+    }
+  },
+  {
+    "id": 14592963478,
+    "name": "ztty-linux-aarch64",
+    "size_in_bytes": 1806741,
+    "url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592963478",
+    "archive_download_url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592963478/zip",
+    "expired": false,
+    "created_at": "2026-11-20T01:51:02Z",
+    "expires_at": "2026-12-04T01:51:01Z",
+    "updated_at": "2026-11-20T01:51:02Z",
+    "digest": "sha256:4bb121ff625b9d99c64f79b8a5f644d81231af5f6541d10738256897b234c6cc",
+    "workflow_run": {
+      "id": 44656228400,
+      "repository_id": 1461427790,
+      "head_repository_id": 1461427790,
+      "head_branch": "iter/resume-20261120",
+      "head_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0"
+    }
+  },
+  {
+    "id": 14592789765,
+    "name": "ztty-windows-aarch64",
+    "size_in_bytes": 1165109,
+    "url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592789765",
+    "archive_download_url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592789765/zip",
+    "expired": false,
+    "created_at": "2026-11-20T01:50:09Z",
+    "expires_at": "2026-12-04T01:50:07Z",
+    "updated_at": "2026-11-20T01:50:09Z",
+    "digest": "sha256:e4f3bdf8c2a95c26aa66ee8781b1fb63e601f0e8a983f085bdd969fe3fe3d6cb",
+    "workflow_run": {
+      "id": 44656228400,
+      "repository_id": 1461427790,
+      "head_repository_id": 1461427790,
+      "head_branch": "iter/resume-20261120",
+      "head_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0"
+    }
+  },
+  {
+    "id": 14592528808,
+    "name": "ztty-macos-x86_64",
+    "size_in_bytes": 652734,
+    "url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592528808",
+    "archive_download_url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592528808/zip",
+    "expired": false,
+    "created_at": "2026-11-20T01:50:07Z",
+    "expires_at": "2026-12-04T01:50:05Z",
+    "updated_at": "2026-11-20T01:50:07Z",
+    "digest": "sha256:bcd085f23e34efad72a595a40e1a08f9309f58e38370d8fc045c3a15ddc9cf8e",
+    "workflow_run": {
+      "id": 44656228400,
+      "repository_id": 1461427790,
+      "head_repository_id": 1461427790,
+      "head_branch": "iter/resume-20261120",
+      "head_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0"
+    }
+  },
+  {
+    "id": 14592528695,
+    "name": "ztty-macos-aarch64",
+    "size_in_bytes": 600312,
+    "url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592528695",
+    "archive_download_url": "https://api.github.com/repos/LIghtJUNction/ztty/actions/artifacts/14592528695/zip",
+    "expired": false,
+    "created_at": "2026-11-20T01:49:14Z",
+    "expires_at": "2026-12-04T01:49:13Z",
+    "updated_at": "2026-11-20T01:49:14Z",
+    "digest": "sha256:d5a04a605c538638a49c818eba6fab98bb097921898e7bf8f45bb7e0c5dca545",
+    "workflow_run": {
+      "id": 44656228400,
+      "repository_id": 1461427790,
+      "head_repository_id": 1461427790,
+      "head_branch": "iter/resume-20261120",
+      "head_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0"
+    }
+  }
+]

@@ -1,0 +1,321 @@
+{
+  "source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "platforms": [
+    {
+      "stem": "ztty-linux-aarch64",
+      "pixel_readback": "Actual XGetImage captures from owned X11 windows in private Xvfb",
+      "ime_keyboard": "synthetic XTEST input; no hardware IME acceptance",
+      "remaining_owned_processes": null,
+      "binary_sha256": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4",
+      "native_passed": true,
+      "cases": [
+        {
+          "name": "workspaces",
+          "passed": true,
+          "checks_completed": 17
+        },
+        {
+          "name": "daily_workflow",
+          "passed": true,
+          "checks_completed": 19
+        },
+        {
+          "name": "session_switcher",
+          "passed": true,
+          "checks_completed": 6
+        },
+        {
+          "name": "sixel_gui",
+          "passed": true,
+          "checks_completed": 10
+        },
+        {
+          "name": "input_gui",
+          "passed": true,
+          "checks_completed": 14
+        },
+        {
+          "name": "repaint_gui",
+          "passed": true,
+          "checks_completed": 11
+        },
+        {
+          "name": "native_ui_gui",
+          "passed": true,
+          "checks_completed": 24
+        }
+      ],
+      "manifest_files": 6,
+      "package_executables": [
+        {
+          "archive": "ztty-linux-aarch64.tar.gz",
+          "path": "ztty",
+          "sha256": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4",
+          "bytes": 1149536,
+          "matches_native_tested_binary": true
+        }
+      ],
+      "outer_file_hashes_verified": true,
+      "checksum_files_verified": [
+        "ztty-linux-aarch64.build.json",
+        "ztty-linux-aarch64.tar.gz"
+      ],
+      "native_archive": {
+        "file": "ztty-linux-aarch64.native.tar.gz",
+        "sha256": "e9abde13c0d013b733c27a759c6849130c1b74046185d978b93ee30a5fdbaaed",
+        "members": 146,
+        "json_files": [
+          "ztty-linux-aarch64.native/clipboard.json",
+          "ztty-linux-aarch64.native/daily_workflow/report.json",
+          "ztty-linux-aarch64.native/gpu-repaint.json",
+          "ztty-linux-aarch64.native/gpu-text.json",
+          "ztty-linux-aarch64.native/gpu-ui.json",
+          "ztty-linux-aarch64.native/graphics-gpu/graphics-extensions.json",
+          "ztty-linux-aarch64.native/graphics-software/graphics-extensions.json",
+          "ztty-linux-aarch64.native/input_gui/report.json",
+          "ztty-linux-aarch64.native/native_ui_gui/report.json",
+          "ztty-linux-aarch64.native/osc52-gpu/osc52.json",
+          "ztty-linux-aarch64.native/osc52-software/osc52.json",
+          "ztty-linux-aarch64.native/repaint_gui/report.json",
+          "ztty-linux-aarch64.native/retained-frame.json",
+          "ztty-linux-aarch64.native/session_switcher/report.json",
+          "ztty-linux-aarch64.native/sixel_gui/report.json",
+          "ztty-linux-aarch64.native/wayland/child-exit/command.json",
+          "ztty-linux-aarch64.native/wayland/child-exit/state.json",
+          "ztty-linux-aarch64.native/wayland/disconnect/state.json",
+          "ztty-linux-aarch64.native/wayland/interaction/command.json",
+          "ztty-linux-aarch64.native/wayland/interaction/state.json",
+          "ztty-linux-aarch64.native/wayland/mixed-wayland-first-wayland/state.json",
+          "ztty-linux-aarch64.native/wayland/mixed-wayland-first-x11/state.json",
+          "ztty-linux-aarch64.native/wayland/mixed-x11-first-wayland/state.json",
+          "ztty-linux-aarch64.native/wayland/mixed-x11-first-x11/state.json",
+          "ztty-linux-aarch64.native/wayland/ordinary-close/state.json",
+          "ztty-linux-aarch64.native/wayland/sibling/state.json",
+          "ztty-linux-aarch64.native/wayland/validation.json",
+          "ztty-linux-aarch64.native/workspaces/report.json"
+        ]
+      }
+    },
+    {
+      "stem": "ztty-linux-x86_64",
+      "pixel_readback": "Actual XGetImage captures from owned X11 windows in private Xvfb",
+      "ime_keyboard": "synthetic XTEST input; no hardware IME acceptance",
+      "remaining_owned_processes": null,
+      "binary_sha256": "d1275e8ffbceb5ca3e4d3d501ffa33e2564a8a1a75609ed56ce7ac3270018cb5",
+      "native_passed": true,
+      "cases": [
+        {
+          "name": "workspaces",
+          "passed": true,
+          "checks_completed": 17
+        },
+        {
+          "name": "daily_workflow",
+          "passed": true,
+          "checks_completed": 19
+        },
+        {
+          "name": "session_switcher",
+          "passed": true,
+          "checks_completed": 6
+        },
+        {
+          "name": "sixel_gui",
+          "passed": true,
+          "checks_completed": 10
+        },
+        {
+          "name": "input_gui",
+          "passed": true,
+          "checks_completed": 14
+        },
+        {
+          "name": "repaint_gui",
+          "passed": true,
+          "checks_completed": 11
+        },
+        {
+          "name": "native_ui_gui",
+          "passed": true,
+          "checks_completed": 24
+        }
+      ],
+      "manifest_files": 6,
+      "package_executables": [
+        {
+          "archive": "ztty-linux-x86_64.tar.gz",
+          "path": "ztty",
+          "sha256": "d1275e8ffbceb5ca3e4d3d501ffa33e2564a8a1a75609ed56ce7ac3270018cb5",
+          "bytes": 1211208,
+          "matches_native_tested_binary": true
+        }
+      ],
+      "outer_file_hashes_verified": true,
+      "checksum_files_verified": [
+        "ztty-linux-x86_64.build.json",
+        "ztty-linux-x86_64.tar.gz"
+      ],
+      "native_archive": {
+        "file": "ztty-linux-x86_64.native.tar.gz",
+        "sha256": "75e0303cfb30d37ceb817fcc59feeb75083705dc6b8ce6f3e45e5af0120b9abd",
+        "members": 146,
+        "json_files": [
+          "ztty-linux-x86_64.native/clipboard.json",
+          "ztty-linux-x86_64.native/daily_workflow/report.json",
+          "ztty-linux-x86_64.native/gpu-repaint.json",
+          "ztty-linux-x86_64.native/gpu-text.json",
+          "ztty-linux-x86_64.native/gpu-ui.json",
+          "ztty-linux-x86_64.native/graphics-gpu/graphics-extensions.json",
+          "ztty-linux-x86_64.native/graphics-software/graphics-extensions.json",
+          "ztty-linux-x86_64.native/input_gui/report.json",
+          "ztty-linux-x86_64.native/native_ui_gui/report.json",
+          "ztty-linux-x86_64.native/osc52-gpu/osc52.json",
+          "ztty-linux-x86_64.native/osc52-software/osc52.json",
+          "ztty-linux-x86_64.native/repaint_gui/report.json",
+          "ztty-linux-x86_64.native/retained-frame.json",
+          "ztty-linux-x86_64.native/session_switcher/report.json",
+          "ztty-linux-x86_64.native/sixel_gui/report.json",
+          "ztty-linux-x86_64.native/wayland/child-exit/command.json",
+          "ztty-linux-x86_64.native/wayland/child-exit/state.json",
+          "ztty-linux-x86_64.native/wayland/disconnect/state.json",
+          "ztty-linux-x86_64.native/wayland/interaction/command.json",
+          "ztty-linux-x86_64.native/wayland/interaction/state.json",
+          "ztty-linux-x86_64.native/wayland/mixed-wayland-first-wayland/state.json",
+          "ztty-linux-x86_64.native/wayland/mixed-wayland-first-x11/state.json",
+          "ztty-linux-x86_64.native/wayland/mixed-x11-first-wayland/state.json",
+          "ztty-linux-x86_64.native/wayland/mixed-x11-first-x11/state.json",
+          "ztty-linux-x86_64.native/wayland/ordinary-close/state.json",
+          "ztty-linux-x86_64.native/wayland/sibling/state.json",
+          "ztty-linux-x86_64.native/wayland/validation.json",
+          "ztty-linux-x86_64.native/workspaces/report.json"
+        ]
+      }
+    },
+    {
+      "stem": "ztty-macos-aarch64",
+      "pixel_readback": "WindowServer window via ScreenCaptureKit",
+      "ime_keyboard": "not_performed",
+      "remaining_owned_processes": [],
+      "binary_sha256": "1ac4c93ba32042a245d06ac4bae9749eecf6e5e499b586042f5e48c62983482b",
+      "native_passed": true,
+      "cases": [],
+      "manifest_files": 64,
+      "package_executables": [
+        {
+          "archive": "ztty-macos-aarch64.tar.gz",
+          "path": "ztty.app/Contents/MacOS/ztty",
+          "sha256": "d57c18b2b56204e89d1514e986bf95650a5c8433214ebf50694fe8006fbf0348",
+          "bytes": 518800,
+          "matches_native_tested_binary": false
+        }
+      ],
+      "outer_file_hashes_verified": true,
+      "checksum_files_verified": [
+        "ztty-macos-aarch64.build.json",
+        "ztty-macos-aarch64.manifest.json",
+        "ztty-macos-aarch64.tar.gz",
+        "ztty-macos-aarch64.zip"
+      ]
+    },
+    {
+      "stem": "ztty-macos-x86_64",
+      "pixel_readback": "WindowServer window via ScreenCaptureKit",
+      "ime_keyboard": "not_performed",
+      "remaining_owned_processes": [],
+      "binary_sha256": "b8ec52a9b8e61552a74a5302fa9efbfbee7af5e42dbbc427bbc46ec0c9cb6190",
+      "native_passed": true,
+      "cases": [],
+      "manifest_files": 64,
+      "package_executables": [
+        {
+          "archive": "ztty-macos-x86_64.tar.gz",
+          "path": "ztty.app/Contents/MacOS/ztty",
+          "sha256": "a284c47329ee0bea8bcfecd3d1fb4924a226f99aaa53e82fe6b46892398c6442",
+          "bytes": 551936,
+          "matches_native_tested_binary": false
+        }
+      ],
+      "outer_file_hashes_verified": true,
+      "checksum_files_verified": [
+        "ztty-macos-x86_64.build.json",
+        "ztty-macos-x86_64.manifest.json",
+        "ztty-macos-x86_64.tar.gz",
+        "ztty-macos-x86_64.zip"
+      ]
+    },
+    {
+      "stem": "ztty-windows-aarch64",
+      "pixel_readback": "GetPixel assertions plus owned client DC BitBlt/GetDIBits PNG capture",
+      "ime_keyboard": null,
+      "remaining_owned_processes": null,
+      "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+      "native_passed": true,
+      "cases": [],
+      "manifest_files": 398,
+      "package_executables": [
+        {
+          "archive": "ztty-windows-aarch64.zip",
+          "path": "ztty.exe",
+          "sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+          "bytes": 555520,
+          "matches_native_tested_binary": true
+        }
+      ],
+      "cold_start_summary": {
+        "required": 8,
+        "completed": 8,
+        "passed": true,
+        "runs": {
+          "type": "list",
+          "count": 8
+        },
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+        "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b"
+      },
+      "outer_file_hashes_verified": true,
+      "checksum_files_verified": [
+        "ztty-windows-aarch64.build.json",
+        "ztty-windows-aarch64.manifest.json",
+        "ztty-windows-aarch64.zip"
+      ]
+    },
+    {
+      "stem": "ztty-windows-x86_64",
+      "pixel_readback": "GetPixel assertions plus owned client DC BitBlt/GetDIBits PNG capture",
+      "ime_keyboard": null,
+      "remaining_owned_processes": null,
+      "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+      "native_passed": true,
+      "cases": [],
+      "manifest_files": 398,
+      "package_executables": [
+        {
+          "archive": "ztty-windows-x86_64.zip",
+          "path": "ztty.exe",
+          "sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+          "bytes": 673280,
+          "matches_native_tested_binary": true
+        }
+      ],
+      "cold_start_summary": {
+        "required": 8,
+        "completed": 8,
+        "passed": true,
+        "runs": {
+          "type": "list",
+          "count": 8
+        },
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+        "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915"
+      },
+      "outer_file_hashes_verified": true,
+      "checksum_files_verified": [
+        "ztty-windows-x86_64.build.json",
+        "ztty-windows-x86_64.manifest.json",
+        "ztty-windows-x86_64.zip"
+      ]
+    }
+  ]
+}

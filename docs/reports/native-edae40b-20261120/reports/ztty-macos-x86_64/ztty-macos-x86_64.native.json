@@ -1,0 +1,2859 @@
+{
+  "passed": true,
+  "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "status": "passed",
+  "pixel_readback": "WindowServer window via ScreenCaptureKit",
+  "ime_keyboard": "not_performed",
+  "contract_tests": {
+    "passed": true,
+    "log": "ztty-macos-x86_64.native.contract.log",
+    "exit_code": 0
+  },
+  "checks": {
+    "native_pty_and_pixel_geometry": true,
+    "cursor_reply": true,
+    "kitty_capability_query": true,
+    "chunked_rgba": true,
+    "png": true,
+    "alternate_screen_image_isolation": true,
+    "malformed_image_text_recovery": true,
+    "image_deletion": true,
+    "unicode_cwd_reaches_native_pty_child": true,
+    "relative_config_resolves_before_cwd": true,
+    "native_helper_and_binary_architecture": true,
+    "invalid_cwd_fails_before_window": true,
+    "sixel_rgb_native_pixels": true,
+    "sixel_transparent_preserves_underlying_image": true,
+    "sixel_opaque_uses_current_background": true,
+    "sixel_erase_display_repaints": true,
+    "sixel_cancel_and_pty_recovery": true,
+    "sixel_recovers_after_oversized_raster": true,
+    "sixel_before_resize": true,
+    "sixel_resize_clips_without_ghosts": true,
+    "sixel_resize_restores_visible_image": true,
+    "window_minimized": true,
+    "sixel_minimize_restore_visible_image": true,
+    "pty_recovers_after_window_restore": true
+  },
+  "stages": [
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "preflight",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "permission_preflight",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "window_selection_vector": "passed",
+      "stdout_bytes": 707,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\n",
+      "name": "permissions"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "invalid_cwd",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "launch": {
+        "elapsed_seconds": 0.08400063700003102,
+        "exit_code": 1,
+        "observed_window_frames": [],
+        "observed_window_ids": [],
+        "pid": 5264,
+        "stderr": "ztty: cannot enter command working directory (OS error 2)\n",
+        "stdout": "",
+        "termination_reason": 1,
+        "timed_out": false,
+        "window_observations": 3
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "permission_preflight",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "window_selection_vector": "passed",
+      "stdout_bytes": 1074,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\n",
+      "name": "invalid_cwd_fails_before_window"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "capture",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            255,
+            0,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            16,
+            38
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "actual": [
+            0,
+            255,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            32,
+            38
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "actual": [
+            0,
+            0,
+            255
+          ],
+          "alpha": 255,
+          "client": [
+            48,
+            46
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "passed": true,
+          "provider_bytes": [
+            255,
+            0,
+            0,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_rgb_native_pixels.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 0
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_rgb_native_pixels.png",
+        "bytes": 6537,
+        "sha256": "7c936f08437416ad4c4242b8277c72f94b0a7d1f160bfcae60f45ef00d553916",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4492,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_rgb_native_pixels"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "capture",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            255,
+            0,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            16,
+            38
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "actual": [
+            0,
+            255,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            48,
+            38
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            255,
+            0,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_transparent_preserves_underlying_image.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_transparent_preserves_underlying_image.png",
+        "bytes": 6549,
+        "sha256": "7bab8081b65f3c6ace78fec5ffab0634329ba99b4d3810779b72d9aa0d95d7cb",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4198,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_transparent_preserves_underlying_image"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "capture",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            255,
+            0,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            16,
+            38
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            48,
+            38
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_opaque_uses_current_background.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_opaque_uses_current_background.png",
+        "bytes": 6548,
+        "sha256": "d529ef7c6697a58a07ee03e446cdbc6b58ab8ffa0c627c4963faa3223de68645",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4193,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_opaque_uses_current_background"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "capture",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            16,
+            38
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        },
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            32,
+            38
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        },
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            48,
+            46
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_erase_display_repaints.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_erase_display_repaints.png",
+        "bytes": 6506,
+        "sha256": "350597feb0f2994c92fde1a1d334e5066614d16c92f3ce8f04c0c75abb9a2faf",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4507,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_erase_display_repaints"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "capture",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            16,
+            38
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        },
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            32,
+            38
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        },
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            48,
+            46
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_cancel_and_pty_recovery.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_cancel_and_pty_recovery.png",
+        "bytes": 6506,
+        "sha256": "350597feb0f2994c92fde1a1d334e5066614d16c92f3ce8f04c0c75abb9a2faf",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4508,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_cancel_and_pty_recovery"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "capture",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            255,
+            0,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            16,
+            38
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            0,
+            255,
+            255
+          ]
+        },
+        {
+          "actual": [
+            0,
+            255,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            32,
+            38
+          ],
+          "expected": [
+            0,
+            255,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            255,
+            0,
+            255
+          ]
+        },
+        {
+          "actual": [
+            0,
+            0,
+            255
+          ],
+          "alpha": 255,
+          "client": [
+            48,
+            46
+          ],
+          "expected": [
+            0,
+            0,
+            255
+          ],
+          "passed": true,
+          "provider_bytes": [
+            255,
+            0,
+            0,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_recovers_after_oversized_raster.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_recovers_after_oversized_raster.png",
+        "bytes": 6537,
+        "sha256": "7c936f08437416ad4c4242b8277c72f94b0a7d1f160bfcae60f45ef00d553916",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4507,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_recovers_after_oversized_raster"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "capture",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            255,
+            0,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            304,
+            22
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_before_resize.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_before_resize.png",
+        "bytes": 6538,
+        "sha256": "97b0ee88638a28dd8700eab0a9f096991d4e81d494cc580c596c99d5de35ba8c",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 3858,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_before_resize"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "resize",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "ax_window_candidates": [
+        {
+          "matches_target": true,
+          "minimized": false,
+          "modal": false,
+          "pid": 5246,
+          "pid_error": 0,
+          "role": "AXWindow",
+          "subrole": "AXStandardWindow",
+          "title": "ztty-native-ztty-macos-native-gd83z26z"
+        }
+      ],
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1024,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 256
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            16,
+            24,
+            32
+          ],
+          "alpha": 255,
+          "client": [
+            252,
+            22
+          ],
+          "expected": [
+            16,
+            24,
+            32
+          ],
+          "passed": true,
+          "provider_bytes": [
+            32,
+            24,
+            16,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_resize_clips_without_ghosts.png",
+        "pid": 5246,
+        "width": 256,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          256,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          256,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          256,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          256,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            256,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_resize_clips_without_ghosts.png",
+        "bytes": 5408,
+        "sha256": "85ee56f54be7d06dcdd7d6a0218aa5aef9dc7441735b47e481fcbdf20d3ea60b",
+        "width": 256,
+        "height": 208
+      },
+      "stdout_bytes": 4166,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_resize_clips_without_ghosts"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "resize",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "ax_window_candidates": [
+        {
+          "matches_target": true,
+          "minimized": false,
+          "modal": false,
+          "pid": 5246,
+          "pid_error": 0,
+          "role": "AXWindow",
+          "subrole": "AXStandardWindow",
+          "title": "ztty-native-ztty-macos-native-gd83z26z"
+        }
+      ],
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            255,
+            0,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            304,
+            22
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_resize_restores_visible_image.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_resize_restores_visible_image.png",
+        "bytes": 6538,
+        "sha256": "97b0ee88638a28dd8700eab0a9f096991d4e81d494cc580c596c99d5de35ba8c",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4165,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_resize_restores_visible_image"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "minimize",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "ax_window_candidates": [
+        {
+          "matches_target": true,
+          "minimized": false,
+          "modal": false,
+          "pid": 5246,
+          "pid_error": 0,
+          "role": "AXWindow",
+          "subrole": "AXStandardWindow",
+          "title": "ztty-native-ztty-macos-native-gd83z26z"
+        }
+      ],
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "minimized": true,
+      "on_screen_window_ids": [],
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "window_inventory",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_before_action": {
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "on_screen": true,
+        "pid": 5246,
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        }
+      ],
+      "window_selection_vector": "passed",
+      "stdout_bytes": 2818,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: window_inventory\n",
+      "name": "window_minimized"
+    },
+    {
+      "passed": true,
+      "status": "passed",
+      "action": "restore",
+      "exit_code": 0,
+      "accessibility_selection_vector": "passed",
+      "appkit": {
+        "activation_policy": 2,
+        "activation_policy_before": 2,
+        "initialized": true,
+        "main_thread": true,
+        "transition_requested": false
+      },
+      "architecture": "x86_64",
+      "attempts": 1,
+      "ax_window_candidates": [
+        {
+          "matches_target": true,
+          "minimized": false,
+          "modal": false,
+          "pid": 5246,
+          "pid_error": 0,
+          "role": "AXWindow",
+          "subrole": "AXStandardWindow",
+          "title": "ztty-native-ztty-macos-native-gd83z26z"
+        }
+      ],
+      "capture": "ScreenCaptureKit desktop-independent WindowServer window",
+      "image": {
+        "alpha_info": 2,
+        "bitmap_info": 8194,
+        "bits_per_component": 8,
+        "bits_per_pixel": 32,
+        "bytes_per_row": 1280,
+        "color_space": "kCGColorSpaceDeviceRGB",
+        "height": 208,
+        "requested_color_space": "kCGColorSpaceSRGB",
+        "requested_pixel_format": "32BGRA",
+        "width": 320
+      },
+      "minimized": false,
+      "os": "Version 15.7.9 (Build 24G830)",
+      "permissions": {
+        "accessibility": true,
+        "screen_capture": true
+      },
+      "phase": "saving_png",
+      "physical_display_latency": "not_measured",
+      "pixel_layout_vector": "passed",
+      "process_translated": false,
+      "samples": [
+        {
+          "actual": [
+            255,
+            0,
+            0
+          ],
+          "alpha": 255,
+          "client": [
+            304,
+            22
+          ],
+          "expected": [
+            255,
+            0,
+            0
+          ],
+          "passed": true,
+          "provider_bytes": [
+            0,
+            0,
+            255,
+            255
+          ]
+        }
+      ],
+      "screenshot": {
+        "height": 208,
+        "path": "/Users/runner/work/ztty/ztty/dist/ztty-macos-x86_64.native.sixel_minimize_restore_visible_image.png",
+        "pid": 5246,
+        "width": 320,
+        "window_id": 26
+      },
+      "target": {
+        "pid": 5246,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window": {
+        "client_pixel_rect": [
+          0,
+          28,
+          320,
+          180
+        ],
+        "client_points": [
+          0,
+          0,
+          320,
+          180
+        ],
+        "displays": [
+          {
+            "frame_points": [
+              0,
+              0,
+              1920,
+              1080
+            ],
+            "id": 25165824
+          }
+        ],
+        "filter_content_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "frame_points": [
+          800,
+          216,
+          320,
+          208
+        ],
+        "inside_display": true,
+        "layer": 0,
+        "on_screen": true,
+        "pid": 5246,
+        "point_pixel_scale": 1,
+        "title": "ztty-native-ztty-macos-native-gd83z26z",
+        "window_id": 26
+      },
+      "window_candidates": [
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 30
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 28
+        },
+        {
+          "frame_points": [
+            800,
+            216,
+            320,
+            208
+          ],
+          "layer": 0,
+          "matches_target": true,
+          "on_screen": true,
+          "pid": 5246,
+          "title": "ztty-native-ztty-macos-native-gd83z26z",
+          "window_id": 26
+        },
+        {
+          "frame_points": [
+            0,
+            580,
+            500,
+            500
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 32
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 31
+        },
+        {
+          "frame_points": [
+            0,
+            0,
+            1920,
+            24
+          ],
+          "layer": 0,
+          "matches_target": false,
+          "on_screen": false,
+          "pid": 5246,
+          "title": "",
+          "window_id": 29
+        }
+      ],
+      "window_selection_vector": "passed",
+      "png": {
+        "file": "ztty-macos-x86_64.native.sixel_minimize_restore_visible_image.png",
+        "bytes": 6538,
+        "sha256": "97b0ee88638a28dd8700eab0a9f096991d4e81d494cc580c596c99d5de35ba8c",
+        "width": 320,
+        "height": 208
+      },
+      "stdout_bytes": 4190,
+      "stderr_tail": "ztty-macos-window-probe phase: appkit_initialization\nztty-macos-window-probe phase: permission_preflight\nztty-macos-window-probe phase: window_inventory\nztty-macos-window-probe phase: capture_geometry\nztty-macos-window-probe phase: windowserver_capture\nztty-macos-window-probe phase: pixels_received\nztty-macos-window-probe phase: pixel_comparison\nztty-macos-window-probe phase: saving_png\n",
+      "name": "sixel_minimize_restore_visible_image"
+    }
+  ],
+  "host": "macOS-15.7.9-x86_64-i386-64bit-Mach-O",
+  "architecture": "x86_64",
+  "binary_sha256": "b8ec52a9b8e61552a74a5302fa9efbfbee7af5e42dbbc427bbc46ec0c9cb6190",
+  "helper_sha256": "2ee3c8c43d82baa0b73986a0d61b935d09cd514cccda4222ef975c6991af9287",
+  "remaining_owned_processes": [],
+  "window_title": "ztty-native-ztty-macos-native-gd83z26z",
+  "active_check": "sixel_minimize_restore_visible_image",
+  "application_pid": 5246,
+  "child_pid": 5247,
+  "protocol": {
+    "host": "macOS-15.7.9-x86_64-i386-64bit-Mach-O",
+    "checks": {
+      "native_pty_and_pixel_geometry": true,
+      "cursor_reply": true,
+      "kitty_capability_query": true,
+      "chunked_rgba": true,
+      "png": true,
+      "alternate_screen_image_isolation": true,
+      "malformed_image_text_recovery": true,
+      "image_deletion": true
+    },
+    "pixel_readback": "not_performed",
+    "ime_keyboard": "not_performed",
+    "pty_size": {
+      "cols": 40,
+      "rows": 12,
+      "pixel_width": 320,
+      "pixel_height": 180
+    },
+    "passed": true
+  },
+  "cwd": {
+    "requested": "/private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/ztty-macos-native-gd83z26z/cwd with \u7a7a\u683c\u4e0eUnicode",
+    "child": "/private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/ztty-macos-native-gd83z26z/cwd with \u7a7a\u683c\u4e0eUnicode",
+    "pwd": "/private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/ztty-macos-native-gd83z26z/cwd with \u7a7a\u683c\u4e0eUnicode",
+    "config_argument": "../../../../../private/var/folders/20/jp1_0n3n7kndh6rnbqb5344m0000gn/T/ztty-macos-native-gd83z26z/ztty.conf",
+    "launch_directory": "/Users/runner/work/ztty/ztty"
+  },
+  "pty_size": {
+    "cols": 40,
+    "rows": 12,
+    "pixel_width": 320,
+    "pixel_height": 180
+  },
+  "binary_architectures": [
+    "x86_64"
+  ],
+  "pty_commands": [
+    {
+      "passed": true,
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "reply_hex": "1b5b373b3952",
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "reply_hex": "1b5b393b3352",
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "pty": {
+        "cols": 32,
+        "rows": 12,
+        "pixel_width": 256,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "reply_hex": "1b5b393b3352",
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    },
+    {
+      "passed": true,
+      "pty": {
+        "cols": 40,
+        "rows": 12,
+        "pixel_width": 320,
+        "pixel_height": 180
+      }
+    }
+  ],
+  "application_exit": 0,
+  "application_logs": [
+    "ztty-macos-x86_64.native.application.stdout.log",
+    "ztty-macos-x86_64.native.application.stderr.log"
+  ],
+  "exit_code": 0
+}

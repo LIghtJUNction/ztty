@@ -1,0 +1,528 @@
+{
+  "macos": [
+    {
+      "architecture": "x86_64",
+      "signature": "ad-hoc-verified",
+      "notarized": false,
+      "manifest_validation": "Mach-O structure, bundle metadata, file hashes and archive round trips checked; runtime and displayed pixels are separate tests.",
+      "packages": [
+        {
+          "archive": "ztty-macos-x86_64.zip",
+          "archive_sha256": "101d65e3aeada9d1bb8bb2843a5940bce0434fa031abc7702140972e82e60d9c",
+          "packaged_binary_sha256": "a284c47329ee0bea8bcfecd3d1fb4924a226f99aaa53e82fe6b46892398c6442",
+          "tested_source_binary_sha256": "b8ec52a9b8e61552a74a5302fa9efbfbee7af5e42dbbc427bbc46ec0c9cb6190",
+          "files_verified": 5,
+          "build": {
+            "version": "0.5.0",
+            "architectures": [
+              "x86_64"
+            ],
+            "source_binary_sha256": "b8ec52a9b8e61552a74a5302fa9efbfbee7af5e42dbbc427bbc46ec0c9cb6190",
+            "source_binary_bytes": 529504,
+            "minimum_macos": "11.0",
+            "license": "MIT"
+          }
+        },
+        {
+          "archive": "ztty-macos-x86_64.tar.gz",
+          "archive_sha256": "1b5e8b7384ac8f1e94396d2560337ef1eda9560c21a800616da162376816560f",
+          "packaged_binary_sha256": "a284c47329ee0bea8bcfecd3d1fb4924a226f99aaa53e82fe6b46892398c6442",
+          "tested_source_binary_sha256": "b8ec52a9b8e61552a74a5302fa9efbfbee7af5e42dbbc427bbc46ec0c9cb6190",
+          "files_verified": 5,
+          "build": {
+            "version": "0.5.0",
+            "architectures": [
+              "x86_64"
+            ],
+            "source_binary_sha256": "b8ec52a9b8e61552a74a5302fa9efbfbee7af5e42dbbc427bbc46ec0c9cb6190",
+            "source_binary_bytes": 529504,
+            "minimum_macos": "11.0",
+            "license": "MIT"
+          }
+        }
+      ],
+      "contract_summary": [
+        "Ran 10 tests in 0.774s",
+        "OK"
+      ],
+      "spawn_summary": []
+    },
+    {
+      "architecture": "aarch64",
+      "signature": "ad-hoc-verified",
+      "notarized": false,
+      "manifest_validation": "Mach-O structure, bundle metadata, file hashes and archive round trips checked; runtime and displayed pixels are separate tests.",
+      "packages": [
+        {
+          "archive": "ztty-macos-aarch64.zip",
+          "archive_sha256": "a54d0b499c22eccc580d4015b0d71055d73aa122021c4cd718f1b2b406d0bccf",
+          "packaged_binary_sha256": "d57c18b2b56204e89d1514e986bf95650a5c8433214ebf50694fe8006fbf0348",
+          "tested_source_binary_sha256": "1ac4c93ba32042a245d06ac4bae9749eecf6e5e499b586042f5e48c62983482b",
+          "files_verified": 5,
+          "build": {
+            "version": "0.5.0",
+            "architectures": [
+              "aarch64"
+            ],
+            "source_binary_sha256": "1ac4c93ba32042a245d06ac4bae9749eecf6e5e499b586042f5e48c62983482b",
+            "source_binary_bytes": 500656,
+            "minimum_macos": "11.0",
+            "license": "MIT"
+          }
+        },
+        {
+          "archive": "ztty-macos-aarch64.tar.gz",
+          "archive_sha256": "45440d71bc37ab0bb468f2b93f572affef557e9248fa1317244adf36c0fd7720",
+          "packaged_binary_sha256": "d57c18b2b56204e89d1514e986bf95650a5c8433214ebf50694fe8006fbf0348",
+          "tested_source_binary_sha256": "1ac4c93ba32042a245d06ac4bae9749eecf6e5e499b586042f5e48c62983482b",
+          "files_verified": 5,
+          "build": {
+            "version": "0.5.0",
+            "architectures": [
+              "aarch64"
+            ],
+            "source_binary_sha256": "1ac4c93ba32042a245d06ac4bae9749eecf6e5e499b586042f5e48c62983482b",
+            "source_binary_bytes": 500656,
+            "minimum_macos": "11.0",
+            "license": "MIT"
+          }
+        }
+      ],
+      "contract_summary": [
+        "Ran 10 tests in 0.441s",
+        "OK"
+      ],
+      "spawn_summary": []
+    }
+  ],
+  "windows": [
+    {
+      "architecture": "x86_64",
+      "cold_start_runs": [
+        {
+          "file": "ztty-windows-x86_64.native.cold-01.json",
+          "sha256": "37453e793852e6146132ace1d9fa5332094f506ecef3a32a6074b7f6657f994f",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-x86_64.native.cold-02.json",
+          "sha256": "2d48f1f077736c0878fec363a67c3341ec4df1294b3dd7fb5298957112481abc",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-x86_64.native.cold-03.json",
+          "sha256": "06ae330b1f377da03db5793df8646bbb4241af8969371fe233f236c3540d13d9",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-x86_64.native.cold-04.json",
+          "sha256": "120083f8a5cb06fa566a3637329e64c36b70d6bc85c10185f6b15011fffa6f03",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-x86_64.native.cold-05.json",
+          "sha256": "71b91a00bb0be0d444f926b3a3b10e0a787e57688e0fc721422bce9a3bcf5200",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-x86_64.native.cold-06.json",
+          "sha256": "e72a71a1d76d48b105cebdf33b58ed9ff659014899522fbd262035864e8be65f",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-x86_64.native.cold-07.json",
+          "sha256": "753605e7ef1da52a80024139c5170692cfe133d221937e9ea3162af0c9d14b00",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-x86_64.native.cold-08.json",
+          "sha256": "8eaa7aef50f608c2723ca5f606c896d875a6fac86bb83e09646eaf894d3db31c",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        }
+      ],
+      "cold_binding": {
+        "required": 8,
+        "completed": 8,
+        "passed": true,
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "binary_sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3",
+        "desktop": "ztty-native-3640-c815cee0cd464274b24d56b65f1eb915"
+      },
+      "maximize_check": {
+        "name": "maximize_restore_keeps_pty_identity",
+        "passed": true,
+        "pixels": [
+          {
+            "client": [
+              16,
+              16
+            ],
+            "screen": [
+              32,
+              55
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "expected": [
+              0,
+              0,
+              255
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              317,
+              16
+            ],
+            "screen": [
+              333,
+              55
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 2425316,
+            "pid_at_point": 9312,
+            "owned": true,
+            "visible": true
+          }
+        ]
+      },
+      "contract_summary": [
+        "Ran 41 tests in 0.371s",
+        "OK"
+      ]
+    },
+    {
+      "architecture": "aarch64",
+      "cold_start_runs": [
+        {
+          "file": "ztty-windows-aarch64.native.cold-01.json",
+          "sha256": "ea864a0bdc8bcdf6933bcaa5b5b773d7b0b64fa0e8e2f69a87da59662e9b2b7c",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-aarch64.native.cold-02.json",
+          "sha256": "91bc32c77d50a31fbcf8e3b3bcc4ed069df36914d7e410f8b39a9140e11bb30b",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-aarch64.native.cold-03.json",
+          "sha256": "ecf208e078f74891331bcdfa18bf8c6593c2e07a0229e875353e28da4a502627",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-aarch64.native.cold-04.json",
+          "sha256": "7ae40868cae34e04df65d09afffde3cd2569fb66e0ecd9cbef945adc376e17d3",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-aarch64.native.cold-05.json",
+          "sha256": "469776e51f5684b4313f82ed1d2b5c3d6811e5accc100cd3fee907af5c89e4a8",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-aarch64.native.cold-06.json",
+          "sha256": "c7e63838c034d812bfd8cd51bd28042de4222d4e1e50a5f6192f9c5f7d8f4538",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-aarch64.native.cold-07.json",
+          "sha256": "0eb6d18423d757d8e0eeca60a5909474a4a862ec237307b57a3e541578651009",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        },
+        {
+          "file": "ztty-windows-aarch64.native.cold-08.json",
+          "sha256": "b342ec8c2c896cfcdb6731474d44dae59b0dafc4f8e09a07f23d311cc91ef566",
+          "passed": true,
+          "checks": 31,
+          "binary_sha256": null,
+          "source_sha": null
+        }
+      ],
+      "cold_binding": {
+        "required": 8,
+        "completed": 8,
+        "passed": true,
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "binary_sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382",
+        "desktop": "ztty-native-1408-e626685b4ec54be4a585c4517a5b0b5b"
+      },
+      "maximize_check": {
+        "name": "maximize_restore_keeps_pty_identity",
+        "passed": true,
+        "pixels": [
+          {
+            "client": [
+              16,
+              16
+            ],
+            "screen": [
+              32,
+              55
+            ],
+            "rgb": [
+              0,
+              0,
+              255
+            ],
+            "expected": [
+              0,
+              0,
+              255
+            ],
+            "window_from_point": 3539564,
+            "pid_at_point": 1816,
+            "owned": true,
+            "visible": true
+          },
+          {
+            "client": [
+              317,
+              16
+            ],
+            "screen": [
+              333,
+              55
+            ],
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "expected": [
+              0,
+              0,
+              0
+            ],
+            "window_from_point": 3539564,
+            "pid_at_point": 1816,
+            "owned": true,
+            "visible": true
+          }
+        ]
+      },
+      "contract_summary": [
+        "Ran 41 tests in 0.405s",
+        "OK"
+      ]
+    }
+  ],
+  "linux_identity": [
+    {
+      "architecture": "x86_64",
+      "source_before": {
+        "commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "tracked_changes": []
+      },
+      "source_after": {
+        "commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "tracked_changes": []
+      },
+      "input_source_commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "input_source_changes": [
+        "?? dist/"
+      ],
+      "input_test_sha256": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+      "input_cleanup": {
+        "owned_processes_remaining": []
+      },
+      "vector_sample": {
+        "name": "legacy Ctrl+I",
+        "injection": "XTEST",
+        "expected_hex": "09",
+        "actual_hex": "09",
+        "ok": true
+      },
+      "source_file_checks": [
+        {
+          "file": "tests/workspaces.py",
+          "sha256": "1142af21d5c012d0157b201f59337a7714bfa030d4f98043ee8281042f7411b8",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/daily_workflow.py",
+          "sha256": "738f9201764b65b348f18122d80e214896b16353fba06a48ddbe4bd7a064ef44",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/session_switcher.py",
+          "sha256": "aa2d638ff24cb679a02023e707ee13bb05a6cef732c219b05d7ba62285e2acd5",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/sixel_gui.py",
+          "sha256": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/input_gui.py",
+          "sha256": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/repaint_gui.py",
+          "sha256": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/native_ui_gui.py",
+          "sha256": "202367aee225c2ad8eaf569d436084af7a1d879cca0955874df190f060743a22",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/ioctl_resize_fault.c",
+          "sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tools/isolated_xvfb.py",
+          "sha256": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/linux_native.py",
+          "sha256": "e89c3228bddd2ae491be2defbfbdf893ad6c9c41462e522f0b9344d8f06a1fd3",
+          "matches_frozen_git_blob": true
+        }
+      ]
+    },
+    {
+      "architecture": "aarch64",
+      "source_before": {
+        "commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "tracked_changes": []
+      },
+      "source_after": {
+        "commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "tracked_changes": []
+      },
+      "input_source_commit": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+      "input_source_changes": [
+        "?? dist/"
+      ],
+      "input_test_sha256": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+      "input_cleanup": {
+        "owned_processes_remaining": []
+      },
+      "vector_sample": {
+        "name": "legacy Ctrl+I",
+        "injection": "XTEST",
+        "expected_hex": "09",
+        "actual_hex": "09",
+        "ok": true
+      },
+      "source_file_checks": [
+        {
+          "file": "tests/workspaces.py",
+          "sha256": "1142af21d5c012d0157b201f59337a7714bfa030d4f98043ee8281042f7411b8",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/daily_workflow.py",
+          "sha256": "738f9201764b65b348f18122d80e214896b16353fba06a48ddbe4bd7a064ef44",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/session_switcher.py",
+          "sha256": "aa2d638ff24cb679a02023e707ee13bb05a6cef732c219b05d7ba62285e2acd5",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/sixel_gui.py",
+          "sha256": "c2248bd7c75e9827d69d8ea174aca11a628e04d34ca5c7374713006aea592e0d",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/input_gui.py",
+          "sha256": "9bae79fc47f2152a3868201c5a6c424e7e4bcd188af80b26b771a62510311955",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/repaint_gui.py",
+          "sha256": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/native_ui_gui.py",
+          "sha256": "202367aee225c2ad8eaf569d436084af7a1d879cca0955874df190f060743a22",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/ioctl_resize_fault.c",
+          "sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tools/isolated_xvfb.py",
+          "sha256": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+          "matches_frozen_git_blob": true
+        },
+        {
+          "file": "tests/linux_native.py",
+          "sha256": "e89c3228bddd2ae491be2defbfbdf893ad6c9c41462e522f0b9344d8f06a1fd3",
+          "matches_frozen_git_blob": true
+        }
+      ]
+    }
+  ]
+}

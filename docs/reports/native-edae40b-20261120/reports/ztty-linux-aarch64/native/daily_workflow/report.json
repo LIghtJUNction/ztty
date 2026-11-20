@@ -1,0 +1,207 @@
+{
+  "ok": true,
+  "checks": [
+    "OSC 133 metadata, exit codes, bounded command output and command CLI agree with the real PTY",
+    "real search keys find off-screen retained output, highlight it, navigate matches and copy UTF-8 selection without PTY input",
+    "Alt+C toggles search case; forward/backward navigation and clipboard preserve original spelling without PTY input",
+    "command navigation copies the selected first and second command regions through the real clipboard",
+    "filtered command palette executes a font action, font reset restores the grid and both preserve the running PTY",
+    "custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release",
+    "width reflow preserves command IDs, exit codes and complete UTF-8 output; navigation copies both retained command regions",
+    "atomic config saves update pixels/font without restarting; explicit truecolor survives theme change; malformed reload retains the previous valid state",
+    "config watching recovers after the containing directory is renamed or deleted and recreated",
+    "history shows a temporary return control; new PTY output preserves the inspected rows and marks new output; clicking returns live, clears the indication and sends no application mouse bytes",
+    "the return control avoids search and palette rows; clicking preserves both modal input flows, clipboard search and the unchanged PTY grid",
+    "observing an already attached workspace pane preserves the other pane's actual X input focus",
+    "a read-only observer can return live after new output without acquiring input, resizing or replacing the PTY, or sending mouse input",
+    "closing an observer by action or WM_DELETE preserves the agent-owned PTY and permits reattachment",
+    "observers can inspect commands/search/copy while GUI typing and paste are blocked; explicit takeover restores input without restarting the PTY",
+    "same-owner local acquire leaves observation mode and restores real GUI input without replacing the PTY",
+    "attach --observe on an already attached local-owned view preserves the same live PTY when the observing window closes",
+    "a fresh --observe window owns and reaps only its newly created child when closed",
+    "launch waiter exits and session/PTY resources are released"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "0681944cc2d8360a8a1c4a3619e2348b9aa5f443a835f20f70aeeb7cd3663ad4",
+  "source_sha256": {
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/session_control.rs": "02e3f55082631ec0e43aa007a4f3808b5ba5355de043048ba00192e748f9336c",
+    "src/output_tail.rs": "77097c3034ee253d069846562f3dc1fa2f87f65062ab344979569978fa553b05",
+    "src/session_core.rs": "643c5c8b4b0d3fb93bef829998813707bfdc1b8401673eee0bee46cf434796bc",
+    "src/input_queue.rs": "e34883d0376d2439454e93920fcb813657fbf69007c5937dfae8dd6c4929c44d",
+    "src/search.rs": "e1d6d09ceeec056449dd93625c386ecb52577c41e435e140ab3db71671c560fc",
+    "src/scroll_prompt.rs": "27e9b9edb16d4bed1c6b63f600122c774f42bc6b701f90cc9cf51d867cad75ff",
+    "src/actions.rs": "7199f586fc81fe740ba27ce9174f7788b212df1d5c7b557f7220c4dc43dfbaae",
+    "src/config_watch.rs": "ba4fa930dfb2638a60645a990b92e180b849b86bbe9a9f7108c77957078d92b1",
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "src/main.rs": "6b59e64dfb6aefc581ca87b5e44d693b63535296ab6cf6f3044cf03e502e807d",
+    "tests/daily_workflow.py": "738f9201764b65b348f18122d80e214896b16353fba06a48ddbe4bd7a064ef44"
+  },
+  "screenshots": {
+    "history-search": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/history-search.png",
+      "sha256": "1a34acd2ee81ff6c126b73c402dde57ab8deac66860a06b2d49fb229da50ce7f"
+    },
+    "history-search-ignore-case": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/history-search-ignore-case.png",
+      "sha256": "95531a6037e28cc8bf00b019fceb03d20a6290fba9ca52aa33d7d9fae5500196"
+    },
+    "history-search-match-case": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/history-search-match-case.png",
+      "sha256": "71e62610529df12817e03638ddbc603b27e346d20c4b1832463290bf53ca2a88"
+    },
+    "command-palette": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/command-palette.png",
+      "sha256": "5d4c8899fbbf32632c25ac6e20f07a266f3800181646587e04071500218c44d5"
+    },
+    "invalid-config-diagnostic": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/invalid-config-diagnostic.png",
+      "sha256": "e6b0bb6ac6b795f32beb5a254d56e076ec9abea71bffbe761327bb932f83f9c0"
+    },
+    "reloaded-terminal": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/reloaded-terminal.png",
+      "sha256": "fa5168281b21c4e66edd94dbf7941674403fd1f52a053aa70ba3175c8b8bb935"
+    },
+    "scrollback-return": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-return.png",
+      "sha256": "1d6dc99e72a73ac5f0a2f67a7842f93b9c3f18f166716c1ff4936f3908db15fe"
+    },
+    "scrollback-new-output": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-new-output.png",
+      "sha256": "9fb091282e25836a0993cf77222b1587f0d4b43d7136a305215c2f715f4af8bd"
+    },
+    "scrollback-live": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-live.png",
+      "sha256": "eee8ea672ed3a123331810ec87bdaf2b528fe82c4c3b8a2505108800e9d609c3"
+    },
+    "scrollback-search": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-search.png",
+      "sha256": "cbf7c1ce634f687cb37461f3ad8155050cd8f1c4c26e72b59bb476d105a112d6"
+    },
+    "scrollback-palette": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-palette.png",
+      "sha256": "1b4a4ef8fd4e8283f0fd1c4b433f145e2608e912e134b3254c4d575610c1bab2"
+    },
+    "scrollback-observer": {
+      "path": "/home/runner/work/ztty/ztty/dist/ztty-linux-aarch64.native/daily_workflow/screenshots/scrollback-observer.png",
+      "sha256": "0e54fce52ec99bae30d8f14ed25e276a90ed8c85bb7b01b560130bf5144f927f"
+    }
+  },
+  "display_ownership": {
+    "display": ":16314",
+    "pid": 5282,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X16314",
+        "inode": 23118,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X16314",
+        "inode": 23117,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "command_reflow": {
+    "before": [
+      {
+        "id": 1,
+        "exit_status": 7,
+        "available": true,
+        "has_output": true,
+        "complete": true
+      },
+      {
+        "id": 2,
+        "exit_status": 0,
+        "available": true,
+        "has_output": true,
+        "complete": true
+      },
+      {
+        "id": 3,
+        "exit_status": null,
+        "available": true,
+        "has_output": false,
+        "complete": false
+      }
+    ],
+    "after": [
+      {
+        "id": 1,
+        "exit_status": 7,
+        "available": true,
+        "has_output": true,
+        "complete": true
+      },
+      {
+        "id": 2,
+        "exit_status": 0,
+        "available": true,
+        "has_output": true,
+        "complete": true
+      },
+      {
+        "id": 3,
+        "exit_status": null,
+        "available": true,
+        "has_output": false,
+        "complete": false
+      }
+    ],
+    "retained_outputs": [
+      {
+        "id": 1,
+        "exit_status": 7,
+        "bytes": 20,
+        "sha256": "ff7cf7cb1a47e20fb64938b75f6c562d992faa5f96a13076000be5b23dc45f56"
+      },
+      {
+        "id": 2,
+        "exit_status": 0,
+        "bytes": 2872,
+        "sha256": "57e06bf9d4eaf51f455036b34dc40dd659f2fd0732e89127b0032735a7993a3f"
+      }
+    ]
+  },
+  "scroll_prompt": {
+    "normal_bounds": [
+      778,
+      562,
+      920,
+      592
+    ],
+    "new_output_bounds": [
+      661,
+      562,
+      920,
+      592
+    ],
+    "search_bounds": [
+      778,
+      534,
+      920,
+      564
+    ],
+    "palette_bounds": [
+      778,
+      402,
+      920,
+      432
+    ],
+    "observer": {
+      "input_owner": "workflow-owner",
+      "read_only": true,
+      "pid_preserved": true
+    }
+  },
+  "stderr": "The XKEYBOARD keymap compiler (xkbcomp) reports:\n> Warning:          Could not resolve keysym XF86CameraAccessEnable\n> Warning:          Could not resolve keysym XF86CameraAccessDisable\n> Warning:          Could not resolve keysym XF86CameraAccessToggle\n> Warning:          Could not resolve keysym XF86NextElement\n> Warning:          Could not resolve keysym XF86PreviousElement\n> Warning:          Could not resolve keysym XF86AutopilotEngageToggle\n> Warning:          Could not resolve keysym XF86MarkWaypoint\n> Warning:          Could not resolve keysym XF86Sos\n> Warning:          Could not resolve keysym XF86NavChart\n> Warning:          Could not resolve keysym XF86FishingChart\n> Warning:          Could not resolve keysym XF86SingleRangeRadar\n> Warning:          Could not resolve keysym XF86DualRangeRadar\n> Warning:          Could not resolve keysym XF86RadarOverlay\n> Warning:          Could not resolve keysym XF86TraditionalSonar\n> Warning:          Could not resolve keysym XF86ClearvuSonar\n> Warning:          Could not resolve keysym XF86SidevuSonar\n> Warning:          Could not resolve keysym XF86NavInfo\nErrors from xkbcomp are not fatal to the X server\n"
+}

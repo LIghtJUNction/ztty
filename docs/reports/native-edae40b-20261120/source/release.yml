@@ -1,0 +1,883 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      build_only:
+        description: 'Build official candidate artifacts without publishing a GitHub Release or AUR update'
+        type: boolean
+        required: true
+        default: true
+      candidate_platform:
+        description: 'Build-only validation scope; publishing always requires all native platforms'
+        type: choice
+        required: true
+        default: all
+        options: [all, linux, macos, windows]
+      windows_paint_diagnostics:
+        description: 'Build-only Windows paint DC diagnostics; cannot be used for publication'
+        type: boolean
+        required: true
+        default: false
+      windows_nc_rendering_diagnostics:
+        description: 'Build-only owned-window nonclient rendering isolation; cannot be used for publication'
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ztty-release
+  cancel-in-progress: false
+
+env:
+  RUST_TOOLCHAIN: '1.100.0'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      source_sha: ${{ steps.version.outputs.source_sha }}
+      build_only: ${{ steps.version.outputs.build_only }}
+      candidate_platform: ${{ steps.version.outputs.candidate_platform }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify release version and pin the source commit
+        id: version
+        env:
+          BUILD_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.build_only || false }}
+          CANDIDATE_PLATFORM: ${{ inputs.candidate_platform || 'all' }}
+          WINDOWS_PAINT_DIAGNOSTICS: ${{ inputs.windows_paint_diagnostics && 'true' || 'false' }}
+          WINDOWS_NC_RENDERING_DIAGNOSTICS: ${{ inputs.windows_nc_rendering_diagnostics && 'true' || 'false' }}
+        run: |
+          case "$CANDIDATE_PLATFORM" in
+            all|linux|macos|windows) ;;
+            *) echo "Unknown native candidate platform" >&2; exit 1 ;;
+          esac
+          if [[ "$BUILD_ONLY" != true && "$CANDIDATE_PLATFORM" != all ]]; then
+            echo "Publishing requires all native platforms; scoped builds require build_only=true." >&2
+            exit 1
+          fi
+          if [[ "$WINDOWS_PAINT_DIAGNOSTICS" == true && "$BUILD_ONLY" != true ]]; then
+            echo "Paint diagnostics change GDI query timing and cannot be used for publication." >&2
+            exit 1
+          fi
+          if [[ "$WINDOWS_NC_RENDERING_DIAGNOSTICS" == true && "$BUILD_ONLY" != true ]]; then
+            echo "Nonclient rendering isolation changes window policy and cannot be used for publication." >&2
+            exit 1
+          fi
+          version=$(bash tools/release-source.sh "$RUNNER_TEMP/ztty-release")
+          source_sha=$(git rev-parse HEAD)
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            test "$GITHUB_REF" = "refs/tags/v$version"
+          elif [[ "$BUILD_ONLY" != true ]]; then
+            echo "Publishing requires the matching release tag v$version; branch builds require build_only=true." >&2
+            exit 1
+          fi
+          {
+            echo "version=$version"
+            echo "source_sha=$source_sha"
+            echo "build_only=$BUILD_ONLY"
+            echo "candidate_platform=$CANDIDATE_PLATFORM"
+          } >> "$GITHUB_OUTPUT"
+
+  # Retain the existing publication gate. Candidate artifact builds use the
+  # already completed local Linux gates and do not invoke routine Verify.
+  verify:
+    needs: version
+    if: ${{ needs.version.outputs.build_only != 'true' }}
+    uses: ./.github/workflows/verify.yml
+
+  linux:
+    needs: version
+    if: ${{ needs.version.outputs.build_only != 'true' || needs.version.outputs.candidate_platform == 'all' || needs.version.outputs.candidate_platform == 'linux' }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            arch: x86_64
+            python_arch: x64
+          - runner: ubuntu-24.04-arm
+            arch: aarch64
+            python_arch: arm64
+    runs-on: ${{ matrix.runner }}
+    env:
+      ARCH: ${{ matrix.arch }}
+      RUNNER_LABEL: ${{ matrix.runner }}
+      VERSION: ${{ needs.version.outputs.version }}
+      SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
+      BUILD_ONLY: ${{ needs.version.outputs.build_only }}
+      CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
+      ARTIFACT_STEM: ztty-linux-${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
+          ref: ${{ needs.version.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6, pinned commit
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.python_arch }}
+      - name: Record immutable source and initialize reports
+        id: source
+        shell: python {0}
+        run: |
+          import json, os, platform, subprocess
+          from pathlib import Path
+          source = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          assert source == os.environ["SOURCE_SHA"], "checkout did not match the pinned source commit"
+          out = Path("dist")
+          out.mkdir(exist_ok=True)
+          stem = os.environ["ARTIFACT_STEM"]
+          metadata = {"source_sha": source, "source_ref": os.environ["GITHUB_REF"],
+                      "version": os.environ["VERSION"], "architecture": os.environ["ARCH"],
+                      "runner": os.environ["RUNNER_LABEL"], "runner_image": os.environ.get("ImageVersion"),
+                      "platform": platform.platform(), "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
+                      "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+                      "build_only": os.environ["BUILD_ONLY"] == "true",
+                      "candidate_platform": os.environ["CANDIDATE_PLATFORM"], "passed": False, "status": "initialized"}
+          if "LLVM_MINGW_SHA256" in os.environ:
+              metadata["llvm_mingw"] = {"version": os.environ["LLVM_MINGW_VERSION"], "sha256": os.environ["LLVM_MINGW_SHA256"]}
+          (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+          (out / f"{stem}.native.json").write_text(json.dumps({"source_sha": source, "passed": False,
+              "status": "not_run", "pixel_readback": "not_performed"}, indent=2) + "\n", encoding="utf-8")
+          epoch = subprocess.check_output(["git", "show", "-s", "--format=%ct", "HEAD"], text=True).strip()
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
+              stream.write(f"SOURCE_DATE_EPOCH={epoch}\n")
+      - name: Install native Linux build and GUI acceptance dependencies
+        id: toolchain
+        run: |
+          export RUSTUP_HOME="$RUNNER_TEMP/ztty-release-rustup"
+          printf 'RUSTUP_HOME=%s\n' "$RUSTUP_HOME" >> "$GITHUB_ENV"
+          sudo apt-get update
+          sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev libxtst6 \
+            libwayland-dev libwayland-bin wayland-protocols libxkbcommon-dev \
+            libwayland-client0 libwayland-egl1 libwayland-cursor0 libxkbcommon0 \
+            xvfb sway wtype grim wl-clipboard fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
+          python -m pip install --disable-pip-version-check 'python-xlib==0.33' 'Pillow==13.0.0'
+          fc-cache -f
+          test "$(uname -m)" = "$ARCH"
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+      - name: Build the native Linux executable
+        id: build
+        run: cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty --features wayland
+      - name: Run native Linux PTY and X11 GUI acceptance
+        id: native
+        run: |
+          cargo +"$RUST_TOOLCHAIN" test --locked --features wayland --test working_directory -- --test-threads=1 > "dist/$ARTIFACT_STEM.working-directory.log" 2>&1
+          python tests/linux_native_test.py -v > "dist/$ARTIFACT_STEM.gate-tests.log" 2>&1
+          python tests/linux_native.py --binary target/release/ztty \
+            --source-root "$GITHUB_WORKSPACE" --source-sha "$SOURCE_SHA" \
+            --arch "$ARCH" --version "$VERSION" \
+            --output "dist/$ARTIFACT_STEM.native.json" \
+            --evidence-dir "dist/$ARTIFACT_STEM.native"
+          cargo +"$RUST_TOOLCHAIN" test --locked --features wayland --lib gpu:: -- --ignored --test-threads=1 --show-output > "dist/$ARTIFACT_STEM.native/gpu-tests.log" 2>&1
+          python tests/text_gpu_gui.py --binary target/release/ztty --renderer gpu \
+            --output "dist/$ARTIFACT_STEM.native/gpu-text.json" \
+            --screenshots "dist/$ARTIFACT_STEM.native/gpu-text"
+          python tests/native_ui_gui.py --binary target/release/ztty --renderer gpu \
+            --source-root "$GITHUB_WORKSPACE" --output "dist/$ARTIFACT_STEM.native/gpu-ui.json" \
+            --screenshot "dist/$ARTIFACT_STEM.native/gpu-ui.png"
+          python tests/repaint_gui.py --binary target/release/ztty --renderer gpu \
+            --output "dist/$ARTIFACT_STEM.native/gpu-repaint.json" \
+            --screenshots "dist/$ARTIFACT_STEM.native/gpu-repaint"
+          python tests/retained_frame_gui.py --binary target/release/ztty --renderer software \
+            --output "dist/$ARTIFACT_STEM.native/retained-frame.json"
+          for renderer in gpu software; do
+            python tests/graphics_extensions_gui.py --binary target/release/ztty --renderer "$renderer" \
+              --artifacts "dist/$ARTIFACT_STEM.native/graphics-$renderer"
+            python tests/osc52_gui.py --binary target/release/ztty --renderer "$renderer" \
+              --artifacts "dist/$ARTIFACT_STEM.native/osc52-$renderer"
+          done
+          python tests/clipboard_transfer_gui.py --binary target/release/ztty \
+            --output "dist/$ARTIFACT_STEM.native/clipboard.json"
+          python tests/wayland_gui.py --binary target/release/ztty \
+            --output "dist/$ARTIFACT_STEM.native/wayland"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path("dist") / (os.environ["ARTIFACT_STEM"] + ".native")
+          expected = hashlib.sha256(Path("target/release/ztty").read_bytes()).hexdigest()
+          checks = [("clipboard.json", 25, "ok"), ("wayland/validation.json", 65, "passed")]
+          for renderer in ("gpu", "software"):
+              checks.extend([(f"graphics-{renderer}/graphics-extensions.json", 8, "ok"),
+                             (f"osc52-{renderer}/osc52.json", 13, "ok")])
+          for name, count, flag in checks:
+              report = json.loads((root / name).read_text())
+              assert report[flag] is True, (name, report.get("error"))
+              assert report["binary_sha256"] == expected, name
+              assert len(report["checks"]) == count, (name, len(report["checks"]))
+              assert all(row[flag] is True for row in report["checks"]), name
+          wayland = json.loads((root / "wayland/validation.json").read_text())
+          assert wayland["source"] == os.environ["SOURCE_SHA"]
+          assert all(wayland[key] == [] for key in (
+              "owned_brokers_remaining", "owned_children_remaining", "owned_helpers_remaining"))
+          PY
+      - name: Package the native Linux executable
+        id: package
+        run: |
+          package_dir="$RUNNER_TEMP/ztty-linux-$ARCH"
+          mkdir -p "$package_dir"
+          cp target/release/ztty LICENSE "$package_dir/"
+          tar --sort=name --mtime="@$SOURCE_DATE_EPOCH" --owner=0 --group=0 --numeric-owner \
+            -czf "dist/ztty-linux-$ARCH.tar.gz" -C "$package_dir" ztty LICENSE
+          (cd dist && sha256sum "ztty-linux-$ARCH.tar.gz" > "ztty-linux-$ARCH.tar.gz.sha256")
+      - name: Archive Linux native acceptance evidence
+        id: evidence
+        if: ${{ always() && steps.source.outcome == 'success' }}
+        env:
+          OUTCOME_NATIVE: ${{ steps.native.outcome }}
+        shell: python {0}
+        run: |
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path("tests").resolve()))
+          from linux_native import archive_evidence
+          stem = os.environ["ARTIFACT_STEM"]
+          evidence = Path("dist") / f"{stem}.native"
+          if evidence.exists():
+              print(json.dumps(archive_evidence(evidence, Path("dist") / f"{stem}.native.tar.gz")))
+          elif os.environ["OUTCOME_NATIVE"] == "success":
+              raise RuntimeError("successful native acceptance produced no evidence directory")
+      - name: Finalize source-bound artifact report
+        if: ${{ always() && steps.source.outcome == 'success' }}
+        env:
+          OUTCOME_TOOLCHAIN: ${{ steps.toolchain.outcome }}
+          OUTCOME_BUILD: ${{ steps.build.outcome }}
+          OUTCOME_NATIVE: ${{ steps.native.outcome }}
+          OUTCOME_PACKAGE: ${{ steps.package.outcome }}
+          OUTCOME_EVIDENCE: ${{ steps.evidence.outcome }}
+        shell: python {0}
+        run: |
+          import hashlib, json, os
+          from pathlib import Path
+          out = Path("dist")
+          stem = os.environ["ARTIFACT_STEM"]
+          path = out / f"{stem}.build.json"
+          report = json.loads(path.read_text(encoding="utf-8"))
+          report["outcomes"] = {key: os.environ[f"OUTCOME_{key.upper()}"] for key in ("toolchain", "build", "native", "package", "evidence")}
+          report["passed"] = all(value == "success" for value in report["outcomes"].values())
+          report["status"] = "accepted" if report["passed"] else "failed"
+          report["files"] = {file.name: {"bytes": file.stat().st_size, "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
+              for file in sorted(out.iterdir()) if file.is_file() and file.name not in (path.name, path.name + ".sha256")}
+          path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          (out / (path.name + ".sha256")).write_text(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n", encoding="ascii")
+      - name: Upload artifacts and reports, including failures
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ env.ARTIFACT_STEM }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+
+  macos:
+    needs: version
+    if: ${{ needs.version.outputs.build_only != 'true' || needs.version.outputs.candidate_platform == 'all' || needs.version.outputs.candidate_platform == 'macos' }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: aarch64
+            host_arch: arm64
+            python_arch: arm64
+            target: aarch64-apple-darwin
+          - runner: macos-15-intel
+            arch: x86_64
+            host_arch: x86_64
+            python_arch: x64
+            target: x86_64-apple-darwin
+    runs-on: ${{ matrix.runner }}
+    env:
+      ARCH: ${{ matrix.arch }}
+      HOST_ARCH: ${{ matrix.host_arch }}
+      RUST_TARGET: ${{ matrix.target }}
+      RUNNER_LABEL: ${{ matrix.runner }}
+      VERSION: ${{ needs.version.outputs.version }}
+      SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
+      BUILD_ONLY: ${{ needs.version.outputs.build_only }}
+      CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
+      ARTIFACT_STEM: ztty-macos-${{ matrix.arch }}
+      MACOSX_DEPLOYMENT_TARGET: '11.0'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
+          ref: ${{ needs.version.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6, pinned commit
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.python_arch }}
+      - name: Record immutable source and initialize reports
+        id: source
+        shell: python {0}
+        run: |
+          import json, os, platform, subprocess
+          from pathlib import Path
+          source = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          assert source == os.environ["SOURCE_SHA"], "checkout did not match the pinned source commit"
+          out = Path("dist")
+          out.mkdir(exist_ok=True)
+          stem = os.environ["ARTIFACT_STEM"]
+          metadata = {"source_sha": source, "source_ref": os.environ["GITHUB_REF"],
+                      "version": os.environ["VERSION"], "architecture": os.environ["ARCH"],
+                      "runner": os.environ["RUNNER_LABEL"], "runner_image": os.environ.get("ImageVersion"),
+                      "platform": platform.platform(), "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
+                      "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+                      "build_only": os.environ["BUILD_ONLY"] == "true",
+                      "candidate_platform": os.environ["CANDIDATE_PLATFORM"], "passed": False, "status": "initialized"}
+          if "LLVM_MINGW_SHA256" in os.environ:
+              metadata["llvm_mingw"] = {"version": os.environ["LLVM_MINGW_VERSION"], "sha256": os.environ["LLVM_MINGW_SHA256"]}
+          (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+          (out / f"{stem}.native.json").write_text(json.dumps({"source_sha": source, "passed": False,
+              "status": "not_run", "pixel_readback": "not_performed"}, indent=2) + "\n", encoding="utf-8")
+          (out / f"{stem}.spawn.json").write_text(json.dumps({"source_sha": source, "passed": False,
+              "status": "not_run", "suite": "darwin-threaded-spawn"}, indent=2) + "\n", encoding="utf-8")
+          epoch = subprocess.check_output(["git", "show", "-s", "--format=%ct", "HEAD"], text=True).strip()
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
+              stream.write(f"SOURCE_DATE_EPOCH={epoch}\n")
+      - name: Prepare the native macOS toolchain
+        id: toolchain
+        run: |
+          test "$(uname -m)" = "$HOST_ARCH"
+          xcrun --show-sdk-version
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --target "$RUST_TARGET"
+      - name: Build with the native Apple SDK
+        id: build
+        run: |
+          cargo +"$RUST_TOOLCHAIN" build --locked --release --bin ztty --target "$RUST_TARGET"
+          MACOSX_DEPLOYMENT_TARGET=14.0 xcrun swiftc -O -swift-version 5 -parse-as-library \
+            -target "$HOST_ARCH-apple-macos14.0" tests/macos_window_probe.swift \
+            -o "$RUNNER_TEMP/ztty-macos-window-probe"
+      - name: Validate thread-safe Darwin PTY creation on the native SDK
+        id: spawn
+        shell: python {0}
+        run: |
+          import hashlib, json, os, platform, subprocess, sys
+          from pathlib import Path
+          stem = os.environ["ARTIFACT_STEM"]
+          command = ["cargo", "+" + os.environ["RUST_TOOLCHAIN"], "test", "--locked",
+                     "--manifest-path", "crates/zpty/Cargo.toml", "--test", "darwin_spawn", "--target", os.environ["RUST_TARGET"]]
+          report = {"passed": False, "status": "failed", "source_sha": os.environ["SOURCE_SHA"],
+                    "suite": "darwin-threaded-spawn", "command": command, "timeout_seconds": 120,
+                    "host_machine": platform.machine(), "architecture": os.environ["ARCH"]}
+          stdout = stderr = ""
+          try:
+              assert sys.platform == "darwin" and platform.machine() == os.environ["HOST_ARCH"]
+              environment = os.environ.copy()
+              environment["CARGO_BUILD_JOBS"] = "1"
+              result = subprocess.run(command, capture_output=True, text=True, env=environment, timeout=120)
+              stdout, stderr = result.stdout, result.stderr
+              report["exit_code"] = result.returncode
+              records = [json.loads(line) for line in stdout.splitlines() if line.startswith("{")]
+              assert len(records) == 1, "missing or ambiguous native spawn result (a skip cannot pass)"
+              native = records[0]
+              report["test"] = native
+              assert result.returncode == 0 and native.get("passed") is True
+              assert native.get("suite") == "darwin-threaded-spawn"
+              assert native.get("architecture") == os.environ["ARCH"]
+              assert isinstance(native.get("checks"), list) and len(native["checks"]) == 8
+              assert native.get("worker_iterations", 0) > 0
+              assert 4.0 <= native["timeout_seconds"] < 12.0
+              report.update(passed=True, status="passed")
+          except Exception as error:
+              report["error"] = repr(error)
+              if isinstance(error, subprocess.TimeoutExpired):
+                  stdout = error.stdout.decode(errors="replace") if isinstance(error.stdout, bytes) else error.stdout or ""
+                  stderr = error.stderr.decode(errors="replace") if isinstance(error.stderr, bytes) else error.stderr or ""
+          report["source_files_sha256"] = {name: hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in (
+              "crates/zpty/src/macos/spawn.rs", "crates/zpty/src/macos.rs",
+              "crates/zpty/tests/darwin_spawn.rs", "crates/zpty/tests/darwin_spawn_abi.c")}
+          Path(f"dist/{stem}.spawn.stdout.log").write_text(stdout, encoding="utf-8")
+          Path(f"dist/{stem}.spawn.stderr.log").write_text(stderr, encoding="utf-8")
+          Path(f"dist/{stem}.spawn.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(report, indent=2))
+          raise SystemExit(0 if report["passed"] else 1)
+      - name: Run the native AppKit and Darwin PTY acceptance gate
+        id: native
+        shell: python {0}
+        run: |
+          import hashlib, json, os, subprocess, sys
+          from pathlib import Path
+          stem = os.environ["ARTIFACT_STEM"]
+          binary = Path("target") / os.environ["RUST_TARGET"] / "release/ztty"
+          report = {"passed": False, "source_sha": os.environ["SOURCE_SHA"], "status": "failed",
+                    "pixel_readback": "not_performed", "ime_keyboard": "not_performed"}
+          stdout = stderr = ""
+          contract_log = Path(f"dist/{stem}.native.contract.log")
+          report["contract_tests"] = {"passed": False, "log": contract_log.name}
+          try:
+              with contract_log.open("w", encoding="utf-8") as stream:
+                  contract = subprocess.run([sys.executable, "tests/macos_native_test.py"],
+                      stdout=stream, stderr=subprocess.STDOUT, text=True, timeout=30)
+              report["contract_tests"].update({"passed": contract.returncode == 0,
+                                               "exit_code": contract.returncode})
+              assert contract.returncode == 0, f"macOS gate contract tests failed; see {contract_log}"
+              version = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=30, check=True)
+              assert version.stdout.strip() == "ztty " + os.environ["VERSION"], version.stdout
+              result = subprocess.run([
+                  sys.executable, "tests/macos_native.py", "--binary", str(binary),
+                  "--helper", str(Path(os.environ["RUNNER_TEMP"]) / "ztty-macos-window-probe"),
+                  "--evidence-prefix", f"dist/{stem}.native",
+              ], capture_output=True, text=True, timeout=240)
+              stdout, stderr = result.stdout, result.stderr
+              report.update(json.loads(stdout))
+              report["exit_code"] = result.returncode
+              report["passed"] = bool(report.get("passed")) and result.returncode == 0
+              report["status"] = "passed" if report["passed"] else ("blocked" if report.get("status") == "blocked" else "failed")
+          except Exception as error:
+              report["error"] = repr(error)
+              report["passed"] = False
+              if isinstance(error, subprocess.TimeoutExpired):
+                  stdout = error.stdout.decode(errors="replace") if isinstance(error.stdout, bytes) else error.stdout or ""
+                  stderr = error.stderr.decode(errors="replace") if isinstance(error.stderr, bytes) else error.stderr or ""
+          if not report["passed"]:
+              report["stderr_tail"] = stderr[-4000:]
+          report["source_sha"] = os.environ["SOURCE_SHA"]
+          report["binary_sha256"] = hashlib.sha256(binary.read_bytes()).hexdigest()
+          Path(f"dist/{stem}.native.stdout.log").write_text(stdout, encoding="utf-8")
+          Path(f"dist/{stem}.native.stderr.log").write_text(stderr, encoding="utf-8")
+          Path(f"dist/{stem}.native.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(report, indent=2))
+          raise SystemExit(0 if report["passed"] else 1)
+      - name: Package and verify the native macOS application
+        id: package
+        run: |
+          python tools/package_macos.py --binary "target/$RUST_TARGET/release/ztty" \
+            --output dist --version "$VERSION" --arch "$ARCH" --codesign ad-hoc
+      - name: Finalize source-bound artifact report
+        if: ${{ always() && steps.source.outcome == 'success' }}
+        env:
+          OUTCOME_TOOLCHAIN: ${{ steps.toolchain.outcome }}
+          OUTCOME_BUILD: ${{ steps.build.outcome }}
+          OUTCOME_SPAWN: ${{ steps.spawn.outcome }}
+          OUTCOME_NATIVE: ${{ steps.native.outcome }}
+          OUTCOME_PACKAGE: ${{ steps.package.outcome }}
+        shell: python {0}
+        run: |
+          import hashlib, json, os
+          from pathlib import Path
+          out = Path("dist")
+          stem = os.environ["ARTIFACT_STEM"]
+          path = out / f"{stem}.build.json"
+          report = json.loads(path.read_text(encoding="utf-8"))
+          report["outcomes"] = {key: os.environ[f"OUTCOME_{key.upper()}"] for key in ("toolchain", "build", "spawn", "native", "package")}
+          report["passed"] = all(value == "success" for value in report["outcomes"].values())
+          report["status"] = "accepted" if report["passed"] else "failed"
+          report["files"] = {file.name: {"bytes": file.stat().st_size, "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
+              for file in sorted(out.iterdir()) if file.is_file() and file.name not in (path.name, path.name + ".sha256")}
+          path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          (out / (path.name + ".sha256")).write_text(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n", encoding="ascii")
+      - name: Upload artifacts and reports, including failures
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ env.ARTIFACT_STEM }}
+          path: |
+            dist/*.zip*
+            dist/*.tar.gz*
+            dist/*.json*
+            dist/*.log
+            dist/*.png
+          if-no-files-found: error
+          retention-days: 14
+
+  windows:
+    needs: version
+    if: ${{ needs.version.outputs.build_only != 'true' || needs.version.outputs.candidate_platform == 'all' || needs.version.outputs.candidate_platform == 'windows' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            arch: x86_64
+            windows_arch: x64
+            host: x86_64-pc-windows-msvc
+            target: x86_64-pc-windows-gnullvm
+            llvm_sha256: '552191b5754c49a5a20723276a6fc56541ea1922c4c50b7b669022333fc1b40f'
+          - runner: windows-11-arm
+            arch: aarch64
+            windows_arch: arm64
+            host: aarch64-pc-windows-msvc
+            target: aarch64-pc-windows-gnullvm
+            llvm_sha256: '7d7f8387a8706639b0b47a629d6e23f8b3ef9acce67e9832b8cd4c5bb2816eab'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    env:
+      ARCH: ${{ matrix.arch }}
+      WINDOWS_ARCH: ${{ matrix.windows_arch }}
+      RUNNER_LABEL: ${{ matrix.runner }}
+      RUST_HOST: ${{ matrix.host }}
+      RUST_TARGET: ${{ matrix.target }}
+      VERSION: ${{ needs.version.outputs.version }}
+      SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
+      BUILD_ONLY: ${{ needs.version.outputs.build_only }}
+      CANDIDATE_PLATFORM: ${{ needs.version.outputs.candidate_platform }}
+      ARTIFACT_STEM: ztty-windows-${{ matrix.arch }}
+      ZTTY_NATIVE_PAINT_DIAGNOSTICS: ${{ inputs.windows_paint_diagnostics && '1' || '0' }}
+      ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS: ${{ inputs.windows_nc_rendering_diagnostics && '1' || '0' }}
+      # SHA-256 digests from the official 20261104 release assets API.
+      # https://github.com/mstorsjo/llvm-mingw/releases/tag/20261104
+      LLVM_MINGW_VERSION: '20261104'
+      LLVM_MINGW_SHA256: ${{ matrix.llvm_sha256 }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
+          ref: ${{ needs.version.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6, pinned commit
+        with:
+          python-version: '3.13'
+          architecture: ${{ matrix.windows_arch }}
+      - name: Record immutable source and initialize reports
+        id: source
+        shell: python {0}
+        run: |
+          import json, os, platform, subprocess
+          from pathlib import Path
+          source = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+          assert source == os.environ["SOURCE_SHA"], "checkout did not match the pinned source commit"
+          out = Path("dist")
+          out.mkdir(exist_ok=True)
+          stem = os.environ["ARTIFACT_STEM"]
+          metadata = {"source_sha": source, "source_ref": os.environ["GITHUB_REF"],
+                      "version": os.environ["VERSION"], "architecture": os.environ["ARCH"],
+                      "runner": os.environ["RUNNER_LABEL"], "runner_image": os.environ.get("ImageVersion"),
+                      "platform": platform.platform(), "rust_toolchain": os.environ["RUST_TOOLCHAIN"],
+                      "run_id": os.environ["GITHUB_RUN_ID"], "run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+                      "build_only": os.environ["BUILD_ONLY"] == "true",
+                      "candidate_platform": os.environ["CANDIDATE_PLATFORM"], "passed": False, "status": "initialized"}
+          if "LLVM_MINGW_SHA256" in os.environ:
+              metadata["llvm_mingw"] = {"version": os.environ["LLVM_MINGW_VERSION"], "sha256": os.environ["LLVM_MINGW_SHA256"]}
+          metadata["rust_host"] = os.environ["RUST_HOST"]
+          metadata["rust_target"] = os.environ["RUST_TARGET"]
+          metadata["windows_architecture"] = os.environ["WINDOWS_ARCH"]
+          metadata["paint_diagnostics_enabled"] = os.environ["ZTTY_NATIVE_PAINT_DIAGNOSTICS"] == "1"
+          metadata["nc_rendering_diagnostics_enabled"] = os.environ["ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS"] == "1"
+          (out / f"{stem}.build.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
+          (out / f"{stem}.native.json").write_text(json.dumps({"source_sha": source, "passed": False,
+              "status": "not_run", "pixel_readback": "not_performed"}, indent=2) + "\n", encoding="utf-8")
+          epoch = subprocess.check_output(["git", "show", "-s", "--format=%ct", "HEAD"], text=True).strip()
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as stream:
+              stream.write(f"SOURCE_DATE_EPOCH={epoch}\n")
+      - name: Install the pinned official LLVM MinGW toolchain
+        id: toolchain
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $nativeArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
+          $shellArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString().ToLowerInvariant()
+          if ($nativeArchitecture -ne $env:WINDOWS_ARCH -or $shellArchitecture -ne $env:WINDOWS_ARCH) {
+            throw "Expected native $env:WINDOWS_ARCH PowerShell; OS=$nativeArchitecture process=$shellArchitecture"
+          }
+          $archiveName = "llvm-mingw-${env:LLVM_MINGW_VERSION}-ucrt-${env:ARCH}"
+          $archive = Join-Path $env:RUNNER_TEMP 'llvm-mingw.zip'
+          $url = "https://github.com/mstorsjo/llvm-mingw/releases/download/${env:LLVM_MINGW_VERSION}/$archiveName.zip"
+          Invoke-WebRequest -Uri $url -OutFile $archive
+          $digest = (Get-FileHash -Algorithm SHA256 $archive).Hash.ToLowerInvariant()
+          if ($digest -ne $env:LLVM_MINGW_SHA256) { throw 'LLVM MinGW archive SHA-256 mismatch' }
+          Expand-Archive -Path $archive -DestinationPath $env:RUNNER_TEMP
+          $compilerBin = Join-Path $env:RUNNER_TEMP "$archiveName/bin"
+          $linker = Join-Path $compilerBin "${env:ARCH}-w64-mingw32-clang.exe"
+          if (!(Test-Path $linker)) { throw 'Pinned LLVM MinGW linker is missing' }
+          $compilerBin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "LLVM_MINGW_BIN=$compilerBin" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          $targetKey = $env:RUST_TARGET.ToUpperInvariant().Replace('-', '_')
+          "CARGO_TARGET_${targetKey}_LINKER=$linker" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          rustup toolchain install "${env:RUST_TOOLCHAIN}-${env:RUST_HOST}" --profile minimal --target $env:RUST_TARGET
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build the native Win32 executable
+        id: build
+        shell: pwsh
+        run: |
+          cargo "+${env:RUST_TOOLCHAIN}-${env:RUST_HOST}" build --locked --release --bin ztty --target $env:RUST_TARGET
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Package the pinned ConPTY runtime and unpack the actual test bundle
+        id: package
+        shell: python {0}
+        run: |
+          import hashlib, json, os, subprocess, sys, zipfile
+          from pathlib import Path
+          stem = os.environ["ARTIFACT_STEM"]
+          binary = Path("target") / os.environ["RUST_TARGET"] / "release/ztty.exe"
+          archive_path = Path("dist") / f"{stem}.zip"
+          subprocess.run([sys.executable, "tools/package_windows.py", "--binary", str(binary), "--output", str(archive_path), "--arch", os.environ["WINDOWS_ARCH"]], check=True, timeout=120)
+          runtime = Path(os.environ["RUNNER_TEMP"]) / "ztty-windows-native"
+          runtime.mkdir()
+          with zipfile.ZipFile(archive_path) as archive:
+              assert all(Path(name).name == name for name in archive.namelist()), "expected a flat runtime bundle"
+              archive.extractall(runtime)
+              manifest = Path("dist") / f"{stem}.manifest.json"
+              manifest.write_bytes(archive.read("manifest.json"))
+          for path in (archive_path, manifest):
+              Path(str(path) + ".sha256").write_text(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n", encoding="ascii")
+      - name: Run the native ConPTY and Win32 pixel acceptance gate
+        id: native
+        shell: python {0}
+        run: |
+          import hashlib, json, os, subprocess, sys
+          from pathlib import Path
+          stem = os.environ["ARTIFACT_STEM"]
+          binary = Path(os.environ["RUNNER_TEMP"]) / "ztty-windows-native/ztty.exe"
+          report_path = Path("dist") / f"{stem}.native.json"
+          report = {"passed": False, "source_sha": os.environ["SOURCE_SHA"], "status": "failed"}
+          stdout = stderr = ""
+          contract_log = Path(f"dist/{stem}.native.contract.log")
+          report["contract_tests"] = {"passed": False, "log": contract_log.name}
+          try:
+              with contract_log.open("w", encoding="utf-8") as stream:
+                  contract = subprocess.run([sys.executable, "-m", "unittest", "discover",
+                                            "-s", "tests", "-p", "windows_*_test.py"],
+                                            stdout=stream, stderr=subprocess.STDOUT, timeout=30)
+              report["contract_tests"].update({"passed": contract.returncode == 0,
+                                               "exit_code": contract.returncode})
+              assert contract.returncode == 0, f"Windows gate contract tests failed; see {contract_log}"
+              environment = dict(os.environ)
+              compiler = os.path.normcase(os.path.normpath(environment["LLVM_MINGW_BIN"]))
+              environment["PATH"] = os.pathsep.join(path for path in environment["PATH"].split(os.pathsep)
+                  if os.path.normcase(os.path.normpath(path)) != compiler)
+              version = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=30, check=True, env=environment)
+              assert version.stdout.strip() == "ztty " + os.environ["VERSION"], version.stdout
+              # Explicit CI opt-in: only our temporary desktop and suspended Job tree.
+              # Individual native pixel waits remain unchanged; the outer budget
+              # includes bounded Job cleanup and restoration of the input desktop.
+              result = subprocess.run([sys.executable, "tests/windows_desktop.py", "--isolated-desktop",
+                  "--binary", str(binary), "--output", str(report_path), "--arch", os.environ["WINDOWS_ARCH"]],
+                  capture_output=True, text=True, timeout=225, env=environment)
+              stdout, stderr = result.stdout, result.stderr
+              report.update(json.loads(report_path.read_text(encoding="utf-8")))
+              report["exit_code"] = result.returncode
+              report["passed"] = bool(report.get("passed")) and result.returncode == 0
+              report["status"] = "passed" if report["passed"] else ("blocked" if report.get("status") == "blocked" else "failed")
+          except Exception as error:
+              report["error"] = repr(error)
+              report["passed"] = False
+              if isinstance(error, subprocess.TimeoutExpired):
+                  stdout = error.stdout.decode(errors="replace") if isinstance(error.stdout, bytes) else error.stdout or ""
+                  stderr = error.stderr.decode(errors="replace") if isinstance(error.stderr, bytes) else error.stderr or ""
+          if not report["passed"]:
+              report["stderr_tail"] = stderr[-4000:]
+          report["source_sha"] = os.environ["SOURCE_SHA"]
+          report["binary_sha256"] = hashlib.sha256(binary.read_bytes()).hexdigest()
+          Path(f"dist/{stem}.native.stdout.log").write_text(stdout, encoding="utf-8")
+          Path(f"dist/{stem}.native.stderr.log").write_text(stderr, encoding="utf-8")
+          report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          print(json.dumps(report, indent=2))
+          raise SystemExit(0 if report["passed"] else 1)
+      - name: Run an independent Win32 resize control diagnostic
+        id: resize_control
+        if: ${{ always() && needs.version.outputs.build_only == 'true' && (inputs.windows_paint_diagnostics || inputs.windows_nc_rendering_diagnostics) && steps.package.outcome == 'success' }}
+        shell: python {0}
+        run: |
+          import hashlib, json, os, subprocess, sys, zipfile
+          from pathlib import Path
+          stem = os.environ["ARTIFACT_STEM"]
+          source = Path("tests/windows_resize_control.c")
+          binary = Path(os.environ["RUNNER_TEMP"]) / "ztty-resize-control.exe"
+          compiler = Path(os.environ["LLVM_MINGW_BIN"]) / (os.environ["ARCH"] + "-w64-mingw32-clang.exe")
+          subprocess.run([str(compiler), "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-municode",
+                          str(source), "-o", str(binary), "-luser32", "-lgdi32"], check=True, timeout=60)
+          archive = Path("dist") / f"{stem}.resize-control.zip"
+          manifest = {"diagnostic_only": True, "source_sha": os.environ["SOURCE_SHA"],
+                      "run_id": os.environ["GITHUB_RUN_ID"], "architecture": os.environ["ARCH"],
+                      "files": {p.name: {"bytes": p.stat().st_size,
+                          "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in (source, binary)}}
+          with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as package:
+              package.write(source, source.name)
+              package.write(binary, binary.name)
+              package.writestr("manifest.json", json.dumps(manifest, indent=2) + "\n")
+          Path(str(archive) + ".sha256").write_text(
+              f"{hashlib.sha256(archive.read_bytes()).hexdigest()}  {archive.name}\n", encoding="ascii")
+          # Runs after the unchanged native gate in a separate owned desktop.
+          # Its result cannot replace a failed ztty pixel or cleanup assertion.
+          subprocess.run([sys.executable, "tests/windows_resize_control.py", "--isolated-desktop",
+                          "--binary", str(binary), "--output", f"dist/{stem}.resize-control.json",
+                          "--arch", os.environ["WINDOWS_ARCH"]], check=True, timeout=180)
+      - name: Finalize source-bound artifact report
+        if: ${{ always() && steps.source.outcome == 'success' }}
+        env:
+          OUTCOME_TOOLCHAIN: ${{ steps.toolchain.outcome }}
+          OUTCOME_BUILD: ${{ steps.build.outcome }}
+          OUTCOME_NATIVE: ${{ steps.native.outcome }}
+          OUTCOME_PACKAGE: ${{ steps.package.outcome }}
+          OUTCOME_RESIZE_CONTROL: ${{ steps.resize_control.outcome }}
+        shell: python {0}
+        run: |
+          import hashlib, json, os
+          from pathlib import Path
+          out = Path("dist")
+          stem = os.environ["ARTIFACT_STEM"]
+          path = out / f"{stem}.build.json"
+          report = json.loads(path.read_text(encoding="utf-8"))
+          report["outcomes"] = {key: os.environ[f"OUTCOME_{key.upper()}"] for key in ("toolchain", "build", "native", "package")}
+          report["resize_control_diagnostic"] = {"requested": (os.environ["ZTTY_NATIVE_PAINT_DIAGNOSTICS"] == "1"
+                                                    or os.environ["ZTTY_NATIVE_NC_RENDERING_DIAGNOSTICS"] == "1"),
+                                                "outcome": os.environ["OUTCOME_RESIZE_CONTROL"]}
+          report["passed"] = all(value == "success" for value in report["outcomes"].values())
+          report["status"] = "accepted" if report["passed"] else "failed"
+          report["files"] = {file.name: {"bytes": file.stat().st_size, "sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
+              for file in sorted(out.iterdir()) if file.is_file() and file.name not in (path.name, path.name + ".sha256")}
+          path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          (out / (path.name + ".sha256")).write_text(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n", encoding="ascii")
+      - name: Upload artifacts and reports, including failures
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ env.ARTIFACT_STEM }}
+          path: |
+            dist/*.zip*
+            dist/*.tar.gz*
+            dist/*.json*
+            dist/*.png
+            dist/*.log
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: [version, verify, linux, macos, windows]
+    if: ${{ needs.version.outputs.build_only == 'false' && needs.version.outputs.candidate_platform == 'all' && startsWith(github.ref, 'refs/tags/') && needs.verify.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      SOURCE_SHA: ${{ needs.version.outputs.source_sha }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: recursive
+          ref: ${{ needs.version.outputs.source_sha }}
+          persist-credentials: false
+      - name: Prepare source and test Arch package
+        run: |
+          test "$GITHUB_REF" = "refs/tags/v$VERSION"
+          git fetch --no-tags origin "refs/tags/v$VERSION"
+          test "$(git rev-parse 'FETCH_HEAD^{commit}')" = "$SOURCE_SHA"
+          out="$RUNNER_TEMP/ztty-release"
+          bash tools/release-source.sh "$out"
+          docker run --rm -v "$out:/work" -e VERSION archlinux:base-devel bash -euxc '
+            pacman -Syu --noconfirm git rustup gcc-libs glibc libx11 libxft libxrender fontconfig freetype2 harfbuzz libglvnd wayland libxkbcommon wayland-protocols pkgconf
+            useradd -m builder
+            install -d -o builder -g builder /home/builder/package
+            cp /work/aur/PKGBUILD "/work/ztty-$VERSION.tar.gz" /home/builder/package/
+            chown builder:builder /home/builder/package/*
+            cd /home/builder/package
+            runuser -u builder -- makepkg --noconfirm
+            runuser -u builder -- makepkg --printsrcinfo > /work/aur/.SRCINFO
+            pacman -U --noconfirm ztty-*.pkg.tar.zst
+            /usr/bin/ztty --version | grep -Fx "ztty $VERSION"
+            grep -Fx "Exec=/usr/bin/ztty" /usr/share/applications/ztty.desktop
+            grep -Fx "StartupWMClass=Ztty" /usr/share/applications/ztty.desktop
+          '
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: ztty-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/ztty-release/bin
+      - name: Verify every platform artifact belongs to the accepted source
+        shell: python {0}
+        run: |
+          import hashlib, json, os
+          from pathlib import Path
+          folder = Path(os.environ["RUNNER_TEMP"]) / "ztty-release/bin"
+          expected = {"ztty-linux-x86_64", "ztty-linux-aarch64", "ztty-macos-x86_64", "ztty-macos-aarch64", "ztty-windows-x86_64", "ztty-windows-aarch64"}
+          records = {path.name.removesuffix(".build.json"): path for path in folder.glob("*.build.json")}
+          assert set(records) == expected, f"missing or unexpected platform build reports: {set(records)}"
+          for stem, path in records.items():
+              report = json.loads(path.read_text(encoding="utf-8"))
+              assert report["source_sha"] == os.environ["SOURCE_SHA"] and report["version"] == os.environ["VERSION"], stem
+              assert report["candidate_platform"] == "all", stem
+              assert report["passed"] and all(value == "success" for value in report["outcomes"].values()), stem
+              native = json.loads((folder / f"{stem}.native.json").read_text(encoding="utf-8"))
+              assert native["passed"] and native["source_sha"] == os.environ["SOURCE_SHA"], stem
+              for name, details in report["files"].items():
+                  assert Path(name).name == name
+                  artifact = folder / name
+                  assert artifact.is_file() and artifact.stat().st_size == details["bytes"], name
+                  assert hashlib.sha256(artifact.read_bytes()).hexdigest() == details["sha256"], name
+      - name: Check release evidence packaging contracts
+        run: |
+          python3 -m unittest discover -s tests -p 'release_assets_test.py'
+          python3 -m unittest discover -s tests -p 'release_upload_test.py'
+      - name: Publish or verify GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          out="$RUNNER_TEMP/ztty-release"
+          cp install.sh "$out/bin/"
+          evidence="$out/ztty-$VERSION-native-evidence.zip"
+          python3 tools/release_assets.py prepare --folder "$out/bin" --archive "$evidence" \
+            --asset-list "$out/upload-assets.bin" --version "$VERSION" --source-sha "$SOURCE_SHA"
+          mapfile -d '' -t native_assets < "$out/upload-assets.bin"
+          assets=("$out/ztty-$VERSION.tar.gz" "$out/SHA256SUMS" "${native_assets[@]}")
+          (cd "$out/bin" && for checksum in *.sha256; do sha256sum -c "$checksum"; done)
+          python3 tools/release_upload.py --repo "$GITHUB_REPOSITORY" --tag "v$VERSION" \
+            --notes "Raw native evidence, including empty logs, is retained in ztty-$VERSION-native-evidence.zip." \
+            "${assets[@]}"
+          readback=$(mktemp -d)
+          patterns=()
+          for asset in "${assets[@]}"; do patterns+=(--pattern "${asset##*/}"); done
+          gh release download "v$VERSION" --dir "$readback" "${patterns[@]}"
+          python3 tools/release_assets.py verify --folder "$readback" \
+            --archive "$readback/ztty-$VERSION-native-evidence.zip" --expected-archive "$evidence" \
+            --version "$VERSION" --source-sha "$SOURCE_SHA"
+          cmp "$evidence.sha256" "$readback/${evidence##*/}.sha256"
+          cmp "$out/SHA256SUMS" "$readback/SHA256SUMS"
+          (cd "$readback" && sha256sum --check SHA256SUMS
+           for checksum in *.sha256; do sha256sum --check "$checksum"; done)
+          cmp install.sh "$readback/install.sh"
+          python3 - "$readback" <<'PYREADBACK'
+          import hashlib, json, os, sys
+          from pathlib import Path
+          folder = Path(sys.argv[1])
+          expected = {"ztty-linux-x86_64", "ztty-linux-aarch64", "ztty-macos-x86_64", "ztty-macos-aarch64", "ztty-windows-x86_64", "ztty-windows-aarch64"}
+          records = {path.name.removesuffix(".build.json"): path for path in folder.glob("*.build.json")}
+          assert set(records) == expected, "existing release lacks platform provenance"
+          for path in records.values():
+              report = json.loads(path.read_text(encoding="utf-8"))
+              assert report["source_sha"] == os.environ["SOURCE_SHA"] and report["version"] == os.environ["VERSION"], path.name
+              assert report["candidate_platform"] == "all", path.name
+              assert report["passed"], path.name
+              for name, details in report["files"].items():
+                  assert Path(name).name == name
+                  payload = (folder / name).read_bytes()
+                  assert len(payload) == details["bytes"] and hashlib.sha256(payload).hexdigest() == details["sha256"], name
+          PYREADBACK
+          draft_state="$(gh release view "v$VERSION" --json isDraft --jq .isDraft)"
+          [[ "$draft_state" == true || "$draft_state" == false ]]
+          if [[ "$draft_state" == true ]]; then
+            latest_tag="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)"
+            make_latest="$(python3 - "$VERSION" "$latest_tag" <<'PYLATEST'
+          import re, sys
+          target = tuple(map(int, sys.argv[1].split(".")))
+          match = re.fullmatch(r"v([0-9]+)\.([0-9]+)\.([0-9]+)", sys.argv[2])
+          print("true" if match and tuple(map(int, match.groups())) <= target else "false")
+          PYLATEST
+            )"
+            gh release edit "v$VERSION" --draft=false --latest="$make_latest"
+          fi
+      - name: Update AUR
+        env:
+          AUR_SSH_KEY: ${{ secrets.AUR_SSH_KEY }}
+        run: bash tools/publish-aur.sh "$RUNNER_TEMP/ztty-release/aur"

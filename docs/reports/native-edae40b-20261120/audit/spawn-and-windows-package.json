@@ -1,0 +1,304 @@
+{
+  "macos_spawn": [
+    {
+      "architecture": "x86_64",
+      "report": {
+        "passed": true,
+        "status": "passed",
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "suite": "darwin-threaded-spawn",
+        "command": [
+          "cargo",
+          "+1.100.0",
+          "test",
+          "--locked",
+          "--manifest-path",
+          "crates/zpty/Cargo.toml",
+          "--test",
+          "darwin_spawn",
+          "--target",
+          "x86_64-apple-darwin"
+        ],
+        "timeout_seconds": 120,
+        "host_machine": "x86_64",
+        "architecture": "x86_64",
+        "exit_code": 0,
+        "test": {
+          "suite": "darwin-threaded-spawn",
+          "passed": true,
+          "checks": [
+            "Apple SDK ABI constants, layout and prototypes",
+            "worker-active spawn: controlling tty, session/group, exact argv/env/cwd, input and resize",
+            "nine concurrent PTY spawns drain READY/DONE through EOF, exit, and exclude peer handshakes and a non-CLOEXEC sentinel",
+            "missing/non-executable helper and target errors preserve ENOENT/EACCES without descriptors or owned children",
+            "empty/partial readiness and early helper death cannot report successful handoff",
+            "stalled helper reaches the bounded handshake failure and is reaped",
+            "hangup targets the owned session and wait/drop release its child and master",
+            "seven isolated closed-stdio masks preserve control stdio and cannot collide with helper fd sources"
+          ],
+          "worker_iterations": 1894,
+          "timeout_seconds": 5.001855702,
+          "duration_seconds": 6.350905015,
+          "architecture": "x86_64"
+        },
+        "source_files_sha256": {
+          "crates/zpty/src/macos/spawn.rs": "1bef2a4f4dd6118b0afa1fa900d7b46a3a8a1cfe40e3878dc699c16914789b4e",
+          "crates/zpty/src/macos.rs": "1cf31df4950c11ee5819134fe4b311d609977f93a5e015af55d98035ee358bdb",
+          "crates/zpty/tests/darwin_spawn.rs": "afed17de0cc250c0f9315a3dadee40d6242edd7e53a6766aaa59ea3e75525cac",
+          "crates/zpty/tests/darwin_spawn_abi.c": "629a40ccd7f3a3809503bd90f222dd453f0e0a47eafa6442a96492098c01084f"
+        }
+      },
+      "source_file_checks": [
+        {
+          "file": "crates/zpty/src/macos/spawn.rs",
+          "sha256": "1bef2a4f4dd6118b0afa1fa900d7b46a3a8a1cfe40e3878dc699c16914789b4e",
+          "frozen_source_match": true
+        },
+        {
+          "file": "crates/zpty/src/macos.rs",
+          "sha256": "1cf31df4950c11ee5819134fe4b311d609977f93a5e015af55d98035ee358bdb",
+          "frozen_source_match": true
+        },
+        {
+          "file": "crates/zpty/tests/darwin_spawn.rs",
+          "sha256": "afed17de0cc250c0f9315a3dadee40d6242edd7e53a6766aaa59ea3e75525cac",
+          "frozen_source_match": true
+        },
+        {
+          "file": "crates/zpty/tests/darwin_spawn_abi.c",
+          "sha256": "629a40ccd7f3a3809503bd90f222dd453f0e0a47eafa6442a96492098c01084f",
+          "frozen_source_match": true
+        }
+      ]
+    },
+    {
+      "architecture": "aarch64",
+      "report": {
+        "passed": true,
+        "status": "passed",
+        "source_sha": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+        "suite": "darwin-threaded-spawn",
+        "command": [
+          "cargo",
+          "+1.100.0",
+          "test",
+          "--locked",
+          "--manifest-path",
+          "crates/zpty/Cargo.toml",
+          "--test",
+          "darwin_spawn",
+          "--target",
+          "aarch64-apple-darwin"
+        ],
+        "timeout_seconds": 120,
+        "host_machine": "arm64",
+        "architecture": "aarch64",
+        "exit_code": 0,
+        "test": {
+          "suite": "darwin-threaded-spawn",
+          "passed": true,
+          "checks": [
+            "Apple SDK ABI constants, layout and prototypes",
+            "worker-active spawn: controlling tty, session/group, exact argv/env/cwd, input and resize",
+            "nine concurrent PTY spawns drain READY/DONE through EOF, exit, and exclude peer handshakes and a non-CLOEXEC sentinel",
+            "missing/non-executable helper and target errors preserve ENOENT/EACCES without descriptors or owned children",
+            "empty/partial readiness and early helper death cannot report successful handoff",
+            "stalled helper reaches the bounded handshake failure and is reaped",
+            "hangup targets the owned session and wait/drop release its child and master",
+            "seven isolated closed-stdio masks preserve control stdio and cannot collide with helper fd sources"
+          ],
+          "worker_iterations": 2054,
+          "timeout_seconds": 5.002216375,
+          "duration_seconds": 6.112643792,
+          "architecture": "aarch64"
+        },
+        "source_files_sha256": {
+          "crates/zpty/src/macos/spawn.rs": "1bef2a4f4dd6118b0afa1fa900d7b46a3a8a1cfe40e3878dc699c16914789b4e",
+          "crates/zpty/src/macos.rs": "1cf31df4950c11ee5819134fe4b311d609977f93a5e015af55d98035ee358bdb",
+          "crates/zpty/tests/darwin_spawn.rs": "afed17de0cc250c0f9315a3dadee40d6242edd7e53a6766aaa59ea3e75525cac",
+          "crates/zpty/tests/darwin_spawn_abi.c": "629a40ccd7f3a3809503bd90f222dd453f0e0a47eafa6442a96492098c01084f"
+        }
+      },
+      "source_file_checks": [
+        {
+          "file": "crates/zpty/src/macos/spawn.rs",
+          "sha256": "1bef2a4f4dd6118b0afa1fa900d7b46a3a8a1cfe40e3878dc699c16914789b4e",
+          "frozen_source_match": true
+        },
+        {
+          "file": "crates/zpty/src/macos.rs",
+          "sha256": "1cf31df4950c11ee5819134fe4b311d609977f93a5e015af55d98035ee358bdb",
+          "frozen_source_match": true
+        },
+        {
+          "file": "crates/zpty/tests/darwin_spawn.rs",
+          "sha256": "afed17de0cc250c0f9315a3dadee40d6242edd7e53a6766aaa59ea3e75525cac",
+          "frozen_source_match": true
+        },
+        {
+          "file": "crates/zpty/tests/darwin_spawn_abi.c",
+          "sha256": "629a40ccd7f3a3809503bd90f222dd453f0e0a47eafa6442a96492098c01084f",
+          "frozen_source_match": true
+        }
+      ]
+    }
+  ],
+  "windows_package": [
+    {
+      "architecture": "x86_64",
+      "manifest_keys": [
+        "ztty_version",
+        "architecture",
+        "minimum_windows_build",
+        "conpty",
+        "files",
+        "validation"
+      ],
+      "manifest": {
+        "ztty_version": "0.5.0",
+        "architecture": "x64",
+        "minimum_windows_build": 17763,
+        "conpty": {
+          "package": "Microsoft.Windows.Console.ConPTY",
+          "version": "1.25.261109001",
+          "url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.console.conpty/1.25.261109001/microsoft.windows.console.conpty.1.25.261109001.nupkg",
+          "package_sha256": "3d77f535df848e44225c2a8912ac844fecb23f3057732b639f3034b587496f09",
+          "license": "MIT"
+        },
+        "files": {
+          "ztty.exe": {
+            "bytes": 673280,
+            "sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3"
+          },
+          "conpty.dll": {
+            "bytes": 119608,
+            "sha256": "e971856f89748dc3b458125e9afdd79b5e9574a7c937676116d3cbbd3b71f492"
+          },
+          "OpenConsole.exe": {
+            "bytes": 1089336,
+            "sha256": "b17e48b07ef153b420f0a6e178bacd31fb4c3390e21ae746586213fc0719a775"
+          },
+          "LICENSE-ztty.txt": {
+            "bytes": 1091,
+            "sha256": "6d50dc9c60538cc7e9cb0b4fe1a9c4dcd8c203b48c40d3a348158de7b028fb37"
+          },
+          "LICENSE-ConPTY.txt": {
+            "bytes": 1074,
+            "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+          }
+        },
+        "validation": "Packaging verifies hashes and PE architecture; native runtime tests are separate."
+      },
+      "members": [
+        {
+          "name": "ztty.exe",
+          "bytes": 673280,
+          "sha256": "1d00e2aa077b5dc6129fd4b78a1efd45bf5d154fc13ffaa3c3af59a0b68c25a3"
+        },
+        {
+          "name": "conpty.dll",
+          "bytes": 119608,
+          "sha256": "e971856f89748dc3b458125e9afdd79b5e9574a7c937676116d3cbbd3b71f492"
+        },
+        {
+          "name": "OpenConsole.exe",
+          "bytes": 1089336,
+          "sha256": "b17e48b07ef153b420f0a6e178bacd31fb4c3390e21ae746586213fc0719a775"
+        },
+        {
+          "name": "LICENSE-ztty.txt",
+          "bytes": 1091,
+          "sha256": "6d50dc9c60538cc7e9cb0b4fe1a9c4dcd8c203b48c40d3a348158de7b028fb37"
+        },
+        {
+          "name": "LICENSE-ConPTY.txt",
+          "bytes": 1074,
+          "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+        },
+        {
+          "name": "manifest.json",
+          "bytes": 1255,
+          "sha256": "e22d734dc11f52266bba876fd39fe3f7cabda63c2365b01813a17836d900a8ce"
+        }
+      ]
+    },
+    {
+      "architecture": "aarch64",
+      "manifest_keys": [
+        "ztty_version",
+        "architecture",
+        "minimum_windows_build",
+        "conpty",
+        "files",
+        "validation"
+      ],
+      "manifest": {
+        "ztty_version": "0.5.0",
+        "architecture": "arm64",
+        "minimum_windows_build": 17763,
+        "conpty": {
+          "package": "Microsoft.Windows.Console.ConPTY",
+          "version": "1.25.261109001",
+          "url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.console.conpty/1.25.261109001/microsoft.windows.console.conpty.1.25.261109001.nupkg",
+          "package_sha256": "3d77f535df848e44225c2a8912ac844fecb23f3057732b639f3034b587496f09",
+          "license": "MIT"
+        },
+        "files": {
+          "ztty.exe": {
+            "bytes": 555520,
+            "sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382"
+          },
+          "conpty.dll": {
+            "bytes": 116024,
+            "sha256": "3608cef830a1c4fbbf3981594ad3f64ebe2df6db98fe43a48a4ca7d2875d8959"
+          },
+          "OpenConsole.exe": {
+            "bytes": 1151288,
+            "sha256": "c04334f450b5731930b63a28ac4da8a058367242dbcf2fb9b323ea25e5a23252"
+          },
+          "LICENSE-ztty.txt": {
+            "bytes": 1091,
+            "sha256": "6d50dc9c60538cc7e9cb0b4fe1a9c4dcd8c203b48c40d3a348158de7b028fb37"
+          },
+          "LICENSE-ConPTY.txt": {
+            "bytes": 1074,
+            "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+          }
+        },
+        "validation": "Packaging verifies hashes and PE architecture; native runtime tests are separate."
+      },
+      "members": [
+        {
+          "name": "ztty.exe",
+          "bytes": 555520,
+          "sha256": "de4f4b7e60d2b5c182d4853c53edaae3cf115c21b7f855d3308c3f0bb38a6382"
+        },
+        {
+          "name": "conpty.dll",
+          "bytes": 116024,
+          "sha256": "3608cef830a1c4fbbf3981594ad3f64ebe2df6db98fe43a48a4ca7d2875d8959"
+        },
+        {
+          "name": "OpenConsole.exe",
+          "bytes": 1151288,
+          "sha256": "c04334f450b5731930b63a28ac4da8a058367242dbcf2fb9b323ea25e5a23252"
+        },
+        {
+          "name": "LICENSE-ztty.txt",
+          "bytes": 1091,
+          "sha256": "6d50dc9c60538cc7e9cb0b4fe1a9c4dcd8c203b48c40d3a348158de7b028fb37"
+        },
+        {
+          "name": "LICENSE-ConPTY.txt",
+          "bytes": 1074,
+          "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+        },
+        {
+          "name": "manifest.json",
+          "bytes": 1257,
+          "sha256": "bef91a5b350481ec6745eb365726e2d683482d255d7fae3bb4ae8eff20f360d3"
+        }
+      ]
+    }
+  ]
+}
