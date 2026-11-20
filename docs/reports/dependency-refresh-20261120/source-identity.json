@@ -1,0 +1,36 @@
+{
+  "base": "5b268da910639abd2fb8e581acb4f6eed50b7516",
+  "candidate": "48da8b76a696a419e262454598bbb458eb5f9b47",
+  "portable_source_files": [
+    {
+      "path": "src/layout.rs",
+      "old": "d35e1233f90b519ccc396e63f654db05fa539a96",
+      "new": "d35e1233f90b519ccc396e63f654db05fa539a96"
+    },
+    {
+      "path": "src/layout_tests.rs",
+      "old": "f93fad72af3d30a3480ba39203fc409c61c61894",
+      "new": "f93fad72af3d30a3480ba39203fc409c61c61894"
+    },
+    {
+      "path": "src/lib.rs",
+      "old": "81ba0c8beff25486d3feb9ba3f47c785ab5af4c8",
+      "new": "81ba0c8beff25486d3feb9ba3f47c785ab5af4c8"
+    },
+    {
+      "path": "src/tests.rs",
+      "old": "20ace1d1d4753af16383addc93ad30110ef49133",
+      "new": "20ace1d1d4753af16383addc93ad30110ef49133"
+    },
+    {
+      "path": "src/wire.rs",
+      "old": "81192a5d35311ceae556c24909bdac95aa1311fc",
+      "new": "81192a5d35311ceae556c24909bdac95aa1311fc"
+    }
+  ],
+  "claim": "All 5 portable source files under src/ except the explicitly feature-gated native.rs retain identical blob SHAs.",
+  "truncated": false,
+  "canonical": "b4d5493e0cd985d00558c7be0b5726965ab5163a",
+  "canonical_tree": "caf6d3c249c04f4547aa6556afb03c0c91da5e65",
+  "candidate_and_canonical_tree_equal": true
+}

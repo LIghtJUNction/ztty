@@ -207,7 +207,7 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 
 | 库 | 在 ztty 中的职责 | 发布状态 |
 | --- | --- | --- |
-| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI 场景与布局 | 已发布 [0.1.2](https://crates.io/crates/zgpui/0.1.2) |
+| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI 场景与布局 | 已发布 [0.1.5](https://crates.io/crates/zgpui/0.1.5) |
 | [zinput](https://github.com/LIghtJUNction/zinput) | 键盘、鼠标与粘贴编码 | 已发布 [0.1.3](https://crates.io/crates/zinput/0.1.3) |
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY 进程管理 | 已发布 [0.2.3](https://crates.io/crates/zpty/0.2.3) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | 图片协议与放置 | 已发布 [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
