@@ -1,6 +1,9 @@
 //! Bounded input waiting to be accepted by the platform PTY.
 use alloc::vec::Vec;
 
+// Reuse ordinary input batches, but do not retain a large paste for the session.
+const MAX_RETAINED_BYTES: usize = 64 * 1024;
+
 pub struct InputQueue {
     bytes: Vec<u8>,
     offset: usize,
@@ -55,7 +58,11 @@ impl InputQueue {
     /// This cannot revoke bytes already accepted by Pty::write, including
     /// bytes buffered by the Windows PTY writer thread.
     pub fn clear(&mut self) {
-        self.bytes.clear();
+        if self.bytes.capacity() > MAX_RETAINED_BYTES {
+            self.bytes = Vec::new();
+        } else {
+            self.bytes.clear();
+        }
         self.offset = 0;
     }
 
@@ -71,5 +78,41 @@ impl InputQueue {
         }
         self.clear();
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    extern crate std;
+
+    use super::InputQueue;
+
+    #[test]
+    fn clearing_large_paste_releases_retained_storage() {
+        let mut queue = InputQueue::new(8 * 1024 * 1024);
+        let input = alloc::vec![b'x'; 8 * 1024 * 1024];
+        assert!(queue.push(&input));
+        let before = queue.bytes.capacity();
+        queue.clear();
+        let after = queue.bytes.capacity();
+        std::println!("input queue bytes: before={before}, after={after}");
+        assert!(!queue.pending());
+        assert!(
+            after <= 64 * 1024,
+            "large paste storage remains allocated: {after}"
+        );
+        assert!(queue.push(b"next input"));
+        assert_eq!(queue.pending_len(), 10);
+    }
+
+    #[test]
+    fn clearing_small_input_reuses_retained_storage() {
+        let mut queue = InputQueue::new(8 * 1024 * 1024);
+        assert!(queue.push(&[b'x'; 4096]));
+        let before = queue.bytes.capacity();
+        queue.clear();
+        assert_eq!(queue.bytes.capacity(), before);
+        assert!(queue.push(b"next input"));
+        assert_eq!(queue.bytes.capacity(), before);
     }
 }
