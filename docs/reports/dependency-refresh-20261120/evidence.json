@@ -1,0 +1,635 @@
+{
+  "phase1": {
+    "base": "2410064eef530400f750225b0561262445a3fa66",
+    "candidate_zgpui": "48da8b76a696a419e262454598bbb458eb5f9b47",
+    "canonical_pending": true,
+    "started": 1795185826.230747,
+    "results": [
+      {
+        "command": [
+          "git",
+          "fetch",
+          "origin",
+          "48da8b76a696a419e262454598bbb458eb5f9b47"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-fetch-zgpui.log"
+      },
+      {
+        "command": [
+          "git",
+          "checkout",
+          "--detach",
+          "48da8b76a696a419e262454598bbb458eb5f9b47"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-checkout-zgpui.log"
+      },
+      {
+        "command": [
+          "git",
+          "fetch",
+          "origin",
+          "b296a58f09d6052f13c86dc09e9e7b7f7e87438f"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-fetch-zgraphics.log"
+      },
+      {
+        "command": [
+          "git",
+          "checkout",
+          "--detach",
+          "b296a58f09d6052f13c86dc09e9e7b7f7e87438f"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-checkout-zgraphics.log"
+      },
+      {
+        "command": [
+          "git",
+          "fetch",
+          "origin",
+          "003829a5e7ea45d9827376d89e37c9e6cfbf4a12"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-fetch-zinput.log"
+      },
+      {
+        "command": [
+          "git",
+          "checkout",
+          "--detach",
+          "003829a5e7ea45d9827376d89e37c9e6cfbf4a12"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-checkout-zinput.log"
+      },
+      {
+        "command": [
+          "cargo",
+          "update",
+          "--offline",
+          "-p",
+          "zgpui",
+          "--precise",
+          "0.1.5"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-lock.log"
+      },
+      {
+        "command": [
+          "cargo",
+          "metadata",
+          "--locked",
+          "--format-version",
+          "1"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-metadata.log"
+      },
+      {
+        "command": [
+          "sh",
+          "tools/check.sh"
+        ],
+        "exit_code": 1,
+        "log": "$VALIDATION_ROOT/ztty-check-initial-mise.log"
+      },
+      {
+        "command": [
+          "sh",
+          "tools/check.sh"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-check.log"
+      },
+      {
+        "command": [
+          "git",
+          "diff",
+          "--cached",
+          "--check"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-diff.log"
+      }
+    ],
+    "completed": true,
+    "resolved_zgpui": {
+      "version": "0.1.5",
+      "manifest": "./crates/zgpui/Cargo.toml",
+      "features": []
+    },
+    "bare_metal_enabled": true,
+    "candidate_tree": "4f88110b05e93bffe0976cd25e2ec5170faeb966",
+    "environment_recovery": "Invoke installed system Python and Rustup binaries through task-local PATH; do not alter mise trust/configuration.",
+    "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+    "python": "Python 3.14.10",
+    "binary": {
+      "path": "./target/release/ztty",
+      "sha256": "e7d431bd38141243005c61f4ae370679c8f2317e4c3c01f97b8bebb4c8b5ca1b",
+      "bytes": 1291856
+    },
+    "test_results": [
+      "test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s",
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 50 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s",
+      "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 180 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.82s",
+      "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 26 passed; 0 failed; 7 ignored; 0 measured; 0 filtered out; finished in 0.17s",
+      "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+      "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s",
+      "test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+      "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+      "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s",
+      "test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+      "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+    ],
+    "final_tree": "4f88110b05e93bffe0976cd25e2ec5170faeb966"
+  },
+  "phase2": {
+    "started": 1795186293.769808,
+    "completed": true,
+    "base": "2410064eef530400f750225b0561262445a3fa66",
+    "canonical_zgpui": "b4d5493e0cd985d00558c7be0b5726965ab5163a",
+    "results": [
+      {
+        "label": "canonical-fetch",
+        "command": [
+          "git",
+          "fetch",
+          "origin",
+          "b4d5493e0cd985d00558c7be0b5726965ab5163a"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-canonical-fetch.log"
+      },
+      {
+        "label": "canonical-checkout",
+        "command": [
+          "git",
+          "checkout",
+          "--detach",
+          "b4d5493e0cd985d00558c7be0b5726965ab5163a"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-canonical-checkout.log"
+      },
+      {
+        "label": "portable-lock",
+        "command": [
+          "cargo",
+          "generate-lockfile",
+          "--offline",
+          "--manifest-path",
+          "$VALIDATION_ROOT/ztty-portable-refresh-check/Cargo.toml"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-portable-lock.log"
+      },
+      {
+        "label": "portable-metadata",
+        "command": [
+          "cargo",
+          "metadata",
+          "--locked",
+          "--format-version",
+          "1",
+          "--manifest-path",
+          "$VALIDATION_ROOT/ztty-portable-refresh-check/Cargo.toml"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-portable-metadata.log"
+      },
+      {
+        "label": "portable-check",
+        "command": [
+          "cargo",
+          "check",
+          "--locked",
+          "--manifest-path",
+          "$VALIDATION_ROOT/ztty-portable-refresh-check/Cargo.toml",
+          "--target",
+          "x86_64-unknown-none"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-portable-check.log"
+      },
+      {
+        "label": "gpu-tests",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "--lib",
+          "gpu::",
+          "--",
+          "--ignored",
+          "--test-threads=1",
+          "--show-output"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-gpu-tests.log",
+        "test_results": [
+          "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.55s"
+        ]
+      },
+      {
+        "label": "native-ui-software",
+        "command": [
+          "python3",
+          "tests/native_ui_gui.py",
+          "--binary",
+          "target/release/ztty",
+          "--source-root",
+          ".",
+          "--renderer",
+          "software",
+          "--output",
+          "./artifacts/dependency-refresh/native-ui-software.json",
+          "--screenshot",
+          "./artifacts/dependency-refresh/native-ui-software.png"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-native-ui-software.log"
+      },
+      {
+        "label": "native-ui-gpu",
+        "command": [
+          "python3",
+          "tests/native_ui_gui.py",
+          "--binary",
+          "target/release/ztty",
+          "--source-root",
+          ".",
+          "--renderer",
+          "gpu",
+          "--output",
+          "./artifacts/dependency-refresh/native-ui-gpu.json",
+          "--screenshot",
+          "./artifacts/dependency-refresh/native-ui-gpu.png"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-native-ui-gpu.log"
+      },
+      {
+        "label": "plugin-build",
+        "command": [
+          "python3",
+          "tests/build_text_plugins.py",
+          "--output",
+          "./artifacts/dependency-refresh/plugins"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-plugin-build.log"
+      },
+      {
+        "label": "plugin-cli",
+        "command": [
+          "python3",
+          "tests/plugin_cli.py",
+          "--binary",
+          "target/release/ztty",
+          "--example",
+          "./artifacts/dependency-refresh/plugins/example.so",
+          "--fixtures",
+          "./artifacts/dependency-refresh/plugins",
+          "--output",
+          "./artifacts/dependency-refresh/plugin-cli.json"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-plugin-cli.log"
+      },
+      {
+        "label": "plugin-gui",
+        "command": [
+          "python3",
+          "tests/plugin_gui.py",
+          "--binary",
+          "target/release/ztty",
+          "--example",
+          "./artifacts/dependency-refresh/plugins/example.so",
+          "--fixture",
+          "./artifacts/dependency-refresh/plugins/fixture-valid.so",
+          "--artifacts",
+          "./artifacts/dependency-refresh/plugin-gui"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-plugin-gui.log"
+      },
+      {
+        "label": "package",
+        "command": [
+          "cargo",
+          "package",
+          "--locked",
+          "--allow-dirty"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-package.log"
+      },
+      {
+        "label": "diff-final",
+        "command": [
+          "git",
+          "diff",
+          "--cached",
+          "--check"
+        ],
+        "exit_code": 0,
+        "log": "$VALIDATION_ROOT/ztty-diff-final.log"
+      }
+    ],
+    "candidate_tree": "ce173782555a727b3009ba35080173cce06d6893",
+    "portable_zgpui": {
+      "version": "0.1.5",
+      "manifest": "./crates/zgpui/Cargo.toml",
+      "features": []
+    },
+    "binary": {
+      "path": "./target/release/ztty",
+      "sha256": "e7d431bd38141243005c61f4ae370679c8f2317e4c3c01f97b8bebb4c8b5ca1b",
+      "bytes": 1291856
+    },
+    "final_tree": "ce173782555a727b3009ba35080173cce06d6893"
+  },
+  "ui": {
+    "software": {
+      "ok": true,
+      "checks": [
+        "unsupported producer fallback uses plain text, never changes screen/cursor modes, and restores termios",
+        "one transmitted KGP image renders correct red/blue pixels at two native scene references",
+        "XRes measures one 2048-byte server pixmap for two image references",
+        "mouse click emits only a surface/revision/node-bound action, with no PTY mouse bytes",
+        "button focus consumes ordinary text and Tab; Enter emits one structured action",
+        "Escape returns ordinary typing to the PTY and consumes its own gesture",
+        "view-only font zoom works during button focus, cancels captured geometry and consumes release",
+        "drag/release outside a button never activates or leaks a mouse gesture",
+        "focus loss cancels a captured click while still consuming its release",
+        "a revision change between press and release cancels activation and consumes release",
+        "malformed and oversized payloads preserve revision 2 and recover for the following VT traffic",
+        "retransmitting the same KGP ID refreshes both scene references without a scene update",
+        "pane resize invalidates the captured hit and relayout restores actual image pixels",
+        "alternate-screen transition clears the surface and cancels a pending gesture",
+        "RIS clears surface/actions; revision floor survives and a fresh scene can be drawn",
+        "explicit clear removes image UI and cancels the captured click",
+        "events:false previews the scene but never emits an action",
+        "narrow text leaf renders visible glyphs while clipping combining ink at both horizontal bounds",
+        "native press -> tab change -> other-view motion/release never reaches either PTY; reporting resumes after release",
+        "release outside every ztty view is observed by a separate X client; return motion retires stale capture and reaches the PTY",
+        "an observer cannot emit action intents or ordinary PTY input",
+        "PTY EOF clears the surface and leaves no actionable retained UI",
+        "shipped Python producer negotiates supported ZUI/1 and renders its actual generated image",
+        "real click -> producer action decoder -> revision update reaches 100% native progress pixels"
+      ],
+      "cleanup": {
+        "owned_processes_remaining": []
+      },
+      "renderer_before": {
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      },
+      "renderer_after": {
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      },
+      "binary_sha256": "e7d431bd38141243005c61f4ae370679c8f2317e4c3c01f97b8bebb4c8b5ca1b"
+    },
+    "gpu": {
+      "ok": true,
+      "checks": [
+        "unsupported producer fallback uses plain text, never changes screen/cursor modes, and restores termios",
+        "one transmitted KGP image renders correct red/blue pixels at two native scene references",
+        "GPU images allocate no X server pixmaps for either reference",
+        "mouse click emits only a surface/revision/node-bound action, with no PTY mouse bytes",
+        "button focus consumes ordinary text and Tab; Enter emits one structured action",
+        "Escape returns ordinary typing to the PTY and consumes its own gesture",
+        "view-only font zoom works during button focus, cancels captured geometry and consumes release",
+        "drag/release outside a button never activates or leaks a mouse gesture",
+        "focus loss cancels a captured click while still consuming its release",
+        "a revision change between press and release cancels activation and consumes release",
+        "malformed and oversized payloads preserve revision 2 and recover for the following VT traffic",
+        "retransmitting the same KGP ID refreshes both scene references without a scene update",
+        "pane resize invalidates the captured hit and relayout restores actual image pixels",
+        "alternate-screen transition clears the surface and cancels a pending gesture",
+        "RIS clears surface/actions; revision floor survives and a fresh scene can be drawn",
+        "explicit clear removes image UI and cancels the captured click",
+        "events:false previews the scene but never emits an action",
+        "narrow text leaf renders visible glyphs while clipping combining ink at both horizontal bounds",
+        "native press -> tab change -> other-view motion/release never reaches either PTY; reporting resumes after release",
+        "release outside every ztty view is observed by a separate X client; return motion retires stale capture and reaches the PTY",
+        "an observer cannot emit action intents or ordinary PTY input",
+        "PTY EOF clears the surface and leaves no actionable retained UI",
+        "shipped Python producer negotiates supported ZUI/1 and renders its actual generated image",
+        "real click -> producer action decoder -> revision update reaches 100% native progress pixels"
+      ],
+      "cleanup": {
+        "owned_processes_remaining": []
+      },
+      "renderer_before": {
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+      },
+      "renderer_after": {
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+      },
+      "binary_sha256": "e7d431bd38141243005c61f4ae370679c8f2317e4c3c01f97b8bebb4c8b5ca1b"
+    }
+  },
+  "plugins": {
+    "cli": {
+      "ok": true,
+      "checks": [
+        {
+          "name": "example-load-and-unload",
+          "ok": true
+        },
+        {
+          "name": "example-unicode-relative-indent",
+          "ok": true
+        },
+        {
+          "name": "instance-lifecycle",
+          "ok": true
+        },
+        {
+          "name": "one-mib-roundtrip",
+          "ok": true
+        },
+        {
+          "name": "oversized-input-before-load",
+          "ok": true
+        },
+        {
+          "name": "invalid-input-before-load",
+          "ok": true
+        },
+        {
+          "name": "empty-output",
+          "ok": true
+        },
+        {
+          "name": "invalid-result-count",
+          "ok": true
+        },
+        {
+          "name": "invalid-output-utf8",
+          "ok": true
+        },
+        {
+          "name": "caught-plugin-panic",
+          "ok": true
+        },
+        {
+          "name": "native-plugin-crash",
+          "ok": true
+        },
+        {
+          "name": "wall-clock-timeout",
+          "ok": true
+        },
+        {
+          "name": "cpu-limit",
+          "ok": true
+        },
+        {
+          "name": "child-timeout-process-group",
+          "ok": true
+        },
+        {
+          "name": "leaked-channel-process-group",
+          "ok": true
+        },
+        {
+          "name": "closed-channel-process-group",
+          "ok": true
+        },
+        {
+          "name": "unsolicited-stdout-rejected",
+          "ok": true
+        },
+        {
+          "name": "interface-version-mismatch",
+          "ok": true
+        },
+        {
+          "name": "noncooperative-library-rejected",
+          "ok": true
+        },
+        {
+          "name": "missing-library",
+          "ok": true
+        },
+        {
+          "name": "resource-and-descriptor-limits",
+          "ok": true
+        },
+        {
+          "name": "parent-death-terminates-worker",
+          "ok": true
+        }
+      ],
+      "cleanup_errors": [],
+      "binary_sha256": "e7d431bd38141243005c61f4ae370679c8f2317e4c3c01f97b8bebb4c8b5ca1b"
+    },
+    "gui": {
+      "ok": true,
+      "checks": [
+        {
+          "name": "config registration reaches broker; CLI case-normalized override loads the real example; no selection uses visible text",
+          "ok": true
+        },
+        {
+          "name": "explicit selected text preserves wide and combining characters and hard newline; result only enters clipboard",
+          "ok": true
+        },
+        {
+          "name": "soft-wrapped selection is a single logical input line",
+          "ok": true
+        },
+        {
+          "name": "empty leaves clipboard and PTY unchanged and reaps worker",
+          "ok": true
+        },
+        {
+          "name": "invalid-utf8 leaves clipboard and PTY unchanged and reaps worker",
+          "ok": true
+        },
+        {
+          "name": "panic leaves clipboard and PTY unchanged and reaps worker",
+          "ok": true
+        },
+        {
+          "name": "crash leaves clipboard and PTY unchanged and reaps worker",
+          "ok": true
+        },
+        {
+          "name": "hung plugin does not block another window; Escape cancels without reaching source PTY",
+          "ok": true
+        },
+        {
+          "name": "live configuration removal cancels the owning call and preserves clipboard",
+          "ok": true
+        },
+        {
+          "name": "closing the owning view reaps only its worker; another live PTY remains responsive",
+          "ok": true
+        }
+      ],
+      "cleanup_errors": [],
+      "binary_sha256": "e7d431bd38141243005c61f4ae370679c8f2317e4c3c01f97b8bebb4c8b5ca1b"
+    }
+  },
+  "remaining_ignored": [
+    "test terminal::grapheme::append_boundary_tests::scalar_boundary_matches_every_unicode_scalar_against_context_anchors ... ignored, exhaustive Unicode scalar sweep; run explicitly for boundary changes"
+  ],
+  "package": {
+    "zgpui_requirement": {
+      "version": "=0.1.5",
+      "default-features": false
+    },
+    "resolved_zgpui": [
+      {
+        "name": "zgpui",
+        "version": "0.1.5",
+        "source": "registry+https://github.com/rust-lang/crates.io-index",
+        "checksum": "7a5597b9018e724bcab318e8e52de11f70e1686262692d32d84b1fce30044300"
+      }
+    ]
+  },
+  "scope": {
+    "os": "Linux x86_64",
+    "rust": "1.100.0",
+    "gpu_path": "Mesa llvmpipe; physical GPU and desktop session not exercised",
+    "publication": "Local Cargo package verification only; no registry publication or application release",
+    "other_platforms": "No native Wayland, Windows or macOS application acceptance in this batch"
+  }
+}

@@ -1,5 +1,15 @@
 # Releasing ztty and its reusable libraries
 
+## Current source dependency maintenance
+
+The current development source pins portable zgpui to `=0.1.5` and uses the
+immutable library sources in [dependency propagation](dependency-propagation.md).
+The [local consumer report](reports/dependency-refresh-20261120/README.md) records
+Linux validation and a verified registry package for that dependency graph.
+This source update has no new application release or installed-artifact claim.
+The candidate and publication records below retain their original versions;
+the next release must bind the complete native workflow to its own source and artifacts.
+
 ## 0.5.2 candidate — 2026-11-20
 
 This candidate starts from the fixed
