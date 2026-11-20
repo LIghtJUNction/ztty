@@ -8,7 +8,7 @@ can be used from a window, the CLI or an MCP client.
 
 Published ztty downloads remain **0.4.1**. This page covers the **0.5.0 candidate**
 on `iter/resume-20261120`, with platform scope at
-[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a).
+[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb).
 Application release and device installation remain pending.
 
 ## Install on Linux
@@ -41,7 +41,7 @@ sudo apt install build-essential pkg-config libx11-dev libxft-dev libxrender-dev
 ```
 
 ```sh
-git clone --recurse-submodules https://github.com/LIghtJUNction/ztty.git
+git clone --recurse-submodules --branch iter/resume-20261120 https://github.com/LIghtJUNction/ztty.git
 cd ztty
 cargo build --locked --release
 ./target/release/ztty --font 'monospace:size=12' --geometry 100x28
@@ -62,15 +62,15 @@ preserves running sessions; see [broker upgrades](docs/sessions.md#upgrading-a-r
 - Unicode grapheme storage, history reflow and copy across wrapped lines.
 - Kitty images and Sixel; Linux adds animation, Unicode placeholders and relative placement.
 - Linux X11 Kitty file/shared-memory transport and bounded OSC 52 clipboard access.
-- Linux tabs, splits, shared sessions, history search and a command palette.
-- Linux GPU text shaping with Xft fallback, live configuration and XIM recovery.
+- Linux shared sessions; X11 tabs, splits, history search and a command palette.
+- Linux X11 GPU text shaping, Xft fallback, live configuration and XIM recovery.
 - Optional [shell integration](shell/README.md) and [trusted text actions](docs/text-plugins.zh-CN.md).
 
 The Linux X11 renderer defaults to `renderer = auto`: hardware EGL when available,
 otherwise Xft. [Configuration](docs/configuration.md) and the
 [protocol reference](docs/protocols.md) describe supported modes and limits.
 
-## Linux controls
+## Linux X11 controls
 
 | Action | Shortcut |
 | --- | --- |
@@ -92,8 +92,9 @@ button returns from history to current output.
 
 ## Shared sessions and MCP (Linux)
 
-Linux X11 windows automatically share a broker, display connection and font cache.
-Each session keeps its own PTY, screen and history.
+Linux X11 and native Wayland windows use the same session broker. Each session
+keeps its own PTY, screen and history. X11 windows also share a display connection
+and font cache.
 
 ```sh
 ztty --name work -e /bin/bash &
@@ -132,33 +133,32 @@ covers platform paths, colors, cursor behavior, bindings and renderer selection.
 | Platform | Current source |
 | --- | --- |
 | Linux X11/XWayland | GPU or Xft; shared sessions, tabs/splits, attach and MCP |
-| Linux native Wayland | Explicit experimental single window; EGL/GLES and XKB input |
+| Linux native Wayland | Opt-in EGL/GLES; shared sessions, attach/MCP, clipboard and text-input IME |
 | macOS | Native AppKit/CoreText window and Darwin PTY; local sessions |
 | Windows | Native Win32/GDI and ConPTY; local tabs and splits |
 
 macOS runs without X11; Windows runs without WSL. Windows supports font and
 workspace shortcuts; macOS uses Command+C/V or Ctrl+Shift+C/V for copy/paste.
-Shared sessions, attach, search and MCP currently use the Linux X11 runtime.
+Shared sessions, attach and MCP are Linux features.
 [Platform verification](docs/protocols.md#acceptance-coverage) records the tested scope.
 
-To try the experimental native Wayland window:
+To try the experimental native Wayland backend:
 
 ```sh
 cargo build --locked --release --features wayland
-./target/release/ztty --backend wayland
+./target/release/ztty --backend wayland --name work
 ```
 
 The official Linux package build enables Wayland; startup still defaults to X11.
-[Wayland setup](docs/configuration.md#native-wayland-experimental) covers the extra
-dependencies and current limits, including clipboard, IME and workspace support.
+Wayland rejects tabs, splits and workspace containers. [Wayland setup](docs/configuration.md#native-wayland-experimental)
+covers dependencies and the unverified physical GPU, desktop IME and scaling behavior.
 
 ## Performance and development
 
 <!-- terminal-benchmark:start -->
-[Current benchmark report](docs/benchmarks/resume-2026-11-20.md) records the tested
-binary, workloads and raw measurements. [Benchmark instructions](docs/benchmarks/README.md)
-explain how to repeat the comparisons; [earlier results](docs/performance.md)
-retain their original conditions.
+Fresh measurements are pending in the [candidate report](docs/benchmarks/resume-2026-11-20.md).
+[Benchmark instructions](docs/benchmarks/README.md) explain how to repeat the comparisons;
+[earlier results](docs/performance.md) retain their original conditions.
 <!-- terminal-benchmark:end -->
 
 Run `sh tools/check.sh` for the local development checks.

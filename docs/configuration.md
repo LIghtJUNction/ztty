@@ -17,8 +17,7 @@ On Linux and macOS, setting `XDG_CONFIG_HOME` selects
 
 The Linux X11 backend reloads the file when it changes, including atomic saves.
 Ctrl+Shift+R reloads it manually. Invalid changes leave the previous configuration
-active and show a temporary error. macOS, Windows and the experimental Wayland
-backend read settings at startup.
+active and show a temporary error. macOS and Windows read settings at startup.
 
 ## Fonts, colors and cursor
 
@@ -80,11 +79,12 @@ for tested text and frame behavior.
 ## Native Wayland (experimental)
 
 This section covers `iter/resume-20261120` at
-[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a).
+[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb).
 
-Native Wayland is an explicit single-window path using xdg-shell, EGL/GLES and
-XKB. Enable the Cargo feature when building from source. The official Linux
-package build enables it, while runtime startup continues to select X11.
+Native Wayland uses xdg-shell, EGL/GLES and XKB, with the same Linux session
+broker and PTY ownership as X11. Enable the Cargo feature when building from
+source. The official Linux package build enables it; runtime startup defaults
+to X11.
 
 Install these dependencies in addition to the Linux build dependencies in the
 [README](../README.md#build-and-run):
@@ -97,7 +97,7 @@ sudo pacman -S --needed wayland wayland-protocols libxkbcommon
 sudo apt install libwayland-dev libwayland-bin wayland-protocols libxkbcommon-dev
 ```
 
-Use a separate configuration such as `wayland.conf`:
+A separate configuration such as `wayland.conf` can select the renderer:
 
 ```ini
 font = monospace:pixelsize=16
@@ -108,15 +108,32 @@ background-opacity = 100
 
 ```sh
 cargo build --locked --release --features wayland
-./target/release/ztty --backend wayland --config ./wayland.conf
+./target/release/ztty --backend wayland --config ./wayland.conf --name work
+./target/release/ztty attach --backend wayland --observe work
+./target/release/ztty attach --backend wayland work
 ```
 
-This path provides a local PTY, native keyboard input, history scrolling and
-window resizing. Shared sessions, tabs/splits, attach/MCP, search, system
-clipboard, text-input IME and native UI scenes remain outside its current scope.
-Custom bindings and text plugins cause an explicit startup error on this backend.
-See [native Wayland](native-wayland.zh-CN.md) for the implemented scope and
-source-bound acceptance record.
+Each native window has its own PTY. Detach and reattach preserve the session;
+X11 and Wayland views can coexist on one broker. MCP retains the existing
+input ownership checks. Tabs, splits and workspace containers are rejected
+on Wayland; open separate session windows instead.
+
+Clipboard and primary selection use bounded asynchronous transfers.
+Text-input-v3 handles focus, cursor position, visible preedit and UTF-8 commits.
+The terminal does not own the shell's editable buffer, so it does not invent
+surrounding text or turn IME deletion requests into arbitrary backspaces.
+
+Both `renderer = auto` and `gpu` use EGL/GLES on Wayland; `software` is rejected.
+Mesa software GL still uses that EGL/GLES path. Renderer selection is a
+configuration setting, not a `--renderer` command-line option.
+
+The [shared Wayland report](reports/native-wayland-shared-20261119/README.zh-CN.md)
+records the feature owner's frozen source and headless Sway/software EGL tests.
+Those 65 checks belong to the feature owner's source and ELF. The integrated
+candidate has passed local checks and six additional software EGL unit tests;
+fresh GUI checks and formal native release gates remain pending.
+Physical GPU behavior, real desktop IME combinations, HiDPI/fractional scaling
+and cross-monitor scale changes have not been demonstrated.
 
 ## Key and mouse bindings
 
@@ -134,9 +151,9 @@ See [binding names and input rules](daily-workflow.md#custom-keys-and-mouse-butt
 
 ## Text actions on Linux X11
 
-`ztty-plugin-api` defines the text-action contract. The host and shared API both
-use [zplugin 0.3.1](https://crates.io/crates/zplugin/0.3.1); the locked dependency
-graph includes [zsys 0.1.1](https://crates.io/crates/zsys/0.1.1).
+`ztty-plugin-api` 0.1.0 is a local source candidate awaiting its first registry
+release. The host and shared API both use [zplugin 0.3.1](https://crates.io/crates/zplugin/0.3.1);
+the locked graph includes [zsys 0.1.1](https://crates.io/crates/zsys/0.1.1).
 These library releases are separate from the ztty application release.
 
 Register a trusted native library with:
