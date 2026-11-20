@@ -303,12 +303,11 @@ impl Window {
         let Some(renderer) = &mut self.gpu else {
             return false;
         };
-        if self.pending_damage.take().is_some()
-            && !self.suspended
-            && self.state.id != 0
-            && let Err(error) = renderer.present()
-        {
-            self.gpu_failure(error);
+        if self.pending_damage.take().is_some() && !self.suspended && self.state.id != 0 {
+            match renderer.present() {
+                Ok(()) => self.reveal_pending = false,
+                Err(error) => self.gpu_failure(error),
+            }
         }
         true
     }

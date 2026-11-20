@@ -443,6 +443,7 @@ unsafe extern "C" {
         height: c_uint,
     ) -> c_int;
     pub(super) fn XMapRaised(display: *mut Display, window: Xid) -> c_int;
+    pub(super) fn XLowerWindow(display: *mut Display, window: Xid) -> c_int;
     pub(super) fn XResizeWindow(
         display: *mut Display,
         window: Xid,

@@ -1,4 +1,5 @@
 //! Same-user, single-threaded session broker. No threads or per-window servers.
+mod reload;
 use crate::{
     json::{self, Value},
     os,
@@ -397,6 +398,10 @@ impl PendingRequest {
         let operation = value.get("op").and_then(Value::as_str);
         let reply_timeout = if operation == Some("wait") {
             None
+        } else if operation == Some("reload") {
+            // The pinned replacement gets a bounded 10 s validation window;
+            // reserve time for complete native view/layout reconstruction too.
+            Some(60_000)
         } else {
             let wait = if operation == Some("read") {
                 match value.get("wait_ms") {
@@ -848,11 +853,19 @@ impl Server {
                 if let Some(newline) = peer.input.iter().position(|&b| b == b'\n') {
                     let result = json::parse(&peer.input[..newline])
                         .map_err(String::from)
-                        .and_then(|v| handle(&v));
+                        .and_then(|mut v| {
+                            if v.get("op").and_then(Value::as_str) == Some("reload") {
+                                let pid = credentials(peer.fd.0)
+                                    .ok_or("cannot verify reload caller")?
+                                    .pid;
+                                v.set("_reload_peer_pid", Value::from(pid));
+                            }
+                            handle(&v)
+                        });
                     total_input = total_input.saturating_sub(peer.input.len());
                     match result {
                         Ok(Reply::Wait(name)) => {
-                            if waiting >= MAX_WAITERS {
+                            if waiting >= MAX_WAITERS && name != crate::runtime_reload::WAIT {
                                 peer.reply(Err("session waiter limit reached (128); management connections remain available".into()));
                             } else {
                                 waiting += 1;

@@ -49,6 +49,17 @@ impl OutputChunk {
 }
 
 impl OutputTail {
+    pub(crate) fn checkpoint(&self) -> (Vec<u8>, u64) {
+        (self.bytes.iter().copied().collect(), self.end)
+    }
+
+    pub(crate) fn restore_checkpoint(bytes: Vec<u8>, end: u64) -> Self {
+        Self {
+            bytes: bytes.into(),
+            end,
+        }
+    }
+
     pub fn new() -> Self {
         Self::default()
     }

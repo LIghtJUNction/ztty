@@ -34,6 +34,7 @@ impl Window {
             // publish only after its overlays are complete too.
             self.retained_valid = true;
             self.present_region(top, bottom);
+            self.reveal_pending = false;
         }
     }
 

@@ -2,6 +2,20 @@
 use super::*;
 
 impl Window {
+    pub fn reload_clipboards(&self) -> [Option<String>; 2] {
+        [self.clipboard, 1].map(|selection| {
+            (unsafe { XGetSelectionOwner(self.state.display, selection) } == self.state.id).then(
+                || {
+                    if selection == 1 {
+                        self.primary_text.clone()
+                    } else {
+                        self.clipboard_text.clone()
+                    }
+                },
+            )
+        })
+    }
+
     pub fn copy(&mut self, text: String, primary: bool) {
         let selection = if primary {
             self.primary_text = text;
