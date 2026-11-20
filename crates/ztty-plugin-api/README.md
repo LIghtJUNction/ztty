@@ -1,7 +1,7 @@
 # ztty-plugin-api
 
 A `no_std` contract shared by the ztty host and independently built native text
-extensions. Package 0.1.0 is awaiting its first registry release.
+extensions.
 
 ## Interface
 
@@ -30,6 +30,14 @@ Changing a method signature requires a new interface version. This interface
 version is separate from the crate's package version.
 
 ## Use
+
+For a registry consumer, pin the API and ABI dependency to exact versions:
+
+```toml
+[dependencies]
+ztty-plugin-api = "=0.1.0"
+zplugin = { version = "=0.3.1", default-features = false, features = ["std", "macros"] }
+```
 
 The included `examples/dedent-plugin` builds from the local API source. Its
 independent Cargo workspace uses these dependencies:
