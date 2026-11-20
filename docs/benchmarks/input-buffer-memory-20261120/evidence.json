@@ -1,0 +1,95 @@
+{
+  "schema": "ztty.input-memory-validation.v1",
+  "date": "2026-11-20",
+  "timezone": "Asia/Taipei",
+  "baseline": {
+    "commit": "4e72b17bf938c2e18972a7300160d150221e486b",
+    "new_capacity_regression_applied": true,
+    "queued_bytes": 8388608,
+    "capacity_before_clear": 8388608,
+    "capacity_after_clear": 8388608,
+    "regression_failed_as_expected": true
+  },
+  "candidate": {
+    "commit": "d1db25ccfdac288ccc1fbf2ff0ffa76f15c899d4",
+    "queued_bytes": 8388608,
+    "capacity_before_clear": 8388608,
+    "capacity_after_clear": 0,
+    "retained_small_input_bytes": 4096,
+    "retain_capacity_limit_bytes": 65536,
+    "capacity_checks": 2,
+    "session_core_checks": 10,
+    "observed_pipe_capacity_bytes": 4096,
+    "all_test_children_joined": true
+  },
+  "scope": "Linux kernel pipe backpressure and queue allocation capacity; no process RSS/PSS or throughput benchmark.",
+  "files": {
+    "src/input_queue.rs": "60c79aa74eff789c202594e1b8d4d1e36f8a1138aa9cfa304e2a9ddcf1979b9a",
+    "tests/session_core.rs": "12eff80ef2394d3bcde2d1720c24ec8ce9c16330cce869e93380b79a75d6c535"
+  },
+  "commands": [
+    {
+      "name": "queue-unit",
+      "args": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--lib",
+        "input_queue::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "session-core",
+      "args": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--test",
+        "session_core"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "format",
+      "args": [
+        "rustfmt",
+        "--edition",
+        "2024",
+        "--check",
+        "src/input_queue.rs",
+        "tests/session_core.rs"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "diff-check",
+      "args": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "final_session_core_command": {
+    "args": [
+      "cargo",
+      "test",
+      "--locked",
+      "--offline",
+      "--test",
+      "session_core"
+    ],
+    "exit_code": 0
+  },
+  "logs": {
+    "baseline.stdout.log": "94359f5c6bf63cd6af89e6cde97fcb20be2627c0d5772833bd5501b0e958d11a",
+    "queue-unit.stdout.log": "ca7840b0c9aae34af136953387ac1b796d817ee5cb2ede5cbdc1df928c983bad",
+    "session-core.stdout.log": "57534ebf8fa94c9df3bb5127f2d7a666808727decdadf0c65dee2950323e1ff7"
+  }
+}

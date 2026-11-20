@@ -1,0 +1,13 @@
+
+running 2 tests
+test input_queue::tests::clearing_small_input_reuses_retained_storage ... ok
+input queue bytes: before=8388608, after=8388608
+test input_queue::tests::clearing_large_paste_releases_retained_storage ... FAILED
+
+failures:
+
+failures:
+    input_queue::tests::clearing_large_paste_releases_retained_storage
+
+test result: FAILED. 1 passed; 1 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.05s
+
