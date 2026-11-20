@@ -67,6 +67,11 @@ class ClipboardGui(Gui):
             event=self.d.next_event()
             if event.type==X.SelectionRequest and event.selection in self.sources:
                 source=self.sources[event.selection];mode=source["mode"];prop=event.property or event.target
+                targets=self.d.intern_atom("TARGETS")
+                if event.target==targets:
+                    kind=self.Xatom.STRING if mode=="latin" else self.atoms["UTF8_STRING"]
+                    event.requestor.change_property(prop,self.Xatom.ATOM,32,[targets,kind])
+                    self.notify(event,prop);continue
                 if mode=="hold":self.held.append(event);continue
                 if mode=="latin" and event.target==self.atoms["UTF8_STRING"]:
                     self.notify(event,0);continue

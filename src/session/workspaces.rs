@@ -46,6 +46,8 @@ impl Pool {
             window,
             layout: Layout::new(id),
             title: String::new(),
+            reveal_pending: false,
+            focus_after_reveal: false,
         });
         Ok(self.workspaces.len() - 1)
     }
@@ -57,6 +59,8 @@ impl Pool {
             .placements(workspace.window.width, workspace.window.height);
         let members = workspace.layout.panes();
         let active = workspace.layout.focused;
+        self.workspaces[index].reveal_pending = true;
+        self.workspaces[index].focus_after_reveal |= focus;
         let mut failure = None;
         for session in &mut self.sessions {
             if !members.contains(&session.id) {
@@ -103,12 +107,15 @@ impl Pool {
                         ui.restore_view_anchor(&session.core.terminal, anchor);
                     }
                 }
-                ui.window.visible(true);
+                // Keep the outgoing tab's completed pixels on top until every
+                // incoming pane has published its first complete frame.
+                ui.window.stage_visible();
                 ui.scroll_prompt = None;
                 ui.force = true;
             } else {
                 ui.scroll_prompt = None;
-                ui.window.visible(false);
+                // Native unmapping is committed by reveal_workspace after
+                // paint. PTYs still drain while the old view covers the work.
                 ui.reset_input();
                 ui.blink_deadline = None;
             }
@@ -126,6 +133,52 @@ impl Pool {
             }
         }
         failure.map_or(Ok(()), Err)
+    }
+
+    pub(super) fn reveal_workspace(&mut self, index: usize) {
+        let workspace = &self.workspaces[index];
+        if !workspace.reveal_pending {
+            return;
+        }
+        let placements = workspace
+            .layout
+            .placements(workspace.window.width, workspace.window.height);
+        if placements.iter().any(|(id, _)| {
+            self.sessions
+                .iter()
+                .find(|session| session.id == *id)
+                .and_then(|session| session.ui.as_ref())
+                .is_none_or(|ui| {
+                    !ui.visible
+                        || ui.force
+                        || ui.window.needs_repaint()
+                        || !ui.window.x11().is_ok_and(|window| window.ready_to_reveal())
+                })
+        }) {
+            return;
+        }
+        let members = workspace.layout.panes();
+        let active = workspace.layout.focused;
+        let focus = workspace.focus_after_reveal;
+        for session in &mut self.sessions {
+            if members.contains(&session.id)
+                && let Some(ui) = &mut session.ui
+                && !ui.visible
+            {
+                ui.window.visible(false);
+            }
+        }
+        self.workspaces[index].reveal_pending = false;
+        self.workspaces[index].focus_after_reveal = false;
+        if focus
+            && let Some(ui) = self
+                .sessions
+                .iter()
+                .find(|session| session.id == active)
+                .and_then(|session| session.ui.as_ref())
+        {
+            ui.window.raise();
+        }
     }
 
     pub(super) fn group(&mut self, target: u64, moved: u64, mode: &str) -> Result<(), String> {
@@ -367,6 +420,8 @@ impl Pool {
             window,
             layout: snapshot.layout,
             title: String::new(),
+            reveal_pending: false,
+            focus_after_reveal: false,
         });
         let restored = self.workspaces.len() - 1;
         let mut failure = None;

@@ -1,7 +1,27 @@
 //! X11 selection ownership and bounded incremental transfers.
 use super::*;
 
+// TARGETS is metadata, not the paste payload. Bound it independently before
+// requesting any data so an image-only owner is never asked to produce text.
+const MAX_SELECTION_TARGETS: usize = 1024;
+const NO_CLIPBOARD_TEXT: &str =
+    "Clipboard has no supported text; use the app's image-paste shortcut";
+
 impl Window {
+    pub fn reload_clipboards(&self) -> [Option<String>; 2] {
+        [self.clipboard, 1].map(|selection| {
+            (unsafe { XGetSelectionOwner(self.state.display, selection) } == self.state.id).then(
+                || {
+                    if selection == 1 {
+                        self.primary_text.clone()
+                    } else {
+                        self.clipboard_text.clone()
+                    }
+                },
+            )
+        })
+    }
+
     pub fn copy(&mut self, text: String, primary: bool) {
         let selection = if primary {
             self.primary_text = text;
@@ -38,12 +58,16 @@ impl Window {
     pub fn paste(&mut self, primary: bool) {
         self.cancel_paste();
         self.paste_selection = if primary { 1 } else { self.clipboard };
-        self.paste_target = self.utf8;
+        self.request_paste_target(self.targets);
+    }
+
+    pub(super) fn request_paste_target(&mut self, target: Atom) {
+        self.paste_target = target;
         unsafe {
             XConvertSelection(
                 self.state.display,
                 self.paste_selection,
-                self.utf8,
+                target,
                 self.transfer,
                 self.selection_requestor(),
                 0,
@@ -138,6 +162,11 @@ impl Window {
     }
 
     fn finish_paste(&mut self, data: Vec<u8>, kind: Atom) -> Option<Vec<u8>> {
+        // INCR may split inside a code point. Validate only after all chunks
+        // have arrived, before any bytes reach the PTY or an OSC 52 reply.
+        if kind != 31 && core::str::from_utf8(&data).is_err() {
+            return self.reject_paste("Clipboard text is not valid UTF-8");
+        }
         self.receiving = false;
         self.incoming_type = 0;
         self.paste_selection = 0;
@@ -151,6 +180,56 @@ impl Window {
         } else {
             data
         })
+    }
+
+    fn read_paste_target(&self) -> Result<Atom, &'static str> {
+        let mut kind = 0;
+        let mut format = 0;
+        let mut count = 0;
+        let mut remaining = 0;
+        let mut data = core::ptr::null_mut();
+        let result;
+        unsafe {
+            let code = XGetWindowProperty(
+                self.state.display,
+                self.selection_requestor(),
+                self.transfer,
+                0,
+                MAX_SELECTION_TARGETS as c_long,
+                1,
+                4,
+                &mut kind,
+                &mut format,
+                &mut count,
+                &mut remaining,
+                &mut data,
+            );
+            result = if code != 0
+                || kind != 4
+                || format != 32
+                || remaining != 0
+                || count > MAX_SELECTION_TARGETS as c_ulong
+                || (count != 0 && data.is_null())
+            {
+                Err("Invalid clipboard format list")
+            } else {
+                // Xlib expands each 32-bit property item to a native unsigned
+                // long; reading this buffer as u32 would truncate LP64 lists.
+                let offered = if count == 0 {
+                    &[][..]
+                } else {
+                    core::slice::from_raw_parts(data.cast::<Atom>(), count as usize)
+                };
+                [self.utf8, self.utf8_mime, self.text_mime, 31]
+                    .into_iter()
+                    .find(|target| offered.contains(target))
+                    .ok_or(NO_CLIPBOARD_TEXT)
+            };
+            if !data.is_null() {
+                XFree(data.cast());
+            }
+        }
+        result
     }
 
     fn read_property(&self) -> Result<(Atom, Vec<u8>), &'static str> {
@@ -187,7 +266,7 @@ impl Window {
                 } else {
                     Ok((kind, Vec::new()))
                 }
-            } else if format != 8 || (kind != self.utf8 && kind != 31) {
+            } else if format != 8 || kind != self.paste_target {
                 Err("Clipboard did not provide text")
             } else {
                 let bytes = if count == 0 {
@@ -219,25 +298,16 @@ impl Window {
             return None;
         }
         if event.property == 0 {
-            if event.target == self.utf8 {
-                self.paste_target = 31;
-                unsafe {
-                    XConvertSelection(
-                        self.state.display,
-                        self.paste_selection,
-                        31,
-                        self.transfer,
-                        self.selection_requestor(),
-                        0,
-                    );
-                    XFlush(self.state.display);
-                }
-            } else {
-                return self.reject_paste("No text in clipboard");
-            }
-            return None;
+            return self.reject_paste(NO_CLIPBOARD_TEXT);
         }
         if event.property != self.transfer {
+            return None;
+        }
+        if event.target == self.targets {
+            match self.read_paste_target() {
+                Ok(target) => self.request_paste_target(target),
+                Err(error) => return self.reject_paste(error),
+            }
             return None;
         }
         let (kind, data) = match self.read_property() {

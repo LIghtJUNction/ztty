@@ -185,6 +185,13 @@ impl Window {
             Self::Wayland(w) => w.visible(visible),
         }
     }
+    pub fn stage_visible(&mut self) {
+        match self {
+            Self::X11(w) => w.stage_visible(),
+            #[cfg(feature = "wayland")]
+            Self::Wayland(w) => w.visible(true),
+        }
+    }
     pub fn input_symbol(&self, event: &mut KeyEvent) -> c_ulong {
         match self {
             Self::X11(w) => w.input_symbol(event),

@@ -272,6 +272,7 @@ impl Window {
                 requested_opacity: appearance.opacity,
                 pixmap,
                 retained_valid: false,
+                reveal_pending: false,
                 pending_damage: None,
                 gc,
                 draw,
@@ -287,6 +288,8 @@ impl Window {
                 ic,
                 clipboard: XInternAtom(display, c"CLIPBOARD".as_ptr(), 0),
                 utf8: XInternAtom(display, c"UTF8_STRING".as_ptr(), 0),
+                utf8_mime: XInternAtom(display, c"text/plain;charset=utf-8".as_ptr(), 0),
+                text_mime: XInternAtom(display, c"text/plain".as_ptr(), 0),
                 targets: XInternAtom(display, c"TARGETS".as_ptr(), 0),
                 transfer: XInternAtom(display, c"ZTTY_SELECTION".as_ptr(), 0),
                 osc_requestor: 0,
@@ -537,6 +540,17 @@ impl Window {
         self.resize(rect.width, rect.height)
     }
 
+    pub fn stage_visible(&mut self) {
+        if self.suspended {
+            self.reveal_pending = true;
+        }
+        self.visible(true);
+    }
+
+    pub fn ready_to_reveal(&self) -> bool {
+        !self.suspended && !self.reveal_pending
+    }
+
     pub fn visible(&mut self, visible: bool) {
         if self.state.id == 0 || visible != self.suspended {
             return;
@@ -556,8 +570,12 @@ impl Window {
                 XFreePixmap(self.state.display, self.pixmap);
                 self.pixmap = pixmap;
                 self.last_cursor = None;
+                if self.reveal_pending {
+                    XLowerWindow(self.state.display, self.state.id);
+                }
                 XMapWindow(self.state.display, self.state.id);
             } else {
+                self.reveal_pending = false;
                 XUnmapWindow(self.state.display, self.state.id);
                 // Hidden tabs keep canonical pixels but release all rebuildable
                 // server uploads and their full-size retained surface.
@@ -581,7 +599,11 @@ impl Window {
             return;
         }
         unsafe {
-            XMapRaised(self.state.display, self.state.id);
+            // Keyboard focus may move immediately, but a blank incoming tab
+            // must stay below the outgoing complete frame until publication.
+            if !self.reveal_pending {
+                XMapRaised(self.state.display, self.state.id);
+            }
             XSetInputFocus(self.state.display, self.state.id, 1, 0);
             XFlush(self.state.display);
         }

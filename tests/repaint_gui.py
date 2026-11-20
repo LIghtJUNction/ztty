@@ -345,6 +345,15 @@ def main():
                     time.sleep(0.005)
                 report["startup_quiet_ms"] = (time.monotonic() - started) * 1000
                 def copies_since(offset, view):
+                    # Call only after the real-pixel predicate has succeeded.
+                    # EGL can publish pixels before the interposed swap writes
+                    # its trace. This read-only request runs on the same broker
+                    # UI thread, so its reply fences the complete swap wrapper.
+                    # Keep the original offset and count every publication;
+                    # duplicate copies remain failures, and no repaint is asked.
+                    status = rpc({"op": "info", "session": view["name"]})
+                    assert status["broker_pid"] == view["broker"], status
+                    assert status["window_id"] == view["window"].id, status
                     with trace.open() as stream:
                         stream.seek(offset)
                         records = [list(map(int, line.split())) for line in stream]
