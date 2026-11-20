@@ -1,0 +1,12 @@
+bounded atomic input ... ok
+large input partial writes, backpressure and cancellation ... input backpressure pipe capacity: 4096 bytes
+ok
+control and queue cancellation ... ok
+bounded terminal responses ... ok
+transactional PTY resize ... ok
+reaped child output drain ... ok
+fragmented UTF-8 and EOF ... ok
+per-feed history anchor ... ok
+full-history viewport retention ... ok
+native errors and descriptor cleanup ... ok
+SessionCore: 10 checks passed; every test child joined.
