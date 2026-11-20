@@ -1,0 +1,92 @@
+{
+  "phase": "preflight",
+  "source": "36b367ffda4cea9b3b3dfbf38dc6375567912323",
+  "version": "0.1.0",
+  "timestamp_utc": "2026-11-20T01:22:08.188620+00:00",
+  "inputs_before": {
+    "Cargo.toml": "50dc6e17ec61f0df8064798215b8225c86833b44f3b9c9f165cf83b28f517741",
+    "Cargo.lock": "c4290a5f00aa4437ad31007dfcc0f35e582b4c4f62511ade176ff553fc34efa3",
+    "crates/ztty-plugin-api/Cargo.toml": "279130cb08ed5e639fe1b5d8d61a6948411fa3f58b96c434934abb5b1bcaca6b",
+    "crates/ztty-plugin-api/README.md": "5eb650dd7dbd86b7220a25d69a7ea7ce48e62bb0170ed606676ad7075bd03fa3",
+    "crates/ztty-plugin-api/LICENSE": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+    "crates/ztty-plugin-api/src/lib.rs": "edf7482a3af57c379f6f3e9bc7ddcf2326ac030da858fb4fbbbddab78552371e"
+  },
+  "ok": true,
+  "registry_before": [
+    {
+      "url": "https://crates.io/api/v1/crates/ztty-plugin-api/0.1.0",
+      "status": 404,
+      "bytes": 64,
+      "sha256": "9d52d3dd5b6181712ae0908cd3c94a2d0804d0c5bd0a39a64f51a936d2450524",
+      "duration_seconds": 0.8735334969969699
+    },
+    {
+      "url": "https://index.crates.io/zt/ty/ztty-plugin-api",
+      "status": 404,
+      "bytes": 312,
+      "sha256": "a4d243c444bb87e3244059d6bbaf9d46020fe3916405a3c45ea4a8a6a2a31e1b",
+      "duration_seconds": 0.25082246199599467
+    },
+    {
+      "url": "https://static.crates.io/crates/ztty-plugin-api/ztty-plugin-api-0.1.0.crate",
+      "status": 404,
+      "bytes": 341,
+      "sha256": "b03affd49aef3b6b83caa2fe910ee0ec521d3222c9a7971bf28aa43665a96306",
+      "duration_seconds": 0.5760738550015958
+    }
+  ],
+  "command": [
+    "cargo",
+    "publish",
+    "--locked",
+    "--manifest-path",
+    "crates/ztty-plugin-api/Cargo.toml",
+    "--dry-run"
+  ],
+  "exit_code": 0,
+  "log_sha256": "c4d8fa1ad1f4f879e85c40b6f1773b60d5e7df8f334221366364b497c14a683a",
+  "archive": {
+    "sha256": "e00adc5df1eefa237ea1ccd8d837ceecabef1976141b78918901d95cb8e9d4a6",
+    "bytes": 3482,
+    "members": [
+      "ztty-plugin-api-0.1.0/.cargo_vcs_info.json",
+      "ztty-plugin-api-0.1.0/Cargo.lock",
+      "ztty-plugin-api-0.1.0/Cargo.toml",
+      "ztty-plugin-api-0.1.0/Cargo.toml.orig",
+      "ztty-plugin-api-0.1.0/LICENSE",
+      "ztty-plugin-api-0.1.0/README.md",
+      "ztty-plugin-api-0.1.0/src/lib.rs"
+    ],
+    "vcs": {
+      "git": {
+        "sha1": "36b367ffda4cea9b3b3dfbf38dc6375567912323"
+      },
+      "path_in_vcs": "crates/ztty-plugin-api"
+    },
+    "zplugin": {
+      "version": "=0.3.1",
+      "features": [
+        "macros"
+      ],
+      "default-features": false
+    }
+  },
+  "inputs_after": {
+    "Cargo.toml": "50dc6e17ec61f0df8064798215b8225c86833b44f3b9c9f165cf83b28f517741",
+    "Cargo.lock": "c4290a5f00aa4437ad31007dfcc0f35e582b4c4f62511ade176ff553fc34efa3",
+    "crates/ztty-plugin-api/Cargo.toml": "279130cb08ed5e639fe1b5d8d61a6948411fa3f58b96c434934abb5b1bcaca6b",
+    "crates/ztty-plugin-api/README.md": "5eb650dd7dbd86b7220a25d69a7ea7ce48e62bb0170ed606676ad7075bd03fa3",
+    "crates/ztty-plugin-api/LICENSE": "97016fcf641f0ebb5c3fb6a0eda2e2bec82aecd443f3acd24a536499d5fa28a4",
+    "crates/ztty-plugin-api/src/lib.rs": "edf7482a3af57c379f6f3e9bc7ddcf2326ac030da858fb4fbbbddab78552371e"
+  },
+  "elapsed_seconds": 6.36456354999973,
+  "resources": {
+    "memory.peak": "250687488",
+    "memory.current": "94695424",
+    "memory.swap.peak": "0",
+    "memory.swap.current": "0",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "cpu.stat": "usage_usec 3446877\nuser_usec 2762796\nsystem_usec 684080\nnice_usec 2744457\ncore_sched.force_idle_usec 0\nnr_periods 53\nnr_throttled 1\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+    "cpu.max": "100000 100000"
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "source": "36b367ffda4cea9b3b3dfbf38dc6375567912323",
+  "timestamp_utc": "2026-11-20T01:33:07.807096+00:00",
+  "command": [
+    "/usr/bin/python3",
+    "tools/verify_registry.py",
+    "--output",
+    "WORKTREE/artifacts/registry-consumers-36b367f-20261120/result.json",
+    "--cargo-timeout",
+    "90"
+  ],
+  "tool_sha256": "b1bae659a7f125309f8060e9cb3d8894a14665651770cbe3f5af18223925f51c",
+  "lock_before": "c4290a5f00aa4437ad31007dfcc0f35e582b4c4f62511ade176ff553fc34efa3",
+  "ok": true,
+  "exit_code": 0,
+  "individual_checks": 6,
+  "combined_check": true,
+  "packages": [
+    {
+      "name": "zinput",
+      "version": "0.1.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "37617313dd7aaabcca9dd567344a76c4cbe03907"
+        },
+        "path_in_vcs": ""
+      },
+      "cargo_lock_checksum": "d854f1abbf3a1b2fe2ce8ac2e9ac9ccf05452e6561cf8e8fc70f9f252c0914bd",
+      "library_source_has_no_std": true
+    },
+    {
+      "name": "zgraphics",
+      "version": "0.2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "fe6357f98cf80fb6cc74739e45e8866ee17706ad"
+        },
+        "path_in_vcs": ""
+      },
+      "cargo_lock_checksum": "cc775cfedeae7a0563bb11e51e25b32e9d4a72757fb2935221ab7bc6f2c88e54",
+      "library_source_has_no_std": true
+    },
+    {
+      "name": "zpty",
+      "version": "0.2.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "66919bc6dcb7757e0437fe955bfa809fb1282b68"
+        },
+        "path_in_vcs": ""
+      },
+      "cargo_lock_checksum": "1d46215c9aaad115aa3637217dcd3d7752d4f511f05ca29729c83ae58c0dd955",
+      "library_source_has_no_std": true
+    },
+    {
+      "name": "zgpui",
+      "version": "0.1.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "1d796d1fc63808dc099ed7b10c92e75835ae2814"
+        },
+        "path_in_vcs": ""
+      },
+      "cargo_lock_checksum": "9943673fb607eade54661ff65243c4441a537f75188e361160a97344570bff90",
+      "library_source_has_no_std": true
+    },
+    {
+      "name": "ztty-plugin-api",
+      "version": "0.1.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "36b367ffda4cea9b3b3dfbf38dc6375567912323"
+        },
+        "path_in_vcs": "crates/ztty-plugin-api"
+      },
+      "cargo_lock_checksum": "e00adc5df1eefa237ea1ccd8d837ceecabef1976141b78918901d95cb8e9d4a6",
+      "library_source_has_no_std": true
+    },
+    {
+      "name": "zterm",
+      "version": "0.5.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "selected": true,
+      "vcs": {
+        "git": {
+          "sha1": "13d5e2c74571d35cccd920b1204798211b70c79f"
+        },
+        "path_in_vcs": ""
+      },
+      "cargo_lock_checksum": "5cad31f851ec516590643444f339eb6e0a2b7b034b68d190172233e9392364b1",
+      "library_source_has_no_std": true
+    }
+  ],
+  "elapsed_seconds": 20.0293875530042,
+  "resources": {
+    "memory.peak": "322183168",
+    "memory.current": "227840000",
+    "memory.swap.peak": "0",
+    "memory.swap.current": "0",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "cpu.stat": "usage_usec 10076956\nuser_usec 7251145\nsystem_usec 2825811\nnice_usec 7281494\ncore_sched.force_idle_usec 0\nnr_periods 164\nnr_throttled 28\nthrottled_usec 2502316\nnr_bursts 0\nburst_usec 0",
+    "cpu.max": "100000 100000"
+  },
+  "report_sha256": "d4803771883b01f6c2cbcffede8db1937dabd9e3c8c3ed90b88df7161de6b4e7",
+  "log_sha256": "1e1f699646bbb0b9855ad0d62465c5751e0912607bd59b94ffed9e63f6402a83"
+}
