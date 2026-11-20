@@ -1,0 +1,183 @@
+{
+  "all_nonroot_lock_sources_registry": true,
+  "candidate_clean": true,
+  "complete": true,
+  "crate": {
+    "bytes": 7791804,
+    "path": "/var/tmp/ztty-052-package-target-20261120/package/ztty-0.5.2.crate",
+    "sha256": "75e3c82bbd2ca39334f554169027ae9a16c12f326af225faec7907d8cb664025"
+  },
+  "evidence": {
+    "bytes": 64536,
+    "path": "/var/tmp/ztty-052-package-evidence-20261120/final-evidence.json",
+    "sha256": "e26853c3bae7a461bf390b8482902771da070ed97cdd1bdebd187fb7e4e1e4aa"
+  },
+  "final_commit": "6e2ce246b0b50e6b82da99756832feae6e966f21",
+  "final_readback": {
+    "bytes": 3761,
+    "path": "/var/tmp/ztty-052-package-evidence-20261120/final-readback.json",
+    "sha256": "8df945e0581eaa1aeff72bd983c4b346f64ddde7af53cd42d7bdd6a00d2532a9"
+  },
+  "final_tree": "57c38b1e962578a29dae65c4e54adab65fd6b1bf",
+  "finished_at": "2026-11-20T09:33:35.672815+00:00",
+  "installed": {
+    "argv": [
+      "/home/lightjunction/.cargo/bin/cargo",
+      "+1.100.0",
+      "install",
+      "--offline",
+      "--locked",
+      "--features",
+      "wayland",
+      "--path",
+      "/var/tmp/ztty-052-package-evidence-20261120/attempts/03-registry-metadata-20261120T093303Z-8d65a885/source/ztty-0.5.2",
+      "--root",
+      "/var/tmp/ztty-052-package-evidence-20261120/attempts/04-isolated-install-20261120T093304Z-afef4e18/installed"
+    ],
+    "binary": {
+      "bytes": 1367384,
+      "path": "/var/tmp/ztty-052-package-evidence-20261120/attempts/04-isolated-install-20261120T093304Z-afef4e18/installed/bin/ztty",
+      "sha256": "92632835aad93254e67d5eed7af7c762488e090f174c42852448529a792a4316"
+    },
+    "features": [
+      "wayland"
+    ],
+    "version": "ztty 0.5.2"
+  },
+  "metadata_package_count": 22,
+  "normalized_manifest_no_dependency_path_git_patch_replace": true,
+  "project_z_features": {
+    "zgpui": {
+      "features": [],
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.2"
+    },
+    "zgraphics": {
+      "features": [],
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.2.0"
+    },
+    "zinput": {
+      "features": [],
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.3"
+    },
+    "zpty": {
+      "features": [],
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.2.3"
+    },
+    "zterm": {
+      "features": [],
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.5.2"
+    },
+    "ztty-plugin-api": {
+      "features": [],
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.0"
+    }
+  },
+  "project_z_lock": {
+    "zgpui": {
+      "checksum": "0c5cddf5d0ed86ccb9cf21e035585146cf5aff0e316301bc037684b3c51b1046",
+      "name": "zgpui",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.2"
+    },
+    "zgraphics": {
+      "checksum": "cc775cfedeae7a0563bb11e51e25b32e9d4a72757fb2935221ab7bc6f2c88e54",
+      "dependencies": [
+        "zune-core",
+        "zune-inflate",
+        "zune-png"
+      ],
+      "name": "zgraphics",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.2.0"
+    },
+    "zinput": {
+      "checksum": "d854f1abbf3a1b2fe2ce8ac2e9ac9ccf05452e6561cf8e8fc70f9f252c0914bd",
+      "name": "zinput",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.3"
+    },
+    "zpty": {
+      "checksum": "a08f84625627fc124c4971e728d370a06b6c03fd1098c623a124aad80472aa17",
+      "name": "zpty",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.2.3"
+    },
+    "zterm": {
+      "checksum": "50845a461c4a11de2eceee265183e3e9e2a0d2ad8063266d234d22a25551e4bb",
+      "dependencies": [
+        "unicode-segmentation",
+        "unicode-width",
+        "zgpui",
+        "zgraphics",
+        "zinput",
+        "zvte"
+      ],
+      "name": "zterm",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.5.2"
+    },
+    "ztty-plugin-api": {
+      "checksum": "e00adc5df1eefa237ea1ccd8d837ceecabef1976141b78918901d95cb8e9d4a6",
+      "dependencies": [
+        "zplugin"
+      ],
+      "name": "ztty-plugin-api",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "version": "0.1.0"
+    }
+  },
+  "reload": {
+    "accepted_reloads": 2,
+    "argv": [
+      "/usr/bin/python3",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/release-0.5.2/tests/reload_runtime.py",
+      "--binary",
+      "/var/tmp/ztty-052-final-20261120/target/release/ztty",
+      "--target",
+      "/var/tmp/ztty-052-package-evidence-20261120/attempts/04-isolated-install-20261120T093304Z-afef4e18/installed/bin/ztty",
+      "--renderer",
+      "software",
+      "--output",
+      "/var/tmp/ztty-052-package-evidence-20261120/attempts/05-installed-reload-20261120T093333Z-15a5945d/reload-software.json"
+    ],
+    "checks": 9,
+    "installed_binary_sha256": "92632835aad93254e67d5eed7af7c762488e090f174c42852448529a792a4316",
+    "mode": "source-to-registry-install",
+    "report": {
+      "bytes": 21882,
+      "path": "/var/tmp/ztty-052-package-evidence-20261120/attempts/05-installed-reload-20261120T093333Z-15a5945d/reload-software.json",
+      "sha256": "0c90894b3fa63c71087028e258c2e47af6144369b97c2ba59858d6413cf9cf42"
+    },
+    "source_binary_sha256": "531130e14db08583624ba66b43b54824a319d8e0aba79fd8993f3f70907e9355"
+  },
+  "source_package_full_graph_features_equal": true,
+  "stage_results": {
+    "01-official-fetch": {
+      "seconds": 0.191,
+      "status": "passed"
+    },
+    "02-package": {
+      "seconds": 20.564,
+      "status": "passed"
+    },
+    "03-registry-metadata": {
+      "seconds": 0.334,
+      "status": "passed"
+    },
+    "04-isolated-install": {
+      "seconds": 29.106,
+      "status": "passed"
+    },
+    "05-installed-reload": {
+      "seconds": 2.173,
+      "status": "passed"
+    }
+  },
+  "status": "passed"
+}
