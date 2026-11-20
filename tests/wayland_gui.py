@@ -158,7 +158,7 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
         existing = {n.get("id") for n in nodes(ipc("", "get_tree"))}
         proc = subprocess.Popen([str(binary), "--backend", "wayland", "--name", name, "--config",
                                  str(app_config), "--geometry", "80x24", "--cwd", str(root),
-                                 "-e", shutil.which("python3"),
+                                 "-e", sys.executable,
                                  str(Path(__file__).with_name("wayland_child.py").resolve()), str(root)],
                                 env=env, stdout=log, stderr=subprocess.STDOUT,
                                 start_new_session=True)
@@ -183,7 +183,7 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
         log = (root / "terminal.log").open("w")
         proc = subprocess.Popen([str(binary), "--name", name, "--config", str(app_config),
                                  "--geometry", "80x24", "--cwd", str(root), "-e",
-                                 shutil.which("python3"),
+                                 sys.executable,
                                  str(Path(__file__).with_name("wayland_child.py").resolve()), str(root)],
                                 env=env, stdout=log, stderr=subprocess.STDOUT,
                                 start_new_session=True)
