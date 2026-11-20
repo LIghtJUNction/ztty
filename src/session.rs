@@ -866,7 +866,12 @@ impl Pool {
         }
     }
 
-    fn events(&mut self, openers: &mut os::Openers, buffers: &mut InputBuffers) {
+    fn events(
+        &mut self,
+        openers: &mut os::Openers,
+        buffers: &mut InputBuffers,
+        read_buffer: &mut [u8],
+    ) {
         for connection_index in 0..self.connections.len() {
             let connection = self.connections[connection_index].1.clone();
             for _ in 0..512 {
@@ -1150,8 +1155,21 @@ impl Pool {
                         }
                     }
                     let session = &mut self.sessions[index];
+                    let allow_input =
+                        !session.ui.as_ref().unwrap().read_only && session.core.owns("local");
+                    if allow_input && kind == x11::CONFIGURE_NOTIFY {
+                        let e = unsafe { event.configure };
+                        let window = &session.ui.as_ref().unwrap().window;
+                        if e.serial >= window.configure_serial.get()
+                            && (window.width != e.width.max(1) || window.height != e.height.max(1))
+                        {
+                            // Process queued output with the old grid before
+                            // applying the new width, within the usual budget.
+                            // A shell may already have written its first prompt.
+                            session.pump(read_buffer);
+                        }
+                    }
                     let ui = session.ui.as_mut().unwrap();
-                    let allow_input = !ui.read_only && session.core.owns("local");
                     if ui
                         .event(&mut event, &mut session.core, openers, buffers, allow_input)
                         .is_err()
@@ -1321,7 +1339,7 @@ fn serve_loop(mut server: broker::Server, mut pool: Pool) -> Result<(), String> 
     let mut fds = Vec::new();
     let mut idle_since = os::milliseconds();
     loop {
-        pool.events(&mut openers, &mut buffers);
+        pool.events(&mut openers, &mut buffers, &mut read_buffer);
         let deadline = pool.tick(&mut read_buffer);
         server.pump(|request| pool.handle(request));
         for (uri, status) in pool.finished.drain(..) {
