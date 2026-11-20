@@ -1,0 +1,22 @@
+{
+  "recorded_leaf_path": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+  "leaf_exists": true,
+  "leaf": {
+    "cpu.max": null,
+    "cpu.weight": null,
+    "cgroup.controllers": "memory pids",
+    "cgroup.subtree_control": "",
+    "cgroup.type": "domain"
+  },
+  "parent": {
+    "cpu.max": "max 100000",
+    "cpu.weight": "100",
+    "cgroup.controllers": "cpu memory pids",
+    "cgroup.subtree_control": "memory pids",
+    "cgroup.type": "domain"
+  },
+  "systemd_scope": "ControlGroup=/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope\nCPUWeight=[not set]\nCPUQuotaPerSecUSec=infinity\nCPUQuotaPeriodUSec=infinity\n",
+  "systemd_exit_code": 0,
+  "read_after_run_only": true,
+  "original_raw_unchanged": true
+}
