@@ -1,0 +1,20 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/lib.rs (target/debug/build/ztty/bbc6e09bfb27a053/out/ztty-bbc6e09bfb27a053)
+
+running 7 tests
+test gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters ... ok
+MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+OpenGL renderer: llvmpipe (LLVM 23.1.5, 256 bits)
+test gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels ... ok
+MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+test gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width ... ok
+MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+test gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction ... ok
+MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+test gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas ... ok
+MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+test gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics ... ok
+MESA-EGL: warning: pci id for fd 3: 10de:28a0, driver (null)
+test gpu::tests::terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 26 filtered out; finished in 0.55s
