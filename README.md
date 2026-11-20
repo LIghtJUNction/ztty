@@ -6,10 +6,8 @@ ztty is a native terminal for Linux, macOS and Windows. Its terminal core is
 written in Rust without the standard library. On Linux, the same live session
 can be used from a window, the CLI or an MCP client.
 
-Published ztty downloads remain **0.4.1**. This page covers the **0.5.0 candidate**
-on `iter/resume-20261120`, with platform scope at
-[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb).
-Application release and device installation remain pending.
+This page documents source version **0.5.0**. Published binaries and their release
+notes are available on the [download page](https://github.com/LIghtJUNction/ztty/releases).
 
 ## Install on Linux
 
@@ -21,8 +19,8 @@ sh install.sh
 ztty
 ```
 
-The installer verifies the archive and installs to `~/.local/bin`. The 0.4.1
-Linux binary needs glibc, X11, Xft and Xrender. Wayland desktops use XWayland.
+The installer verifies the archive and installs to `~/.local/bin`.
+On a Wayland desktop, the default X11 backend uses XWayland.
 
 ## Build and run
 
@@ -41,7 +39,7 @@ sudo apt install build-essential pkg-config libx11-dev libxft-dev libxrender-dev
 ```
 
 ```sh
-git clone --recurse-submodules --branch iter/resume-20261120 https://github.com/LIghtJUNction/ztty.git
+git clone --recurse-submodules https://github.com/LIghtJUNction/ztty.git
 cd ztty
 cargo build --locked --release
 ./target/release/ztty --font 'monospace:size=12' --geometry 100x28
@@ -156,7 +154,8 @@ covers dependencies and the unverified physical GPU, desktop IME and scaling beh
 ## Performance and development
 
 <!-- terminal-benchmark:start -->
-Fresh measurements are pending in the [candidate report](docs/benchmarks/resume-2026-11-20.md).
+The [benchmark report](docs/benchmarks/resume-2026-11-20.md) records fixed sources,
+raw measurements and the remaining performance gaps.
 [Benchmark instructions](docs/benchmarks/README.md) explain how to repeat the comparisons;
 [earlier results](docs/performance.md) retain their original conditions.
 <!-- terminal-benchmark:end -->
@@ -171,7 +170,7 @@ Run `sh tools/check.sh` for the local development checks.
 | [zinput](https://github.com/LIghtJUNction/zinput) | Keyboard, mouse and paste encoding | Published [0.1.3](https://crates.io/crates/zinput/0.1.3) |
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY process ownership | Published [0.2.2](https://crates.io/crates/zpty/0.2.2) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | Image protocol and placement | Published [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
-| [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.0](https://crates.io/crates/zterm/0.5.0) |
+| [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.1](https://crates.io/crates/zterm/0.5.1) |
 
 The [architecture](docs/architecture.md) describes the reusable Project Z libraries;
 the [documentation index](docs/README.md) links usage guides and verification records.
