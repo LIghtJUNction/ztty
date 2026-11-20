@@ -391,3 +391,105 @@ fn shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas() {
             .is_err()
     );
 }
+
+#[test]
+#[ignore = "requires native fonts and a real EGL implementation"]
+fn terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors() {
+    let _guard = EGL_TEST.lock().unwrap();
+    let mut renderer = Renderer::new(
+        Display::headless().unwrap(),
+        Target::Offscreen,
+        800,
+        160,
+        "DejaVu Sans Mono:size=16",
+    )
+    .unwrap();
+    let mut terminal = zterm::Terminal::new(40, 4, 0);
+    terminal.feed(
+        concat!(
+            "\x1b[1;1Hplain ASCII and blank trailing cells",
+            "\x1b[2;1H\x1b[1;3;4;31moffice\x1b[0m 中e\u{301}👩🏽‍💻",
+            "\x1b[3;1H\x1b[7m reverse \x1b[0m \x1b[9mstrike\x1b[0m سلام",
+            "\x1b[4;1H\x1b[5mblink\x1b[0m \x1b[8mhidden\x1b[0m",
+        )
+        .as_bytes(),
+    );
+    let metrics = renderer.metrics();
+    let style = GridStyle {
+        padding: 2.0,
+        cell_width: metrics.cell_width,
+        cell_height: metrics.cell_height,
+        ascent: metrics.ascent,
+        background: 0x101010,
+        background_alpha: 255,
+        selection_foreground: 0x000000,
+        selection_background: 0xffffff,
+        cursor: Some(((2, 1), zterm::CursorShape::Block)),
+        cursor_color: 0x55ff55,
+        slow_blink_visible: true,
+        rapid_blink_visible: true,
+    };
+    let selected = |x, y| y == 2 && (3..12).contains(&x);
+    renderer
+        .draw_terminal(&terminal, 0, style, selected)
+        .unwrap();
+    let expected = renderer.read_pixels().unwrap();
+    let text_buffer = (renderer.row_text.as_ptr(), renderer.row_text.capacity());
+    let cell_buffer = (renderer.row_cells.as_ptr(), renderer.row_cells.capacity());
+    assert!(text_buffer.1 > 0 && text_buffer.1 <= MAX_TEXT_BYTES);
+    assert!(cell_buffer.1 > 0 && cell_buffer.1 <= terminal.cols().next_power_of_two());
+    for _ in 0..3 {
+        renderer
+            .draw_terminal(&terminal, 0, style, selected)
+            .unwrap();
+        assert_eq!(renderer.read_pixels().unwrap(), expected);
+        assert!(renderer.row_text.is_empty() && renderer.row_cells.is_empty());
+        assert_eq!(
+            (renderer.row_text.as_ptr(), renderer.row_text.capacity()),
+            text_buffer
+        );
+        assert_eq!(
+            (renderer.row_cells.as_ptr(), renderer.row_cells.capacity()),
+            cell_buffer
+        );
+    }
+    let blinking = GridStyle {
+        slow_blink_visible: false,
+        ..style
+    };
+    renderer
+        .draw_terminal(&terminal, 0, blinking, selected)
+        .unwrap();
+    assert_ne!(renderer.read_pixels().unwrap(), expected);
+
+    // Finite input geometry can still overflow a cell's computed x coordinate.
+    // Exercise the real draw_cells validation error after the row was assembled.
+    let invalid = GridStyle {
+        cell_width: f32::MAX,
+        ..style
+    };
+    assert_eq!(
+        renderer.draw_terminal(&terminal, 0, invalid, selected),
+        Err("invalid shaped-cell mapping")
+    );
+    assert!(renderer.row_text.is_empty() && renderer.row_cells.is_empty());
+    assert_eq!(
+        (renderer.row_text.as_ptr(), renderer.row_text.capacity()),
+        text_buffer
+    );
+    assert_eq!(
+        (renderer.row_cells.as_ptr(), renderer.row_cells.capacity()),
+        cell_buffer
+    );
+    renderer
+        .draw_terminal(&terminal, 0, style, selected)
+        .unwrap();
+    assert_eq!(renderer.read_pixels().unwrap(), expected);
+    renderer.present().unwrap();
+
+    let narrow = zterm::Terminal::new(8, 4, 0);
+    renderer
+        .draw_terminal(&narrow, 0, style, |_, _| false)
+        .unwrap();
+    assert!(renderer.row_cells.capacity() <= narrow.cols().next_power_of_two());
+}
