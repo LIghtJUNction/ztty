@@ -729,7 +729,9 @@ def run(binary, output, expected_arch=None):
         b.wait_grid(top, cell)
         c.wait_grid(bottom, cell)
         check("split_down_distinct_pty", child=state)
+        # Isolate geometry from history; render() above must preserve scrollback.
         for probe in probes.values():
+            probe.send(b"\x1b[3J")
             probe.render()
         gdi = window.user.GetGuiResources(int(process._handle), 0)
         assert len(window.windows()) == 1 and 0 < gdi <= initial_gdi + 2, (initial_gdi, gdi, window.windows())
