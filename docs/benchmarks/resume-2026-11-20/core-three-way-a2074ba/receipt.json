@@ -1,0 +1,347 @@
+{
+  "native_job": "59cd4366f811fed8854b09c698ca60d5-33b",
+  "ok": true,
+  "status": "complete",
+  "error": null,
+  "defer_reasons": null,
+  "runs": 9,
+  "raw_sha256": "765ffc3b74c2191795ed0b587de27a7164a339d5271678663e9ecbe3570abc43",
+  "root_source": "36b367ffda4cea9b3b3dfbf38dc6375567912323",
+  "sources": {
+    "legacy_0_4": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+    "published_0_5": "13d5e2c74571d35cccd920b1204798211b70c79f",
+    "candidate_0_5_1": "a2074bac4c030cfd7c0b2514c852a89dcf54648f"
+  },
+  "binary_sha256": {
+    "legacy_0_4": "4b3f5d75d409cb697d46a41937e87d2123a59b67127dd2178c1e115423ee0d5d",
+    "published_0_5": "7c645edd3c7fe9feae80386c93be856003b1b938f8ad20b5f47dd0898b64d652",
+    "candidate_0_5_1": "e6721b2bc2eece65993521695dbb9f2819cef68902ea8e510aaa02157d350bc6"
+  },
+  "summary": {
+    "ascii_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          305.046,
+          237.555,
+          243.684
+        ],
+        "published_0_5": [
+          270.457,
+          198.848,
+          215.103
+        ],
+        "candidate_0_5_1": [
+          269.172,
+          203.772,
+          201.814
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 243.684,
+        "published_0_5": 215.103,
+        "candidate_0_5_1": 203.772
+      },
+      "candidate_over_published": 0.9473229104196593,
+      "candidate_over_legacy": 0.8362141133599251
+    },
+    "ascii_full_history_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          169.575,
+          140.261,
+          136.29
+        ],
+        "published_0_5": [
+          154.178,
+          92.959,
+          112.67
+        ],
+        "candidate_0_5_1": [
+          138.657,
+          114.955,
+          108.114
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 140.261,
+        "published_0_5": 112.67,
+        "candidate_0_5_1": 114.955
+      },
+      "candidate_over_published": 1.0202804650749977,
+      "candidate_over_legacy": 0.8195792130385495
+    },
+    "sgr_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          173.396,
+          106.351,
+          133.699
+        ],
+        "published_0_5": [
+          141.343,
+          91.305,
+          112.745
+        ],
+        "candidate_0_5_1": [
+          130.094,
+          118.767,
+          122.179
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 133.699,
+        "published_0_5": 112.745,
+        "candidate_0_5_1": 122.179
+      },
+      "candidate_over_published": 1.0836755510222182,
+      "candidate_over_legacy": 0.9138363039364542
+    },
+    "unicode_mib_s": {
+      "samples": {
+        "legacy_0_4": [
+          111.586,
+          86.099,
+          91.404
+        ],
+        "published_0_5": [
+          21.103,
+          19.33,
+          17.719
+        ],
+        "candidate_0_5_1": [
+          22.232,
+          28.405,
+          26.101
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 91.404,
+        "published_0_5": 19.33,
+        "candidate_0_5_1": 26.101
+      },
+      "candidate_over_published": 1.3502845318158303,
+      "candidate_over_legacy": 0.28555643079077503
+    },
+    "cell_bytes": {
+      "samples": {
+        "legacy_0_4": [
+          28,
+          28,
+          28
+        ],
+        "published_0_5": [
+          32,
+          32,
+          32
+        ],
+        "candidate_0_5_1": [
+          32,
+          32,
+          32
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 28,
+        "published_0_5": 32,
+        "candidate_0_5_1": 32
+      },
+      "candidate_over_published": 1.0,
+      "candidate_over_legacy": 1.1428571428571428
+    },
+    "initial_core_heap_bytes": {
+      "samples": {
+        "legacy_0_4": [
+          107932,
+          107932,
+          107932
+        ],
+        "published_0_5": [
+          123292,
+          123292,
+          123292
+        ],
+        "candidate_0_5_1": [
+          123292,
+          123292,
+          123292
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 107932,
+        "published_0_5": 123292,
+        "candidate_0_5_1": 123292
+      },
+      "candidate_over_published": 1.0,
+      "candidate_over_legacy": 1.1423118259644962
+    },
+    "steady_state_allocations": {
+      "samples": {
+        "legacy_0_4": [
+          0,
+          0,
+          0
+        ],
+        "published_0_5": [
+          0,
+          0,
+          0
+        ],
+        "candidate_0_5_1": [
+          0,
+          0,
+          0
+        ]
+      },
+      "medians": {
+        "legacy_0_4": 0,
+        "published_0_5": 0,
+        "candidate_0_5_1": 0
+      },
+      "candidate_over_published": null,
+      "candidate_over_legacy": null
+    }
+  },
+  "host_guards": [
+    [
+      "legacy_0_4",
+      1,
+      [],
+      0
+    ],
+    [
+      "published_0_5",
+      1,
+      [],
+      0
+    ],
+    [
+      "candidate_0_5_1",
+      1,
+      [],
+      0
+    ],
+    [
+      "published_0_5",
+      2,
+      [],
+      0
+    ],
+    [
+      "candidate_0_5_1",
+      2,
+      [],
+      0
+    ],
+    [
+      "legacy_0_4",
+      2,
+      [],
+      0
+    ],
+    [
+      "candidate_0_5_1",
+      3,
+      [],
+      0
+    ],
+    [
+      "legacy_0_4",
+      3,
+      [],
+      0
+    ],
+    [
+      "published_0_5",
+      3,
+      [],
+      0
+    ]
+  ],
+  "identities_preserved": true,
+  "old6_unchanged": true,
+  "old9_unchanged": true,
+  "helper_same_as_old9": true,
+  "native_pid": 3822099,
+  "native_pid_exists": false,
+  "elapsed_runs_seconds": 43.80380034446716,
+  "execution_context_before": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ],
+    "nice": -4,
+    "execution": "Direct native exec; no task-created systemd build unit or CPU quota."
+  },
+  "execution_context_after": {
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ],
+    "nice": -4,
+    "execution": "Direct native exec; no task-created systemd build unit or CPU quota."
+  }
+}

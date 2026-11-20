@@ -1,0 +1,18 @@
+{
+  "source": "a2074bac4c030cfd7c0b2514c852a89dcf54648f",
+  "binary": "PERF_WORKTREE/artifacts/zterm-0.5.1-borrowed-benchmark",
+  "binary_sha256": "e6721b2bc2eece65993521695dbb9f2819cef68902ea8e510aaa02157d350bc6",
+  "benchmark_source_sha256": "8551f815d1ca276154df9f2050a9039f0e9cd225da363137338d3c820ecc3624",
+  "build_sha256": "dec0d9b01b336ca1bda9b54a72a2ba6ed39a1cef2fcaf11b3937aaf2c60892b5",
+  "correctness_gate_sha256": "2a1817976b1097da96efa93ca2749879a17f91c129fe9e2db8b54de8b7393d45",
+  "collector": "PERF_WORKTREE/artifacts/run-three-way-borrowed.py",
+  "collector_sha256": "9eaec60bdc52e969a5de5af1cd786865fb7e887465866a54ccd2c128ff892d73",
+  "collector_derived_from_sha256": "6d7ce5689394f725cbe467a1cea19a7ee0fa5d6d2c1bcbb23ef6c9f6427c4f62",
+  "collector_changes": [
+    "candidate source/binary/build receipt",
+    "preserve previous nine-run report and previous candidate binary",
+    "assert recorded ancestor CPU limits are unlimited"
+  ],
+  "ready_for_timing": true,
+  "timing_started": false
+}
