@@ -1,0 +1,1306 @@
+{
+  "schema": 1,
+  "ok": true,
+  "status": "complete",
+  "timestamp_utc": "2026-11-20T02:14:02.523626+00:00",
+  "purpose": "Resolve whether incremental batching improves Unicode at a consistent ASCII/SGR cost; the preceding three-way record remains unchanged.",
+  "scope": "Parser/screen only; no PTY, renderer or physical latency.",
+  "root_source": "da8b697d6ca3b3948810ee632e3f5d90cbd60913",
+  "sources": {
+    "borrowed": "a2074bac4c030cfd7c0b2514c852a89dcf54648f",
+    "print_batch": "28d5d266375ff67562e16652a3eef10bd36b4756"
+  },
+  "binary_sha256": {
+    "borrowed": "e6721b2bc2eece65993521695dbb9f2819cef68902ea8e510aaa02157d350bc6",
+    "print_batch": "0ad515013c182f9edcd4ffac152f0646659507e7676679504ee6ba80cfd6e2d5"
+  },
+  "build_record_sha256": {
+    "borrowed": "dec0d9b01b336ca1bda9b54a72a2ba6ed39a1cef2fcaf11b3937aaf2c60892b5",
+    "print_batch": "b79dcc18291ebffc361178709b718ec60a62ef9644be00720ca7113c9f4db558"
+  },
+  "collector_sha256": "a4aa9bd773c94716f60377c383d3f129108a2c741ba49db6e794bae579f10257",
+  "host_helper_sha256": "f87af5c337fcbc17c5a0ec519db1c1a391cae9460bc924f203efa9bc5c61cf69",
+  "orders": [
+    [
+      "borrowed",
+      "print_batch"
+    ],
+    [
+      "print_batch",
+      "borrowed"
+    ],
+    [
+      "borrowed",
+      "print_batch"
+    ],
+    [
+      "print_batch",
+      "borrowed"
+    ],
+    [
+      "borrowed",
+      "print_batch"
+    ],
+    [
+      "print_batch",
+      "borrowed"
+    ]
+  ],
+  "cpu": 23,
+  "execution_before": {
+    "nice": -4,
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ]
+  },
+  "prior_records": {
+    "WORKTREE/artifacts/benchmark-final/core-paired-6053.json": "bd01c057f00745fe5e186fd13d9ab4422eb4484b4027f8738193edd4263c43f6",
+    "PERF_WORKTREE/artifacts/core-three-way-0.5.1/comparison.json": "16e8662c14c0f92bcbfe0ebc75982802b066e28552ef5a66b01381c40a30080a",
+    "PERF_WORKTREE/artifacts/core-three-way-a2074ba/comparison.json": "765ffc3b74c2191795ed0b587de27a7164a339d5271678663e9ecbe3570abc43",
+    "PERF_WORKTREE/artifacts/core-three-way-28d5d26/comparison.json": "215fcf2b8d7cf70f92dd8de08d7093e45e370864aed14bdb6772ce18e8bec13d"
+  },
+  "runs": [
+    {
+      "round": 1,
+      "side": "borrowed",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-borrowed-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.056574633999844,
+      "child_user_seconds": 4.039013,
+      "child_system_seconds": 0.004963999999999996,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5250551808,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878621184,
+        "swap_used_bytes": 20798066688,
+        "load_average": [
+          2.44677734375,
+          2.744140625,
+          3.04296875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802563317\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.08 avg60=0.16 avg300=0.25 total=1139247707\nfull avg10=0.04 avg60=0.13 avg300=0.21 total=1075153941",
+          "io": "some avg10=0.78 avg60=1.20 avg300=1.98 total=4178311903\nfull avg10=0.42 avg60=0.95 avg300=1.73 total=3591242718"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5353238528,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876245504,
+        "swap_used_bytes": 20800442368,
+        "load_average": [
+          2.41064453125,
+          2.7314453125,
+          3.037109375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802571272\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.05 avg60=0.15 avg300=0.25 total=1139254883\nfull avg10=0.02 avg60=0.12 avg300=0.21 total=1075160816",
+          "io": "some avg10=0.82 avg60=1.19 avg300=1.97 total=4178341014\nfull avg10=0.58 avg60=0.95 avg300=1.72 total=3591270514"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 266.012,
+        "ascii_full_history_mib_s": 153.476,
+        "sgr_mib_s": 146.719,
+        "unicode_mib_s": 32.653,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 59,
+          "p95": 60,
+          "p99": 62,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2885,
+          "p95": 3186,
+          "p99": 3395,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 1,
+      "side": "print_batch",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.387443207990145,
+      "child_user_seconds": 4.371637000000001,
+      "child_system_seconds": 0.0029829999999999995,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5352230912,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876245504,
+        "swap_used_bytes": 20800442368,
+        "load_average": [
+          2.41064453125,
+          2.7314453125,
+          3.037109375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802571272\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.05 avg60=0.15 avg300=0.25 total=1139254883\nfull avg10=0.02 avg60=0.12 avg300=0.21 total=1075160816",
+          "io": "some avg10=0.82 avg60=1.19 avg300=1.97 total=4178341014\nfull avg10=0.58 avg60=0.95 avg300=1.72 total=3591270514"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5229371392,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876626432,
+        "swap_used_bytes": 20800061440,
+        "load_average": [
+          2.37744140625,
+          2.71923828125,
+          3.03125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802577799\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.03 avg60=0.14 avg300=0.24 total=1139255888\nfull avg10=0.01 avg60=0.11 avg300=0.21 total=1075161820",
+          "io": "some avg10=0.73 avg60=1.14 avg300=1.95 total=4178381556\nfull avg10=0.57 avg60=0.92 avg300=1.70 total=3591309538"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 205.606,
+        "ascii_full_history_mib_s": 140.813,
+        "sgr_mib_s": 144.582,
+        "unicode_mib_s": 32.531,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 69,
+          "p95": 72,
+          "p99": 74,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3472,
+          "p95": 3804,
+          "p99": 4024,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 2,
+      "side": "print_batch",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 5.020343675001641,
+      "child_user_seconds": 4.999494,
+      "child_system_seconds": 0.0029889999999999986,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5229371392,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876626432,
+        "swap_used_bytes": 20800061440,
+        "load_average": [
+          2.37744140625,
+          2.71923828125,
+          3.03125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802577799\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.03 avg60=0.14 avg300=0.24 total=1139255888\nfull avg10=0.01 avg60=0.11 avg300=0.21 total=1075161820",
+          "io": "some avg10=0.73 avg60=1.14 avg300=1.95 total=4178381556\nfull avg10=0.57 avg60=0.92 avg300=1.70 total=3591309538"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5244919808,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27874816000,
+        "swap_used_bytes": 20801871872,
+        "load_average": [
+          2.34716796875,
+          2.70703125,
+          3.025390625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802586537\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=0.12 avg300=0.24 total=1139256636\nfull avg10=0.00 avg60=0.10 avg300=0.20 total=1075162559",
+          "io": "some avg10=0.76 avg60=1.10 avg300=1.92 total=4178436814\nfull avg10=0.67 avg60=0.90 avg300=1.68 total=3591362961"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 248.416,
+        "ascii_full_history_mib_s": 122.215,
+        "sgr_mib_s": 118.015,
+        "unicode_mib_s": 26.514,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 60,
+          "p95": 64,
+          "p99": 66,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2962,
+          "p95": 3234,
+          "p99": 3411,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 2,
+      "side": "borrowed",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-borrowed-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.243521859010798,
+      "child_user_seconds": 4.2266059999999985,
+      "child_system_seconds": 0.003977000000000001,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5244919808,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27874816000,
+        "swap_used_bytes": 20801871872,
+        "load_average": [
+          2.34716796875,
+          2.70703125,
+          3.025390625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802586537\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.02 avg60=0.12 avg300=0.24 total=1139256636\nfull avg10=0.00 avg60=0.10 avg300=0.20 total=1075162559",
+          "io": "some avg10=0.76 avg60=1.10 avg300=1.92 total=4178436814\nfull avg10=0.67 avg60=0.90 avg300=1.68 total=3591362961"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5232685056,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876212736,
+        "swap_used_bytes": 20800475136,
+        "load_average": [
+          2.3193359375,
+          2.69482421875,
+          3.01953125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802592629\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.01 avg60=0.12 avg300=0.23 total=1139257064\nfull avg10=0.00 avg60=0.09 avg300=0.20 total=1075162986",
+          "io": "some avg10=0.51 avg60=1.03 avg300=1.89 total=4178453965\nfull avg10=0.45 avg60=0.84 avg300=1.66 total=3591379053"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 253.563,
+        "ascii_full_history_mib_s": 152.973,
+        "sgr_mib_s": 124.815,
+        "unicode_mib_s": 32.68,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 61,
+          "p95": 66,
+          "p99": 69,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2875,
+          "p95": 3150,
+          "p99": 3340,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 3,
+      "side": "borrowed",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-borrowed-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.158246994004003,
+      "child_user_seconds": 4.143256000000001,
+      "child_system_seconds": 0.0029860000000000025,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5232685056,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876212736,
+        "swap_used_bytes": 20800475136,
+        "load_average": [
+          2.3193359375,
+          2.69482421875,
+          3.01953125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802592629\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.01 avg60=0.12 avg300=0.23 total=1139257064\nfull avg10=0.00 avg60=0.09 avg300=0.20 total=1075162986",
+          "io": "some avg10=0.51 avg60=1.03 avg300=1.89 total=4178453965\nfull avg10=0.45 avg60=0.84 avg300=1.66 total=3591379053"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5229195264,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876454400,
+        "swap_used_bytes": 20800233472,
+        "load_average": [
+          2.3740234375,
+          2.7001953125,
+          3.01904296875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802599331\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.11 avg300=0.23 total=1139257722\nfull avg10=0.00 avg60=0.08 avg300=0.20 total=1075163626",
+          "io": "some avg10=0.34 avg60=0.96 avg300=1.87 total=4178517115\nfull avg10=0.30 avg60=0.79 avg300=1.63 total=3591437886"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 253.309,
+        "ascii_full_history_mib_s": 152.555,
+        "sgr_mib_s": 149.655,
+        "unicode_mib_s": 32.519,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 59,
+          "p95": 66,
+          "p99": 69,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2896,
+          "p95": 3590,
+          "p99": 3715,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 3,
+      "side": "print_batch",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.303633328992873,
+      "child_user_seconds": 4.2890049999999995,
+      "child_system_seconds": 0.0029879999999999976,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5229195264,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876454400,
+        "swap_used_bytes": 20800233472,
+        "load_average": [
+          2.3740234375,
+          2.7001953125,
+          3.01904296875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802599331\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.11 avg300=0.23 total=1139257722\nfull avg10=0.00 avg60=0.08 avg300=0.20 total=1075163626",
+          "io": "some avg10=0.34 avg60=0.96 avg300=1.87 total=4178517115\nfull avg10=0.30 avg60=0.79 avg300=1.63 total=3591437886"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5230985216,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876642816,
+        "swap_used_bytes": 20800045056,
+        "load_average": [
+          2.3740234375,
+          2.7001953125,
+          3.01904296875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802604711\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.10 avg300=0.22 total=1139257723\nfull avg10=0.00 avg60=0.08 avg300=0.19 total=1075163628",
+          "io": "some avg10=0.52 avg60=0.96 avg300=1.86 total=4178535989\nfull avg10=0.50 avg60=0.80 avg300=1.62 total=3591456297"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 224.092,
+        "ascii_full_history_mib_s": 137.181,
+        "sgr_mib_s": 146.745,
+        "unicode_mib_s": 32.047,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 68,
+          "p95": 74,
+          "p99": 79,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2907,
+          "p95": 3161,
+          "p99": 3248,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 4,
+      "side": "print_batch",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.319435191995581,
+      "child_user_seconds": 4.303459,
+      "child_system_seconds": 0.003956000000000001,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5230985216,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27876642816,
+        "swap_used_bytes": 20800045056,
+        "load_average": [
+          2.3740234375,
+          2.7001953125,
+          3.01904296875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802604711\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.10 avg300=0.22 total=1139257723\nfull avg10=0.00 avg60=0.08 avg300=0.19 total=1075163628",
+          "io": "some avg10=0.52 avg60=0.96 avg300=1.86 total=4178535989\nfull avg10=0.50 avg60=0.80 avg300=1.62 total=3591456297"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5219753984,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878174720,
+        "swap_used_bytes": 20798513152,
+        "load_average": [
+          3.38525390625,
+          2.90478515625,
+          3.08349609375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802610345\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.09 avg300=0.22 total=1139257723\nfull avg10=0.00 avg60=0.07 avg300=0.19 total=1075163628",
+          "io": "some avg10=0.35 avg60=0.90 avg300=1.83 total=4178562941\nfull avg10=0.33 avg60=0.75 avg300=1.60 total=3591481653"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 243.83,
+        "ascii_full_history_mib_s": 137.947,
+        "sgr_mib_s": 138.652,
+        "unicode_mib_s": 31.277,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 60,
+          "p95": 61,
+          "p99": 63,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2904,
+          "p95": 3049,
+          "p99": 3159,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 4,
+      "side": "borrowed",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-borrowed-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.009246974004782,
+      "child_user_seconds": 3.9949650000000005,
+      "child_system_seconds": 0.0029879999999999976,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5219753984,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878174720,
+        "swap_used_bytes": 20798513152,
+        "load_average": [
+          3.38525390625,
+          2.90478515625,
+          3.08349609375
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802610347\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.09 avg300=0.22 total=1139257723\nfull avg10=0.00 avg60=0.07 avg300=0.19 total=1075163628",
+          "io": "some avg10=0.35 avg60=0.90 avg300=1.83 total=4178563297\nfull avg10=0.33 avg60=0.75 avg300=1.60 total=3591482009"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5211152384,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27877974016,
+        "swap_used_bytes": 20798713856,
+        "load_average": [
+          3.19384765625,
+          2.873046875,
+          3.072265625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802615023\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.09 avg300=0.22 total=1139258265\nfull avg10=0.00 avg60=0.07 avg300=0.19 total=1075164169",
+          "io": "some avg10=0.23 avg60=0.84 avg300=1.80 total=4178581874\nfull avg10=0.22 avg60=0.70 avg300=1.58 total=3591499749"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 268.638,
+        "ascii_full_history_mib_s": 152.584,
+        "sgr_mib_s": 152.506,
+        "unicode_mib_s": 33.087,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 60,
+          "p95": 65,
+          "p99": 68,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2857,
+          "p95": 3114,
+          "p99": 3256,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 5,
+      "side": "borrowed",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-borrowed-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.159494220002671,
+      "child_user_seconds": 4.144902000000002,
+      "child_system_seconds": 0.0029670000000000044,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5209161728,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27877974016,
+        "swap_used_bytes": 20798713856,
+        "load_average": [
+          3.19384765625,
+          2.873046875,
+          3.072265625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802615023\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.09 avg300=0.22 total=1139258265\nfull avg10=0.00 avg60=0.07 avg300=0.19 total=1075164169",
+          "io": "some avg10=0.23 avg60=0.84 avg300=1.80 total=4178581874\nfull avg10=0.22 avg60=0.70 avg300=1.58 total=3591499749"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5215408128,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878338560,
+        "swap_used_bytes": 20798349312,
+        "load_average": [
+          3.01806640625,
+          2.841796875,
+          3.06103515625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802620087\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.08 avg300=0.21 total=1139258292\nfull avg10=0.00 avg60=0.06 avg300=0.18 total=1075164196",
+          "io": "some avg10=0.15 avg60=0.79 avg300=1.78 total=4178599971\nfull avg10=0.14 avg60=0.65 avg300=1.56 total=3591517459"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 268.152,
+        "ascii_full_history_mib_s": 151.833,
+        "sgr_mib_s": 153.225,
+        "unicode_mib_s": 30.957,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 71,
+          "p95": 75,
+          "p99": 79,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2956,
+          "p95": 3265,
+          "p99": 3419,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 5,
+      "side": "print_batch",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.31519171698892,
+      "child_user_seconds": 4.2995929999999944,
+      "child_system_seconds": 0.0029850000000000015,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5215408128,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878338560,
+        "swap_used_bytes": 20798349312,
+        "load_average": [
+          3.01806640625,
+          2.841796875,
+          3.06103515625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.04 total=802620091\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.08 avg300=0.21 total=1139258292\nfull avg10=0.00 avg60=0.06 avg300=0.18 total=1075164196",
+          "io": "some avg10=0.15 avg60=0.79 avg300=1.78 total=4178600278\nfull avg10=0.14 avg60=0.65 avg300=1.56 total=3591517748"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5264379904,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878244352,
+        "swap_used_bytes": 20798443520,
+        "load_average": [
+          3.0166015625,
+          2.8447265625,
+          3.060546875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.03 total=802627625\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.07 avg300=0.21 total=1139260415\nfull avg10=0.00 avg60=0.06 avg300=0.18 total=1075166197",
+          "io": "some avg10=0.25 avg60=0.77 avg300=1.76 total=4178644443\nfull avg10=0.24 avg60=0.64 avg300=1.54 total=3591559951"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 267.717,
+        "ascii_full_history_mib_s": 150.738,
+        "sgr_mib_s": 144.107,
+        "unicode_mib_s": 31.417,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 64,
+          "p95": 67,
+          "p99": 69,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3235,
+          "p95": 4965,
+          "p99": 5195,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 6,
+      "side": "print_batch",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-print-batch-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.335238960993593,
+      "child_user_seconds": 4.317242,
+      "child_system_seconds": 0.005977999999999997,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5264379904,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878244352,
+        "swap_used_bytes": 20798443520,
+        "load_average": [
+          3.0166015625,
+          2.8447265625,
+          3.060546875
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.03 total=802627625\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.07 avg300=0.21 total=1139260415\nfull avg10=0.00 avg60=0.06 avg300=0.18 total=1075166197",
+          "io": "some avg10=0.25 avg60=0.77 avg300=1.76 total=4178644443\nfull avg10=0.24 avg60=0.64 avg300=1.54 total=3591559951"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5269671936,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878772736,
+        "swap_used_bytes": 20797915136,
+        "load_average": [
+          2.85498046875,
+          2.81396484375,
+          3.04931640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.03 total=802634023\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.07 avg300=0.20 total=1139260545\nfull avg10=0.00 avg60=0.05 avg300=0.18 total=1075166326",
+          "io": "some avg10=0.13 avg60=0.69 avg300=1.72 total=4178664259\nfull avg10=0.13 avg60=0.58 avg300=1.51 total=3591578797"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 270.303,
+        "ascii_full_history_mib_s": 151.445,
+        "sgr_mib_s": 145.871,
+        "unicode_mib_s": 30.066,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 62,
+          "p95": 69,
+          "p99": 71,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 2896,
+          "p95": 3167,
+          "p99": 3330,
+          "allocations": 0
+        }
+      }
+    },
+    {
+      "round": 6,
+      "side": "borrowed",
+      "command": [
+        "taskset",
+        "-c",
+        "23",
+        "PERF_WORKTREE/artifacts/zterm-0.5.1-borrowed-benchmark"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 4.774088000995107,
+      "child_user_seconds": 4.753307000000007,
+      "child_system_seconds": 0.0039889999999999926,
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5269671936,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27878772736,
+        "swap_used_bytes": 20797915136,
+        "load_average": [
+          2.85498046875,
+          2.81396484375,
+          3.04931640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.03 total=802634025\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.07 avg300=0.20 total=1139260545\nfull avg10=0.00 avg60=0.05 avg300=0.18 total=1075166326",
+          "io": "some avg10=0.13 avg60=0.69 avg300=1.72 total=4178664550\nfull avg10=0.13 avg60=0.58 avg300=1.51 total=3591579089"
+        }
+      },
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 5120548864,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28089556992,
+        "swap_used_bytes": 20587130880,
+        "load_average": [
+          2.86669921875,
+          2.8173828125,
+          3.048828125
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.03 total=802649464\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.18 avg60=0.09 avg300=0.21 total=1139282638\nfull avg10=0.00 avg60=0.05 avg300=0.17 total=1075187700",
+          "io": "some avg10=0.96 avg60=0.81 avg300=1.73 total=4178818196\nfull avg10=0.96 avg60=0.70 avg300=1.52 total=3591723338"
+        }
+      },
+      "host_reasons_after": [],
+      "result": {
+        "schema": 1,
+        "scope": "parser plus screen model; no PTY, renderer or display",
+        "geometry": [
+          120,
+          32
+        ],
+        "cell_bytes": 32,
+        "initial_core_heap_bytes": 123292,
+        "ascii_mib_s": 238.024,
+        "ascii_full_history_mib_s": 137.771,
+        "sgr_mib_s": 141.087,
+        "unicode_mib_s": 28.15,
+        "steady_state_allocations": 0,
+        "edit_ns": {
+          "p50": 81,
+          "p95": 86,
+          "p99": 90,
+          "allocations": 0
+        },
+        "burst_1024_ns": {
+          "p50": 3826,
+          "p95": 4201,
+          "p99": 4711,
+          "allocations": 0
+        }
+      }
+    }
+  ],
+  "summary": {
+    "ascii_mib_s": {
+      "samples": {
+        "borrowed": [
+          266.012,
+          253.563,
+          253.309,
+          268.638,
+          268.152,
+          238.024
+        ],
+        "print_batch": [
+          205.606,
+          248.416,
+          224.092,
+          243.83,
+          267.717,
+          270.303
+        ]
+      },
+      "medians": {
+        "borrowed": 259.7875,
+        "print_batch": 246.123
+      },
+      "batch_over_borrowed": 0.9474012413992204,
+      "per_round_batch_over_borrowed": [
+        0.7729200186457753,
+        0.9797012971135379,
+        0.8846586580026766,
+        0.9076526775809827,
+        0.9983777857334646,
+        1.1356123752226666
+      ]
+    },
+    "ascii_full_history_mib_s": {
+      "samples": {
+        "borrowed": [
+          153.476,
+          152.973,
+          152.555,
+          152.584,
+          151.833,
+          137.771
+        ],
+        "print_batch": [
+          140.813,
+          122.215,
+          137.181,
+          137.947,
+          150.738,
+          151.445
+        ]
+      },
+      "medians": {
+        "borrowed": 152.5695,
+        "print_batch": 139.38
+      },
+      "batch_over_borrowed": 0.9135508735363227,
+      "per_round_batch_over_borrowed": [
+        0.9174919857176366,
+        0.7989318376445516,
+        0.8992232309658812,
+        0.9040725108792534,
+        0.992788129062852,
+        1.0992516567347266
+      ]
+    },
+    "sgr_mib_s": {
+      "samples": {
+        "borrowed": [
+          146.719,
+          124.815,
+          149.655,
+          152.506,
+          153.225,
+          141.087
+        ],
+        "print_batch": [
+          144.582,
+          118.015,
+          146.745,
+          138.652,
+          144.107,
+          145.871
+        ]
+      },
+      "medians": {
+        "borrowed": 148.187,
+        "print_batch": 144.34449999999998
+      },
+      "batch_over_borrowed": 0.974069925162126,
+      "per_round_batch_over_borrowed": [
+        0.9854347426032075,
+        0.9455193686656251,
+        0.9805552771374161,
+        0.9091576724850169,
+        0.9404927394354707,
+        1.0339081559605068
+      ]
+    },
+    "unicode_mib_s": {
+      "samples": {
+        "borrowed": [
+          32.653,
+          32.68,
+          32.519,
+          33.087,
+          30.957,
+          28.15
+        ],
+        "print_batch": [
+          32.531,
+          26.514,
+          32.047,
+          31.277,
+          31.417,
+          30.066
+        ]
+      },
+      "medians": {
+        "borrowed": 32.586,
+        "print_batch": 31.347
+      },
+      "batch_over_borrowed": 0.9619775363653104,
+      "per_round_batch_over_borrowed": [
+        0.9962637429945181,
+        0.8113219094247246,
+        0.9854854085303976,
+        0.9452957354852358,
+        1.0148593209936363,
+        1.068063943161634
+      ]
+    },
+    "cell_bytes": {
+      "samples": {
+        "borrowed": [
+          32,
+          32,
+          32,
+          32,
+          32,
+          32
+        ],
+        "print_batch": [
+          32,
+          32,
+          32,
+          32,
+          32,
+          32
+        ]
+      },
+      "medians": {
+        "borrowed": 32.0,
+        "print_batch": 32.0
+      },
+      "batch_over_borrowed": 1.0,
+      "per_round_batch_over_borrowed": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "initial_core_heap_bytes": {
+      "samples": {
+        "borrowed": [
+          123292,
+          123292,
+          123292,
+          123292,
+          123292,
+          123292
+        ],
+        "print_batch": [
+          123292,
+          123292,
+          123292,
+          123292,
+          123292,
+          123292
+        ]
+      },
+      "medians": {
+        "borrowed": 123292.0,
+        "print_batch": 123292.0
+      },
+      "batch_over_borrowed": 1.0,
+      "per_round_batch_over_borrowed": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "steady_state_allocations": {
+      "samples": {
+        "borrowed": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "print_batch": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "medians": {
+        "borrowed": 0.0,
+        "print_batch": 0.0
+      },
+      "batch_over_borrowed": null,
+      "per_round_batch_over_borrowed": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  },
+  "identities_and_prior_records_preserved": true,
+  "execution_after": {
+    "nice": -4,
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ]
+  }
+}
