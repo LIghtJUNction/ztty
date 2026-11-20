@@ -8,6 +8,12 @@ and adds [input-buffer reclamation and its evidence](https://github.com/LIghtJUN
 Its runtime change releases queue allocations larger than 64 KiB after input
 is fully sent or explicitly cancelled, while retaining small buffers for reuse.
 
+The [native UI probe correction](https://github.com/LIghtJUNction/ztty/commit/b42c0d7e787476d760241fa92930d77bab28d675)
+also waits for the outgoing tab to be unmapped as well as the incoming tab to
+be mapped. Mapping an incoming view starts its complete-frame transition; it
+does not prove the outgoing view has been hidden. The existing timeout,
+external ButtonRelease and PTY checks remain required.
+
 The [memory report](benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
 records queue capacity and Linux backpressure checks at its stated source.
 It does not measure process RSS/PSS or throughput. Build, package verification
@@ -107,6 +113,28 @@ python3 tools/verify_registry.py --output artifacts/registry-consumer.json
 This verification uses exact registry versions without local path overrides.
 Record registry closure only when all six consumers and the combined consumer
 pass. The verification tool does not publish crates.
+
+## 0.5.1 validation record — 2026-11-20
+
+The immutable `v0.5.1` tag points to source
+[`1631db8`](https://github.com/LIghtJUNction/ztty/commit/1631db8a02e8627d5d35ac0e1d4bef93475f45dc).
+Its 17 local validation stages completed, but the formal
+[Release run 44706305817](https://github.com/LIghtJUNction/ztty/actions/runs/44706305817)
+failed the GPU outside-release probe on both Linux architectures. The first
+ARM attempt stopped during Rust toolchain installation; the second built
+successfully and then reproduced the same probe failure. Windows, macOS and
+Verify passed on that source. Publication was skipped and no GitHub Release
+was created. The failed tag is preserved; 0.5.2 uses a new immutable tag and
+must pass the complete workflow again.
+
+The local 0.5.1 registry package also had a different dependency input from
+the source checkout. Its clean `.cargo_vcs_info.json` names `1631db8`, but its
+generated lockfile and installation resolved `zgpui 0.1.3` through the version
+range allowed by published `zterm 0.5.2`. The source submodule and exact registry
+consumer used `zgpui 0.1.2`. The local package and its installed X11/reload
+checks passed; they do not establish a single shared dependency graph or
+formal publication. The application's exact constraints and archive readback
+requirements above address this difference for 0.5.2.
 
 ## Historical records: 0.4.1 and earlier
 

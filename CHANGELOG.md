@@ -10,6 +10,10 @@
   dependencies to registry dependencies in the published crate. The three
   libraries supplied through local patches now have direct version constraints
   with their default features disabled.
+- Wait for both the incoming tab to be mapped and the outgoing tab to be
+  unmapped before the native UI outside-release probe. This preserves the
+  original timeout, external mouse-release and PTY assertions while matching
+  the application's complete-frame tab transition.
 
 The [input-buffer report](docs/benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
 records an 8 MiB queue retaining 0 bytes after clearing, compared with 8 MiB
@@ -17,6 +21,11 @@ before the change. This is allocation capacity; process RSS/PSS and throughput
 were not measured for this change. The report retains the fixed-source capacity
 and native backpressure checks. This integrated candidate still needs its own
 build, package and formal native release acceptance.
+
+The tagged 0.5.1 [release attempt](https://github.com/LIghtJUNction/ztty/actions/runs/44706305817)
+failed the Linux GPU outside-release gate and published no application release.
+Its tag stays unchanged. This 0.5.2 candidate carries the source changes below,
+the corrected probe preconditions and its own complete publication gates.
 
 ## 0.5.1 changes — 2026-11-20 (Asia/Taipei)
 
