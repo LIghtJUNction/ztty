@@ -7,6 +7,7 @@ const INTERVALS: [u64; 2] = [500, 250];
 
 pub struct TextBlink {
     row_flags: Vec<u16>,
+    active: u16,
     columns: usize,
     offset: usize,
     alternate: bool,
@@ -18,6 +19,7 @@ impl Default for TextBlink {
     fn default() -> Self {
         Self {
             row_flags: Vec::new(),
+            active: 0,
             columns: 0,
             offset: 0,
             alternate: false,
@@ -75,11 +77,19 @@ impl TextBlink {
                 }
             }
         }
-        let active = self.row_flags.iter().fold(0, |all, flags| all | flags);
+        self.active = self.row_flags.iter().fold(0, |all, flags| all | flags);
+        self.tick(focused, synchronized, now)
+    }
+
+    /// Advance the last rendered view's blink clocks without inspecting cells.
+    /// A host that batches output calls this on every wakeup, then `update`
+    /// immediately before drawing. Pending damage stays owned by the terminal
+    /// until that refresh, including the final output before the PTY goes quiet.
+    pub fn tick(&mut self, focused: bool, synchronized: bool, now: u64) -> Tick {
         let previous = self.visible;
         for (index, (flag, interval)) in [BLINK, RAPID_BLINK].into_iter().zip(INTERVALS).enumerate()
         {
-            if active & flag == 0 || !focused || synchronized {
+            if self.active & flag == 0 || !focused || synchronized {
                 self.visible[index] = true;
                 self.next[index] = None;
                 continue;

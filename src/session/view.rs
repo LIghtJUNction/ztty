@@ -474,16 +474,11 @@ impl Ui {
         self.last_cursor = cursor;
         self.reset_blink = false;
         let cursor = cursor.filter(|_| self.cursor_visible);
-        let text_blink = self.text_blink.update(
-            terminal,
-            self.history,
-            self.force,
-            self.window.focused,
-            synchronized,
-            now,
-        );
+        // Dirty rows remain dirty throughout an output batch. Advance only the
+        // cached clocks here; scanning before the repaint decision repeatedly
+        // walks the same viewport for every PTY read in that batch.
+        let mut text_blink = self.text_blink.tick(self.window.focused, synchronized, now);
         self.force |= text_blink.changed;
-        self.window.set_text_blink_visible(text_blink.visible);
         let native_interactive =
             alive && !observing && terminal.ui_scene().is_some_and(|scene| scene.events);
         if self.native_ui.refresh(
@@ -509,6 +504,16 @@ impl Ui {
             Plan::Idle | Plan::Render => None,
         };
         if plan == Plan::Render {
+            text_blink = self.text_blink.update(
+                terminal,
+                self.history,
+                self.force,
+                self.window.focused,
+                synchronized,
+                now,
+            );
+            self.force |= text_blink.changed;
+            self.window.set_text_blink_visible(text_blink.visible);
             if let Some(search) = &self.search
                 && (self.force || terminal.dirty())
             {
