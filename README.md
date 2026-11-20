@@ -6,7 +6,7 @@ ztty is a native terminal for Linux, macOS and Windows. Its terminal core is
 written in Rust without the standard library. On Linux, the same live session
 can be used from a window, the CLI or an MCP client.
 
-This page documents source version **0.5.0**. Published binaries and their release
+This page documents source version **0.5.1**. Published binaries and their release
 notes are available on the [download page](https://github.com/LIghtJUNction/ztty/releases).
 
 ## Install on Linux

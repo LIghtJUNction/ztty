@@ -178,6 +178,17 @@ def cargo(arguments, cwd, result, stage, timeout):
     return completed.stdout
 
 
+def library_has_no_std(source, features):
+    if "std" in features:
+        return False
+    if re.search(r"(?m)^#!\[no_std\]\s*$", source):
+        return True
+    conditional = re.search(
+        r'(?m)^#!\[cfg_attr\(not\(feature\s*=\s*"([^"]+)"\),\s*no_std\)\]\s*$', source
+    )
+    return bool(conditional and conditional.group(1) not in features)
+
+
 def check(selected, directory, cargo_timeout=DEFAULT_CARGO_TIMEOUT):
     name = "ztty-registry-check-" + "-".join(selected)
     result = {"selected": selected, "ok": False, "packages": [], "commands": [],
@@ -193,6 +204,7 @@ def check(selected, directory, cargo_timeout=DEFAULT_CARGO_TIMEOUT):
         lock = tomllib.loads((directory / "Cargo.lock").read_text())
         checksums = {(p["name"], p["version"]): p.get("checksum") for p in lock.get("package", [])}
         found = set()
+        features_by_id = {node["id"]: node["features"] for node in metadata["resolve"]["nodes"]}
         for package in metadata["packages"]:
             if package["name"] not in PACKAGES:
                 continue
@@ -200,14 +212,15 @@ def check(selected, directory, cargo_timeout=DEFAULT_CARGO_TIMEOUT):
             vcs_path = package_root / ".cargo_vcs_info.json"
             vcs = json.loads(vcs_path.read_text()) if vcs_path.is_file() else None
             library_targets = [target for target in package["targets"] if "lib" in target["kind"]]
+            features = features_by_id[package["id"]]
             no_std = bool(library_targets) and all(
-                re.search(r"(?m)^#!\[no_std\]\s*$", pathlib.Path(target["src_path"]).read_text())
+                library_has_no_std(pathlib.Path(target["src_path"]).read_text(), features)
                 for target in library_targets
             )
             actual = {"name": package["name"], "version": package["version"], "source": package["source"],
                       "selected": package["name"] in selected, "vcs": vcs,
                       "cargo_lock_checksum": checksums.get((package["name"], package["version"])),
-                      "library_source_has_no_std": bool(no_std)}
+                      "library_source_has_no_std": bool(no_std), "enabled_features": features}
             result["packages"].append(actual)
             if actual["selected"]:
                 found.add(package["name"])

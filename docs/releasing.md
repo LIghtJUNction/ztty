@@ -1,8 +1,8 @@
 # Releasing ztty and its reusable libraries
 
-## 0.5.0 candidate — 2026-11-20
+## 0.5.1 candidate — 2026-11-20
 
-The current checkout is a **0.5.0 source candidate**. Application publication
+The current checkout is a **0.5.1 source candidate**. Application publication
 and device installation are not complete. A successful library test, candidate build or
 cross-compilation check establishes only its recorded source and scope.
 
@@ -10,30 +10,30 @@ cross-compilation check establishes only its recorded source and scope.
 
 | Stage | Package | Version | Required before publication or release |
 | --- | --- | --- | --- |
-| 1 | `zgpui` | `0.1.0` | Its independent repository's candidate checks |
+| 1 | `zgpui` | `0.1.1` | Its independent repository's candidate checks |
 | 1 | `zgraphics` | `0.2.0` | Package verification and existing registry dependencies |
 | 1 | `zinput` | `0.1.3` | Its independent repository's release checks |
 | 1 | `zpty` | `0.2.2` | Its independent repository's release checks |
 | 1 | `ztty-plugin-api` | `0.1.0` | Package verification and `zplugin =0.3.1` |
-| 2 | `zterm` | `0.5.0` | Published `zgpui 0.1.0`, `zgraphics 0.2.0` and `zinput 0.1.3` |
-| 3 | `ztty` application | `0.5.0` | Published `zterm 0.5.0`, `zpty 0.2.2`, `ztty-plugin-api 0.1.0` and complete application gates |
+| 2 | `zterm` | `0.5.1` | Published `zgpui 0.1.1`, `zgraphics 0.2.0` and `zinput 0.1.3` |
+| 3 | `ztty` application | `0.5.1` | Published `zterm 0.5.1`, `zpty 0.2.2`, `ztty-plugin-api 0.1.0` and complete application gates |
 
-`zgpui 0.1.0`, `zgraphics 0.2.0`, `zinput 0.1.3`, `zpty 0.2.2` and
-`zterm 0.5.0` are published from their independent repositories. Reuse these
+`zgpui 0.1.1`, `zgraphics 0.2.0`, `zinput 0.1.3`, `zpty 0.2.2` and
+`zterm 0.5.1` are published from their independent repositories. Reuse these
 versions and the candidate's fixed submodule commits and lockfile.
-`zterm 0.5.1` is still under performance investigation and is not published.
 `ztty-plugin-api 0.1.0` is also published. Its [publication and registry record](reports/plugin-api-registry-20261120/README.md)
-confirms all six isolated consumers and their combined consumer passed with
-published `zterm 0.5.0`. The application remains unpublished.
+records the earlier six isolated consumers and their combined consumer passed with
+published `zterm 0.5.0`. This 0.5.1 application candidate has not been published.
 
 [zgpui](https://github.com/LIghtJUNction/zgpui) is an independent repository,
 included at `crates/zgpui` as a Git submodule pinned to
-[`1d796d1fc63808dc099ed7b10c92e75835ae2814`](https://github.com/LIghtJUNction/zgpui/commit/1d796d1fc63808dc099ed7b10c92e75835ae2814).
+[`cb50f2fe554622fdc984ae7fec9bcd844f175d67`](https://github.com/LIghtJUNction/zgpui/commit/cb50f2fe554622fdc984ae7fec9bcd844f175d67).
 Initialize all five library submodules with
 `git submodule update --init --recursive` before building a fresh checkout.
 `zgpui` replaces the former `ztty-ui` package; `zterm::ui` remains the public re-export and the
 ZUI/1 wire format is retained. Its scene, layout and renderer contracts are
-platform-independent; native windows and graphics remain host responsibilities.
+platform-independent. This application leaves zgpui features `std` and `native` disabled;
+its existing platform hosts provide native windows and graphics.
 
 ### Candidate to release
 
@@ -52,7 +52,7 @@ platform-independent; native windows and graphics remain host responsibilities.
    Confirm registry versions and package contents before verifying consumers
    without workspace path overrides.
 4. Run the [application Release workflow](../.github/workflows/release.yml) for
-   `v0.5.0`. Formal publication requires Verify and all six native architecture
+   `v0.5.1`. Formal publication requires Verify and all six native architecture
    gates on that tagged source, plus source and artifact readback. Retain the
    immutable tag and record published downloads separately from candidate
    artifacts.
