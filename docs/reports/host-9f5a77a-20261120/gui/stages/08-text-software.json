@@ -1,0 +1,634 @@
+{
+  "ok": true,
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "scope": "Owned PTY, XTEST, private clipboard and X11 pixel readback; not physical display latency",
+  "checks": [
+    "complete colored ZWJ and flag clusters reach real pixels in two-cell allocations",
+    "the ARGB window preserves configured 70 percent background alpha",
+    "real drag and Ctrl+Shift+C copy the exact original ZWJ, flag and combining sequence",
+    "SGR 5 and SGR 6 change actual pixels independently while ordinary text remains visible",
+    "unfocused blinking text stays visible without recurring repaint wakeups",
+    "font reload changes geometry while retaining the same window, broker and PTY",
+    "GPU and Xft use the same display-resolved font size and baseline",
+    "live GPU/software switching preserves the PTY and returns to the requested backend"
+  ],
+  "screenshots": {
+    "complete-graphemes": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/screenshots/complete-graphemes.png",
+      "sha256": "a0911ef03987bb213ec5a1101a0a78ad1d4e4d7f3f1187f8363ee6179dbd2446"
+    },
+    "font-reload": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/screenshots/font-reload.png",
+      "sha256": "e14778ba6fe0e4b55b47f8b823ef2d63a8392c14ae782e8f2c6f4949ce15caea"
+    },
+    "completed": {
+      "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/08-text-software/screenshots/completed.png",
+      "sha256": "aa5337736457a396037f3fda5ecb15a10a5daa55bb9f524e42263680384f55dd"
+    }
+  },
+  "source_sha256": {
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "src/x11/gpu.rs": "b23437f52c5acda0a2212e793fab99141be1cc1df022b287bc1c8323fd90d82e",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "0478c66d0049a005397de450072a66ee5bf8fb45be96249825f8fdd73adea644",
+    "native/font_bridge.c": "cc7c5137fa6b5e9010bcaa3cdc7a98cf870c2a237a96b22d59970e5707a9f654",
+    "tests/text_gpu_gui.py": "4c04070ff0b1e9dbc4fc5f98647deaa89bc0917f1462139625b837bc20aa7928",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9"
+  },
+  "display_ownership": {
+    "display": ":21227",
+    "pid": 301431,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X21227",
+        "inode": 92376539,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X21227",
+        "inode": 92376538,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "grid": {
+    "cell_width": 11,
+    "cell_height": 26,
+    "depth": 32
+  },
+  "background_alpha": 179,
+  "copied_utf8_sha256": "d52553cb5842b25483223a3be75fdcd76fa9a0b9a3c031b29c561707ebd3b63b",
+  "blink_samples": [
+    {
+      "ms": 0.302,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 21.077,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 41.699,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 62.852,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 83.832,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 104.54,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 125.55,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 146.111,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 166.948,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 187.912,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 208.685,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 229.432,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 250.535,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 271.283,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 292.163,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 313.293,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 334.17,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 355.004,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 376.436,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 397.143,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 418.047,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 438.953,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 459.845,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 480.757,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 501.525,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 522.281,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 543.179,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 564.037,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 584.731,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 605.582,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 626.581,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 647.291,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 668.513,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 689.74,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 710.833,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 732.145,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 752.986,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 773.985,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 795.035,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 816.026,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 837.015,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 857.863,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 878.737,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 899.856,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 920.993,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 941.891,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 962.861,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 983.806,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1005.126,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1026.129,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1046.836,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1067.531,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1088.174,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1109.15,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1129.933,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1150.911,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1171.812,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1192.544,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1213.26,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1233.85,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1254.999,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1276.299,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1297.554,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1318.517,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1339.287,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    }
+  ],
+  "unfocused_idle": {
+    "seconds": 0.55,
+    "context_switch_delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "backend_font_boxes": {
+    "gpu": [
+      1,
+      5,
+      44,
+      19
+    ],
+    "software": [
+      1,
+      5,
+      43,
+      19
+    ]
+  },
+  "renderer_after": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "remaining_owned_pids": [],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "stderr_tail": ""
+}

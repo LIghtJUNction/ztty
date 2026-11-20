@@ -1,0 +1,31 @@
+{
+  "started_utc": "2026-11-20T02:22:05.965723+00:00",
+  "unit": "ztty-default-egl-9f5a77a-20261120.service",
+  "command": [
+    "systemd-run",
+    "--user",
+    "--quiet",
+    "--no-ask-password",
+    "--unit=ztty-default-egl-9f5a77a-20261120.service",
+    "--service-type=exec",
+    "--property=MemoryMax=768M",
+    "--property=MemorySwapMax=0",
+    "--property=CPUQuota=100%",
+    "--property=Nice=10",
+    "--property=KillMode=control-group",
+    "--property=TimeoutStopSec=20s",
+    "--property=OOMPolicy=stop",
+    "--property=WorkingDirectory=WORKTREE",
+    "--property=StandardOutput=append:WORKTREE/artifacts/integration-validation-zterm051-20261120/default-egl/unit.log",
+    "--property=StandardError=append:WORKTREE/artifacts/integration-validation-zterm051-20261120/default-egl/unit.log",
+    "--setenv=PATH=USER_WORKSPACE/.cargo/bin:USER_WORKSPACE/.local/bin:/usr/local/bin:/usr/bin:/bin",
+    "--setenv=PYTHONUNBUFFERED=1",
+    "/usr/bin/python3",
+    "-u",
+    "WORKTREE/artifacts/integration-validation-zterm051-20261120/default-egl/run.py"
+  ],
+  "script_sha256": "3c65489c43a0608898cadc61e04df1e6dbf8eb41ce01368ee56a2d3a2aa05e96",
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": ""
+}

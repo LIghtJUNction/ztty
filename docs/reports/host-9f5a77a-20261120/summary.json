@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "zterm_version": "0.5.1",
+  "zterm_source": "a2074bac4c030cfd7c0b2514c852a89dcf54648f",
+  "scope": "Actual Linux host validation after the zterm 0.5.1 update; no application release or throughput claim",
+  "rust": {
+    "passed": 472,
+    "failed": 0,
+    "initially_ignored": 6,
+    "egl_executed_passed": 6
+  },
+  "egl_original_postprocessor_exit": 1,
+  "egl_cargo_steps_exit_codes": [
+    0,
+    0
+  ],
+  "gui": {
+    "stages_passed": 21,
+    "checks_passed": 365
+  },
+  "registry": {
+    "standalone": 1,
+    "combined": 1,
+    "cargo_commands": 6
+  },
+  "source_size": {
+    "before": {
+      "root_repository": {
+        "files": 79,
+        "lines": 40436,
+        "bytes": 1432454
+      },
+      "gitlink_libraries": {
+        "files": 3,
+        "lines": 1345,
+        "bytes": 44946
+      },
+      "combined": {
+        "files": 82,
+        "lines": 41781,
+        "bytes": 1477400
+      }
+    },
+    "after": {
+      "root_repository": {
+        "files": 89,
+        "lines": 30886,
+        "bytes": 1094059
+      },
+      "gitlink_libraries": {
+        "files": 39,
+        "lines": 14306,
+        "bytes": 491136
+      },
+      "combined": {
+        "files": 128,
+        "lines": 45192,
+        "bytes": 1585195
+      }
+    }
+  },
+  "wayland_elf_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "no_default_features_elf_sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46",
+  "prior_native_report_source": "edae40b03be0207fd062e13bc4304c42bf0d9fc0",
+  "prior_native_report_reused_as_current": false
+}

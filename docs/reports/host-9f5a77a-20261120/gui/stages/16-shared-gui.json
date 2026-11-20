@@ -1,0 +1,72 @@
+{
+  "ok": true,
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "checks": [
+    {
+      "name": "concurrent_start_and_independent_pty_input",
+      "ok": true,
+      "windows": 3,
+      "gui_owner_pid": 305061,
+      "different_font_sizes": [
+        11,
+        13
+      ]
+    },
+    {
+      "name": "attach_reuses_window",
+      "ok": true
+    },
+    {
+      "name": "close_one_preserves_shared_font_peer",
+      "ok": true
+    },
+    {
+      "name": "reload_font_group_with_other_windows_alive",
+      "ok": true
+    },
+    {
+      "name": "external_destroy_preserves_host_and_survivor",
+      "ok": true
+    },
+    {
+      "name": "close_all_windows",
+      "ok": true
+    },
+    {
+      "name": "same_name_replacement_keeps_old_wait_generation",
+      "ok": true
+    },
+    {
+      "name": "headless_mcp_broker_then_display_attach",
+      "ok": true,
+      "xauth_scope": "isolated Xvfb without authentication"
+    },
+    {
+      "name": "persistent_reattach_renews_wait_generation",
+      "ok": true
+    }
+  ],
+  "remaining_owned_pids": [],
+  "display_ownership": {
+    "display": ":4348",
+    "pid": 305049,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X4348",
+        "inode": 92413128,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X4348",
+        "inode": 92413127,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "terminal_stderr": ""
+}

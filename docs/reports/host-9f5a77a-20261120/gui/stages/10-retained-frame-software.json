@@ -1,0 +1,493 @@
+{
+  "ok": true,
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "scope": "Reproduce undefined retained-canvas publication through a real private X server.\n\nThe preload helper fills undefined newly allocated pixmaps with a visible marker.\nIt records actual source pixels at XCopyArea; it does not substitute presents.\nThis proves canvas initialization ordering, not physical compositor latency.\n",
+  "poisoned": true,
+  "stages": [
+    {
+      "name": "resize",
+      "iterations": 12,
+      "copies": 12,
+      "invalid_publications": [],
+      "all_publications": [
+        {
+          "kind": "copy",
+          "src": 2097161,
+          "dst": 2097155,
+          "w": 671,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 226798,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097164,
+          "dst": 2097155,
+          "w": 682,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 248248,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097167,
+          "dst": 2097155,
+          "w": 693,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 234234,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097170,
+          "dst": 2097155,
+          "w": 671,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 244244,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097173,
+          "dst": 2097155,
+          "w": 682,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 230516,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097176,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097179,
+          "dst": 2097155,
+          "w": 671,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 226798,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097182,
+          "dst": 2097155,
+          "w": 682,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 248248,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097185,
+          "dst": 2097155,
+          "w": 693,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 234234,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097188,
+          "dst": 2097155,
+          "w": 671,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 244244,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097191,
+          "dst": 2097155,
+          "w": 682,
+          "h": 338,
+          "poison_pixels": 0,
+          "pixels": 230516,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        }
+      ]
+    },
+    {
+      "name": "offscreen_return",
+      "iterations": 6,
+      "copies": 12,
+      "invalid_publications": [],
+      "all_publications": [
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        }
+      ]
+    },
+    {
+      "name": "external_unmap_map",
+      "iterations": 6,
+      "copies": 13,
+      "invalid_publications": [],
+      "all_publications": [
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        },
+        {
+          "kind": "copy",
+          "src": 2097194,
+          "dst": 2097155,
+          "w": 693,
+          "h": 364,
+          "poison_pixels": 0,
+          "pixels": 252252,
+          "first": 3003121664,
+          "last": 3003121664
+        }
+      ]
+    }
+  ],
+  "checks": [
+    "expected canvas publication result observed from real X server source pixels",
+    "all resizes and visibility transitions preserve the owned PTY and broker"
+  ],
+  "source_sha256": {
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "src/x11/gpu.rs": "b23437f52c5acda0a2212e793fab99141be1cc1df022b287bc1c8323fd90d82e",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/retained_frame_gui.py": "d7cbf35b66f1f041810b86f2f2217469ec9d5b508c5fd877d2adbb31018aaf38",
+    "tests/retained_frame_trace.c": "5afdfd62438c53216a6aa2349a6264b78a92a485f8b1e9025026936c73d319a3",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9"
+  },
+  "helper_sha256": "ab63372e4e952e5fb5a937411597bf094168f56988bd1c60181031a8a195a3f7",
+  "display_ownership": {
+    "display": ":500",
+    "pid": 302449,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X500",
+        "inode": 92389586,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X500",
+        "inode": 92389585,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "initial_copies": 3,
+  "final_screenshot": {
+    "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/report.png",
+    "sha256": "0bf5dc6beb845fa1de132ef68d8023c3c2aa063a559b645557cac647a15a03e3"
+  },
+  "invalid_publications": 0,
+  "remaining_owned_pids": [],
+  "stderr_tail": "",
+  "trace": {
+    "path": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/10-retained-frame-software/report.trace.jsonl",
+    "sha256": "9a0a3c0443c8c2d8ffe81e7c3ee7e52e44e6a5f3f1869522163b54b76955204f"
+  }
+}

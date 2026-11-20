@@ -1,0 +1,3 @@
+{"graph": "zterm", "ok": true}
+{"graph": "combined", "ok": true}
+{"ok": true, "output": "WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/result.json", "elapsed_seconds": 12.001569275002112, "error": null}

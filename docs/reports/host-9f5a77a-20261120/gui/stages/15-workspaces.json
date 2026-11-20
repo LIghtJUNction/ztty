@@ -1,0 +1,225 @@
+{
+  "ok": true,
+  "checks": [
+    "two PTYs share one workspace and only the focused pane receives real keyboard input",
+    "split resize, swap, maximize and restore change real window geometry",
+    "tabs unmap hidden panes while their PTYs keep draining; shortcut bytes never reach the shell",
+    "moving panes between native windows and layouts preserves the PTY process",
+    "versioned CLI layout snapshots restore tabs/splits/geometry with unchanged PTY PIDs; unknown sessions and nonlocal restores fail before mutation",
+    "injected ioctl EIO keeps both containers, every view, PTY identity and old dimensions alive; retrying the same snapshot repairs actual PTY sizes",
+    "rename keeps the URI stable; detach and observe reattach preserve PTY/output and enforce read-only input",
+    "per-request input ownership rejects old operators and permits multiple observers",
+    "a stale layout cannot adopt a new PTY that reuses the closed session's origin/name; rejection preserves the replacement view and process",
+    "new tab inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "right split inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "lower split inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "new window inherits encoded local OSC 7: actual child cwd/PWD and shortcut isolation",
+    "remote OSC 7 uses initial launch directory: actual child cwd/PWD and shortcut isolation",
+    "bad-escape OSC 7 uses initial launch directory: actual child cwd/PWD and shortcut isolation",
+    "nul OSC 7 uses initial launch directory: actual child cwd/PWD and shortcut isolation",
+    "all launch/attach waiters complete and sessions release their views and PTYs"
+  ],
+  "platform": "Linux X11 / private Xvfb",
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "test_script_sha256": "1142af21d5c012d0157b201f59337a7714bfa030d4f98043ee8281042f7411b8",
+  "display": ":22567",
+  "xserver_pid": 304729,
+  "xserver_ownership": {
+    "display": ":22567",
+    "pid": 304729,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X22567",
+        "inode": 92413968,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X22567",
+        "inode": 92413967,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "fault_injection": {
+    "source": "WORKTREE/tests/ioctl_resize_fault.c",
+    "source_sha256": "60aa6bc23861ad4b00bb50c4393590a75414d7de9f7bcca61248a998116a3d63",
+    "library_sha256": "fe2aed76f6906445d9192eaef4e2b95f6e59091492d85dd69ef3e3d24eb6a45f",
+    "compile_command": [
+      "/usr/bin/cc",
+      "-shared",
+      "-fPIC",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-o",
+      "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/ioctl_resize_fault.so",
+      "WORKTREE/tests/ioctl_resize_fault.c"
+    ],
+    "compiler_stdout": "",
+    "compiler_stderr": "",
+    "scope": "Private marker matches this test's broker PID; only TIOCSWINSZ fails with EIO. No global LD_PRELOAD.",
+    "attempts": [
+      {
+        "pid": 304746,
+        "fd": 19,
+        "rows": 26,
+        "cols": 100,
+        "errno": 5
+      },
+      {
+        "pid": 304746,
+        "fd": 13,
+        "rows": 12,
+        "cols": 100,
+        "errno": 5
+      }
+    ],
+    "error_response": {
+      "ok": false,
+      "error": "cannot resize split PTY: Resize: OS error 5"
+    },
+    "child_pids": {
+      "alpha": 304799,
+      "beta": 304801,
+      "gamma": 304834,
+      "delta": 304840
+    },
+    "pty_sizes_before": {
+      "alpha": [
+        47,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        47,
+        12
+      ]
+    },
+    "old_container": 2097220,
+    "restored_container_after_error": 2097234,
+    "child_start_ticks": {
+      "alpha": 7731878,
+      "beta": 7731881,
+      "gamma": 7731890,
+      "delta": 7731904
+    },
+    "child_window_ids": {
+      "alpha": 2097154,
+      "beta": 2097163,
+      "gamma": 2097191,
+      "delta": 2097224
+    },
+    "pty_sizes_recovered": {
+      "alpha": [
+        100,
+        12
+      ],
+      "beta": [
+        100,
+        12
+      ],
+      "gamma": [
+        100,
+        26
+      ],
+      "delta": [
+        100,
+        26
+      ]
+    }
+  },
+  "broker_pid": 304746,
+  "broker_start_ticks": 7731867,
+  "screenshot_glyph_pixels": {
+    "alpha": 1938,
+    "beta": 1504
+  },
+  "screenshot": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/workspaces.png",
+  "incarnation_reuse": {
+    "uri": "ztty://local/incarnation",
+    "previous_id": 5,
+    "replacement_id": 6,
+    "previous_pid": 304889,
+    "replacement_pid": 304931,
+    "previous_created_at": 1795141553264,
+    "replacement_created_at": 1795141553303,
+    "rejected_restore": {
+      "ok": false,
+      "error": "workspace session identity is no longer available"
+    }
+  },
+  "cwd_inheritance": [
+    {
+      "case": "new tab inherits encoded local OSC 7",
+      "child_id": 8,
+      "uri": "ztty://local/session-8",
+      "pid": 304976,
+      "cwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+",
+      "pwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+"
+    },
+    {
+      "case": "right split inherits encoded local OSC 7",
+      "child_id": 9,
+      "uri": "ztty://local/session-9",
+      "pid": 305004,
+      "cwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+",
+      "pwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+"
+    },
+    {
+      "case": "lower split inherits encoded local OSC 7",
+      "child_id": 10,
+      "uri": "ztty://local/session-10",
+      "pid": 305012,
+      "cwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+",
+      "pwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+"
+    },
+    {
+      "case": "new window inherits encoded local OSC 7",
+      "child_id": 11,
+      "uri": "ztty://local/session-11",
+      "pid": 305013,
+      "cwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+",
+      "pwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/shell directory 中文 #?%+"
+    },
+    {
+      "case": "remote OSC 7 uses initial launch directory",
+      "child_id": 12,
+      "uri": "ztty://local/session-12",
+      "pid": 305016,
+      "cwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/launch-directory",
+      "pwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/launch-directory"
+    },
+    {
+      "case": "bad-escape OSC 7 uses initial launch directory",
+      "child_id": 13,
+      "uri": "ztty://local/session-13",
+      "pid": 305018,
+      "cwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/launch-directory",
+      "pwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/launch-directory"
+    },
+    {
+      "case": "nul OSC 7 uses initial launch directory",
+      "child_id": 14,
+      "uri": "ztty://local/session-14",
+      "pid": 305019,
+      "cwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/launch-directory",
+      "pwd": "/tmp/zfg-o93tw626/tmp/ztty-workspaces-oj_ms45d/launch-directory"
+    }
+  ],
+  "cwd_screenshot": "WORKTREE/artifacts/shared-gui-20261120/runs/final-zterm051-9f5a77a/15-workspaces/workspace-cwd.png",
+  "stderr": ""
+}

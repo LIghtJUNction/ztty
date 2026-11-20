@@ -1,0 +1,291 @@
+{
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "source_commit": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "test_sha256": "427c68a18b6fbf0de70090d06bbc8847489605c159835c1bebcc3bfea3372a27",
+  "scope": "Owned Xvfb, private D-Bus/fcitx5, XTEST and raw PTY",
+  "checks": [
+    {
+      "name": "restart initial XIM context",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "restart initial Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "restart ASCII without server",
+      "ok": true,
+      "actual": "616263",
+      "expected": "616263"
+    },
+    {
+      "name": "restart existing context reconnects",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "restart existing Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "restart same broker",
+      "ok": true,
+      "actual": 290284,
+      "expected": 290284
+    },
+    {
+      "name": "restart second window Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "restart focus returns Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "restart restart excludes closed context",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "restart repeated restart Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "delayed ASCII without server",
+      "ok": true,
+      "actual": "616263",
+      "expected": "616263"
+    },
+    {
+      "name": "delayed existing context reconnects",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "delayed existing Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "delayed same broker",
+      "ok": true,
+      "actual": 290706,
+      "expected": 290706
+    },
+    {
+      "name": "delayed second window Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "delayed focus returns Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "delayed restart excludes closed context",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "delayed repeated restart Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "callback initial XIM context",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "callback initial Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "callback ASCII without server",
+      "ok": true,
+      "actual": "616263",
+      "expected": "616263"
+    },
+    {
+      "name": "callback existing context reconnects",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "callback existing Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "callback same broker",
+      "ok": true,
+      "actual": 291155,
+      "expected": 291155
+    },
+    {
+      "name": "callback second window Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "callback focus returns Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "callback restart excludes closed context",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "callback repeated restart Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "creation destroy handled before IC returned",
+      "ok": true,
+      "actual": "1",
+      "expected": "1"
+    },
+    {
+      "name": "creation ASCII without server",
+      "ok": true,
+      "actual": "616263",
+      "expected": "616263"
+    },
+    {
+      "name": "creation existing context reconnects",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "creation existing Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "creation same broker",
+      "ok": true,
+      "actual": 291767,
+      "expected": 291767
+    },
+    {
+      "name": "creation second window Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "creation focus returns Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    },
+    {
+      "name": "creation restart excludes closed context",
+      "ok": true,
+      "actual": true,
+      "expected": true
+    },
+    {
+      "name": "creation repeated restart Chinese commit",
+      "ok": true,
+      "actual": "e4bda0e5a5bd",
+      "expected": "e4bda0e5a5bd"
+    }
+  ],
+  "ok": true,
+  "source_changes": [],
+  "source_sha256": {
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a"
+  },
+  "xvfb": {
+    "display": ":29944",
+    "pid": 290192,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X29944",
+        "inode": 92323509,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X29944",
+        "inode": 92323508,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "reaped": [
+    {
+      "pid": 290284,
+      "status": 0
+    },
+    {
+      "pid": 290706,
+      "status": 0
+    },
+    {
+      "pid": 291765,
+      "status": 0
+    },
+    {
+      "pid": 290192,
+      "status": 0
+    },
+    {
+      "pid": 290206,
+      "status": 0
+    },
+    {
+      "pid": 291155,
+      "status": 15
+    },
+    {
+      "pid": 291767,
+      "status": 15
+    }
+  ],
+  "cleanup": {
+    "owned_processes_remaining": []
+  },
+  "stderr": "208] Loaded addon dbus\nI2026-11-20 10:24:35.373590 addonmanager.cpp:208] Loaded addon xim\nI2026-11-20 10:24:35.373827 addonmanager.cpp:208] Loaded addon dbusfrontend\nI2026-11-20 10:24:35.387897 inputmethodmanager.cpp:213] Found 758 input method(s) in addon keyboard\nI2026-11-20 10:24:35.398117 dbusmodule.cpp:844] Service name change: org.fcitx.Fcitx5  :1.54\nI2026-11-20 10:24:35.471603 addonmanager.cpp:208] Loaded addon punctuation\nI2026-11-20 10:24:35.491594 addonmanager.cpp:208] Loaded addon pinyin\nI2026-11-20 10:24:35.491742 addonmanager.cpp:208] Loaded addon fullwidth\nI2026-11-20 10:24:35.492091 addonmanager.cpp:208] Loaded addon chttrans\n=========================\nFcitx 5.1.23 -- Get Signal No.: 15\nDate: try \"date -d @1795141475\" if you are using GNU date ***\nProcessID: 291603\nfcitx5(+0x13b91) [0x55f4e8e2fb91]\n/usr/lib/libc.so.6(+0x44e70) [0x7f7a94a44e70]\n/usr/lib/libc.so.6(+0xb5a22) [0x7f7a94ab5a22]\n/usr/lib/libc.so.6(epoll_wait+0x58) [0x7f7a94b4f178]\n/usr/lib/libsystemd.so.0(sd_event_wait+0x1f2) [0x7f7a94cfd662]\n/usr/lib/libsystemd.so.0(sd_event_run+0x2cc) [0x7f7a94cfebbc]\n/usr/lib/libsystemd.so.0(sd_event_loop+0x90) [0x7f7a94cfef60]\n/usr/lib/libFcitx5Utils.so.2(_ZN5fcitx9EventLoop4execEv+0x2c) [0x7f7a953baefc]\n/usr/lib/libFcitx5Core.so.7(_ZN5fcitx8Instance4execEv+0x5e) [0x7f7a9548b74e]\nfcitx5(+0x11aa8) [0x55f4e8e2daa8]\n/usr/lib/libc.so.6(+0x27d0e) [0x7f7a94a27d0e]\n/usr/lib/libc.so.6(__libc_start_main+0x8b) [0x7f7a94a27e4b]\nfcitx5(+0x12e95) [0x55f4e8e2ee95]\nI2026-11-20 10:24:35.812510 xcbmodule.cpp:100] Disconnected from X11 Display :29944\nI2026-11-20 10:24:35.812538 instance.cpp:1498] Save before exiting...\nI2026-11-20 10:24:35.813565 addonmanager.cpp:312] Unloading addon chttrans\nI2026-11-20 10:24:35.813584 addonmanager.cpp:312] Unloading addon fullwidth\nI2026-11-20 10:24:35.813593 addonmanager.cpp:312] Unloading addon pinyin\nI2026-11-20 10:24:35.814587 addonmanager.cpp:312] Unloading addon punctuation\nI2026-11-20 10:24:35.814677 addonmanager.cpp:312] Unloading addon dbusfrontend\nI2026-11-20 10:24:35.814702 addonmanager.cpp:312] Unloading addon xim\nI2026-11-20 10:24:35.814709 addonmanager.cpp:312] Unloading addon dbus\nI2026-11-20 10:24:35.814742 addonmanager.cpp:312] Unloading addon pinyinhelper\nI2026-11-20 10:24:35.816581 addonmanager.cpp:312] Unloading addon keyboard\nI2026-11-20 10:24:35.816669 addonmanager.cpp:312] Unloading addon xcb\nI2026-11-20 10:24:35.821784 instance.cpp:669] Starting fcitx5 5.1.23\nI2026-11-20 10:24:35.825379 instance.cpp:1448] Override Enabled Addons: {fullwidth, pinyinhelper, keyboard, chttrans, pinyin, dbusfrontend, punctuation, dbus, xim, xcb}\nI2026-11-20 10:24:35.825387 instance.cpp:1449] Override Disabled Addons: {all}\nI2026-11-20 10:24:35.827649 xcbconnection.cpp:198] Connecting to X11 display, display name::29944.\nI2026-11-20 10:24:35.827728 addonmanager.cpp:208] Loaded addon xcb\nI2026-11-20 10:24:35.828168 keyboard.cpp:229] Attempting to load keyboard from: [\"/etc/xkb\", \"/usr/share/xkeyboard-config-2\"] Rule: evdev\nI2026-11-20 10:24:35.831389 addonmanager.cpp:208] Loaded addon keyboard\nI2026-11-20 10:24:35.831714 addonmanager.cpp:208] Loaded addon pinyinhelper\nI2026-11-20 10:24:35.832220 addonmanager.cpp:208] Loaded addon dbus\nI2026-11-20 10:24:35.832442 addonmanager.cpp:208] Loaded addon xim\nI2026-11-20 10:24:35.832666 addonmanager.cpp:208] Loaded addon dbusfrontend\nI2026-11-20 10:24:35.846302 inputmethodmanager.cpp:213] Found 758 input method(s) in addon keyboard\nI2026-11-20 10:24:35.855765 dbusmodule.cpp:844] Service name change: org.fcitx.Fcitx5  :1.60\n=========================\nFcitx 5.1.23 -- Get Signal No.: 15\nDate: try \"date -d @1795141475\" if you are using GNU date ***\nProcessID: 291756\nfcitx5(+0x13b91) [0x55a8c47cbb91]\n/usr/lib/libc.so.6(+0x44e70) [0x7f2424e44e70]\n/usr/lib/libc.so.6(+0xb5a22) [0x7f2424eb5a22]\n/usr/lib/libc.so.6(poll+0x52) [0x7f2424f3db92]\n/usr/lib/libxcb.so.1(+0xd67d) [0x7f24247e067d]\n/usr/lib/libxcb.so.1(+0xdeb7) [0x7f24247e0eb7]\n/usr/lib/libxcb.so.1(xcb_request_check+0xb4) [0x7f24247e2af4]\n/usr/lib/libxcb-imdkit.so.1(+0x5324) [0x7f2423b1f324]\n/usr/lib/libxcb-imdkit.so.1(xcb_im_filter_event+0x1c83) [0x7f2423b27ca3]\n/usr/lib/fcitx5/libxim.so(+0x90ca) [0x7f2423baa0ca]\n/usr/lib/fcitx5/libxcb.so(+0x1b163) [0x7f2425086163]\n/usr/lib/libFcitx5Utils.so.2(+0x4c51b) [0x7f24257f451b]\n/usr/lib/libFcitx5Utils.so.2(+0x43a08) [0x7f24257eba08]\n/usr/lib/libFcitx5Utils.so.2(+0x48d6f) [0x7f24257f0d6f]\n/usr/lib/libsystemd.so.0(+0x4441e) [0x7f24255c341e]\n/usr/lib/libsystemd.so.0(sd_event_dispatch+0x13e) [0x7f24255c76ee]\n/usr/lib/libsystemd.so.0(sd_event_run+0x289) [0x7f24255c7b79]\n/usr/lib/libsystemd.so.0(sd_event_loop+0x90) [0x7f24255c7f60]\n/usr/lib/libFcitx5Utils.so.2(_ZN5fcitx9EventLoop4execEv+0x2c) [0x7f2425811efc]\n/usr/lib/libFcitx5Core.so.7(_ZN5fcitx8Instance4execEv+0x5e) [0x7f24258e274e]\nfcitx5(+0x11aa8) [0x55a8c47c9aa8]\n/usr/lib/libc.so.6(+0x27d0e) [0x7f2424e27d0e]\n/usr/lib/libc.so.6(__libc_start_main+0x8b) [0x7f2424e27e4b]\nfcitx5(+0x12e95) [0x55a8c47cae95]\nI2026-11-20 10:24:35.894468 xcbmodule.cpp:100] Disconnected from X11 Display :29944\nI2026-11-20 10:24:35.894483 instance.cpp:1498] Save before exiting...\nI2026-11-20 10:24:35.894559 addonmanager.cpp:312] Unloading addon dbusfrontend\nI2026-11-20 10:24:35.894601 addonmanager.cpp:312] Unloading addon xim\nI2026-11-20 10:24:35.894607 addonmanager.cpp:312] Unloading addon dbus\nI2026-11-20 10:24:35.894638 addonmanager.cpp:312] Unloading addon pinyinhelper\nI2026-11-20 10:24:35.894650 addonmanager.cpp:312] Unloading addon keyboard\nI2026-11-20 10:24:35.894755 addonmanager.cpp:312] Unloading addon xcb\nI2026-11-20 10:24:36.267928 instance.cpp:669] Starting fcitx5 5.1.23\nI2026-11-20 10:24:36.276305 instance.cpp:1448] Override Enabled Addons: {fullwidth, pinyinhelper, keyboard, chttrans, pinyin, dbusfrontend, punctuation, dbus, xim, xcb}\nI2026-11-20 10:24:36.276318 instance.cpp:1449] Override Disabled Addons: {all}\nI2026-11-20 10:24:36.279716 xcbconnection.cpp:198] Connecting to X11 display, display name::29944.\nI2026-11-20 10:24:36.279811 addonmanager.cpp:208] Loaded addon xcb\nI2026-11-20 10:24:36.280277 keyboard.cpp:229] Attempting to load keyboard from: [\"/etc/xkb\", \"/usr/share/xkeyboard-config-2\"] Rule: evdev\nI2026-11-20 10:24:36.282955 addonmanager.cpp:208] Loaded addon keyboard\nI2026-11-20 10:24:36.283224 addonmanager.cpp:208] Loaded addon pinyinhelper\nI2026-11-20 10:24:36.283655 addonmanager.cpp:208] Loaded addon dbus\nI2026-11-20 10:24:36.283956 addonmanager.cpp:208] Loaded addon xim\nI2026-11-20 10:24:36.284206 addonmanager.cpp:208] Loaded addon dbusfrontend\nI2026-11-20 10:24:36.299071 inputmethodmanager.cpp:213] Found 758 input method(s) in addon keyboard\nI2026-11-20 10:24:36.309452 dbusmodule.cpp:844] Service name change: org.fcitx.Fcitx5  :1.63\nI2026-11-20 10:24:36.392633 addonmanager.cpp:208] Loaded addon punctuation\nI2026-11-20 10:24:36.413996 addonmanager.cpp:208] Loaded addon pinyin\nI2026-11-20 10:24:36.414128 addonmanager.cpp:208] Loaded addon fullwidth\nI2026-11-20 10:24:36.414422 addonmanager.cpp:208] Loaded addon chttrans\n=========================\nFcitx 5.1.23 -- Get Signal No.: 15\nDate: try \"date -d @1795141477\" if you are using GNU date ***\nProcessID: 291902\nfcitx5(+0x13b91) [0x55e4e1c73b91]\n/usr/lib/libc.so.6(+0x44e70) [0x7f8adec44e70]\n/usr/lib/libc.so.6(+0xb5a22) [0x7f8adecb5a22]\n/usr/lib/libc.so.6(epoll_wait+0x58) [0x7f8aded4f178]\n/usr/lib/libsystemd.so.0(sd_event_wait+0x1f2) [0x7f8adeefd662]\n/usr/lib/libsystemd.so.0(sd_event_run+0x2cc) [0x7f8adeefebbc]\n/usr/lib/libsystemd.so.0(sd_event_loop+0x90) [0x7f8adeefef60]\n/usr/lib/libFcitx5Utils.so.2(_ZN5fcitx9EventLoop4execEv+0x2c) [0x7f8adf537efc]\n/usr/lib/libFcitx5Core.so.7(_ZN5fcitx8Instance4execEv+0x5e) [0x7f8adf60874e]\nfcitx5(+0x11aa8) [0x55e4e1c71aa8]\n/usr/lib/libc.so.6(+0x27d0e) [0x7f8adec27d0e]\n/usr/lib/libc.so.6(__libc_start_main+0x8b) [0x7f8adec27e4b]\nfcitx5(+0x12e95) [0x55e4e1c72e95]\nI2026-11-20 10:24:37.584926 xcbmodule.cpp:100] Disconnected from X11 Display :29944\nI2026-11-20 10:24:37.584954 instance.cpp:1498] Save before exiting...\nI2026-11-20 10:24:37.586170 addonmanager.cpp:312] Unloading addon chttrans\nI2026-11-20 10:24:37.586198 addonmanager.cpp:312] Unloading addon fullwidth\nI2026-11-20 10:24:37.586211 addonmanager.cpp:312] Unloading addon pinyin\nI2026-11-20 10:24:37.587126 addonmanager.cpp:312] Unloading addon punctuation\nI2026-11-20 10:24:37.587194 addonmanager.cpp:312] Unloading addon dbusfrontend\nI2026-11-20 10:24:37.587224 addonmanager.cpp:312] Unloading addon xim\nI2026-11-20 10:24:37.587231 addonmanager.cpp:312] Unloading addon dbus\nI2026-11-20 10:24:37.587264 addonmanager.cpp:312] Unloading addon pinyinhelper\nI2026-11-20 10:24:37.589209 addonmanager.cpp:312] Unloading addon keyboard\nI2026-11-20 10:24:37.589297 addonmanager.cpp:312] Unloading addon xcb\nI2026-11-20 10:24:37.594338 instance.cpp:669] Starting fcitx5 5.1.23\nI2026-11-20 10:24:37.597752 instance.cpp:1448] Override Enabled Addons: {fullwidth, pinyinhelper, keyboard, chttrans, pinyin, dbusfrontend, punctuation, dbus, xim, xcb}\nI2026-11-20 10:24:37.597760 instance.cpp:1449] Override Disabled Addons: {all}\nI2026-11-20 10:24:37.599925 xcbconnection.cpp:198] Connecting to X11 display, display name::29944.\nI2026-11-20 10:24:37.600007 addonmanager.cpp:208] Loaded addon xcb\nI2026-11-20 10:24:37.600364 keyboard.cpp:229] Attempting to load keyboard from: [\"/etc/xkb\", \"/usr/share/xkeyboard-config-2\"] Rule: evdev\nI2026-11-20 10:24:37.602694 addonmanager.cpp:208] Loaded addon keyboard\nI2026-11-20 10:24:37.602993 addonmanager.cpp:208] Loaded addon pinyinhelper\nI2026-11-20 10:24:37.603609 addonmanager.cpp:208] Loaded addon dbus\nI2026-11-20 10:24:37.603990 addonmanager.cpp:208] Loaded addon xim\nI2026-11-20 10:24:37.604413 addonmanager.cpp:208] Loaded addon dbusfrontend\nI2026-11-20 10:24:37.618419 inputmethodmanager.cpp:213] Found 758 input method(s) in addon keyboard\nI2026-11-20 10:24:37.628168 dbusmodule.cpp:844] Service name change: org.fcitx.Fcitx5  :1.73\nI2026-11-20 10:24:37.704272 addonmanager.cpp:208] Loaded addon punctuation\nI2026-11-20 10:24:37.720645 addonmanager.cpp:208] Loaded addon pinyin\nI2026-11-20 10:24:37.720762 addonmanager.cpp:208] Loaded addon fullwidth\nI2026-11-20 10:24:37.721125 addonmanager.cpp:208] Loaded addon chttrans\n=========================\nFcitx 5.1.23 -- Get Signal No.: 15\nDate: try \"date -d @1795141478\" if you are using GNU date ***\nProcessID: 292191\nfcitx5(+0x13b91) [0x55e560991b91]\n/usr/lib/libc.so.6(+0x44e70) [0x7fd7a2044e70]\n/usr/lib/libc.so.6(+0xb5a22) [0x7fd7a20b5a22]\n/usr/lib/libc.so.6(epoll_wait+0x58) [0x7fd7a214f178]\n/usr/lib/libsystemd.so.0(sd_event_wait+0x1f2) [0x7fd7a22f2662]\n/usr/lib/libsystemd.so.0(sd_event_run+0x2cc) [0x7fd7a22f3bbc]\n/usr/lib/libsystemd.so.0(sd_event_loop+0x90) [0x7fd7a22f3f60]\n/usr/lib/libFcitx5Utils.so.2(_ZN5fcitx9EventLoop4execEv+0x2c) [0x7fd7a286befc]\n/usr/lib/libFcitx5Core.so.7(_ZN5fcitx8Instance4execEv+0x5e) [0x7fd7a293c74e]\nfcitx5(+0x11aa8) [0x55e56098faa8]\n/usr/lib/libc.so.6(+0x27d0e) [0x7fd7a2027d0e]\n/usr/lib/libc.so.6(__libc_start_main+0x8b) [0x7fd7a2027e4b]\nfcitx5(+0x12e95) [0x55e560990e95]\nI2026-11-20 10:24:38.043194 xcbmodule.cpp:100] Disconnected from X11 Display :29944\nI2026-11-20 10:24:38.043213 instance.cpp:1498] Save before exiting...\nI2026-11-20 10:24:38.044068 addonmanager.cpp:312] Unloading addon chttrans\nI2026-11-20 10:24:38.044087 addonmanager.cpp:312] Unloading addon fullwidth\nI2026-11-20 10:24:38.044094 addonmanager.cpp:312] Unloading addon pinyin\nI2026-11-20 10:24:38.044875 addonmanager.cpp:312] Unloading addon punctuation\nI2026-11-20 10:24:38.044933 addonmanager.cpp:312] Unloading addon dbusfrontend\nI2026-11-20 10:24:38.044957 addonmanager.cpp:312] Unloading addon xim\nI2026-11-20 10:24:38.044964 addonmanager.cpp:312] Unloading addon dbus\nI2026-11-20 10:24:38.044995 addonmanager.cpp:312] Unloading addon pinyinhelper\nI2026-11-20 10:24:38.046816 addonmanager.cpp:312] Unloading addon keyboard\nI2026-11-20 10:24:38.046938 addonmanager.cpp:312] Unloading addon xcb\n"
+}

@@ -1,0 +1,11 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling syn v2.0.119
+   Compiling zplugin-macros v0.3.1
+    Checking zsys v0.1.1
+    Checking zplugin v0.3.1
+    Checking ztty-plugin-api v0.1.0
+    Checking zpty v0.2.2
+    Checking ztty-registry-check-zinput-zgraphics-zpty-zgpui-ztty-plugin-api-zterm v0.0.0 (WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/consumers/combined)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.29s

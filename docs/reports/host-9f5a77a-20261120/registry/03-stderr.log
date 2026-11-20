@@ -1,0 +1,14 @@
+   Compiling simd-adler32 v0.3.10
+   Compiling zune-inflate v0.2.54
+   Compiling zune-core v0.5.3
+   Compiling zune-png v0.5.2
+   Compiling zgraphics v0.2.0
+   Compiling zinput v0.1.3
+   Compiling zvte v0.1.3
+   Compiling unicode-segmentation v1.13.3
+   Compiling unicode-width v0.2.3
+   Compiling zgpui v0.1.0
+   Compiling zterm v0.5.1
+   Compiling ztty-registry-check-zterm v0.0.0 (WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/consumers/zterm)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.22s
+     Running `WORKTREE/artifacts/registry-consumers-zterm051-9f5a77a-20261120/target/debug/ztty-registry-check-zterm`

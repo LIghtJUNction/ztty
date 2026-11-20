@@ -1,0 +1,267 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "invalid_backend",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "--backend must be x11 or wayland"
+    },
+    {
+      "name": "missing_backend",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "--backend needs x11 or wayland"
+    },
+    {
+      "name": "attach_invalid_backend",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "--backend needs x11 or wayland"
+    },
+    {
+      "name": "attach_missing_backend",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "--backend needs x11 or wayland"
+    },
+    {
+      "name": "feature_disabled",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "native Wayland is optional; build with --features wayland"
+    },
+    {
+      "name": "feature_disabled_no_child",
+      "passed": true,
+      "sentinel": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/4/should-not-exist"
+    },
+    {
+      "name": "missing_compositor_named",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "cannot create native Wayland window"
+    },
+    {
+      "name": "missing_compositor_named_no_child",
+      "passed": true,
+      "sentinel": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/5/should-not-exist"
+    },
+    {
+      "name": "missing_compositor_observe",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "cannot create native Wayland window"
+    },
+    {
+      "name": "missing_compositor_observe_no_child",
+      "passed": true,
+      "sentinel": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/6/should-not-exist"
+    },
+    {
+      "name": "software_renderer_requires_gpu",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "native Wayland requires renderer=auto or renderer=gpu"
+    },
+    {
+      "name": "software_renderer_requires_gpu_no_child",
+      "passed": true,
+      "sentinel": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/7/should-not-exist"
+    },
+    {
+      "name": "wayland_workspace_rejected",
+      "passed": true,
+      "expected_exit_code": 1,
+      "expected_stderr_fragment": "Wayland workspaces are not available; use independent session windows"
+    },
+    {
+      "name": "wayland_workspace_rejected_no_child",
+      "passed": true,
+      "sentinel": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/8/should-not-exist"
+    }
+  ],
+  "commands": [
+    {
+      "name": "invalid_backend",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--config",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/0/minimal.conf",
+        "--backend",
+        "wrong"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/0",
+      "private_broker": "@ztty-wayland-cli-e3ed9f686de00d557fef0432",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: --backend must be x11 or wayland\n"
+    },
+    {
+      "name": "missing_backend",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--config",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/1/minimal.conf",
+        "--backend"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/1",
+      "private_broker": "@ztty-wayland-cli-2b136b10912c7c91ff532c38",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: --backend needs x11 or wayland\n"
+    },
+    {
+      "name": "attach_invalid_backend",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "attach",
+        "--backend",
+        "wrong",
+        "unused"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/2",
+      "private_broker": "@ztty-wayland-cli-5f7cde1a5676c7bf7482c2b3",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: --backend needs x11 or wayland\n"
+    },
+    {
+      "name": "attach_missing_backend",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "attach",
+        "--backend"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/3",
+      "private_broker": "@ztty-wayland-cli-dfcf00ae9d669562d8ce5977",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: --backend needs x11 or wayland\n"
+    },
+    {
+      "name": "feature_disabled",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+        "--config",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/4/minimal.conf",
+        "--backend",
+        "wayland",
+        "-e",
+        "/usr/bin/touch",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/4/should-not-exist"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/4",
+      "private_broker": "@ztty-wayland-cli-7e6a0897ee8a6a4878059dfd",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: native Wayland is optional; build with --features wayland\n"
+    },
+    {
+      "name": "missing_compositor_named",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--config",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/5/minimal.conf",
+        "--backend",
+        "wayland",
+        "--name",
+        "cli-named",
+        "-e",
+        "/usr/bin/touch",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/5/should-not-exist"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/5",
+      "private_broker": "@ztty-wayland-cli-eda3aee39403504d3a8d3745",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: cannot create native Wayland window\n"
+    },
+    {
+      "name": "missing_compositor_observe",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--config",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/6/minimal.conf",
+        "--backend",
+        "wayland",
+        "--observe",
+        "-e",
+        "/usr/bin/touch",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/6/should-not-exist"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/6",
+      "private_broker": "@ztty-wayland-cli-4337c343c2a03fa6de17d33c",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: cannot create native Wayland window\n"
+    },
+    {
+      "name": "software_renderer_requires_gpu",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--config",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/7/minimal.conf",
+        "--backend",
+        "wayland",
+        "-e",
+        "/usr/bin/touch",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/7/should-not-exist"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/7",
+      "private_broker": "@ztty-wayland-cli-77671a094457d9f707d60ddb",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: native Wayland requires renderer=auto or renderer=gpu\n"
+    },
+    {
+      "name": "wayland_workspace_rejected",
+      "command": [
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--config",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/8/minimal.conf",
+        "--backend",
+        "wayland",
+        "--split-right",
+        "unused",
+        "-e",
+        "/usr/bin/touch",
+        "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/8/should-not-exist"
+      ],
+      "timeout_seconds": 8,
+      "private_runtime": "/tmp/zfg-rltnv863/tmp/ztty-wayland-cli-0bld29z2/8",
+      "private_broker": "@ztty-wayland-cli-b49341596e2c2288b83ff67f",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: Wayland workspaces are not available; use independent session windows\n"
+    }
+  ],
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "no_wayland_binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-default",
+  "expected_checks": [
+    "invalid_backend",
+    "missing_backend",
+    "attach_invalid_backend",
+    "attach_missing_backend",
+    "feature_disabled",
+    "feature_disabled_no_child",
+    "missing_compositor_named",
+    "missing_compositor_named_no_child",
+    "missing_compositor_observe",
+    "missing_compositor_observe_no_child",
+    "software_renderer_requires_gpu",
+    "software_renderer_requires_gpu_no_child",
+    "wayland_workspace_rejected",
+    "wayland_workspace_rejected_no_child"
+  ],
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "no_wayland_binary_sha256": "8ac2b30e72c33b68688234a180bd25e48f0fa64f8b54fac492fd597568bdeb46"
+}
