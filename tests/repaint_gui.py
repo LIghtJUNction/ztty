@@ -539,6 +539,21 @@ def main():
                      + "".join(f"history row {row:03d}\r\n" for row in range(ROWS * 2))
                      + "\x1b[0m\x1b[?2026l")
                 visible(a, scroll_color, "scroll-history-ready")
+                # The parse marker and one matching background pixel do not
+                # fence all prior presents. Drain that earlier scene before
+                # counting the scroll action's exact single complete publish.
+                scroll_quiet_since = time.monotonic()
+                scroll_trace_size = trace.stat().st_size
+                def prior_scroll_frames_settled():
+                    nonlocal scroll_quiet_since, scroll_trace_size
+                    size = trace.stat().st_size
+                    if size != scroll_trace_size:
+                        scroll_trace_size = size
+                        scroll_quiet_since = time.monotonic()
+                    return time.monotonic() - scroll_quiet_since >= 0.04
+                _, quiet_elapsed = wait(prior_scroll_frames_settled,
+                                        "prior scroll scene presentations settled", 0.5)
+                report["timings_ms"]["scroll-precondition-settled"] = quiet_elapsed * 1000
                 offset = trace.stat().st_size
                 rpc({"op": "action", "session": "repaint-a", "action": "scroll-up"})
                 def scroll_prompt_visible():
