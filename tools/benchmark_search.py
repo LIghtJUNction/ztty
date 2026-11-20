@@ -7,7 +7,8 @@ Example:
     python3 tools/benchmark_search.py --baseline-ref HEAD --lines 100000 \
         --samples 7 --output docs/benchmarks/search-before-after.json
 
-The first run resolves dependencies normally and saves a sibling .Cargo.lock.
+The first run seeds the production Cargo.lock and uses checkout dependency patches.
+Cargo reconciles the benchmark root; the resulting graph is saved in a sibling .Cargo.lock.
 Replay that dependency graph with --lockfile path/to/search-before-after.Cargo.lock;
 Cargo then builds with --locked. Keep checkout sources and toolchain identical too.
 """
@@ -42,6 +43,8 @@ def main():
     if min(args.lines, args.samples, args.iterations) <= 0:
         parser.error("lines, samples and iterations must be positive")
     root = Path(__file__).resolve().parents[1]
+    production_lock = (root / "Cargo.lock").read_bytes()
+    patched_crates = ("zgpui", "zgraphics", "zinput")
     baseline_commit = command(["git", "rev-parse", "--verify", args.baseline_ref + "^{commit}"], root)
     candidate_commit = command(["git", "rev-parse", "HEAD"], root)
     before = command(["git", "show", baseline_commit + ":src/search.rs"], root) + "\n"
@@ -57,6 +60,7 @@ def main():
         "candidate_search_sha256": hashlib.sha256(after.encode()).hexdigest(),
         "harness_sha256": hashlib.sha256(harness.encode()).hexdigest(),
         "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "production_cargo_lock_sha256": hashlib.sha256(production_lock).hexdigest(),
         "rustc": command(["rustc", "--version"]),
         "machine": platform.machine(),
         "system": platform.system(),
@@ -66,11 +70,14 @@ def main():
         "logical_lines_per_scenario": args.lines,
         "load_average_before": os.getloadavg() if hasattr(os, "getloadavg") else None,
     }
-    try:
-        metadata["zterm_commit"] = command(["git", "-C", str(root / "crates/zterm"), "rev-parse", "HEAD"])
-        metadata["zterm_worktree_status"] = command(["git", "-C", str(root / "crates/zterm"), "status", "--porcelain"])
-    except subprocess.CalledProcessError:
-        metadata["zterm_commit"] = None
+    for name in ("zterm", *patched_crates):
+        dependency = str(root / "crates" / name)
+        try:
+            metadata[f"{name}_commit"] = command(["git", "-C", dependency, "rev-parse", "HEAD"])
+            metadata[f"{name}_worktree_status"] = command(["git", "-C", dependency, "status", "--porcelain"])
+        except subprocess.CalledProcessError:
+            metadata[f"{name}_commit"] = None
+            metadata[f"{name}_worktree_status"] = None
     if args.cpu is not None:
         if not hasattr(os, "sched_setaffinity"):
             parser.error("--cpu is supported only where sched_setaffinity is available")
@@ -91,6 +98,9 @@ def main():
             + ', default-features = false }\n'
             '[profile.release]\nlto = "fat"\ncodegen-units = 1\npanic = "abort"\n'
         )
+        manifest += "[patch.crates-io]\n"
+        for name in patched_crates:
+            manifest += f"{name} = {{ path = {json.dumps(str(root / 'crates' / name))} }}\n"
         (project / "Cargo.toml").write_text(manifest)
         target = root / "target/search-benchmark"
         build_args = [
@@ -100,6 +110,8 @@ def main():
         if args.lockfile is not None:
             (project / "Cargo.lock").write_bytes(args.lockfile.read_bytes())
             build_args.append("--locked")
+        else:
+            (project / "Cargo.lock").write_bytes(production_lock)
         subprocess.run(build_args, check=True)
         lock_bytes = (project / "Cargo.lock").read_bytes()
         lock_output = args.output.with_suffix(".Cargo.lock")
@@ -108,6 +120,7 @@ def main():
         metadata["cargo_lockfile"] = lock_output.name
         metadata["cargo_lockfile_sha256"] = hashlib.sha256(lock_bytes).hexdigest()
         metadata["cargo_lockfile_reused"] = args.lockfile is not None
+        metadata["cargo_lockfile_seed"] = "supplied" if args.lockfile is not None else "production"
         binary = target / "release/ztty-search-benchmark"
         if os.name == "nt":
             binary = binary.with_suffix(".exe")
