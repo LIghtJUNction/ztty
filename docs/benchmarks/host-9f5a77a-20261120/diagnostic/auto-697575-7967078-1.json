@@ -1,0 +1,689 @@
+{
+  "pid": 697575,
+  "start_ticks": "7967078",
+  "captured_utc": "2026-11-20T03:05:08.800218+00:00",
+  "maps": "auto-697575-7967078-1.maps",
+  "maps_sha256": "e9e1f3625c33cba977cef58ea97313ea432638e96ba4df5745cd4b94e0becec0",
+  "rollup": "auto-697575-7967078-1.smaps_rollup",
+  "rollup_sha256": "5ab90f28fdab87d6b7985c6f760bccb5e887a7a2de22691a199aadb314dfe4ea",
+  "groups": [
+    {
+      "path": "/usr/lib/libLLVM.so.23.1",
+      "Rss_bytes": 46190592,
+      "Pss_bytes": 38744064,
+      "Private_bytes": 31297536
+    },
+    {
+      "path": "[heap]",
+      "Rss_bytes": 24715264,
+      "Pss_bytes": 24700928,
+      "Private_bytes": 24686592
+    },
+    {
+      "path": "/usr/lib/libnvidia-gpucomp.so.620.70.06",
+      "Rss_bytes": 31211520,
+      "Pss_bytes": 17199104,
+      "Private_bytes": 3186688
+    },
+    {
+      "path": "/usr/lib/libgallium-26.2.4-arch3.1.so",
+      "Rss_bytes": 12181504,
+      "Pss_bytes": 11206656,
+      "Private_bytes": 11034624
+    },
+    {
+      "path": "/usr/lib/libnvidia-eglcore.so.620.70.06",
+      "Rss_bytes": 7069696,
+      "Pss_bytes": 6437888,
+      "Private_bytes": 6127616
+    },
+    {
+      "path": "[anonymous]",
+      "Rss_bytes": 2891776,
+      "Pss_bytes": 2885632,
+      "Private_bytes": 2879488
+    },
+    {
+      "path": "/usr/share/fonts/noto-cjk/NotoSansCJK-Regular.ttc",
+      "Rss_bytes": 1576960,
+      "Pss_bytes": 945152,
+      "Private_bytes": 761856
+    },
+    {
+      "path": "/usr/lib/libEGL_nvidia.so.620.70.06",
+      "Rss_bytes": 937984,
+      "Pss_bytes": 758784,
+      "Private_bytes": 733184
+    },
+    {
+      "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+      "Rss_bytes": 1085440,
+      "Pss_bytes": 716800,
+      "Private_bytes": 352256
+    },
+    {
+      "path": "/usr/lib/libX11.so.6.4.0",
+      "Rss_bytes": 905216,
+      "Pss_bytes": 641024,
+      "Private_bytes": 581632
+    },
+    {
+      "path": "/usr/lib/libharfbuzz.so.0.61510.0",
+      "Rss_bytes": 1359872,
+      "Pss_bytes": 619520,
+      "Private_bytes": 430080
+    },
+    {
+      "path": "/var/cache/fontconfig/923e285e415b1073c8df160bee08820f-le64.cache-12",
+      "Rss_bytes": 1155072,
+      "Pss_bytes": 571392,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/6d006ae94db972f3bc99bc2999c017b0-le64.cache-12",
+      "Rss_bytes": 1003520,
+      "Pss_bytes": 501760,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf",
+      "Rss_bytes": 344064,
+      "Pss_bytes": 344064,
+      "Private_bytes": 344064
+    },
+    {
+      "path": "/usr/lib/libfreetype.so.6.20.7",
+      "Rss_bytes": 819200,
+      "Pss_bytes": 343040,
+      "Private_bytes": 204800
+    },
+    {
+      "path": "/usr/lib/libEGL_mesa.so.0.0.0",
+      "Rss_bytes": 393216,
+      "Pss_bytes": 320512,
+      "Private_bytes": 311296
+    },
+    {
+      "path": "/usr/lib/libnvidia-glsi.so.620.70.06",
+      "Rss_bytes": 466944,
+      "Pss_bytes": 297984,
+      "Private_bytes": 143360
+    },
+    {
+      "path": "/usr/lib/libstdc++.so.6.0.36",
+      "Rss_bytes": 1617920,
+      "Pss_bytes": 242688,
+      "Private_bytes": 73728
+    },
+    {
+      "path": "/usr/lib/libSPIRV-Tools.so",
+      "Rss_bytes": 237568,
+      "Pss_bytes": 237568,
+      "Private_bytes": 237568
+    },
+    {
+      "path": "[stack]",
+      "Rss_bytes": 208896,
+      "Pss_bytes": 200704,
+      "Private_bytes": 192512
+    },
+    {
+      "path": "/usr/lib/libfontconfig.so.1.17.0",
+      "Rss_bytes": 462848,
+      "Pss_bytes": 163840,
+      "Private_bytes": 36864
+    },
+    {
+      "path": "/usr/lib/libicuuc.so.78.3",
+      "Rss_bytes": 475136,
+      "Pss_bytes": 131072,
+      "Private_bytes": 81920
+    },
+    {
+      "path": "/var/cache/fontconfig/8d4af663993b81a124ee82e610bb31f9-le64.cache-12",
+      "Rss_bytes": 245760,
+      "Pss_bytes": 124928,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/var/cache/fontconfig/f6b893a7224233d96cb72fd88691c0b4-le64.cache-12",
+      "Rss_bytes": 331776,
+      "Pss_bytes": 116736,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/libzstd.so.1.5.7",
+      "Rss_bytes": 442368,
+      "Pss_bytes": 113664,
+      "Private_bytes": 49152
+    },
+    {
+      "path": "/usr/lib/libelf-0.197.so",
+      "Rss_bytes": 106496,
+      "Pss_bytes": 99328,
+      "Private_bytes": 94208
+    },
+    {
+      "path": "/usr/lib/libxcb-glx.so.0.0.0",
+      "Rss_bytes": 98304,
+      "Pss_bytes": 98304,
+      "Private_bytes": 98304
+    },
+    {
+      "path": "/usr/lib/libGLdispatch.so.0.0.0",
+      "Rss_bytes": 270336,
+      "Pss_bytes": 96256,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libnvidia-egl-wayland.so.1.1.24",
+      "Rss_bytes": 94208,
+      "Pss_bytes": 94208,
+      "Private_bytes": 94208
+    },
+    {
+      "path": "/usr/lib/libdrm_intel.so.1.134.0",
+      "Rss_bytes": 90112,
+      "Pss_bytes": 90112,
+      "Private_bytes": 90112
+    },
+    {
+      "path": "/usr/lib/libnvidia-egl-xlib.so.1.0.6",
+      "Rss_bytes": 90112,
+      "Pss_bytes": 90112,
+      "Private_bytes": 90112
+    },
+    {
+      "path": "/usr/lib/libnvidia-egl-xcb.so.1.0.6",
+      "Rss_bytes": 90112,
+      "Pss_bytes": 90112,
+      "Private_bytes": 90112
+    },
+    {
+      "path": "/var/cache/fontconfig/f2e43df3287529323e79e7929dc44cc9-le64.cache-12",
+      "Rss_bytes": 172032,
+      "Pss_bytes": 81920,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libXft.so.2.3.9",
+      "Rss_bytes": 139264,
+      "Pss_bytes": 70656,
+      "Private_bytes": 32768
+    },
+    {
+      "path": "/usr/lib/libxcb.so.1.1.0",
+      "Rss_bytes": 184320,
+      "Pss_bytes": 66560,
+      "Private_bytes": 40960
+    },
+    {
+      "path": "/usr/lib/libedit.so.0.0.78",
+      "Rss_bytes": 114688,
+      "Pss_bytes": 65536,
+      "Private_bytes": 16384
+    },
+    {
+      "path": "/usr/lib/libxcb-randr.so.0.1.0",
+      "Rss_bytes": 61440,
+      "Pss_bytes": 61440,
+      "Private_bytes": 61440
+    },
+    {
+      "path": "/usr/lib/libxml2.so.16.1.4",
+      "Rss_bytes": 233472,
+      "Pss_bytes": 60416,
+      "Private_bytes": 40960
+    },
+    {
+      "path": "/usr/lib/libncursesw.so.6.6",
+      "Rss_bytes": 172032,
+      "Pss_bytes": 60416,
+      "Private_bytes": 24576
+    },
+    {
+      "path": "/usr/lib/libnvidia-egl-wayland2.so.1.0.2",
+      "Rss_bytes": 94208,
+      "Pss_bytes": 60416,
+      "Private_bytes": 49152
+    },
+    {
+      "path": "/var/cache/fontconfig/f349e9996a5320f6dd491cedd2b1f964-le64.cache-12",
+      "Rss_bytes": 176128,
+      "Pss_bytes": 58368,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libdrm_amdgpu.so.1.134.0",
+      "Rss_bytes": 57344,
+      "Pss_bytes": 57344,
+      "Private_bytes": 57344
+    },
+    {
+      "path": "/usr/lib/libsensors.so.5.0.0",
+      "Rss_bytes": 57344,
+      "Pss_bytes": 57344,
+      "Private_bytes": 57344
+    },
+    {
+      "path": "/usr/lib/locale/C.utf8/LC_CTYPE",
+      "Rss_bytes": 110592,
+      "Pss_bytes": 55296,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libwayland-server.so.0.26.0",
+      "Rss_bytes": 94208,
+      "Pss_bytes": 53248,
+      "Private_bytes": 45056
+    },
+    {
+      "path": "/usr/lib/libpciaccess.so.0.11.1",
+      "Rss_bytes": 45056,
+      "Pss_bytes": 45056,
+      "Private_bytes": 45056
+    },
+    {
+      "path": "/usr/lib/libexpat.so.1.13.1",
+      "Rss_bytes": 192512,
+      "Pss_bytes": 40960,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libnvidia-egl-gbm.so.1.1.3",
+      "Rss_bytes": 36864,
+      "Pss_bytes": 36864,
+      "Private_bytes": 36864
+    },
+    {
+      "path": "/usr/lib/libxcb-sync.so.1.0.0",
+      "Rss_bytes": 32768,
+      "Pss_bytes": 32768,
+      "Private_bytes": 32768
+    },
+    {
+      "path": "/usr/lib/libxcb-xfixes.so.0.0.0",
+      "Rss_bytes": 32768,
+      "Pss_bytes": 32768,
+      "Private_bytes": 32768
+    },
+    {
+      "path": "/usr/lib/libEGL.so.1.1.0",
+      "Rss_bytes": 73728,
+      "Pss_bytes": 30720,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/var/cache/fontconfig/e95b4d59d280a3acdc6fb85954763694-le64.cache-12",
+      "Rss_bytes": 57344,
+      "Pss_bytes": 28672,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libgcc_s.so.1",
+      "Rss_bytes": 143360,
+      "Pss_bytes": 28672,
+      "Private_bytes": 16384
+    },
+    {
+      "path": "/var/cache/fontconfig/614d1caaa4d7914789410f6367de37ca-le64.cache-12",
+      "Rss_bytes": 81920,
+      "Pss_bytes": 25600,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libGLESv2.so.2.1.0",
+      "Rss_bytes": 57344,
+      "Pss_bytes": 25600,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libdrm.so.2.134.0",
+      "Rss_bytes": 102400,
+      "Pss_bytes": 24576,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/var/cache/fontconfig/7d660be5d4eca970fa91d6ca176f5ce2-le64.cache-12",
+      "Rss_bytes": 49152,
+      "Pss_bytes": 24576,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libglib-2.0.so.0.9000.1",
+      "Rss_bytes": 122880,
+      "Pss_bytes": 23552,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libXext.so.6.4.0",
+      "Rss_bytes": 86016,
+      "Pss_bytes": 21504,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/libX11-xcb.so.1.0.0",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 20480,
+      "Private_bytes": 20480
+    },
+    {
+      "path": "/usr/lib/libxcb-dri3.so.0.1.0",
+      "Rss_bytes": 28672,
+      "Pss_bytes": 20480,
+      "Private_bytes": 12288
+    },
+    {
+      "path": "/usr/lib/libxcb-present.so.0.0.0",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 20480,
+      "Private_bytes": 20480
+    },
+    {
+      "path": "/var/cache/fontconfig/491f45a0a771fef1c10b9b647a97fb82-le64.cache-12",
+      "Rss_bytes": 65536,
+      "Pss_bytes": 20480,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libc.so.6",
+      "Rss_bytes": 1847296,
+      "Pss_bytes": 20480,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/var/cache/fontconfig/494e308e3ced70c4145d1031293adbac-le64.cache-12",
+      "Rss_bytes": 36864,
+      "Pss_bytes": 18432,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/1dce2cb908b447e938fc03acd9b47fcf-le64.cache-12",
+      "Rss_bytes": 61440,
+      "Pss_bytes": 18432,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libxshmfence.so.1.0.0",
+      "Rss_bytes": 16384,
+      "Pss_bytes": 16384,
+      "Private_bytes": 16384
+    },
+    {
+      "path": "/var/cache/fontconfig/a9166a13c4a4e072c9ea2dae19ae425f-le64.cache-12",
+      "Rss_bytes": 32768,
+      "Pss_bytes": 16384,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/4b31aef11cb0687b6d280d34cbe23592-le64.cache-12",
+      "Rss_bytes": 49152,
+      "Pss_bytes": 14336,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libm.so.6",
+      "Rss_bytes": 270336,
+      "Pss_bytes": 13312,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/tmp/ztty-compare-shysoea7/cache/mesa_shader_cache/index",
+      "Rss_bytes": 12288,
+      "Pss_bytes": 12288,
+      "Private_bytes": 12288
+    },
+    {
+      "path": "/usr/lib/libxcb-shm.so.0.0.0",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 12288,
+      "Private_bytes": 12288
+    },
+    {
+      "path": "/var/cache/fontconfig/7491cb2ac7fc5b2a9d11049a14736625-le64.cache-12",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 12288,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libwayland-cursor.so.0.26.0",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 12288,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libicudata.so.78.3",
+      "Rss_bytes": 86016,
+      "Pss_bytes": 11264,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libXau.so.6.0.0",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 11264,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/libz.so.1.3.1.zlib-ng",
+      "Rss_bytes": 188416,
+      "Pss_bytes": 11264,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libdl.so.2",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 10240,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/librt.so.1",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 10240,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/libgbm.so.1.0.0",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 9216,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/libwayland-client.so.0.26.0",
+      "Rss_bytes": 57344,
+      "Pss_bytes": 9216,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/etc/ld.so.cache",
+      "Rss_bytes": 323584,
+      "Pss_bytes": 9216,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libpthread.so.0",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 8192,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/libxkbcommon.so.0.13.2",
+      "Rss_bytes": 28672,
+      "Pss_bytes": 8192,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libXrender.so.1.3.0",
+      "Rss_bytes": 45056,
+      "Pss_bytes": 8192,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/ld-linux-x86-64.so.2",
+      "Rss_bytes": 286720,
+      "Pss_bytes": 8192,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/var/cache/fontconfig/b67b32625a2bb51b023d3814a918f351-le64.cache-12",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 7168,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/aaac3452274625c4167ca2eab9cb5e70-le64.cache-12",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 7168,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/409fa0c256bdaa15a3604ed27c99db9d-le64.cache-12",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 7168,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/fb42211fc6e0c1a73c189e83d3791827-le64.cache-12",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 7168,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libgraphite2.so.3.3.1",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 7168,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libpng16.so.16.59.0",
+      "Rss_bytes": 32768,
+      "Pss_bytes": 7168,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/e552019f4ed2e530c25d313cf4ffa813-le64.cache-12",
+      "Rss_bytes": 12288,
+      "Pss_bytes": 6144,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libwayland-egl.so.1.26.0",
+      "Rss_bytes": 12288,
+      "Pss_bytes": 6144,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libXdmcp.so.6.0.0",
+      "Rss_bytes": 16384,
+      "Pss_bytes": 5120,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libpcre2-8.so.0.16.1",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libbrotlicommon.so.1.2.1",
+      "Rss_bytes": 12288,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libbrotlidec.so.1.2.1",
+      "Rss_bytes": 12288,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libbz2.so.1.0.8",
+      "Rss_bytes": 16384,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libffi.so.8.5.0",
+      "Rss_bytes": 16384,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/ec9db0aec63b087e87fa5135389d951c-le64.cache-12",
+      "Rss_bytes": 12288,
+      "Pss_bytes": 3072,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/1876b2dcf508980ebba421dbe8e808d3-le64.cache-12",
+      "Rss_bytes": 12288,
+      "Pss_bytes": 2048,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/787b69f04c7448ed6c581b040220c91f-le64.cache-12",
+      "Rss_bytes": 4096,
+      "Pss_bytes": 2048,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/061e4bb214a55cfecd58789ba388a75a-le64.cache-12",
+      "Rss_bytes": 4096,
+      "Pss_bytes": 2048,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/4c31730dec557ab86b580f3ca5555446-le64.cache-12",
+      "Rss_bytes": 8192,
+      "Pss_bytes": 2048,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/var/cache/fontconfig/3f1df0fe0284fef7cc33df8b1d039122-le64.cache-12",
+      "Rss_bytes": 8192,
+      "Pss_bytes": 2048,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/locale/locale-archive",
+      "Rss_bytes": 65536,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/memfd:lp_dma_buf (deleted)",
+      "Rss_bytes": 0,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/gconv/gconv-modules.cache",
+      "Rss_bytes": 28672,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vvar]",
+      "Rss_bytes": 8192,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vvar_vclock]",
+      "Rss_bytes": 0,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vdso]",
+      "Rss_bytes": 8192,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vsyscall]",
+      "Rss_bytes": 0,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    }
+  ]
+}

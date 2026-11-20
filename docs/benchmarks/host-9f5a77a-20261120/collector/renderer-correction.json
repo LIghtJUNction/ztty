@@ -1,0 +1,11 @@
+{
+  "source": "4b56a261b290e0bc5e8d327734ec17bdf2e0ba6d",
+  "binary_source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "production_inputs_unchanged": true,
+  "collector_before_sha256": "4621fcec1e00dbd4c34772671704e8d09afde27fc60ca35b6655a88bdf604fe7",
+  "collector_after_sha256": "937baa15c808579518a5dcf3677d5e86b0c897daa666215f5a6d78a60da2336f",
+  "wrapper_before_sha256": "d0af7d42f6ac952a316e1fc4ae3246f1a996b2dced63b299119abdfcc33a1e37",
+  "wrapper_after_sha256": "c1b2f21af58790771cc8dd7693b4163057bf3a261803c8def07f50d7cd888f54",
+  "validation": "AST syntax and diff-check; real window assertions will run in the requested measurement.",
+  "timed_region_unchanged": true
+}

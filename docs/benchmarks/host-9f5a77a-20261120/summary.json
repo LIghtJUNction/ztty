@@ -1,0 +1,936 @@
+{
+  "schema": 1,
+  "collector_source": "3cace1d18446d1cc63dc84d635955e5a2b213a0b",
+  "binary_source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "paired": {
+    "summary": [
+      {
+        "windows": 1,
+        "before": {
+          "runs": 3,
+          "output_mib_per_second": [
+            310.4400374110335,
+            296.68662485314746,
+            274.5671448271292
+          ],
+          "median_output_mib_per_second": 296.68662485314746,
+          "output_range_mib_per_second": [
+            274.5671448271292,
+            310.4400374110335
+          ],
+          "median_latency_p50_us": 13.695,
+          "median_latency_p95_us": 16.464,
+          "median_application_pss_bytes": 14100480
+        },
+        "after": {
+          "runs": 3,
+          "output_mib_per_second": [
+            222.88038265781844,
+            236.91500292075366,
+            183.02646206104265
+          ],
+          "median_output_mib_per_second": 222.88038265781844,
+          "output_range_mib_per_second": [
+            183.02646206104265,
+            236.91500292075366
+          ],
+          "median_latency_p50_us": 8.354,
+          "median_latency_p95_us": 20.832,
+          "median_application_pss_bytes": 129808384
+        },
+        "ratio_of_median_throughputs": 0.7512316497858261,
+        "paired_throughput_ratios": [
+          0.7179498640593095,
+          0.7985361761354113,
+          0.6666000120891316
+        ],
+        "median_paired_throughput_ratio": 0.7179498640593095
+      },
+      {
+        "windows": 10,
+        "before": {
+          "runs": 3,
+          "output_mib_per_second": [
+            286.2953882144161,
+            271.53859162522804,
+            301.55954214497604
+          ],
+          "median_output_mib_per_second": 286.2953882144161,
+          "output_range_mib_per_second": [
+            271.53859162522804,
+            301.55954214497604
+          ],
+          "median_latency_p50_us": 13.085,
+          "median_latency_p95_us": 24.485,
+          "median_application_pss_bytes": 19904512
+        },
+        "after": {
+          "runs": 3,
+          "output_mib_per_second": [
+            201.9819556638854,
+            213.61111158356016,
+            199.54916203687628
+          ],
+          "median_output_mib_per_second": 201.9819556638854,
+          "output_range_mib_per_second": [
+            199.54916203687628,
+            213.61111158356016
+          ],
+          "median_latency_p50_us": 15.0075,
+          "median_latency_p95_us": 25.022,
+          "median_application_pss_bytes": 155617280
+        },
+        "ratio_of_median_throughputs": 0.7055019535020047,
+        "paired_throughput_ratios": [
+          0.7055019535020047,
+          0.7866694391579588,
+          0.6617239189895777
+        ],
+        "median_paired_throughput_ratio": 0.7055019535020047
+      }
+    ],
+    "runs": [
+      {
+        "order": 1,
+        "app": "ztty",
+        "variant": "before",
+        "windows": 1,
+        "repetition": 1,
+        "output_mib_per_second": 310.4400374110335,
+        "application_pss_bytes": 14184448,
+        "latency_p50_us": 8.8865,
+        "latency_p95_us": 9.866
+      },
+      {
+        "order": 2,
+        "app": "ztty",
+        "variant": "after",
+        "windows": 1,
+        "repetition": 1,
+        "output_mib_per_second": 222.88038265781844,
+        "application_pss_bytes": 129890304,
+        "latency_p50_us": 8.012,
+        "latency_p95_us": 9.989
+      },
+      {
+        "order": 3,
+        "app": "ztty",
+        "variant": "before",
+        "windows": 10,
+        "repetition": 1,
+        "output_mib_per_second": 286.2953882144161,
+        "application_pss_bytes": 19809280,
+        "latency_p50_us": 13.085,
+        "latency_p95_us": 20.013
+      },
+      {
+        "order": 4,
+        "app": "ztty",
+        "variant": "after",
+        "windows": 10,
+        "repetition": 1,
+        "output_mib_per_second": 201.9819556638854,
+        "application_pss_bytes": 155617280,
+        "latency_p50_us": 13.1135,
+        "latency_p95_us": 25.124
+      },
+      {
+        "order": 5,
+        "app": "ztty",
+        "variant": "after",
+        "windows": 10,
+        "repetition": 2,
+        "output_mib_per_second": 213.61111158356016,
+        "application_pss_bytes": 155626496,
+        "latency_p50_us": 15.0075,
+        "latency_p95_us": 25.022
+      },
+      {
+        "order": 6,
+        "app": "ztty",
+        "variant": "before",
+        "windows": 10,
+        "repetition": 2,
+        "output_mib_per_second": 271.53859162522804,
+        "application_pss_bytes": 19904512,
+        "latency_p50_us": 14.6785,
+        "latency_p95_us": 24.485
+      },
+      {
+        "order": 7,
+        "app": "ztty",
+        "variant": "after",
+        "windows": 1,
+        "repetition": 2,
+        "output_mib_per_second": 236.91500292075366,
+        "application_pss_bytes": 129808384,
+        "latency_p50_us": 8.354,
+        "latency_p95_us": 21.937
+      },
+      {
+        "order": 8,
+        "app": "ztty",
+        "variant": "before",
+        "windows": 1,
+        "repetition": 2,
+        "output_mib_per_second": 296.68662485314746,
+        "application_pss_bytes": 14096384,
+        "latency_p50_us": 13.695,
+        "latency_p95_us": 16.464
+      },
+      {
+        "order": 9,
+        "app": "ztty",
+        "variant": "before",
+        "windows": 1,
+        "repetition": 3,
+        "output_mib_per_second": 274.5671448271292,
+        "application_pss_bytes": 14100480,
+        "latency_p50_us": 13.7715,
+        "latency_p95_us": 23.301
+      },
+      {
+        "order": 10,
+        "app": "ztty",
+        "variant": "after",
+        "windows": 1,
+        "repetition": 3,
+        "output_mib_per_second": 183.02646206104265,
+        "application_pss_bytes": 129600512,
+        "latency_p50_us": 11.337499999999999,
+        "latency_p95_us": 20.832
+      },
+      {
+        "order": 11,
+        "app": "ztty",
+        "variant": "before",
+        "windows": 10,
+        "repetition": 3,
+        "output_mib_per_second": 301.55954214497604,
+        "application_pss_bytes": 20016128,
+        "latency_p50_us": 12.16,
+        "latency_p95_us": 29.876
+      },
+      {
+        "order": 12,
+        "app": "ztty",
+        "variant": "after",
+        "windows": 10,
+        "repetition": 3,
+        "output_mib_per_second": 199.54916203687628,
+        "application_pss_bytes": 155004928,
+        "latency_p50_us": 15.008,
+        "latency_p95_us": 21.651
+      }
+    ]
+  },
+  "terminals": {
+    "summary": [
+      {
+        "app": "ghostty",
+        "windows": 1,
+        "mode": "shared",
+        "workload": "idle",
+        "successful_runs": 3,
+        "median_rss_bytes": 358907904,
+        "median_pss_bytes": 335249408,
+        "median_private_bytes": 322469888,
+        "median_idle_cpu_percent": 17.992123443943793,
+        "median_swap_bytes": 0,
+        "median_app_plus_xserver_pss_bytes": 424186880,
+        "app_plus_xserver_pss_range_bytes": [
+          424105984,
+          424801280
+        ],
+        "sampled_application_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_application_swap_bytes": 0,
+        "sampled_app_plus_xserver_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_app_plus_xserver_swap_bytes": 0,
+        "xserver_after_swap_range_bytes": [
+          0,
+          0
+        ],
+        "xserver_delta_pss_range_bytes": [
+          -5571584,
+          -5496832
+        ],
+        "median_latency_p50_us": 60.045,
+        "median_latency_p95_us": 644.21,
+        "median_output_mib_per_second": 152.87969742011413,
+        "pss_range_bytes": [
+          335175680,
+          335485952
+        ],
+        "latency_p50_range_us": [
+          37.4455,
+          61.998000000000005
+        ],
+        "output_range_mib_per_second": [
+          132.5294208967629,
+          251.21701256171633
+        ],
+        "gui_process_counts": [
+          1
+        ],
+        "application_process_counts": [
+          1
+        ]
+      },
+      {
+        "app": "kitty",
+        "windows": 1,
+        "mode": "shared",
+        "workload": "idle",
+        "successful_runs": 3,
+        "median_rss_bytes": 220102656,
+        "median_pss_bytes": 188677120,
+        "median_private_bytes": 174698496,
+        "median_idle_cpu_percent": 0.0,
+        "median_swap_bytes": 0,
+        "median_app_plus_xserver_pss_bytes": 275926016,
+        "app_plus_xserver_pss_range_bytes": [
+          275495936,
+          277009408
+        ],
+        "sampled_application_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_application_swap_bytes": 0,
+        "sampled_app_plus_xserver_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_app_plus_xserver_swap_bytes": 0,
+        "xserver_after_swap_range_bytes": [
+          0,
+          0
+        ],
+        "xserver_delta_pss_range_bytes": [
+          -7203840,
+          -7145472
+        ],
+        "median_latency_p50_us": 4946.8665,
+        "median_latency_p95_us": 9628.259,
+        "median_output_mib_per_second": 56.87480826941831,
+        "pss_range_bytes": [
+          188051456,
+          189282304
+        ],
+        "latency_p50_range_us": [
+          4878.039,
+          6525.151
+        ],
+        "output_range_mib_per_second": [
+          52.59689844693039,
+          60.882101405636824
+        ],
+        "gui_process_counts": [
+          1
+        ],
+        "application_process_counts": [
+          2
+        ]
+      },
+      {
+        "app": "ztty",
+        "windows": 1,
+        "mode": "shared",
+        "workload": "idle",
+        "successful_runs": 3,
+        "median_rss_bytes": 170086400,
+        "median_pss_bytes": 146892800,
+        "median_private_bytes": 133791744,
+        "median_idle_cpu_percent": 0.0,
+        "median_swap_bytes": 0,
+        "median_app_plus_xserver_pss_bytes": 236551168,
+        "app_plus_xserver_pss_range_bytes": [
+          236534784,
+          236846080
+        ],
+        "sampled_application_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_application_swap_bytes": 0,
+        "sampled_app_plus_xserver_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_app_plus_xserver_swap_bytes": 0,
+        "xserver_after_swap_range_bytes": [
+          0,
+          0
+        ],
+        "xserver_delta_pss_range_bytes": [
+          -5137408,
+          -4940800
+        ],
+        "median_latency_p50_us": 10.5415,
+        "median_latency_p95_us": 11.708,
+        "median_output_mib_per_second": 136.00827258185353,
+        "pss_range_bytes": [
+          146448384,
+          147109888
+        ],
+        "latency_p50_range_us": [
+          7.987,
+          10.9055
+        ],
+        "output_range_mib_per_second": [
+          96.38024607344632,
+          165.6068438040479
+        ],
+        "gui_process_counts": [
+          1
+        ],
+        "application_process_counts": [
+          2
+        ]
+      },
+      {
+        "app": "ghostty",
+        "windows": 10,
+        "mode": "shared",
+        "workload": "idle",
+        "successful_runs": 3,
+        "median_rss_bytes": 880844800,
+        "median_pss_bytes": 857159680,
+        "median_private_bytes": 844427264,
+        "median_idle_cpu_percent": 35.98372089307457,
+        "median_swap_bytes": 0,
+        "median_app_plus_xserver_pss_bytes": 973254656,
+        "app_plus_xserver_pss_range_bytes": [
+          970428416,
+          974189568
+        ],
+        "sampled_application_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_application_swap_bytes": 0,
+        "sampled_app_plus_xserver_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_app_plus_xserver_swap_bytes": 0,
+        "xserver_after_swap_range_bytes": [
+          0,
+          0
+        ],
+        "xserver_delta_pss_range_bytes": [
+          21006336,
+          21108736
+        ],
+        "median_latency_p50_us": 33.197,
+        "median_latency_p95_us": 118.409,
+        "median_output_mib_per_second": 191.81312146300127,
+        "pss_range_bytes": [
+          854874112,
+          858045440
+        ],
+        "latency_p50_range_us": [
+          29.2245,
+          47.319
+        ],
+        "output_range_mib_per_second": [
+          125.69425597745229,
+          198.67802225785744
+        ],
+        "gui_process_counts": [
+          1
+        ],
+        "application_process_counts": [
+          1
+        ]
+      },
+      {
+        "app": "kitty",
+        "windows": 10,
+        "mode": "shared",
+        "workload": "idle",
+        "successful_runs": 3,
+        "median_rss_bytes": 421699584,
+        "median_pss_bytes": 376878080,
+        "median_private_bytes": 350408704,
+        "median_idle_cpu_percent": 0.0,
+        "median_swap_bytes": 0,
+        "median_app_plus_xserver_pss_bytes": 478048256,
+        "app_plus_xserver_pss_range_bytes": [
+          477589504,
+          480056320
+        ],
+        "sampled_application_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_application_swap_bytes": 0,
+        "sampled_app_plus_xserver_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_app_plus_xserver_swap_bytes": 0,
+        "xserver_after_swap_range_bytes": [
+          0,
+          0
+        ],
+        "xserver_delta_pss_range_bytes": [
+          6720512,
+          6839296
+        ],
+        "median_latency_p50_us": 5085.09,
+        "median_latency_p95_us": 7917.933,
+        "median_output_mib_per_second": 55.46047197830795,
+        "pss_range_bytes": [
+          375954432,
+          378349568
+        ],
+        "latency_p50_range_us": [
+          4921.1155,
+          5525.25
+        ],
+        "output_range_mib_per_second": [
+          49.54524150898777,
+          58.97629719138688
+        ],
+        "gui_process_counts": [
+          1
+        ],
+        "application_process_counts": [
+          2
+        ]
+      },
+      {
+        "app": "ztty",
+        "windows": 10,
+        "mode": "shared",
+        "workload": "idle",
+        "successful_runs": 3,
+        "median_rss_bytes": 444362752,
+        "median_pss_bytes": 346733568,
+        "median_private_bytes": 330285056,
+        "median_idle_cpu_percent": 0.0,
+        "median_swap_bytes": 0,
+        "median_app_plus_xserver_pss_bytes": 467283968,
+        "app_plus_xserver_pss_range_bytes": [
+          466285568,
+          467376128
+        ],
+        "sampled_application_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_application_swap_bytes": 0,
+        "sampled_app_plus_xserver_swap_range_bytes": [
+          0,
+          0
+        ],
+        "max_sampled_app_plus_xserver_swap_bytes": 0,
+        "xserver_after_swap_range_bytes": [
+          0,
+          0
+        ],
+        "xserver_delta_pss_range_bytes": [
+          25575424,
+          25629696
+        ],
+        "median_latency_p50_us": 18.7125,
+        "median_latency_p95_us": 82.806,
+        "median_output_mib_per_second": 116.45301216560645,
+        "pss_range_bytes": [
+          346351616,
+          346792960
+        ],
+        "latency_p50_range_us": [
+          14.883,
+          20.313000000000002
+        ],
+        "output_range_mib_per_second": [
+          106.33815990536814,
+          144.85708723140783
+        ],
+        "gui_process_counts": [
+          1
+        ],
+        "application_process_counts": [
+          11
+        ]
+      }
+    ],
+    "runs": [
+      {
+        "order": 1,
+        "app": "ztty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 1,
+        "output_mib_per_second": 165.6068438040479,
+        "application_pss_bytes": 147109888,
+        "latency_p50_us": 7.987,
+        "latency_p95_us": 9.311
+      },
+      {
+        "order": 2,
+        "app": "ghostty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 1,
+        "output_mib_per_second": 251.21701256171633,
+        "application_pss_bytes": 335175680,
+        "latency_p50_us": 60.045,
+        "latency_p95_us": 640.186
+      },
+      {
+        "order": 3,
+        "app": "kitty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 1,
+        "output_mib_per_second": 60.882101405636824,
+        "application_pss_bytes": 188051456,
+        "latency_p50_us": 4878.039,
+        "latency_p95_us": 9628.259
+      },
+      {
+        "order": 4,
+        "app": "ztty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 1,
+        "output_mib_per_second": 144.85708723140783,
+        "application_pss_bytes": 346351616,
+        "latency_p50_us": 14.883,
+        "latency_p95_us": 33.332
+      },
+      {
+        "order": 5,
+        "app": "ghostty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 1,
+        "output_mib_per_second": 198.67802225785744,
+        "application_pss_bytes": 854874112,
+        "latency_p50_us": 29.2245,
+        "latency_p95_us": 94.542
+      },
+      {
+        "order": 6,
+        "app": "kitty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 1,
+        "output_mib_per_second": 58.97629719138688,
+        "application_pss_bytes": 376878080,
+        "latency_p50_us": 4921.1155,
+        "latency_p95_us": 8545.925
+      },
+      {
+        "order": 7,
+        "app": "ghostty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 2,
+        "output_mib_per_second": 152.87969742011413,
+        "application_pss_bytes": 335249408,
+        "latency_p50_us": 37.4455,
+        "latency_p95_us": 644.21
+      },
+      {
+        "order": 8,
+        "app": "kitty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 2,
+        "output_mib_per_second": 52.59689844693039,
+        "application_pss_bytes": 188677120,
+        "latency_p50_us": 6525.151,
+        "latency_p95_us": 19153.832
+      },
+      {
+        "order": 9,
+        "app": "ztty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 2,
+        "output_mib_per_second": 136.00827258185353,
+        "application_pss_bytes": 146448384,
+        "latency_p50_us": 10.5415,
+        "latency_p95_us": 12.766
+      },
+      {
+        "order": 10,
+        "app": "ghostty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 2,
+        "output_mib_per_second": 125.69425597745229,
+        "application_pss_bytes": 857159680,
+        "latency_p50_us": 47.319,
+        "latency_p95_us": 632.143
+      },
+      {
+        "order": 11,
+        "app": "kitty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 2,
+        "output_mib_per_second": 55.46047197830795,
+        "application_pss_bytes": 378349568,
+        "latency_p50_us": 5085.09,
+        "latency_p95_us": 7249.465
+      },
+      {
+        "order": 12,
+        "app": "ztty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 2,
+        "output_mib_per_second": 106.33815990536814,
+        "application_pss_bytes": 346733568,
+        "latency_p50_us": 20.313000000000002,
+        "latency_p95_us": 82.806
+      },
+      {
+        "order": 13,
+        "app": "kitty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 3,
+        "output_mib_per_second": 56.87480826941831,
+        "application_pss_bytes": 189282304,
+        "latency_p50_us": 4946.8665,
+        "latency_p95_us": 7061.809
+      },
+      {
+        "order": 14,
+        "app": "ztty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 3,
+        "output_mib_per_second": 96.38024607344632,
+        "application_pss_bytes": 146892800,
+        "latency_p50_us": 10.9055,
+        "latency_p95_us": 11.708
+      },
+      {
+        "order": 15,
+        "app": "ghostty",
+        "variant": null,
+        "windows": 1,
+        "repetition": 3,
+        "output_mib_per_second": 132.5294208967629,
+        "application_pss_bytes": 335485952,
+        "latency_p50_us": 61.998000000000005,
+        "latency_p95_us": 2030.421
+      },
+      {
+        "order": 16,
+        "app": "kitty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 3,
+        "output_mib_per_second": 49.54524150898777,
+        "application_pss_bytes": 375954432,
+        "latency_p50_us": 5525.25,
+        "latency_p95_us": 7917.933
+      },
+      {
+        "order": 17,
+        "app": "ztty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 3,
+        "output_mib_per_second": 116.45301216560645,
+        "application_pss_bytes": 346792960,
+        "latency_p50_us": 18.7125,
+        "latency_p95_us": 181.937
+      },
+      {
+        "order": 18,
+        "app": "ghostty",
+        "variant": null,
+        "windows": 10,
+        "repetition": 3,
+        "output_mib_per_second": 191.81312146300127,
+        "application_pss_bytes": 858045440,
+        "latency_p50_us": 33.197,
+        "latency_p95_us": 118.409
+      }
+    ]
+  },
+  "output": [
+    {
+      "name": "ascii-log-headless",
+      "kind": "ascii-log",
+      "mode": "headless",
+      "payload_bytes": 8388640,
+      "samples": [
+        {
+          "elapsed_ns": 60545860,
+          "bytes": 8388640,
+          "mib_s": 132.1317513299526
+        },
+        {
+          "elapsed_ns": 60071192,
+          "bytes": 8388640,
+          "mib_s": 133.175824404785
+        },
+        {
+          "elapsed_ns": 60161382,
+          "bytes": 8388640,
+          "mib_s": 132.9761759392117
+        }
+      ],
+      "median_mib_s": 132.9761759392117,
+      "idle_dsr_p50_ns": 17295,
+      "idle_dsr_p95_ns": 20848
+    },
+    {
+      "name": "ascii-log-window",
+      "kind": "ascii-log",
+      "mode": "window",
+      "payload_bytes": 8388640,
+      "samples": [
+        {
+          "elapsed_ns": 88241936,
+          "bytes": 8388640,
+          "mib_s": 90.66018811711163
+        },
+        {
+          "elapsed_ns": 78705301,
+          "bytes": 8388640,
+          "mib_s": 101.64538367724589
+        },
+        {
+          "elapsed_ns": 77470785,
+          "bytes": 8388640,
+          "mib_s": 103.26512784888038
+        }
+      ],
+      "median_mib_s": 101.64538367724589,
+      "idle_dsr_p50_ns": 32716,
+      "idle_dsr_p95_ns": 34310
+    },
+    {
+      "name": "inplace-ascii-headless",
+      "kind": "inplace-ascii",
+      "mode": "headless",
+      "payload_bytes": 8407496,
+      "samples": [
+        {
+          "elapsed_ns": 43597905,
+          "bytes": 8407496,
+          "mib_s": 183.90821761936223
+        },
+        {
+          "elapsed_ns": 41745714,
+          "bytes": 8407496,
+          "mib_s": 192.067933021538
+        },
+        {
+          "elapsed_ns": 41461587,
+          "bytes": 8407496,
+          "mib_s": 193.3841316900938
+        }
+      ],
+      "median_mib_s": 192.067933021538,
+      "idle_dsr_p50_ns": 17579,
+      "idle_dsr_p95_ns": 18933
+    },
+    {
+      "name": "inplace-ascii-window",
+      "kind": "inplace-ascii",
+      "mode": "window",
+      "payload_bytes": 8407496,
+      "samples": [
+        {
+          "elapsed_ns": 67546186,
+          "bytes": 8407496,
+          "mib_s": 118.70415600502271
+        },
+        {
+          "elapsed_ns": 56007362,
+          "bytes": 8407496,
+          "mib_s": 143.15998315521952
+        },
+        {
+          "elapsed_ns": 57060885,
+          "bytes": 8407496,
+          "mib_s": 140.51680061548785
+        }
+      ],
+      "median_mib_s": 140.51680061548785,
+      "idle_dsr_p50_ns": 31233,
+      "idle_dsr_p95_ns": 34622
+    },
+    {
+      "name": "unicode-log-headless",
+      "kind": "unicode-log",
+      "mode": "headless",
+      "payload_bytes": 8388640,
+      "samples": [
+        {
+          "elapsed_ns": 308054840,
+          "bytes": 8388640,
+          "mib_s": 25.96950113680449
+        },
+        {
+          "elapsed_ns": 299905037,
+          "bytes": 8388640,
+          "mib_s": 26.675212252530873
+        },
+        {
+          "elapsed_ns": 301658462,
+          "bytes": 8388640,
+          "mib_s": 26.520159469546474
+        }
+      ],
+      "median_mib_s": 26.520159469546474,
+      "idle_dsr_p50_ns": 16775,
+      "idle_dsr_p95_ns": 18760
+    },
+    {
+      "name": "unicode-log-window",
+      "kind": "unicode-log",
+      "mode": "window",
+      "payload_bytes": 8388640,
+      "samples": [
+        {
+          "elapsed_ns": 327659308,
+          "bytes": 8388640,
+          "mib_s": 24.41569740963417
+        },
+        {
+          "elapsed_ns": 327137312,
+          "bytes": 8388640,
+          "mib_s": 24.454656268552224
+        },
+        {
+          "elapsed_ns": 330806751,
+          "bytes": 8388640,
+          "mib_s": 24.183395572776945
+        }
+      ],
+      "median_mib_s": 24.41569740963417,
+      "idle_dsr_p50_ns": 20317,
+      "idle_dsr_p95_ns": 24982
+    }
+  ],
+  "counts": {
+    "paired_runs": 12,
+    "terminal_runs": 18,
+    "output_groups": 6,
+    "paired_bursts": 198,
+    "terminal_bursts": 297,
+    "output_bursts": 18,
+    "paired_latency_values": 19800,
+    "terminal_latency_values": 29700,
+    "output_idle_latency_values": 1200
+  }
+}

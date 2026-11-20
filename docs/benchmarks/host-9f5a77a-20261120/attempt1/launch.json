@@ -1,0 +1,73 @@
+{
+  "created_utc": "2026-11-20T02:37:12.112165+00:00",
+  "collector_source": "baf721b05540ddfe9c789ef359ac2c7ed40884e4",
+  "binary_source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "wrapper_sha256": "c1b2f21af58790771cc8dd7693b4163057bf3a261803c8def07f50d7cd888f54",
+  "execution": "Native direct process; no task-created CPU quota; tools apply host admission and isolated owned displays.",
+  "commands": [
+    {
+      "phase": "throughput",
+      "argv": [
+        "/usr/bin/python3",
+        "WORKTREE/artifacts/performance-preparation-20261120/run-final-performance.py",
+        "--phase",
+        "throughput",
+        "--source",
+        "baf721b05540ddfe9c789ef359ac2c7ed40884e4",
+        "--binary-source",
+        "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--binary-sha256",
+        "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "--output",
+        "WORKTREE/artifacts/final-performance-9f5a77a-20261120/throughput",
+        "--expected-nice",
+        "-4"
+      ]
+    },
+    {
+      "phase": "output",
+      "argv": [
+        "/usr/bin/python3",
+        "WORKTREE/artifacts/performance-preparation-20261120/run-final-performance.py",
+        "--phase",
+        "output",
+        "--source",
+        "baf721b05540ddfe9c789ef359ac2c7ed40884e4",
+        "--binary-source",
+        "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--binary-sha256",
+        "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "--output",
+        "WORKTREE/artifacts/final-performance-9f5a77a-20261120/output",
+        "--expected-nice",
+        "-4"
+      ]
+    },
+    {
+      "phase": "terminals",
+      "argv": [
+        "/usr/bin/python3",
+        "WORKTREE/artifacts/performance-preparation-20261120/run-final-performance.py",
+        "--phase",
+        "terminals",
+        "--source",
+        "baf721b05540ddfe9c789ef359ac2c7ed40884e4",
+        "--binary-source",
+        "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--binary-sha256",
+        "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+        "--output",
+        "WORKTREE/artifacts/final-performance-9f5a77a-20261120/terminals",
+        "--expected-nice",
+        "-4"
+      ]
+    }
+  ]
+}

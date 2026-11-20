@@ -1,0 +1,16 @@
+{
+  "binary_source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "collector_source": "3cace1d18446d1cc63dc84d635955e5a2b213a0b",
+  "scope": [
+    "src",
+    "native",
+    "build",
+    "build.rs",
+    ".cargo",
+    "Cargo.toml",
+    "Cargo.lock",
+    "crates"
+  ],
+  "changed_paths": [],
+  "method": "git diff --name-only of the two fixed commit objects; no build or measurement"
+}
