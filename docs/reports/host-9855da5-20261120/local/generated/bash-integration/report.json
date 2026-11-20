@@ -1,0 +1,41 @@
+{
+  "schema": "ztty.bash-integration.v1",
+  "ok": true,
+  "platform": "Linux",
+  "source_path": "WORKTREE/shell/ztty.bash",
+  "source_sha256": "b67a54158f43329ae4d7b5f1f90946415a67aa75d557b1c5a148bf533815514f",
+  "test_sha256": "87c7619a3fde7411ef2e334c8f9b57bdac27aca59326744a93ded67e7c7a2590",
+  "bash_version": "GNU bash，版本 5.3.20(1)-release (x86_64-pc-linux-gnu)",
+  "checks": [
+    "production script passes bash -n before any PTY is started",
+    "array: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "array: both existing prompt hooks run once; nonzero hook/command statuses match the original Bash behavior",
+    "array: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "nested: exported PS0 receives one execution marker; re-source is idempotent; parent hooks/status survive child exit",
+    "string: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "string: both existing prompt hooks run once; nonzero hook/command statuses match the original Bash behavior",
+    "string: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "unset: successful first/repeated source; one start/end marker; original PS0, prompt, DEBUG trap and exit status retained",
+    "unset: OSC 7 preserves spaces, Unicode, percent, question mark, hash, semicolon and dollar via URI escaping",
+    "noninteractive sourcing is inert and emits no terminal controls"
+  ],
+  "syntax": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "transcripts": {
+    "array.pty": {
+      "bytes": 2376,
+      "sha256": "ed6451f34893bb156c25d8564d52b62eccc639742764f4a834c77437e8f2aaea"
+    },
+    "string.pty": {
+      "bytes": 1239,
+      "sha256": "84d22306b5b9b10f91791411c207d5393a8f669ba47eb143699e16fcabebb09b"
+    },
+    "unset.pty": {
+      "bytes": 872,
+      "sha256": "a2fde99092d181821e33d03868b8ca35a5b6ee30288a45627f49b2786a85af50"
+    }
+  }
+}

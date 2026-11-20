@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "before": "f2db31d7ea35bf1a0554e76d69d2e44faafd0cab",
+  "after": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "script": "WORKTREE/artifacts/source-size-20261120/audit.py",
+  "script_sha256": "960b8dcd52363816dea50943261e2f7f2852e0c7de8e932b928b0e4cc9ab0612",
+  "command": [
+    "/usr/bin/python3",
+    "WORKTREE/artifacts/source-size-20261120/audit.py",
+    "--before",
+    "f2db31d7ea35bf1a0554e76d69d2e44faafd0cab",
+    "--after",
+    "9855da563f3038adee2fa88e1e24e20eafb77010",
+    "--repo",
+    "WORKTREE",
+    "--output",
+    "WORKTREE/artifacts/source-size-20261120/final-f2-9855da5"
+  ],
+  "exit_code": 0,
+  "seconds": 0.31523033398843836,
+  "stdout": "{\"complete\": true, \"output\": \"WORKTREE/artifacts/source-size-20261120/final-f2-9855da5\", \"before\": {\"root_repository\": {\"files\": 79, \"lines\": 40436, \"bytes\": 1432454}, \"gitlink_libraries\": {\"files\": 3, \"lines\": 1345, \"bytes\": 44946}, \"combined\": {\"files\": 82, \"lines\": 41781, \"bytes\": 1477400}}, \"after\": {\"root_repository\": {\"files\": 89, \"lines\": 30893, \"bytes\": 1094322}, \"gitlink_libraries\": {\"files\": 39, \"lines\": 14306, \"bytes\": 491136}, \"combined\": {\"files\": 128, \"lines\": 45199, \"bytes\": 1585458}}}\n",
+  "stderr": "",
+  "old_files_unchanged": 17,
+  "files": {
+    "SUMMARY.md": "cf21e63a7d8175758ddfbc23ec74d8432f5011736967634a938fb0c85b61cfa6",
+    "audit.json": "3a8145b504404acdc0195221973fb3fb5c02a0044f6b0b59324f8a491a2dc0da"
+  },
+  "head_clean_unchanged": true,
+  "no_build_gui_or_test": true
+}

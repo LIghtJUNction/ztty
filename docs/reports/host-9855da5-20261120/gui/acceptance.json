@@ -1,0 +1,61 @@
+{
+  "schema": 1,
+  "started": "2026-11-20T03:16:01.302585+00:00",
+  "purpose": "Targeted existing pixel/UI verification of exact Auto software-environment early return and explicit GPU hot switching",
+  "before": {
+    "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+    "clean": true,
+    "binary": "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+    "binary_sha256": "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66",
+    "binary_bytes": 1237824
+  },
+  "environment": {
+    "LIBGL_ALWAYS_SOFTWARE": "1",
+    "ZTTY_DISPLAY": "x11"
+  },
+  "script_sha256": "67169637f44f126f3b2b9c5b8a395bee10fecb134c1d1b09b88ca446fa73f472",
+  "runs": [
+    {
+      "name": "native-ui-auto",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tests/native_ui_gui.py",
+        "--binary",
+        "WORKTREE/artifacts/final-elf-9855da5-20261120/ztty-9855da5-wayland",
+        "--source-root",
+        "WORKTREE",
+        "--renderer",
+        "auto",
+        "--output",
+        "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/native-ui-auto.json",
+        "--screenshot",
+        "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/native-ui-auto.png"
+      ],
+      "exit_code": 0,
+      "report": "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/native-ui-auto.json",
+      "report_sha256": "80ce004845467e2df85f0c0aa9615ca94becbd9e34a92ca12f599cf3e2a12035",
+      "log_sha256": "80ce004845467e2df85f0c0aa9615ca94becbd9e34a92ca12f599cf3e2a12035",
+      "checks": 24,
+      "ok": true,
+      "renderer_before": {
+        "window_id": 2097154,
+        "requested": "auto",
+        "actual": "software",
+        "driver": ""
+      },
+      "renderer_after": {
+        "window_id": 2097215,
+        "requested": "auto",
+        "actual": "software",
+        "driver": ""
+      },
+      "display_ownership": null,
+      "display_cleanup": null,
+      "cleanup": {
+        "owned_processes_remaining": []
+      }
+    }
+  ],
+  "ok": false,
+  "finished": "2026-11-20T03:16:05.007611+00:00"
+}
