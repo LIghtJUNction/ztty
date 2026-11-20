@@ -224,7 +224,7 @@ def main():
     metadata["after"]["source_revision"] = args.after_source
     payload = bench.output_payload()
     helpers = ("benchmark_throughput.py", "benchmark_terminals.py",
-               "measure_runtime.py", "measure_multiwindow.py", "isolated_xvfb.py")
+               "measure_runtime.py", "measure_multiwindow.py", "isolated_xvfb.py", "gui_renderer.py")
     report = {
         "schema": 1, "ok": False, "timestamp": utc(),
         "purpose": "paired comparison" if args.rounds >= 3 else "exploration",
