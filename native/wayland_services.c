@@ -353,6 +353,15 @@ static void im_commit_state(struct ztty_wl_services *s) {
   zwp_text_input_v3_commit(s->text);
   s->im_serial++;
 }
+static void im_commit_cursor(struct ztty_wl_services *s) {
+  /* Cursor geometry is not an external edit. Some compositors retain the last
+   * cause across commits instead of resetting it to INPUT_METHOD. */
+  zwp_text_input_v3_set_text_change_cause(
+      s->text, ZWP_TEXT_INPUT_V3_CHANGE_CAUSE_INPUT_METHOD);
+  zwp_text_input_v3_set_cursor_rectangle(
+      s->text, s->cursor[0], s->cursor[1], s->cursor[2], s->cursor[3]);
+  im_commit_state(s);
+}
 static void im_sync(struct ztty_wl_services *s) {
   if (!s->text)
     return;
@@ -465,9 +474,7 @@ static void im_done(void *d, struct zwp_text_input_v3 *p, uint32_t serial) {
     s->im_acked = serial;
     if (s->im_enabled && s->cursor_dirty) {
       s->cursor_dirty = 0;
-      zwp_text_input_v3_set_cursor_rectangle(
-          s->text, s->cursor[0], s->cursor[1], s->cursor[2], s->cursor[3]);
-      im_commit_state(s);
+      im_commit_cursor(s);
     }
   }
 }
@@ -544,8 +551,7 @@ void ztty_wl_services_cursor(struct ztty_wl_services *s, int x, int y,
   s->cursor_dirty = 1;
   if (s->text && s->im_enabled && s->im_acked == s->im_serial) {
     s->cursor_dirty = 0;
-    zwp_text_input_v3_set_cursor_rectangle(s->text, x, y, width, height);
-    im_commit_state(s);
+    im_commit_cursor(s);
   }
 }
 int ztty_wl_services_copy(struct ztty_wl_services *s, const uint8_t *text,
