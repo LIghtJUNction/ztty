@@ -68,11 +68,18 @@ mod benchmark {
         let mut arguments = std::env::args().skip(1);
         let frames = arguments
             .next()
-            .map(|value| value.parse::<usize>().expect("frame count must be an integer"))
+            .map(|value| {
+                value
+                    .parse::<usize>()
+                    .expect("frame count must be an integer")
+            })
             .unwrap_or(100);
         assert!((1..=5000).contains(&frames), "frame count must be 1..=5000");
         let output = arguments.next().map(PathBuf::from);
-        assert!(arguments.next().is_none(), "usage: [frames] [RGBA output directory]");
+        assert!(
+            arguments.next().is_none(),
+            "usage: [frames] [RGBA output directory]"
+        );
         if let Some(directory) = &output {
             std::fs::create_dir_all(directory).unwrap();
         }
@@ -83,10 +90,7 @@ mod benchmark {
                 "ascii",
                 "0123456789 abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ",
             ),
-            (
-                "unicode",
-                "中文 e\u{301} 👩🏽‍💻 office سلام 👨‍👩‍👧‍👦 🇨🇳",
-            ),
+            ("unicode", "中文 e\u{301} 👩🏽‍💻 office سلام 👨‍👩‍👧‍👦 🇨🇳"),
             (
                 "styled",
                 "\x1b[1;31mbold\x1b[0m \x1b[3;32mitalic\x1b[0m \x1b[4munderlined\x1b[0m \x1b[9mstrike\x1b[0m 中 👩🏽‍💻",
