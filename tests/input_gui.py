@@ -106,7 +106,7 @@ def main():
         "source_changes": subprocess.check_output(["git", "status", "--short"], cwd=source, text=True, timeout=5).splitlines(),
         "checks": [], "vectors": [], "button_injection": {},
     }
-    for name in ("src/x11/gpu.rs", "src/gpu/mod.rs", "src/gpu/font.rs", "src/gpu/grid.rs", "src/text_blink.rs", "src/appearance.rs", "tools/gui_renderer.py", "src/session.rs", "src/x11.rs", "src/main.rs", "src/actions.rs", "crates/zinput/src/lib.rs", "crates/zterm/src/lib.rs", "tools/isolated_xvfb.py"):
+    for name in ("src/x11/gpu.rs", "src/gpu/mod.rs", "src/gpu/font.rs", "src/gpu/grid.rs", "src/text_blink.rs", "src/appearance.rs", "tools/gui_renderer.py", "src/session.rs", "src/search.rs", "src/session/view.rs", "src/session/view_input.rs", "src/x11.rs", "src/main.rs", "src/actions.rs", "crates/zinput/src/lib.rs", "crates/zterm/src/lib.rs", "tools/isolated_xvfb.py"):
         path = source / name
         if path.is_file():
             report["source_sha256"][name] = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -788,7 +788,7 @@ def main():
             begin(RESET)
             num_lock(False)
 
-            def search_selection(label, chord, expected=None):
+            def search_selection(label, chord, expected=None, cached=False):
                 begin(RESET + "\x1b[=3u\x1b[2J\x1b[H"
                       "keypadprobe first\r\n\r\nkeypadprobe second\r\n\r\n"
                       "keypadprobe third\r\n")
@@ -813,7 +813,8 @@ def main():
                 else:
                     raise TimeoutError(label + ": search frame did not settle")
                 key(*chord)
-                assert_input(label + ": navigation press/release stays local", b"")
+                if not cached:
+                    assert_input(label + ": navigation press/release stays local", b"")
                 def selected_pixels():
                     pixels = window_pixels()
                     matches = pixels == expected if expected is not None else pixels != initial
@@ -822,9 +823,44 @@ def main():
                 selected = wait(selected_pixels, label + " selects the expected search match", 3)
                 assert selected != initial, label
                 key("Shift_L")
-                assert_input(label + ": bare Shift press/release stays local", b"")
+                if not cached:
+                    assert_input(label + ": bare Shift press/release stays local", b"")
                 wait(lambda: window_pixels() == selected,
                      label + ": bare Shift preserves the selected search match", 3)
+                if cached:
+                    # Keep PTY output/reply barriers out of this sequence:
+                    # even a query feed changes the terminal text revision.
+                    sequence = [
+                        ("next", ("Return",), previous_match),
+                        ("previous", ("Shift_L", "Return"), next_match),
+                        ("wrap backward", ("Shift_L", "Return"), initial),
+                        ("wrap forward", ("Return",), next_match),
+                        ("F3 next", ("F3",), previous_match),
+                        ("Shift+F3 previous", ("Shift_L", "F3"), next_match),
+                        ("keypad next", ("KP_Enter",), previous_match),
+                        ("keypad previous", ("Shift_L", "KP_Enter"), next_match),
+                    ]
+                    verified = []
+                    for step, keys, reference in sequence:
+                        key(*keys)
+                        wait(lambda: window_pixels() == reference,
+                             label + ": " + step + " restores exact reference pixels", 3)
+                        verified.append({"name": step, "keys": list(keys),
+                                         "pixels_equal": True})
+                    current = view.get_geometry()
+                    search_path = args.screenshot.with_name(
+                        args.screenshot.stem + "-search" + args.screenshot.suffix)
+                    search_path.parent.mkdir(parents=True, exist_ok=True)
+                    Image.frombytes("RGB", (current.width, current.height),
+                                    window_pixels(), "raw", "BGRX").save(search_path)
+                    report["cached_search_navigation"] = {
+                        "steps": verified, "fixture_matches": 3,
+                        "no_pty_output_barriers_between_steps": True,
+                        "screenshot": {"path": str(search_path),
+                                       "sha256": hashlib.sha256(search_path.read_bytes()).hexdigest()},
+                        "ok": True,
+                    }
+                    assert_input(label + ": complete cached sequence stays local", b"")
                 key("Escape")
                 assert_input(label + ": search exit stays local", b"")
                 return selected
@@ -834,6 +870,8 @@ def main():
             assert next_match != previous_match, "forward and reverse search must select different matches"
             search_selection("search keypad Enter", ("KP_Enter",), next_match)
             search_selection("search Shift+keypad Enter", ("Shift_L", "KP_Enter"), previous_match)
+            search_selection("cached search navigation", ("Return",), next_match, cached=True)
+            report["checks"].append("cached search navigation preserves exact selection pixels in both directions and at wrap boundaries without sending keys to the PTY")
             report["keypad_overlays"].append({
                 "name": "keypad Enter and Shift+Enter navigate search matches",
                 "injection": "XTEST", "num_lock": False, "kitty_flags": 3,

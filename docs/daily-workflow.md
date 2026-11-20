@@ -70,6 +70,12 @@ the viewport. Queries are limited to 1,024 bytes; the streaming matcher retains
 one normalized query's positions, not a copy of the history. The highlight map uses one bit
 per visible cell, at most 16 KiB for a 512×256 grid.
 
+Repeated Next/Previous navigation reuses the match count and up to 128 match
+coordinates while the query, case mode and terminal text revision are unchanged.
+The first search still scans retained text; moving beyond the cached window can
+scan again. Closing search releases its cache. See the
+[bounded navigation measurements](reports/search-navigation-20261121/README.zh-CN.md).
+
 Copying a selection joins automatic line wraps while retaining explicit newlines.
 Wide-glyph wrap padding is omitted, meaningful spaces are retained, and UTF-8
 cells remain whole within the 4 MiB selection limit. An active search can copy

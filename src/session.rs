@@ -12,7 +12,9 @@ use crate::{
     session_core::{ReadStep, SessionCore},
     x11::{self, Selection},
 };
-use alloc::{collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec};
+use alloc::{
+    boxed::Box, collections::VecDeque, ffi::CString, format, rc::Rc, string::String, vec::Vec,
+};
 use core::ffi::c_int;
 use zterm::CursorShape;
 
@@ -22,6 +24,7 @@ struct InputBuffers {
 }
 
 struct Search {
+    cache: Box<search::Cache>,
     query: String,
     case: search::Case,
     hit: Option<search::Hit>,

@@ -1,7 +1,7 @@
 # Performance and validation record
 
-Later source measurements: [GPU text-run buffer reuse](benchmarks/text-run-scratch-20261120/report.zh-CN.md)
-and [search/row-buffer improvements](benchmarks/performance-audit-20261120/report.zh-CN.md).
+Later source measurements: [GPU text-run buffer reuse](benchmarks/text-run-scratch-20261120/report.zh-CN.md), [search/row-buffer improvements](benchmarks/performance-audit-20261120/report.zh-CN.md),
+and [bounded search navigation](reports/search-navigation-20261121/README.zh-CN.md).
 The dated records below retain their original source and measurement scope.
 
 Report date: **2026-11-18, Asia/Taipei**. This report keeps measurements tied to

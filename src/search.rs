@@ -1,6 +1,6 @@
 //! Literal UTF-8 history search across soft-wrapped rows. The streaming matcher
 //! keeps at most one query's byte positions, never a copy of a logical line or
-//! the history. Match counts and navigation do not retain all matches.
+//! the history. Navigation keeps only a bounded window of matching coordinates.
 use alloc::{borrow::Cow, string::String, vec, vec::Vec};
 use zterm::Terminal;
 
@@ -56,10 +56,143 @@ pub struct Hit {
     revision: u64,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Result {
     pub hit: Option<Hit>,
     pub count: usize,
     pub ordinal: usize,
+}
+
+/// Navigation state for one terminal. A full scan computes the initial result;
+/// later navigation retains at most 128 hits, without copying history text.
+/// A query, case or text revision change discards those coordinates. Drop this
+/// state when changing terminals or closing search.
+#[derive(Default)]
+pub struct Cache {
+    query: String,
+    key: Option<(u64, Case)>,
+    result: Result,
+    first: usize,
+    hits: Vec<Hit>,
+}
+
+const CACHED_HITS: usize = 128;
+
+impl Cache {
+    pub fn find(
+        &mut self,
+        terminal: &Terminal,
+        query: &str,
+        case: Case,
+        from: Option<Hit>,
+        forward: bool,
+    ) -> Result {
+        if query.is_empty() || query.len() > MAX_QUERY {
+            *self = Self::default();
+            return self.result;
+        }
+        let key = (terminal.text_revision(), case);
+        if self.key != Some(key) || self.query != query {
+            self.key = Some(key);
+            self.query.clear();
+            self.query.reserve_exact(query.len());
+            self.query.push_str(query);
+            return self.refresh(terminal, query, case, from, forward);
+        }
+        if self.result.count == 0 {
+            return self.result;
+        }
+        let from = from.filter(|hit| hit.revision == key.0);
+        let current = match from {
+            None => None,
+            Some(hit) if Some(hit) == self.result.hit => Some(self.result.ordinal),
+            Some(hit) => match self.hits.iter().position(|&cached| cached == hit) {
+                Some(index) => Some(self.first + index),
+                None => return self.refresh(terminal, query, case, from, forward),
+            },
+        };
+        let ordinal = match current {
+            None => {
+                if forward {
+                    1
+                } else {
+                    self.result.count
+                }
+            }
+            Some(current) if forward => {
+                if current == self.result.count {
+                    1
+                } else {
+                    current + 1
+                }
+            }
+            Some(current) => {
+                if current == 1 {
+                    self.result.count
+                } else {
+                    current - 1
+                }
+            }
+        };
+        if ordinal == self.result.ordinal {
+            return self.result;
+        }
+        if ordinal < self.first || ordinal - self.first >= self.hits.len() {
+            // Include the previous selection when changing direction. Small
+            // result sets fit completely, including both wrap boundaries.
+            let (first, end) = if self.result.count <= CACHED_HITS {
+                (1, self.result.count)
+            } else if forward {
+                let first = ordinal.saturating_sub(1).max(1);
+                (first, (first + CACHED_HITS - 1).min(self.result.count))
+            } else {
+                let end = (ordinal + 1).min(self.result.count);
+                (end.saturating_sub(CACHED_HITS - 1).max(1), end)
+            };
+            self.first = first;
+            self.hits.clear();
+            self.hits.reserve_exact(end - first + 1);
+            let normalized = case.query(query);
+            let mut count = 0;
+            hits(
+                terminal,
+                &normalized,
+                case,
+                0,
+                terminal.history_len() + terminal.rows(),
+                |hit| {
+                    count += 1;
+                    if count >= first {
+                        self.hits.push(hit);
+                    }
+                    count < end
+                },
+            );
+        }
+        let Some(hit) = self.hits.get(ordinal - self.first).copied() else {
+            return self.refresh(terminal, query, case, from, forward);
+        };
+        self.result = Result {
+            hit: Some(hit),
+            count: self.result.count,
+            ordinal,
+        };
+        self.result
+    }
+
+    fn refresh(
+        &mut self,
+        terminal: &Terminal,
+        query: &str,
+        case: Case,
+        from: Option<Hit>,
+        forward: bool,
+    ) -> Result {
+        self.hits.clear();
+        self.first = 0;
+        self.result = find(terminal, query, case, from, forward);
+        self.result
+    }
 }
 
 #[derive(Clone, Copy, Default)]
@@ -157,7 +290,7 @@ fn hits(
     case: Case,
     first: usize,
     end: usize,
-    mut visit: impl FnMut(Hit),
+    mut visit: impl FnMut(Hit) -> bool,
 ) {
     let mut matcher = Matcher::new(query, terminal.text_revision());
     let mut suffix = query.len() - 1;
@@ -188,8 +321,9 @@ fn hits(
                             end: x + usize::from(cell.width) - 1,
                             byte,
                         },
-                    ) {
-                        visit(hit);
+                    ) && !visit(hit)
+                    {
+                        return;
                     }
                     byte += 1;
                 }
@@ -246,6 +380,7 @@ pub fn find(
                     candidate = Some(record);
                 }
             }
+            true
         },
     );
     let selected = candidate.or(if forward { first } else { last });
@@ -286,6 +421,7 @@ pub fn highlights(terminal: &Terminal, query: &str, case: Case, history: usize) 
                 bits[bit / 64] |= 1 << (bit % 64);
             }
         }
+        true
     });
     bits
 }
@@ -331,4 +467,49 @@ pub fn text(terminal: &Terminal, hit: Hit) -> Option<String> {
         }
     }
     Some(text)
+}
+
+#[cfg(test)]
+mod cache_bounds {
+    use super::*;
+
+    #[test]
+    fn navigation_storage_is_bounded_and_empty_queries_release_it() {
+        let mut terminal = Terminal::new(16, 3, 512);
+        terminal.feed("hit\r\n".repeat(300).as_bytes());
+        let mut cache = Cache::default();
+        let first = cache.find(&terminal, "hit", Case::Sensitive, None, true);
+        assert_eq!(
+            cache.hits.capacity(),
+            0,
+            "initial search does not allocate a window"
+        );
+        let mut result = cache.find(&terminal, "hit", Case::Sensitive, first.hit, true);
+        for direction in [true, false] {
+            for _ in 0..310 {
+                result = cache.find(&terminal, "hit", Case::Sensitive, result.hit, direction);
+                assert!(cache.hits.capacity() <= CACHED_HITS);
+                assert!(cache.query.capacity() <= MAX_QUERY);
+            }
+        }
+        cache.find(
+            &terminal,
+            &"x".repeat(MAX_QUERY),
+            Case::Sensitive,
+            None,
+            true,
+        );
+        assert!(cache.query.capacity() <= MAX_QUERY);
+        cache.find(&terminal, "", Case::Sensitive, None, true);
+        assert_eq!(cache.hits.capacity(), 0);
+        assert_eq!(cache.query.capacity(), 0);
+        cache.find(
+            &terminal,
+            &"x".repeat(MAX_QUERY + 1),
+            Case::Sensitive,
+            None,
+            true,
+        );
+        assert_eq!(cache.query.capacity(), 0);
+    }
 }
