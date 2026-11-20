@@ -1,0 +1,295 @@
+{
+  "schema": 1,
+  "scope": "Actual API 0.1.0 upload and six published registry consumers plus their combination; zterm remains published 0.5.0 in this graph.",
+  "redaction_rules": [
+    {
+      "original_prefix_sha256": "90f6ce2c170b4e50f5fd1c46b840b1232ede8a01d30cf47535a42b58b2873352",
+      "replacement": "WORKTREE",
+      "meaning": "application integration checkout"
+    },
+    {
+      "original_prefix_sha256": "ce9a5f916e75002650bc764f456dac3be56330a15a552d09b14c360f59e1cc52",
+      "replacement": "USER_HOME",
+      "meaning": "developer home directory"
+    }
+  ],
+  "files": [
+    {
+      "public_file": "api-preflight.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/plugin-api-publication-20261120/preflight.json",
+      "original_sha256": "9f856f237e1a8a64542d004c4f659dac8c54a850f3d80ccaf1ea0e7c11d16430",
+      "public_sha256": "9f856f237e1a8a64542d004c4f659dac8c54a850f3d80ccaf1ea0e7c11d16430",
+      "original_bytes": 3724,
+      "public_bytes": 3724,
+      "modified_fields": [],
+      "modified_lines": [],
+      "byte_identical": true
+    },
+    {
+      "public_file": "api-preflight.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/plugin-api-publication-20261120/preflight.log",
+      "original_sha256": "c4d8fa1ad1f4f879e85c40b6f1773b60d5e7df8f334221366364b497c14a683a",
+      "public_sha256": "ce96d6f7af9553ac9f5c06a2eaf7da818404a92fc0a9c246cf92fac8c481ff80",
+      "original_bytes": 1001,
+      "public_bytes": 765,
+      "modified_fields": [],
+      "modified_lines": [
+        {
+          "line": 2,
+          "original_line_sha256": "c66c44d3461f61de45a13562492e1f97dafc1c3e059409d41642655a1eb16f8e",
+          "public_line": "   Packaging ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)\n"
+        },
+        {
+          "line": 5,
+          "original_line_sha256": "6f6b2e38abffb20a8b54cbd0d9c93f6873cfeddfc5adef39da760cfc9b392317",
+          "public_line": "   Verifying ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)\n"
+        },
+        {
+          "line": 13,
+          "original_line_sha256": "0b50cd37311adfa687e9668f1cc3743a05091dcf62864f0fd14e1afc5d497dd2",
+          "public_line": "   Compiling ztty-plugin-api v0.1.0 (WORKTREE/artifacts/plugin-api-publication-20261120/target/package/ztty-plugin-api-0.1.0)\n"
+        },
+        {
+          "line": 15,
+          "original_line_sha256": "da5f7e52fa9096176112634ce688237bcc9e2d1915f783dce0599f8872447ae3",
+          "public_line": "   Uploading ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)\n"
+        }
+      ],
+      "byte_identical": false
+    },
+    {
+      "public_file": "api-publish.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/plugin-api-publication-20261120/publish.json",
+      "original_sha256": "8d97ff1521241f294abe45681af1aac98e55b092413665e652e6adc64c493a19",
+      "public_sha256": "8d97ff1521241f294abe45681af1aac98e55b092413665e652e6adc64c493a19",
+      "original_bytes": 3722,
+      "public_bytes": 3722,
+      "modified_fields": [],
+      "modified_lines": [],
+      "byte_identical": true
+    },
+    {
+      "public_file": "api-publish.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/plugin-api-publication-20261120/publish.log",
+      "original_sha256": "3c0c478c0d7a3f61f39cffbf3753015f9bfddfa56cae95d51ac85e3b6bd7a0a6",
+      "public_sha256": "a9b4f7b7326951b9ccbad402bc93a9d6c281c1eb5fae7626ad6db1502643bac5",
+      "original_bytes": 1034,
+      "public_bytes": 798,
+      "modified_fields": [],
+      "modified_lines": [
+        {
+          "line": 2,
+          "original_line_sha256": "c66c44d3461f61de45a13562492e1f97dafc1c3e059409d41642655a1eb16f8e",
+          "public_line": "   Packaging ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)\n"
+        },
+        {
+          "line": 5,
+          "original_line_sha256": "6f6b2e38abffb20a8b54cbd0d9c93f6873cfeddfc5adef39da760cfc9b392317",
+          "public_line": "   Verifying ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)\n"
+        },
+        {
+          "line": 6,
+          "original_line_sha256": "0b50cd37311adfa687e9668f1cc3743a05091dcf62864f0fd14e1afc5d497dd2",
+          "public_line": "   Compiling ztty-plugin-api v0.1.0 (WORKTREE/artifacts/plugin-api-publication-20261120/target/package/ztty-plugin-api-0.1.0)\n"
+        },
+        {
+          "line": 8,
+          "original_line_sha256": "da5f7e52fa9096176112634ce688237bcc9e2d1915f783dce0599f8872447ae3",
+          "public_line": "   Uploading ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)\n"
+        }
+      ],
+      "byte_identical": false
+    },
+    {
+      "public_file": "api-verify.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/plugin-api-publication-20261120/verify.json",
+      "original_sha256": "d7deaeece4e5bb9c0d78ec00fd670c0048e38fa39804cb8c3b9863fa9e4d3b5e",
+      "public_sha256": "d7deaeece4e5bb9c0d78ec00fd670c0048e38fa39804cb8c3b9863fa9e4d3b5e",
+      "original_bytes": 3564,
+      "public_bytes": 3564,
+      "modified_fields": [],
+      "modified_lines": [],
+      "byte_identical": true
+    },
+    {
+      "public_file": "registry-api.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/plugin-api-publication-20261120/registry-api.json",
+      "original_sha256": "668239579ba2fdff6cd29ba73c5f9db1f584c90bb23362fd8cb105a8153c5d42",
+      "public_sha256": "668239579ba2fdff6cd29ba73c5f9db1f584c90bb23362fd8cb105a8153c5d42",
+      "original_bytes": 2113,
+      "public_bytes": 2113,
+      "modified_fields": [],
+      "modified_lines": [],
+      "byte_identical": true
+    },
+    {
+      "public_file": "registry-index-version.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/plugin-api-publication-20261120/registry-index-version.json",
+      "original_sha256": "ec3c9c4da049cdb45a67a47b7d14a8a49591f740e85e3b2234da1c33ce76447c",
+      "public_sha256": "ec3c9c4da049cdb45a67a47b7d14a8a49591f740e85e3b2234da1c33ce76447c",
+      "original_bytes": 457,
+      "public_bytes": 457,
+      "modified_fields": [],
+      "modified_lines": [],
+      "byte_identical": true
+    },
+    {
+      "public_file": "consumers-result.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/registry-consumers-36b367f-20261120/result.json",
+      "original_sha256": "d4803771883b01f6c2cbcffede8db1937dabd9e3c8c3ed90b88df7161de6b4e7",
+      "public_sha256": "e14a551befde5f4c27e01c4636e2510ae8973ffc96347a4a69a11745911c1ded",
+      "original_bytes": 28413,
+      "public_bytes": 28000,
+      "modified_fields": [
+        {
+          "json_pointer": "/individual_checks/0/commands/2/stderr",
+          "original_value_sha256": "53eb7ecf679fcb3c20ae7177202fcd824dfe55fa97bf193032bbcf7d49037be9",
+          "public_value": "   Compiling zinput v0.1.3\n   Compiling ztty-registry-check-zinput v0.0.0 (/tmp/ztty-registry-4lx_8nn8/zinput)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.41s\n     Running `WORKTREE/artifacts/registry-consumers-36b367f-20261120/target/debug/ztty-registry-check-zinput`\n"
+        },
+        {
+          "json_pointer": "/individual_checks/1/commands/2/stderr",
+          "original_value_sha256": "fe4bdb327b2749fd4c1849e5636bbfe1d2c6541b41ff675e8884b4ac57497c7f",
+          "public_value": "   Compiling simd-adler32 v0.3.10\n   Compiling zune-inflate v0.2.54\n   Compiling zune-core v0.5.3\n   Compiling zune-png v0.5.2\n   Compiling zgraphics v0.2.0\n   Compiling ztty-registry-check-zgraphics v0.0.0 (/tmp/ztty-registry-4lx_8nn8/zgraphics)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.34s\n     Running `WORKTREE/artifacts/registry-consumers-36b367f-20261120/target/debug/ztty-registry-check-zgraphics`\n"
+        },
+        {
+          "json_pointer": "/individual_checks/2/commands/2/stderr",
+          "original_value_sha256": "8e047234792f21e6441da22cb9a6331be129f3eb2649572075a4af89383d5fa0",
+          "public_value": "   Compiling zpty v0.2.2\n   Compiling ztty-registry-check-zpty v0.0.0 (/tmp/ztty-registry-4lx_8nn8/zpty)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.23s\n     Running `WORKTREE/artifacts/registry-consumers-36b367f-20261120/target/debug/ztty-registry-check-zpty`\n"
+        },
+        {
+          "json_pointer": "/individual_checks/3/commands/2/stderr",
+          "original_value_sha256": "cc84fe5a2f4695115613b29fb9fb58fe2bdc8e00d825a8a8f00e29a17bd736ef",
+          "public_value": "   Compiling zgpui v0.1.0\n   Compiling ztty-registry-check-zgpui v0.0.0 (/tmp/ztty-registry-4lx_8nn8/zgpui)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.40s\n     Running `WORKTREE/artifacts/registry-consumers-36b367f-20261120/target/debug/ztty-registry-check-zgpui`\n"
+        },
+        {
+          "json_pointer": "/individual_checks/4/commands/2/stderr",
+          "original_value_sha256": "a5fffcb90c07ffb8966e4ccd9ad8359e38038d2a3524183be8f69b5b206dde73",
+          "public_value": "   Compiling zsys v0.1.1\n   Compiling zplugin v0.3.1\n   Compiling ztty-plugin-api v0.1.0\n   Compiling ztty-registry-check-ztty-plugin-api v0.0.0 (/tmp/ztty-registry-4lx_8nn8/ztty-plugin-api)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.50s\n     Running `WORKTREE/artifacts/registry-consumers-36b367f-20261120/target/debug/ztty-registry-check-ztty-plugin-api`\n"
+        },
+        {
+          "json_pointer": "/individual_checks/5/commands/2/stderr",
+          "original_value_sha256": "758718be45d4518b24e6527f84bff470ea0b58ae32ba24661d8500474f4dd10e",
+          "public_value": "   Compiling zvte v0.1.3\n   Compiling unicode-width v0.2.3\n   Compiling unicode-segmentation v1.13.3\n   Compiling zterm v0.5.0\n   Compiling ztty-registry-check-zterm v0.0.0 (/tmp/ztty-registry-4lx_8nn8/zterm)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.16s\n     Running `WORKTREE/artifacts/registry-consumers-36b367f-20261120/target/debug/ztty-registry-check-zterm`\n"
+        },
+        {
+          "json_pointer": "/combined_check/commands/2/stderr",
+          "original_value_sha256": "1b639797497f0e4a33dd59f177d4134167025286279f0a6531670e59018ae79f",
+          "public_value": "   Compiling ztty-registry-check-zinput-zgraphics-zpty-zgpui-ztty-plugin-api-zterm v0.0.0 (/tmp/ztty-registry-4lx_8nn8/combined)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.34s\n     Running `WORKTREE/artifacts/registry-consumers-36b367f-20261120/target/debug/ztty-registry-check-zinput-zgraphics-zpty-zgpui-ztty-plugin-api-zterm`\n"
+        }
+      ],
+      "modified_lines": [],
+      "byte_identical": false
+    },
+    {
+      "public_file": "consumers-closure.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/registry-consumers-36b367f-20261120/closure.json",
+      "original_sha256": "560e324a50988e2db0274c57b1ee2fc14037aa3f431b82f06e26581d71a0f882",
+      "public_sha256": "764ac898fd4abf1df0904d889d8e265ba26a8dfd3d5e859668a8ce68e3c29667",
+      "original_bytes": 3994,
+      "public_bytes": 3935,
+      "modified_fields": [
+        {
+          "json_pointer": "/command/3",
+          "original_value_sha256": "b15bdfba4448ea1bacd60d1492472d27113a11a2bb8e1ffcdbb037292b6629c7",
+          "public_value": "WORKTREE/artifacts/registry-consumers-36b367f-20261120/result.json"
+        }
+      ],
+      "modified_lines": [],
+      "byte_identical": false
+    },
+    {
+      "public_file": "consumers-launch.json",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/registry-consumers-36b367f-20261120/launch.json",
+      "original_sha256": "20fd463114aa3b3ed59b6a3b68d03c28b9679e7ce2f82f6cb620e4448b371933",
+      "public_sha256": "66c5e07eef157aebbbc0a0067ae348b0803b061f91177bbd48d87db230effacf",
+      "original_bytes": 4269,
+      "public_bytes": 3964,
+      "modified_fields": [
+        {
+          "json_pointer": "/command/11",
+          "original_value_sha256": "587d571a872484800bcfcbe647bf30f7f85410f34c790f5daad280aaa8f15b33",
+          "public_value": "--working-directory=WORKTREE"
+        },
+        {
+          "json_pointer": "/command/15",
+          "original_value_sha256": "ecec7bad035b000d20e1c4ecf87aec5306fbd41b31b912801294d595844b77d0",
+          "public_value": "--setenv=CARGO_TARGET_DIR=WORKTREE/artifacts/registry-consumers-36b367f-20261120/target"
+        },
+        {
+          "json_pointer": "/command/16",
+          "original_value_sha256": "84c004d12f491a0b69187beac1b1203b3332378c40c189ef7ecde2cfd79c6ead",
+          "public_value": "--setenv=CARGO_HOME=WORKTREE/artifacts/cargo-home-20261120"
+        },
+        {
+          "json_pointer": "/command/17",
+          "original_value_sha256": "b1137ce81be2c2c12b5dd9ab6686c51045d6279a38b33afe9db09a1bf0be033b",
+          "public_value": "--setenv=PATH=USER_HOME/.cargo/bin:/usr/local/bin:/usr/bin:/bin"
+        },
+        {
+          "json_pointer": "/command/20",
+          "original_value_sha256": "cbc56d3b6a1bc399af8cbd92adc66917276d257e584d8672ca26b2fc2f4fca31",
+          "public_value": "from pathlib import Path\nimport subprocess,json,hashlib,time,runpy,datetime\nr=Path(\"WORKTREE\");out=Path(\"WORKTREE/artifacts/registry-consumers-36b367f-20261120\");out.mkdir(parents=True,exist_ok=True)\nsource=\"36b367ffda4cea9b3b3dfbf38dc6375567912323\"\ngit=lambda *a:subprocess.check_output([\"git\",*a],cwd=r,text=True).strip()\nassert git(\"rev-parse\",\"HEAD\")==source\nassert not git(\"status\",\"--porcelain\",\"--untracked-files=no\")\nassert not (out/\"result.json\").exists(),\"preserve prior registry results\"\nsha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()\nbefore=sha(r/\"Cargo.lock\")\ncommand=[\"/usr/bin/python3\",\"tools/verify_registry.py\",\"--output\",str(out/\"result.json\"),\"--cargo-timeout\",\"90\"]\nreceipt={\"source\":source,\"timestamp_utc\":datetime.datetime.now(datetime.timezone.utc).isoformat(),\"command\":command,\"tool_sha256\":sha(r/\"tools/verify_registry.py\"),\"lock_before\":before,\"ok\":False}\nstart=time.monotonic()\ntry:\n with (out/\"run.log\").open(\"wb\") as log:\n  c=subprocess.run(command,cwd=r,stdout=log,stderr=subprocess.STDOUT,timeout=900)\n receipt[\"exit_code\"]=c.returncode\n assert c.returncode==0,\"registry consumer command failed\"\n data=json.loads((out/\"result.json\").read_text())\n assert data[\"ok\"] and len(data[\"individual_checks\"])==6 and data[\"combined_check\"][\"ok\"]\n api=next(x for x in data[\"packages\"] if x[\"name\"]==\"ztty-plugin-api\")\n assert api[\"version\"]==\"0.1.0\" and api[\"vcs\"][\"git\"][\"sha1\"]==source\n assert api[\"cargo_lock_checksum\"]==\"e00adc5df1eefa237ea1ccd8d837ceecabef1976141b78918901d95cb8e9d4a6\"\n expected={\"zgpui\":(\"0.1.0\",\"1d796d1fc63808dc099ed7b10c92e75835ae2814\"),\"zinput\":(\"0.1.3\",\"37617313dd7aaabcca9dd567344a76c4cbe03907\"),\"zpty\":(\"0.2.2\",\"66919bc6dcb7757e0437fe955bfa809fb1282b68\"),\"zgraphics\":(\"0.2.0\",\"fe6357f98cf80fb6cc74739e45e8866ee17706ad\"),\"zterm\":(\"0.5.0\",\"13d5e2c74571d35cccd920b1204798211b70c79f\"),\"ztty-plugin-api\":(\"0.1.0\",source)}\n for check in [*data[\"individual_checks\"],data[\"combined_check\"]]:\n  for package in check[\"packages\"]:\n   if package[\"selected\"]:\n    assert (package[\"version\"],package[\"vcs\"][\"git\"][\"sha1\"])==expected[package[\"name\"]]\n    assert package[\"cargo_lock_checksum\"] and package[\"library_source_has_no_std\"]\n assert sha(r/\"Cargo.lock\")==before and git(\"rev-parse\",\"HEAD\")==source\n assert not git(\"status\",\"--porcelain\",\"--untracked-files=no\")\n receipt.update(ok=True,individual_checks=6,combined_check=True,packages=data[\"packages\"])\nexcept Exception as error:receipt[\"error\"]=repr(error)\nfinally:\n receipt[\"elapsed_seconds\"]=time.monotonic()-start\n receipt[\"resources\"]=runpy.run_path(str(r/\"artifacts/plugin-api-publication-20261120/publish.py\"))[\"own_resources\"]()\n for key,name in [(\"report_sha256\",\"result.json\"),(\"log_sha256\",\"run.log\")]:\n  if (out/name).exists():receipt[key]=sha(out/name)\n (out/\"closure.json\").write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+\"\\n\")\nprint(json.dumps(receipt,ensure_ascii=False),flush=True)\nraise SystemExit(0 if receipt[\"ok\"] else 1)\n"
+        }
+      ],
+      "modified_lines": [],
+      "byte_identical": false
+    },
+    {
+      "public_file": "consumers-run.log",
+      "source_scope": "WORKTREE",
+      "source_relative_path": "artifacts/registry-consumers-36b367f-20261120/run.log",
+      "original_sha256": "1e1f699646bbb0b9855ad0d62465c5751e0912607bd59b94ffed9e63f6402a83",
+      "public_sha256": "1e646ecf8620dc3f64f0b1705f4415804bc40810221567ffaec5b55f40c14337",
+      "original_bytes": 3725,
+      "public_bytes": 3666,
+      "modified_fields": [],
+      "modified_lines": [
+        {
+          "line": 7,
+          "original_line_sha256": "d80ea66dd539024eb40b115e2897365ec8657501b7e09db9806bc539b3b6f08c",
+          "public_line": "{\"ok\": true, \"requested_packages\": [\"zinput\", \"zgraphics\", \"zpty\", \"zgpui\", \"ztty-plugin-api\", \"zterm\"], \"output\": \"WORKTREE/artifacts/registry-consumers-36b367f-20261120/result.json\"}\n"
+        }
+      ],
+      "byte_identical": false
+    },
+    {
+      "public_file": "README.md",
+      "kind": "report",
+      "public_sha256": "9c5ca4ec93564c530cc5f59b7b1310d258cea5d1d16151feb5b12620040f875d",
+      "public_bytes": 8352
+    },
+    {
+      "public_file": "verify-record.py",
+      "kind": "offline verification helper",
+      "public_sha256": "e42938df6de19fa9d8d4b896eae599244aeaa39e86aa1ed7c9822bad6680fc9f",
+      "public_bytes": 7550
+    }
+  ],
+  "releasing_history": {
+    "marker": "## Historical records: 0.4.1 and earlier",
+    "bytes": 34527,
+    "sha256": "965fe28286b15399c4d64661b0370788edaa0696820846a893ddc4eb21f49437"
+  },
+  "preservation": {
+    "numeric_literals": true,
+    "json_key_order": true,
+    "json_whitespace": true,
+    "exit_and_failure_fields": true,
+    "resource_values": true,
+    "source_artifacts_unmodified": true,
+    "original_hashes_inside_receipts_not_rewritten": true
+  },
+  "source": "36b367ffda4cea9b3b3dfbf38dc6375567912323",
+  "consumer_verifier_sha256": "b1bae659a7f125309f8060e9cb3d8894a14665651770cbe3f5af18223925f51c",
+  "crate_binaries_committed": false
+}

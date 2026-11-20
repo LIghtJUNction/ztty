@@ -22,7 +22,9 @@ cross-compilation check establishes only its recorded source and scope.
 `zterm 0.5.0` are published from their independent repositories. Reuse these
 versions and the candidate's fixed submodule commits and lockfile.
 `zterm 0.5.1` is still under performance investigation and is not published.
-`ztty-plugin-api 0.1.0` and the application remain unpublished.
+`ztty-plugin-api 0.1.0` is also published. Its [publication and registry record](reports/plugin-api-registry-20261120/README.md)
+confirms all six isolated consumers and their combined consumer passed with
+published `zterm 0.5.0`. The application remains unpublished.
 
 [zgpui](https://github.com/LIghtJUNction/zgpui) is an independent repository,
 included at `crates/zgpui` as a Git submodule pinned to
@@ -45,7 +47,8 @@ platform-independent; native windows and graphics remain host responsibilities.
    exact candidate, and checks any existing tag and archive before continuing.
 3. Verify and publish changed independent libraries from their own repositories
    in the order above; this candidate reuses the published versions listed here.
-   Publish the remaining `ztty-plugin-api` from the root manifest path below.
+   For a changed `ztty-plugin-api` version, publish from the root manifest path
+   below; the current `0.1.0` is already published.
    Confirm registry versions and package contents before verifying consumers
    without workspace path overrides.
 4. Run the [application Release workflow](../.github/workflows/release.yml) for
@@ -60,16 +63,16 @@ platform-independent; native windows and graphics remain host responsibilities.
 
 The native application gates build `ztty-plugin-api` through its local `path`
 dependency. Passing those gates does not verify the registry package and does
-not require the API to have been published first. Publish it from the approved,
-clean candidate checkout:
+not require the API to have been published first. For a future API version,
+package and publish from its approved, clean candidate checkout:
 
 ```sh
 cargo package --locked --manifest-path crates/ztty-plugin-api/Cargo.toml
 cargo publish --locked --manifest-path crates/ztty-plugin-api/Cargo.toml
 ```
 
-After `ztty-plugin-api 0.1.0` is available in the registry, run the default
-verification for all six libraries and their combined consumer:
+After all candidate dependency versions are available in the registry, run the
+default verification for all six libraries and their combined consumer:
 
 ```sh
 python3 tools/verify_registry.py --output artifacts/registry-consumer.json
