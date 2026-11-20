@@ -1,0 +1,26 @@
+{
+  "timestamp_utc": "2026-11-20T01:33:07.684381+00:00",
+  "command": [
+    "/usr/bin/systemd-run",
+    "--user",
+    "--unit=ztty-registry-36b367f-20261120",
+    "--collect",
+    "--wait",
+    "--pipe",
+    "--property=MemoryMax=768M",
+    "--property=MemorySwapMax=0",
+    "--property=CPUQuota=100%",
+    "--property=Nice=10",
+    "--property=OOMPolicy=stop",
+    "--working-directory=WORKTREE",
+    "--setenv=RUSTC_WRAPPER=",
+    "--setenv=CARGO_BUILD_JOBS=1",
+    "--setenv=RUSTUP_TOOLCHAIN=1.100.0",
+    "--setenv=CARGO_TARGET_DIR=WORKTREE/artifacts/registry-consumers-36b367f-20261120/target",
+    "--setenv=CARGO_HOME=WORKTREE/artifacts/cargo-home-20261120",
+    "--setenv=PATH=USER_HOME/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "/usr/bin/python3",
+    "-c",
+    "from pathlib import Path\nimport subprocess,json,hashlib,time,runpy,datetime\nr=Path(\"WORKTREE\");out=Path(\"WORKTREE/artifacts/registry-consumers-36b367f-20261120\");out.mkdir(parents=True,exist_ok=True)\nsource=\"36b367ffda4cea9b3b3dfbf38dc6375567912323\"\ngit=lambda *a:subprocess.check_output([\"git\",*a],cwd=r,text=True).strip()\nassert git(\"rev-parse\",\"HEAD\")==source\nassert not git(\"status\",\"--porcelain\",\"--untracked-files=no\")\nassert not (out/\"result.json\").exists(),\"preserve prior registry results\"\nsha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()\nbefore=sha(r/\"Cargo.lock\")\ncommand=[\"/usr/bin/python3\",\"tools/verify_registry.py\",\"--output\",str(out/\"result.json\"),\"--cargo-timeout\",\"90\"]\nreceipt={\"source\":source,\"timestamp_utc\":datetime.datetime.now(datetime.timezone.utc).isoformat(),\"command\":command,\"tool_sha256\":sha(r/\"tools/verify_registry.py\"),\"lock_before\":before,\"ok\":False}\nstart=time.monotonic()\ntry:\n with (out/\"run.log\").open(\"wb\") as log:\n  c=subprocess.run(command,cwd=r,stdout=log,stderr=subprocess.STDOUT,timeout=900)\n receipt[\"exit_code\"]=c.returncode\n assert c.returncode==0,\"registry consumer command failed\"\n data=json.loads((out/\"result.json\").read_text())\n assert data[\"ok\"] and len(data[\"individual_checks\"])==6 and data[\"combined_check\"][\"ok\"]\n api=next(x for x in data[\"packages\"] if x[\"name\"]==\"ztty-plugin-api\")\n assert api[\"version\"]==\"0.1.0\" and api[\"vcs\"][\"git\"][\"sha1\"]==source\n assert api[\"cargo_lock_checksum\"]==\"e00adc5df1eefa237ea1ccd8d837ceecabef1976141b78918901d95cb8e9d4a6\"\n expected={\"zgpui\":(\"0.1.0\",\"1d796d1fc63808dc099ed7b10c92e75835ae2814\"),\"zinput\":(\"0.1.3\",\"37617313dd7aaabcca9dd567344a76c4cbe03907\"),\"zpty\":(\"0.2.2\",\"66919bc6dcb7757e0437fe955bfa809fb1282b68\"),\"zgraphics\":(\"0.2.0\",\"fe6357f98cf80fb6cc74739e45e8866ee17706ad\"),\"zterm\":(\"0.5.0\",\"13d5e2c74571d35cccd920b1204798211b70c79f\"),\"ztty-plugin-api\":(\"0.1.0\",source)}\n for check in [*data[\"individual_checks\"],data[\"combined_check\"]]:\n  for package in check[\"packages\"]:\n   if package[\"selected\"]:\n    assert (package[\"version\"],package[\"vcs\"][\"git\"][\"sha1\"])==expected[package[\"name\"]]\n    assert package[\"cargo_lock_checksum\"] and package[\"library_source_has_no_std\"]\n assert sha(r/\"Cargo.lock\")==before and git(\"rev-parse\",\"HEAD\")==source\n assert not git(\"status\",\"--porcelain\",\"--untracked-files=no\")\n receipt.update(ok=True,individual_checks=6,combined_check=True,packages=data[\"packages\"])\nexcept Exception as error:receipt[\"error\"]=repr(error)\nfinally:\n receipt[\"elapsed_seconds\"]=time.monotonic()-start\n receipt[\"resources\"]=runpy.run_path(str(r/\"artifacts/plugin-api-publication-20261120/publish.py\"))[\"own_resources\"]()\n for key,name in [(\"report_sha256\",\"result.json\"),(\"log_sha256\",\"run.log\")]:\n  if (out/name).exists():receipt[key]=sha(out/name)\n (out/\"closure.json\").write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+\"\\n\")\nprint(json.dumps(receipt,ensure_ascii=False),flush=True)\nraise SystemExit(0 if receipt[\"ok\"] else 1)\n"
+  ]
+}

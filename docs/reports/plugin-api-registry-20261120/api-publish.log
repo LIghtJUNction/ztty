@@ -1,0 +1,12 @@
+    Updating crates.io index
+   Packaging ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)
+    Updating crates.io index
+    Packaged 7 files, 7.4KiB (3.4KiB compressed)
+   Verifying ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)
+   Compiling ztty-plugin-api v0.1.0 (WORKTREE/artifacts/plugin-api-publication-20261120/target/package/ztty-plugin-api-0.1.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.87s
+   Uploading ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)
+    Uploaded ztty-plugin-api v0.1.0 to registry `crates-io`
+note: waiting for ztty-plugin-api v0.1.0 to be available at registry `crates-io`
+help: you may press ctrl-c to skip waiting; the crate should be available shortly
+   Published ztty-plugin-api v0.1.0 at registry `crates-io`

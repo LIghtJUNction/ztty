@@ -1,0 +1,16 @@
+    Updating crates.io index
+   Packaging ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)
+    Updating crates.io index
+    Packaged 7 files, 7.4KiB (3.4KiB compressed)
+   Verifying ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling syn v2.0.119
+   Compiling zplugin-macros v0.3.1
+   Compiling zsys v0.1.1
+   Compiling zplugin v0.3.1
+   Compiling ztty-plugin-api v0.1.0 (WORKTREE/artifacts/plugin-api-publication-20261120/target/package/ztty-plugin-api-0.1.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.57s
+   Uploading ztty-plugin-api v0.1.0 (WORKTREE/crates/ztty-plugin-api)
+warning: aborting upload due to dry run
