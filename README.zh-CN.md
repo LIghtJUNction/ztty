@@ -7,7 +7,7 @@ Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令
 
 ztty 当前正式下载版本仍为 **0.4.1**。本页描述 **0.5.0 源码候选版**，
 平台范围对应 `iter/resume-20261120` 的
-[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a) 检查点。
+[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb) 检查点。
 应用正式发布和设备安装尚未完成。
 
 ## Linux 安装
@@ -39,7 +39,7 @@ sudo apt install build-essential pkg-config libx11-dev libxft-dev libxrender-dev
 ```
 
 ```sh
-git clone --recurse-submodules https://github.com/LIghtJUNction/ztty.git
+git clone --recurse-submodules --branch iter/resume-20261120 https://github.com/LIghtJUNction/ztty.git
 cd ztty
 cargo build --locked --release
 ./target/release/ztty --font 'monospace:size=12' --geometry 100x28
@@ -60,14 +60,14 @@ macOS 和 Windows 的原生构建、打包入口见[发布说明](docs/releasing
 - 完整字符簇存储、历史重排，以及跨自动换行的文字复制。
 - Kitty 图片和 Sixel；Linux 增加动画、Unicode 占位符和相对位置。
 - Linux X11 Kitty 文件、共享内存传输，以及有界的 OSC 52 剪贴板访问。
-- Linux 标签页、分屏、共享会话、历史搜索和命令面板。
-- Linux GPU 文字整形、Xft 回退、配置热重载和 XIM 输入法恢复。
+- Linux 共享会话；X11 标签页、分屏、历史搜索和命令面板。
+- Linux X11 GPU 文字整形、Xft 回退、配置热重载和 XIM 输入法恢复。
 - 可选的 [Shell 集成](shell/README.md)和[可信文本扩展](docs/text-plugins.zh-CN.md)。
 
 Linux X11 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使用 Xft。
 [配置指南](docs/configuration.md)和[协议说明](docs/protocols.md)列出支持的模式与范围。
 
-## Linux 常用操作
+## Linux X11 常用操作
 
 | 操作 | 快捷键 |
 | --- | --- |
@@ -88,8 +88,8 @@ Linux X11 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使
 
 ## 共享会话与 MCP（Linux）
 
-Linux X11 多个窗口自动共用会话进程、显示连接和字体缓存；
-每个会话分别保留自己的 PTY、屏幕和历史。
+Linux X11 与原生 Wayland 窗口共用同一个会话进程；每个会话保留自己的
+PTY、屏幕和历史。X11 窗口还共用显示连接与字体缓存。
 
 ```sh
 ztty --name work -e /bin/bash &
@@ -127,30 +127,30 @@ Linux X11 会在原窗口中应用有效配置。[配置指南](docs/configurati
 | 平台 | 当前源码 |
 | --- | --- |
 | Linux X11/XWayland | GPU 或 Xft；共享会话、标签页、分屏、Attach、MCP |
-| Linux 原生 Wayland | 显式启用的实验性单窗口；EGL/GLES 与 XKB 输入 |
+| Linux 原生 Wayland | 显式启用 EGL/GLES；共享会话、Attach/MCP、剪贴板与 text-input 输入法 |
 | macOS | 原生 AppKit/CoreText 窗口与 Darwin PTY；本地会话 |
 | Windows | 原生 Win32/GDI 与 ConPTY；本地标签页和分屏 |
 
 macOS 无需 X11，Windows 无需 WSL。Windows 支持字体与工作区快捷键；
 macOS 复制粘贴使用 Command+C/V 或 Ctrl+Shift+C/V。
-共享会话、Attach、搜索与 MCP 当前使用 Linux X11 运行时。
+共享会话、Attach 与 MCP 当前属于 Linux 功能。
 各平台实际测试范围见[验收说明](docs/protocols.md#acceptance-coverage)。
 
-试用实验性原生 Wayland 窗口：
+试用实验性原生 Wayland 后端：
 
 ```sh
 cargo build --locked --release --features wayland
-./target/release/ztty --backend wayland
+./target/release/ztty --backend wayland --name work
 ```
 
 官方 Linux 包的构建会启用 Wayland 支持，运行时仍默认使用 X11。
-[Wayland 配置](docs/configuration.md#native-wayland-experimental)列出额外依赖，
-以及剪贴板、输入法和工作区等当前边界。
+Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/configuration.md#native-wayland-experimental)
+说明额外依赖，以及尚未实机验证的物理 GPU、桌面输入法与显示缩放。
 
 ## 性能与开发
 
 <!-- terminal-benchmark:start -->
-[本轮基准报告](docs/benchmarks/resume-2026-11-20.md)列出实测版本、负载与原始数据。
+新的测量结果待补入[本轮基准报告](docs/benchmarks/resume-2026-11-20.md)。
 [复现方法](docs/benchmarks/README.md)说明如何运行同条件对比；
 [较早的性能记录](docs/performance.md)保留对应的测量环境。
 <!-- terminal-benchmark:end -->

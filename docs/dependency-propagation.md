@@ -1,6 +1,6 @@
 # 依赖传播维护记录
 
-更新：2026-11-20（Asia/Taipei）。本轮独立库已发布，ztty 的核心版本/pin/lock 已对应；**最终应用验收与 oh-my-ztty 传播尚未闭环**。本记录区分库发布、消费者验收和应用安装，后续回执应更新对应行。
+更新：2026-11-20（Asia/Taipei）。本轮独立库已发布，统一候选 `6053a97` 已合入共享 Wayland，核心版本/pin/lock 与本地完整检查已核对；**新 GUI、正式原生发布验收与 oh-my-ztty 传播尚未闭环**。本记录区分库发布、消费者验收和应用安装，后续回执应更新对应行。
 
 ## 维护约定
 
@@ -95,14 +95,31 @@ zgraphics 0.2.0 的[正式发布](https://github.com/LIghtJUNction/zgraphics/act
 
 早期原始证据保留了 23:10 UTC 的干净提交 `4aec236`。随后 root 已提交、推送 [7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a)，完成独立 zterm 接入。GitHub 读回确认五个 gitlink 都指向上表发布点；[Cargo.toml](https://github.com/LIghtJUNction/ztty/blob/7544a0d7a6d01bfe149d743ed3147baff188d67a/Cargo.toml) 用根 patch 固定传递依赖，[Cargo.lock](https://github.com/LIghtJUNction/ztty/blob/7544a0d7a6d01bfe149d743ed3147baff188d67a/Cargo.lock)保持不变。root 回执的 metadata 每个核心 path 库恰好一份，zterm 的 28 个 Rust 源文件与实际 registry 包逐字一致。
 
-| 消费边 | `7544a0d` 的实际状态 | 后续 owner / 状态 |
+统一候选 [6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb) 保留同样的五个发布 gitlink 和 Cargo.lock（SHA-256 `c4290a5f00aa4437ad31007dfcc0f35e582b4c4f62511ade176ff553fc34efa3`）；本次只读检查已再次核对。
+
+| 消费边 | `6053a97` 的实际状态 | 后续 owner / 状态 |
 | --- | --- | --- |
 | zterm → zgpui / zgraphics / zinput | 版本为 0.1.0 / 0.2.0 / 0.1.3；根 patch 与三个固定 gitlink 保证使用同一源码 | 版本/pin/lock 已对应；root 负责最终应用验收 |
 | ztty → zpty | 约束 0.2.2、gitlink `66919bc`、锁文件 0.2.2 一致 | 版本/pin/lock 已对应；wayland 的提取/库验收已交付 |
 | ztty → zterm | gitlink 为正式 0.5.0/`13d5e2c`，已移出应用 workspace 成员 | 版本/pin/lock 已对应；root 负责完整应用 gate |
-| Linux host / ztty-plugin-api → zplugin | 两处精确约束 `=0.3.1`；锁文件为单一 zplugin/macros 0.3.1 和 zsys 0.1.1 | root：在最终应用提交上完成原生、MCP、GUI 和发布/安装验收 |
+| Linux host / ztty-plugin-api / 当前示例 → zplugin | 统一为 `=0.3.1`；锁文件为单一 zplugin/macros 0.3.1 和 zsys 0.1.1 | root：新 GUI、正式原生发布与安装仍待完成；API 0.1.0 尚未首次发布 |
 
-完整应用 gate 暂待分支协调。另一个活动 owner 的 `release/0.5.0` 已到 [80888ee](https://github.com/LIghtJUNction/ztty/commit/80888eede7d9f5c5bb5b62a2acc21680691eec72)；root/graphics 正在对账其 Wayland、IME 等工作。这里的单窗口 Wayland 描述只属于 `iter/resume-20261120` 检查点，不能据此限定最终合并版的能力。现有 owner 的工作树和发布职责继续保留。
+### 统一候选与验收归属
+
+共享 Wayland 已冻结为 [8b9f566](https://github.com/LIghtJUNction/ztty/commit/8b9f566c15ec3fb1020c4e2d96d41138c8cd2293)，进入 release 分支 [8b73651](https://github.com/LIghtJUNction/ztty/commit/8b7365122379b958942aedfb51c62419271698c2)，再经 `99a22c2` 合并到本轮候选 `6053a97`。此前缺少可合并 feature SHA 的阻碍已解除。[PR #18](https://github.com/LIghtJUNction/ztty/pull/18) 是接收路径；本次 GitHub 读回为 open/draft，head 为 `6053a97`、base 为 `8b73651`。尚未观察到现有 release owner 对接收和发布角色的明确 ACK，由 root 继续协调。
+
+当前 Wayland 与 X11 共用 broker、PTY 管理和输入控制，支持 attach/MCP、混合后端会话、剪贴板/primary selection 与 text-input-v3。它仍需显式 `--backend wayland`；默认 X11，Wayland 拒绝 tab/split/workspace 容器。物理 GPU、实际桌面 IME 组合与 HiDPI/fractional scale 尚未实机验证。
+
+| 验证或交付 | 已有证据 | 当前状态 / owner |
+| --- | --- | --- |
+| 共享 Wayland 实现 | [owner 报告](reports/native-wayland-shared-20261119/README.zh-CN.md)绑定 `8b9f566`；65 项 Wayland 检查属于 ELF `7fbaf9942d82c168bc08c54a472ccda8acd81c24f31d65558ebc48771a4dee74` | feature 已合并；旧 ELF 结果不代替 `6053a97` 验收 |
+| `6053a97` 本地检查 | root 回执：默认 release 构建、默认/Wayland 严格 Clippy、`ZTTY_WAYLAND=1 BARE_METAL=1 make check` 通过；466 Rust 测试通过，6 项在该命令中 ignored；5 组原生服务预算 ASan/UBSan 通过，IME peer 已构建；同一候选的 6 项 EGL 专项随后实际全部通过（Mesa 软件 GL） | 本地完整 gate 与 EGL 专项已通过；不外推物理 GPU 性能 |
+| 新整合 GUI 与正式原生发布 | 新 21 阶段 GUI（含 65 项 Wayland、14 项 Wayland CLI）和六架构正式原生门禁尚未取得通过回执 | root 与 wayland owner 接续；不借用旧候选结果 |
+| `ztty-plugin-api` 0.1.0 | 当前源码、host 与示例依赖已统一；尚未首次 registry 发布 | root 与现有 release owner 确认首发源码和发布归属 |
+| 新基准 | 本次 admission 因 load `16.886 > 12` 延后，实际 0 runs | root：等待满足资源条件再测；目前没有本候选性能结果 |
+| ztty 0.5.0 应用及安装 | 仍为源码候选；正式下载保持 0.4.1 | root 与现有 release owner 完成接收、发布、安装回执后再交套件 owner |
+
+较早 `7544a0d` 的本地/GUI 记录保留为该阶段证据，不能自动转记到新的合并源码。中央目录与外部消费者的以下观察仍是原快照；未取得新 owner 回执的条目保持待完成。
 
 ### oh-my-ztty 的明确接手条件
 

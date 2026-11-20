@@ -3,7 +3,7 @@
 ## 0.5.0 candidate — 2026-11-20 (Asia/Taipei)
 
 This entry covers `iter/resume-20261120` at
-[7544a0d](https://github.com/LIghtJUNction/ztty/commit/7544a0d7a6d01bfe149d743ed3147baff188d67a).
+[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb).
 
 This is a source candidate. The ztty application release and device installation
 are pending; published application downloads remain 0.4.1.
@@ -17,10 +17,11 @@ Its application integration and remaining release gates are tracked in
 - Linux X11 EGL/GLES rendering with HarfBuzz shaping and FreeType/Fontconfig
   font fallback. Text, images and interface overlays share complete frames;
   `renderer = auto` selects hardware EGL with Xft fallback.
-- An explicit experimental native Wayland backend: build with `--features
-  wayland` and select `--backend wayland`. It provides one xdg-shell window,
-  a local PTY, XKB keyboard input, history scrolling and resizing. The official
-  Linux package build enables the feature; default startup still selects X11.
+- An opt-in native Wayland backend: build with `--features wayland` and select
+  `--backend wayland`. It shares the Linux broker, PTY ownership and attach/MCP
+  path with X11, including mixed-backend sessions, bounded clipboard/primary
+  selection transfers and text-input-v3 preedit/commit. The official Linux
+  package build enables the feature; runtime startup still defaults to X11.
 - Kitty animation, Unicode placeholders and relative placement, with bounded
   Linux file/shared-memory image transport. Linux X11 OSC 52 adds bounded
   clipboard access with input ownership and cancellation checks.
@@ -45,8 +46,9 @@ Its application integration and remaining release gates are tracked in
   [zgraphics 0.2.0](https://github.com/LIghtJUNction/zgraphics/commit/fe6357f).
   Their canonical implementations live in independent repositories; the
   application consumes pinned submodules and versioned dependencies.
-- Align the text-plugin host and shared API on `zplugin 0.3.1`, with
-  `zsys 0.1.1` in the locked dependency graph.
+- Align the text-plugin host, shared API and active example on `zplugin 0.3.1`,
+  with `zsys 0.1.1` in the locked graph. `ztty-plugin-api` 0.1.0 remains a source
+  candidate awaiting its first registry release.
 - Separate the Linux session broker and macOS/Windows frontends into modules
   for requests, input, drawing and system bindings. Public entry points and
   data layouts remain unchanged.
@@ -65,15 +67,20 @@ Its application integration and remaining release gates are tracked in
 
 The [X11 renderer report](docs/reports/x11-gpu-20261119/report.zh-CN.md),
 [Kitty/OSC 52 report](docs/reports/graphics-extensions-20261120/report.zh-CN.md)
-and [Wayland record](docs/measurements/native-wayland-2026-11-19/README.md)
-retain their tested source and environment. Native clipboard acceptance in
-this iteration is limited to Linux X11. Wayland shared sessions, workspace UI,
-system clipboard and text-input IME remain pending; complete Unicode
-bidirectional paragraph layout is outside the current shaping scope.
+and [shared Wayland report](docs/reports/native-wayland-shared-20261119/README.zh-CN.md)
+retain their tested source and environment. The feature owner's 65 Wayland
+checks belong to its recorded source and ELF, not the later integrated candidate.
 
-The [candidate benchmark report](docs/benchmarks/resume-2026-11-20.md) records
-performance separately. No earlier measurement establishes this candidate's
-performance or its final native release acceptance.
+At `6053a97`, the default release build, default/Wayland strict Clippy and full
+local check gate have passed, as have six additional software EGL unit tests.
+Fresh integrated GUI and formal native release gates remain pending. Wayland rejects tabs, splits and workspace containers;
+physical GPU behavior, desktop IME combinations and HiDPI/fractional scaling
+remain unverified. Complete Unicode bidirectional paragraph layout is outside
+the current shaping scope.
+
+Fresh measurements for the [candidate benchmark report](docs/benchmarks/resume-2026-11-20.md)
+remain pending. Earlier measurements do not establish this candidate's
+performance or final native release acceptance.
 
 ## 0.4.1 — 2026-11-19 (Asia/Taipei)
 
