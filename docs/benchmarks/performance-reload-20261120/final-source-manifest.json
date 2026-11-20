@@ -1,0 +1,37 @@
+{
+  "source": "f7e019654684ceae4b0cb64d47d651ebed99bc35",
+  "baseline_source": "755c2c01c2a3eb535088a6f06d1655aaef97d931",
+  "verified_paths": [
+    "crates/zpty",
+    "crates/zterm",
+    "src/broker.rs",
+    "src/broker/reload.rs",
+    "src/display.rs",
+    "src/input_queue.rs",
+    "src/json.rs",
+    "src/main.rs",
+    "src/output_tail.rs",
+    "src/runtime_reload.rs",
+    "src/session.rs",
+    "src/session/reload.rs",
+    "src/session/requests.rs",
+    "src/session/workspaces.rs",
+    "src/session_core.rs",
+    "src/x11.rs",
+    "src/x11/clipboard.rs",
+    "src/x11/ffi.rs",
+    "src/x11/gpu.rs",
+    "src/x11/render.rs",
+    "src/x11/window.rs",
+    "tests/reload_runtime.py",
+    "tests/repaint_gui.py",
+    "tests/tab_mouse_release.py",
+    "tests/tab_switch_pixels.py"
+  ],
+  "binaries": {
+    "ztty-before": "25157d0cef430c5d2e2355304e56c7f2a6abbe3aeb7f52072eebe643091615ca",
+    "ztty-final": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368"
+  },
+  "source_status": "clean",
+  "time": 1795158162.0317416
+}

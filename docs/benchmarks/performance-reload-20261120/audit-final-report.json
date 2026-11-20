@@ -1,0 +1,772 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-20T07:32:36.856719+00:00",
+  "audit_ok": true,
+  "reviewed_report": "/workspace/scratch/3dc04f47346d/ztty-performance-reload-2026-11-20.md",
+  "reviewed_report_sha256": "a71f1b49f10ee890f22943b17b1ae4d863c0bd8822847a8083104fbc931997e5",
+  "scope": "Final documentation and existing clipboard evidence review only; no application, clipboard read, native test, or performance workload executed by this audit.",
+  "failures": [],
+  "checks": [
+    {
+      "check": "clipboard source is fixed 2aa561b",
+      "ok": true
+    },
+    {
+      "check": "performance samples retain f7e0196 identity",
+      "ok": true
+    },
+    {
+      "check": "new ELF identity matches report",
+      "ok": true
+    },
+    {
+      "check": "before is legacy leak reproduction, not a successful rejection",
+      "ok": true
+    },
+    {
+      "check": "after is explicit rejection mode on new ELF",
+      "ok": true
+    },
+    {
+      "check": "same recorded image fixture matches fixed GitHub source",
+      "ok": true
+    },
+    {
+      "check": "image fixture uses default key bindings",
+      "ok": true
+    },
+    {
+      "check": "native before and after used identical recorded synthetic PNG size and digest",
+      "ok": true
+    },
+    {
+      "check": "before has 10 checks with its own explicit expectation",
+      "ok": true
+    },
+    {
+      "check": "before has no recorded cleanup error",
+      "ok": true
+    },
+    {
+      "check": "before default Ctrl+V delivers one 0x16 byte without selection requests",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: image-only owner lies about UTF8 conversion",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: image-only owner lies about STRING fallback",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: invalid UTF8 is rejected directly",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: invalid UTF8 is rejected after complete INCR",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: advertised UTF8 rejects a STRING property",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: UTF8 direct",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: UTF8 INCR split across codepoints",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: STRING direct",
+      "ok": true
+    },
+    {
+      "check": "before exact expected bytes and digest: STRING INCR split across codepoints",
+      "ok": true
+    },
+    {
+      "check": "after has 10 checks with its own explicit expectation",
+      "ok": true
+    },
+    {
+      "check": "after has no recorded cleanup error",
+      "ok": true
+    },
+    {
+      "check": "after default Ctrl+V delivers one 0x16 byte without selection requests",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: image-only owner lies about UTF8 conversion",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: image-only owner lies about STRING fallback",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: invalid UTF8 is rejected directly",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: invalid UTF8 is rejected after complete INCR",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: advertised UTF8 rejects a STRING property",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: UTF8 direct",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: UTF8 INCR split across codepoints",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: STRING direct",
+      "ok": true
+    },
+    {
+      "check": "after exact expected bytes and digest: STRING INCR split across codepoints",
+      "ok": true
+    },
+    {
+      "check": "native lossy UTF-8 case matches its exact nonempty expected bytes and digest",
+      "ok": true
+    },
+    {
+      "check": "legacy image-only path requests unadvertised conversion",
+      "ok": true
+    },
+    {
+      "check": "new image-only path reads TARGETS only and produces no PTY bytes",
+      "ok": true
+    },
+    {
+      "check": "native Latin-1 case matches its exact nonempty expected bytes and digest",
+      "ok": true
+    },
+    {
+      "check": "legacy image-only path requests unadvertised conversion",
+      "ok": true
+    },
+    {
+      "check": "new image-only path reads TARGETS only and produces no PTY bytes",
+      "ok": true
+    },
+    {
+      "check": "new invalid/image/type guard rejects complete input: image-only owner lies about UTF8 conversion",
+      "ok": true
+    },
+    {
+      "check": "new invalid/image/type guard rejects complete input: image-only owner lies about STRING fallback",
+      "ok": true
+    },
+    {
+      "check": "new invalid/image/type guard rejects complete input: invalid UTF8 is rejected directly",
+      "ok": true
+    },
+    {
+      "check": "new invalid/image/type guard rejects complete input: invalid UTF8 is rejected after complete INCR",
+      "ok": true
+    },
+    {
+      "check": "new invalid/image/type guard rejects complete input: advertised UTF8 rejects a STRING property",
+      "ok": true
+    },
+    {
+      "check": "legacy guard-named case records the old leak, not new rejection: image-only owner lies about UTF8 conversion",
+      "ok": true
+    },
+    {
+      "check": "legacy guard-named case records the old leak, not new rejection: image-only owner lies about STRING fallback",
+      "ok": true
+    },
+    {
+      "check": "legacy guard-named case records the old leak, not new rejection: invalid UTF8 is rejected directly",
+      "ok": true
+    },
+    {
+      "check": "legacy guard-named case records the old leak, not new rejection: invalid UTF8 is rejected after complete INCR",
+      "ok": true
+    },
+    {
+      "check": "legacy guard-named case records the old leak, not new rejection: advertised UTF8 rejects a STRING property",
+      "ok": true
+    },
+    {
+      "check": "text transfer exact count and outcomes",
+      "ok": true
+    },
+    {
+      "check": "text transfer new ELF and successful cleanup",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: direct UTF-8 multiline and tabs",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: INCR UTF-8 split inside codepoints",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: direct STRING fallback",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: INCR STRING fallback",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: large INCR complete byte-for-byte",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: empty clipboard sends no paste brackets",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: control characters cannot close paste brackets",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: missing text",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after missing text",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: non-text direct type",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after non-text direct type",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: wrong direct format",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after wrong direct format",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: malformed INCR header",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after malformed INCR header",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: INCR type change rejects prefix",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after INCR type change rejects prefix",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: malformed INCR chunk rejects prefix",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after malformed INCR chunk rejects prefix",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: oversized direct reply",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after oversized direct reply",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: oversized INCR declaration",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after oversized INCR declaration",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: cumulative INCR limit",
+      "ok": true
+    },
+    {
+      "check": "text transfer raw byte/digest equality: recovery after cumulative INCR limit",
+      "ok": true
+    },
+    {
+      "check": "OSC52 software exact count and outcomes",
+      "ok": true
+    },
+    {
+      "check": "OSC52 software new ELF and successful cleanup",
+      "ok": true
+    },
+    {
+      "check": "OSC52 GPU exact count and outcomes",
+      "ok": true
+    },
+    {
+      "check": "OSC52 GPU new ELF and successful cleanup",
+      "ok": true
+    },
+    {
+      "check": "OSC52 observed software before/after and 13 passed",
+      "ok": true
+    },
+    {
+      "check": "OSC52 software permission/cancellation/timeout gates present",
+      "ok": true
+    },
+    {
+      "check": "OSC52 observed gpu before/after and 13 passed",
+      "ok": true
+    },
+    {
+      "check": "OSC52 gpu permission/cancellation/timeout gates present",
+      "ok": true
+    },
+    {
+      "check": "reload has 9 checks and 2 replacements",
+      "ok": true
+    },
+    {
+      "check": "reload target is new real ELF without synthetic suffix identity",
+      "ok": true
+    },
+    {
+      "check": "reload distinguishes ELF images and records no owned leftovers",
+      "ok": true
+    },
+    {
+      "check": "successful reload response retains broker identity and sessions",
+      "ok": true
+    },
+    {
+      "check": "successful reload response retains broker identity and sessions",
+      "ok": true
+    },
+    {
+      "check": "reload swaps forward and back between different real ELF images",
+      "ok": true
+    },
+    {
+      "check": "reload child PID/start/PTY/nonce preserved: reload-alpha",
+      "ok": true
+    },
+    {
+      "check": "reload child PID/start/PTY/nonce preserved: reload-beta",
+      "ok": true
+    },
+    {
+      "check": "reload child PID/start/PTY/nonce preserved: reload-gamma",
+      "ok": true
+    },
+    {
+      "check": "real desktop evidence limited to MIME list and denied X11 query",
+      "ok": true
+    },
+    {
+      "check": "report separates synthetic terminal evidence from actual Codex attachment and Wayland GUI claims",
+      "ok": true
+    },
+    {
+      "check": "report does not claim a verified real desktop bridge root cause",
+      "ok": true
+    },
+    {
+      "check": "viewed refusal screenshot matches raw receipt",
+      "ok": true
+    },
+    {
+      "check": "prior recommendation resolved: pipeline_geometry",
+      "ok": true
+    },
+    {
+      "check": "prior recommendation resolved: payload_and_screen_evidence_scope",
+      "ok": true
+    },
+    {
+      "check": "prior recommendation resolved: renderer_observation_scope",
+      "ok": true
+    },
+    {
+      "check": "prior recommendation resolved: binary_pool_transition",
+      "ok": true
+    },
+    {
+      "check": "prior recommendation resolved: window_error_not_tested",
+      "ok": true
+    },
+    {
+      "check": "prior recommendation resolved: performance_source_not_relabelled",
+      "ok": true
+    },
+    {
+      "check": "prior recommendation resolved: negative_and_variable_results_retained",
+      "ok": true
+    },
+    {
+      "check": "prior audit unchanged: audit-result.json",
+      "ok": true
+    },
+    {
+      "check": "prior audit unchanged: audit-pipeline.json",
+      "ok": true
+    },
+    {
+      "check": "prior audit unchanged: audit-result-complete.json",
+      "ok": true
+    },
+    {
+      "check": "prior audit unchanged: audit-report-review.json",
+      "ok": true
+    },
+    {
+      "check": "prior audit unchanged: audit-summary.md",
+      "ok": true
+    },
+    {
+      "check": "raw evidence unchanged: clipboard-source-manifest.json",
+      "ok": true
+    },
+    {
+      "check": "raw evidence unchanged: clipboard-image-before.json",
+      "ok": true
+    },
+    {
+      "check": "raw evidence unchanged: clipboard-image-after.json",
+      "ok": true
+    },
+    {
+      "check": "raw evidence unchanged: clipboard-transfer-after.json",
+      "ok": true
+    },
+    {
+      "check": "raw evidence unchanged: clipboard-osc52-software/osc52.json",
+      "ok": true
+    },
+    {
+      "check": "raw evidence unchanged: clipboard-osc52-gpu/osc52.json",
+      "ok": true
+    },
+    {
+      "check": "raw evidence unchanged: clipboard-reload-software.json",
+      "ok": true
+    },
+    {
+      "check": "reviewed report remained unchanged during audit",
+      "ok": true
+    },
+    {
+      "check": "native before PNG equals exported base64 bytes",
+      "ok": true
+    },
+    {
+      "check": "native before PNG actual byte count matches original run",
+      "ok": true
+    },
+    {
+      "check": "native before PNG digest matches original run",
+      "ok": true
+    },
+    {
+      "check": "native before PNG CRC, deflate stream and decoded 2x2 RGB pixels independently valid",
+      "ok": true
+    },
+    {
+      "check": "native after PNG equals exported base64 bytes",
+      "ok": true
+    },
+    {
+      "check": "native after PNG actual byte count matches original run",
+      "ok": true
+    },
+    {
+      "check": "native after PNG digest matches original run",
+      "ok": true
+    },
+    {
+      "check": "native after PNG CRC, deflate stream and decoded 2x2 RGB pixels independently valid",
+      "ok": true
+    },
+    {
+      "check": "native before/after PNG actual byte streams identical",
+      "ok": true
+    },
+    {
+      "check": "actual native PNG utf8 transform independently matches legacy PTY byte count",
+      "ok": true
+    },
+    {
+      "check": "actual native PNG utf8 transform independently matches legacy PTY SHA256",
+      "ok": true
+    },
+    {
+      "check": "actual native PNG latin1 transform independently matches legacy PTY byte count",
+      "ok": true
+    },
+    {
+      "check": "actual native PNG latin1 transform independently matches legacy PTY SHA256",
+      "ok": true
+    },
+    {
+      "check": "different local compressed PNG decodes to identical native pixels",
+      "ok": true
+    },
+    {
+      "check": "initial oracle mismatch is compressed encoding, not image pixel identity",
+      "ok": true
+    }
+  ],
+  "previous_recommendations_resolved": {
+    "pipeline_geometry": true,
+    "payload_and_screen_evidence_scope": true,
+    "renderer_observation_scope": true,
+    "binary_pool_transition": true,
+    "window_error_not_tested": true,
+    "performance_source_not_relabelled": true,
+    "negative_and_variable_results_retained": true
+  },
+  "source_identities": {
+    "performance_source": "f7e019654684ceae4b0cb64d47d651ebed99bc35",
+    "clipboard_source": "2aa561bbf51e894756cd4bc5fec00db63107bdd0",
+    "clipboard_binary_sha256": "e222e34918d7e9a25b4c8ad910652990de81d19cd56f8bc7257bc5a7f6ef92d6"
+  },
+  "input_file_sha256": {
+    "clipboard-source-manifest.json": "c7f17f7dec64e63ca0bafdb9d9bf3ec3dde05dc1c21f4bca634e1dc70dcd1998",
+    "clipboard-image-before.json": "8f05ab860fc359828901495494f7ad0bf7ca22abcfe24a9bcfeb1c316ea6c9a7",
+    "clipboard-image-after.json": "093aa29758b4b33a216d77bdab96d41bfa911b4b31b8eab91895a1196020f009",
+    "clipboard-transfer-after.json": "6987d4824b20b7ead84709c3100c8e98e67ae572c6d739c68275a187f19b2990",
+    "clipboard-osc52-software/osc52.json": "c858241c1384e7890c3629442f376be14b2bd5d8b520de0c22c5647881623f53",
+    "clipboard-osc52-gpu/osc52.json": "5b7b88916b4b19c40adf61d0c1c01341b4a16f10d367b22df9273d8e749683bc",
+    "clipboard-reload-software.json": "5ab650dda32290e686967299f6950f12f67fa0333e03f176c219ac820d003b89",
+    "clipboard-image-before/synthetic-clipboard.png": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+    "clipboard-image-after/synthetic-clipboard.png": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+    "clipboard-native-png.json": "130bb5d4d5f6465d14479dac5975beaa2e2bcbb59e3a6c249aa689322acd415b"
+  },
+  "previous_audit_sha256_unchanged": {
+    "audit-result.json": "6b4fe3d719eaa2dac9458dc84c3840c4d4904f16fe87f14014545faf38ff3e59",
+    "audit-pipeline.json": "a40228441d4668f16eff63784c5633daf1240e6b1f3f22031151c7f40bad69c8",
+    "audit-result-complete.json": "c133d2c989f4174c7c40663776f87f714735676091be80df51af740ed3485469",
+    "audit-report-review.json": "f0a1a7c3ac3ca7ca9589270c41f2756f81c54994b0aac4217174aa3f7aa24c92",
+    "audit-summary.md": "3f139de2d14b8b335a5227e2d28dc026fe71f2694bd749ab22d8d14f3dc6603f"
+  },
+  "verified_counts": {
+    "legacy_fixture_checks": 10,
+    "new_image_guard_checks": 10,
+    "text_transfer_checks": 25,
+    "osc52_software_checks": 13,
+    "osc52_gpu_checks": 13,
+    "reload_software_checks": 9,
+    "reload_distinct_elf_replacements": 2
+  },
+  "legacy_image_leak": {
+    "expect": "legacy-leak",
+    "lossy_utf8_bytes": 73,
+    "latin1_bytes": 54,
+    "meaning": "ok=true confirms exact old leakage; guard case names do not imply old-version rejection"
+  },
+  "fixed_image_behavior": {
+    "expect": "reject",
+    "selection_requests": [
+      "TARGETS"
+    ],
+    "pty_bytes": 0
+  },
+  "default_ctrl_v": {
+    "before_hex": "16",
+    "after_hex": "16",
+    "selection_requests": [],
+    "fixture_custom_keybindings": false,
+    "source_review": "Real XTEST Ctrl+V followed by Ctrl+G->raw PTY input fence, plus live broker/child checks; no timeouts counted as expected results.",
+    "scope": "Key forwarding only; Codex attachment was not exercised"
+  },
+  "real_desktop_limit": {
+    "observed_wayland_mime_types": [
+      "image/png"
+    ],
+    "real_image_read": false,
+    "x11_target_query": "authorization denied"
+  },
+  "viewed_synthetic_screenshot": {
+    "file": "/workspace/scratch/3dc04f47346d/final-evidence/clipboard-image-after/image-only-refused.png",
+    "sha256": "84744c53d2a04080207bc423706d9ca58ef0e3e290ce0c23d1f97d301f3b7cc8",
+    "visible_message_confirmed": true,
+    "message": "ztty: Clipboard has no supported text; use the app's image-paste shortcut"
+  },
+  "primary_sources_read": [
+    {
+      "key": "final-clip-fixture",
+      "git_blob_sha": "34c80a60c099c5bdac4b38790b5c7ee7b2c9c4da",
+      "url": "https://github.com/LIghtJUNction/ztty/blob/2aa561bbf51e894756cd4bc5fec00db63107bdd0/tests/clipboard_image_guard_gui.py"
+    },
+    {
+      "key": "final-clip-source",
+      "git_blob_sha": "875483f874a46da795b62a97279343f667ab33e2",
+      "url": "https://github.com/LIghtJUNction/ztty/blob/2aa561bbf51e894756cd4bc5fec00db63107bdd0/src/x11/clipboard.rs"
+    },
+    {
+      "key": "final-wayland-clipboard-source",
+      "git_blob_sha": "3a101842ac69021b5cf7130e6f2e1511720aa64e",
+      "url": "https://github.com/LIghtJUNction/ztty/blob/2aa561bbf51e894756cd4bc5fec00db63107bdd0/src/platform/wayland/clipboard.rs"
+    },
+    {
+      "key": "final-codex-clip-source",
+      "git_blob_sha": "4429b3a8cbba0e97e8fcc2e87f5ac531ac520aea",
+      "url": "https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/chatwidget/clipboard.rs"
+    },
+    {
+      "key": "final-codex-cargo-source",
+      "git_blob_sha": "bc5910cdfcbfcac370f9780460a42f5fa469d2de",
+      "url": "https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/Cargo.toml"
+    }
+  ],
+  "primary_source_findings": [
+    "Codex fixed commit workspace Cargo.toml states version 0.170.0.",
+    "Codex fixed clipboard handler maps Ctrl+V to PasteImage and calls paste_image_to_temp_png then attach_image.",
+    "ztty fixed X11 source bounds TARGETS, selects offered text atoms, validates property type, and validates complete UTF-8.",
+    "ztty Wayland clipboard source validates UTF-8 after the completed receive; native Wayland GUI execution is not claimed."
+  ],
+  "notes": [
+    "All old audit files are preserved.",
+    "Source and binary provenance are checked against saved native receipts and fixed GitHub source; this is not an independent rebuild.",
+    "The report treats the desktop bridge mechanism as a supported synthetic hypothesis, not a reproduced real clipboard/Codex attachment issue.",
+    "Initial failed audit is preserved verbatim as audit-final-report-initial.json.",
+    "Final legacy byte reconstruction uses the original native PNG artifact, not a newly compressed surrogate. Both expected and actual native byte digests match the independently recomputed conversions."
+  ],
+  "png_oracle_correction": {
+    "initial_audit_file": "audit-final-report-initial.json",
+    "initial_audit_sha256": "22ae38b119a47a874cae2063958958fd3000e82d9b98ea688b2697600a88e59a",
+    "initial_failures": [
+      {
+        "check": "same synthetic PNG independently reconstructed",
+        "ok": false
+      },
+      {
+        "check": "legacy image leak matches independently reconstructed lossy UTF-8 transformation",
+        "ok": false
+      },
+      {
+        "check": "legacy image leak matches independently reconstructed Latin-1 transformation",
+        "ok": false
+      }
+    ],
+    "cause": "The first offline checker regenerated compressed PNG bytes locally and incorrectly required that stream to equal a native PNG produced by a different zlib implementation. PNG DEFLATE encoding is not canonical.",
+    "local_zlib_runtime": "1.3.2",
+    "native_zlib_version": "1.3.2",
+    "native_zlib_runtime": "1.3.1.zlib-ng",
+    "local_png_bytes": 73,
+    "native_png_bytes": 74,
+    "local_png_sha256": "67e80ed203170641bb4068134853205ea6be0a237bcdc0660444cd12e0e59212",
+    "native_png_sha256": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+    "same_decoded_rgb": true,
+    "resolution": "Use exported native PNG bytes tied to original run SHA256; validate chunk CRC, IHDR, complete DEFLATE stream and exact 2x2 pixels; derive legacy PTY conversions from those native bytes. No expected or actual field in any native record was changed.",
+    "native_png_validation": {
+      "before": {
+        "file": "clipboard-image-before/synthetic-clipboard.png",
+        "bytes": 74,
+        "sha256": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+        "width": 2,
+        "height": 2,
+        "bit_depth": 8,
+        "color_type": 2,
+        "filter_types": [
+          0,
+          0
+        ],
+        "rgb_pixels_hex": "17436d17436d17436d17436d",
+        "rgb_sha256": "a6e9e76687bccad086a826630d8c45c2c3fd49dbef1b47973f7506d464fc3366",
+        "uncompressed_scanlines_hex": "0017436d17436d0017436d17436d",
+        "chunks": [
+          {
+            "type": "IHDR",
+            "bytes": 13,
+            "crc32": "fdd49a73",
+            "crc_valid": true
+          },
+          {
+            "type": "IDAT",
+            "bytes": 17,
+            "crc32": "cc9f4d84",
+            "crc_valid": true
+          },
+          {
+            "type": "IEND",
+            "bytes": 0,
+            "crc32": "ae426082",
+            "crc_valid": true
+          }
+        ],
+        "no_trailing_bytes": true
+      },
+      "after": {
+        "file": "clipboard-image-after/synthetic-clipboard.png",
+        "bytes": 74,
+        "sha256": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+        "width": 2,
+        "height": 2,
+        "bit_depth": 8,
+        "color_type": 2,
+        "filter_types": [
+          0,
+          0
+        ],
+        "rgb_pixels_hex": "17436d17436d17436d17436d",
+        "rgb_sha256": "a6e9e76687bccad086a826630d8c45c2c3fd49dbef1b47973f7506d464fc3366",
+        "uncompressed_scanlines_hex": "0017436d17436d0017436d17436d",
+        "chunks": [
+          {
+            "type": "IHDR",
+            "bytes": 13,
+            "crc32": "fdd49a73",
+            "crc_valid": true
+          },
+          {
+            "type": "IDAT",
+            "bytes": 17,
+            "crc32": "cc9f4d84",
+            "crc_valid": true
+          },
+          {
+            "type": "IEND",
+            "bytes": 0,
+            "crc32": "ae426082",
+            "crc_valid": true
+          }
+        ],
+        "no_trailing_bytes": true
+      }
+    },
+    "independent_legacy_transforms": {
+      "utf8": {
+        "bytes": 73,
+        "sha256": "8f53894f6aedd507aa0137b5ff2cc42296a2c7ec49a64ef77c96e04f0f6a78dd",
+        "matches_native_expected_and_actual": true,
+        "input_source": "original 74-byte PNG exported by native fixture",
+        "conversion": "decode with replacement for UTF-8 or Latin-1, remove Cc except TAB/LF/CR, encode UTF-8, add bracketed-paste markers"
+      },
+      "latin1": {
+        "bytes": 54,
+        "sha256": "92ef7d8a5ffd21a662d6f8ef8406e96faf1b03f0abfbeec8ea819332a88e6ce4",
+        "matches_native_expected_and_actual": true,
+        "input_source": "original 74-byte PNG exported by native fixture",
+        "conversion": "decode with replacement for UTF-8 or Latin-1, remove Cc except TAB/LF/CR, encode UTF-8, add bracketed-paste markers"
+      }
+    }
+  },
+  "revision": "native-png-validated"
+}

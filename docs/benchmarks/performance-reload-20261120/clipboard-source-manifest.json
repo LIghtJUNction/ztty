@@ -1,0 +1,38 @@
+{
+  "source": "2aa561bbf51e894756cd4bc5fec00db63107bdd0",
+  "performance_source": "f7e019654684ceae4b0cb64d47d651ebed99bc35",
+  "binary_sha256": "e222e34918d7e9a25b4c8ad910652990de81d19cd56f8bc7257bc5a7f6ef92d6",
+  "verified_paths": [
+    "src/main.rs",
+    "src/platform/wayland/clipboard.rs",
+    "src/x11.rs",
+    "src/x11/clipboard.rs",
+    "src/x11/osc52.rs",
+    "src/x11/window.rs",
+    "tests/clipboard_image_guard_gui.py",
+    "tests/clipboard_transfer_gui.py",
+    "tests/osc52_gui.py"
+  ],
+  "source_status": "clean",
+  "validation": {
+    "workspace_tests": "passed",
+    "clippy": "passed",
+    "wayland_release_build": "passed",
+    "image_guard": 10,
+    "clipboard_transfer": 25,
+    "osc52_software": 13,
+    "osc52_gpu": 13,
+    "reload_software": {
+      "checks": 9,
+      "distinct_elf_reloads": 2
+    }
+  },
+  "real_clipboard": {
+    "observed_wayland_mime_types": [
+      "image/png"
+    ],
+    "real_image_read": false,
+    "x11_target_query": "authorization denied"
+  },
+  "native_synthetic_refusal_viewed": true
+}

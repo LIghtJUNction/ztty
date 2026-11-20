@@ -1,0 +1,70 @@
+{
+  "ok": true,
+  "checks": [
+    "older broker rejects runtime reload and retains the exact command, PTY and executable"
+  ],
+  "reloads": [],
+  "failures": [
+    {
+      "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: session is required\n",
+      "elapsed_ms": 3.750166011741385,
+      "accepted": false
+    }
+  ],
+  "partial_parser_cases": [],
+  "rejected_target_cases": [],
+  "screenshots": {},
+  "scope": "Linux same-PID exec, real PTY and private X11 pixels",
+  "binary_sha256": "25157d0cef430c5d2e2355304e56c7f2a6abbe3aeb7f52072eebe643091615ca",
+  "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+  "test_script_sha256": "661d665f70e7dd87d5f7c40f919737f6866eb5ebf930c6b8181969ca3a15cd4c",
+  "identity_fixture_suffixes": false,
+  "expected_unsupported": true,
+  "renderer": "software",
+  "helper_sha256": {
+    "isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "images": {
+    "before": "25157d0cef430c5d2e2355304e56c7f2a6abbe3aeb7f52072eebe643091615ca",
+    "after": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368"
+  },
+  "display_ownership": {
+    "display": ":29415",
+    "pid": 3121680,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X29415",
+        "inode": 111318490,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X29415",
+        "inode": 111318489,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "broker_pid": 3121691,
+  "broker_start_ticks": 9358392,
+  "output": {
+    "reload-alpha": {
+      "bytes": 55,
+      "sha256": "77fb466e303bb2094628179511675e15e97df7ff7d90d2c94af46b73fc069b17",
+      "cursor": 55,
+      "truncated": false
+    }
+  },
+  "remaining_owned_pids": [],
+  "xserver_exit_code": 0,
+  "terminal_log": ""
+}

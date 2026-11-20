@@ -447,9 +447,115 @@ another's cursor. See [the bounded output contract and real PTY regression](sess
 
 ## Upgrading a running broker
 
-Replacing an installed executable does not replace the code already running in
-an existing broker. On Linux, a new standalone window launched without an
-explicit `ZTTY_SOCKET` compares the running executable with the current build.
+Installing a replacement executable leaves existing brokers running their
+current code. Current main, after the 0.5.0 release, adds an explicit Linux
+process handover. This is an unreleased source feature: installing the latest
+published package does not add it to a broker from the published 0.5.0 release.
+
+### Reload the running broker
+
+A broker started from reload-capable source supports:
+
+```sh
+ztty reload
+ztty reload --binary /absolute/path/to/ztty
+```
+
+The command targets the broker selected by `ZTTY_SOCKET`. Inside a ztty shell,
+that variable identifies its own broker; from another shell, copy the target
+session's broker socket path explicitly. Without `--binary`, the target is the executable
+of the CLI process you just invoked. Use an absolute path to select another
+local build. The command does not download, install or select a newer release.
+
+Reload replaces the broker executable with `exec` while retaining its PID and
+owned PTY descriptors. Existing shells and commands continue with the same child
+PIDs and PTYs. The checkpoint preserves session identities, input ownership and
+queued input, retained raw output and byte cursors, primary/alternate screens,
+scrollback and viewport positions, terminal cursors/styles/modes, and X11
+tabs/splits. Output retention limits still apply; reload cannot recover bytes
+that were already evicted.
+
+The target ELF first runs as a separate validator. It decodes the complete
+checkpoint and returns an acknowledgement tied to that attempt's random nonce.
+Only after the broker checks that acknowledgement does it hand over to the
+validated executable. An unsupported state or failed preflight keeps the current
+broker and terminal models in control; it does not restart the shell or replay
+a bounded output tail to reconstruct the screen.
+
+The supported hosts are Linux X11, XWayland and headless brokers. A broker with
+native Wayland views cannot perform this handover; macOS and Windows do not
+support it. Ctrl+Shift+R continues to reload configuration, and does not replace
+the executable.
+
+#### Refusal conditions and bounds
+
+The whole broker must be ready for handover. One unsupported session or active
+operation causes the request to be refused before `exec`.
+
+| Condition | Behavior |
+| --- | --- |
+| Partial UTF-8 or control sequence | Continue normal PTY processing for at most 250 ms to reach a complete parser boundary; otherwise refuse and preserve the partial state for later input |
+| A session has processed Kitty graphics, Sixel or native UI input | Conservatively refuse, even after image deletion or a terminal reset |
+| Pending OSC 52, paste transfer, active overlay, running text-plugin work or pending child reaping | Refuse until normal handling completes or the active UI/operation is closed |
+| Checkpoint would exceed 128 sessions or 128 MiB total | Refuse before handover |
+| Target cannot decode the format/state or does not return the expected acknowledgement | Keep the current broker; validator deadline is 10 seconds |
+
+The CLI waits up to 60 seconds for its response. A parser-boundary refusal does
+not discard buffered input: when the remaining UTF-8 or sequence bytes arrive,
+the existing terminal can continue parsing them normally.
+
+Native windows and renderer resources are rebuilt after a successful handover.
+They may briefly disappear; compositor placement and uninterrupted physical
+frames are not guaranteed. If the new executable restores the sessions but
+cannot reopen a display, it returns `window_error` and the CLI exits nonzero.
+The broker and PTYs remain alive. Restore display access and use `ztty attach`
+with the same `ZTTY_SOCKET` to reopen the retained sessions. This recovery path
+is implemented but was not exercised by this round of reload tests.
+
+#### Moving from a 0.5.0 broker
+
+A broker from the published 0.5.0 release has no checkpoint/restore handover
+support. A newer CLI receives a safe refusal; it cannot retrofit the capability
+into the running process. Keep the old windows open until their work finishes.
+
+Build the current source with its pinned submodules and start a new independent
+broker pool separated from the old executable for new work. An existing broker
+for the same new ELF may be reused. From an older ztty shell, clear its inherited socket only
+for this new launch:
+
+```sh
+env -u ZTTY_SOCKET /absolute/path/to/new-ztty --name new-work -e /bin/bash
+```
+
+The new window inherits its new broker's address. Reload-capable brokers can
+then use `ztty reload` for later compatible executable replacements. Older
+windows remain available alongside them during this one-time transition.
+
+#### Verification scope
+
+The [2026-11-20 performance and reload report](benchmarks/performance-reload-2026-11-20.md)
+records successful software and GPU-path handovers between two different ELF
+builds, plus safe refusal by the legacy broker. It identifies the tested source
+commits, executable hashes and renderer environments, and records the retained
+process, PTY, terminal and workspace checks.
+
+The final checks also sample complete old/new frames during tab switches and
+verify synchronized-output hold and explicit commit on private Xvfb displays.
+These finite pixel samples establish the recorded test results; they do not
+guarantee uninterrupted frames on every physical desktop or compositor.
+
+To compare two reload-capable local builds:
+
+```sh
+python3 tests/reload_runtime.py --binary /absolute/path/to/before-ztty \
+  --target /absolute/path/to/after-ztty \
+  --output artifacts/reload-runtime/report.json
+```
+
+### Opening a separate broker for another build
+
+On Linux, a new standalone window launched without an explicit `ZTTY_SOCKET`
+compares the running executable with the current build.
 If the default broker belongs to an older build, the new window uses a separate
 broker for the current build. Later independent windows from the same build
 reuse that broker, including when identical binaries are installed at different
@@ -457,7 +563,8 @@ paths or the old default broker exits.
 
 Existing windows and their children continue running. Tab/split operations with
 a target, explicit `ZTTY_SOCKET` addresses, and attach/control/MCP operations keep
-their existing routing. Sessions are not moved between brokers during an update.
+their existing routing. Installing a binary alone does not move sessions between
+brokers. An explicit reload keeps the sessions inside their existing broker.
 
 The selected address is inherited by the new window's child environment, so
 `ztty attach`, `ztty list`, and related commands started inside that window

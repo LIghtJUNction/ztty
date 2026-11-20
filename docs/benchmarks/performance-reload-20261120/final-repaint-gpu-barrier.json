@@ -1,0 +1,336 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-final",
+  "binary_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted",
+    "one-row GPU updates publish one complete surface swap",
+    "terminal content and search overlay share one visible copy",
+    "bulk output ending in silence publishes the final real pixels without an external wakeup",
+    "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+    "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+    "a force/expose paint of the old screen does not lose the subsequent interactive response",
+    "synchronized output and Expose retain the committed pixels until explicit release",
+    "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+    "a synchronized begin/end in one small write publishes its complete final pixels",
+    "scrollback and its return-to-live prompt share one visible copy"
+  ],
+  "timings_ms": {
+    "initial-a": 0.14007100253365934,
+    "initial-b": 0.061086000641807914,
+    "quiet-final-frame": 6.105881009716541,
+    "old-frame-expose": 0.08656299905851483,
+    "xtest-visible-echo": 15.131618987652473,
+    "broker-write-during-flood": 5.09229299495928,
+    "rpc-visible-echo": 0.15726500714663416,
+    "sync-initial": 0.12745399726554751,
+    "sync-expose-retained": 0.07809999806340784,
+    "sync-explicit-release": 2.2883780038682744,
+    "sync-quiet-timeout": 50.23623400484212,
+    "sync-total-from-first-begin": 152.94609300326556,
+    "sync-same-feed": 1.4389580028364435,
+    "scroll-history-ready": 3.27455899969209
+  },
+  "screenshots": {
+    "nonadjacent-frame": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/nonadjacent-frame.png",
+      "sha256": "9fcb895518a24fe035294e28b4cdafec97b0f62689d050004d3dc77f58c28cc4",
+      "rgb_sha256": "78e869259fe8a0124192bfd5c706798244b3793bb7cf2046f1c042cd153cc861"
+    },
+    "single-publish-overlay": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/single-publish-overlay.png",
+      "sha256": "d3b9b1cdad1404232a6060752400bbf55f1e10c4bccca848f16fed1a5a6faac1",
+      "rgb_sha256": "3081e5093a9b4e0c99d6371d1491923b4cf592640bfb7106fc47d938028f51bc"
+    },
+    "quiet-final-frame": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/quiet-final-frame.png",
+      "sha256": "5c2e812d601edede5b6f1bc230fee5684d2e3bfd89cf4afd1bc9ddf03e1ab2ec",
+      "rgb_sha256": "c6dcc33bb6cd5de371442e87362d1b1eb618986ec133681fc4adb1106a4dca6b"
+    },
+    "fairness-flood": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/fairness-flood.png",
+      "sha256": "b873ba25afe4f8ccc8c8b4a164ce0871e8fe4886b80276e49fb114426b30e8ed",
+      "rgb_sha256": "3ace05717997dbea5378522385938742a27d910e6346ffd4d395a05a7a0add79"
+    },
+    "fairness-interaction": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/fairness-interaction.png",
+      "sha256": "42914bbb313c8cf66125cd8c7b06946fca0ec945d39cc9cea3addaf2a0374160",
+      "rgb_sha256": "0955457b460ce8a13633c315819f86f4bdb8aff9356bb097f8d1967176b6e892"
+    },
+    "sync-release": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/sync-release.png",
+      "sha256": "6581cb5af52083de74eedfbc1a0cfb8a50b6f540a8e8fb00fc68ecf7fb2912fa",
+      "rgb_sha256": "6bba0a1f38f1a5a30a1e77c6ffcac8e6aa2295b98e4a1e5d013e875f2d99a8b9"
+    },
+    "sync-timeout": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/sync-timeout.png",
+      "sha256": "882054c0d4008b2a77470141921b9c197b30fee7d4db8453f5eb19c526bd5879",
+      "rgb_sha256": "499bf98ed11d6350dd0727bf0893b28728c08e7fd96640b968a3cb01d008e139"
+    },
+    "sync-same-feed": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/sync-same-feed.png",
+      "sha256": "48d98b1c91d7ec239da85b7a0b985b45bf70e9b57313c9a381da455fce8b8886",
+      "rgb_sha256": "9984a4ec5c02c9fbe71b91ae8f48a60b17983abc620891e5e890e1cf5076b39c"
+    },
+    "single-publish-scroll": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-gpu-barrier/single-publish-scroll.png",
+      "sha256": "82c6450fec2cd5a7004d7b4f530218292d1c3b8c60af210bb3e3f792226652e9",
+      "rgb_sha256": "272f6707027ecf7ab42d4acff6f523c7e40928b3dc9662ff62744bfa6cae8f08"
+    }
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "bab96c8612a6cf22810348c9136e60e663dc4b24c26296fd5dbe624d50e7e142",
+    "src/x11.rs": "eeccb3b7e99f26fc9a1a1124405c5a0b39234ca77f24e43c50d8d36550af1f1a",
+    "crates/zterm/src/terminal.rs": "cbb6a6b91f42612b69e85be7032f99411756478e3d64099c15e7e8acff2c677a",
+    "tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "src/x11/gpu.rs": "b653c6dbc28e38e8b864ce1c233cf15991b73bd4ec613c3d2e0c5f7ca6a56519",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "5b8aa4dc006956d547456dc1ea994227916f35693c1040dea430cd6d2d16594c",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "08f333f3ab32a9df1fc77b810845bd088c130208e56d1df33586251cf972e4eb",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "01ed1685a603c7f26a8f945c3bf12de86ba0fedcf4e8b9c6aa15bb4f9480a19f",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":19314",
+    "pid": 3120156,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X19314",
+        "inode": 111318296,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X19314",
+        "inode": 111318295,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderers_before": [
+    {
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    }
+  ],
+  "broker": {
+    "pid": 3120174,
+    "state": "R",
+    "user_ticks": 13,
+    "system_ticks": 7,
+    "threads": 50,
+    "start_ticks": 9357355,
+    "exe_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368"
+  },
+  "owned_processes": {
+    "3120172": 9357355,
+    "3120226": 9357367,
+    "3120174": 9357355,
+    "3120228": 9357374,
+    "3120235": 9357376
+  },
+  "startup_quiet_ms": 51.66570200526621,
+  "nonadjacent_start_ns": 93573890559837,
+  "nonadjacent_frame_copies": [
+    [
+      94566187612624,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "single_row_frame_copies": [
+    [
+      94566187612624,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "overlay_frame_copies": [
+    [
+      94566187612624,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "payload": {
+    "bytes": 1050937,
+    "sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+  },
+  "idle_context_switches": {
+    "seconds": 0.35,
+    "before": {
+      "voluntary_ctxt_switches": 464,
+      "nonvoluntary_ctxt_switches": 32
+    },
+    "after": {
+      "voluntary_ctxt_switches": 464,
+      "nonvoluntary_ctxt_switches": 32
+    },
+    "delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "flood_visible_colors": [
+    [
+      40,
+      128,
+      136
+    ],
+    [
+      42,
+      154,
+      54
+    ],
+    [
+      46,
+      206,
+      178
+    ],
+    [
+      58,
+      170,
+      198
+    ],
+    [
+      59,
+      183,
+      157
+    ],
+    [
+      91,
+      215,
+      61
+    ],
+    [
+      94,
+      62,
+      194
+    ],
+    [
+      114,
+      130,
+      110
+    ],
+    [
+      114,
+      130,
+      206
+    ],
+    [
+      117,
+      169,
+      83
+    ],
+    [
+      141,
+      97,
+      59
+    ],
+    [
+      145,
+      149,
+      151
+    ],
+    [
+      159,
+      139,
+      121
+    ],
+    [
+      166,
+      38,
+      186
+    ],
+    [
+      170,
+      90,
+      54
+    ],
+    [
+      176,
+      168,
+      192
+    ],
+    [
+      180,
+      28,
+      92
+    ],
+    [
+      215,
+      99,
+      129
+    ]
+  ],
+  "scroll_frame_copies": [
+    [
+      94566187612624,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "renderers_after": [
+    {
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    }
+  ],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": ""
+}
