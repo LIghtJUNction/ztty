@@ -204,9 +204,15 @@ jobs:
               --artifacts "dist/$ARTIFACT_STEM.native/graphics-$renderer"
             python tests/osc52_gui.py --binary target/release/ztty --renderer "$renderer" \
               --artifacts "dist/$ARTIFACT_STEM.native/osc52-$renderer"
+            python tests/reload_runtime.py --binary target/release/ztty --renderer "$renderer" \
+              --output "dist/$ARTIFACT_STEM.native/reload-$renderer.json"
+            python tests/tab_switch_pixels.py --binary target/release/ztty --renderer "$renderer" \
+              --scope all --expect clean --output "dist/$ARTIFACT_STEM.native/tab-switch-$renderer.json"
           done
           python tests/clipboard_transfer_gui.py --binary target/release/ztty \
             --output "dist/$ARTIFACT_STEM.native/clipboard.json"
+          python tests/clipboard_image_guard_gui.py --binary target/release/ztty --expect reject \
+            --output "dist/$ARTIFACT_STEM.native/clipboard-image-guard.json"
           python tests/wayland_gui.py --binary target/release/ztty \
             --output "dist/$ARTIFACT_STEM.native/wayland"
           python - <<'PY'
@@ -214,7 +220,8 @@ jobs:
           from pathlib import Path
           root = Path("dist") / (os.environ["ARTIFACT_STEM"] + ".native")
           expected = hashlib.sha256(Path("target/release/ztty").read_bytes()).hexdigest()
-          checks = [("clipboard.json", 25, "ok"), ("wayland/validation.json", 65, "passed")]
+          checks = [("clipboard.json", 25, "ok"), ("clipboard-image-guard.json", 10, "ok"),
+                    ("wayland/validation.json", 65, "passed")]
           for renderer in ("gpu", "software"):
               checks.extend([(f"graphics-{renderer}/graphics-extensions.json", 8, "ok"),
                              (f"osc52-{renderer}/osc52.json", 13, "ok")])
@@ -224,6 +231,24 @@ jobs:
               assert report["binary_sha256"] == expected, name
               assert len(report["checks"]) == count, (name, len(report["checks"]))
               assert all(row[flag] is True for row in report["checks"]), name
+          image_guard = json.loads((root / "clipboard-image-guard.json").read_text())
+          assert image_guard["expect"] == "reject" and image_guard["cleanup_errors"] == []
+          for renderer in ("gpu", "software"):
+              reload = json.loads((root / f"reload-{renderer}.json").read_text())
+              assert reload["ok"] is True and reload["expected_unsupported"] is False, renderer
+              assert reload["renderer"] == renderer, renderer
+              assert reload["binary_sha256"] == reload["target_sha256"] == expected, renderer
+              assert len(reload["checks"]) == 9 and all(isinstance(row, str) and row for row in reload["checks"]), renderer
+              assert len(reload["reloads"]) >= 2 and all(
+                  row["accepted"] is True and row["exit_code"] == 0 for row in reload["reloads"]), renderer
+              assert reload["remaining_owned_pids"] == [], renderer
+              switch = json.loads((root / f"tab-switch-{renderer}.json").read_text())
+              assert switch["ok"] is True and switch["binary_sha256"] == expected, renderer
+              assert switch["renderer"] == renderer and switch["requested_scope"] == "all", renderer
+              assert switch["expect"] == "clean" and switch["invalid_application_samples"] == 0, renderer
+              assert len(switch["checks"]) == 3 and all(isinstance(row, str) and row for row in switch["checks"]), renderer
+              assert switch["invalid_samples_by_scope"] == {"tabs": 0, "focus_raise": 0}, renderer
+              assert switch["remaining_owned_pids"] == [] and not switch.get("cleanup_errors"), renderer
           wayland = json.loads((root / "wayland/validation.json").read_text())
           assert wayland["source"] == os.environ["SOURCE_SHA"]
           assert all(wayland[key] == [] for key in (
