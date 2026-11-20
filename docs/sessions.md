@@ -483,9 +483,10 @@ broker and terminal models in control; it does not restart the shell or replay
 a bounded output tail to reconstruct the screen.
 
 The supported hosts are Linux X11, XWayland and headless brokers. A broker with
-native Wayland views cannot perform this handover; macOS and Windows do not
-support it. Ctrl+Shift+R continues to reload configuration, and does not replace
-the executable.
+active native Wayland views cannot perform this handover. Detached native
+sessions retain their last backend across a supported handover and can reattach
+to the same PTY. macOS and Windows do not support it. Ctrl+Shift+R continues to
+reload configuration, and does not replace the executable.
 
 #### Refusal conditions and bounds
 
@@ -495,10 +496,18 @@ operation causes the request to be refused before `exec`.
 | Condition | Behavior |
 | --- | --- |
 | Partial UTF-8 or control sequence | Continue normal PTY processing for at most 250 ms to reach a complete parser boundary; otherwise refuse and preserve the partial state for later input |
-| A session has processed Kitty graphics, Sixel or native UI input | Conservatively refuse, even after image deletion or a terminal reset |
+| Completed stateless Kitty/native UI capability queries, without persistent resources or pending protocol input | Allow and retain queued replies |
+| Actual Kitty/Sixel graphics or native UI state | Conservatively refuse, even after image deletion or a terminal reset |
+| Unfinished graphics/query transfer, including a zero-byte pending transfer | Refuse while pending state remains |
 | Pending OSC 52, paste transfer, active overlay, running text-plugin work or pending child reaping | Refuse until normal handling completes or the active UI/operation is closed |
 | Checkpoint would exceed 128 sessions or 128 MiB total | Refuse before handover |
 | Target cannot decode the format/state or does not return the expected acknowledgement | Keep the current broker; validator deadline is 10 seconds |
+
+Ordinary ED2 screen erasure preserves the prior graphics history classification;
+it does not create external-protocol history or clear an existing unsafe history.
+Older running brokers may already have marked a stateless query as unsupported.
+A newer CLI cannot retroactively change that broker's classification. Keep those
+sessions available and use the updated executable for new work.
 
 The CLI waits up to 60 seconds for its response. A parser-boundary refusal does
 not discard buffered input: when the remaining UTF-8 or sequence bytes arrive,
@@ -543,6 +552,12 @@ The final checks also sample complete old/new frames during tab switches and
 verify synchronized-output hold and explicit commit on private Xvfb displays.
 These finite pixel samples establish the recorded test results; they do not
 guarantee uninterrupted frames on every physical desktop or compositor.
+
+The [runtime iteration report](benchmarks/runtime-iteration-20261120/report.zh-CN.md)
+adds stateless-query and ED2 checks, refused stateful-resource controls, and
+native detach/exec/reattach coverage. The tests verify child and PTY identities,
+restored pixels and continued input/output; they do not serialize arbitrary
+Kitty, Sixel or UI resources.
 
 To compare two reload-capable local builds:
 

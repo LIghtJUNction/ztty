@@ -20,7 +20,9 @@ ztty
 ```
 
 The installer verifies the archive and installs to `~/.local/bin`.
-On a Wayland desktop, the default X11 backend uses XWayland.
+On Wayland desktops, the X11 backend runs through XWayland. Current source
+uses `--backend auto`; see [backend selection](docs/configuration.md#native-wayland-experimental)
+for its initial fallback and session compatibility rules.
 
 ## Build and run
 
@@ -130,7 +132,9 @@ ztty reload --binary /absolute/path/to/ztty
 you invoked; the command does not download an update. It keeps the broker PID,
 existing shells and command PTYs, session identities, queued input, output byte
 cursors, terminal screens and history, and X11 tabs/splits. Windows are rebuilt and may
-briefly disappear. Native Wayland, macOS and Windows do not support this handover.
+briefly disappear. Active native Wayland views block this handover; detached
+native sessions retain their backend for later reattachment. macOS and Windows
+do not support this handover.
 
 A broker from the published 0.5.0 release safely refuses reload, even when asked
 by a newer CLI. Keep its windows until their work finishes and use a new source-built broker for new
@@ -160,7 +164,7 @@ covers platform paths, colors, cursor behavior, bindings and renderer selection.
 | Platform | Current source |
 | --- | --- |
 | Linux X11/XWayland | GPU or Xft; shared sessions, tabs/splits, attach and MCP |
-| Linux native Wayland | Opt-in EGL/GLES; shared sessions, attach/MCP, clipboard and text-input IME |
+| Linux native Wayland | Auto fallback or explicit EGL/GLES; shared sessions, attach/MCP, clipboard and text-input IME |
 | macOS | Native AppKit/CoreText window and Darwin PTY; local sessions |
 | Windows | Native Win32/GDI and ConPTY; local tabs and splits |
 
@@ -176,11 +180,18 @@ cargo build --locked --release --features wayland
 ./target/release/ztty --backend wayland --name work
 ```
 
-The official Linux package build enables Wayland; startup still defaults to X11.
+The official Linux package build enables Wayland. Current source defaults to
+Auto and tries the complete X11/XWayland view before a compatible native fallback.
 Wayland rejects tabs, splits and workspace containers. [Wayland setup](docs/configuration.md#native-wayland-experimental)
 covers dependencies and the unverified physical GPU, desktop IME and scaling behavior.
 
 ## Performance and development
+
+The [runtime iteration report](docs/benchmarks/runtime-iteration-20261120/report.zh-CN.md)
+records the startup marker and INCR paste fixes, Auto selection, query-safe reload,
+final native checks and installation. In its fixed Xvfb GPU-path test, lazy software
+backing pixmaps save about 3.66 MiB per window of X-server resources; this is not
+a whole-process RSS or hardware VRAM claim. Large-paste ZLE editing time remains.
 
 After input is fully sent or explicitly cancelled, this source releases an
 input buffer whose allocated capacity exceeds 64 KiB; smaller buffers remain

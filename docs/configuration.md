@@ -163,7 +163,9 @@ checks use headless Sway/software EGL and an IME protocol peer.
 Physical GPU behavior and real desktop IME combinations remain unverified.
 Output-scale and fractional-scale protocol handling are not implemented;
 HiDPI and cross-monitor scale changes are therefore not accepted features.
-Native Wayland also remains outside the supported `ztty reload` handover scope.
+Active native Wayland views remain outside the supported `ztty reload` handover
+scope. Detached native sessions preserve their backend provenance across a
+supported handover and can then reattach to the same PTY.
 
 ## Key and mouse bindings
 

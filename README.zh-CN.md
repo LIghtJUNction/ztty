@@ -19,7 +19,8 @@ ztty
 ```
 
 安装器校验归档后安装到 `~/.local/bin`。
-在 Wayland 桌面上，默认的 X11 后端通过 XWayland 运行。
+在 Wayland 桌面上，X11 后端通过 XWayland 运行。当前源码默认使用 `--backend auto`，
+其初始回退与会话兼容规则见[后端选择](docs/configuration.md#native-wayland-experimental)。
 
 ## 从源码构建
 
@@ -121,7 +122,8 @@ ztty reload --binary /absolute/path/to/ztty
 `ZTTY_SOCKET` 决定目标共享进程。不指定 `--binary` 时，目标就是本次调用的 CLI
 自身的可执行文件；命令不会下载更新。替换保留共享进程 PID、原 shell 和命令的 PTY、
 会话身份、输入队列与输出位置、终端屏幕和滚屏历史，以及 X11 标签页和分屏。
-窗口会重建，可能短暂消失。原生 Wayland、macOS 和 Windows 暂不支持此操作。
+窗口会重建，可能短暂消失。活动原生 Wayland 视图会阻止替换；已 detach 的原生
+会话保留后端来源，可在替换后重新附着。macOS 和 Windows 暂不支持此操作。
 
 已发布的 0.5.0 旧共享进程会安全拒绝，即使用新 CLI 请求也不能原地迁移。
 保留旧窗口直到工作结束，用新源码构建的共享进程开始新工作；后续可在该进程内热替换。
@@ -149,7 +151,7 @@ Linux X11 会在原窗口中应用有效配置。[配置指南](docs/configurati
 | 平台 | 当前源码 |
 | --- | --- |
 | Linux X11/XWayland | GPU 或 Xft；共享会话、标签页、分屏、Attach、MCP |
-| Linux 原生 Wayland | 显式启用 EGL/GLES；共享会话、Attach/MCP、剪贴板与 text-input 输入法 |
+| Linux 原生 Wayland | Auto 回退或显式选择 EGL/GLES；共享会话、Attach/MCP、剪贴板与 text-input 输入法 |
 | macOS | 原生 AppKit/CoreText 窗口与 Darwin PTY；本地会话 |
 | Windows | 原生 Win32/GDI 与 ConPTY；本地标签页和分屏 |
 
@@ -165,11 +167,17 @@ cargo build --locked --release --features wayland
 ./target/release/ztty --backend wayland --name work
 ```
 
-官方 Linux 包的构建会启用 Wayland 支持，运行时仍默认使用 X11。
+官方 Linux 包的构建会启用 Wayland 支持。当前源码默认 Auto，先完整初始化
+X11/XWayland，再在兼容条件下考虑原生 Wayland 初始回退。
 Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/configuration.md#native-wayland-experimental)
 说明额外依赖，以及尚未实机验证的物理 GPU、桌面输入法与显示缩放。
 
 ## 性能与开发
+
+[本轮运行时报告](docs/benchmarks/runtime-iteration-20261120/report.zh-CN.md)记录启动 `%`、
+INCR 粘贴、Auto、查询后 reload、最终原生验收和实际安装。固定 Xvfb GPU 路径下，
+按需分配软件回退 pixmap 每窗口节省约 3.66 MiB 的 X server 资源；这不代表整进程
+RSS 或硬件显存的同等降幅。大段粘贴进入 ZLE 后的编辑耗时仍然存在。
 
 输入发送完毕或明确取消后，当前源码释放容量超过 64 KiB 的输入缓冲，
 较小的缓冲继续复用。[输入缓冲回归记录](docs/benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
