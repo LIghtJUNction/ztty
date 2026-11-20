@@ -18,6 +18,14 @@ Application publication requires the complete native workflow and
 registry-package verification. Installation is checked separately against the
 accepted release artifact.
 
+The application pins all six locally sourced Project Z packages to exact
+registry versions. [Cargo packaging](https://doc.rust-lang.org/cargo/commands/cargo-package.html)
+removes local dependency paths and the source manifest's patch section. Direct
+constraints for zgpui, zgraphics and zinput keep those registry versions aligned
+with the source submodules, with default features disabled as before. Verify
+the generated archive's lockfile and resolved features before publication; a
+clean source commit and its source lockfile do not establish the packaged graph.
+
 ### Source and dependency order
 
 | Stage | Package | Version | Required before publication or release |
@@ -68,10 +76,12 @@ its existing platform hosts provide native windows and graphics.
    gates on that tagged source, plus source and artifact readback. Retain the
    immutable tag and record published downloads separately from candidate
    artifacts.
-5. From the same clean source, run `cargo package --locked`, install from the
-   unpacked crate in an isolated directory, and verify its registry dependencies.
+5. From the same clean source, run `cargo package --locked`. Read the generated
+   archive's `Cargo.lock` and require the six Project Z versions in the table above.
+   Install from the unpacked crate with `--locked` in an isolated directory,
+   verify registry-only dependency sources, and record the resolved features.
    After all formal native gates pass, run `cargo publish --locked`. Read back
-   the registry archive, checksum and embedded source commit.
+   the registry archive, checksum, embedded source commit and dependency versions.
 6. Install the accepted application artifact and record the installed version
    and executable hash. Publication alone does not establish device installation.
 

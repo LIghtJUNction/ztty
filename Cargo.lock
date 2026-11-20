@@ -127,6 +127,9 @@ version = "0.5.2"
 dependencies = [
  "libc",
  "unicode-segmentation",
+ "zgpui",
+ "zgraphics",
+ "zinput",
  "zplugin",
  "zpty",
  "zterm",
