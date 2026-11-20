@@ -300,7 +300,7 @@ impl Ui {
         let Some(search) = &mut self.search else {
             return;
         };
-        let result = search::find(
+        let result = search.cache.find(
             terminal,
             &search.query,
             search.case,
@@ -332,6 +332,7 @@ impl Ui {
             .filter(|text| text.len() <= 1024 && !text.contains('\n'))
             .unwrap_or_default();
         self.search = Some(Search {
+            cache: alloc::boxed::Box::default(),
             query,
             case: search::Case::Sensitive,
             hit: None,

@@ -1,0 +1,547 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-21T05:30:03.164890+08:00",
+  "baseline_commit": "c7c2a3e887a2f132f3e1e3d9e18cc0ebc16bae25",
+  "candidate_description": "baseline plus the source hashes below; unchanged production sources between application acceptance, paired benchmark and supplemental diagnostic",
+  "source_sha256": {
+    "src/search.rs": "ad24acf75800a44d324a933d7af0c2be2b4c77da5945f5942851bb4d76455f3d",
+    "src/session.rs": "f6906097389e65650566bd17e5c1e429845ca04e199a7c963861731d0281110f",
+    "src/session/view.rs": "f8beddb57f5d22afabdbce1190e50b6f5c20444fe649accc4e22fff945958d25",
+    "tests/search.rs": "058d376a25e8491cde09402463bdf035d662d461133e1a8741b55caeca4c2aa7",
+    "tests/input_gui.py": "421cf3e070d24c7c8f5c31692a1be16fb85c6ac554d649ae56787aefb01da25e",
+    "tools/benchmark_search_navigation.py": "acaca5e2949313507ed304e60009928f47c8fe667a038c55532954485c4a4865",
+    "tools/search_navigation_benchmark.rs": "fe72c92d99163f830684a901cc9803f59b0b4993eb98f0f65eadd834bb850666",
+    "Cargo.toml": "439108c88d76063163efe87bb573811fc67aed7134e6826ba6e5d3cfaab2b481",
+    "Cargo.lock": "c08e1d48d3fd77067496512bd54fec042ecc625da362db14cd4cac1b1db86101"
+  },
+  "binary": {
+    "built_path": "/var/tmp/project-z-cargo-target/release/ztty",
+    "validated_path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/ztty",
+    "sha256": "748da679b89394d8f7a70ffb5872023ea7c4c02e3dc9563a22bff7bd1f133fa7"
+  },
+  "rust_workspace": {
+    "passed": 214,
+    "failed": 0,
+    "ignored": 8,
+    "ignored_tests": [
+      "test gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels ... ignored, requires a real EGL implementation; run with --ignored",
+      "test gpu::tests::font_reload_keeps_the_surface_and_image_cache_and_updates_ui_metrics ... ignored, requires a real EGL implementation; run with --ignored",
+      "test gpu::tests::image_texture_coordinates_preserve_every_column_at_four_k_width ... ignored, requires a real EGL implementation; run with --ignored",
+      "test gpu::tests::native_fonts_shape_joining_scripts_and_complete_emoji_clusters ... ignored, requires installed native fonts and a real EGL implementation",
+      "test gpu::tests::shaped_terminal_cells_render_whole_clusters_and_reuse_the_bounded_atlas ... ignored, requires native fonts and a real EGL implementation",
+      "test gpu::tests::shared_display_survives_interleaved_windows_resize_and_context_destruction ... ignored, requires a real EGL implementation; run with --ignored",
+      "test gpu::tests::terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors ... ignored, requires native fonts and a real EGL implementation",
+      "test gpu::tests::text_run_scratch_reuses_storage_and_recovers_from_shaping_errors ... ignored, requires native fonts and a real EGL implementation"
+    ]
+  },
+  "gates": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "seconds": 0.592
+    },
+    {
+      "name": "format-check",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.436
+    },
+    {
+      "name": "workspace-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--features",
+        "wayland"
+      ],
+      "exit_code": 0,
+      "seconds": 17.867
+    },
+    {
+      "name": "strict-clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-targets",
+        "--features",
+        "wayland",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 2.886
+    },
+    {
+      "name": "release-build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "--release",
+        "--features",
+        "wayland",
+        "--message-format=json-render-diagnostics"
+      ],
+      "exit_code": 0,
+      "seconds": 17.811
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.192
+    },
+    {
+      "name": "input-gui-software",
+      "command": [
+        "python3",
+        "tests/input_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/ztty",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121",
+        "--renderer",
+        "software",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-software.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-software.png"
+      ],
+      "exit_code": 0,
+      "seconds": 28.845
+    },
+    {
+      "name": "input-gui-gpu",
+      "command": [
+        "python3",
+        "tests/input_gui.py",
+        "--binary",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/ztty",
+        "--source-root",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121",
+        "--renderer",
+        "gpu",
+        "--output",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-gpu.json",
+        "--screenshot",
+        "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-gpu.png"
+      ],
+      "exit_code": 0,
+      "seconds": 29.518
+    }
+  ],
+  "input_gui": {
+    "software": {
+      "ok": true,
+      "platform": "Linux X11 / private Xvfb",
+      "binary_sha256": "748da679b89394d8f7a70ffb5872023ea7c4c02e3dc9563a22bff7bd1f133fa7",
+      "source_commit": "c7c2a3e887a2f132f3e1e3d9e18cc0ebc16bae25",
+      "source_sha256": {
+        "src/x11/gpu.rs": "ab78152267737a9004f7aefdb57fd26af6b468f6b2c8e379f5d5f2102391d830",
+        "src/gpu/mod.rs": "fce3bfcea8647ce0c64fbf14ac54d3c7eaf6ba0de144e31e95428dac3c5123fb",
+        "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+        "src/gpu/grid.rs": "652824f869c6bb3c93129fcae0b3fecb8d52c411aa99c0f4bb7e1a75bb22021f",
+        "src/text_blink.rs": "5b8aa4dc006956d547456dc1ea994227916f35693c1040dea430cd6d2d16594c",
+        "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+        "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+        "src/session.rs": "f6906097389e65650566bd17e5c1e429845ca04e199a7c963861731d0281110f",
+        "src/search.rs": "ad24acf75800a44d324a933d7af0c2be2b4c77da5945f5942851bb4d76455f3d",
+        "src/session/view.rs": "f8beddb57f5d22afabdbce1190e50b6f5c20444fe649accc4e22fff945958d25",
+        "src/session/view_input.rs": "562c7c8d0111d88eb01ac454e37a58e958ae7aec1ddacd4b099ec0a2c9ec639e",
+        "src/x11.rs": "f85c4afce7ef9967b4a7adaae47f36e2141dea4b126cbf6c945f4e19d5b6efb2",
+        "src/main.rs": "3dbb8ec91ff2405116f7aa4496f07c7bbd77a743352387cc55744a74b7211247",
+        "src/actions.rs": "7199f586fc81fe740ba27ce9174f7788b212df1d5c7b557f7220c4dc43dfbaae",
+        "crates/zinput/src/lib.rs": "ac3022a9ba9c02aa967fbc5c7d32ab1110ac0e038364b48ea957116aece21cec",
+        "crates/zterm/src/lib.rs": "0b6b57e16be46b7f76df5e7183f7ed51644fcac755d4912b6b88f8b8f02c4b15",
+        "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+      },
+      "test_sha256": "421cf3e070d24c7c8f5c31692a1be16fb85c6ac554d649ae56787aefb01da25e",
+      "check_count": 15,
+      "checks": [
+        "real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings",
+        "Num Lock stays silent in legacy mode; verified physical keypad digits/decimal use text while all eleven navigation keys retain legacy or requested Kitty identity, including Begin; lock reporting stays explicit",
+        "every physical keypad digit/decimal follows the XKB NumLock/Shift layer; application cursor/keypad modes, NumLock override and held-key release identity are verified",
+        "vertical and horizontal wheel input has distinct SGR press codes and no release reports",
+        "extra button press/release reports retain button identity; report records physical XTEST versus synthetic XSendEvent coverage",
+        "held extra-button state survives motion and clears on release, including X11 buttons lacking core state-mask bits",
+        "press ownership remains stable when Shift changes before a primary or extra-button release",
+        "focus loss clears held extra-button state before focus returns, motion, and release",
+        "mode 9 filters input correctly, follows SGR selection, and its reset cannot cancel active mode 1000",
+        "custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled",
+        "shifted punctuation bindings consume their press, release and palette input using the active XKB layout",
+        "real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered",
+        "cached search navigation preserves exact selection pixels in both directions and at wrap boundaries without sending keys to the PTY",
+        "keypad Enter and Shift+Enter reproduce search selection; keypad Up/Down choose and execute distinct palette actions without leaking press/release bytes",
+        "Ctrl+Tab and Ctrl+Shift+Tab move between real raw PTYs without leaking a consumed key release after focus changes"
+      ],
+      "vector_count": 200,
+      "all_vectors_passed": true,
+      "renderer_before": {
+        "window_id": 2097154,
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      },
+      "renderer_after": {
+        "window_id": 2097154,
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      },
+      "cached_search_navigation": {
+        "steps": [
+          {
+            "name": "next",
+            "keys": [
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "previous",
+            "keys": [
+              "Shift_L",
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "wrap backward",
+            "keys": [
+              "Shift_L",
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "wrap forward",
+            "keys": [
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "F3 next",
+            "keys": [
+              "F3"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "Shift+F3 previous",
+            "keys": [
+              "Shift_L",
+              "F3"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "keypad next",
+            "keys": [
+              "KP_Enter"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "keypad previous",
+            "keys": [
+              "Shift_L",
+              "KP_Enter"
+            ],
+            "pixels_equal": true
+          }
+        ],
+        "fixture_matches": 3,
+        "no_pty_output_barriers_between_steps": true,
+        "screenshot": {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-software-search.png",
+          "sha256": "ca441976d36ae78d425a812de4e2698ad5581bf3a50b71186851ca6b8d7093a4"
+        },
+        "ok": true
+      },
+      "keyboard_mapping_restored": true,
+      "cleanup": {
+        "owned_processes_remaining": []
+      },
+      "full_report_sha256": "eeb4ba05d4ba156628e3e3c2b5d56ee8f737219f508055df63b6e8b96234e7bc",
+      "full_report_retained_at": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-software.json"
+    },
+    "gpu": {
+      "ok": true,
+      "platform": "Linux X11 / private Xvfb",
+      "binary_sha256": "748da679b89394d8f7a70ffb5872023ea7c4c02e3dc9563a22bff7bd1f133fa7",
+      "source_commit": "c7c2a3e887a2f132f3e1e3d9e18cc0ebc16bae25",
+      "source_sha256": {
+        "src/x11/gpu.rs": "ab78152267737a9004f7aefdb57fd26af6b468f6b2c8e379f5d5f2102391d830",
+        "src/gpu/mod.rs": "fce3bfcea8647ce0c64fbf14ac54d3c7eaf6ba0de144e31e95428dac3c5123fb",
+        "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+        "src/gpu/grid.rs": "652824f869c6bb3c93129fcae0b3fecb8d52c411aa99c0f4bb7e1a75bb22021f",
+        "src/text_blink.rs": "5b8aa4dc006956d547456dc1ea994227916f35693c1040dea430cd6d2d16594c",
+        "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+        "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+        "src/session.rs": "f6906097389e65650566bd17e5c1e429845ca04e199a7c963861731d0281110f",
+        "src/search.rs": "ad24acf75800a44d324a933d7af0c2be2b4c77da5945f5942851bb4d76455f3d",
+        "src/session/view.rs": "f8beddb57f5d22afabdbce1190e50b6f5c20444fe649accc4e22fff945958d25",
+        "src/session/view_input.rs": "562c7c8d0111d88eb01ac454e37a58e958ae7aec1ddacd4b099ec0a2c9ec639e",
+        "src/x11.rs": "f85c4afce7ef9967b4a7adaae47f36e2141dea4b126cbf6c945f4e19d5b6efb2",
+        "src/main.rs": "3dbb8ec91ff2405116f7aa4496f07c7bbd77a743352387cc55744a74b7211247",
+        "src/actions.rs": "7199f586fc81fe740ba27ce9174f7788b212df1d5c7b557f7220c4dc43dfbaae",
+        "crates/zinput/src/lib.rs": "ac3022a9ba9c02aa967fbc5c7d32ab1110ac0e038364b48ea957116aece21cec",
+        "crates/zterm/src/lib.rs": "0b6b57e16be46b7f76df5e7183f7ed51644fcac755d4912b6b88f8b8f02c4b15",
+        "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a"
+      },
+      "test_sha256": "421cf3e070d24c7c8f5c31692a1be16fb85c6ac554d649ae56787aefb01da25e",
+      "check_count": 15,
+      "checks": [
+        "real XTEST keyboard events distinguish Ctrl+Shift+I and retain Ctrl+I and Ctrl+tilde control mappings",
+        "Num Lock stays silent in legacy mode; verified physical keypad digits/decimal use text while all eleven navigation keys retain legacy or requested Kitty identity, including Begin; lock reporting stays explicit",
+        "every physical keypad digit/decimal follows the XKB NumLock/Shift layer; application cursor/keypad modes, NumLock override and held-key release identity are verified",
+        "vertical and horizontal wheel input has distinct SGR press codes and no release reports",
+        "extra button press/release reports retain button identity; report records physical XTEST versus synthetic XSendEvent coverage",
+        "held extra-button state survives motion and clears on release, including X11 buttons lacking core state-mask bits",
+        "press ownership remains stable when Shift changes before a primary or extra-button release",
+        "focus loss clears held extra-button state before focus returns, motion, and release",
+        "mode 9 filters input correctly, follows SGR selection, and its reset cannot cancel active mode 1000",
+        "custom keyboard and mouse actions consume their bound events and overlay text while mouse reporting is enabled",
+        "shifted punctuation bindings consume their press, release and palette input using the active XKB layout",
+        "real zoom/reset shortcuts change glyph cell metrics and matching PTY grid, preserve pixel window size and emit no key press/release bytes; default non-US plus and custom overrides are covered",
+        "cached search navigation preserves exact selection pixels in both directions and at wrap boundaries without sending keys to the PTY",
+        "keypad Enter and Shift+Enter reproduce search selection; keypad Up/Down choose and execute distinct palette actions without leaking press/release bytes",
+        "Ctrl+Tab and Ctrl+Shift+Tab move between real raw PTYs without leaking a consumed key release after focus changes"
+      ],
+      "vector_count": 200,
+      "all_vectors_passed": true,
+      "renderer_before": {
+        "window_id": 2097154,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+      },
+      "renderer_after": {
+        "window_id": 2097154,
+        "requested": "gpu",
+        "actual": "gpu",
+        "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+      },
+      "cached_search_navigation": {
+        "steps": [
+          {
+            "name": "next",
+            "keys": [
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "previous",
+            "keys": [
+              "Shift_L",
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "wrap backward",
+            "keys": [
+              "Shift_L",
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "wrap forward",
+            "keys": [
+              "Return"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "F3 next",
+            "keys": [
+              "F3"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "Shift+F3 previous",
+            "keys": [
+              "Shift_L",
+              "F3"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "keypad next",
+            "keys": [
+              "KP_Enter"
+            ],
+            "pixels_equal": true
+          },
+          {
+            "name": "keypad previous",
+            "keys": [
+              "Shift_L",
+              "KP_Enter"
+            ],
+            "pixels_equal": true
+          }
+        ],
+        "fixture_matches": 3,
+        "no_pty_output_barriers_between_steps": true,
+        "screenshot": {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-gpu-search.png",
+          "sha256": "065e0db23c6cc3c772af423b6274499da078ffa753d8bfbea68570890262151c"
+        },
+        "ok": true
+      },
+      "keyboard_mapping_restored": true,
+      "cleanup": {
+        "owned_processes_remaining": []
+      },
+      "full_report_sha256": "a049eb85d0f705123da307762e4320e54e5f438b910288512efc6bdb083115b1",
+      "full_report_retained_at": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/input-gui-gpu.json"
+    }
+  },
+  "dependency_heads": {
+    "observed_at": "2026-11-20T21:05:40.064696+00:00",
+    "heads": [
+      {
+        "url": "https://github.com/LIghtJUNction/zgpui.git",
+        "locked": "b4d5493e0cd985d00558c7be0b5726965ab5163a",
+        "default_head": "b4d5493e0cd985d00558c7be0b5726965ab5163a",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "url": "https://github.com/LIghtJUNction/zgraphics.git",
+        "locked": "aa0ed19fb706ad147aff1df54c4ef762d918e864",
+        "default_head": "aa0ed19fb706ad147aff1df54c4ef762d918e864",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "url": "https://github.com/LIghtJUNction/zinput.git",
+        "locked": "fe1cbaec744fa790a043383d45f612b8d19dcd32",
+        "default_head": "fe1cbaec744fa790a043383d45f612b8d19dcd32",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "url": "https://github.com/LIghtJUNction/zplugin.git",
+        "locked": "cf02c1d9db575b92b36297dfe1fde72de9ee51e4",
+        "default_head": "cf02c1d9db575b92b36297dfe1fde72de9ee51e4",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "url": "https://github.com/LIghtJUNction/zpty.git",
+        "locked": "d263f9a8f0881d259e46c51a7b6753c61ab9be59",
+        "default_head": "d263f9a8f0881d259e46c51a7b6753c61ab9be59",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "url": "https://github.com/LIghtJUNction/zsys.git",
+        "locked": "808fcfdb73584ca7ca122e20b76f0209f56ab0f7",
+        "default_head": "808fcfdb73584ca7ca122e20b76f0209f56ab0f7",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "url": "https://github.com/LIghtJUNction/zterm.git",
+        "locked": "1a761334f0b9cf26da700426a5b82778f0d48c3d",
+        "default_head": "1a761334f0b9cf26da700426a5b82778f0d48c3d",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      },
+      {
+        "url": "https://github.com/LIghtJUNction/zvte.git",
+        "locked": "b4e50a5cde476fb5303060f3ecbc9200ccea5cc0",
+        "default_head": "b4e50a5cde476fb5303060f3ecbc9200ccea5cc0",
+        "match": true,
+        "exit_code": 0,
+        "stderr": ""
+      }
+    ]
+  },
+  "benchmark_command": {
+    "command": [
+      "python3",
+      "-u",
+      "tools/benchmark_search_navigation.py",
+      "--baseline-ref",
+      "c7c2a3e887a2f132f3e1e3d9e18cc0ebc16bae25",
+      "--lines",
+      "12000",
+      "--samples",
+      "5",
+      "--steps",
+      "160",
+      "--first-iterations",
+      "5",
+      "--cpu",
+      "0",
+      "--output",
+      "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation/navigation-ab.json"
+    ],
+    "exit_code": 0,
+    "seconds": 88.398,
+    "finished_at": "2026-11-20T21:22:34.524746+00:00"
+  },
+  "benchmark": {
+    "path": "navigation-ab.json",
+    "sha256": "97fc9f3f9341012b357e3daf8a4665b8834f7ecad1c743e2e435b1d9f76b3491",
+    "dependency_graph_matches_production": true,
+    "comparison_fields": "name, version, source and enabled features for the complete zterm closure",
+    "target_directory": "/var/tmp/project-z-cargo-target"
+  },
+  "supplemental_first_search_diagnostic": {
+    "path": "initial-search-diagnostic.json",
+    "sha256": "22ef507b90a46e31d951c79367a20aa48fb4400192f77ae6854fccfa65d6748d",
+    "harness": "initial-search-diagnostic.rs",
+    "harness_sha256": "8360340f7504d55ab2a4945c415598f4bd3ce288059864722d53961e7c3366d3",
+    "purpose": "resolve first-search noise and inspect stateless/cache/inline-hint paths; no inline annotation was added to production",
+    "limits": "A diagnostic binary hash was not captured; production-source hashes, diagnostic source and all samples are retained. Diagnostic timings are separate from the formal navigation A/B."
+  },
+  "evidence_directory": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/search-navigation-20261121/artifacts/search-navigation-validation",
+  "limits": [
+    "Logical search timing excludes PTY, input dispatch, redraw and scanout.",
+    "Private Xvfb GPU acceptance used Mesa llvmpipe; no hardware GPU or native Wayland performance claim.",
+    "Eight existing EGL/native-font unit tests remained explicitly ignored; GUI acceptance is recorded separately.",
+    "Allocator live-byte counters exclude allocator metadata, terminal text, renderer state and whole-process RSS.",
+    "A bounded-window miss still scans; rapid alternation across global wrap boundaries can repeatedly refill.",
+    "First searches retain the full scan and can cost more than the stateless baseline.",
+    "No application install, new package release or consumer-repository update was performed by this change."
+  ]
+}

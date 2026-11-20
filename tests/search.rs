@@ -514,3 +514,169 @@ fn sparse_unicode_lowercase_and_graphemes_keep_positions_after_idle_bytes() {
     let highlights = search::highlights(&terminal, query, Insensitive, offset);
     assert!(highlights.iter().any(|&bits| bits != 0));
 }
+
+fn compare_cached(
+    cache: &mut search::Cache,
+    terminal: &Terminal,
+    query: &str,
+    case: search::Case,
+    from: Option<search::Hit>,
+    forward: bool,
+) -> search::Result {
+    let expected = search::find(terminal, query, case, from, forward);
+    let actual = cache.find(terminal, query, case, from, forward);
+    assert_eq!(actual, expected, "query={query:?}, forward={forward}");
+    if let Some(hit) = actual.hit {
+        assert!(search::text(terminal, hit).is_some());
+    }
+    actual
+}
+
+#[test]
+fn cached_navigation_matches_full_scans_across_windows_and_wrap_boundaries() {
+    for count in [0, 1, 2, 127, 128, 129, 257] {
+        let mut terminal = Terminal::new(16, 3, 512);
+        for _ in 0..count {
+            terminal.feed(b"hit noise\r\n");
+        }
+        for initial_forward in [true, false] {
+            let mut cache = search::Cache::default();
+            let mut result = compare_cached(
+                &mut cache,
+                &terminal,
+                "hit",
+                Sensitive,
+                None,
+                initial_forward,
+            );
+            assert_eq!(result.count, count);
+            for forward in [true, false, true] {
+                for _ in 0..count + 3 {
+                    result = compare_cached(
+                        &mut cache, &terminal, "hit", Sensitive, result.hit, forward,
+                    );
+                }
+            }
+            for i in 0..260 {
+                result = compare_cached(
+                    &mut cache,
+                    &terminal,
+                    "hit",
+                    Sensitive,
+                    result.hit,
+                    i % 2 == 0,
+                );
+            }
+            compare_cached(&mut cache, &terminal, "hit", Sensitive, None, true);
+            compare_cached(&mut cache, &terminal, "hit", Sensitive, None, false);
+        }
+    }
+}
+
+#[test]
+fn cached_navigation_retains_distinct_hits_inside_graphemes_and_soft_wraps() {
+    let mut terminal = Terminal::new(7, 3, 2048);
+    terminal.feed("Aİ中e\u{301}\u{301}👩🏽‍💻z".repeat(150).as_bytes());
+    for (query, case) in [
+        ("\u{301}", Sensitive),
+        ("i", Insensitive),
+        ("ai\u{307}中e\u{301}", Insensitive),
+        ("💻", Sensitive),
+        ("🏽‍💻z", Sensitive),
+    ] {
+        let mut cache = search::Cache::default();
+        let mut result = compare_cached(&mut cache, &terminal, query, case, None, false);
+        assert!(result.count > 128);
+        for forward in [true, false] {
+            for _ in 0..result.count + 2 {
+                result = compare_cached(&mut cache, &terminal, query, case, result.hit, forward);
+            }
+        }
+    }
+}
+
+#[test]
+fn cached_navigation_invalidates_after_output_eviction_erase_and_reflow() {
+    let mut terminal = Terminal::new(8, 3, 12);
+    terminal.feed(b"hit one\r\nhit two\r\nhit three\r\n");
+    let mut cache = search::Cache::default();
+    let mut result = compare_cached(&mut cache, &terminal, "hit", Sensitive, None, false);
+    result = compare_cached(&mut cache, &terminal, "hit", Sensitive, result.hit, false);
+    let old = result.hit;
+    terminal.feed(b"new hit\r\n");
+    compare_cached(&mut cache, &terminal, "hit", Sensitive, old, true);
+    terminal.resize(5, 4);
+    result = compare_cached(&mut cache, &terminal, "hit", Sensitive, old, false);
+    let before_eviction = result.hit;
+    for _ in 0..40 {
+        terminal.feed(b"new hit\r\n");
+    }
+    result = compare_cached(
+        &mut cache,
+        &terminal,
+        "hit",
+        Sensitive,
+        before_eviction,
+        true,
+    );
+    for bytes in [
+        b"\x1b[2J\x1b[Hnew hit".as_slice(),
+        b"\x1b[3J".as_slice(),
+        b"\x1b[?1049hother hit".as_slice(),
+        b"\x1b[?1049l".as_slice(),
+        b"\x1bcfinal hit".as_slice(),
+    ] {
+        let stale = result.hit;
+        terminal.feed(bytes);
+        result = compare_cached(&mut cache, &terminal, "hit", Sensitive, stale, false);
+        result = compare_cached(&mut cache, &terminal, "hit", Sensitive, result.hit, true);
+    }
+}
+
+#[test]
+fn cached_navigation_rejects_stale_query_keys_and_preserves_query_limits() {
+    let mut terminal = Terminal::new(12, 3, 512);
+    terminal.feed("Alpha alpha Aİ e\u{301}\r\n".repeat(140).as_bytes());
+    let mut cache = search::Cache::default();
+    let mut from = None;
+    for (query, case) in [
+        ("alpha", Sensitive),
+        ("alpha", Insensitive),
+        ("Alpha", Sensitive),
+        ("i\u{307}", Insensitive),
+        ("absent", Sensitive),
+        ("", Sensitive),
+        ("alpha", Sensitive),
+    ] {
+        let result = compare_cached(&mut cache, &terminal, query, case, from, false);
+        from = compare_cached(&mut cache, &terminal, query, case, result.hit, true).hit;
+    }
+    compare_cached(
+        &mut cache,
+        &terminal,
+        &"x".repeat(1025),
+        Sensitive,
+        from,
+        true,
+    );
+    let query = "a".repeat(1024);
+    terminal.feed(query.as_bytes());
+    let result = compare_cached(&mut cache, &terminal, &query, Sensitive, None, false);
+    assert_eq!(result.count, 1);
+    compare_cached(&mut cache, &terminal, &query, Sensitive, result.hit, true);
+}
+
+#[test]
+fn cached_navigation_accepts_valid_external_positions_outside_its_window() {
+    let mut terminal = Terminal::new(16, 3, 512);
+    for _ in 0..300 {
+        terminal.feed(b"hit noise\r\n");
+    }
+    let mut cache = search::Cache::default();
+    let first = compare_cached(&mut cache, &terminal, "hit", Sensitive, None, true);
+    compare_cached(&mut cache, &terminal, "hit", Sensitive, first.hit, true);
+    let last = search::find(&terminal, "hit", Sensitive, None, false).hit;
+    compare_cached(&mut cache, &terminal, "hit", Sensitive, last, false);
+    compare_cached(&mut cache, &terminal, "hit", Sensitive, first.hit, true);
+    compare_cached(&mut cache, &terminal, "hit", Sensitive, last, true);
+}
