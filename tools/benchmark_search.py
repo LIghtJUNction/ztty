@@ -6,6 +6,10 @@ Uses only Python/Rust standard libraries and the repository's existing zterm.
 Example:
     python3 tools/benchmark_search.py --baseline-ref HEAD --lines 100000 \
         --samples 7 --output docs/benchmarks/search-before-after.json
+
+The first run resolves dependencies normally and saves a sibling .Cargo.lock.
+Replay that dependency graph with --lockfile path/to/search-before-after.Cargo.lock;
+Cargo then builds with --locked. Keep checkout sources and toolchain identical too.
 """
 from __future__ import annotations
 
@@ -33,6 +37,7 @@ def main():
     parser.add_argument("--iterations", type=int, default=1)
     parser.add_argument("--cpu", type=int, help="Pin the benchmark process to one available CPU")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--lockfile", type=Path, help="Reuse a captured benchmark Cargo.lock (build with --locked)")
     args = parser.parse_args()
     if min(args.lines, args.samples, args.iterations) <= 0:
         parser.error("lines, samples and iterations must be positive")
@@ -51,6 +56,7 @@ def main():
         "baseline_search_sha256": hashlib.sha256(before.encode()).hexdigest(),
         "candidate_search_sha256": hashlib.sha256(after.encode()).hexdigest(),
         "harness_sha256": hashlib.sha256(harness.encode()).hexdigest(),
+        "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "rustc": command(["rustc", "--version"]),
         "machine": platform.machine(),
         "system": platform.system(),
@@ -87,11 +93,21 @@ def main():
         )
         (project / "Cargo.toml").write_text(manifest)
         target = root / "target/search-benchmark"
-        subprocess.run(
-            ["cargo", "build", "--release", "--manifest-path", str(project / "Cargo.toml"),
-             "--target-dir", str(target)],
-            check=True,
-        )
+        build_args = [
+            "cargo", "build", "--release", "--manifest-path", str(project / "Cargo.toml"),
+            "--target-dir", str(target),
+        ]
+        if args.lockfile is not None:
+            (project / "Cargo.lock").write_bytes(args.lockfile.read_bytes())
+            build_args.append("--locked")
+        subprocess.run(build_args, check=True)
+        lock_bytes = (project / "Cargo.lock").read_bytes()
+        lock_output = args.output.with_suffix(".Cargo.lock")
+        lock_output.parent.mkdir(parents=True, exist_ok=True)
+        lock_output.write_bytes(lock_bytes)
+        metadata["cargo_lockfile"] = lock_output.name
+        metadata["cargo_lockfile_sha256"] = hashlib.sha256(lock_bytes).hexdigest()
+        metadata["cargo_lockfile_reused"] = args.lockfile is not None
         binary = target / "release/ztty-search-benchmark"
         if os.name == "nt":
             binary = binary.with_suffix(".exe")
