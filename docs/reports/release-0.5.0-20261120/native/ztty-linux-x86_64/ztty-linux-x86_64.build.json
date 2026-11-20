@@ -1,0 +1,49 @@
+{
+  "source_sha": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "source_ref": "refs/tags/v0.5.0",
+  "version": "0.5.0",
+  "architecture": "x86_64",
+  "runner": "ubuntu-24.04",
+  "runner_image": "20261116.133.1",
+  "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39",
+  "rust_toolchain": "1.100.0",
+  "run_id": "44668398577",
+  "run_attempt": "1",
+  "build_only": false,
+  "candidate_platform": "all",
+  "passed": true,
+  "status": "accepted",
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "native": "success",
+    "package": "success",
+    "evidence": "success"
+  },
+  "files": {
+    "ztty-linux-x86_64.gate-tests.log": {
+      "bytes": 2573,
+      "sha256": "875bb81216b20e2b4684aeb3359dca15bfadbb2b99a92f38a260f8d04daa0a31"
+    },
+    "ztty-linux-x86_64.native.json": {
+      "bytes": 27129,
+      "sha256": "66b52e9ea8305cec5f860e8314df6a6812e16f034151f924e12826b0fa1b1c23"
+    },
+    "ztty-linux-x86_64.native.tar.gz": {
+      "bytes": 1238642,
+      "sha256": "765be6bbd4c77415c762c99871e548cb4daa37bc95850cd81a84b19846f23b54"
+    },
+    "ztty-linux-x86_64.tar.gz": {
+      "bytes": 584351,
+      "sha256": "4b79ded489c37325ac049e4962e75c7ff773c2c5d073d8fbad154bb47dfed6b2"
+    },
+    "ztty-linux-x86_64.tar.gz.sha256": {
+      "bytes": 91,
+      "sha256": "3031105f5dc6bb12619f91cabea80946993572fa2e0f5e5ee7acfcc49c3ea57a"
+    },
+    "ztty-linux-x86_64.working-directory.log": {
+      "bytes": 1550,
+      "sha256": "d9f881d9eedb8a28353c317427bae55c123b9664d742636585db0da1f3e9e2bf"
+    }
+  }
+}

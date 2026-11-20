@@ -1,0 +1,35 @@
+{
+  "ztty_version": "0.5.0",
+  "architecture": "x64",
+  "minimum_windows_build": 17763,
+  "conpty": {
+    "package": "Microsoft.Windows.Console.ConPTY",
+    "version": "1.25.261109001",
+    "url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.console.conpty/1.25.261109001/microsoft.windows.console.conpty.1.25.261109001.nupkg",
+    "package_sha256": "3d77f535df848e44225c2a8912ac844fecb23f3057732b639f3034b587496f09",
+    "license": "MIT"
+  },
+  "files": {
+    "ztty.exe": {
+      "bytes": 678400,
+      "sha256": "b415dae9aea8f59e9caf6784b09e5951efb0e3bfa0a6178990ea51ff631ebdcd"
+    },
+    "conpty.dll": {
+      "bytes": 119608,
+      "sha256": "e971856f89748dc3b458125e9afdd79b5e9574a7c937676116d3cbbd3b71f492"
+    },
+    "OpenConsole.exe": {
+      "bytes": 1089336,
+      "sha256": "b17e48b07ef153b420f0a6e178bacd31fb4c3390e21ae746586213fc0719a775"
+    },
+    "LICENSE-ztty.txt": {
+      "bytes": 1091,
+      "sha256": "6d50dc9c60538cc7e9cb0b4fe1a9c4dcd8c203b48c40d3a348158de7b028fb37"
+    },
+    "LICENSE-ConPTY.txt": {
+      "bytes": 1074,
+      "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+    }
+  },
+  "validation": "Packaging verifies hashes and PE architecture; native runtime tests are separate."
+}

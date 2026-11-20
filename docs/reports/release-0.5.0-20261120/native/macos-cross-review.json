@@ -1,0 +1,125 @@
+{
+  "ok": true,
+  "source": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "run_id": "44668398577",
+  "checks": 414,
+  "scope": "read-only cross-review; no native test rerun, compilation, dispatch or package mutation",
+  "results": [
+    {
+      "architecture": "aarch64",
+      "source": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+      "run_id": "44668398577",
+      "build_sha256": "c719414fec2ee673aac5a24e736831ba554e4ae62b7845cac3bde7dd6791abc1",
+      "native_sha256": "ed0c51596a22d4c12b3e56510e04a7699709daa0fbfb305bf21128b891865346",
+      "manifest_sha256": "6ca0c5d3f9b264556d64b24e6f17ab065a1d4722aeeed9dee8d5105d22067815",
+      "pre_sign_native_binary_sha256": "a940e025ee5826b70696ac252de5869cbe975c7bcc926ede8f9136d36a758a8a",
+      "pre_sign_binary_bytes": 501520,
+      "signed_binary": {
+        "bytes": 519664,
+        "sha256": "ff6bc6135df90e1a90f2995793c1dd98a1fdaf6adac37a594b61b9e4a2270ccc",
+        "mode": "0755"
+      },
+      "bundle_build": {
+        "version": "0.5.0",
+        "architectures": [
+          "aarch64"
+        ],
+        "source_binary_sha256": "a940e025ee5826b70696ac252de5869cbe975c7bcc926ede8f9136d36a758a8a",
+        "source_binary_bytes": 501520,
+        "minimum_macos": "11.0",
+        "license": "MIT"
+      },
+      "archives": {
+        "ztty-macos-aarch64.zip": {
+          "sha256": "27a6db5df663bc2d301af2095bd04668c9847b7fb2f842be96ef16dd855bad60",
+          "bytes": 252006
+        },
+        "ztty-macos-aarch64.tar.gz": {
+          "sha256": "3cf0005f5d47e05668f2de35da84ab51067c268c60ef7ef2b314e9e2d069c326",
+          "bytes": 251447
+        }
+      },
+      "signature": "ad-hoc-verified",
+      "notarized": false,
+      "CodeDirectories": [
+        {
+          "slot": 0,
+          "version": 132096,
+          "flags": 2,
+          "ad_hoc_flag": true
+        }
+      ],
+      "native_checks": 24,
+      "native_stages": 13,
+      "pixel_pngs": 10,
+      "empty_logs": [
+        "ztty-macos-aarch64.native.application.stderr.log",
+        "ztty-macos-aarch64.native.application.stdout.log",
+        "ztty-macos-aarch64.native.stderr.log"
+      ],
+      "owned_remaining": [],
+      "ime_keyboard": "not_performed",
+      "physical_display_latency": "not_measured",
+      "binary_runtime_test_scope": "pre-sign native binary; signed package hash and metadata checked, not a second GUI run",
+      "original_build_members_unchanged": 64
+    },
+    {
+      "architecture": "x86_64",
+      "source": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+      "run_id": "44668398577",
+      "build_sha256": "37ab2a922aa6f3cb1e1000367701f25a08d4757ae9e2a36bf018887d10cefdfb",
+      "native_sha256": "d88c565ac9a3225450967c0e34306f79d279af803c0481aace725b3ca866daa3",
+      "manifest_sha256": "6b4d54f00ebc02d6421bb0ef6711dec7a275223bd947986f4f2b7745b3643da4",
+      "pre_sign_native_binary_sha256": "6416aa3724fe5bd47e930f07a8f52d95cc405ebbda6aab1b187abdbff8ff0277",
+      "pre_sign_binary_bytes": 538560,
+      "signed_binary": {
+        "bytes": 561056,
+        "sha256": "d9b8936c1eba636a781c6dcd00e6706870f281edef70bbb37d18683f0d704f24",
+        "mode": "0755"
+      },
+      "bundle_build": {
+        "version": "0.5.0",
+        "architectures": [
+          "x86_64"
+        ],
+        "source_binary_sha256": "6416aa3724fe5bd47e930f07a8f52d95cc405ebbda6aab1b187abdbff8ff0277",
+        "source_binary_bytes": 538560,
+        "minimum_macos": "11.0",
+        "license": "MIT"
+      },
+      "archives": {
+        "ztty-macos-x86_64.zip": {
+          "sha256": "4af65abc7044ec307bb37b2cab1abafca4175f7025399f9ffcd369582f8460e7",
+          "bytes": 278711
+        },
+        "ztty-macos-x86_64.tar.gz": {
+          "sha256": "dcf27e3d0dc86b67f35f44f365b6cc07fcc2e480c39ed412c017b2040fe129f8",
+          "bytes": 277930
+        }
+      },
+      "signature": "ad-hoc-verified",
+      "notarized": false,
+      "CodeDirectories": [
+        {
+          "slot": 0,
+          "version": 132096,
+          "flags": 2,
+          "ad_hoc_flag": true
+        }
+      ],
+      "native_checks": 24,
+      "native_stages": 13,
+      "pixel_pngs": 10,
+      "empty_logs": [
+        "ztty-macos-x86_64.native.application.stderr.log",
+        "ztty-macos-x86_64.native.application.stdout.log",
+        "ztty-macos-x86_64.native.stderr.log"
+      ],
+      "owned_remaining": [],
+      "ime_keyboard": "not_performed",
+      "physical_display_latency": "not_measured",
+      "binary_runtime_test_scope": "pre-sign native binary; signed package hash and metadata checked, not a second GUI run",
+      "original_build_members_unchanged": 64
+    }
+  ]
+}

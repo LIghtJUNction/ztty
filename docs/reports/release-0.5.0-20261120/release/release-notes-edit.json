@@ -1,0 +1,14 @@
+{
+  "recorded_at": "2026-11-20T03:53:01.457024+00:00",
+  "release_id": 452238617,
+  "tag": "v0.5.0",
+  "original_body_sha256": "b8cda59dc40303598e1db0e499fbb9a79b1ee73797730c35901ccc6958a6ac23",
+  "published_body_sha256": "a2ef81f3444c822cb75789df8b72209e08fcb71d1e53d10cce99e9f58b3cf252",
+  "bytes": 3361,
+  "original_body_retained_exactly_once": true,
+  "assets_unchanged": true,
+  "readback": "GitHub connector body exactly equals notes file",
+  "first_readback_failure_retained": true,
+  "mutation_repeated": false,
+  "success": true
+}

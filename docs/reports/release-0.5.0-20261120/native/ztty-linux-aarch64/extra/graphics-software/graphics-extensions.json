@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "ok": true,
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "39ced58ddb1f3fd2abb2558d33949a24dc6bf8801e3809cbbda187090c10057d",
+  "checks": [
+    {
+      "name": "file_and_symlink",
+      "ok": true,
+      "symlink_followed": true,
+      "offset": 6,
+      "bytes": 4,
+      "pixels": [
+        255,
+        0,
+        0,
+        255
+      ]
+    },
+    {
+      "name": "temporary_file",
+      "ok": true,
+      "eligible_source_unlinked": true,
+      "nonprotocol_name_retained": true
+    },
+    {
+      "name": "shared_memory",
+      "ok": true,
+      "names_with_and_without_slash": true,
+      "range_verified": true,
+      "objects_unlinked": true
+    },
+    {
+      "name": "invalid_sources",
+      "ok": true,
+      "opaque_error_cases": 7,
+      "fifo_did_not_block": true,
+      "sources_preserved": true
+    },
+    {
+      "name": "compressed_files",
+      "ok": true,
+      "zlib_rgba_and_png": true
+    },
+    {
+      "name": "relative_placements",
+      "ok": true,
+      "child_followed_moved_parent": true,
+      "parent_removal_cascaded": true
+    },
+    {
+      "name": "placeholders",
+      "ok": true,
+      "partial_tile_clipped": true,
+      "inherited_column": true,
+      "text_erase_only_removed_its_tile": true,
+      "relative_virtual_parent": true
+    },
+    {
+      "name": "animation",
+      "ok": true,
+      "timer_advanced_real_pixels": true,
+      "stop_stable": true,
+      "edit_compose_delete": true
+    }
+  ],
+  "cleanup_errors": [],
+  "cell_pixels": [
+    9,
+    22
+  ],
+  "display_ownership": {
+    "display": ":16556",
+    "pid": 5680,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X16556",
+        "inode": 34522,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X16556",
+        "inode": 34521,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "renderer_after": {
+    "window_id": 2097155,
+    "requested": "software",
+    "actual": "software",
+    "driver": ""
+  },
+  "stderr_tail": "",
+  "passed": 8
+}

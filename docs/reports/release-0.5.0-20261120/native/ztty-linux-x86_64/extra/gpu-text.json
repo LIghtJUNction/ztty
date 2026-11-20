@@ -1,0 +1,618 @@
+{
+  "ok": true,
+  "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+  "binary_sha256": "3ed8cead1c4ca20aedd4aa262de8fe992bcf9639546d95f89f7a782eeef7a491",
+  "scope": "Owned PTY, XTEST, private clipboard and X11 pixel readback; not physical display latency",
+  "checks": [
+    "complete colored ZWJ and flag clusters reach real pixels in two-cell allocations",
+    "the ARGB window preserves configured 70 percent background alpha",
+    "real drag and Ctrl+Shift+C copy the exact original ZWJ, flag and combining sequence",
+    "SGR 5 and SGR 6 change actual pixels independently while ordinary text remains visible",
+    "unfocused blinking text stays visible without recurring repaint wakeups",
+    "font reload changes geometry while retaining the same window, broker and PTY",
+    "GPU and Xft use the same display-resolved font size and baseline",
+    "live GPU/software switching preserves the PTY and returns to the requested backend"
+  ],
+  "screenshots": {
+    "complete-graphemes": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-text/complete-graphemes.png",
+      "sha256": "866d958d9bd223111bcfe7702049b8ae99ff325cdfcb0a7d90e6112202956ba5"
+    },
+    "font-reload": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-text/font-reload.png",
+      "sha256": "139a5f1d29d4d96a219735b0fa09e8886909265b1be909d67c40547edbc87f1a"
+    },
+    "completed": {
+      "path": "dist/ztty-linux-x86_64.native/gpu-text/completed.png",
+      "sha256": "7e72a6d9fbe17aed8b3365bf2aa8d6f42bb39c9881a17771434db42680f4f57e"
+    }
+  },
+  "source_sha256": {
+    "src/x11.rs": "cb5697103d7a0a58cb0f0299a9e9f845fdaefec7dc372459945aad77d28d535a",
+    "src/x11/gpu.rs": "ad11e4046d018aea41d1520d7329810a70d4aba66ecd6cd203d7f418ab8c9ddf",
+    "src/session.rs": "8a44dfb0bf5a0d20858f00d4dfade2381cf03cdcd9b86d431f958662ffb182fd",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "0478c66d0049a005397de450072a66ee5bf8fb45be96249825f8fdd73adea644",
+    "native/font_bridge.c": "cc7c5137fa6b5e9010bcaa3cdc7a98cf870c2a237a96b22d59970e5707a9f654",
+    "tests/text_gpu_gui.py": "4c04070ff0b1e9dbc4fc5f98647deaa89bc0917f1462139625b837bc20aa7928",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9"
+  },
+  "display_ownership": {
+    "display": ":4582",
+    "pid": 5149,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X4582",
+        "inode": 34539,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X4582",
+        "inode": 34538,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+  },
+  "grid": {
+    "cell_width": 11,
+    "cell_height": 26,
+    "depth": 32
+  },
+  "background_alpha": 178,
+  "copied_utf8_sha256": "d52553cb5842b25483223a3be75fdcd76fa9a0b9a3c031b29c561707ebd3b63b",
+  "blink_samples": [
+    {
+      "ms": 0.507,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 22.118,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 43.384,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 65.235,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 86.559,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 107.62,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 129.137,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 151.217,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 172.537,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 193.64,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 214.84,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 236.41,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 257.789,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 279.076,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 300.062,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 322.02,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 343.215,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 365.216,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 386.632,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 407.888,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 429.916,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 451.937,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 473.712,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 494.687,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 515.892,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 536.852,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 558.389,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 580.256,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 601.689,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 622.736,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 643.767,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 664.805,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 686.154,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 707.737,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 729.23,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 750.074,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 772.025,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 794.438,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 815.8,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 837.003,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 858.054,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 879.962,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 901.845,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 923.219,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 944.615,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 966.457,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 988.738,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1010.615,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1031.562,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1053.029,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1074.563,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1096.089,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1118.131,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1139.443,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1161.44,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1182.961,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1204.222,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1225.464,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1247.249,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1268.448,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1290.397,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1311.755,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1333.847,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    }
+  ],
+  "unfocused_idle": {
+    "seconds": 0.55,
+    "context_switch_delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "backend_font_boxes": {
+    "software": [
+      0,
+      5,
+      44,
+      19
+    ],
+    "gpu": [
+      1,
+      5,
+      44,
+      19
+    ]
+  },
+  "renderer_after": {
+    "window_id": 2097155,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+  },
+  "remaining_owned_pids": [],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "stderr_tail": "The XKEYBOARD keymap compiler (xkbcomp) reports:\n> Warning:          Could not resolve keysym XF86CameraAccessEnable\n> Warning:          Could not resolve keysym XF86CameraAccessDisable\n> Warning:          Could not resolve keysym XF86CameraAccessToggle\n> Warning:          Could not resolve keysym XF86NextElement\n> Warning:          Could not resolve keysym XF86PreviousElement\n> Warning:          Could not resolve keysym XF86AutopilotEngageToggle\n> Warning:          Could not resolve keysym XF86MarkWaypoint\n> Warning:          Could not resolve keysym XF86Sos\n> Warning:          Could not resolve keysym XF86NavChart\n> Warning:          Could not resolve keysym XF86FishingChart\n> Warning:          Could not resolve keysym XF86SingleRangeRadar\n> Warning:          Could not resolve keysym XF86DualRangeRadar\n> Warning:          Could not resolve keysym XF86RadarOverlay\n> Warning:          Could not resolve keysym XF86TraditionalSonar\n> Warning:          Could not resolve keysym XF86ClearvuSonar\n> Warning:          Could not resolve keysym XF86SidevuSonar\n> Warning:          Could not resolve keysym XF86NavInfo\nErrors from xkbcomp are not fatal to the X server\n"
+}

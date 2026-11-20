@@ -1,0 +1,281 @@
+{
+  "source_sha": "c4f8f48c9598284a589e609f25242b49ceabfea8",
+  "source_ref": "refs/tags/v0.5.0",
+  "version": "0.5.0",
+  "architecture": "x86_64",
+  "runner": "macos-15-intel",
+  "runner_image": "20260824.0482.1",
+  "platform": "macOS-15.7.9-x86_64-i386-64bit-Mach-O",
+  "rust_toolchain": "1.100.0",
+  "run_id": "44668398577",
+  "run_attempt": "1",
+  "build_only": false,
+  "candidate_platform": "all",
+  "passed": true,
+  "status": "accepted",
+  "outcomes": {
+    "toolchain": "success",
+    "build": "success",
+    "spawn": "success",
+    "native": "success",
+    "package": "success"
+  },
+  "files": {
+    "ztty-macos-x86_64.manifest.json": {
+      "bytes": 2963,
+      "sha256": "6b4d54f00ebc02d6421bb0ef6711dec7a275223bd947986f4f2b7745b3643da4"
+    },
+    "ztty-macos-x86_64.manifest.json.sha256": {
+      "bytes": 98,
+      "sha256": "7e6b7a56e225459b0b0b6d5c614da79996639d44f447afd5236dda420a08d5fa"
+    },
+    "ztty-macos-x86_64.native.application.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ztty-macos-x86_64.native.application.stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ztty-macos-x86_64.native.contract.log": {
+      "bytes": 1049,
+      "sha256": "717ea11ac7622d46c1caa6e3f923fa4d32f68c98af4197d5c00543429027a486"
+    },
+    "ztty-macos-x86_64.native.invalid_cwd_fails_before_window.json": {
+      "bytes": 1246,
+      "sha256": "05b34a8414cda482b872d22f89001a7e8c259eb56137473868728deb7f6c8808"
+    },
+    "ztty-macos-x86_64.native.invalid_cwd_fails_before_window.stderr.log": {
+      "bytes": 105,
+      "sha256": "08edd59518317ced7fe4e7aba220e9c63ffd50f6c06bc8ae77d5346d7fba855c"
+    },
+    "ztty-macos-x86_64.native.invalid_cwd_fails_before_window.stdout.log": {
+      "bytes": 1075,
+      "sha256": "ffa920ac21d56a178c5a7c255f950b0b5b345a5c59f736fcdbe1f04b131de3cd"
+    },
+    "ztty-macos-x86_64.native.json": {
+      "bytes": 70033,
+      "sha256": "d88c565ac9a3225450967c0e34306f79d279af803c0481aace725b3ca866daa3"
+    },
+    "ztty-macos-x86_64.native.permissions.json": {
+      "bytes": 880,
+      "sha256": "b0e8c8078e15089387592e4d6f399d335bddb57ca2c511b0305f8d682bf92e0a"
+    },
+    "ztty-macos-x86_64.native.permissions.stderr.log": {
+      "bytes": 105,
+      "sha256": "08edd59518317ced7fe4e7aba220e9c63ffd50f6c06bc8ae77d5346d7fba855c"
+    },
+    "ztty-macos-x86_64.native.permissions.stdout.log": {
+      "bytes": 707,
+      "sha256": "34c3bd43a745aecb91594af440606e597c30abea113c61ed5048d62c41f6f49c"
+    },
+    "ztty-macos-x86_64.native.sixel_before_resize.json": {
+      "bytes": 4454,
+      "sha256": "fc600ecb932f92135dea89596e4b5a8ef87736208f594af37eb176333c011e7e"
+    },
+    "ztty-macos-x86_64.native.sixel_before_resize.png": {
+      "bytes": 6429,
+      "sha256": "1a627d18dc5d94de04f04a4de0dbf099c9820bbbd17bcd2deee26654c9adc3b7"
+    },
+    "ztty-macos-x86_64.native.sixel_before_resize.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_before_resize.stdout.log": {
+      "bytes": 3858,
+      "sha256": "9e63a287322b3ee7b741c55929fe8a813910b9af02d85ec7a7332ae94c5b31c7"
+    },
+    "ztty-macos-x86_64.native.sixel_cancel_and_pty_recovery.json": {
+      "bytes": 5112,
+      "sha256": "84bec4991ec5247f4eb9e896159274be619702ea3b52364f7df5a6dfc5783dd3"
+    },
+    "ztty-macos-x86_64.native.sixel_cancel_and_pty_recovery.png": {
+      "bytes": 6424,
+      "sha256": "2e55abc7bbc544497ce628293900b9f78a7234dbfccc85853c67e30aef826d75"
+    },
+    "ztty-macos-x86_64.native.sixel_cancel_and_pty_recovery.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_cancel_and_pty_recovery.stdout.log": {
+      "bytes": 4508,
+      "sha256": "399d403dfe2373d709fe45bd9b8113cd530816c4079421ef4f2de7d060edc802"
+    },
+    "ztty-macos-x86_64.native.sixel_erase_display_repaints.json": {
+      "bytes": 5109,
+      "sha256": "fbad9d121d3c9ba3bf2ca19daead113fae68e4de68cc140a8464f22044195931"
+    },
+    "ztty-macos-x86_64.native.sixel_erase_display_repaints.png": {
+      "bytes": 6424,
+      "sha256": "2e55abc7bbc544497ce628293900b9f78a7234dbfccc85853c67e30aef826d75"
+    },
+    "ztty-macos-x86_64.native.sixel_erase_display_repaints.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_erase_display_repaints.stdout.log": {
+      "bytes": 4507,
+      "sha256": "7ef49a61ac6d69f5e7ad10acd28da485e007ca5965732f81ded6af8769dfacaa"
+    },
+    "ztty-macos-x86_64.native.sixel_minimize_restore_visible_image.json": {
+      "bytes": 4810,
+      "sha256": "8113d9c31fbcb0c7b968bbfb8f1a6140a2560fe467b41ccfccaab7b1014b82c4"
+    },
+    "ztty-macos-x86_64.native.sixel_minimize_restore_visible_image.png": {
+      "bytes": 6429,
+      "sha256": "1a627d18dc5d94de04f04a4de0dbf099c9820bbbd17bcd2deee26654c9adc3b7"
+    },
+    "ztty-macos-x86_64.native.sixel_minimize_restore_visible_image.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_minimize_restore_visible_image.stdout.log": {
+      "bytes": 4190,
+      "sha256": "51eac46b0dd5ea6c22e880a5ba2e07210ad42f5c19cd668fbd16af40ad44ca2c"
+    },
+    "ztty-macos-x86_64.native.sixel_opaque_uses_current_background.json": {
+      "bytes": 4817,
+      "sha256": "f81f6d6a8d6986ff54f35a1b36321aa03ea3fd897afe3313b5dbbb9033af4eea"
+    },
+    "ztty-macos-x86_64.native.sixel_opaque_uses_current_background.png": {
+      "bytes": 6461,
+      "sha256": "8626c6974c19660c35ea9610ba97d9129519417e1a5a077f9728b7d5de32595c"
+    },
+    "ztty-macos-x86_64.native.sixel_opaque_uses_current_background.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_opaque_uses_current_background.stdout.log": {
+      "bytes": 4193,
+      "sha256": "d2b2f3ab94724d5dc5984084b480398ccbc9ec4a20dc551370e5682467d57b8e"
+    },
+    "ztty-macos-x86_64.native.sixel_recovers_after_oversized_raster.json": {
+      "bytes": 5127,
+      "sha256": "2e8a8d4ec2ecf718486e98276ed709745e48afb1f6685e4f11a35834e90612c1"
+    },
+    "ztty-macos-x86_64.native.sixel_recovers_after_oversized_raster.png": {
+      "bytes": 6421,
+      "sha256": "a43f7782d1b3230f26af499cd3b1d27bca2156e764cc7a5718c7293f28f7a5fb"
+    },
+    "ztty-macos-x86_64.native.sixel_recovers_after_oversized_raster.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_recovers_after_oversized_raster.stdout.log": {
+      "bytes": 4507,
+      "sha256": "8a7600671803ca5b4ff8f610d96c8e510a96203444a97f68b3086ce129e1bfb9"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_clips_without_ghosts.json": {
+      "bytes": 4830,
+      "sha256": "e24905874975178cc648bb6746cc5c9e4d9a49f358a5cf1202065195925cfd91"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_clips_without_ghosts.png": {
+      "bytes": 5408,
+      "sha256": "85ee56f54be7d06dcdd7d6a0218aa5aef9dc7441735b47e481fcbdf20d3ea60b"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_clips_without_ghosts.stderr.log": {
+      "bytes": 438,
+      "sha256": "f12d2598aff94353c0b840b9b064beac0684bd1ced567ec48ed4f57a8190d579"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_clips_without_ghosts.stdout.log": {
+      "bytes": 4166,
+      "sha256": "2108712aa1ce91c8433bbc42f090ddcb6f7f704f1a19f0180291a8ff51c6d667"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_restores_visible_image.json": {
+      "bytes": 4833,
+      "sha256": "19d68fc404c246ac4a3ff5c51a7913dc630ee4a4c176f8541e83338f675bc224"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_restores_visible_image.png": {
+      "bytes": 6429,
+      "sha256": "1a627d18dc5d94de04f04a4de0dbf099c9820bbbd17bcd2deee26654c9adc3b7"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_restores_visible_image.stderr.log": {
+      "bytes": 438,
+      "sha256": "f12d2598aff94353c0b840b9b064beac0684bd1ced567ec48ed4f57a8190d579"
+    },
+    "ztty-macos-x86_64.native.sixel_resize_restores_visible_image.stdout.log": {
+      "bytes": 4165,
+      "sha256": "1740f69285ba45499d6a886194b80b0f883ea287de175477184b89fb2ab3c5cd"
+    },
+    "ztty-macos-x86_64.native.sixel_rgb_native_pixels.json": {
+      "bytes": 5084,
+      "sha256": "d03841674dcf375b4f089bfc06cbc525dcd824260bd1baced94927fe762ae050"
+    },
+    "ztty-macos-x86_64.native.sixel_rgb_native_pixels.png": {
+      "bytes": 6421,
+      "sha256": "a43f7782d1b3230f26af499cd3b1d27bca2156e764cc7a5718c7293f28f7a5fb"
+    },
+    "ztty-macos-x86_64.native.sixel_rgb_native_pixels.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_rgb_native_pixels.stdout.log": {
+      "bytes": 4492,
+      "sha256": "581a63c0c9a0aad7c7525b1edfdc20a355c46d9437ceaa411d965bb8970eb8a5"
+    },
+    "ztty-macos-x86_64.native.sixel_transparent_preserves_underlying_image.json": {
+      "bytes": 4838,
+      "sha256": "46bba42d04692fdeb0a20d36eaa3459d07ec07616b42b4ba2d6bc00f1adcf699"
+    },
+    "ztty-macos-x86_64.native.sixel_transparent_preserves_underlying_image.png": {
+      "bytes": 6449,
+      "sha256": "913ac6e05e2a8a9e95e48d819c3d657feae038695d2982e16da0821a96de07f3"
+    },
+    "ztty-macos-x86_64.native.sixel_transparent_preserves_underlying_image.stderr.log": {
+      "bytes": 390,
+      "sha256": "432c20b310d93ca9aa72ca434fb20d59526502da37cdf59e9fd859e84fe3d372"
+    },
+    "ztty-macos-x86_64.native.sixel_transparent_preserves_underlying_image.stdout.log": {
+      "bytes": 4198,
+      "sha256": "47c74b02a28bf44677089569a25af9b47eea24b445d44da4839a2d39ff8e0b61"
+    },
+    "ztty-macos-x86_64.native.stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ztty-macos-x86_64.native.stdout.log": {
+      "bytes": 69810,
+      "sha256": "52dadd3bfd942aa507853758632425e657585e1fb0e0d2b5a6a08ac3e5fc4ec5"
+    },
+    "ztty-macos-x86_64.native.window_minimized.json": {
+      "bytes": 3077,
+      "sha256": "3f6bf0328100555130cd9c389b2c3ec20fec3566933e89b33a8336574bfcab36"
+    },
+    "ztty-macos-x86_64.native.window_minimized.stderr.log": {
+      "bytes": 249,
+      "sha256": "33c97aeb40493a0ba68b088064a27b3e8aefae46fcdff26febc3551253715bbe"
+    },
+    "ztty-macos-x86_64.native.window_minimized.stdout.log": {
+      "bytes": 2818,
+      "sha256": "e986387a285f212579c1bfe48108105b4ae37b77992513f8dac2acfeb0c9054c"
+    },
+    "ztty-macos-x86_64.spawn.json": {
+      "bytes": 1891,
+      "sha256": "f4444145d5d628ea49c2d1bea97f64e557b9d09c0ca3475df844e195a33a34ce"
+    },
+    "ztty-macos-x86_64.spawn.stderr.log": {
+      "bytes": 8977,
+      "sha256": "9b624d5dd43f7ddb65f3ba4201192f4b7d7823f9be95270ae1d314bb74f86460"
+    },
+    "ztty-macos-x86_64.spawn.stdout.log": {
+      "bytes": 871,
+      "sha256": "77ba32f002503e9c24d751249f22ce1ffc2e923f52ab3248ab955e9782a2079e"
+    },
+    "ztty-macos-x86_64.tar.gz": {
+      "bytes": 277930,
+      "sha256": "dcf27e3d0dc86b67f35f44f365b6cc07fcc2e480c39ed412c017b2040fe129f8"
+    },
+    "ztty-macos-x86_64.tar.gz.sha256": {
+      "bytes": 91,
+      "sha256": "c7d53bd66392dfed5b599c5827a6dff65559b4927b2faacae52526ad9672f40b"
+    },
+    "ztty-macos-x86_64.zip": {
+      "bytes": 278711,
+      "sha256": "4af65abc7044ec307bb37b2cab1abafca4175f7025399f9ffcd369582f8460e7"
+    },
+    "ztty-macos-x86_64.zip.sha256": {
+      "bytes": 88,
+      "sha256": "a1d446b450b51735256e2d2b63c2a6b4829e7cf6c49e7895f7db32ca05e5be4a"
+    }
+  }
+}

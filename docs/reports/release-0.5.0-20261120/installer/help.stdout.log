@@ -1,0 +1,56 @@
+ztty — shared no_std terminal sessions for Linux
+
+Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]
+ztty attach [NAME | ztty://ADDRESS]
+ztty attach --observe NAME
+ztty detach NAME | close NAME | rename NAME NEW_NAME | list [FILTER]
+ztty action NAME ACTION | move NAME TARGET [tab|right|down]
+ztty control NAME acquire|release [--takeover]
+ztty commands NAME | command-output NAME COMMAND_ID
+ztty shell-integration bash|zsh|fish|nu
+ztty plugin check|run /absolute/library.so
+ztty save-layout NAME > workspace.json
+ztty restore-layout workspace.json
+ztty mcp [--transport stdio|http] [--host HOST] [--port PORT]
+
+--backend x11|wayland Select Linux host (default: x11; Wayland is experimental)
+--name NAME          Name this local session
+--observe            Open a standalone read-only view without requesting focus
+--tab NAME           Open a new tab in NAME's window
+--split-right NAME   Open a pane to the right of NAME
+--split-down NAME    Open a pane below NAME
+--cwd PATH           Start the command in PATH
+--config PATH        Load an appearance file
+--text-plugin NAME=PATH Register a trusted text extension (repeatable, Linux)
+--font NAME          Fontconfig name (default: monospace:size=11)
+--geometry COLSxROWS Initial character dimensions (default: 120x32)
+--scrollback LINES   Maximum retained lines (default: 2000; 0 disables)
+--help               Show this help
+--version            Show the version
+
+Ctrl+Shift+C copies a selection; Ctrl+Shift+V pastes.
+Shift+PageUp/PageDown and the wheel browse scrollback.
+Shift+drag selects while applications use the mouse; Ctrl+click opens links.
+Multiple windows share one process, display connection and font cache.
+Ctrl+Shift+T adds a tab; E/O splits right/down; PageUp/PageDown switches tabs.
+Ctrl+Tab / Ctrl+Shift+Tab also switches to the next / previous tab.
+Ctrl+Shift+Left/Right focuses panes; Up/Down swaps; Enter maximizes/restores.
+Ctrl+Alt+Shift+Equal/Minus grows or shrinks the nearest split.
+Ctrl+Shift+D detaches; U moves a pane to a new window; G takes input control.
+Ctrl+Shift+S opens the session switcher (action: sessions).
+Type name/title/URI words; Up/Down selects; Enter focuses or explicitly attaches.
+Switching preserves the PTY and input owner; observing attaches stay read-only.
+Ctrl+Shift+F searches across soft-wrapped text; Alt+C toggles case, Enter/Shift+Enter navigates.
+Copy joins soft-wrapped rows and preserves explicit line breaks.
+Ctrl+Shift+P opens actions: filter with multiple words and see effective bindings.
+Registered plugins add Copy using NAME actions for a selection or visible text.
+Ctrl+U clears an overlay query; Esc closes it. Ctrl+Shift+R reloads configuration.
+Ctrl+Shift+K/J browses shell commands; Y copies the selected command output.
+Ctrl+Plus/Equal or Ctrl+Shift+Equal increases font size; Ctrl+Minus decreases it.
+Ctrl+Shift+Minus also decreases; Ctrl+0 or Ctrl+Shift+0 resets to the config font.
+Ctrl+keypad Add/Subtract/0 adjusts or resets; keypad 0 requires Num Lock on.
+Lock keys stay silent in legacy mode.
+With Num Lock off, keypad zero sends Insert in normal keypad mode.
+attach without a name lists all local and MCP sessions.
+MCP defaults to stdio; HTTP defaults to 127.0.0.1:8732/mcp.
+Runs on X11 and XWayland. Use ztty mcp --help for transport options.

@@ -1,0 +1,648 @@
+{
+  "ztty-macos-x86_64": {
+    "build": {
+      "bytes": 11899,
+      "sha256": "37ab2a922aa6f3cb1e1000367701f25a08d4757ae9e2a36bf018887d10cefdfb"
+    },
+    "native": {
+      "bytes": 70033,
+      "sha256": "d88c565ac9a3225450967c0e34306f79d279af803c0481aace725b3ca866daa3"
+    },
+    "build_indexed_files": 64,
+    "tested_binary_sha256": "6416aa3724fe5bd47e930f07a8f52d95cc405ebbda6aab1b187abdbff8ff0277",
+    "runner": "macos-15-intel",
+    "runner_image": "20260824.0482.1",
+    "architecture": "x86_64",
+    "native_checks": 24,
+    "stages": 13,
+    "screenshots": 10,
+    "independent_review": "macos-independent-review.json",
+    "independent_review_sha256": "db6cf733b9f1fda4fc3add9ddc3d6c0658c3e0105d207b51483119a84c466466",
+    "remaining_owned": [],
+    "limitations": [
+      "Native AppKit/Darwin PTY GUI was exercised before ad-hoc signing. Signed package code-signature verified; no second GUI run after signing.",
+      "Ad-hoc signed, not notarized; interactive IME keyboard acceptance not performed; physical latency unmeasured.",
+      "Packages are .tar.gz and .zip; no DMG."
+    ]
+  },
+  "ztty-linux-aarch64": {
+    "build": {
+      "bytes": 1546,
+      "sha256": "9d5fa6b864d064e9c4d65c4f458e75f03bdaf12047019a426eab8cbbe5039bb9"
+    },
+    "native": {
+      "bytes": 27188,
+      "sha256": "ffccf9297c896894f921155ec5fe37b85137243c0eab04aa591be3de394ad1c3"
+    },
+    "build_indexed_files": 6,
+    "tested_binary_sha256": "39ced58ddb1f3fd2abb2558d33949a24dc6bf8801e3809cbbda187090c10057d",
+    "runner": "ubuntu-24.04-arm",
+    "runner_image": "20261111.182.1",
+    "architecture": "aarch64",
+    "gui_checks": 278,
+    "base_cases": [
+      {
+        "name": "workspaces",
+        "checks": 17
+      },
+      {
+        "name": "daily_workflow",
+        "checks": 19
+      },
+      {
+        "name": "session_switcher",
+        "checks": 6
+      },
+      {
+        "name": "sixel_gui",
+        "checks": 10
+      },
+      {
+        "name": "input_gui",
+        "checks": 14
+      },
+      {
+        "name": "repaint_gui",
+        "checks": 11
+      },
+      {
+        "name": "native_ui_gui",
+        "checks": 24
+      }
+    ],
+    "extra_reports": [
+      {
+        "report": "gpu-text.json",
+        "checks": 8,
+        "flag": "ok",
+        "identity": {
+          "bytes": 11963,
+          "sha256": "0ebdf443c048307bb2d19affdb7492a0c3cd96ab19bc272d33fc83fb52716c80"
+        },
+        "scope": "Owned PTY, XTEST, private clipboard and X11 pixel readback; not physical display latency",
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        }
+      },
+      {
+        "report": "gpu-ui.json",
+        "checks": 24,
+        "flag": "ok",
+        "identity": {
+          "bytes": 8786,
+          "sha256": "3c2e66e31527d3b941f4e2fb5a7f8d3f305cb9d3d37b12359a437817999b2453"
+        },
+        "renderer_before": {
+          "window_id": 2097154,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097266,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        }
+      },
+      {
+        "report": "gpu-repaint.json",
+        "checks": 11,
+        "flag": "ok",
+        "identity": {
+          "bytes": 10770,
+          "sha256": "3a9ebb6c46f33e0293c5f8d199508899fd6f98a495e3b7ceb56262b009ecbc2d"
+        },
+        "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency"
+      },
+      {
+        "report": "retained-frame.json",
+        "checks": 2,
+        "flag": "ok",
+        "identity": {
+          "bytes": 13746,
+          "sha256": "5e652e4141a42e025b756df11aa4e94865ff5558f443f89bd5ce6d64b7d5d983"
+        },
+        "scope": "Reproduce undefined retained-canvas publication through a real private X server.\n\nThe preload helper fills undefined newly allocated pixmaps with a visible marker.\nIt records actual source pixels at XCopyArea; it does not substitute presents.\nThis proves canvas initialization ordering, not physical compositor latency.\n",
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      },
+      {
+        "report": "clipboard.json",
+        "checks": 25,
+        "flag": "ok",
+        "identity": {
+          "bytes": 12609,
+          "sha256": "9827de37d603206eb9e2011d5febd9fca8d89cd05b959b01f3b7822a8f5d0fd0"
+        }
+      },
+      {
+        "report": "wayland/validation.json",
+        "checks": 65,
+        "flag": "passed",
+        "identity": {
+          "bytes": 9045,
+          "sha256": "6bdfa50b55fe67df6703348a90f1a39ca06bc1f974747bd03c0b9b787a1bd929"
+        },
+        "scope": "Linux headless Sway, software Mesa EGL, private shared broker; no physical display"
+      },
+      {
+        "report": "graphics-gpu/graphics-extensions.json",
+        "checks": 8,
+        "flag": "ok",
+        "identity": {
+          "bytes": 2389,
+          "sha256": "515a61613f7845c7006e86f0540a53f714a80aeb4353132e79fe964fcac59880"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        }
+      },
+      {
+        "report": "osc52-gpu/osc52.json",
+        "checks": 13,
+        "flag": "ok",
+        "identity": {
+          "bytes": 3174,
+          "sha256": "4190891e93c0345748ec5e4a81c2117342f4f8c4b71181d2ff97742c1ee8d9cc"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 128 bits)"
+        }
+      },
+      {
+        "report": "graphics-software/graphics-extensions.json",
+        "checks": 8,
+        "flag": "ok",
+        "identity": {
+          "bytes": 2345,
+          "sha256": "59b4ab1ce3b27803e3bb98d4268dfecaeb558b13d7001e36223de5ddee753960"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      },
+      {
+        "report": "osc52-software/osc52.json",
+        "checks": 13,
+        "flag": "ok",
+        "identity": {
+          "bytes": 3130,
+          "sha256": "a8ddd1efade239d87e2c254ddfe6ef4188f5faefcaaf5685951e26cef487c44c"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      }
+    ],
+    "input_vectors": 198,
+    "egl_tests": 6,
+    "working_directory_tests": 4,
+    "driver_contract_tests": 17,
+    "nested_evidence_files": 146,
+    "nested_png_files": 75,
+    "remaining_owned": [],
+    "limitations": [
+      "Headless X11/Xvfb and native Wayland protocol test with private headless compositor; not physical desktop/scanout or hardware input latency.",
+      "GPU path uses runner software OpenGL/EGL; hardware GPU performance is not established."
+    ]
+  },
+  "ztty-macos-aarch64": {
+    "build": {
+      "bytes": 11956,
+      "sha256": "c719414fec2ee673aac5a24e736831ba554e4ae62b7845cac3bde7dd6791abc1"
+    },
+    "native": {
+      "bytes": 69957,
+      "sha256": "ed0c51596a22d4c12b3e56510e04a7699709daa0fbfb305bf21128b891865346"
+    },
+    "build_indexed_files": 64,
+    "tested_binary_sha256": "a940e025ee5826b70696ac252de5869cbe975c7bcc926ede8f9136d36a758a8a",
+    "runner": "macos-15",
+    "runner_image": "20261118.0550.1",
+    "architecture": "aarch64",
+    "native_checks": 24,
+    "stages": 13,
+    "screenshots": 10,
+    "independent_review": "macos-independent-review.json",
+    "independent_review_sha256": "db6cf733b9f1fda4fc3add9ddc3d6c0658c3e0105d207b51483119a84c466466",
+    "remaining_owned": [],
+    "limitations": [
+      "Native AppKit/Darwin PTY GUI was exercised before ad-hoc signing. Signed package code-signature verified; no second GUI run after signing.",
+      "Ad-hoc signed, not notarized; interactive IME keyboard acceptance not performed; physical latency unmeasured.",
+      "Packages are .tar.gz and .zip; no DMG."
+    ]
+  },
+  "ztty-windows-x86_64": {
+    "build": {
+      "bytes": 71829,
+      "sha256": "92044dd85f2e9025c8fc1fec4e6febf9bef5e7b8ee39c72fb21656bbc79a0254"
+    },
+    "native": {
+      "bytes": 336856,
+      "sha256": "1191cbe6f54baf6bcc3595fa36844283e969c794d608dcc81d503f0b5d8eddff"
+    },
+    "build_indexed_files": 398,
+    "tested_binary_sha256": "b415dae9aea8f59e9caf6784b09e5951efb0e3bfa0a6178990ea51ff631ebdcd",
+    "runner": "windows-2025",
+    "runner_image": "20261103.298.1",
+    "architecture": "x86_64",
+    "native_checks": 31,
+    "visible_pixel_checks": 19,
+    "cold_starts": 8,
+    "cold_checks_each": 31,
+    "workspace_checks": 22,
+    "contract_test_summary": [
+      "Ran 41 tests in 0.285s",
+      "OK"
+    ],
+    "package_manifest": {
+      "ztty_version": "0.5.0",
+      "architecture": "x64",
+      "minimum_windows_build": 17763,
+      "conpty": {
+        "package": "Microsoft.Windows.Console.ConPTY",
+        "version": "1.25.261109001",
+        "url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.console.conpty/1.25.261109001/microsoft.windows.console.conpty.1.25.261109001.nupkg",
+        "package_sha256": "3d77f535df848e44225c2a8912ac844fecb23f3057732b639f3034b587496f09",
+        "license": "MIT"
+      },
+      "files": {
+        "ztty.exe": {
+          "bytes": 678400,
+          "sha256": "b415dae9aea8f59e9caf6784b09e5951efb0e3bfa0a6178990ea51ff631ebdcd"
+        },
+        "conpty.dll": {
+          "bytes": 119608,
+          "sha256": "e971856f89748dc3b458125e9afdd79b5e9574a7c937676116d3cbbd3b71f492"
+        },
+        "OpenConsole.exe": {
+          "bytes": 1089336,
+          "sha256": "b17e48b07ef153b420f0a6e178bacd31fb4c3390e21ae746586213fc0719a775"
+        },
+        "LICENSE-ztty.txt": {
+          "bytes": 1091,
+          "sha256": "6d50dc9c60538cc7e9cb0b4fe1a9c4dcd8c203b48c40d3a348158de7b028fb37"
+        },
+        "LICENSE-ConPTY.txt": {
+          "bytes": 1074,
+          "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+        }
+      },
+      "validation": "Packaging verifies hashes and PE architecture; native runtime tests are separate."
+    },
+    "transport": "real ConPTY",
+    "renderer": "Win32 retained DIB",
+    "remaining_owned": [],
+    "limitations": [
+      "Private Win32 desktop and real ConPTY/DIB acceptance; optional paint/nonclient diagnostic flags were disabled.",
+      "Physical input-to-display latency and interactive IME composition are not established by this gate."
+    ]
+  },
+  "ztty-linux-x86_64": {
+    "build": {
+      "bytes": 1532,
+      "sha256": "c8b93eee2c906bf419c6190049cac3d45cfa0ad269ff971c9ae712d084312fef"
+    },
+    "native": {
+      "bytes": 27129,
+      "sha256": "66b52e9ea8305cec5f860e8314df6a6812e16f034151f924e12826b0fa1b1c23"
+    },
+    "build_indexed_files": 6,
+    "tested_binary_sha256": "3ed8cead1c4ca20aedd4aa262de8fe992bcf9639546d95f89f7a782eeef7a491",
+    "runner": "ubuntu-24.04",
+    "runner_image": "20261116.133.1",
+    "architecture": "x86_64",
+    "gui_checks": 278,
+    "base_cases": [
+      {
+        "name": "workspaces",
+        "checks": 17
+      },
+      {
+        "name": "daily_workflow",
+        "checks": 19
+      },
+      {
+        "name": "session_switcher",
+        "checks": 6
+      },
+      {
+        "name": "sixel_gui",
+        "checks": 10
+      },
+      {
+        "name": "input_gui",
+        "checks": 14
+      },
+      {
+        "name": "repaint_gui",
+        "checks": 11
+      },
+      {
+        "name": "native_ui_gui",
+        "checks": 24
+      }
+    ],
+    "extra_reports": [
+      {
+        "report": "gpu-text.json",
+        "checks": 8,
+        "flag": "ok",
+        "identity": {
+          "bytes": 11750,
+          "sha256": "7c447dbbc69161006f20f89154eaa5af5836a996339d9ab457de313db45ce087"
+        },
+        "scope": "Owned PTY, XTEST, private clipboard and X11 pixel readback; not physical display latency",
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        }
+      },
+      {
+        "report": "gpu-ui.json",
+        "checks": 24,
+        "flag": "ok",
+        "identity": {
+          "bytes": 8783,
+          "sha256": "c272400b27b06c1d358ec5fd0a08ad5d8323b667d0dfa5cad98116d586d7c98b"
+        },
+        "renderer_before": {
+          "window_id": 2097154,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097267,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        }
+      },
+      {
+        "report": "gpu-repaint.json",
+        "checks": 11,
+        "flag": "ok",
+        "identity": {
+          "bytes": 10940,
+          "sha256": "7ae9ef318e9d6e48f79dda8c3ebc902567f468aa815adab58397876bc679768e"
+        },
+        "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency"
+      },
+      {
+        "report": "retained-frame.json",
+        "checks": 2,
+        "flag": "ok",
+        "identity": {
+          "bytes": 13744,
+          "sha256": "46805a943e05be076c44d1150d04a40386d3c682d914894515fc0221d59d5305"
+        },
+        "scope": "Reproduce undefined retained-canvas publication through a real private X server.\n\nThe preload helper fills undefined newly allocated pixmaps with a visible marker.\nIt records actual source pixels at XCopyArea; it does not substitute presents.\nThis proves canvas initialization ordering, not physical compositor latency.\n",
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      },
+      {
+        "report": "clipboard.json",
+        "checks": 25,
+        "flag": "ok",
+        "identity": {
+          "bytes": 12609,
+          "sha256": "c74b316bc501d532101bf8649f5c29ba4cb1e00931750bb48b2e4f011e85f50b"
+        }
+      },
+      {
+        "report": "wayland/validation.json",
+        "checks": 65,
+        "flag": "passed",
+        "identity": {
+          "bytes": 9047,
+          "sha256": "d9eb627367fc17f89932af67e080bcb0819aaa4ff7a2b7b6fed34098e420d204"
+        },
+        "scope": "Linux headless Sway, software Mesa EGL, private shared broker; no physical display"
+      },
+      {
+        "report": "graphics-gpu/graphics-extensions.json",
+        "checks": 8,
+        "flag": "ok",
+        "identity": {
+          "bytes": 2389,
+          "sha256": "497749eb391a8c016ec51c5a539b71f2a88504c8f1414494618c908272c992fb"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        }
+      },
+      {
+        "report": "osc52-gpu/osc52.json",
+        "checks": 13,
+        "flag": "ok",
+        "identity": {
+          "bytes": 3177,
+          "sha256": "123e2968fcaac4d1add1cd32d0b1a84774cb932a75f072331abd963e03b7d8d2"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 20.1.2, 256 bits)"
+        }
+      },
+      {
+        "report": "graphics-software/graphics-extensions.json",
+        "checks": 8,
+        "flag": "ok",
+        "identity": {
+          "bytes": 2345,
+          "sha256": "12a832437f579a8eeaf32026a7c353c52e3be0eeeb9be51a59dbc09678369efc"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      },
+      {
+        "report": "osc52-software/osc52.json",
+        "checks": 13,
+        "flag": "ok",
+        "identity": {
+          "bytes": 3133,
+          "sha256": "433f659186658963fa49365c928fc9daf16282b0fd8a7948cc2600153a9457b3"
+        },
+        "renderer_before": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        },
+        "renderer_after": {
+          "window_id": 2097155,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      }
+    ],
+    "input_vectors": 198,
+    "egl_tests": 6,
+    "working_directory_tests": 4,
+    "driver_contract_tests": 17,
+    "nested_evidence_files": 146,
+    "nested_png_files": 75,
+    "remaining_owned": [],
+    "limitations": [
+      "Headless X11/Xvfb and native Wayland protocol test with private headless compositor; not physical desktop/scanout or hardware input latency.",
+      "GPU path uses runner software OpenGL/EGL; hardware GPU performance is not established."
+    ]
+  },
+  "ztty-windows-aarch64": {
+    "build": {
+      "bytes": 72226,
+      "sha256": "5b4715ddc7582f03b7221674b8564451e465289139c80bf0f6d87b4eca851f4c"
+    },
+    "native": {
+      "bytes": 338582,
+      "sha256": "52d5248c5846aea0450254adea279f7c83eac9633080abccbd5ddbded94e66f5"
+    },
+    "build_indexed_files": 398,
+    "tested_binary_sha256": "bba1525b2aef06d80ca4950bd00e94ad1d20e1e694b1fca2658929b38d9cbff7",
+    "runner": "windows-11-arm",
+    "runner_image": "20261112.217.1",
+    "architecture": "aarch64",
+    "native_checks": 31,
+    "visible_pixel_checks": 19,
+    "cold_starts": 8,
+    "cold_checks_each": 31,
+    "workspace_checks": 22,
+    "contract_test_summary": [
+      "Ran 41 tests in 0.354s",
+      "OK"
+    ],
+    "package_manifest": {
+      "ztty_version": "0.5.0",
+      "architecture": "arm64",
+      "minimum_windows_build": 17763,
+      "conpty": {
+        "package": "Microsoft.Windows.Console.ConPTY",
+        "version": "1.25.261109001",
+        "url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.console.conpty/1.25.261109001/microsoft.windows.console.conpty.1.25.261109001.nupkg",
+        "package_sha256": "3d77f535df848e44225c2a8912ac844fecb23f3057732b639f3034b587496f09",
+        "license": "MIT"
+      },
+      "files": {
+        "ztty.exe": {
+          "bytes": 561152,
+          "sha256": "bba1525b2aef06d80ca4950bd00e94ad1d20e1e694b1fca2658929b38d9cbff7"
+        },
+        "conpty.dll": {
+          "bytes": 116024,
+          "sha256": "3608cef830a1c4fbbf3981594ad3f64ebe2df6db98fe43a48a4ca7d2875d8959"
+        },
+        "OpenConsole.exe": {
+          "bytes": 1151288,
+          "sha256": "c04334f450b5731930b63a28ac4da8a058367242dbcf2fb9b323ea25e5a23252"
+        },
+        "LICENSE-ztty.txt": {
+          "bytes": 1091,
+          "sha256": "6d50dc9c60538cc7e9cb0b4fe1a9c4dcd8c203b48c40d3a348158de7b028fb37"
+        },
+        "LICENSE-ConPTY.txt": {
+          "bytes": 1074,
+          "sha256": "7df20dcdf9197e9945c14858d41c60f11b52b93e5b69e2b63416b874d598d322"
+        }
+      },
+      "validation": "Packaging verifies hashes and PE architecture; native runtime tests are separate."
+    },
+    "transport": "real ConPTY",
+    "renderer": "Win32 retained DIB",
+    "remaining_owned": [],
+    "limitations": [
+      "Private Win32 desktop and real ConPTY/DIB acceptance; optional paint/nonclient diagnostic flags were disabled.",
+      "Physical input-to-display latency and interactive IME composition are not established by this gate."
+    ]
+  }
+}

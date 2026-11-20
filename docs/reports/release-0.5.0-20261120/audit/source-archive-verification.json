@@ -1,0 +1,16 @@
+{
+  "archive": {
+    "bytes": 6666022,
+    "sha256": "cca31ef869c0872e0fd4a772f008f5919bab85628c11824c13fe4908016d6059"
+  },
+  "files": 1700,
+  "gitlinks": {
+    "crates/zgpui": "1d796d1fc63808dc099ed7b10c92e75835ae2814",
+    "crates/zgraphics": "fe6357f98cf80fb6cc74739e45e8866ee17706ad",
+    "crates/zinput": "37617313dd7aaabcca9dd567344a76c4cbe03907",
+    "crates/zpty": "66919bc6dcb7757e0437fe955bfa809fb1282b68",
+    "crates/zterm": "a2074bac4c030cfd7c0b2514c852a89dcf54648f"
+  },
+  "all_blobs_match": true,
+  "exact_tracked_file_set": true
+}
