@@ -38,6 +38,13 @@ impl Connection {
     }
 }
 
+// Honor an explicit software environment before loading EGL drivers.
+fn software_requested(kind: RendererKind) -> bool {
+    kind == RendererKind::Software
+        || (kind == RendererKind::Auto
+            && crate::os::env(c"LIBGL_ALWAYS_SOFTWARE") == Some(&b"1"[..]))
+}
+
 fn software_driver(driver: &str) -> bool {
     let lower = driver.to_ascii_lowercase();
     [
@@ -121,7 +128,7 @@ impl Window {
         self.pending_damage = None;
         self.renderer_kind = appearance.renderer;
         self.gpu_notice = None;
-        if appearance.renderer == RendererKind::Software {
+        if software_requested(appearance.renderer) {
             self.gpu = None;
             self.renderer_property(c"_ZTTY_RENDERER", "software");
             self.renderer_property(c"_ZTTY_GPU_DRIVER", "");
@@ -150,7 +157,7 @@ impl Window {
     }
 
     fn start_gpu(&mut self) {
-        if self.suspended || self.state.id == 0 || self.renderer_kind == RendererKind::Software {
+        if self.suspended || self.state.id == 0 || software_requested(self.renderer_kind) {
             return;
         }
         let result = (|| {
