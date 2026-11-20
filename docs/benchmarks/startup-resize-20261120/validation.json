@@ -1,0 +1,175 @@
+{
+  "passed": true,
+  "baseline": "9c0d8c3a4418dc684428daefd78ec77ae3de121e",
+  "candidate": "cbea202aac882b774b3d8ffe6afce784a43a1224",
+  "binary_sha256": "3b410373c0c162686caec46e0b3ad95834b389181b2b3be449cbf0f48758115d",
+  "commands": [
+    {
+      "name": "apply-check",
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "<temporary>/startup-percent/startup-resize-drain.patch"
+      ],
+      "exit_code": 0,
+      "seconds": 0.018
+    },
+    {
+      "name": "apply",
+      "command": [
+        "git",
+        "apply",
+        "<temporary>/startup-percent/startup-resize-drain.patch"
+      ],
+      "exit_code": 0,
+      "seconds": 0.01
+    },
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "seconds": 1.207
+    },
+    {
+      "name": "workspace-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--features",
+        "wayland"
+      ],
+      "exit_code": 0,
+      "seconds": 31.928
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--offline",
+        "--workspace",
+        "--all-targets",
+        "--features",
+        "wayland",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 178.654
+    },
+    {
+      "name": "release-build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--offline",
+        "--release",
+        "--features",
+        "wayland",
+        "--bin",
+        "ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 14.371
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.269
+    },
+    {
+      "name": "format-check",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.727
+    },
+    {
+      "name": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.044
+    },
+    {
+      "name": "after",
+      "command": [
+        "python3",
+        "<worktree>/tests/resize_prompt_gui.py",
+        "--binary",
+        "<worktree>/target/release/ztty",
+        "--output",
+        "after.json",
+        "--screenshots",
+        "after"
+      ],
+      "exit_code": 0,
+      "seconds": 1.505
+    },
+    {
+      "name": "suite-startup",
+      "command": [
+        "python3",
+        "<home>/Documents/GITHUB/ztty/artifacts/startup-percent-probe-20261120.py",
+        "--repo",
+        "<worktree>",
+        "--binary",
+        "<worktree>/target/release/ztty",
+        "--suite",
+        "<home>/.local/share/oh-my-ztty/current",
+        "--output",
+        "<temporary>/startup-percent/after.json"
+      ],
+      "exit_code": 0,
+      "seconds": 1.709
+    }
+  ],
+  "baseline_regression": {
+    "name": "before",
+    "command": [
+      "python3",
+      "<worktree>/tests/resize_prompt_gui.py",
+      "--binary",
+      "<temporary>/startup-percent/before-ztty",
+      "--output",
+      "before.json",
+      "--screenshots",
+      "before"
+    ],
+    "exit_code": 1,
+    "seconds": 2.113
+  },
+  "workspace_tests_passed": 193,
+  "session_core_checks": 10,
+  "regression_cases": 6,
+  "suite_startups_clean": [
+    0,
+    28
+  ],
+  "suite_marker_cases_passed": 8,
+  "remaining_owned_pids": [],
+  "publication_scope": "Controlled resize regression, build/test logs and suite summary only. User-configured suite screenshots and raw diagnostic JSON remain local."
+}

@@ -1,0 +1,150 @@
+{
+  "ok": false,
+  "binary": "<temporary>/startup-percent/before-ztty",
+  "cases": [
+    {
+      "name": "same-width",
+      "padding": 0,
+      "screen": "\nprobe\n>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "first_row": "",
+      "expected_first_row": "",
+      "pty_winsize": [
+        32,
+        120,
+        1200,
+        800
+      ],
+      "broker_cols": 120,
+      "broker_rows": 32,
+      "dsr": "1b5b333b3352",
+      "ok": true
+    },
+    {
+      "name": "partial-line",
+      "padding": 0,
+      "screen": "x%\n\nprobe\n>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "first_row": "x%",
+      "expected_first_row": "x%",
+      "pty_winsize": [
+        32,
+        120,
+        1200,
+        800
+      ],
+      "broker_cols": 120,
+      "broker_rows": 32,
+      "dsr": "1b5b343b3352",
+      "ok": true
+    },
+    {
+      "name": "resize-queued-marker",
+      "padding": 0,
+      "screen": "%\n\nprobe\n>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "first_row": "%",
+      "expected_first_row": "",
+      "pty_winsize": [
+        32,
+        110,
+        1100,
+        800
+      ],
+      "broker_cols": 110,
+      "broker_rows": 32,
+      "dsr": "1b5b343b3352",
+      "ok": false,
+      "old_columns": 120,
+      "expected_columns": 110,
+      "queued_output_dsr": "1b5b343b3352",
+      "child_write_completed_before_configure": true
+    },
+    {
+      "name": "same-width",
+      "padding": 28,
+      "screen": "\nprobe\n>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "first_row": "",
+      "expected_first_row": "",
+      "pty_winsize": [
+        32,
+        120,
+        1200,
+        800
+      ],
+      "broker_cols": 120,
+      "broker_rows": 32,
+      "dsr": "1b5b333b3352",
+      "ok": true
+    },
+    {
+      "name": "partial-line",
+      "padding": 28,
+      "screen": "x%\n\nprobe\n>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "first_row": "x%",
+      "expected_first_row": "x%",
+      "pty_winsize": [
+        32,
+        120,
+        1200,
+        800
+      ],
+      "broker_cols": 120,
+      "broker_rows": 32,
+      "dsr": "1b5b343b3352",
+      "ok": true
+    },
+    {
+      "name": "resize-queued-marker",
+      "padding": 28,
+      "screen": "%\n\nprobe\n>\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "first_row": "%",
+      "expected_first_row": "",
+      "pty_winsize": [
+        32,
+        110,
+        1100,
+        800
+      ],
+      "broker_cols": 110,
+      "broker_rows": 32,
+      "dsr": "1b5b343b3352",
+      "ok": false,
+      "old_columns": 120,
+      "expected_columns": 110,
+      "queued_output_dsr": "1b5b343b3352",
+      "child_write_completed_before_configure": true
+    }
+  ],
+  "screenshots": {
+    "0:same-width": "before/padding-0-same-width.png",
+    "0:partial-line": "before/padding-0-partial-line.png",
+    "0:resize-queued-marker": "before/padding-0-resize-queued-marker.png",
+    "28:same-width": "before/padding-28-same-width.png",
+    "28:partial-line": "before/padding-28-partial-line.png",
+    "28:resize-queued-marker": "before/padding-28-resize-queued-marker.png"
+  },
+  "scope": "Owned Linux X11 windows and PTYs; queued output plus ConfigureNotify; software renderer",
+  "display_ownership": {
+    "display": ":14194",
+    "pid": 3945296,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "<temporary>",
+        "inode": 180936612,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@<temporary>",
+        "inode": 180936611,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": "",
+  "binary_sha256": "23262f736eea493e6a03c9aafffcd194a6d951baadf716e95d939ff6ea2e9b2d",
+  "test_script_sha256": "33140151ccda32b75ad818454212df6c000c7058f60683f14834ae68eaa8281a"
+}

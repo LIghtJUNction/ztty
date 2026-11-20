@@ -1,5 +1,12 @@
 # Ten-window terminal benchmark
 
+## 2026-11-20 Startup marker and standalone resize ordering
+
+The [startup resize report](startup-resize-20261120/report.zh-CN.md) preserves
+two deterministic baseline failures and six passing candidate checks for queued
+old-width output, bounded pre-resize reading, and controlled X11 screenshots.
+It includes build results and a summary of the local suite startup checks.
+
 ## 2026-11-20 GPU text-run buffer reuse
 
 The [text-run buffer report](text-run-scratch-20261120/report.zh-CN.md) records
