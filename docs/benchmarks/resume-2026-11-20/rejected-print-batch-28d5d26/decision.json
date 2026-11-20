@@ -1,0 +1,30 @@
+{
+  "recorded_at_utc": "2026-11-20T02:34:18.623448+00:00",
+  "evidence_kind": "post-execution selection record; no new experiment",
+  "selected_source": "a2074bac4c030cfd7c0b2514c852a89dcf54648f",
+  "selected_version": "0.5.1",
+  "rejected_source": "28d5d266375ff67562e16652a3eef10bd36b4756",
+  "unicode_improving_pairs": 2,
+  "pairs": 6,
+  "focused_batch_over_borrowed": {
+    "ascii_mib_s": 0.9474012413992204,
+    "ascii_full_history_mib_s": 0.9135508735363227,
+    "sgr_mib_s": 0.974069925162126,
+    "unicode_mib_s": 0.9619775363653104
+  },
+  "selection_owner": "root",
+  "owner_confirmation": {
+    "attempts_started_per_collection": 1,
+    "prior_deferred_or_failed_attempts_for_these_two_collections": 0,
+    "implicit_retries": 0,
+    "kind": "execution-owner confirmation; not inferred from absence of errors"
+  },
+  "selected_release": {
+    "url": "https://github.com/LIghtJUNction/zterm/releases/tag/v0.5.1",
+    "published_at": "2026-11-20T02:18:36Z",
+    "asset_bytes": 78051,
+    "asset_sha256": "fc48bcaf9892a77d17ab235316448c3e235b0dccd00e5963b542586585c26c91",
+    "github_plugin_readback": true
+  },
+  "application_release_or_installation_claimed": false
+}
