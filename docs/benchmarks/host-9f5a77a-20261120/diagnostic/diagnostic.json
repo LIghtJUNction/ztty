@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "purpose": "one-run-per-mode PSS and owned mapping diagnosis; timing output is incidental and not a new performance comparison",
+  "started": "2026-11-20T03:05:04.510725+00:00",
+  "binary_source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "before": {
+    "source": "6885cafdf05903ba5a4a9d3e56121e3a3684bc2e",
+    "clean": true,
+    "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807"
+  },
+  "script_sha256": "cd7de343cc20f3a280f66a0ab3e771439a56f5eb10326381df4296cc72ee0601",
+  "collector_sha256": "01ed1685a603c7f26a8f945c3bf12de86ba0fedcf4e8b9c6aa15bb4f9480a19f",
+  "runs": [
+    {
+      "mode": "auto",
+      "raw": "auto.json",
+      "raw_sha256": "26c448b280ad55870eaafeb99bcdee7323ec23d93fa46959be244ac789bd3bfc",
+      "mapping_snapshots": [
+        {
+          "pid": 697573,
+          "start_ticks": "7967078",
+          "captured_utc": "2026-11-20T03:05:06.797644+00:00",
+          "maps": "auto-697573-7967078-0.maps",
+          "maps_sha256": "a542d6b7303c937be67b782117ee57fdc1c946e78cd8e12fca9a78ef5759eb4c",
+          "rollup": "auto-697573-7967078-0.smaps_rollup",
+          "rollup_sha256": "744a462b4ebb9b287a124a011ef3e69a25b6b1c327d83316d8a6d7a9fec9b4d6"
+        },
+        {
+          "pid": 697575,
+          "start_ticks": "7967078",
+          "captured_utc": "2026-11-20T03:05:06.807439+00:00",
+          "maps": "auto-697575-7967078-0.maps",
+          "maps_sha256": "e9e1f3625c33cba977cef58ea97313ea432638e96ba4df5745cd4b94e0becec0",
+          "rollup": "auto-697575-7967078-0.smaps_rollup",
+          "rollup_sha256": "aa416930451eb943654d046168428e79af88a8f0c2b5d5efd6e1bcb081dbd04d"
+        },
+        {
+          "pid": 697573,
+          "start_ticks": "7967078",
+          "captured_utc": "2026-11-20T03:05:08.791236+00:00",
+          "maps": "auto-697573-7967078-1.maps",
+          "maps_sha256": "a542d6b7303c937be67b782117ee57fdc1c946e78cd8e12fca9a78ef5759eb4c",
+          "rollup": "auto-697573-7967078-1.smaps_rollup",
+          "rollup_sha256": "5c90a5d80488f1e3a81d94b75becd8772eaf33d442ab2940ad096ae081778f7a"
+        },
+        {
+          "pid": 697575,
+          "start_ticks": "7967078",
+          "captured_utc": "2026-11-20T03:05:08.800218+00:00",
+          "maps": "auto-697575-7967078-1.maps",
+          "maps_sha256": "e9e1f3625c33cba977cef58ea97313ea432638e96ba4df5745cd4b94e0becec0",
+          "rollup": "auto-697575-7967078-1.smaps_rollup",
+          "rollup_sha256": "5ab90f28fdab87d6b7985c6f760bccb5e887a7a2de22691a199aadb314dfe4ea"
+        }
+      ],
+      "monitor_errors": [],
+      "ok": true,
+      "remaining_owned_pids": [],
+      "application": {
+        "Rss_bytes": 152256512,
+        "Pss_bytes": 112327680,
+        "Pss_Anon_bytes": 37167104,
+        "Pss_File_bytes": 75148288,
+        "Pss_Shmem_bytes": 12288,
+        "Private_Clean_bytes": 48766976,
+        "Private_Dirty_bytes": 36687872,
+        "Swap_bytes": 0,
+        "Private_bytes": 85454848
+      },
+      "renderers": [
+        {
+          "window_id": 2097154,
+          "requested": "auto",
+          "actual": "software",
+          "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+        }
+      ]
+    },
+    {
+      "mode": "software",
+      "raw": "software.json",
+      "raw_sha256": "d429a68588203a6caf783af7e8c42726a72db11c7c9629b3f2b84328f61cf52a",
+      "mapping_snapshots": [
+        {
+          "pid": 698375,
+          "start_ticks": "7967613",
+          "captured_utc": "2026-11-20T03:05:12.164129+00:00",
+          "maps": "software-698375-7967613-0.maps",
+          "maps_sha256": "00c8bba3b84d60eddbecd84b13af009712baa4f34dfca2d4728953bed31fd78c",
+          "rollup": "software-698375-7967613-0.smaps_rollup",
+          "rollup_sha256": "2e1440b98a4c79651d32eeaae828f9fd2f214c722500eb69158bfdac8d3fb0fa"
+        },
+        {
+          "pid": 698377,
+          "start_ticks": "7967613",
+          "captured_utc": "2026-11-20T03:05:12.170098+00:00",
+          "maps": "software-698377-7967613-0.maps",
+          "maps_sha256": "d14fd86aa9eb6421db55c98032a7b50fc22d1fcc8f4567df4c4d89a01fe92a9d",
+          "rollup": "software-698377-7967613-0.smaps_rollup",
+          "rollup_sha256": "9893697c0ccfdf11772134df02ee9480d637d48f95dc607d71fac9974382d6d9"
+        },
+        {
+          "pid": 698375,
+          "start_ticks": "7967613",
+          "captured_utc": "2026-11-20T03:05:14.151721+00:00",
+          "maps": "software-698375-7967613-1.maps",
+          "maps_sha256": "00c8bba3b84d60eddbecd84b13af009712baa4f34dfca2d4728953bed31fd78c",
+          "rollup": "software-698375-7967613-1.smaps_rollup",
+          "rollup_sha256": "2e1440b98a4c79651d32eeaae828f9fd2f214c722500eb69158bfdac8d3fb0fa"
+        },
+        {
+          "pid": 698377,
+          "start_ticks": "7967613",
+          "captured_utc": "2026-11-20T03:05:14.155080+00:00",
+          "maps": "software-698377-7967613-1.maps",
+          "maps_sha256": "d14fd86aa9eb6421db55c98032a7b50fc22d1fcc8f4567df4c4d89a01fe92a9d",
+          "rollup": "software-698377-7967613-1.smaps_rollup",
+          "rollup_sha256": "9893697c0ccfdf11772134df02ee9480d637d48f95dc607d71fac9974382d6d9"
+        }
+      ],
+      "monitor_errors": [],
+      "ok": true,
+      "remaining_owned_pids": [],
+      "application": {
+        "Rss_bytes": 24305664,
+        "Pss_bytes": 12172288,
+        "Pss_Anon_bytes": 5554176,
+        "Pss_File_bytes": 6618112,
+        "Pss_Shmem_bytes": 0,
+        "Private_Clean_bytes": 2818048,
+        "Private_Dirty_bytes": 4988928,
+        "Swap_bytes": 0,
+        "Private_bytes": 7806976
+      },
+      "renderers": [
+        {
+          "window_id": 2097154,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      ]
+    }
+  ],
+  "ok": true,
+  "after": {
+    "source": "6885cafdf05903ba5a4a9d3e56121e3a3684bc2e",
+    "clean": true,
+    "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807"
+  },
+  "resource": {
+    "memory.max": "805306368",
+    "memory.swap.max": "0",
+    "memory.peak": "303071232",
+    "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "cpu.max": "100000 100000"
+  },
+  "finished": "2026-11-20T03:05:15.217625+00:00"
+}

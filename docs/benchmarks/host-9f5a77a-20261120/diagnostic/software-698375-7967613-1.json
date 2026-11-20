@@ -1,0 +1,245 @@
+{
+  "pid": 698375,
+  "start_ticks": "7967613",
+  "captured_utc": "2026-11-20T03:05:14.151721+00:00",
+  "maps": "software-698375-7967613-1.maps",
+  "maps_sha256": "00c8bba3b84d60eddbecd84b13af009712baa4f34dfca2d4728953bed31fd78c",
+  "rollup": "software-698375-7967613-1.smaps_rollup",
+  "rollup_sha256": "2e1440b98a4c79651d32eeaae828f9fd2f214c722500eb69158bfdac8d3fb0fa",
+  "groups": [
+    {
+      "path": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+      "Rss_bytes": 868352,
+      "Pss_bytes": 434176,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libglib-2.0.so.0.9000.1",
+      "Rss_bytes": 544768,
+      "Pss_bytes": 120832,
+      "Private_bytes": 77824
+    },
+    {
+      "path": "/usr/lib/libGLdispatch.so.0.0.0",
+      "Rss_bytes": 258048,
+      "Pss_bytes": 106496,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libharfbuzz.so.0.61510.0",
+      "Rss_bytes": 196608,
+      "Pss_bytes": 87040,
+      "Private_bytes": 69632
+    },
+    {
+      "path": "[heap]",
+      "Rss_bytes": 94208,
+      "Pss_bytes": 79872,
+      "Private_bytes": 65536
+    },
+    {
+      "path": "/usr/lib/libfreetype.so.6.20.7",
+      "Rss_bytes": 188416,
+      "Pss_bytes": 61440,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[anonymous]",
+      "Rss_bytes": 94208,
+      "Pss_bytes": 57344,
+      "Private_bytes": 20480
+    },
+    {
+      "path": "/usr/lib/libpng16.so.16.59.0",
+      "Rss_bytes": 143360,
+      "Pss_bytes": 56320,
+      "Private_bytes": 36864
+    },
+    {
+      "path": "/usr/lib/libEGL.so.1.1.0",
+      "Rss_bytes": 73728,
+      "Pss_bytes": 51200,
+      "Private_bytes": 45056
+    },
+    {
+      "path": "/usr/lib/libX11.so.6.4.0",
+      "Rss_bytes": 270336,
+      "Pss_bytes": 49152,
+      "Private_bytes": 12288
+    },
+    {
+      "path": "/usr/lib/libGLESv2.so.2.1.0",
+      "Rss_bytes": 57344,
+      "Pss_bytes": 45056,
+      "Private_bytes": 32768
+    },
+    {
+      "path": "/usr/lib/libfontconfig.so.1.17.0",
+      "Rss_bytes": 155648,
+      "Pss_bytes": 39936,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libXft.so.2.3.9",
+      "Rss_bytes": 90112,
+      "Pss_bytes": 34816,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libxkbcommon.so.0.13.2",
+      "Rss_bytes": 102400,
+      "Pss_bytes": 28672,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "/usr/lib/libgraphite2.so.3.3.1",
+      "Rss_bytes": 106496,
+      "Pss_bytes": 24576,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libwayland-cursor.so.0.26.0",
+      "Rss_bytes": 36864,
+      "Pss_bytes": 24576,
+      "Private_bytes": 12288
+    },
+    {
+      "path": "/usr/lib/libxcb.so.1.1.0",
+      "Rss_bytes": 122880,
+      "Pss_bytes": 18432,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libc.so.6",
+      "Rss_bytes": 1384448,
+      "Pss_bytes": 18432,
+      "Private_bytes": 8192
+    },
+    {
+      "path": "[stack]",
+      "Rss_bytes": 24576,
+      "Pss_bytes": 18432,
+      "Private_bytes": 12288
+    },
+    {
+      "path": "/usr/lib/libexpat.so.1.13.1",
+      "Rss_bytes": 98304,
+      "Pss_bytes": 17408,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libwayland-egl.so.1.26.0",
+      "Rss_bytes": 20480,
+      "Pss_bytes": 12288,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libwayland-client.so.0.26.0",
+      "Rss_bytes": 69632,
+      "Pss_bytes": 11264,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libpcre2-8.so.0.16.1",
+      "Rss_bytes": 94208,
+      "Pss_bytes": 10240,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/etc/ld.so.cache",
+      "Rss_bytes": 323584,
+      "Pss_bytes": 9216,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libXrender.so.1.3.0",
+      "Rss_bytes": 49152,
+      "Pss_bytes": 8192,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/ld-linux-x86-64.so.2",
+      "Rss_bytes": 286720,
+      "Pss_bytes": 8192,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libXdmcp.so.6.0.0",
+      "Rss_bytes": 32768,
+      "Pss_bytes": 7168,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libXau.so.6.0.0",
+      "Rss_bytes": 16384,
+      "Pss_bytes": 7168,
+      "Private_bytes": 4096
+    },
+    {
+      "path": "/usr/lib/libbrotlidec.so.1.2.1",
+      "Rss_bytes": 65536,
+      "Pss_bytes": 5120,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libbrotlicommon.so.1.2.1",
+      "Rss_bytes": 36864,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libbz2.so.1.0.8",
+      "Rss_bytes": 69632,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libz.so.1.3.1.zlib-ng",
+      "Rss_bytes": 86016,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libffi.so.8.5.0",
+      "Rss_bytes": 61440,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libgcc_s.so.1",
+      "Rss_bytes": 106496,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "/usr/lib/libm.so.6",
+      "Rss_bytes": 143360,
+      "Pss_bytes": 4096,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vvar]",
+      "Rss_bytes": 4096,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vvar_vclock]",
+      "Rss_bytes": 0,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vdso]",
+      "Rss_bytes": 8192,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    },
+    {
+      "path": "[vsyscall]",
+      "Rss_bytes": 0,
+      "Pss_bytes": 0,
+      "Private_bytes": 0
+    }
+  ]
+}

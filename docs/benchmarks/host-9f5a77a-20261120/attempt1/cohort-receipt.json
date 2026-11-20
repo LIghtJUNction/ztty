@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "status": "stopped_at_throughput",
+  "phases": [
+    {
+      "phase": "throughput",
+      "exit_code": 1,
+      "receipt_sha256": "f99be61c5d90528476c8e0048c7bf103d7a17e89931f65801b2d80a4133d671f",
+      "status": "failed",
+      "ok": false,
+      "error": "RuntimeError('collector failed: paired')",
+      "defer_reasons": null
+    }
+  ]
+}

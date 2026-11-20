@@ -1,0 +1,2 @@
+{"variant": "before", "windows": 1, "repetition": 1, "ok": false, "output_mib_per_second": null, "latency_p50_us": null, "error": "TimeoutError('timed out')", "remaining_owned_pids": []}
+{"ok": false, "purpose": "paired comparison", "json": "WORKTREE/artifacts/final-performance-9f5a77a-20261120/throughput/paired.json", "summary": null, "error": "RuntimeError('measurement failed; diagnostic and partial samples preserved')"}

@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "phase": "throughput",
+  "collector_source": "3cace1d18446d1cc63dc84d635955e5a2b213a0b",
+  "binary_source": "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+  "binary": "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+  "binary_sha256": "c7935e9e76476a9cd7d0186f23f5806e3e2e2fc556a494b0e3741a2c893b3807",
+  "collector_sha256": "2a0e6f52d43404c8d2764d87ea14a71aea7e0d15c544bdf192f5b585ce961a2c",
+  "helper_sha256": {
+    "benchmark_throughput.py": "95b3acc011052151a621a6209a74d214dd131f089703940e8d3bf312d3915d9d",
+    "benchmark_output_pipeline.py": "937baa15c808579518a5dcf3677d5e86b0c897daa666215f5a6d78a60da2336f",
+    "benchmark_terminals.py": "01ed1685a603c7f26a8f945c3bf12de86ba0fedcf4e8b9c6aa15bb4f9480a19f",
+    "measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25",
+    "isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9"
+  },
+  "started": "2026-11-20T02:52:36.617748+00:00",
+  "execution_before": {
+    "pid": 566629,
+    "nice": -4,
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "name": "paired",
+      "command": [
+        "/usr/bin/python3",
+        "WORKTREE/tools/benchmark_throughput.py",
+        "--before",
+        "WORKTREE/artifacts/benchmark-final/before-ztty",
+        "--after",
+        "WORKTREE/artifacts/final-elf-zterm051-20261120/ztty-9f5a77a-wayland",
+        "--before-application-default-renderer",
+        "--before-source",
+        "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+        "--after-source",
+        "9f5a77a1299093d0ba609bfafa2cec3b0ba931dd",
+        "--counts",
+        "1,10",
+        "--rounds",
+        "3",
+        "--settle-seconds",
+        "1",
+        "--json",
+        "WORKTREE/artifacts/final-performance-9f5a77a-attempt2-20261120/throughput/paired.json"
+      ],
+      "result": "WORKTREE/artifacts/final-performance-9f5a77a-attempt2-20261120/throughput/paired.json",
+      "host_before": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 4381310976,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 27083677696,
+        "swap_used_bytes": 21593010176,
+        "load_average": [
+          2.234375,
+          3.57275390625,
+          3.7978515625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.08 total=815242556\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.00 avg60=0.09 avg300=0.25 total=1146724256\nfull avg10=0.00 avg60=0.07 avg300=0.20 total=1081858094",
+          "io": "some avg10=0.28 avg60=0.58 avg300=1.60 total=4230423596\nfull avg10=0.24 avg60=0.47 avg300=1.32 total=3637260244"
+        }
+      },
+      "before_reasons": [],
+      "exit_code": 0,
+      "host_after": {
+        "MemTotal_bytes": 16476704768,
+        "MemAvailable_bytes": 4919623680,
+        "SwapTotal_bytes": 48676687872,
+        "SwapFree_bytes": 28073713664,
+        "swap_used_bytes": 20602974208,
+        "load_average": [
+          2.6025390625,
+          3.51025390625,
+          3.76806640625
+        ],
+        "logical_cpus": 24,
+        "psi": {
+          "cpu": "some avg10=0.00 avg60=0.00 avg300=0.07 total=815356669\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+          "memory": "some avg10=0.18 avg60=0.08 avg300=0.22 total=1146769481\nfull avg10=0.00 avg60=0.04 avg300=0.17 total=1081901591",
+          "io": "some avg10=1.22 avg60=1.15 avg300=1.65 total=4231308387\nfull avg10=0.93 avg60=0.94 avg300=1.35 total=3638059760"
+        }
+      },
+      "after_reasons": [],
+      "result_sha256": "9a6be71703a344ab669218d96fb8cbbefea5b0dd8f66b4781edcd9bc5d52907f",
+      "collector_ok": true
+    }
+  ],
+  "ok": true,
+  "status": "complete",
+  "scope": "Private X11 and logical PTY completion; no physical display fence or keyboard-to-photon claim.",
+  "execution_after": {
+    "pid": 566629,
+    "nice": -4,
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "cgroup": "/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope",
+    "ancestor_cpu_limits": [
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice/app-Hyprland-xdg\\x2dterminal\\x2dexec-b1394ade.scope"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/app-graphical.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice/user-1000.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100"
+      },
+      {
+        "path": "/sys/fs/cgroup/user.slice",
+        "cpu.max": "max 100000",
+        "cpu.weight": "100",
+        "cpuset.cpus.effective": "0-23"
+      },
+      {
+        "path": "/sys/fs/cgroup",
+        "cpuset.cpus.effective": "0-23"
+      }
+    ]
+  },
+  "finished": "2026-11-20T02:53:10.031880+00:00"
+}
