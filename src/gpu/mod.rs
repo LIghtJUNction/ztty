@@ -22,6 +22,7 @@ const IMAGE_BYTES: usize = 32 * 1024 * 1024;
 const MAX_VERTICES: usize = 4092;
 const MAX_TEXT_BYTES: usize = 16_384;
 const MAX_TEXT_CELLS: usize = 8192;
+const MAX_RETAINED_TEXT_RUNS: usize = 256;
 
 #[derive(Clone, Copy, Default, Debug)]
 pub struct Rect {
@@ -100,6 +101,7 @@ pub struct Renderer {
     driver: String,
     row_text: String,
     row_cells: Vec<TextCell>,
+    text_runs: Vec<TextRun>,
 }
 
 fn color(rgb: u32, alpha: u8) -> [f32; 4] {
@@ -293,6 +295,7 @@ impl Renderer {
             driver,
             row_text: String::new(),
             row_cells: Vec::new(),
+            text_runs: Vec::new(),
         };
         renderer.white_pixel();
         renderer.configure();
@@ -596,36 +599,54 @@ impl Renderer {
         Ok(cached)
     }
 
-    fn runs(&mut self, text: &str, style: Style) -> Result<Vec<TextRun>, &'static str> {
-        if text.len() > MAX_TEXT_BYTES {
-            return Err("one shaping run is limited to 16 KiB");
-        }
-        let mut runs: Vec<TextRun> = Vec::new();
-        for (start, grapheme) in text.grapheme_indices(true) {
-            let font = self.fonts.select(grapheme, style.bold, style.italic)?;
-            let script = grapheme
-                .chars()
-                .map(font::script)
-                .find(|script| !matches!(*script, 0x5a797979 | 0x5a696e68 | 0x5a7a7a7a))
-                .unwrap_or(0);
-            if let Some(last) = runs.last_mut()
-                && last.font == font
-                && (script == 0 || last.script == 0 || last.script == script)
-            {
-                last.end = start + grapheme.len();
-                if last.script == 0 {
-                    last.script = script;
-                }
-                continue;
+    fn with_runs<T>(
+        &mut self,
+        text: &str,
+        style: Style,
+        draw: impl FnOnce(&mut Self, &[TextRun]) -> Result<T, &'static str>,
+    ) -> Result<T, &'static str> {
+        // Keep the scratch independent of the renderer while shaping/drawing.
+        // Every Result path returns it, including font selection and GL errors.
+        let mut runs = mem::take(&mut self.text_runs);
+        let result = (|| {
+            if text.len() > MAX_TEXT_BYTES {
+                return Err("one shaping run is limited to 16 KiB");
             }
-            runs.push(TextRun {
-                start,
-                end: start + grapheme.len(),
-                font,
-                script,
-            });
-        }
-        Ok(runs)
+            for (start, grapheme) in text.grapheme_indices(true) {
+                let font = self.fonts.select(grapheme, style.bold, style.italic)?;
+                let script = grapheme
+                    .chars()
+                    .map(font::script)
+                    .find(|script| !matches!(*script, 0x5a797979 | 0x5a696e68 | 0x5a7a7a7a))
+                    .unwrap_or(0);
+                if let Some(last) = runs.last_mut()
+                    && last.font == font
+                    && (script == 0 || last.script == 0 || last.script == script)
+                {
+                    last.end = start + grapheme.len();
+                    if last.script == 0 {
+                        last.script = script;
+                    }
+                    continue;
+                }
+                runs.push(TextRun {
+                    start,
+                    end: start + grapheme.len(),
+                    font,
+                    script,
+                });
+            }
+            draw(self, &runs)
+        })();
+        runs.clear();
+        // Retain at most 6 KiB on 64-bit hosts. Unusually fragmented text can
+        // still use the full shaping budget without keeping its larger buffer.
+        self.text_runs = if runs.capacity() <= MAX_RETAINED_TEXT_RUNS {
+            runs
+        } else {
+            Vec::new()
+        };
+        result
     }
 
     fn draw_glyph(
@@ -657,17 +678,19 @@ impl Renderer {
     }
 
     pub fn measure_text(&mut self, text: &str, style: Style) -> Result<f32, &'static str> {
-        let mut width = 0.0;
-        for run in self.runs(text, style)? {
-            for glyph in self
-                .fonts
-                .shape(run.font, &text[run.start..run.end])?
-                .iter()
-            {
-                width += glyph.x_advance;
+        self.with_runs(text, style, |renderer, runs| {
+            let mut width = 0.0;
+            for run in runs {
+                for glyph in renderer
+                    .fonts
+                    .shape(run.font, &text[run.start..run.end])?
+                    .iter()
+                {
+                    width += glyph.x_advance;
+                }
             }
-        }
-        Ok(width)
+            Ok(width)
+        })
     }
 
     /// Shape free-flowing UI text with script and complete-grapheme font fallback.
@@ -679,22 +702,24 @@ impl Renderer {
         rgb: u32,
         style: Style,
     ) -> Result<f32, &'static str> {
-        let mut pen = x;
-        for run in self.runs(text, style)? {
-            let glyphs = self.fonts.shape(run.font, &text[run.start..run.end])?;
-            for glyph in glyphs.iter() {
-                self.draw_glyph(
-                    run.font,
-                    glyph.glyph,
-                    pen + glyph.x_offset,
-                    baseline - glyph.y_offset,
-                    1.0,
-                    rgb,
-                )?;
-                pen += glyph.x_advance;
+        self.with_runs(text, style, |renderer, runs| {
+            let mut pen = x;
+            for run in runs {
+                let glyphs = renderer.fonts.shape(run.font, &text[run.start..run.end])?;
+                for glyph in glyphs.iter() {
+                    renderer.draw_glyph(
+                        run.font,
+                        glyph.glyph,
+                        pen + glyph.x_offset,
+                        baseline - glyph.y_offset,
+                        1.0,
+                        rgb,
+                    )?;
+                    pen += glyph.x_advance;
+                }
             }
-        }
-        Ok(pen - x)
+            Ok(pen - x)
+        })
     }
 
     /// Shape terminal runs while keeping each cluster within its assigned cells.
@@ -725,72 +750,74 @@ impl Renderer {
         {
             return Err("invalid shaped-cell mapping");
         }
-        for run in self.runs(text, style)? {
-            let glyphs = self.fonts.shape(run.font, &text[run.start..run.end])?;
-            let ascending = glyphs
-                .first()
-                .zip(glyphs.last())
-                .is_none_or(|(first, last)| first.cluster <= last.cluster);
-            if glyphs.windows(2).any(|pair| {
-                if ascending {
-                    pair[0].cluster > pair[1].cluster
-                } else {
-                    pair[0].cluster < pair[1].cluster
+        self.with_runs(text, style, |renderer, runs| {
+            for run in runs {
+                let glyphs = renderer.fonts.shape(run.font, &text[run.start..run.end])?;
+                let ascending = glyphs
+                    .first()
+                    .zip(glyphs.last())
+                    .is_none_or(|(first, last)| first.cluster <= last.cluster);
+                if glyphs.windows(2).any(|pair| {
+                    if ascending {
+                        pair[0].cluster > pair[1].cluster
+                    } else {
+                        pair[0].cluster < pair[1].cluster
+                    }
+                }) {
+                    return Err("nonmonotone HarfBuzz clusters");
                 }
-            }) {
-                return Err("nonmonotone HarfBuzz clusters");
+                let mut index = 0;
+                while index < glyphs.len() {
+                    let cluster = glyphs[index].cluster as usize + run.start;
+                    if cluster >= run.end || !text.is_char_boundary(cluster) {
+                        return Err("invalid HarfBuzz cluster offset");
+                    }
+                    let mut end = index + 1;
+                    while end < glyphs.len() && glyphs[end].cluster == glyphs[index].cluster {
+                        end += 1;
+                    }
+                    // HarfBuzz uses MONOTONE_GRAPHEMES. The adjacent group gives
+                    // the next logical boundary in either direction; scanning the
+                    // whole row for every glyph would make long rows quadratic.
+                    let next = if ascending {
+                        glyphs.get(end)
+                    } else {
+                        index
+                            .checked_sub(1)
+                            .and_then(|previous| glyphs.get(previous))
+                    }
+                    .map_or(run.end, |glyph| glyph.cluster as usize + run.start);
+                    let first = cells
+                        .partition_point(|cell| cell.byte as usize <= cluster)
+                        .saturating_sub(1);
+                    let last = cells
+                        .partition_point(|cell| (cell.byte as usize) < next)
+                        .saturating_sub(1)
+                        .max(first);
+                    let width = cells[last].x + cells[last].width - cells[first].x;
+                    let advance: f32 = glyphs[index..end].iter().map(|glyph| glyph.x_advance).sum();
+                    let scale = if advance.abs() > 0.01 && width > 0.0 {
+                        width / advance.abs()
+                    } else {
+                        1.0
+                    };
+                    let mut pen = 0.0;
+                    for glyph in &glyphs[index..end] {
+                        renderer.draw_glyph(
+                            run.font,
+                            glyph.glyph,
+                            x + cells[first].x + (pen + glyph.x_offset) * scale,
+                            baseline - glyph.y_offset,
+                            scale,
+                            rgb,
+                        )?;
+                        pen += glyph.x_advance;
+                    }
+                    index = end;
+                }
             }
-            let mut index = 0;
-            while index < glyphs.len() {
-                let cluster = glyphs[index].cluster as usize + run.start;
-                if cluster >= run.end || !text.is_char_boundary(cluster) {
-                    return Err("invalid HarfBuzz cluster offset");
-                }
-                let mut end = index + 1;
-                while end < glyphs.len() && glyphs[end].cluster == glyphs[index].cluster {
-                    end += 1;
-                }
-                // HarfBuzz uses MONOTONE_GRAPHEMES. The adjacent group gives
-                // the next logical boundary in either direction; scanning the
-                // whole row for every glyph would make long rows quadratic.
-                let next = if ascending {
-                    glyphs.get(end)
-                } else {
-                    index
-                        .checked_sub(1)
-                        .and_then(|previous| glyphs.get(previous))
-                }
-                .map_or(run.end, |glyph| glyph.cluster as usize + run.start);
-                let first = cells
-                    .partition_point(|cell| cell.byte as usize <= cluster)
-                    .saturating_sub(1);
-                let last = cells
-                    .partition_point(|cell| (cell.byte as usize) < next)
-                    .saturating_sub(1)
-                    .max(first);
-                let width = cells[last].x + cells[last].width - cells[first].x;
-                let advance: f32 = glyphs[index..end].iter().map(|glyph| glyph.x_advance).sum();
-                let scale = if advance.abs() > 0.01 && width > 0.0 {
-                    width / advance.abs()
-                } else {
-                    1.0
-                };
-                let mut pen = 0.0;
-                for glyph in &glyphs[index..end] {
-                    self.draw_glyph(
-                        run.font,
-                        glyph.glyph,
-                        x + cells[first].x + (pen + glyph.x_offset) * scale,
-                        baseline - glyph.y_offset,
-                        scale,
-                        rgb,
-                    )?;
-                    pen += glyph.x_advance;
-                }
-                index = end;
-            }
-        }
-        Ok(())
+            Ok(())
+        })
     }
 
     pub fn draw_image(

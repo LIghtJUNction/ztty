@@ -493,3 +493,99 @@ fn terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors() {
         .unwrap();
     assert!(renderer.row_cells.capacity() <= narrow.cols().next_power_of_two());
 }
+
+#[test]
+#[ignore = "requires native fonts and a real EGL implementation"]
+fn text_run_scratch_reuses_storage_and_recovers_from_shaping_errors() {
+    let _guard = EGL_TEST.lock().unwrap();
+    let mut renderer = Renderer::new(
+        Display::headless().unwrap(),
+        Target::Offscreen,
+        800,
+        120,
+        "DejaVu Sans Mono:size=16",
+    )
+    .unwrap();
+    let text = "office α中e\u{301}👩🏽‍💻 سلام";
+    let cells: Vec<_> = text
+        .grapheme_indices(true)
+        .enumerate()
+        .map(|(index, (byte, _))| TextCell {
+            byte: byte as u32,
+            x: index as f32 * 28.0,
+            width: 28.0,
+        })
+        .collect();
+    let style = Style::default();
+    let draw = |renderer: &mut Renderer| {
+        renderer.begin_frame(0x101010, 255).unwrap();
+        let measured = renderer.measure_text(text, style).unwrap();
+        let drawn = renderer
+            .draw_text(text, 4.0, 35.0, 0xffffff, style)
+            .unwrap();
+        assert!((measured - drawn).abs() < 0.01);
+        renderer
+            .draw_cells(text, &cells, 4.0, 85.0, 0xffffff, style)
+            .unwrap();
+        renderer.read_pixels().unwrap()
+    };
+    let expected = draw(&mut renderer);
+    let buffer = (renderer.text_runs.as_ptr(), renderer.text_runs.capacity());
+    assert!(buffer.1 > 0 && buffer.1 <= MAX_RETAINED_TEXT_RUNS);
+    for _ in 0..3 {
+        assert_eq!(draw(&mut renderer), expected);
+        assert!(renderer.text_runs.is_empty());
+        assert_eq!(
+            (renderer.text_runs.as_ptr(), renderer.text_runs.capacity()),
+            buffer
+        );
+    }
+
+    let one_cell = [TextCell {
+        byte: 0,
+        x: 0.0,
+        width: 28.0,
+    }];
+    for (invalid, error) in [
+        (
+            "a".repeat(MAX_TEXT_BYTES + 1),
+            "one shaping run is limited to 16 KiB",
+        ),
+        // This passes text/run validation and fails inside native shaping:
+        // 8193 separate monospace glyphs exceed the 8192-glyph output budget.
+        ("a".repeat(8193), "font shaping exceeded its glyph budget"),
+    ] {
+        for result in [
+            renderer.measure_text(&invalid, style).map(|_| ()),
+            renderer
+                .draw_text(&invalid, 0.0, 0.0, 0xffffff, style)
+                .map(|_| ()),
+            renderer.draw_cells(&invalid, &one_cell, 0.0, 0.0, 0xffffff, style),
+        ] {
+            assert_eq!(result, Err(error));
+        }
+        assert!(renderer.text_runs.is_empty());
+        assert_eq!(
+            (renderer.text_runs.as_ptr(), renderer.text_runs.capacity()),
+            buffer
+        );
+        assert_eq!(draw(&mut renderer), expected);
+    }
+
+    // Latin/Greek boundaries require separate runs even with the same font.
+    // Large inputs may grow transient scratch; neither success nor an error
+    // may leave that capacity retained for subsequent small UI labels.
+    let fragmented = "aα".repeat(MAX_RETAINED_TEXT_RUNS + 1);
+    assert!(renderer.measure_text(&fragmented, style).unwrap() > 0.0);
+    assert_eq!(renderer.text_runs.capacity(), 0);
+    assert_eq!(draw(&mut renderer), expected);
+    let fragmented_error = fragmented + &"a".repeat(8193);
+    assert_eq!(
+        renderer.measure_text(&fragmented_error, style),
+        Err("font shaping exceeded its glyph budget")
+    );
+    assert!(renderer.text_runs.is_empty());
+    assert_eq!(renderer.text_runs.capacity(), 0);
+    assert_eq!(draw(&mut renderer), expected);
+    assert!(renderer.text_runs.capacity() <= MAX_RETAINED_TEXT_RUNS);
+}
