@@ -1,0 +1,43 @@
+{
+  "command": [
+    "systemd-run",
+    "--user",
+    "--quiet",
+    "--no-ask-password",
+    "--unit=ztty-final-auto-9855da5-20261120",
+    "--collect",
+    "--wait",
+    "--pipe",
+    "--property=MemoryMax=768M",
+    "--property=MemorySwapMax=0",
+    "--property=CPUQuota=100%",
+    "--property=Nice=10",
+    "--property=OOMPolicy=stop",
+    "--working-directory=WORKTREE",
+    "--setenv=RUSTC_WRAPPER=",
+    "--setenv=CARGO_BUILD_JOBS=1",
+    "--setenv=RUSTUP_TOOLCHAIN=1.100.0",
+    "--setenv=CARGO_NET_OFFLINE=true",
+    "--setenv=CARGO_TARGET_DIR=WORKTREE/target",
+    "--setenv=CARGO_HOME=WORKTREE/artifacts/cargo-home-20261120",
+    "--setenv=PATH=USER_WORKSPACE/.cargo/bin:/usr/local/bin:/usr/bin:/bin",
+    "--setenv=ZTTY_WAYLAND=1",
+    "--setenv=ZTTY_BARE_METAL=1",
+    "/usr/bin/python3",
+    "WORKTREE/artifacts/integration-validation-9855da5-20261120/run-local-gate.py"
+  ],
+  "source": "9855da563f3038adee2fa88e1e24e20eafb77010",
+  "helper_sha256": "11e20abbda7f596ab5ae9790467a03c2ec2eb787c80d0e818b11a004e8963ba7",
+  "before": {
+    "MemAvailable_bytes": 4596416512,
+    "MemTotal_bytes": 16476704768,
+    "load_average": [
+      3.3642578125,
+      4.267578125,
+      4.0859375
+    ],
+    "logical_cpus": 24
+  },
+  "started": "2026-11-20T03:11:52.470420+00:00",
+  "scope": "full local gate after minimum X11 Auto software-environment early return"
+}

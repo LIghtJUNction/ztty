@@ -1,0 +1,78 @@
+{
+  "binary_sha256": "9c0297477b2a24355f865d12413135a327a69a7a8f7dd50e40927ae9e21f1e66",
+  "selected_checks": [
+    "sse_lifecycle",
+    "prompt_payload_and_observer",
+    "heartbeat_and_idle",
+    "timeout_and_half_close",
+    "cancellation_and_exact_ids",
+    "capacity_disconnect_and_delete",
+    "json_default_and_cli"
+  ],
+  "checks": {
+    "sse_lifecycle": {
+      "status": "passed",
+      "elapsed_ms": 7.006,
+      "sse_initialization": true,
+      "single_event_and_zero_chunk": true,
+      "escaped_identifier": "init🙂\r\nid: injected\ndata: injected",
+      "request_errors_are_sse": true,
+      "http_errors_remain_json": true,
+      "notifications_empty_202": true,
+      "get_not_advertised": true
+    },
+    "prompt_payload_and_observer": {
+      "status": "passed",
+      "elapsed_ms": 47.668,
+      "headers_before_child_release_ms": 0.35,
+      "payload_bytes": 59,
+      "observer_read": true,
+      "observer_write_denied": true,
+      "role_session_isolation": true,
+      "output_has_no_sse_line_injection": true
+    },
+    "heartbeat_and_idle": {
+      "status": "passed",
+      "elapsed_ms": 5047.538,
+      "heartbeat_ms": 5025.107,
+      "transport_cpu_seconds": 0.0,
+      "comments": [
+        ": ztty",
+        ": keepalive"
+      ],
+      "final_output_after_heartbeat": true
+    },
+    "timeout_and_half_close": {
+      "status": "passed",
+      "elapsed_ms": 174.032,
+      "timeout_ms": 150.967,
+      "ordinary_half_close": true,
+      "waiting_half_close_releases_request": true
+    },
+    "cancellation_and_exact_ids": {
+      "status": "passed",
+      "elapsed_ms": 25.932,
+      "equivalent_numeric_duplicate_rejected": true,
+      "equivalent_numeric_cancelled": true,
+      "original_token_echoed": true,
+      "adjacent_large_ids_remain_distinct": true,
+      "cross_session_cancel_ignored": true
+    },
+    "capacity_disconnect_and_delete": {
+      "status": "passed",
+      "elapsed_ms": 37.067,
+      "wait_limit": 32,
+      "all_slots_reused_after_disconnect": true,
+      "management_at_limit_ms": 0.402,
+      "delete_cancels_stream_and_preserves_terminal": true
+    },
+    "json_default_and_cli": {
+      "status": "passed",
+      "elapsed_ms": 20.008,
+      "default_json": true,
+      "explicit_json": true,
+      "invalid_cli_cases": 4
+    }
+  },
+  "cleanup": "passed"
+}

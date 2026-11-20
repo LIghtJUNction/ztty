@@ -1,0 +1,9 @@
+WORKTREE/tests/text_gpu_gui.py:166: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  wait(lambda: any(r!=g or g!=b for r,g,b,a in capture().crop((2*cw,0,4*cw,ch)).getdata()),
+WORKTREE/tests/text_gpu_gui.py:169: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  assert any(r!=g or g!=b for r,g,b,a in picture.crop((5*cw,0,7*cw,ch)).getdata())
+WORKTREE/tests/text_gpu_gui.py:197: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  return any(r>20 or g>20 or b>20 for r,g,b,a in picture.crop(region).getdata())
+WORKTREE/tests/text_gpu_gui.py:231: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  wait(lambda: any(r>20 for r,g,b,a in capture().getdata()),"font reload pixels")
+{"ok": true, "checks": 8, "error": null, "remaining": [], "report": "WORKTREE/artifacts/auto-renderer-gui-9855da5-20261120/text-gpu.json"}

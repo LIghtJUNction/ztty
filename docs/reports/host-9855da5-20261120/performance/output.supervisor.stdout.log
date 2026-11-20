@@ -1,0 +1,6 @@
+{"case": "ascii-log-headless", "passed": true, "result_sha256": "93e3fe07673aca3fa8828ebc94abf568764fe3560ab1f4d8e305275ecd1776f1"}
+{"case": "ascii-log-window", "passed": true, "result_sha256": "7387301bf4ea436d4ccdc174e16cc32dbe10cccc82f8aa9b50c2e763d5a0ed75"}
+{"case": "inplace-ascii-headless", "passed": true, "result_sha256": "b9e5bcf8e401d52b1f46feebbc9ec437b2accb558637059339e0864405226760"}
+{"case": "inplace-ascii-window", "passed": true, "result_sha256": "8f88380eecc781c8491648dc475efe60aede44539e642c6de156b8888fb0275b"}
+{"case": "unicode-log-headless", "passed": true, "result_sha256": "0e3afeee770acc9678435c6ba13dc3c49c865d8bceaaeb4b61b9c8a41f65bc7e"}
+{"case": "unicode-log-window", "passed": true, "result_sha256": "1e657d4c8df55f91f55ea9f282610476f87d64cdd91d2af0e368699287465ed0"}
