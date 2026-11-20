@@ -1,0 +1,1482 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-reload-v3",
+  "binary_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+  "test_script_sha256": "bdfb709243f1f933c642416f2d05f7f52e997d80d3358aa31cbf610fd956e4f9",
+  "renderer": "software",
+  "requested_scope": "all",
+  "expect": "reproduce",
+  "checks": [
+    "sampled workspace parent through first/repeated RPC and XTEST tab switches, hidden PTY updates and synchronized commit",
+    "separately sampled two independent overlapping top-level windows through real focus and stacking changes",
+    "all owned commands, PTYs, broker identity and launcher wait peers remain live"
+  ],
+  "scope": "Continuous real X11 pixels on private Xvfb; no physical compositor claim",
+  "gpu_environment": "LIBGL_ALWAYS_SOFTWARE=1; GPU mode uses the local Mesa software driver",
+  "colors": {
+    "A": [
+      215,
+      31,
+      49
+    ],
+    "B": [
+      22,
+      169,
+      203
+    ],
+    "C": [
+      47,
+      195,
+      83
+    ],
+    "D": [
+      211,
+      157,
+      23
+    ],
+    "calibration": [
+      241,
+      11,
+      239
+    ]
+  },
+  "stages": [
+    {
+      "name": "visible-pixel-calibration",
+      "scope": "tabs",
+      "kind": "calibration",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 6,
+      "invalid_samples": 2,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 7.361652,
+      "largest_sample_interval_ms": 2.564876,
+      "median_sample_interval_ms": 1.083448,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-software/report/tabs-00-unexpected-0.png",
+          "sha256": "a0e2af86691e8f82ecfa9fb439275f40edaea77f42501dff0e90600e84415eac",
+          "rgb_sha256": "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284",
+          "colors": [
+            [
+              238464,
+              [
+                241,
+                11,
+                239
+              ]
+            ]
+          ]
+        }
+      ],
+      "calibration_observed": true
+    },
+    {
+      "name": "first-return-to-hidden-tab",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874234762619,
+          "observed_target_ns": 92874237525980,
+          "settled_ns": 92874257730813
+        }
+      ],
+      "samples": 26,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 24
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 23.762732,
+      "largest_sample_interval_ms": 1.131772,
+      "median_sample_interval_ms": 0.923036,
+      "fault_screenshots": []
+    },
+    {
+      "name": "repeated-tab-rpc",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874259131271,
+          "observed_target_ns": 92874261870226,
+          "settled_ns": 92874281934714
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874281937442,
+          "observed_target_ns": 92874283630144,
+          "settled_ns": 92874303724509
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874303732288,
+          "observed_target_ns": 92874305797897,
+          "settled_ns": 92874325860243
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874325862799,
+          "observed_target_ns": 92874327763942,
+          "settled_ns": 92874347904829
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874347907550,
+          "observed_target_ns": 92874349886631,
+          "settled_ns": 92874369956043
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874369958943,
+          "observed_target_ns": 92874371821554,
+          "settled_ns": 92874391887192
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874391889974,
+          "observed_target_ns": 92874394998928,
+          "settled_ns": 92874415086412
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874415090801,
+          "observed_target_ns": 92874417143625,
+          "settled_ns": 92874437243218
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874437247307,
+          "observed_target_ns": 92874439510816,
+          "settled_ns": 92874459623354
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874459626330,
+          "observed_target_ns": 92874462515635,
+          "settled_ns": 92874482588265
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874482591783,
+          "observed_target_ns": 92874484828205,
+          "settled_ns": 92874505121106
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874505124032,
+          "observed_target_ns": 92874506946269,
+          "settled_ns": 92874527070264
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874527072828,
+          "observed_target_ns": 92874530156179,
+          "settled_ns": 92874550225217
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874550228042,
+          "observed_target_ns": 92874553791387,
+          "settled_ns": 92874573883668
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874573886807,
+          "observed_target_ns": 92874576206599,
+          "settled_ns": 92874596278597
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874596282430,
+          "observed_target_ns": 92874599194843,
+          "settled_ns": 92874619276061
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874619279601,
+          "observed_target_ns": 92874622600624,
+          "settled_ns": 92874642688364
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874642693189,
+          "observed_target_ns": 92874645739260,
+          "settled_ns": 92874665809070
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874665812251,
+          "observed_target_ns": 92874668163348,
+          "settled_ns": 92874688321089
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874688323918,
+          "observed_target_ns": 92874690121568,
+          "settled_ns": 92874710196059
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874710198672,
+          "observed_target_ns": 92874714169686,
+          "settled_ns": 92874734346046
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874734350006,
+          "observed_target_ns": 92874737037579,
+          "settled_ns": 92874757109689
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874757112585,
+          "observed_target_ns": 92874759980687,
+          "settled_ns": 92874780167728
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874780170985,
+          "observed_target_ns": 92874781833746,
+          "settled_ns": 92874801898280
+        }
+      ],
+      "samples": 492,
+      "invalid_samples": 2,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 246,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 244,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 2
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 543.5795,
+      "largest_sample_interval_ms": 2.15519,
+      "median_sample_interval_ms": 1.047451,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-software/report/tabs-02-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "repeated-tab-xtest",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874803693335,
+          "observed_target_ns": 92874806968904,
+          "settled_ns": 92874827139681
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874827143697,
+          "observed_target_ns": 92874830531347,
+          "settled_ns": 92874850638763
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874850642527,
+          "observed_target_ns": 92874854677434,
+          "settled_ns": 92874874779506
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874874782563,
+          "observed_target_ns": 92874877179473,
+          "settled_ns": 92874897260197
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874897264236,
+          "observed_target_ns": 92874901506388,
+          "settled_ns": 92874921583068
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874921586781,
+          "observed_target_ns": 92874924858199,
+          "settled_ns": 92874944930462
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874944934050,
+          "observed_target_ns": 92874949207311,
+          "settled_ns": 92874969293295
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92874969296342,
+          "observed_target_ns": 92874972106066,
+          "settled_ns": 92874992172170
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92874992175905,
+          "observed_target_ns": 92874995312535,
+          "settled_ns": 92875015513555
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875015518427,
+          "observed_target_ns": 92875018638555,
+          "settled_ns": 92875038743605
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875038747850,
+          "observed_target_ns": 92875042503774,
+          "settled_ns": 92875062573970
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875062577395,
+          "observed_target_ns": 92875065869848,
+          "settled_ns": 92875085954956
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875085959069,
+          "observed_target_ns": 92875089159423,
+          "settled_ns": 92875109234985
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875109237868,
+          "observed_target_ns": 92875111447662,
+          "settled_ns": 92875131544771
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875131547872,
+          "observed_target_ns": 92875134540930,
+          "settled_ns": 92875154701721
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875154704431,
+          "observed_target_ns": 92875157720709,
+          "settled_ns": 92875177901799
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875177905070,
+          "observed_target_ns": 92875180731191,
+          "settled_ns": 92875200881889
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875200885181,
+          "observed_target_ns": 92875203909751,
+          "settled_ns": 92875224012853
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875224015777,
+          "observed_target_ns": 92875227180744,
+          "settled_ns": 92875247266312
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875247272843,
+          "observed_target_ns": 92875249879251,
+          "settled_ns": 92875270100762
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875270117411,
+          "observed_target_ns": 92875274907130,
+          "settled_ns": 92875295080349
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875295084105,
+          "observed_target_ns": 92875298852988,
+          "settled_ns": 92875319014312
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875319018213,
+          "observed_target_ns": 92875322244002,
+          "settled_ns": 92875342323407
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875342326740,
+          "observed_target_ns": 92875345502107,
+          "settled_ns": 92875365640818
+        }
+      ],
+      "samples": 506,
+      "invalid_samples": 3,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 257,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 246,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 3
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 562.573633,
+      "largest_sample_interval_ms": 2.331216,
+      "median_sample_interval_ms": 1.059827,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-software/report/tabs-03-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hidden-output-prepare-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875366922568,
+          "observed_target_ns": 92875369788652,
+          "settled_ns": 92875389880798
+        }
+      ],
+      "samples": 24,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 2,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 22
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 24.151579,
+      "largest_sample_interval_ms": 1.477658,
+      "median_sample_interval_ms": 0.993981,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875392025291,
+          "observed_target_ns": 92875394495040,
+          "settled_ns": 92875414600297
+        }
+      ],
+      "samples": 25,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 23
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 23.314356,
+      "largest_sample_interval_ms": 1.291848,
+      "median_sample_interval_ms": 0.950698,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875415991994,
+          "observed_target_ns": 92875419063315,
+          "settled_ns": 92875439209722
+        }
+      ],
+      "samples": 23,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 21
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 24.154942,
+      "largest_sample_interval_ms": 1.460531,
+      "median_sample_interval_ms": 1.049377,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "D"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875441414072,
+          "observed_target_ns": 92875444793246,
+          "settled_ns": 92875464879656
+        }
+      ],
+      "samples": 22,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 20
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d"
+      },
+      "duration_ms": 24.1663,
+      "largest_sample_interval_ms": 1.521348,
+      "median_sample_interval_ms": 1.106218,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "D",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875466255586,
+          "observed_target_ns": 92875469368852,
+          "settled_ns": 92875489443162
+        }
+      ],
+      "samples": 23,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 2,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 21
+      },
+      "allowed_rgb_sha256": {
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 23.599904,
+      "largest_sample_interval_ms": 1.21943,
+      "median_sample_interval_ms": 1.044492,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875490901500,
+          "observed_target_ns": 92875493764152,
+          "settled_ns": 92875513834254
+        }
+      ],
+      "samples": 23,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 21
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 23.661672,
+      "largest_sample_interval_ms": 1.481288,
+      "median_sample_interval_ms": 1.058689,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-3",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875515230896,
+          "observed_target_ns": 92875518286801,
+          "settled_ns": 92875538484163
+        }
+      ],
+      "samples": 22,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 20
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 24.240727,
+      "largest_sample_interval_ms": 1.517606,
+      "median_sample_interval_ms": 1.10441,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-return-3",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "D"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92875540577590,
+          "observed_target_ns": 92875542871214,
+          "settled_ns": 92875562954821
+        }
+      ],
+      "samples": 22,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 20
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d"
+      },
+      "duration_ms": 22.707258,
+      "largest_sample_interval_ms": 1.215042,
+      "median_sample_interval_ms": 1.050868,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "D",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875564306675,
+          "observed_target_ns": 92875567584268,
+          "settled_ns": 92875587685230
+        }
+      ],
+      "samples": 22,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 2,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 20
+      },
+      "allowed_rgb_sha256": {
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 23.979652,
+      "largest_sample_interval_ms": 1.262499,
+      "median_sample_interval_ms": 1.124334,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-held-tab-switch-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 29,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 29
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 31.60758,
+      "largest_sample_interval_ms": 1.266659,
+      "median_sample_interval_ms": 1.116555,
+      "fault_screenshots": [],
+      "hold_ms": 31.078136,
+      "sync_timing": {
+        "begin_before_write_ns": 92875588154152,
+        "begin_parsed_ns": 92875588350857,
+        "switch_requested_ns": 92875589590705,
+        "begin_to_hold_end_ms": 32.516462
+      }
+    },
+    {
+      "name": "sync-explicit-commit-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92875621623055,
+          "parsed_ns": 92875622093675,
+          "begin_before_write_ns": 92875588154152,
+          "begin_to_end_parsed_ms": 33.939523,
+          "settled_ns": 92875624285136
+        }
+      ],
+      "samples": 4,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 3.165534,
+      "largest_sample_interval_ms": 1.021255,
+      "median_sample_interval_ms": 0.974468,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875625556277,
+          "observed_target_ns": 92875627513307,
+          "settled_ns": 92875647702860
+        }
+      ],
+      "samples": 25,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 23
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 22.848565,
+      "largest_sample_interval_ms": 0.983101,
+      "median_sample_interval_ms": 0.947737,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-held-tab-switch-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 26,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 26
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 31.180111,
+      "largest_sample_interval_ms": 1.530336,
+      "median_sample_interval_ms": 1.345009,
+      "fault_screenshots": [],
+      "hold_ms": 30.856013,
+      "sync_timing": {
+        "begin_before_write_ns": 92875648484662,
+        "begin_parsed_ns": 92875648566066,
+        "switch_requested_ns": 92875649615747,
+        "begin_to_hold_end_ms": 31.992626
+      }
+    },
+    {
+      "name": "sync-explicit-commit-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92875681569134,
+          "parsed_ns": 92875681999871,
+          "begin_before_write_ns": 92875648484662,
+          "begin_to_end_parsed_ms": 33.515209,
+          "settled_ns": 92875684129561
+        }
+      ],
+      "samples": 4,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 3.350619,
+      "largest_sample_interval_ms": 1.077927,
+      "median_sample_interval_ms": 1.041163,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92875685507393,
+          "observed_target_ns": 92875688471827,
+          "settled_ns": 92875708566826
+        }
+      ],
+      "samples": 24,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 22
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 24.393015,
+      "largest_sample_interval_ms": 1.566021,
+      "median_sample_interval_ms": 0.95875,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-held-tab-switch-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 32,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 32
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 32.303751,
+      "largest_sample_interval_ms": 1.333301,
+      "median_sample_interval_ms": 1.022528,
+      "fault_screenshots": [],
+      "hold_ms": 31.998767,
+      "sync_timing": {
+        "begin_before_write_ns": 92875709942818,
+        "begin_parsed_ns": 92875710019937,
+        "switch_requested_ns": 92875711061473,
+        "begin_to_hold_end_ms": 33.121279
+      }
+    },
+    {
+      "name": "sync-explicit-commit-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92875744138825,
+          "parsed_ns": 92875744637932,
+          "begin_before_write_ns": 92875709942818,
+          "begin_to_end_parsed_ms": 34.695114,
+          "settled_ns": 92875746874735
+        }
+      ],
+      "samples": 4,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 2,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 3.485559,
+      "largest_sample_interval_ms": 1.171996,
+      "median_sample_interval_ms": 1.021532,
+      "fault_screenshots": []
+    },
+    {
+      "name": "visible-pixel-calibration",
+      "scope": "focus_raise",
+      "kind": "calibration",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 6,
+      "invalid_samples": 2,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 8.809871,
+      "largest_sample_interval_ms": 2.880362,
+      "median_sample_interval_ms": 1.437151,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-software/report/focus_raise-00-unexpected-0.png",
+          "sha256": "a0e2af86691e8f82ecfa9fb439275f40edaea77f42501dff0e90600e84415eac",
+          "rgb_sha256": "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284",
+          "colors": [
+            [
+              238464,
+              [
+                241,
+                11,
+                239
+              ]
+            ]
+          ]
+        }
+      ],
+      "calibration_observed": true
+    },
+    {
+      "name": "independent-top-level-focus-and-raise",
+      "scope": "focus_raise",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92875925814556,
+          "observed_target_ns": 92875928723580,
+          "settled_ns": 92875948817918
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92875948821559,
+          "observed_target_ns": 92875951444235,
+          "settled_ns": 92875971549591
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92875971551627,
+          "observed_target_ns": 92875974085673,
+          "settled_ns": 92875994147459
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92875994149549,
+          "observed_target_ns": 92875995562483,
+          "settled_ns": 92876015630676
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876015632475,
+          "observed_target_ns": 92876018006513,
+          "settled_ns": 92876038177178
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876038180473,
+          "observed_target_ns": 92876040804081,
+          "settled_ns": 92876061040718
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876061042577,
+          "observed_target_ns": 92876063483518,
+          "settled_ns": 92876083555628
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876083557953,
+          "observed_target_ns": 92876086093243,
+          "settled_ns": 92876106167365
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876106169742,
+          "observed_target_ns": 92876108640174,
+          "settled_ns": 92876128709004
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876128710831,
+          "observed_target_ns": 92876131240292,
+          "settled_ns": 92876151310364
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876151312405,
+          "observed_target_ns": 92876153915689,
+          "settled_ns": 92876174020908
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876174023198,
+          "observed_target_ns": 92876176717548,
+          "settled_ns": 92876196784675
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876196792586,
+          "observed_target_ns": 92876199187381,
+          "settled_ns": 92876219256060
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876219257903,
+          "observed_target_ns": 92876221797654,
+          "settled_ns": 92876241988130
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876241994251,
+          "observed_target_ns": 92876244345646,
+          "settled_ns": 92876264411283
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876264412931,
+          "observed_target_ns": 92876266858173,
+          "settled_ns": 92876287043226
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876287044929,
+          "observed_target_ns": 92876289495175,
+          "settled_ns": 92876309599973
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876309606049,
+          "observed_target_ns": 92876311171503,
+          "settled_ns": 92876331243963
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876331246413,
+          "observed_target_ns": 92876333682404,
+          "settled_ns": 92876353769045
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876353775129,
+          "observed_target_ns": 92876355233053,
+          "settled_ns": 92876375297906
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876375299784,
+          "observed_target_ns": 92876377686282,
+          "settled_ns": 92876397749781
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876397751574,
+          "observed_target_ns": 92876401754775,
+          "settled_ns": 92876421872994
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92876421875415,
+          "observed_target_ns": 92876424663796,
+          "settled_ns": 92876444907125
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92876444909536,
+          "observed_target_ns": 92876447595950,
+          "settled_ns": 92876467787506
+        }
+      ],
+      "samples": 503,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 254,
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 249
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 543.17856,
+      "largest_sample_interval_ms": 2.710861,
+      "median_sample_interval_ms": 1.040242,
+      "fault_screenshots": []
+    }
+  ],
+  "viewports": {
+    "tabs": {
+      "drawable": 2097163,
+      "kind": "workspace parent",
+      "box": [
+        0,
+        0,
+        576,
+        414
+      ]
+    },
+    "focus_raise": {
+      "drawable": 1135,
+      "kind": "root visible screen region",
+      "box": [
+        1604,
+        40,
+        576,
+        414
+      ],
+      "window_ids": [
+        2097354,
+        2097358
+      ]
+    }
+  },
+  "renderers": [
+    {
+      "session": "switch-tab-a",
+      "window_id": 2097154,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    },
+    {
+      "session": "switch-tab-b",
+      "window_id": 2097159,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    },
+    {
+      "session": "switch-focus-a",
+      "window_id": 2097354,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    },
+    {
+      "session": "switch-focus-b",
+      "window_id": 2097358,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    }
+  ],
+  "process_cleanup_helper_sha256": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+  "helper_sha256": {
+    "isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":1863",
+    "pid": 3010183,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X1863",
+        "inode": 110053260,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X1863",
+        "inode": 110053259,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": "",
+  "sample_trace": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-software/report.samples.jsonl",
+    "sha256": "d9fc101cc010dcfc24ec3fb0ce65958d18eb50968ce8e258ab8d6dc790aa9c84"
+  },
+  "invalid_samples_by_scope": {
+    "tabs": 5,
+    "focus_raise": 0
+  },
+  "invalid_application_samples": 5
+}

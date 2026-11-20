@@ -1,0 +1,2392 @@
+[
+  {
+    "round": 0,
+    "family": "core",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      2.306640625,
+      4.00390625,
+      4.56005859375
+    ],
+    "elapsed_s": 4.766174215008505,
+    "sha256": "d59a2d160fa73bd86a3c134c74c3f79da5dd971349e65cebd22cbe9d2788944d",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 264.63,
+      "ascii_full_history_mib_s": 146.036,
+      "sgr_mib_s": 128.614,
+      "unicode_mib_s": 27.887,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 90,
+        "p95": 100,
+        "p99": 102,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3427,
+        "p95": 4815,
+        "p99": 5120,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 0,
+    "family": "core",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      2.4423828125,
+      4.00341796875,
+      4.556640625
+    ],
+    "elapsed_s": 4.042715814997791,
+    "sha256": "68afae21024095a5030a0ff84abb7b44c595d166d82fe0b0a34b39efbe3baed8",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 215.981,
+      "ascii_full_history_mib_s": 120.955,
+      "sgr_mib_s": 130.703,
+      "unicode_mib_s": 41.606,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 85,
+        "p95": 92,
+        "p99": 96,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3255,
+        "p95": 4257,
+        "p99": 4668,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 0,
+    "family": "diverse",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      2.4423828125,
+      4.00341796875,
+      4.556640625
+    ],
+    "elapsed_s": 10.170149436002248,
+    "sha256": "18baf351ab23c6ad8555a4a0991e37072d9861e3c1d351acf18cde52321ceb8c",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          30.655159528616775,
+          32.98092195570726,
+          29.449281086989384,
+          29.641546168000893,
+          30.37067511872147,
+          32.780530984540206,
+          30.436100860107636
+        ],
+        "elapsed_ns": [
+          50510535,
+          46948612,
+          52578822,
+          52237778,
+          50983671,
+          47235614,
+          50874076
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 30.436100860107636,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          26.832176390694258,
+          27.893875166313098,
+          27.658169839820733,
+          27.441380848594363,
+          27.523002542944752,
+          28.086873730475045,
+          27.972956858992777
+        ],
+        "elapsed_ns": [
+          57707153,
+          55510699,
+          55983766,
+          56426042,
+          56258706,
+          55129258,
+          55353766
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 27.658169839820733,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          13.755929016470272,
+          10.59208984834965,
+          11.156543349948441,
+          13.575292842104558,
+          12.686302080190748,
+          11.073527563793014,
+          13.633470564885872
+        ],
+        "elapsed_ns": [
+          474895655,
+          616746177,
+          585542557,
+          481214733,
+          514935785,
+          589932240,
+          479161259
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 12.686302080190748,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.782483697205876,
+          12.165920182521974,
+          4.54563651431459,
+          12.412296381993013,
+          12.427246508009258,
+          11.037020819199025,
+          12.430374473163017
+        ],
+        "elapsed_ns": [
+          511061158,
+          536961514,
+          1437121270,
+          526303169,
+          525670020,
+          591883537,
+          525537741
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 12.412296381993013,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 0,
+    "family": "diverse",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      2.3740234375,
+      3.93701171875,
+      4.52880859375
+    ],
+    "elapsed_s": 8.721350439998787,
+    "sha256": "85ae7e06dfa30707eadd9a46fc408a7f68df12227064bed47dbabc289929ba9b",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          35.51855202873338,
+          35.75396164027351,
+          35.55934289388723,
+          28.60151387514509,
+          30.338202844819463,
+          34.340611177922426,
+          34.7819630208661
+        ],
+        "elapsed_ns": [
+          43594359,
+          43307327,
+          43544351,
+          54137292,
+          51038241,
+          45089719,
+          44517571
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 34.7819630208661,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          29.581293237988913,
+          28.74163289334439,
+          28.45869130440094,
+          29.202023051268018,
+          27.738805155218603,
+          26.572284235332173,
+          25.41054499823201
+        ],
+        "elapsed_ns": [
+          52344179,
+          53873366,
+          54408985,
+          53024015,
+          55821024,
+          58271562,
+          60935667
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 28.45869130440094,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          14.33959761858477,
+          12.550623499136956,
+          13.160796324556193,
+          14.283447453426614,
+          14.642160634052619,
+          14.700036725638048,
+          14.360029444032364
+        ],
+        "elapsed_ns": [
+          455565846,
+          520502501,
+          496370490,
+          457356737,
+          446152114,
+          444395551,
+          454917655
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 14.33959761858477,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.767329042377511,
+          12.237637055107408,
+          12.050728794581643,
+          12.083523436522698,
+          12.373068232065009,
+          13.17229362883647,
+          12.557286452577324
+        ],
+        "elapsed_ns": [
+          511667781,
+          533814730,
+          542094261,
+          540623019,
+          527971785,
+          495937238,
+          520226320
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 12.373068232065009,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 1,
+    "family": "core",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      2.4638671875,
+      3.90625,
+      4.51220703125
+    ],
+    "elapsed_s": 4.2653160500049125,
+    "sha256": "68afae21024095a5030a0ff84abb7b44c595d166d82fe0b0a34b39efbe3baed8",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 178.893,
+      "ascii_full_history_mib_s": 139.623,
+      "sgr_mib_s": 147.722,
+      "unicode_mib_s": 46.177,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 73,
+        "p95": 78,
+        "p99": 83,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2708,
+        "p95": 2955,
+        "p99": 3127,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 1,
+    "family": "core",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      2.6669921875,
+      3.9248046875,
+      4.51513671875
+    ],
+    "elapsed_s": 4.2378753640077775,
+    "sha256": "d59a2d160fa73bd86a3c134c74c3f79da5dd971349e65cebd22cbe9d2788944d",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 274.978,
+      "ascii_full_history_mib_s": 153.801,
+      "sgr_mib_s": 143.784,
+      "unicode_mib_s": 29.928,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 60,
+        "p95": 67,
+        "p99": 70,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2692,
+        "p95": 3207,
+        "p99": 3879,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 1,
+    "family": "diverse",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      2.69384765625,
+      3.9091796875,
+      4.5068359375
+    ],
+    "elapsed_s": 9.219953988998896,
+    "sha256": "85ae7e06dfa30707eadd9a46fc408a7f68df12227064bed47dbabc289929ba9b",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          34.99573874981057,
+          34.06038065237547,
+          35.10274406782485,
+          35.05155029028363,
+          34.98395293497533,
+          34.79717237224826,
+          34.747820565807416
+        ],
+        "elapsed_ns": [
+          44245630,
+          45460693,
+          44110754,
+          44175179,
+          44260536,
+          44498113,
+          44561313
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 34.98395293497533,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          28.974440101601996,
+          28.706382783917643,
+          29.139605708161852,
+          28.379797542319764,
+          23.929711268552264,
+          24.877148998969066,
+          26.3310392765456
+        ],
+        "elapsed_ns": [
+          53440498,
+          53939520,
+          53137593,
+          54560238,
+          64706527,
+          62242201,
+          58805446
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 28.379797542319764,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.845763479863448,
+          12.074456142803088,
+          6.187808456635783,
+          13.92730862454121,
+          14.347632265134969,
+          14.178337623740346,
+          14.297846221322862
+        ],
+        "elapsed_ns": [
+          508543609,
+          541028999,
+          1055726105,
+          469051925,
+          455310730,
+          460747310,
+          456896152
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 13.92730862454121,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.53190080890759,
+          12.857830726509338,
+          13.127378231684563,
+          13.004852791042993,
+          12.964898075556997,
+          12.594881846470264,
+          12.80333149005017
+        ],
+        "elapsed_ns": [
+          521280133,
+          508066334,
+          497634090,
+          502322558,
+          503870596,
+          518673458,
+          510228992
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 12.857830726509338,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 1,
+    "family": "diverse",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      2.81494140625,
+      3.89599609375,
+      4.49560546875
+    ],
+    "elapsed_s": 10.760554198001046,
+    "sha256": "18baf351ab23c6ad8555a4a0991e37072d9861e3c1d351acf18cde52321ceb8c",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          32.89036743845986,
+          31.896659599289215,
+          32.06904666192098,
+          32.002150032934736,
+          31.79552795811944,
+          31.973152864711466,
+          27.935821650727025
+        ],
+        "elapsed_ns": [
+          47077872,
+          48544535,
+          48283584,
+          48384515,
+          48698940,
+          48428396,
+          55427348
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 31.973152864711466,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          27.69379933983062,
+          24.417715947495473,
+          22.943090872258825,
+          27.223499896097685,
+          27.419736057639874,
+          27.242499069649863,
+          24.224703199356075
+        ],
+        "elapsed_ns": [
+          55911740,
+          63413323,
+          67489098,
+          56877643,
+          56470584,
+          56837976,
+          63918575
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 27.223499896097685,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.817658265397489,
+          12.687386629761662,
+          13.39697682816764,
+          13.497334880742216,
+          13.31328593476698,
+          13.297268161000417,
+          12.271468085494124
+        ],
+        "elapsed_ns": [
+          509658690,
+          514891767,
+          487619782,
+          483994135,
+          490685091,
+          491276166,
+          532343064
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 13.297268161000417,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          8.745274419049686,
+          10.26824228033912,
+          10.228417026884864,
+          9.962750932662033,
+          4.4833815938741,
+          9.837032868356646,
+          12.565466442386974
+        ],
+        "elapsed_ns": [
+          746989815,
+          636197583,
+          638674675,
+          655705534,
+          1457076714,
+          664085503,
+          519887658
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 9.962750932662033,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 2,
+    "family": "core",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      3.244140625,
+      3.94970703125,
+      4.50634765625
+    ],
+    "elapsed_s": 4.750821425011964,
+    "sha256": "d59a2d160fa73bd86a3c134c74c3f79da5dd971349e65cebd22cbe9d2788944d",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 279.423,
+      "ascii_full_history_mib_s": 154.573,
+      "sgr_mib_s": 147.047,
+      "unicode_mib_s": 28.5,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 67,
+        "p95": 77,
+        "p99": 78,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3728,
+        "p95": 4585,
+        "p99": 4876,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 2,
+    "family": "core",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      3.3046875,
+      3.95068359375,
+      4.50341796875
+    ],
+    "elapsed_s": 3.5754301229899283,
+    "sha256": "68afae21024095a5030a0ff84abb7b44c595d166d82fe0b0a34b39efbe3baed8",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 259.282,
+      "ascii_full_history_mib_s": 113.743,
+      "sgr_mib_s": 120.583,
+      "unicode_mib_s": 50.444,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 69,
+        "p95": 82,
+        "p99": 83,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2723,
+        "p95": 3748,
+        "p99": 3937,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 2,
+    "family": "diverse",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      3.1201171875,
+      3.9013671875,
+      4.484375
+    ],
+    "elapsed_s": 11.179205477994401,
+    "sha256": "18baf351ab23c6ad8555a4a0991e37072d9861e3c1d351acf18cde52321ceb8c",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          26.07308638465457,
+          23.860225280043775,
+          25.33517559877963,
+          23.394804162523513,
+          19.211540194893097,
+          20.6882175984067,
+          21.443247370315788
+        ],
+        "elapsed_ns": [
+          59387235,
+          64894966,
+          61116944,
+          66186000,
+          80597833,
+          74844945,
+          72209609
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 23.394804162523513,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          15.749302390302361,
+          19.31228233329979,
+          19.178455517830578,
+          19.496115420357704,
+          17.92404209493003,
+          22.387754033800743,
+          24.279958810552326
+        ],
+        "elapsed_ns": [
+          98316006,
+          80177396,
+          80736872,
+          79421386,
+          86387239,
+          69163191,
+          63773111
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 19.31228233329979,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          10.473279683753015,
+          10.746680131878964,
+          10.397482481655787,
+          11.585246732887402,
+          12.567060991065942,
+          14.27904747354943,
+          12.695349149881862
+        ],
+        "elapsed_ns": [
+          623742621,
+          607874324,
+          628289678,
+          563874993,
+          519821693,
+          457497668,
+          514568827
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.585246732887402,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          11.926133524024031,
+          11.045038893270625,
+          11.364052084301267,
+          10.926682221361997,
+          11.123672636209607,
+          11.23684976349508,
+          4.520106606015386
+        ],
+        "elapsed_ns": [
+          547757654,
+          591453863,
+          574850491,
+          597860429,
+          587272849,
+          581357859,
+          1445238241
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.123672636209607,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 2,
+    "family": "diverse",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      3.4287109375,
+      3.9384765625,
+      4.48974609375
+    ],
+    "elapsed_s": 9.482266343999072,
+    "sha256": "85ae7e06dfa30707eadd9a46fc408a7f68df12227064bed47dbabc289929ba9b",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          22.272822426796246,
+          24.380274713687356,
+          25.512149943077134,
+          25.76721842892457,
+          24.81224518755466,
+          23.528702622716896,
+          28.22330681687872
+        ],
+        "elapsed_ns": [
+          69520085,
+          63510708,
+          60692984,
+          60092187,
+          62405014,
+          65809345,
+          54862760
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 24.81224518755466,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          26.350416241215143,
+          28.067727036886748,
+          29.4127308385352,
+          28.427270773219192,
+          25.332166424625854,
+          25.338156463545594,
+          26.259719482152178
+        ],
+        "elapsed_ns": [
+          58762203,
+          55166865,
+          52644160,
+          54469123,
+          61124204,
+          61109754,
+          58965158
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 26.350416241215143,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.010569023487678,
+          10.984979853093375,
+          11.82088513533328,
+          12.95649401702152,
+          12.368593654200346,
+          14.095586883098438,
+          13.622483053048287
+        ],
+        "elapsed_ns": [
+          543906863,
+          594687565,
+          552634667,
+          504197425,
+          528162789,
+          463452212,
+          479547737
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 12.368593654200346,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          11.867025470628043,
+          11.331024811567977,
+          12.183999538608518,
+          11.525824415614844,
+          12.018358319544076,
+          11.86506213534526,
+          12.861802251461071
+        ],
+        "elapsed_ns": [
+          550485961,
+          576526045,
+          536164738,
+          566782096,
+          543554348,
+          550577051,
+          507909451
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.867025470628043,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 3,
+    "family": "core",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      3.3623046875,
+      3.9072265625,
+      4.47314453125
+    ],
+    "elapsed_s": 3.425903408002341,
+    "sha256": "68afae21024095a5030a0ff84abb7b44c595d166d82fe0b0a34b39efbe3baed8",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 278.154,
+      "ascii_full_history_mib_s": 134.014,
+      "sgr_mib_s": 131.385,
+      "unicode_mib_s": 47.726,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 64,
+        "p95": 71,
+        "p99": 73,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2709,
+        "p95": 2941,
+        "p99": 3044,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 3,
+    "family": "core",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      3.3623046875,
+      3.9072265625,
+      4.47314453125
+    ],
+    "elapsed_s": 5.1479223189962795,
+    "sha256": "d59a2d160fa73bd86a3c134c74c3f79da5dd971349e65cebd22cbe9d2788944d",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 276.474,
+      "ascii_full_history_mib_s": 144.24,
+      "sgr_mib_s": 135.405,
+      "unicode_mib_s": 31.928,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 72,
+        "p95": 74,
+        "p99": 74,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2696,
+        "p95": 3024,
+        "p99": 3285,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 3,
+    "family": "diverse",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      3.41357421875,
+      3.9091796875,
+      4.47021484375
+    ],
+    "elapsed_s": 10.16853513699607,
+    "sha256": "85ae7e06dfa30707eadd9a46fc408a7f68df12227064bed47dbabc289929ba9b",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          35.08110327018432,
+          35.139945887884835,
+          34.02625985470096,
+          33.06273051301894,
+          32.59788444809839,
+          33.389196784648824,
+          30.07709940216521
+        ],
+        "elapsed_ns": [
+          44137965,
+          44064055,
+          45506280,
+          46832445,
+          47500276,
+          46374536,
+          51481311
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 33.389196784648824,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          19.707380710810686,
+          22.122157417698087,
+          18.66114030029328,
+          20.74541339237135,
+          18.053302774956958,
+          23.284365781673866,
+          24.138354167085463
+        ],
+        "elapsed_ns": [
+          78569980,
+          69993558,
+          82975021,
+          74638595,
+          85768711,
+          66499922,
+          64147228
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 20.74541339237135,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          13.458024349436652,
+          14.322957816124932,
+          14.146511548091965,
+          14.25302701479797,
+          14.220730246193177,
+          12.609128484060442,
+          11.666432524900836
+        ],
+        "elapsed_ns": [
+          485407869,
+          456095103,
+          461783875,
+          458332880,
+          459373802,
+          518087426,
+          559951031
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 14.146511548091965,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          11.673733228152688,
+          12.413506945184512,
+          11.895971971881988,
+          11.838300376359175,
+          9.427969825100538,
+          4.718814768387873,
+          11.606489980354265
+        ],
+        "elapsed_ns": [
+          559600840,
+          526251844,
+          549146462,
+          551821690,
+          692899006,
+          1384379604,
+          562842938
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.673733228152688,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 3,
+    "family": "diverse",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      4.31396484375,
+      4.091796875,
+      4.52392578125
+    ],
+    "elapsed_s": 10.59244355300325,
+    "sha256": "18baf351ab23c6ad8555a4a0991e37072d9861e3c1d351acf18cde52321ceb8c",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          32.7525902367777,
+          31.284679774064212,
+          30.365601843466287,
+          30.63608481021998,
+          26.27745521284522,
+          22.74350142683374,
+          23.03050558882006
+        ],
+        "elapsed_ns": [
+          47275910,
+          49494146,
+          50992189,
+          50541984,
+          58925360,
+          68081360,
+          67232936
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 30.365601843466287,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          23.09939257614875,
+          20.12184550383746,
+          23.069709343086803,
+          25.738756058619234,
+          17.314075517991277,
+          19.43762465875326,
+          22.365530525925525
+        ],
+        "elapsed_ns": [
+          67032434,
+          76951615,
+          67118683,
+          60158638,
+          89430620,
+          79660377,
+          69231915
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 22.365530525925525,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.939264561738048,
+          13.133051632746675,
+          12.793938835262205,
+          12.347868744069705,
+          10.530242427323543,
+          10.72639314058526,
+          11.407529189994584
+        ],
+        "elapsed_ns": [
+          504868796,
+          497419115,
+          510603576,
+          529049268,
+          620368521,
+          609024006,
+          572659584
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 12.347868744069705,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          11.532922860857427,
+          12.02784166188287,
+          11.517299597123777,
+          12.315346988123155,
+          11.961241652468303,
+          5.806119873094171,
+          7.32852455313643
+        ],
+        "elapsed_ns": [
+          566433245,
+          543125783,
+          567201614,
+          530446355,
+          546149899,
+          1125128496,
+          891397835
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.532922860857427,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 4,
+    "family": "core",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      5.1005859375,
+      4.29443359375,
+      4.58447265625
+    ],
+    "elapsed_s": 4.567607996999868,
+    "sha256": "d59a2d160fa73bd86a3c134c74c3f79da5dd971349e65cebd22cbe9d2788944d",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 277.441,
+      "ascii_full_history_mib_s": 154.76,
+      "sgr_mib_s": 141.985,
+      "unicode_mib_s": 26.033,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 114,
+        "p95": 121,
+        "p99": 122,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 2876,
+        "p95": 4288,
+        "p99": 4699,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 4,
+    "family": "core",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      5.1005859375,
+      4.29443359375,
+      4.58447265625
+    ],
+    "elapsed_s": 3.455175874987617,
+    "sha256": "68afae21024095a5030a0ff84abb7b44c595d166d82fe0b0a34b39efbe3baed8",
+    "data": {
+      "schema": 1,
+      "scope": "parser plus screen model; no PTY, renderer or display",
+      "geometry": [
+        120,
+        32
+      ],
+      "cell_bytes": 32,
+      "initial_core_heap_bytes": 123292,
+      "ascii_mib_s": 278.579,
+      "ascii_full_history_mib_s": 153.1,
+      "sgr_mib_s": 146.629,
+      "unicode_mib_s": 48.556,
+      "steady_state_allocations": 0,
+      "edit_ns": {
+        "p50": 76,
+        "p95": 82,
+        "p99": 87,
+        "allocations": 0
+      },
+      "burst_1024_ns": {
+        "p50": 3486,
+        "p95": 4652,
+        "p99": 4877,
+        "allocations": 0
+      }
+    }
+  },
+  {
+    "round": 4,
+    "family": "diverse",
+    "version": "before",
+    "cpu": 23,
+    "load": [
+      4.85205078125,
+      4.255859375,
+      4.5703125
+    ],
+    "elapsed_s": 12.47524631700071,
+    "sha256": "18baf351ab23c6ad8555a4a0991e37072d9861e3c1d351acf18cde52321ceb8c",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          20.008527849003862,
+          21.4162768328303,
+          20.585390410416657,
+          16.97635284338458,
+          18.016357029790893,
+          5.922997222023919,
+          3.7496498121433857
+        ],
+        "elapsed_ns": [
+          77387428,
+          72300546,
+          75218807,
+          91209727,
+          85944595,
+          261423136,
+          412947498
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 18.016357029790893,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          7.803871719693792,
+          12.278694739581855,
+          15.509607382724678,
+          15.55000638055697,
+          16.54871417390629,
+          16.15281147820552,
+          17.94959308413515
+        ],
+        "elapsed_ns": [
+          198415423,
+          126105302,
+          99835442,
+          99576069,
+          93566696,
+          95860000,
+          86264268
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 15.55000638055697,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          13.359732276883218,
+          11.335216096094047,
+          13.175157303506477,
+          10.757317053135809,
+          10.801406573072308,
+          11.188097069924199,
+          9.000161516644607
+        ],
+        "elapsed_ns": [
+          488979179,
+          576312870,
+          495829444,
+          607273253,
+          604794466,
+          583891155,
+          725834854
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.188097069924199,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          8.782802068588628,
+          6.275403667815693,
+          9.948128111855496,
+          10.815985915108794,
+          12.114493247820286,
+          10.244317698135442,
+          9.321826877422268
+        ],
+        "elapsed_ns": [
+          743798035,
+          1040989754,
+          656669360,
+          603979237,
+          539240956,
+          637683359,
+          700788698
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 9.948128111855496,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  },
+  {
+    "round": 4,
+    "family": "diverse",
+    "version": "cache",
+    "cpu": 23,
+    "load": [
+      5.56884765625,
+      4.45361328125,
+      4.630859375
+    ],
+    "elapsed_s": 10.63728104699112,
+    "sha256": "85ae7e06dfa30707eadd9a46fc408a7f68df12227064bed47dbabc289929ba9b",
+    "data": [
+      {
+        "schema": 1,
+        "scope": "parser and retained screen model; no PTY or renderer",
+        "seed": "4d595df4d0f33173",
+        "units": 65536,
+        "geometry": [
+          120,
+          32
+        ],
+        "history_rows": 2048,
+        "cell_bytes": 32
+      },
+      {
+        "case": "diverse-unicode-log",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          31.620105275355535,
+          29.45870550667927,
+          30.077976946277737,
+          29.000640829369967,
+          22.180835246259154,
+          27.588524589184757,
+          25.629518413845116
+        ],
+        "elapsed_ns": [
+          48969113,
+          52562001,
+          51479809,
+          53392217,
+          69808395,
+          56125093,
+          60415045
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 29.000640829369967,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-unicode-log-fragmented",
+        "bytes_per_feed": 202953,
+        "payload_fnv1a64": "413a3e7d43627f17",
+        "non_ascii_scalars": 65536,
+        "unique_non_ascii_scalars": 24526,
+        "adjacent_non_ascii_pairs": 63897,
+        "unique_adjacent_non_ascii_pairs": 62616,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          22.579876542254496,
+          22.12975684328358,
+          22.261219836845896,
+          23.04287547047271,
+          23.108377385499377,
+          23.133900628233167,
+          25.59088114685623
+        ],
+        "elapsed_ns": [
+          68574711,
+          69969522,
+          69556319,
+          67196844,
+          67006371,
+          66932444,
+          60506260
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 23.04287547047271,
+        "single_feed_semantic_fnv1a64": "a9b762472c1ffd6b",
+        "final_semantic_fnv1a64": "151b22c551221494",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": false,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          12.468234091592501,
+          13.56720301062082,
+          11.643265266389632,
+          11.87114414027628,
+          5.1291332729141965,
+          7.345545527103333,
+          14.14358524286994
+        ],
+        "elapsed_ns": [
+          523941953,
+          481501671,
+          561065197,
+          550294971,
+          1273632517,
+          889332303,
+          461879418
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.87114414027628,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      },
+      {
+        "case": "diverse-emoji-combining-log-fragmented",
+        "bytes_per_feed": 856245,
+        "payload_fnv1a64": "ef980a46fcc550eb",
+        "non_ascii_scalars": 262261,
+        "unique_non_ascii_scalars": 24792,
+        "adjacent_non_ascii_pairs": 192561,
+        "unique_adjacent_non_ascii_pairs": 52397,
+        "fragmented": true,
+        "iterations_per_sample": 8,
+        "warmup_feeds": 4,
+        "samples_mib_s": [
+          11.707966949927757,
+          10.172779829006569,
+          10.701568290667955,
+          11.93491501482256,
+          11.826442722527855,
+          11.500242871477514,
+          12.208404656135885
+        ],
+        "elapsed_ns": [
+          557964585,
+          642167729,
+          610436783,
+          547354624,
+          552374968,
+          568042866,
+          535092922
+        ],
+        "allocations": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "median_mib_s": 11.707966949927757,
+        "single_feed_semantic_fnv1a64": "11486ec2feb581d3",
+        "final_semantic_fnv1a64": "11486ec2feb581d3",
+        "fragment_equivalence": true
+      }
+    ]
+  }
+]

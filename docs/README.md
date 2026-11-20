@@ -3,6 +3,10 @@
 The READMEs cover installation and common controls:
 [English](../README.md) · [中文](../README.zh-CN.md).
 
+These guides follow unreleased main after 0.5.0. Runtime reload requires a broker
+started from the development source; published binaries retain the capabilities
+documented in their own release notes.
+
 ## Use ztty
 
 | Guide | Contents |
@@ -12,6 +16,7 @@ The READMEs cover installation and common controls:
 | [Daily workflow](daily-workflow.md) | Search, command palette, live configuration and shell commands |
 | [Workspaces](workspaces.md) | Tabs, splits, pane movement and saved layouts |
 | [Sessions and MCP](sessions.md) | Shared sessions, attach, input ownership and MCP clients |
+| [Runtime reload](sessions.md#reload-the-running-broker) | Executable handover, retained sessions, refusal conditions and migration from 0.5.0 |
 | [Observer mode](ssmcp-observer.md) | Read-only windows and ssmcp integration |
 | [Shell integration](../shell/README.md) | Bash, Zsh, Fish and Nushell setup |
 | [Startup directory](startup-directory.md) | Shell selection and working-directory rules |
@@ -30,7 +35,7 @@ The READMEs cover installation and common controls:
 | [Session core](session-core.md) | PTY reads, input queues, sizing and ownership |
 | [Native output bytes](native-output-bytes.zh-CN.md) | Lossless MCP output and readable text |
 | [Darwin PTY helper](darwin-threaded-pty.md) | Native macOS process creation |
-| [Current benchmark report](benchmarks/resume-2026-11-20.md) | Candidate identity, workloads and raw measurements |
+| [Performance and reload report](benchmarks/performance-reload-2026-11-20.md) | Fixed sources, raw measurements, distinct-ELF handover, sampled tab/synchronized frames and validation limits |
 | [Benchmark instructions](benchmarks/README.md) | Workloads, accounting and reproduction |
 | [Performance](performance.md) | Design and dated measurements |
 | [Releasing](releasing.md) | Native builds, packages and published versions |

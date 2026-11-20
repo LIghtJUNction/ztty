@@ -1,0 +1,70 @@
++ cargo metadata --locked --offline --no-deps --format-version 1
+{"packages":[{"name":"zpty","version":"0.2.2","id":"path+file:///home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty#0.2.2","license":"MIT","license_file":null,"description":"Native no_std PTY and ConPTY ownership for Linux, macOS and Windows","source":null,"dependencies":[],"targets":[{"kind":["lib"],"crate_types":["lib"],"name":"zpty","src_path":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty/src/lib.rs","edition":"2024","doc":true,"doctest":true,"test":true},{"kind":["example"],"crate_types":["bin"],"name":"capture","src_path":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty/examples/capture.rs","edition":"2024","doc":false,"doctest":false,"test":false},{"kind":["test"],"crate_types":["bin"],"name":"darwin_spawn","src_path":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty/tests/darwin_spawn.rs","edition":"2024","doc":false,"doctest":false,"test":true},{"kind":["test"],"crate_types":["bin"],"name":"linux_restore","src_path":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty/tests/linux_restore.rs","edition":"2024","doc":false,"doctest":false,"test":true}],"features":{},"manifest_path":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty/Cargo.toml","metadata":null,"publish":null,"authors":["LIghtJUNction"],"categories":["os::unix-apis","no-std"],"keywords":["pty","terminal","no-std","linux"],"readme":"README.md","repository":"https://github.com/LIghtJUNction/zpty","homepage":null,"documentation":null,"edition":"2024","links":null,"default_run":null,"rust_version":"1.100"}],"workspace_members":["path+file:///home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty#0.2.2"],"workspace_default_members":["path+file:///home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty#0.2.2"],"resolve":null,"target_directory":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/target","build_directory":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/target","version":1,"workspace_root":"/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty","metadata":null}
++ cargo fmt --all -- --check
++ cargo check --locked --lib --no-default-features
+    Checking zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `dev` profile [unoptimized] target(s) in 11.39s
++ cargo build --locked --release --lib
+   Compiling zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `release` profile [optimized] target(s) in 0.12s
++ cargo test --locked --lib
+   Compiling zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `test` profile [unoptimized] target(s) in 0.17s
+     Running unittests src/lib.rs (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/target/debug/build/zpty/9477b7e3e9324523/out/zpty-9477b7e3e9324523)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
++ cargo test --locked --doc
+   Compiling zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `test` profile [unoptimized] target(s) in 0.05s
+   Doc-tests zpty
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
++ cargo doc --locked --no-deps
+ Documenting zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `dev` profile [unoptimized] target(s) in 0.09s
+   Generated /home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/target/doc/zpty/index.html
++ cargo run --locked --example capture
+   Compiling zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `dev` profile [unoptimized] target(s) in 0.16s
+     Running `/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/target/debug/examples/capture`
+hello from a PTY
+reply:hello from a PTY
+30 100
++ cargo test --locked --test linux_restore
+   Compiling zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `test` profile [unoptimized] target(s) in 0.17s
+     Running tests/linux_restore.rs (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/target/debug/build/zpty/c288bee02d1b2541/out/linux_restore-c288bee02d1b2541)
+{"suite":"linux-pty-exec-restore","passed":true,"same_parent_pid":true,"child_exit_code":7}
++ cargo clippy --locked --all-targets -- -D warnings
+    Checking zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Finished `dev` profile [unoptimized] target(s) in 0.28s
++ cargo package --locked --list
+.cargo_vcs_info.json
+Cargo.lock
+Cargo.toml
+Cargo.toml.orig
+LICENSE
+README.md
+SOURCE.json
+examples/capture.rs
+src/lib.rs
+src/linux.rs
+src/macos/spawn.rs
+src/macos.rs
+src/windows.rs
+tests/darwin_spawn.rs
+tests/darwin_spawn_abi.c
+tests/linux_restore.rs
++ cargo package --locked
+   Packaging zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+    Packaged 16 files, 133.5KiB (35.7KiB compressed)
+   Verifying zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty)
+   Compiling zpty v0.2.2 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/target/package/zpty-0.2.2)
+    Finished `dev` profile [unoptimized] target(s) in 0.15s
+{"passed": true, "source": "1e94387bf7987d690e56b88a195712aa92f670ec", "unit_tests_passed": 0, "doc_tests_passed": 0, "darwin_spawn": "not_run", "linux_restore": "passed", "output": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zpty/artifacts/acceptance"}

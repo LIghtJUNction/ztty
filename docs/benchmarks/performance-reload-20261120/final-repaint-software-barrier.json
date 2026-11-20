@@ -1,0 +1,366 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-final",
+  "binary_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+  "checks": [
+    "nonadjacent dirty rows publish once after the complete frame is painted",
+    "one-row software updates still copy only one row",
+    "terminal content and search overlay share one visible copy",
+    "bulk output ending in silence publishes the final real pixels without an external wakeup",
+    "idle hidden-cursor windows have no recurring 8 ms repaint wakeup",
+    "one shared broker updates the flooding view while XTEST echo and broker input render in the other view before flood ends",
+    "a force/expose paint of the old screen does not lose the subsequent interactive response",
+    "synchronized output and Expose retain the committed pixels until explicit release",
+    "a quiet synchronized frame commits at the 150 ms timeout; repeated begin does not restart it",
+    "a synchronized begin/end in one small write publishes its complete final pixels",
+    "scrollback and its return-to-live prompt share one visible copy"
+  ],
+  "timings_ms": {
+    "initial-a": 0.2663670020410791,
+    "initial-b": 0.2288169926032424,
+    "quiet-final-frame": 4.078483994817361,
+    "old-frame-expose": 0.28633199690375477,
+    "xtest-visible-echo": 1.1429250007495284,
+    "broker-write-during-flood": 0.2995450049638748,
+    "rpc-visible-echo": 0.6584289949387312,
+    "sync-initial": 0.07884200022090226,
+    "sync-expose-retained": 0.04536700726021081,
+    "sync-explicit-release": 0.04690600326284766,
+    "sync-quiet-timeout": 49.87884000001941,
+    "sync-total-from-first-begin": 151.98795500327833,
+    "sync-same-feed": 0.13625399151351303,
+    "scroll-history-ready": 0.08272999548353255
+  },
+  "screenshots": {
+    "nonadjacent-frame": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/nonadjacent-frame.png",
+      "sha256": "9fcb895518a24fe035294e28b4cdafec97b0f62689d050004d3dc77f58c28cc4",
+      "rgb_sha256": "78e869259fe8a0124192bfd5c706798244b3793bb7cf2046f1c042cd153cc861"
+    },
+    "single-publish-overlay": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/single-publish-overlay.png",
+      "sha256": "a78403703c7322923d4c3f6823f1b21271f88c3ba47fe98106704d934a26a388",
+      "rgb_sha256": "9298c5cf12c6df5f0384813187c4777b8f0df812d19850bec33faea63a957683"
+    },
+    "quiet-final-frame": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/quiet-final-frame.png",
+      "sha256": "6a077c67991b8b33da2afa055046ef88435019da871c67b5a3b35eb57362bafc",
+      "rgb_sha256": "3ca4e8ba665135b81a7fd1f26e6b1fb96a44a010d3087f75c716c15f8f4fb1ce"
+    },
+    "fairness-flood": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/fairness-flood.png",
+      "sha256": "5875ba94353dd8a08f9737299f77512cf18874811737e5b57a17f84bb12c824d",
+      "rgb_sha256": "8c8b08a8c7c7c1b879b6ca87ef233ec49c1dc8f67cc7350f3d2226745880ad0a"
+    },
+    "fairness-interaction": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/fairness-interaction.png",
+      "sha256": "b0cb1e3a4249677812b67680889a4b4b143393c60be3fd1a21f2b1d188d0a097",
+      "rgb_sha256": "5e65a4d8c18ebfc49b72d19f48cc99cb66eb6cf3f7063b5d3012dbc607596f8e"
+    },
+    "sync-release": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/sync-release.png",
+      "sha256": "adc5c4cb460e19ab8b3f9bb7b5483d0649f6a8fd80e3648bf60c55c3db6539f2",
+      "rgb_sha256": "8c1e51d883ae7d83e8d22dd893cf5dd5b96ceadd13658c0e60bf4963575d6763"
+    },
+    "sync-timeout": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/sync-timeout.png",
+      "sha256": "4bc401daaca8ab4e6d1ce86c5287bdac29e6def7f1b8ef63f7e2f55a32a74c06",
+      "rgb_sha256": "c4c2af48285a9d387da56bff8bb8ea7ee59c76123280343c53505bd27a7e9b49"
+    },
+    "sync-same-feed": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/sync-same-feed.png",
+      "sha256": "13364cf21c78e5aeb8e8f010b938bcebfefdff1cfcba3fdbef3f9b14904ebf4a",
+      "rgb_sha256": "3348902948e537517045c60fc4115203bde850e48cecc55c0bd00b12908f6299"
+    },
+    "single-publish-scroll": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-repaint-software-barrier/single-publish-scroll.png",
+      "sha256": "eee56550c0eabd62660324278161afd28c4a346bfa79fd8083643badd0f4c08f",
+      "rgb_sha256": "5d14c2e9cd38f77aeb65b0fd9d7b0708bb6fe25f56ea30fc767dc72c2c2fc22c"
+    }
+  },
+  "scope": "Real PTY/XTEST and X11 pixels on owned Xvfb, not physical display latency",
+  "source_sha256": {
+    "src/repaint.rs": "93bc8f0ba4fabf6eb757eab38eecc26759430b1711db406ab5a69fb314cb0498",
+    "src/session.rs": "bab96c8612a6cf22810348c9136e60e663dc4b24c26296fd5dbe624d50e7e142",
+    "src/x11.rs": "eeccb3b7e99f26fc9a1a1124405c5a0b39234ca77f24e43c50d8d36550af1f1a",
+    "crates/zterm/src/terminal.rs": "cbb6a6b91f42612b69e85be7032f99411756478e3d64099c15e7e8acff2c677a",
+    "tests/egl_present_trace.c": "c9ca16238841640876c9ef4b0f9defd60cabbc02e4d4e7e7aac7fc2958131739",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "src/x11/gpu.rs": "b653c6dbc28e38e8b864ce1c233cf15991b73bd4ec613c3d2e0c5f7ca6a56519",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "5b8aa4dc006956d547456dc1ea994227916f35693c1040dea430cd6d2d16594c",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "tests/x11_present_trace.c": "8519d9f1380022171515ae29fbc03015238b3beaf9044f5b6e5bfbf4903bbdf2",
+    "tests/repaint_gui.py": "08f333f3ab32a9df1fc77b810845bd088c130208e56d1df33586251cf972e4eb",
+    "tools/isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "tools/benchmark_terminals.py": "01ed1685a603c7f26a8f945c3bf12de86ba0fedcf4e8b9c6aa15bb4f9480a19f",
+    "tools/measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "tools/measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":6667",
+    "pid": 3119909,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X6667",
+        "inode": 111325297,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X6667",
+        "inode": 111325296,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderers_before": [
+    {
+      "window_id": 2097154,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    },
+    {
+      "window_id": 2097159,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    }
+  ],
+  "broker": {
+    "pid": 3119923,
+    "state": "S",
+    "user_ticks": 1,
+    "system_ticks": 0,
+    "threads": 1,
+    "start_ticks": 9357201,
+    "exe_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368"
+  },
+  "owned_processes": {
+    "3119921": 9357200,
+    "3119924": 9357206,
+    "3119923": 9357201,
+    "3119925": 9357213,
+    "3119926": 9357213
+  },
+  "startup_quiet_ms": 42.58432901406195,
+  "nonadjacent_start_ns": 93572252436067,
+  "nonadjacent_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      16,
+      1112,
+      736,
+      0,
+      16
+    ]
+  ],
+  "single_row_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      729,
+      1112,
+      23,
+      0,
+      729
+    ]
+  ],
+  "overlay_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "payload": {
+    "bytes": 1050937,
+    "sha256": "76376cc29e434d25d2fd58b984b231d6ad3efae2c7a9b0d8c87e762d12427f29"
+  },
+  "idle_context_switches": {
+    "seconds": 0.35,
+    "before": {
+      "voluntary_ctxt_switches": 118,
+      "nonvoluntary_ctxt_switches": 8
+    },
+    "after": {
+      "voluntary_ctxt_switches": 118,
+      "nonvoluntary_ctxt_switches": 8
+    },
+    "delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "flood_visible_colors": [
+    [
+      35,
+      63,
+      53
+    ],
+    [
+      64,
+      56,
+      112
+    ],
+    [
+      64,
+      56,
+      176
+    ],
+    [
+      69,
+      121,
+      163
+    ],
+    [
+      70,
+      134,
+      58
+    ],
+    [
+      79,
+      59,
+      105
+    ],
+    [
+      81,
+      85,
+      119
+    ],
+    [
+      91,
+      215,
+      157
+    ],
+    [
+      103,
+      179,
+      145
+    ],
+    [
+      104,
+      192,
+      72
+    ],
+    [
+      117,
+      169,
+      83
+    ],
+    [
+      122,
+      42,
+      102
+    ],
+    [
+      128,
+      120,
+      48
+    ],
+    [
+      136,
+      32,
+      136
+    ],
+    [
+      143,
+      123,
+      105
+    ],
+    [
+      151,
+      35,
+      65
+    ],
+    [
+      183,
+      67,
+      129
+    ],
+    [
+      189,
+      145,
+      139
+    ],
+    [
+      191,
+      171,
+      57
+    ],
+    [
+      192,
+      184,
+      176
+    ],
+    [
+      193,
+      197,
+      71
+    ],
+    [
+      203,
+      135,
+      173
+    ],
+    [
+      205,
+      161,
+      123
+    ],
+    [
+      222,
+      190,
+      194
+    ]
+  ],
+  "scroll_frame_copies": [
+    [
+      2097155,
+      2097154,
+      0,
+      0,
+      1112,
+      768,
+      0,
+      0
+    ]
+  ],
+  "renderers_after": [
+    {
+      "window_id": 2097154,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    },
+    {
+      "window_id": 2097159,
+      "requested": "software",
+      "actual": "software",
+      "driver": ""
+    }
+  ],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": ""
+}

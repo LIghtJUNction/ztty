@@ -1,5 +1,14 @@
 # Ten-window terminal benchmark
 
+## 2026-11-20 performance, reload and clipboard fixes
+
+The [current development report](performance-reload-2026-11-20.md) contains the
+fixed-source software A/B results, three-terminal software-OpenGL comparison,
+Unicode pipeline measurements, complete-frame tab-switch validation, runtime
+reload checks and the later image-only clipboard fix. It preserves all raw
+samples and negative results. Performance samples bind to `f7e0196`; clipboard
+validation binds to `2aa561b`. This is a source update, not a new formal release.
+
 This benchmark compares **ten real windows** of ztty, Ghostty, and Kitty on one
 Linux machine. Each terminal uses its available shared-instance mode. The figure
 reports application and dedicated display-server memory plus PTY processing
@@ -383,3 +392,4 @@ separate from this three-terminal, ten-window comparison.
 以及实际 PTY 写入到 DSR 回复的逻辑处理时间。图中列出最大采样 Swap 计数；
 子进程和私有 D-Bus 单列。软件渲染结果不代表日常 GPU 桌面的帧率。
 在仓库根目录运行上方的一条命令即可重新实测并更新 JSON、SVG 和 README 引用。
+

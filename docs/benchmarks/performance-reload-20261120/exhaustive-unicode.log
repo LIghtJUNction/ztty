@@ -1,0 +1,9 @@
+   Compiling zterm v0.5.1 (/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/crates/zterm)
+    Finished `release` profile [optimized] target(s) in 7.75s
+     Running unittests src/lib.rs (target/release/build/zterm/38ffca71a13146a4/out/zterm-38ffca71a13146a4)
+
+running 1 test
+test terminal::grapheme::append_boundary_tests::scalar_boundary_matches_every_unicode_scalar_against_context_anchors ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 165 filtered out; finished in 3.35s
+

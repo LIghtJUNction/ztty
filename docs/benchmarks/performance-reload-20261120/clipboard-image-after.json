@@ -1,0 +1,200 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Ctrl+V remains raw application input",
+      "ok": true,
+      "actual_hex": "16",
+      "selection_requests": [],
+      "scope": "Proves key forwarding only; an application must implement image attachment itself"
+    },
+    {
+      "name": "image-only owner lies about UTF8 conversion",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "image/png"
+      ],
+      "requests": [
+        "TARGETS"
+      ],
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "chunks_sent": 0,
+      "visible_feedback": {
+        "footer_changed": true,
+        "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/clipboard-image-after/image-only-refused.png",
+        "sha256": "84744c53d2a04080207bc423706d9ca58ef0e3e290ce0c23d1f97d301f3b7cc8",
+        "expected_message": "Clipboard has no supported text; use the app's image-paste shortcut"
+      }
+    },
+    {
+      "name": "image-only owner lies about STRING fallback",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "image/png"
+      ],
+      "requests": [
+        "TARGETS"
+      ],
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "chunks_sent": 0
+    },
+    {
+      "name": "invalid UTF8 is rejected directly",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "TARGETS",
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "chunks_sent": 0
+    },
+    {
+      "name": "invalid UTF8 is rejected after complete INCR",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "TARGETS",
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "chunks_sent": 16
+    },
+    {
+      "name": "advertised UTF8 rejects a STRING property",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "TARGETS",
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 0,
+      "actual_bytes": 0,
+      "expected_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "chunks_sent": 0
+    },
+    {
+      "name": "UTF8 direct",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "TARGETS",
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 44,
+      "actual_bytes": 44,
+      "expected_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "actual_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "chunks_sent": 0
+    },
+    {
+      "name": "UTF8 INCR split across codepoints",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "TARGETS",
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 44,
+      "actual_bytes": 44,
+      "expected_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "actual_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "chunks_sent": 17
+    },
+    {
+      "name": "STRING direct",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "STRING"
+      ],
+      "requests": [
+        "TARGETS",
+        "STRING"
+      ],
+      "expected_bytes": 24,
+      "actual_bytes": 24,
+      "expected_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "actual_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "chunks_sent": 0
+    },
+    {
+      "name": "STRING INCR split across codepoints",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "STRING"
+      ],
+      "requests": [
+        "TARGETS",
+        "STRING"
+      ],
+      "expected_bytes": 24,
+      "actual_bytes": 24,
+      "expected_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "actual_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "chunks_sent": 6
+    }
+  ],
+  "cleanup_errors": [],
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-clipboard-final",
+  "binary_sha256": "e222e34918d7e9a25b4c8ad910652990de81d19cd56f8bc7257bc5a7f6ef92d6",
+  "test_script_sha256": "899650a070aca910f979ddac0a19efec3b530926169045d62ea36505fc2ea334",
+  "xvfb_helper_sha256": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+  "expect": "reject",
+  "png_sha256": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+  "png_bytes": 74,
+  "scope": "Owned private Xvfb, synthetic selection owner, XTEST, native pixels and raw PTY; no real desktop clipboard or Codex process",
+  "display_ownership": {
+    "display": ":24150",
+    "pid": 3362899,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X24150",
+        "inode": 113746574,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X24150",
+        "inode": 113746573,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "stderr": ""
+}

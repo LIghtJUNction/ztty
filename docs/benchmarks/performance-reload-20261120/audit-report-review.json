@@ -1,0 +1,42 @@
+{
+  "scope": "Numeric and scope review of root report; no new runtime testing",
+  "report": "ztty-performance-reload-2026-11-20.md",
+  "report_sha256_at_summary_time": "db0cf5aa0d827d4b2669d756017c53304f3bba9971f3af4cad8e105eb78e47cd",
+  "numeric_errors": [],
+  "cache_five_round_raw_to_summary_checked": true,
+  "diverse_raw_rates_and_all_fingerprints_checked": true,
+  "native_receipt_counts": {
+    "final-reload-software.json": {
+      "ok": true,
+      "checks": 9,
+      "remaining_owned_pids": []
+    },
+    "final-reload-gpu.json": {
+      "ok": true,
+      "checks": 9,
+      "remaining_owned_pids": []
+    },
+    "final-repaint-software-barrier.json": {
+      "ok": true,
+      "checks": 11,
+      "remaining_owned_pids": []
+    },
+    "final-repaint-gpu-barrier.json": {
+      "ok": true,
+      "checks": 11,
+      "remaining_owned_pids": []
+    },
+    "final-text-gpu.json": {
+      "ok": true,
+      "checks": 8,
+      "remaining_owned_pids": []
+    }
+  },
+  "recommendations": [
+    "State pipeline windows are consistently 1112x800, separately from 1112x768 in the other ztty collectors.",
+    "Say JSON preserves payload size/hash, expected screen fingerprint and actual full-text-equality result; it does not embed the full raw payload or screen.",
+    "Only ztty records actual driver per window; all three use a forced Mesa software-GL environment, with actual Kitty driver not independently recorded.",
+    "Render author confirmed default-broker selection separates different ELF images using FNV64+length, even when both --version strings are 0.5.0. The transition command may reuse an existing pool for the same new ELF; say separate from the old binary pool rather than guaranteed fresh broker.",
+    "window_error -> later attach is an implemented degradation/recovery path but was not exercised by the recorded native acceptance tests."
+  ]
+}

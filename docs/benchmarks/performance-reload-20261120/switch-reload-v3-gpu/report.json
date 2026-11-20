@@ -1,0 +1,1601 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-reload-v3",
+  "binary_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+  "test_script_sha256": "bdfb709243f1f933c642416f2d05f7f52e997d80d3358aa31cbf610fd956e4f9",
+  "renderer": "gpu",
+  "requested_scope": "all",
+  "expect": "reproduce",
+  "checks": [
+    "sampled workspace parent through first/repeated RPC and XTEST tab switches, hidden PTY updates and synchronized commit",
+    "separately sampled two independent overlapping top-level windows through real focus and stacking changes",
+    "all owned commands, PTYs, broker identity and launcher wait peers remain live"
+  ],
+  "scope": "Continuous real X11 pixels on private Xvfb; no physical compositor claim",
+  "gpu_environment": "LIBGL_ALWAYS_SOFTWARE=1; GPU mode uses the local Mesa software driver",
+  "colors": {
+    "A": [
+      215,
+      31,
+      49
+    ],
+    "B": [
+      22,
+      169,
+      203
+    ],
+    "C": [
+      47,
+      195,
+      83
+    ],
+    "D": [
+      211,
+      157,
+      23
+    ],
+    "calibration": [
+      241,
+      11,
+      239
+    ]
+  },
+  "stages": [
+    {
+      "name": "visible-pixel-calibration",
+      "scope": "tabs",
+      "kind": "calibration",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 7,
+      "invalid_samples": 3,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284": 3
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 10.284725,
+      "largest_sample_interval_ms": 2.530819,
+      "median_sample_interval_ms": 1.563187,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-00-unexpected-0.png",
+          "sha256": "a0e2af86691e8f82ecfa9fb439275f40edaea77f42501dff0e90600e84415eac",
+          "rgb_sha256": "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284",
+          "colors": [
+            [
+              238464,
+              [
+                241,
+                11,
+                239
+              ]
+            ]
+          ]
+        }
+      ],
+      "calibration_observed": true
+    },
+    {
+      "name": "first-return-to-hidden-tab",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92879801503884,
+          "observed_target_ns": 92879819613899,
+          "settled_ns": 92879839787048
+        }
+      ],
+      "samples": 39,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 16,
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 23
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 39.329939,
+      "largest_sample_interval_ms": 1.310632,
+      "median_sample_interval_ms": 1.025809,
+      "fault_screenshots": []
+    },
+    {
+      "name": "repeated-tab-rpc",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92879841610596,
+          "observed_target_ns": 92879860726994,
+          "settled_ns": 92879880825685
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92879880829212,
+          "observed_target_ns": 92879900477938,
+          "settled_ns": 92879920566279
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92879920586715,
+          "observed_target_ns": 92879940606585,
+          "settled_ns": 92879960676167
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92879960679512,
+          "observed_target_ns": 92879979615805,
+          "settled_ns": 92879999683482
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92879999686923,
+          "observed_target_ns": 92880020017069,
+          "settled_ns": 92880040095056
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880040099530,
+          "observed_target_ns": 92880060266289,
+          "settled_ns": 92880080467651
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880080472060,
+          "observed_target_ns": 92880099799811,
+          "settled_ns": 92880120121020
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880120125628,
+          "observed_target_ns": 92880138974595,
+          "settled_ns": 92880159402470
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880159406982,
+          "observed_target_ns": 92880181571682,
+          "settled_ns": 92880201742066
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880201746449,
+          "observed_target_ns": 92880220259732,
+          "settled_ns": 92880240341425
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880240345909,
+          "observed_target_ns": 92880260706103,
+          "settled_ns": 92880280838573
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880280842786,
+          "observed_target_ns": 92880299252752,
+          "settled_ns": 92880319326072
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880319329456,
+          "observed_target_ns": 92880334928164,
+          "settled_ns": 92880355104641
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880355108043,
+          "observed_target_ns": 92880369516877,
+          "settled_ns": 92880389634981
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880389637825,
+          "observed_target_ns": 92880405767021,
+          "settled_ns": 92880425853902
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880425863538,
+          "observed_target_ns": 92880440968208,
+          "settled_ns": 92880461047193
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880461050109,
+          "observed_target_ns": 92880478691111,
+          "settled_ns": 92880498806120
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880498809569,
+          "observed_target_ns": 92880515031306,
+          "settled_ns": 92880535116759
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880535121780,
+          "observed_target_ns": 92880553515547,
+          "settled_ns": 92880573672155
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880573675355,
+          "observed_target_ns": 92880588540836,
+          "settled_ns": 92880608690169
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880608693414,
+          "observed_target_ns": 92880624741408,
+          "settled_ns": 92880644895168
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880644899010,
+          "observed_target_ns": 92880661828598,
+          "settled_ns": 92880682022733
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880682157093,
+          "observed_target_ns": 92880699930057,
+          "settled_ns": 92880719998874
+        },
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880720006909,
+          "observed_target_ns": 92880735515852,
+          "settled_ns": 92880755696161
+        }
+      ],
+      "samples": 778,
+      "invalid_samples": 158,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 236,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 158,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 384
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 914.801284,
+      "largest_sample_interval_ms": 2.14116,
+      "median_sample_interval_ms": 1.136067,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-02-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "repeated-tab-xtest",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880757236206,
+          "observed_target_ns": 92880775165470,
+          "settled_ns": 92880795227638
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880795230469,
+          "observed_target_ns": 92880810286991,
+          "settled_ns": 92880830367280
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880830375164,
+          "observed_target_ns": 92880846905723,
+          "settled_ns": 92880866963396
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880866965788,
+          "observed_target_ns": 92880882216799,
+          "settled_ns": 92880902384117
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880902387156,
+          "observed_target_ns": 92880919154224,
+          "settled_ns": 92880939232740
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92880939236510,
+          "observed_target_ns": 92880956091406,
+          "settled_ns": 92880976245423
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92880976248617,
+          "observed_target_ns": 92880993108830,
+          "settled_ns": 92881013175292
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881013178076,
+          "observed_target_ns": 92881031108818,
+          "settled_ns": 92881051273884
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881051278389,
+          "observed_target_ns": 92881068788316,
+          "settled_ns": 92881088909264
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881088912674,
+          "observed_target_ns": 92881104442832,
+          "settled_ns": 92881124760718
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881124765537,
+          "observed_target_ns": 92881146884713,
+          "settled_ns": 92881166978543
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881166982942,
+          "observed_target_ns": 92881182904240,
+          "settled_ns": 92881203109124
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881203113214,
+          "observed_target_ns": 92881219669682,
+          "settled_ns": 92881239736700
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881239739312,
+          "observed_target_ns": 92881256072271,
+          "settled_ns": 92881276218437
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881276221970,
+          "observed_target_ns": 92881293922042,
+          "settled_ns": 92881314088190
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881314091940,
+          "observed_target_ns": 92881330149172,
+          "settled_ns": 92881350213094
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881350216184,
+          "observed_target_ns": 92881368479382,
+          "settled_ns": 92881388595184
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881388599616,
+          "observed_target_ns": 92881401810630,
+          "settled_ns": 92881421963613
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881421967321,
+          "observed_target_ns": 92881439293467,
+          "settled_ns": 92881459360273
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881459363061,
+          "observed_target_ns": 92881473382631,
+          "settled_ns": 92881493450748
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881493453873,
+          "observed_target_ns": 92881512578203,
+          "settled_ns": 92881532696992
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881532700523,
+          "observed_target_ns": 92881548438599,
+          "settled_ns": 92881568519207
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881568527710,
+          "observed_target_ns": 92881584363919,
+          "settled_ns": 92881604461645
+        },
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881604464594,
+          "observed_target_ns": 92881618898882,
+          "settled_ns": 92881638966190
+        }
+      ],
+      "samples": 806,
+      "invalid_samples": 153,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 257,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 153,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 396
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 882.710994,
+      "largest_sample_interval_ms": 2.657502,
+      "median_sample_interval_ms": 1.042018,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-03-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hidden-output-prepare-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881640659554,
+          "observed_target_ns": 92881656752128,
+          "settled_ns": 92881676851638
+        }
+      ],
+      "samples": 35,
+      "invalid_samples": 12,
+      "frame_counts": {
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 2,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 12,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 21
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 36.743514,
+      "largest_sample_interval_ms": 1.504683,
+      "median_sample_interval_ms": 1.052365,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-04-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hidden-output-return-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881678354295,
+          "observed_target_ns": 92881693873134,
+          "settled_ns": 92881713964477
+        }
+      ],
+      "samples": 38,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 15,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 23
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 36.254404,
+      "largest_sample_interval_ms": 1.112485,
+      "median_sample_interval_ms": 0.971997,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881715369316,
+          "observed_target_ns": 92881732246459,
+          "settled_ns": 92881752317638
+        }
+      ],
+      "samples": 38,
+      "invalid_samples": 14,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 14,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 22
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 37.611567,
+      "largest_sample_interval_ms": 1.151133,
+      "median_sample_interval_ms": 0.999367,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-06-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hidden-output-return-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "D"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881754118851,
+          "observed_target_ns": 92881770221167,
+          "settled_ns": 92881791775052
+        }
+      ],
+      "samples": 35,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 15,
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 20
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d"
+      },
+      "duration_ms": 39.138611,
+      "largest_sample_interval_ms": 1.355737,
+      "median_sample_interval_ms": 1.073282,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "D",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881793962265,
+          "observed_target_ns": 92881809010589,
+          "settled_ns": 92881829096766
+        }
+      ],
+      "samples": 36,
+      "invalid_samples": 12,
+      "frame_counts": {
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 2,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 12,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 22
+      },
+      "allowed_rgb_sha256": {
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 36.464463,
+      "largest_sample_interval_ms": 1.196131,
+      "median_sample_interval_ms": 1.034142,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-08-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hidden-output-return-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881831494883,
+          "observed_target_ns": 92881845516740,
+          "settled_ns": 92881865614755
+        }
+      ],
+      "samples": 38,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 14,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 24
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 35.173531,
+      "largest_sample_interval_ms": 1.187401,
+      "median_sample_interval_ms": 0.933253,
+      "fault_screenshots": []
+    },
+    {
+      "name": "hidden-output-prepare-3",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881867268116,
+          "observed_target_ns": 92881883146215,
+          "settled_ns": 92881903346231
+        }
+      ],
+      "samples": 35,
+      "invalid_samples": 13,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 13,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 20
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 36.723701,
+      "largest_sample_interval_ms": 1.677708,
+      "median_sample_interval_ms": 0.979408,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-10-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hidden-output-return-3",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "D"
+      ],
+      "actions": [
+        {
+          "method": "xtest",
+          "from": "switch-tab-b",
+          "to": "switch-tab-a",
+          "start_ns": 92881905236631,
+          "observed_target_ns": 92881921394886,
+          "settled_ns": 92881941455318
+        }
+      ],
+      "samples": 34,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 14,
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 20
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d"
+      },
+      "duration_ms": 36.827706,
+      "largest_sample_interval_ms": 1.604356,
+      "median_sample_interval_ms": 1.021813,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "D",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92881942742341,
+          "observed_target_ns": 92881959523268,
+          "settled_ns": 92881979617223
+        }
+      ],
+      "samples": 36,
+      "invalid_samples": 13,
+      "frame_counts": {
+        "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d": 2,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 13,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 21
+      },
+      "allowed_rgb_sha256": {
+        "D": "15a4f41ad106b480737447d7e212bf2b864f4b745e1303001c71b67e30bc4a2d",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 37.406537,
+      "largest_sample_interval_ms": 1.264188,
+      "median_sample_interval_ms": 1.036282,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-12-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sync-held-tab-switch-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 37,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 37
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 43.02685,
+      "largest_sample_interval_ms": 1.944884,
+      "median_sample_interval_ms": 1.095324,
+      "fault_screenshots": [],
+      "hold_ms": 42.232308,
+      "sync_timing": {
+        "begin_before_write_ns": 92881980094858,
+        "begin_parsed_ns": 92881980176593,
+        "switch_requested_ns": 92881981788898,
+        "begin_to_hold_end_ms": 43.927978
+      }
+    },
+    {
+      "name": "sync-explicit-commit-0",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92882025278367,
+          "parsed_ns": 92882028377347,
+          "begin_before_write_ns": 92881980094858,
+          "begin_to_end_parsed_ms": 48.282489,
+          "settled_ns": 92882030805260
+        }
+      ],
+      "samples": 6,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 6.748998,
+      "largest_sample_interval_ms": 1.339265,
+      "median_sample_interval_ms": 1.280082,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92882032854659,
+          "observed_target_ns": 92882053644458,
+          "settled_ns": 92882073811186
+        }
+      ],
+      "samples": 34,
+      "invalid_samples": 12,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 12,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 20
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 42.120655,
+      "largest_sample_interval_ms": 2.309505,
+      "median_sample_interval_ms": 1.229224,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-15-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sync-held-tab-switch-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 38,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 38
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 42.4858,
+      "largest_sample_interval_ms": 1.360013,
+      "median_sample_interval_ms": 1.113944,
+      "fault_screenshots": [],
+      "hold_ms": 42.22595,
+      "sync_timing": {
+        "begin_before_write_ns": 92882074889396,
+        "begin_parsed_ns": 92882074975466,
+        "switch_requested_ns": 92882076069609,
+        "begin_to_hold_end_ms": 43.408664
+      }
+    },
+    {
+      "name": "sync-explicit-commit-1",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92882119497353,
+          "parsed_ns": 92882123524225,
+          "begin_before_write_ns": 92882074889396,
+          "begin_to_end_parsed_ms": 48.634829,
+          "settled_ns": 92882125708774
+        }
+      ],
+      "samples": 7,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 5,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 7.54449,
+      "largest_sample_interval_ms": 1.322197,
+      "median_sample_interval_ms": 1.165468,
+      "fault_screenshots": []
+    },
+    {
+      "name": "sync-prepare-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "C",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "rpc",
+          "from": "switch-tab-a",
+          "to": "switch-tab-b",
+          "start_ns": 92882128122498,
+          "observed_target_ns": 92882148932700,
+          "settled_ns": 92882169130453
+        }
+      ],
+      "samples": 33,
+      "invalid_samples": 13,
+      "frame_counts": {
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2,
+        "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0": 13,
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 18
+      },
+      "allowed_rgb_sha256": {
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 42.009698,
+      "largest_sample_interval_ms": 1.707196,
+      "median_sample_interval_ms": 1.255239,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/tabs-18-unexpected-0.png",
+          "sha256": "8f28dbdeb1fd4f92fd965afab505a12cfba07329cdead212327f31f773117d9f",
+          "rgb_sha256": "8ee1a4db8b555e5c5ac84d78adc6637abb4cca1a48c6a5e386fa4e6540b1f4b0",
+          "colors": [
+            [
+              238464,
+              [
+                0,
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sync-held-tab-switch-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 39,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 39
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 43.646783,
+      "largest_sample_interval_ms": 1.576084,
+      "median_sample_interval_ms": 1.119734,
+      "fault_screenshots": [],
+      "hold_ms": 43.219269,
+      "sync_timing": {
+        "begin_before_write_ns": 92882170051595,
+        "begin_parsed_ns": 92882170289106,
+        "switch_requested_ns": 92882171521115,
+        "begin_to_hold_end_ms": 44.690459
+      }
+    },
+    {
+      "name": "sync-explicit-commit-2",
+      "scope": "tabs",
+      "kind": "application",
+      "allowed_frames": [
+        "B",
+        "C"
+      ],
+      "actions": [
+        {
+          "method": "explicit-sync-end",
+          "start_ns": 92882215872695,
+          "parsed_ns": 92882219338529,
+          "begin_before_write_ns": 92882170051595,
+          "begin_to_end_parsed_ms": 49.286934,
+          "settled_ns": 92882221511150
+        }
+      ],
+      "samples": 6,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420": 2
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a",
+        "C": "5216654b927a840c7e8e1a1d3349cb23e4f799e66a094d0782ac6a17e75d3420"
+      },
+      "duration_ms": 6.28026,
+      "largest_sample_interval_ms": 1.369372,
+      "median_sample_interval_ms": 1.139026,
+      "fault_screenshots": []
+    },
+    {
+      "name": "visible-pixel-calibration",
+      "scope": "focus_raise",
+      "kind": "calibration",
+      "allowed_frames": [
+        "B"
+      ],
+      "actions": [],
+      "samples": 7,
+      "invalid_samples": 3,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 4,
+        "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284": 3
+      },
+      "allowed_rgb_sha256": {
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 9.137647,
+      "largest_sample_interval_ms": 2.267731,
+      "median_sample_interval_ms": 1.513344,
+      "fault_screenshots": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report/focus_raise-00-unexpected-0.png",
+          "sha256": "a0e2af86691e8f82ecfa9fb439275f40edaea77f42501dff0e90600e84415eac",
+          "rgb_sha256": "fb078b365a72bb15a934420c255f0157d8e5f3ea4c89189eab57697c59283284",
+          "colors": [
+            [
+              238464,
+              [
+                241,
+                11,
+                239
+              ]
+            ]
+          ]
+        }
+      ],
+      "calibration_observed": true
+    },
+    {
+      "name": "independent-top-level-focus-and-raise",
+      "scope": "focus_raise",
+      "kind": "application",
+      "allowed_frames": [
+        "A",
+        "B"
+      ],
+      "actions": [
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882407956333,
+          "observed_target_ns": 92882412743092,
+          "settled_ns": 92882432814733
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882432818021,
+          "observed_target_ns": 92882437343011,
+          "settled_ns": 92882457474061
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882457475650,
+          "observed_target_ns": 92882460891389,
+          "settled_ns": 92882480969757
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882480971787,
+          "observed_target_ns": 92882484374321,
+          "settled_ns": 92882504442299
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882504444180,
+          "observed_target_ns": 92882507933894,
+          "settled_ns": 92882528039184
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882528041619,
+          "observed_target_ns": 92882532896159,
+          "settled_ns": 92882553069618
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882553071690,
+          "observed_target_ns": 92882555607607,
+          "settled_ns": 92882575706291
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882575708285,
+          "observed_target_ns": 92882580180676,
+          "settled_ns": 92882600310090
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882600312019,
+          "observed_target_ns": 92882603865287,
+          "settled_ns": 92882623933771
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882623935937,
+          "observed_target_ns": 92882627761463,
+          "settled_ns": 92882647856065
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882647858290,
+          "observed_target_ns": 92882652473298,
+          "settled_ns": 92882672549853
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882672551749,
+          "observed_target_ns": 92882676561835,
+          "settled_ns": 92882696659209
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882696660932,
+          "observed_target_ns": 92882699065198,
+          "settled_ns": 92882719216898
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882719218911,
+          "observed_target_ns": 92882722663068,
+          "settled_ns": 92882742726405
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882742728047,
+          "observed_target_ns": 92882746143761,
+          "settled_ns": 92882766215908
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882766218175,
+          "observed_target_ns": 92882769524692,
+          "settled_ns": 92882789710042
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882789712390,
+          "observed_target_ns": 92882793148548,
+          "settled_ns": 92882813272292
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882813274585,
+          "observed_target_ns": 92882816860553,
+          "settled_ns": 92882837093683
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882837095680,
+          "observed_target_ns": 92882839527173,
+          "settled_ns": 92882859609935
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882859616460,
+          "observed_target_ns": 92882863327993,
+          "settled_ns": 92882883386935
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882883388982,
+          "observed_target_ns": 92882886929349,
+          "settled_ns": 92882906994734
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882906996662,
+          "observed_target_ns": 92882910340655,
+          "settled_ns": 92882930416263
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-b",
+          "to": "switch-focus-a",
+          "start_ns": 92882930421872,
+          "observed_target_ns": 92882933966371,
+          "settled_ns": 92882954106151
+        },
+        {
+          "method": "real-XConfigureWindow-Above-and-XSetInputFocus",
+          "from": "switch-focus-a",
+          "to": "switch-focus-b",
+          "start_ns": 92882954107930,
+          "observed_target_ns": 92882957474617,
+          "settled_ns": 92882977576911
+        }
+      ],
+      "samples": 561,
+      "invalid_samples": 0,
+      "frame_counts": {
+        "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a": 281,
+        "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced": 280
+      },
+      "allowed_rgb_sha256": {
+        "A": "3ee13d48eb5895b66b21c208ddf2e5e4d3380dd387a57727646a4d32bd7d0ced",
+        "B": "f3a584e48e345703cc1e5f58db7daaa26c90bbe7fa7e046c1d1d89236a0e972a"
+      },
+      "duration_ms": 570.856638,
+      "largest_sample_interval_ms": 2.982115,
+      "median_sample_interval_ms": 0.989041,
+      "fault_screenshots": []
+    }
+  ],
+  "viewports": {
+    "tabs": {
+      "drawable": 2097167,
+      "kind": "workspace parent",
+      "box": [
+        0,
+        0,
+        576,
+        414
+      ]
+    },
+    "focus_raise": {
+      "drawable": 1135,
+      "kind": "root visible screen region",
+      "box": [
+        1604,
+        40,
+        576,
+        414
+      ],
+      "window_ids": [
+        2097488,
+        2097493
+      ]
+    }
+  },
+  "renderers": [
+    {
+      "session": "switch-tab-a",
+      "window_id": 2097154,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "session": "switch-tab-b",
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "session": "switch-focus-a",
+      "window_id": 2097488,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    },
+    {
+      "session": "switch-focus-b",
+      "window_id": 2097493,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+    }
+  ],
+  "process_cleanup_helper_sha256": "c260ea2d656df697add013ae68a3fb0cae1703e34e0a849d6c9aab6f7c21c5d5",
+  "helper_sha256": {
+    "isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9",
+    "measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "display_ownership": {
+    "display": ":3155",
+    "pid": 3010890,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X3155",
+        "inode": 110024683,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X3155",
+        "inode": 110024682,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "remaining_owned_pids": [],
+  "stderr_tail": "",
+  "sample_trace": {
+    "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/switch-reload-v3-gpu/report.samples.jsonl",
+    "sha256": "6f6aad45c9a46f5d2850ef39d66551c10f0144cde263fcc99d63bf6a5f403eb1"
+  },
+  "invalid_samples_by_scope": {
+    "tabs": 400,
+    "focus_raise": 0
+  },
+  "invalid_application_samples": 400
+}

@@ -1,0 +1,672 @@
+{
+  "ok": true,
+  "checks": [
+    "an already parked read socket survives exec and replies with the exact later output and cursor",
+    "new executable runs in the same broker PID with every PTY, child nonce, session identity and launcher wait peer retained",
+    "long-running command progress and raw output cursors continue through exec without loss or duplication",
+    "two tabs, split topology, alternate screen text and actual framebuffer pixels survive",
+    "application cursor mode remains active for real XTEST keyboard input",
+    "scrollback contents and the user's scrolled viewport are retained across reload",
+    "unfinished UTF-8, CSI and OSC either migrate or explicitly refuse without state loss; each actual outcome is recorded separately",
+    "exiting the restored alternate screen returns the original primary buffer",
+    "missing, non-executable, invalid ELF, zero-exit /bin/true and FIFO targets are explicitly refused while the old executable, PID, PTYs, screen, layout and exact output remain intact"
+  ],
+  "reloads": [
+    {
+      "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+      "exit_code": 0,
+      "stdout": "{\"reloaded\":true,\"broker_pid\":3120347,\"sessions\":3,\"version\":\"0.5.0\"}\n",
+      "stderr": "",
+      "elapsed_ms": 125.58007999905385,
+      "accepted": true
+    },
+    {
+      "target_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "exit_code": 0,
+      "stdout": "{\"reloaded\":true,\"broker_pid\":3120347,\"sessions\":3,\"version\":\"0.5.0\"}\n",
+      "stderr": "",
+      "elapsed_ms": 177.1079290047055,
+      "accepted": true
+    }
+  ],
+  "failures": [
+    {
+      "target_sha256": null,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: cannot open reload executable (OS error 2)\n",
+      "elapsed_ms": 3.509464004309848,
+      "accepted": false
+    },
+    {
+      "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: new executable rejected the checkpoint; original sessions kept\n",
+      "elapsed_ms": 17.923292994964868,
+      "accepted": false
+    },
+    {
+      "target_sha256": "842a0d49a0b1bc57d405e3df19d5626de82f46408b67fbe83b785c973e765bb5",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: reload target must be a native ztty executable\n",
+      "elapsed_ms": 4.378017998533323,
+      "accepted": false
+    },
+    {
+      "target_sha256": "3141dd3506805dc7a68851abaf0bd3fd8466ca0ff1746f61c8243e2a869f55e0",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: new executable does not support validated runtime reload; original sessions kept\n",
+      "elapsed_ms": 15.879897007835098,
+      "accepted": false
+    },
+    {
+      "target_sha256": null,
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: reload target must be a native ztty executable\n",
+      "elapsed_ms": 4.053033000673167,
+      "accepted": false
+    },
+    {
+      "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: session reload-beta: terminal parser has pending input; retry after a complete sequence; original session kept\n",
+      "elapsed_ms": 255.17287600087002,
+      "accepted": false
+    },
+    {
+      "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: session reload-beta: terminal parser has pending input; retry after a complete sequence; original session kept\n",
+      "elapsed_ms": 256.9359780027298,
+      "accepted": false
+    },
+    {
+      "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "ztty: session reload-beta: terminal parser has pending input; retry after a complete sequence; original session kept\n",
+      "elapsed_ms": 258.34983999084216,
+      "accepted": false
+    }
+  ],
+  "partial_parser_cases": [
+    {
+      "parser": "utf8",
+      "outcome": "rejected_without_state_loss",
+      "suffix_verified": true,
+      "before_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "after_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1"
+    },
+    {
+      "parser": "csi",
+      "outcome": "rejected_without_state_loss",
+      "suffix_verified": true,
+      "before_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "after_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1"
+    },
+    {
+      "parser": "osc",
+      "outcome": "rejected_without_state_loss",
+      "suffix_verified": true,
+      "before_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "after_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1"
+    }
+  ],
+  "rejected_target_cases": [
+    {
+      "case": "missing",
+      "target": "/tmp/ztty-runtime-reload-x9addlxn/missing-runtime",
+      "elapsed_ms": 3.509464004309848,
+      "outcome": "rejected_without_state_loss",
+      "broker_pid": 3120347,
+      "unchanged_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "input_continuity": true,
+      "screen_and_layout_unchanged": true,
+      "output_before": {
+        "reload-alpha": {
+          "bytes": 26,
+          "sha256": "edfc391bee616e7336d8f4150137ed7784e39343eb2f098b4edd54b1620cc81f",
+          "cursor": 26,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      },
+      "output_after": {
+        "reload-alpha": {
+          "bytes": 56,
+          "sha256": "51f5037420301dea1de641d958cc2444f789f8cb2a6f6d468adbe057a2127a0a",
+          "cursor": 56,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "case": "not-executable",
+      "target": "/tmp/ztty-runtime-reload-x9addlxn/not-executable",
+      "elapsed_ms": 17.923292994964868,
+      "outcome": "rejected_without_state_loss",
+      "broker_pid": 3120347,
+      "unchanged_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "input_continuity": true,
+      "screen_and_layout_unchanged": true,
+      "output_before": {
+        "reload-alpha": {
+          "bytes": 56,
+          "sha256": "51f5037420301dea1de641d958cc2444f789f8cb2a6f6d468adbe057a2127a0a",
+          "cursor": 56,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      },
+      "output_after": {
+        "reload-alpha": {
+          "bytes": 93,
+          "sha256": "e20e4cdb700432d6ecbdf4fae9f194870a97c8b4ef40d083ae35b69e5501429f",
+          "cursor": 93,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "case": "invalid-elf",
+      "target": "/tmp/ztty-runtime-reload-x9addlxn/invalid-executable",
+      "elapsed_ms": 4.378017998533323,
+      "outcome": "rejected_without_state_loss",
+      "broker_pid": 3120347,
+      "unchanged_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "input_continuity": true,
+      "screen_and_layout_unchanged": true,
+      "output_before": {
+        "reload-alpha": {
+          "bytes": 93,
+          "sha256": "e20e4cdb700432d6ecbdf4fae9f194870a97c8b4ef40d083ae35b69e5501429f",
+          "cursor": 93,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      },
+      "output_after": {
+        "reload-alpha": {
+          "bytes": 127,
+          "sha256": "3a66bc51fd2b65c15320b82589c7c59a6bc5ea090661e413a13e5230a221c8c1",
+          "cursor": 127,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "case": "zero-exit-without-protocol",
+      "target": "/usr/bin/true",
+      "elapsed_ms": 15.879897007835098,
+      "outcome": "rejected_without_state_loss",
+      "broker_pid": 3120347,
+      "unchanged_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "input_continuity": true,
+      "screen_and_layout_unchanged": true,
+      "output_before": {
+        "reload-alpha": {
+          "bytes": 127,
+          "sha256": "3a66bc51fd2b65c15320b82589c7c59a6bc5ea090661e413a13e5230a221c8c1",
+          "cursor": 127,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      },
+      "output_after": {
+        "reload-alpha": {
+          "bytes": 176,
+          "sha256": "254feb6dfdced49dcc81ccde188113e752df074987401b3ae78e4bd8bbc45b85",
+          "cursor": 176,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      }
+    },
+    {
+      "case": "fifo",
+      "target": "/tmp/ztty-runtime-reload-x9addlxn/fifo-runtime",
+      "elapsed_ms": 4.053033000673167,
+      "outcome": "rejected_without_state_loss",
+      "broker_pid": 3120347,
+      "unchanged_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+      "input_continuity": true,
+      "screen_and_layout_unchanged": true,
+      "output_before": {
+        "reload-alpha": {
+          "bytes": 176,
+          "sha256": "254feb6dfdced49dcc81ccde188113e752df074987401b3ae78e4bd8bbc45b85",
+          "cursor": 176,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      },
+      "output_after": {
+        "reload-alpha": {
+          "bytes": 203,
+          "sha256": "3057a448a9534c473165b3063cfffa68ab18069519a1289a0512b737546defbd",
+          "cursor": 203,
+          "truncated": false
+        },
+        "reload-beta": {
+          "bytes": 3951,
+          "sha256": "6dcb084517825a960673a3b3a3cb60728ef36da8d33be5b501d469a71c6c3b53",
+          "cursor": 3951,
+          "truncated": false
+        },
+        "reload-gamma": {
+          "bytes": 164,
+          "sha256": "3f266fbdb3ce7a27261eb6cc3ef40b4e69b28c3ce1986a9171ee8863ca4e61d7",
+          "cursor": 164,
+          "truncated": false
+        }
+      }
+    }
+  ],
+  "screenshots": {
+    "alternate-before": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-reload-gpu/alternate-before.png",
+      "sha256": "4253eb40902e837cc9db2ea5f378760e60a19d351b410b3f48aa9939eb11063d",
+      "width": 720,
+      "height": 460
+    },
+    "alternate-after-refusals": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-reload-gpu/alternate-after-refusals.png",
+      "sha256": "4253eb40902e837cc9db2ea5f378760e60a19d351b410b3f48aa9939eb11063d",
+      "width": 720,
+      "height": 460
+    },
+    "alternate-after": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-reload-gpu/alternate-after.png",
+      "sha256": "4253eb40902e837cc9db2ea5f378760e60a19d351b410b3f48aa9939eb11063d",
+      "width": 720,
+      "height": 460
+    },
+    "history-before": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-reload-gpu/history-before.png",
+      "sha256": "18134364af67f7366ab2e18675c4b7e76f32e19fc0b1008167436e9b7ac0c3e7",
+      "width": 359,
+      "height": 460
+    },
+    "history-after": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-reload-gpu/history-after.png",
+      "sha256": "18134364af67f7366ab2e18675c4b7e76f32e19fc0b1008167436e9b7ac0c3e7",
+      "width": 359,
+      "height": 460
+    }
+  },
+  "scope": "Linux same-PID exec, real PTY and private X11 pixels",
+  "binary_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+  "target_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+  "test_script_sha256": "661d665f70e7dd87d5f7c40f919737f6866eb5ebf930c6b8181969ca3a15cd4c",
+  "identity_fixture_suffixes": false,
+  "expected_unsupported": false,
+  "renderer": "gpu",
+  "helper_sha256": {
+    "isolated_xvfb.py": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+    "measure_runtime.py": "ccf100dc905ef332eeb4d02303aa7f61cd747b3ef48b9860f6883931a85d0eb3",
+    "measure_multiwindow.py": "e1007f2fae7318ffc2181c7bc4834d5aa1ad1f5f3e3e36cb908ccf902b5e8b25"
+  },
+  "images": {
+    "before": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+    "after": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368"
+  },
+  "display_ownership": {
+    "display": ":1852",
+    "pid": 3120338,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X1852",
+        "inode": 111308084,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X1852",
+        "inode": 111308083,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "broker_pid": 3120347,
+  "broker_start_ticks": 9357524,
+  "initial_identities": {
+    "reload-alpha": {
+      "metadata": {
+        "id": 1,
+        "created_at": 1795157809477,
+        "uri": "ztty://local/reload-alpha",
+        "name": "reload-alpha",
+        "origin": "local",
+        "pid": 3120498,
+        "broker_pid": 3120347,
+        "cols": 39,
+        "rows": 20,
+        "input_owner": "local",
+        "read_only": false,
+        "attachment": 1,
+        "visible": false
+      },
+      "child_start_ticks": 9357550,
+      "tty_rdev": 34818,
+      "tty_size": [
+        20,
+        39,
+        351,
+        460
+      ],
+      "nonce": "7f52d83b9b4c705e775f9d714cd02f61"
+    },
+    "reload-beta": {
+      "metadata": {
+        "id": 2,
+        "created_at": 1795157809568,
+        "uri": "ztty://local/reload-beta",
+        "name": "reload-beta",
+        "origin": "local",
+        "pid": 3120527,
+        "broker_pid": 3120347,
+        "cols": 39,
+        "rows": 20,
+        "input_owner": "local",
+        "read_only": false,
+        "attachment": 2,
+        "visible": false
+      },
+      "child_start_ticks": 9357559,
+      "tty_rdev": 34822,
+      "tty_size": [
+        20,
+        39,
+        351,
+        460
+      ],
+      "nonce": "fcda6eab81f8ab8e0cc4528d9abfe67f"
+    },
+    "reload-gamma": {
+      "metadata": {
+        "id": 3,
+        "created_at": 1795157809656,
+        "uri": "ztty://local/reload-gamma",
+        "name": "reload-gamma",
+        "origin": "local",
+        "pid": 3120529,
+        "broker_pid": 3120347,
+        "cols": 80,
+        "rows": 20,
+        "input_owner": "local",
+        "read_only": false,
+        "attachment": 3,
+        "visible": true
+      },
+      "child_start_ticks": 9357568,
+      "tty_rdev": 34831,
+      "tty_size": [
+        20,
+        80,
+        720,
+        460
+      ],
+      "nonce": "54f17879b76f7c413def66916802ad24"
+    }
+  },
+  "initial_layout": {
+    "version": 2,
+    "width": 720,
+    "height": 460,
+    "tabs": [
+      2,
+      3
+    ],
+    "active_tab": 1,
+    "focused": "ztty://local/reload-gamma",
+    "maximized": false,
+    "nodes": [
+      {
+        "pane": "ztty://local/reload-alpha",
+        "id": 1,
+        "created_at": 1795157809477,
+        "broker_pid": 3120347
+      },
+      {
+        "pane": "ztty://local/reload-beta",
+        "id": 2,
+        "created_at": 1795157809568,
+        "broker_pid": 3120347
+      },
+      {
+        "axis": "vertical",
+        "ratio": 500,
+        "first": 0,
+        "second": 1
+      },
+      {
+        "pane": "ztty://local/reload-gamma",
+        "id": 3,
+        "created_at": 1795157809656,
+        "broker_pid": 3120347
+      }
+    ]
+  },
+  "stream_progress": {
+    "before_reload": 1,
+    "on_reload_return": 4,
+    "still_pending_on_return": 1020,
+    "stopped_after_reload": 5
+  },
+  "output": {
+    "reload-alpha": {
+      "bytes": 363,
+      "sha256": "c679b1c844ab5b64fd404623fa9fdc40c8ee6875975c54474a9d38c65c67640e",
+      "cursor": 363,
+      "truncated": false
+    },
+    "reload-beta": {
+      "bytes": 4022,
+      "sha256": "dd7ce6c3fc6b26aedce8c09a559379af26d59d0de1cbc2ac829da446723b7b66",
+      "cursor": 4022,
+      "truncated": false
+    },
+    "reload-gamma": {
+      "bytes": 178,
+      "sha256": "3d28aa5b8cdef380e3424c9437b9a4dbd57107e81a75638921379e03e12bf235",
+      "cursor": 178,
+      "truncated": false
+    }
+  },
+  "final_identities": {
+    "reload-alpha": {
+      "metadata": {
+        "id": 1,
+        "created_at": 1795157809477,
+        "uri": "ztty://local/reload-alpha",
+        "name": "reload-alpha",
+        "origin": "local",
+        "pid": 3120498,
+        "broker_pid": 3120347,
+        "cols": 39,
+        "rows": 20,
+        "input_owner": "local",
+        "read_only": false,
+        "attachment": 1,
+        "visible": true
+      },
+      "child_start_ticks": 9357550,
+      "tty_rdev": 34818,
+      "tty_size": [
+        20,
+        39,
+        351,
+        460
+      ],
+      "nonce": "7f52d83b9b4c705e775f9d714cd02f61"
+    },
+    "reload-beta": {
+      "metadata": {
+        "id": 2,
+        "created_at": 1795157809568,
+        "uri": "ztty://local/reload-beta",
+        "name": "reload-beta",
+        "origin": "local",
+        "pid": 3120527,
+        "broker_pid": 3120347,
+        "cols": 39,
+        "rows": 20,
+        "input_owner": "local",
+        "read_only": false,
+        "attachment": 2,
+        "visible": true
+      },
+      "child_start_ticks": 9357559,
+      "tty_rdev": 34822,
+      "tty_size": [
+        20,
+        39,
+        351,
+        460
+      ],
+      "nonce": "fcda6eab81f8ab8e0cc4528d9abfe67f"
+    },
+    "reload-gamma": {
+      "metadata": {
+        "id": 3,
+        "created_at": 1795157809656,
+        "uri": "ztty://local/reload-gamma",
+        "name": "reload-gamma",
+        "origin": "local",
+        "pid": 3120529,
+        "broker_pid": 3120347,
+        "cols": 80,
+        "rows": 20,
+        "input_owner": "local",
+        "read_only": false,
+        "attachment": 3,
+        "visible": false
+      },
+      "child_start_ticks": 9357568,
+      "tty_rdev": 34831,
+      "tty_size": [
+        20,
+        80,
+        720,
+        460
+      ],
+      "nonce": "54f17879b76f7c413def66916802ad24"
+    }
+  },
+  "final_running_image_sha256": "6cc448717c1022155d2002c9f76a844108109284cb825d1f5b3bce65b41db3b1",
+  "remaining_owned_pids": [],
+  "xserver_exit_code": 0,
+  "terminal_log": ""
+}

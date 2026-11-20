@@ -1,0 +1,626 @@
+{
+  "ok": true,
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-final",
+  "binary_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+  "scope": "Owned PTY, XTEST, private clipboard and X11 pixel readback; not physical display latency",
+  "checks": [
+    "complete colored ZWJ and flag clusters reach real pixels in two-cell allocations",
+    "the ARGB window preserves configured 70 percent background alpha",
+    "real drag and Ctrl+Shift+C copy the exact original ZWJ, flag and combining sequence",
+    "SGR 5 and SGR 6 change actual pixels independently while ordinary text remains visible",
+    "unfocused blinking text stays visible without recurring repaint wakeups",
+    "font reload changes geometry while retaining the same window, broker and PTY",
+    "GPU and Xft use the same display-resolved font size and baseline",
+    "live GPU/software switching preserves the PTY and returns to the requested backend"
+  ],
+  "screenshots": {
+    "complete-graphemes": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-text-gpu/complete-graphemes.png",
+      "sha256": "57d5070ca0a10e5bae904b745e79c437a93070cecaea6dda30da82fefc0e57d9"
+    },
+    "font-reload": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-text-gpu/font-reload.png",
+      "sha256": "b0908037628febd87b2829b4de93bce023ddd056b8e8f1f14896fbd37c152d28"
+    },
+    "completed": {
+      "path": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/final-text-gpu/completed.png",
+      "sha256": "2d9f28241f4e53dc269f2f062779534ffdae16b7245076db48095f9df96c57f7"
+    }
+  },
+  "source_sha256": {
+    "src/x11.rs": "eeccb3b7e99f26fc9a1a1124405c5a0b39234ca77f24e43c50d8d36550af1f1a",
+    "src/x11/gpu.rs": "b653c6dbc28e38e8b864ce1c233cf15991b73bd4ec613c3d2e0c5f7ca6a56519",
+    "src/session.rs": "bab96c8612a6cf22810348c9136e60e663dc4b24c26296fd5dbe624d50e7e142",
+    "src/appearance.rs": "4be89f01640e24fd23aaf7f4961796abf181e27775bd8d074a7bc35074201468",
+    "src/gpu/mod.rs": "d56946bb39b7170951beee0b6d74fc9b3eafee329695f89f024c0b21a505d233",
+    "src/gpu/font.rs": "639b3161d543a68c772f67c5852de04cd1c74cb5ffdb9188fbb70be36a87ac05",
+    "src/gpu/grid.rs": "967f265d3fea2bdfb372220c11f0c18fe1b276e319dd28e75af1f2c68681b570",
+    "src/text_blink.rs": "5b8aa4dc006956d547456dc1ea994227916f35693c1040dea430cd6d2d16594c",
+    "native/font_bridge.c": "cc7c5137fa6b5e9010bcaa3cdc7a98cf870c2a237a96b22d59970e5707a9f654",
+    "tests/text_gpu_gui.py": "4c04070ff0b1e9dbc4fc5f98647deaa89bc0917f1462139625b837bc20aa7928",
+    "tools/gui_renderer.py": "bcec80b0b6da986ccf29d2e0d8a10fe56e0d685c66d2e0fd551c8153ebd8caf9"
+  },
+  "display_ownership": {
+    "display": ":13485",
+    "pid": 3121261,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X13485",
+        "inode": 111322952,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X13485",
+        "inode": 111322951,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "renderer_before": {
+    "window_id": 2097155,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+  },
+  "grid": {
+    "cell_width": 11,
+    "cell_height": 26,
+    "depth": 32
+  },
+  "background_alpha": 178,
+  "copied_utf8_sha256": "d52553cb5842b25483223a3be75fdcd76fa9a0b9a3c031b29c561707ebd3b63b",
+  "blink_samples": [
+    {
+      "ms": 0.491,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 21.397,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 42.828,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 64.081,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 85.511,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 106.598,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 128.063,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 149.255,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 170.858,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 191.87,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 213.398,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 234.203,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 255.213,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 276.073,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 297.206,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 318.102,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 339.684,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 360.809,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 382.478,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 403.316,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 424.807,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 445.692,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 467.326,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 488.686,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 510.853,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 532.078,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 553.61,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 574.642,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 596.611,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 617.583,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 639.352,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 660.746,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 682.867,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 704.217,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 725.403,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 746.631,
+      "visible": [
+        false,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 767.497,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 788.556,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 810.4,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 831.627,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 853.181,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 874.487,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 896.641,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 917.847,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 939.804,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 960.809,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 982.455,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1003.619,
+      "visible": [
+        false,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1025.326,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1046.249,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1067.434,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1088.316,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1109.674,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1130.569,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1152.179,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1173.068,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1194.447,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1215.624,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1238.028,
+      "visible": [
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "ms": 1259.068,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1280.939,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1302.459,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1323.872,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    },
+    {
+      "ms": 1345.044,
+      "visible": [
+        true,
+        false,
+        true
+      ]
+    }
+  ],
+  "unfocused_idle": {
+    "seconds": 0.55,
+    "context_switch_delta": {
+      "voluntary_ctxt_switches": 0,
+      "nonvoluntary_ctxt_switches": 0
+    }
+  },
+  "backend_font_boxes": {
+    "software": [
+      1,
+      5,
+      43,
+      19
+    ],
+    "gpu": [
+      1,
+      5,
+      44,
+      19
+    ]
+  },
+  "renderer_after": {
+    "window_id": 2097155,
+    "requested": "gpu",
+    "actual": "gpu",
+    "driver": "llvmpipe (LLVM 23.1.1, 256 bits)"
+  },
+  "remaining_owned_pids": [],
+  "display_cleanup": {
+    "exit_code": 0,
+    "pid_lock_exists": false,
+    "socket_exists": false,
+    "lease_exists": false
+  },
+  "stderr_tail": ""
+}

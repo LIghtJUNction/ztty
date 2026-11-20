@@ -1,0 +1,14 @@
+{
+  "before": {
+    "base64": "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEUlEQVR4nGMQd84Vd85lgFAAFHoDHcyfTYQAAAAASUVORK5CYII=",
+    "sha256": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+    "bytes": 74
+  },
+  "after": {
+    "base64": "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEUlEQVR4nGMQd84Vd85lgFAAFHoDHcyfTYQAAAAASUVORK5CYII=",
+    "sha256": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+    "bytes": 74
+  },
+  "zlib_version": "1.3.2",
+  "zlib_runtime_version": "1.3.1.zlib-ng"
+}
