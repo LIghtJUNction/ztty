@@ -30,9 +30,9 @@
 
 每组画面直接比较 1,492,992 字节的 RGBA 内容。原始样本、环境、子模块版本和逐组比较结果见 [results.json](results.json)。
 
-![Unicode、组合字符、emoji、选择区和块光标](unicode.png)
+[Unicode、组合字符、emoji、选择区和块光标（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
-![粗体、斜体、下划线、删除线和选择区](styled.png)
+[粗体、斜体、下划线、删除线和选择区（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## 提交耗时复测
 

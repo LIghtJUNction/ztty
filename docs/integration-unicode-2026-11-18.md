@@ -59,9 +59,9 @@ X11 将连续需要更新的行合并复制。每个分屏窗格继续使用自�
 
 实际 GUI 检查使用隔离的 Xvfb/X11、真实 PTY、键鼠事件及窗口像素。以下为本轮最终二进制的分屏截图。
 
-![最终二进制的实际分屏窗口](measurements/integration-unicode-2026-11-18/workspaces.png)
+[最终二进制的实际分屏窗口（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
-其他截图：[命令面板](measurements/integration-unicode-2026-11-18/daily-workflow/command-palette.png) · [历史搜索](measurements/integration-unicode-2026-11-18/daily-workflow/history-search.png) · [同步帧释放](measurements/integration-unicode-2026-11-18/repaint/sync-release.png) · [Sixel](measurements/integration-unicode-2026-11-18/sixel.png)
+其他截图：[命令面板（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) · [历史搜索（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) · [同步帧释放（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) · [Sixel（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## 4. Unicode 核心微基准
 

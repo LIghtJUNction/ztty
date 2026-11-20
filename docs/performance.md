@@ -490,4 +490,4 @@ The original [GUI result](measurements/gui-2026-11-18.json) and
 preserved. Detailed implemented and tested boundaries are in
 [protocols.md](protocols.md).
 
-![Actual ztty output showing UTF-8, ANSI colors, RGB colors, and an OSC 8 link](assets/ztty-preview.png)
+[Actual ztty output showing UTF-8, ANSI colors, RGB colors, and an OSC 8 link（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)

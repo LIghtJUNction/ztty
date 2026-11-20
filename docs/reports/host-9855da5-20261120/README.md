@@ -11,7 +11,7 @@
 与 [9f 功能检查点](../host-9f5a77a-20261120/README.md)相比，生产范围只改变 `src/x11/gpu.rs`：
 当请求 Auto 且 `LIBGL_ALWAYS_SOFTWARE` **恰为 `1`** 时，在初始化 GPU 前选择已有 software 路径。
 显式 GPU、变量未设或其他值沿用原有选择逻辑。
-[固定对象对照](source/production-change.json)和[实际补丁](source/production-change.patch.gz)保留了范围。
+[固定对象对照](source/production-change.json)和[实际补丁（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)保留了范围。
 
 本页记录新的本地门禁、32 项定向 GUI 和三组宿主性能采集。
 正式标签 [v0.5.0](https://github.com/LIghtJUNction/ztty/tree/v0.5.0) 指向
@@ -155,7 +155,7 @@ Ghostty 与 Kitty 各 33 次只记录 CPR 与 payload hash，没有完整屏幕�
 加上 paired 的 66 次 ztty 窗口运行，总计 99 次完整文本检查、66 次 CPR/hash 范围检查。
 应用及专用 X server 的 sampled swap 均为 0；resident PSS 与 swap 保持分列。
 
-[完整 JSON](performance/terminals/terminals.json.gz)、[原图](performance/terminals/terminals.svg)及
+[完整 JSON（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)、[原图](performance/terminals/terminals.svg)及
 [规模图](performance/terminals/terminals-scaling.svg)保留全部三轮。
 Ghostty ELF SHA-256 为 `ef28bf3a0f6ead69014da86ab0c9a2ef30fcf3bf297a6a27c4c18dfc80a56a62`，
 Kitty 为 `e3aec26698a05b4c024a672e92365649a8fdeff8e884e432f345b14d54e20dd7`；身份前后由原件校验。
@@ -173,7 +173,7 @@ Kitty 为 `e3aec26698a05b4c024a672e92365649a8fdeff8e884e432f345b14d54e20dd7`；�
 
 根维护面减少 9,543 行，展开后的总代码增加 3,418 行；独立库迁移与共享 Wayland 的新增实现需要一起计数。
 相对 9f，本次根/展开均只增加 7 行、263 B，库不变。
-[完整 audit](size/audit.json.gz)、[摘要](size/SUMMARY.md)与[执行回执](size/invocation.json)保留逐文件/blob 证据；
+[完整 audit（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)、[摘要](size/SUMMARY.md)与[执行回执](size/invocation.json)保留逐文件/blob 证据；
 19 个文件的 blob 相同而归属改变，不能算作实现代码删除。旧 37,848 行来自不同口径，未混入本表。
 
 五个 gitlink、Cargo manifest 与锁文件均未因本次修复改变，六库 registry 消费证据继续引用
@@ -190,9 +190,9 @@ API 0.1.0 的发布 VCS 仍为 36b367ff，而非当前应用 SHA。
 | [gui/acceptance.json](gui/acceptance.json) | `2ef3b60aad2c6b6b6d6248b665def7e80d4cbeaeac8e06284be241a2a2765c2f` |
 | [gui/verified-acceptance.json](gui/verified-acceptance.json) | `5ba3188db7f33361f8097d8fbed24dc226c065f69a1bbe419d30b8785239f25b` |
 | [performance/cohort-receipt.json](performance/cohort-receipt.json) | `2261bf8737db349c64ea8abc6f89b9a43f5b5217a682c7b37f8bad33da7fadcc` |
-| [performance/throughput/paired.json.gz](performance/throughput/paired.json.gz) | `f3d6455464647119ed5eab9a4a6d1b89e49b146981ee5f8d29e283dd5cbcb9cc` |
-| [performance/terminals/terminals.json.gz](performance/terminals/terminals.json.gz) | `4fee5064151ce7742ffd8a4faa579032b14ac00924735bd4a77fe74dc4ad87ad` |
-| [size/audit.json.gz](size/audit.json.gz) | `3a8145b504404acdc0195221973fb3fb5c02a0044f6b0b59324f8a491a2dc0da` |
+| [performance/throughput/paired.json.gz（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) | `f3d6455464647119ed5eab9a4a6d1b89e49b146981ee5f8d29e283dd5cbcb9cc` |
+| [performance/terminals/terminals.json.gz（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) | `4fee5064151ce7742ffd8a4faa579032b14ac00924735bd4a77fe74dc4ad87ad` |
+| [size/audit.json.gz（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) | `3a8145b504404acdc0195221973fb3fb5c02a0044f6b0b59324f8a491a2dc0da` |
 
 ```sh
 python3 docs/reports/host-9855da5-20261120/verify-record.py

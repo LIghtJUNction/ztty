@@ -61,7 +61,7 @@ all **27 vectors** against the immutable candidate with SHA-256
 The [JSON evidence](measurements/input-x11-2026-11-18.json) records exact expected
 and received bytes, binary/test/source hashes, the source commit and changes,
 pointer mapping, verified Xvfb socket ownership, and completed process cleanup.
-The [actual window capture](assets/input-x11-2026-11-18.png) was visually checked:
+The [actual window capture（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) was visually checked:
 text is readable on the black background, overlays are closed, and no stray
 protocol bytes or drawing artifacts appear.
 

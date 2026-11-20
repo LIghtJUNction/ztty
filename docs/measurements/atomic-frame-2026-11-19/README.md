@@ -43,7 +43,7 @@ Binary SHA-256: `6739a4f1d535ada1885cafed39a808cbe667cc527f83f19769d664be5597de0
 
 Package SHA-256: `d8c2d70cc6e7e040853e8323e0c4de99b86a50eba684746302d3ed16ebe99d1c`
 
-![Integrated scrollback frame](integrated-0.3.1-scroll.png)
+[Integrated scrollback frame（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## Original baseline verification
 
@@ -98,7 +98,7 @@ Run the regression from the candidate source tree:
 python3 tests/repaint_gui.py --binary ./target/release/ztty
 ```
 
-![Scrollback and its return prompt are committed together](single-publish-scroll.png)
+[Scrollback and its return prompt are committed together（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## Scope
 

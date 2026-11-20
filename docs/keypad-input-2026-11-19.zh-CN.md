@@ -30,7 +30,7 @@
 | 小键盘搜索／命令面板场景 | 4 通过 |
 | 测试结束后仍存活的自有进程 | 0 |
 
-完整预期值与实际字节见 [JSON 验收记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/keypad-routing-2026-11-19.json)。[窗口截图](https://github.com/LIghtJUNction/ztty/blob/main/docs/assets/keypad-routing-2026-11-19.png) 已检查，文字清晰，覆盖层退出后没有残留。
+完整预期值与实际字节见 [JSON 验收记录](https://github.com/LIghtJUNction/ztty/blob/main/docs/measurements/keypad-routing-2026-11-19.json)。[窗口截图（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) 已检查，文字清晰，覆盖层退出后没有残留。
 
 测试使用独立 Xvfb、私有 broker、原始 PTY 和真实 XTEST 按键。物理小数点键根据 `KP_Delete` 所在键位定位，避免测试误用键盘映射中的另一个 `KP_Decimal` 别名。输入重置同时恢复应用键盘和光标模式，防止用例之间继承模式。
 

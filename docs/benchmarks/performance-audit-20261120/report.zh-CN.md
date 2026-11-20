@@ -93,9 +93,9 @@
 
 原始记录：[gpu-ab.json](gpu-ab.json)；基准：[gpu_row_scratch_benchmark.rs](../../../examples/gpu_row_scratch_benchmark.rs)。
 
-![Unicode 混合文本、块光标与选择区](unicode.png)
+[Unicode 混合文本、块光标与选择区（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
-![粗体、斜体、下划线、删除线与选择区](styled.png)
+[粗体、斜体、下划线、删除线与选择区（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## 4. 还有哪些性能空间
 

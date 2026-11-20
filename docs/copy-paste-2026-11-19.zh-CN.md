@@ -21,7 +21,7 @@
 
 右键只打开临时菜单，选择 **Paste** 后才发送文本。没有可复制的选择时，**Copy** 显示为不可用；只读观察窗口仍可复制，**Paste** 则不可用。点击菜单外部会关闭菜单，菜单里的方向键和点击不会进入终端程序。原有 `Ctrl+C` 仍交给终端程序处理。[13 项交互结果](measurements/copy-paste-2026-11-19/copy-paste-gui.json)
 
-![隔离测试窗口中的复制粘贴菜单](measurements/copy-paste-2026-11-19/copy-paste-menu.png)
+[隔离测试窗口中的复制粘贴菜单（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 图中内容全部由测试夹具生成。菜单沿用配置中的选择前景色、背景色，最终检查同时验证了实际窗口像素与复制结果。
 

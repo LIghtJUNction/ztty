@@ -38,7 +38,7 @@ cleared pixels. PNG capture happens after those assertions.
 ## Recorded development-candidate result
 
 [Machine-readable passing report](measurements/sixel-gui-xvfb-2026-11-18.json),
-[captured PNG](assets/sixel-x11-2026-11-18.png).
+[captured PNG（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view).
 
 The run timestamp is 2026-11-17T22:15:39 UTC; the filenames use the 2026-11-18
 development batch name. Binary SHA-256:
@@ -76,7 +76,7 @@ footer, and no overlapping text. Its SHA-256 is:
 aa64fca868aeca8b1f23b9fe34b39d61addefd77cb3ee7c710c1e5c535435d75
 ```
 
-![Actual Sixel window capture](assets/sixel-x11-2026-11-18.png)
+[Actual Sixel window capture（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## Native display blocker
 

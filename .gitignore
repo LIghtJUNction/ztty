@@ -8,3 +8,13 @@ __pycache__/
 
 # Isolated targets for concurrent performance work.
 /target-*/
+
+# Generated validation attachments; see docs/artifact-storage.md.
+/docs/assets/**/*.png
+/docs/benchmarks/**/*.png
+/docs/benchmarks/**/*.gz
+/docs/benchmarks/**/*.bin
+/docs/measurements/**/*.png
+/docs/measurements/**/*.bin
+/docs/reports/**/*.png
+/docs/reports/**/*.gz

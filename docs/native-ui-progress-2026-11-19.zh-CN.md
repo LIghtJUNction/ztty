@@ -111,7 +111,7 @@ flowchart TD
 
 下图来自最终验收中实际运行的 `examples/native_ui.py`。程序协商 ZUI/1 能力并上传图片；XTEST 点击 Continue 后，示例收到结构化 action，提交新场景版本，进度达到 100%。截图没有重绘或修改，已进行视觉复核。
 
-![最终整合二进制的原生 UI：点击 Continue 后进度达到 100%](assets/native-ui-atomic-2026-11-19.png)
+[最终整合二进制的原生 UI：点击 Continue 后进度达到 100%（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 PNG 为 24,072 字节，SHA-256 为 `9c65b58fbe8a1ded0225bb599c2426f293c6596ce7acf65169d6f06406e3de6b`，Git blob 为 `b153fdb54726e99ed645fb74fe51ba3502e24f02`。[验收摘要](measurements/native-ui-atomic-2026-11-19/summary.json)将此截图与上述 ELF 绑定。
 
@@ -131,7 +131,7 @@ PNG 为 24,072 字节，SHA-256 为 `9c65b58fbe8a1ded0225bb599c2426f293c6596ce7a
 
 ### 历史宿主检查：`9c2ff7d`
 
-以下保留原子帧合并之前的独立宿主结果。历史截图仍见[原宿主 demo](assets/native-ui-demo-2026-11-19.png)，其 SHA-256 为 `19c3e073399356930c6f3c985c87207cdc3626728cdebb94f445258c2dfcd043`。本节的图片分配量和 DSR 时间均属于该历史源码。
+以下保留原子帧合并之前的独立宿主结果。历史截图仍见[原宿主 demo（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)，其 SHA-256 为 `19c3e073399356930c6f3c985c87207cdc3626728cdebb94f445258c2dfcd043`。本节的图片分配量和 DSR 时间均属于该历史源码。
 
 这轮历史验收对应宿主提交 `9c2ff7d4ef1187feb130617a720cdec8c804de98`，同一个 ELF 的 SHA-256 为 `0038181826e86eff11e97de53884e427a508f35ddc60830920e7340d56ed4440`。测试时的修改随后原样提交；源码 attestation 确认构建和两组 GUI 报告中的源文件哈希均与提交一致。
 

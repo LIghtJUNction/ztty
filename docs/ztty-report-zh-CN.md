@@ -8,7 +8,7 @@
 
 项目：[LIghtJUNction/ztty](https://github.com/LIghtJUNction/ztty)。最终原生制品构建：[Release candidate 44165748395](https://github.com/LIghtJUNction/ztty/actions/runs/44165748395)。报告与安装包归档：[Google Drive / ztty](https://drive.google.com/drive/folders/1XwquftPqNH9H6fjScYw6FPpn5QdxZZxa)。
 
-![实际 Hyprland/XWayland 窗口中的照片与透明 PNG](https://raw.githubusercontent.com/LIghtJUNction/ztty/main/docs/assets/kitty-graphics-hyprland.png)
+[实际 Hyprland/XWayland 窗口中的照片与透明 PNG（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## 三项图片验收
 

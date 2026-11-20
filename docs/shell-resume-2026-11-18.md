@@ -66,7 +66,7 @@ Linux 的 OSC 7 目录继承已有实现，本轮补的是实际输入到子进�
 
 另有三种不可信或非法目录标记：远端主机名、无效百分号转义和编码 NUL。它们均回退到原启动目录。七个新增场景复用原有私有 Xvfb、真实 PTY、键盘事件和进程清理，工作区验收由 10 项扩展到 **17 项**。[实际结果](measurements/shell-resume-2026-11-18/workspaces.json) · [验收代码](../tests/workspaces.py)
 
-![真实分屏：右侧子进程显示继承后的目录](measurements/shell-resume-2026-11-18/workspace-cwd.png)
+[真实分屏：右侧子进程显示继承后的目录（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 截图已经目检：两侧文字清晰，右侧显示实际继承目录，界面保持黑底和留白。
 

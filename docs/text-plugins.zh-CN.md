@@ -104,6 +104,6 @@ GUI 检查使用新建的私有 Xvfb、独立 broker socket 和合成文本，�
 
 [验证汇总](measurements/zplugin-2026-11-19/validation.json) · [CLI 与生命周期](measurements/zplugin-2026-11-19/cli.json) · [GUI 检查](measurements/zplugin-2026-11-19/gui.json) · [基线复现](measurements/zplugin-2026-11-19/group-cleanup-baseline.json) · [依赖特征图](measurements/zplugin-2026-11-19/features.log)
 
-![命令面板中的注册动作](measurements/zplugin-2026-11-19/registered-actions.png)
+[命令面板中的注册动作（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
-![选区处理后的轻量复制反馈](measurements/zplugin-2026-11-19/copied-selection.png)
+[选区处理后的轻量复制反馈（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)

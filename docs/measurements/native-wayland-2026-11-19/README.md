@@ -76,9 +76,9 @@ Wayland 增量依赖如下；原有 X11、字体和 EGL/GLES 依赖仍然需要�
 
 ## 截图与未测边界
 
-![实际原生窗口](initial.png)
+[实际原生窗口（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
-[缩放后](resized.png)、[实时历史](history-live.png)、[向上滚动](history-scrolled.png)、[同步前](sync-before.png)、[同步中](sync-during.png)、[同步后](sync-after.png) 保存了相同测试产生的完整截图。内容全部为合成测试数据。
+[缩放后（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)、[实时历史（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)、[向上滚动（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)、[同步前（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)、[同步中（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)、[同步后（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) 保存了相同测试产生的完整截图。内容全部为合成测试数据。
 
 本轮没有验收物理显示器、硬件 GPU、触控板或完整鼠标协议、真实输入法、系统剪贴板、HiDPI、分数缩放、多窗口/标签/分屏、共享 broker/MCP、自定义按键或文本插件。复杂文字排版和图形协议沿用公共渲染器，但本组 Wayland 检查不能单独证明其完整正确性。功能差异见 [原生 Wayland 使用与边界](../../native-wayland.zh-CN.md)。
 

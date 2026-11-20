@@ -89,7 +89,7 @@ Unicode 没有得到提速证据。新版三次运行统计量为 71.710–118.1
 
 计时以外增加了独立的终态验证。每个窗口重新播放同一负载，直接请求光标位置，必须得到第 32 行、第 120 列，避免先重置光标而掩盖丢字；ztty 还通过本轮私有 broker 核对全部 32 行的最终文本。随后恢复相同静态页。吞吐计时里的负载和 HOME／DSR 尾部保持原样，验证自身的耗时没有混入吞吐分母。[完整性与发布门槛测试](../../tests/test_throughput_benchmark.py)
 
-像素呈现由另外的真实 X11 测试验证。最终二进制通过七项检查，包括输出后静默时最终像素仍出现、洪水输出期间另一个窗口的 XTEST 和 broker 输入可见、旧画面 Expose 不吞掉输入优先级、同步帧在释放前保持已提交画面，以及同步超时和同块 begin／end。一次验收中，静默最终标记约 2.74 ms 后被观察到，洪水输出期间 XTEST 回显约 1.18 ms、broker 回显约 1.26 ms；这些是隔离 Xvfb 内的观测，不是真实显示器上的硬件输入延迟。[验收 JSON](throughput-evidence-2026-11-18/repaint-gui.json) · [最终帧截图](throughput-evidence-2026-11-18/screenshots/quiet-final-frame.png) · [并发交互截图](throughput-evidence-2026-11-18/screenshots/fairness-interaction.png)
+像素呈现由另外的真实 X11 测试验证。最终二进制通过七项检查，包括输出后静默时最终像素仍出现、洪水输出期间另一个窗口的 XTEST 和 broker 输入可见、旧画面 Expose 不吞掉输入优先级、同步帧在释放前保持已提交画面，以及同步超时和同块 begin／end。一次验收中，静默最终标记约 2.74 ms 后被观察到，洪水输出期间 XTEST 回显约 1.18 ms、broker 回显约 1.26 ms；这些是隔离 Xvfb 内的观测，不是真实显示器上的硬件输入延迟。[验收 JSON](throughput-evidence-2026-11-18/repaint-gui.json) · [最终帧截图（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) · [并发交互截图（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## 4. 环境、验证与制品身份
 

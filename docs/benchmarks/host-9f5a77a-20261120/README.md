@@ -75,7 +75,7 @@ output 单独把 broker/writer/Xserver 绑到 CPU 23/22/21。
 
 新候选 1 / 10 窗口应用 PSS 分别增加约 110.35 / 129.43 MiB。
 这份检查点暴露的问题由宿主渲染路径继续调查；后续修复与复验应使用新的源码和独立样本。
-原始 [paired.json.gz](attempt2/throughput/paired.json.gz)与首次失败均保留。
+原始 [paired.json.gz（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)与首次失败均保留。
 
 ### 随后的独立内存诊断
 
@@ -128,7 +128,7 @@ Ghostty 33 次和 Kitty 33 次保留 CPR 与 payload hash，没有完整屏幕�
 加上 paired 的 66 次 ztty 窗口运行，本报告总共 99 次完整文本检查、66 次 CPR/hash 范围检查。
 不能把 99 写成三应用矩阵单独的 ztty 数量。
 
-完整 [terminals.json.gz](attempt2/terminals/terminals.json.gz)保存三轮和区间；
+完整 [terminals.json.gz（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)保存三轮和区间；
 [原始图](attempt2/terminals/terminals.svg)与[规模图](attempt2/terminals/terminals-scaling.svg)沿用该矩阵的数据。
 应用与专用 X server 的 sampled swap 均记录为 0；resident PSS 与 swap 分列，未相加成唯一物理内存总量。
 

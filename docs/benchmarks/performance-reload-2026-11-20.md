@@ -227,7 +227,7 @@ env -u ZTTY_SOCKET /absolute/path/to/new-ztty --name new-work -e /bin/bash
 
 首次拒绝的真实窗口截图已人工检查，显示明确的 no-text / application image-paste 提示：
 
-![合成图片专用剪贴板被明确拒绝，未进入 PTY](performance-reload-20261120/clipboard-image-after/image-only-refused.png)
+[合成图片专用剪贴板被明确拒绝，未进入 PTY（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 **默认快捷键的用途不同。** ztty 的 `Ctrl+Shift+V` 是文本粘贴；普通 `Ctrl+V` 交给前台应用。Codex CLI 0.170.0 的[对应版本源码](https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/chatwidget/clipboard.rs)把 `Ctrl+V` 交给自己的图片附件读取流程；它也可[识别粘贴的已有图片文件路径](https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/bottom_pane/chat_composer.rs)。因此在 Codex 输入框粘贴图片应使用 `Ctrl+V`，不加 Shift。自定义快捷键、前台应用和剪贴板访问权限仍会影响这条路径。
 

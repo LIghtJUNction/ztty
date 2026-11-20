@@ -31,9 +31,9 @@ zsh 默认以 `PROMPT_SP` 保护未换行的输出，用反显、加粗的 `%` �
 | 28 px | 确有未换行内容 | 通过 | 通过 | `"x%"` → `"x%"` |
 | 28 px | 旧宽输出排队后窗口缩窄 | 失败（预期重现） | 通过 | `"%"` → `""` |
 
-![修复前：受控窗口重排后留下百分号](before/padding-28-resize-queued-marker.png)
+[修复前：受控窗口重排后留下百分号（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
-![修复后：同一受控场景清除了百分号](after/padding-28-resize-queued-marker.png)
+[修复后：同一受控场景清除了百分号（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 全部受控截图见 [before](before/) 与 [after](after/)。另完成八项套件标记检查，并在 padding=0/28 下各启动一次真实 oh-my-ztty shell：两次均无独立 `%`，PTY 与模型尺寸一致。这是正常启动兼容性检查；修复的因果证据来自受控回归。涉及个人配置的套件原始 JSON 和截图仅留本地，公开 [验证摘要](validation.json)。
 

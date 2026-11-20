@@ -43,7 +43,7 @@ GUI 用例也修正了两处测试问题。Kitty 的省略坐标依赖当前左�
 | 图形扩展 GPU 检查 | 7/8，占位图邻格被污染 | 8/8 |
 | 应保持背景的邻格 RGBA | 实际 `[255, 0, 0, 255]` | 预期背景 `[24, 36, 48, 191]` |
 
-这里比较的是功能正确性，没有使用耗时差声称性能提高。原始结果见 [修复前](baseline-gpu.json)、[GPU](graphics-gpu.json)、[软件渲染](graphics-software.json)。[最终占位图截图](placeholder-gpu.png) 已检查，图像只出现在预期字符格和相对位置。
+这里比较的是功能正确性，没有使用耗时差声称性能提高。原始结果见 [修复前](baseline-gpu.json)、[GPU](graphics-gpu.json)、[软件渲染](graphics-software.json)。[最终占位图截图（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view) 已检查，图像只出现在预期字符格和相对位置。
 
 ## 复查命令
 

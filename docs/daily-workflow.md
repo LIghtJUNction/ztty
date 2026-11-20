@@ -228,9 +228,9 @@ record the exact binary and source hashes. Earlier failed checks led to the
 invalid-region navigation fix and the visible config-error diagnostic; the
 linked final records are the passing reruns.
 
-![Actual history search](assets/daily-workflow/history-search.png)
+[Actual history search（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
-![Actual temporary command palette](assets/daily-workflow/command-palette.png)
+[Actual temporary command palette（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ## Configuration-directory race regression
 

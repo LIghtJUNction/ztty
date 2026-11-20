@@ -130,7 +130,7 @@ API 包仍为
 
 固定比较 f2db31d7ea35bf1a0554e76d69d2e44faafd0cab → 9f5a77a。
 同一[审计脚本](size/audit.py)递归枚举生产根中的受 Git 管理 blob 和 gitlink，
-完整规则、逐文件摘要和排除项保存在无损压缩的 [audit.json.gz](size/audit.json.gz)。
+完整规则、逐文件摘要和排除项保存在无损压缩的 [audit.json.gz（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)。
 
 | 范围 | 文件数：前 → 后 | 物理行：前 → 后 | 最终字节 |
 | --- | --- | --- | --- |

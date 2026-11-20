@@ -155,7 +155,7 @@ The actual candidate image was also inspected visually: the blue final marker,
 complete text rows, dark background and padding are present without clipping.
 The new two-session GUI suite's interaction image was inspected as well.
 
-![Actual final window from run 6; all six final images have identical bytes](repaint-ab-2026-11-18.png)
+[Actual final window from run 6; all six final images have identical bytes（历史附件）](https://drive.google.com/file/d/10Lf0VuCzh5I2y54kYfwgHCcyFO7KXvpb/view)
 
 ### Host pressure and cleanup
 
