@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-11-20T02:46:46.925593+00:00",
+  "failed_attempt_directory": "WORKTREE/artifacts/final-performance-9f5a77a-20261120/throughput",
+  "failed_attempt_preserved": true,
+  "completed_timing_samples": 0,
+  "after_binary_started": false,
+  "terminal_stderr": "ztty: unknown appearance option (renderer = auto); /tmp/ztty-compare-wujb0euy/ztty.conf:4\n",
+  "error": "TimeoutError('timed out')",
+  "classification": "collector configuration incompatible with frozen legacy baseline",
+  "before_source": "155fea51aa138b0503ea1d80be4252aacb2c61a7",
+  "before_binary_sha256": "9f58c1a679ccca62cffd09d9991fbbb9c35fff4254f7d64dfc5eedaa6a2bb704",
+  "original_wrapper_sha256": "c1b2f21af58790771cc8dd7693b4163057bf3a261803c8def07f50d7cd888f54",
+  "corrected_wrapper_sha256": "2a0e6f52d43404c8d2764d87ea14a71aea7e0d15c544bdf192f5b585ce961a2c",
+  "explicit_compatibility_argument": "--before-application-default-renderer",
+  "unchanged_guard": "old source and ELF hash remain checked before/after every case",
+  "original_files": {
+    "paired.json": "cd41cf005586bbba8124b6322b2dded6406e22b3b9b3246100dc06cded576f81",
+    "paired.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "paired.stdout.log": "65ae2c8a3dfc172ec09871d603faa0e4d0516cd6ce076bd40057479b9ea713ec",
+    "receipt.json": "f99be61c5d90528476c8e0048c7bf103d7a17e89931f65801b2d80a4133d671f"
+  },
+  "status": "diagnosed; no retry performed"
+}

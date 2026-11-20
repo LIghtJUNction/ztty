@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "ok": true,
+  "launch_sha256": "9a3cf5f7c38ad56f64c12ede145be790b2a09b879703a7e00244dd9e7e72a18c",
+  "phases": [
+    {
+      "phase": "throughput",
+      "exit_code": 0,
+      "elapsed_seconds": 33.493077635008376,
+      "receipt_sha256": "b8df75cd77b49ba0eec8d6c64ecbd890713e36fa591fa3b45e83b5e2abe6c610"
+    },
+    {
+      "phase": "output",
+      "exit_code": 0,
+      "elapsed_seconds": 6.478063215996372,
+      "receipt_sha256": "a7c9bd550dc398806062a83cbc13609f7bb8b83b4290151e94c69096d0c24b13"
+    },
+    {
+      "phase": "terminals",
+      "exit_code": 0,
+      "elapsed_seconds": 136.77459188700595,
+      "receipt_sha256": "2afac56794ccdf5b7ae80d589fcf7784594dd3341c8059c21f1fba728cf5609f"
+    }
+  ],
+  "completed": "2026-11-20T02:55:33.295163+00:00",
+  "not_started": []
+}

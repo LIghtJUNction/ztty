@@ -1,0 +1,23 @@
+55edbc2ea000-7ffea1670000 ---p 00000000 00:00 0                          [rollup]
+Rss:              142612 kB
+Pss:              108370 kB
+Pss_Dirty:         35844 kB
+Pss_Anon:          35832 kB
+Pss_File:          72526 kB
+Pss_Shmem:            12 kB
+Shared_Clean:      59024 kB
+Shared_Dirty:        480 kB
+Private_Clean:     47504 kB
+Private_Dirty:     35604 kB
+Referenced:       118556 kB
+Anonymous:         36072 kB
+KSM:                   0 kB
+LazyFree:              0 kB
+AnonHugePages:         0 kB
+ShmemPmdMapped:        0 kB
+FilePmdMapped:         0 kB
+Shared_Hugetlb:        0 kB
+Private_Hugetlb:       0 kB
+Swap:                  0 kB
+SwapPss:               0 kB
+Locked:                0 kB

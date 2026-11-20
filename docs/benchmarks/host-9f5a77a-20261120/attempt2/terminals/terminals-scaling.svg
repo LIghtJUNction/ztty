@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img" aria-labelledby="title desc">
+<title id="title">Terminal memory scaling by window count and process mode</title>
+<desc id="desc">Measured application PSS in MiB. Each panel has its own vertical scale. PTY child workloads and Xvfb memory are recorded separately.</desc>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#e8eaed}.muted{fill:#aeb5c2}</style>
+<rect width="1120" height="520" fill="#111318"/>
+<text x="36" y="43" font-size="27">Terminal memory scaling</text>
+<text x="36" y="73" font-size="14" class="muted">Application PSS · MiB · 3 fresh-process runs · isolated X11 software rendering</text>
+<text x="36" y="110" font-size="18">idle / shared</text>
+<line x1="84" x2="524" y1="310.00" y2="310.00" stroke="#343944"/>
+<text x="76" y="314.00" text-anchor="end" font-size="12" class="muted">0.0</text>
+<line x1="84" x2="524" y1="253.33" y2="253.33" stroke="#343944"/>
+<text x="76" y="257.33" text-anchor="end" font-size="12" class="muted">305.2</text>
+<line x1="84" x2="524" y1="196.67" y2="196.67" stroke="#343944"/>
+<text x="76" y="200.67" text-anchor="end" font-size="12" class="muted">610.4</text>
+<line x1="84" x2="524" y1="140.00" y2="140.00" stroke="#343944"/>
+<text x="76" y="144.00" text-anchor="end" font-size="12" class="muted">915.5</text>
+<text x="84.00" y="332" text-anchor="middle" font-size="12" class="muted">1</text>
+<text x="524.00" y="332" text-anchor="middle" font-size="12" class="muted">10</text>
+<polyline points="84.00,283.99 524.00,248.60" fill="none" stroke="#72a7ff" stroke-width="2"/>
+<circle cx="84.00" cy="283.99" r="3.5" fill="#72a7ff"><title>ztty, 1 windows: 140.09 MiB</title></circle>
+<circle cx="524.00" cy="248.60" r="3.5" fill="#72a7ff"><title>ztty, 10 windows: 330.67 MiB</title></circle>
+<text x="36" y="367" font-size="13" style="fill:#72a7ff">ztty 330.67 MiB</text>
+<polyline points="84.00,250.63 524.00,158.21" fill="none" stroke="#6dcbb1" stroke-width="2"/>
+<circle cx="84.00" cy="250.63" r="3.5" fill="#6dcbb1"><title>Ghostty, 1 windows: 319.72 MiB</title></circle>
+<circle cx="524.00" cy="158.21" r="3.5" fill="#6dcbb1"><title>Ghostty, 10 windows: 817.45 MiB</title></circle>
+<text x="205" y="367" font-size="13" style="fill:#6dcbb1">Ghostty 817.45 MiB</text>
+<polyline points="84.00,276.59 524.00,243.26" fill="none" stroke="#c09aff" stroke-width="2"/>
+<circle cx="84.00" cy="276.59" r="3.5" fill="#c09aff"><title>Kitty, 1 windows: 179.94 MiB</title></circle>
+<circle cx="524.00" cy="243.26" r="3.5" fill="#c09aff"><title>Kitty, 10 windows: 359.42 MiB</title></circle>
+<text x="374" y="367" font-size="13" style="fill:#c09aff">Kitty 359.42 MiB</text>
+<text x="36" y="459" font-size="13" class="muted">Panel scales are independent. Legends show the largest window count. Native GPU memory and display latency remain unmeasured.</text>
+<text x="36" y="484" font-size="13" class="muted">Maximum sampled application Swap: 0.00 MiB. Resident PSS excludes swap; paging can lower resident memory values.</text>
+</svg>
