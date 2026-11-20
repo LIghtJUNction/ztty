@@ -169,7 +169,7 @@ jobs:
           sudo apt-get install -y build-essential libx11-dev libxft-dev libxrender-dev pkg-config libfontconfig1-dev libfreetype-dev libharfbuzz-dev libegl1-mesa-dev libgles2-mesa-dev libxtst6 \
             libwayland-dev libwayland-bin wayland-protocols libxkbcommon-dev \
             libwayland-client0 libwayland-egl1 libwayland-cursor0 libxkbcommon0 \
-            xvfb fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
+            xvfb sway wtype grim wl-clipboard fontconfig fonts-dejavu-core fonts-noto-cjk fonts-noto-color-emoji
           python -m pip install --disable-pip-version-check 'python-xlib==0.33' 'Pillow==13.0.0'
           fc-cache -f
           test "$(uname -m)" = "$ARCH"
@@ -199,6 +199,36 @@ jobs:
             --screenshots "dist/$ARTIFACT_STEM.native/gpu-repaint"
           python tests/retained_frame_gui.py --binary target/release/ztty --renderer software \
             --output "dist/$ARTIFACT_STEM.native/retained-frame.json"
+          for renderer in gpu software; do
+            python tests/graphics_extensions_gui.py --binary target/release/ztty --renderer "$renderer" \
+              --artifacts "dist/$ARTIFACT_STEM.native/graphics-$renderer"
+            python tests/osc52_gui.py --binary target/release/ztty --renderer "$renderer" \
+              --artifacts "dist/$ARTIFACT_STEM.native/osc52-$renderer"
+          done
+          python tests/clipboard_transfer_gui.py --binary target/release/ztty \
+            --output "dist/$ARTIFACT_STEM.native/clipboard.json"
+          python tests/wayland_gui.py --binary target/release/ztty \
+            --output "dist/$ARTIFACT_STEM.native/wayland"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path("dist") / (os.environ["ARTIFACT_STEM"] + ".native")
+          expected = hashlib.sha256(Path("target/release/ztty").read_bytes()).hexdigest()
+          checks = [("clipboard.json", 25, "ok"), ("wayland/validation.json", 65, "passed")]
+          for renderer in ("gpu", "software"):
+              checks.extend([(f"graphics-{renderer}/graphics-extensions.json", 8, "ok"),
+                             (f"osc52-{renderer}/osc52.json", 13, "ok")])
+          for name, count, flag in checks:
+              report = json.loads((root / name).read_text())
+              assert report[flag] is True, (name, report.get("error"))
+              assert report["binary_sha256"] == expected, name
+              assert len(report["checks"]) == count, (name, len(report["checks"]))
+              assert all(row[flag] is True for row in report["checks"]), name
+          wayland = json.loads((root / "wayland/validation.json").read_text())
+          assert wayland["source"] == os.environ["SOURCE_SHA"]
+          assert all(wayland[key] == [] for key in (
+              "owned_brokers_remaining", "owned_children_remaining", "owned_helpers_remaining"))
+          PY
       - name: Package the native Linux executable
         id: package
         run: |

@@ -16,16 +16,16 @@ import time
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "artifacts/native-ui-acceptance"
+OUT = Path(os.environ.get("ZTTY_ACCEPTANCE_OUTPUT", str(ROOT / "artifacts/native-ui-acceptance"))).resolve()
 BINARY = ROOT / "target/release/ztty"
 CARGO = ["cargo", "+" + os.environ.get("RUST_TOOLCHAIN", "1.100.0")]
 GATES = {
     "fmt": (CARGO + ["fmt", "--all", "--", "--check"], 120),
-    "clippy": (CARGO + ["clippy", "--locked", "--workspace", "--all-targets", "--", "-D", "warnings"], 600),
-    "lib": (CARGO + ["test", "--locked", "-p", "ztty", "--lib"], 300),
-    "actions": (CARGO + ["test", "--locked", "-p", "ztty", "--test", "actions"], 300),
-    "gpu": (CARGO + ["test", "--locked", "-p", "ztty", "--lib", "gpu::", "--", "--ignored", "--test-threads=1", "--show-output"], 300),
-    "build": (CARGO + ["build", "--locked", "--release"], 600),
+    "clippy": (CARGO + ["clippy", "--locked", "--workspace", "--all-targets", "--features", "wayland", "--", "-D", "warnings"], 1800),
+    "lib": (CARGO + ["test", "--locked", "--features", "wayland", "-p", "ztty", "--lib"], 300),
+    "actions": (CARGO + ["test", "--locked", "--features", "wayland", "-p", "ztty", "--test", "actions"], 300),
+    "gpu": (CARGO + ["test", "--locked", "--features", "wayland", "-p", "ztty", "--lib", "gpu::", "--", "--ignored", "--test-threads=1", "--show-output"], 300),
+    "build": (CARGO + ["build", "--locked", "--release", "--features", "wayland"], 1800),
 }
 GPU_TESTS = {
     "gpu::tests::egl_composites_clipping_alpha_and_replaced_images_with_exact_pixels",
@@ -52,6 +52,13 @@ for name, kind in GUI_KIND.items():
     elif kind in ("native_ui", "input"):
         command += ["--source-root", str(ROOT), "--screenshot", str(OUT / (name + ".png"))]
     GATES[name] = (command, 300)
+
+GATES["wayland"] = (
+    [sys.executable, "-B", "tests/wayland_gui.py", "--binary", str(BINARY),
+     "--output", str(OUT / "wayland")], 300)
+for option, variable in (("--sway", "ZTTY_TEST_SWAY"), ("--swaymsg", "ZTTY_TEST_SWAYMSG")):
+    if os.environ.get(variable):
+        GATES["wayland"][0].extend([option, os.environ[variable]])
 
 
 
@@ -220,6 +227,29 @@ def validate_gui(name, gate):
         require(path.is_relative_to(OUT) and digest(path) == picture["sha256"], "screenshot path/hash mismatch")
 
 
+def validate_wayland(gate):
+    report = read_json("wayland/validation.json")
+    require(report.get("passed") is True, f"Wayland report failed: {report.get('error')}")
+    checks = report.get("checks", [])
+    require(len(checks) == 65 and all(row.get("passed") is True for row in checks),
+            "Wayland coverage or check result changed")
+    require(report.get("binary_sha256") == check_binary(), "Wayland used a different ELF")
+    require(report.get("source") == read_json("source.json")["source_sha"],
+            "Wayland source commit differs")
+    baseline = read_json("source-before.json")
+    hashes = report.get("test_source_sha256")
+    require(isinstance(hashes, dict) and hashes
+            and all(baseline.get(path) == value for path, value in hashes.items()),
+            "Wayland harness hashes differ")
+    cleanup = {key: report.get(key) for key in (
+        "owned_brokers_remaining", "owned_children_remaining", "owned_helpers_remaining")}
+    require(all(value == [] for value in cleanup.values()),
+            "Wayland omitted cleanup or left owned processes")
+    gate.update(binary_sha256=report["binary_sha256"], counts={"checks": len(checks)},
+                cleanup=cleanup, compositor_version=report.get("compositor_version"),
+                scope=report.get("scope"))
+
+
 def run_gate(name):
     command, limit = GATES[name]
     gate = {"ok": False, "command": command, "timeout_seconds": limit, "command_exit_code": None,
@@ -229,7 +259,7 @@ def run_gate(name):
     try:
         require(read_json("source.json")["initialized"], "source identity was not initialized")
         require(ctypes.CDLL(None).prctl(36, 1, 0, 0, 0) == 0, "could not become an owned-child subreaper")
-        if name in GUI:
+        if name in GUI or name == "wayland":
             gate["binary_sha256_before"] = check_binary()
         with (OUT / (name + ".log")).open("wb") as log:
             try:
@@ -273,6 +303,9 @@ def run_gate(name):
             gate["binary_sha256"] = check_binary()
         if name in GUI:
             validate_gui(name, gate)
+            gate["binary_sha256_after"] = check_binary()
+        if name == "wayland":
+            validate_wayland(gate)
             gate["binary_sha256_after"] = check_binary()
         gate.update(ok=True, exit_code=0)
     except Exception as error:
