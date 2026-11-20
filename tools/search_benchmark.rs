@@ -2,9 +2,9 @@
 //! Before and after compile against the exact same zterm source and settings.
 extern crate alloc;
 #[allow(dead_code)]
-mod before;
-#[allow(dead_code)]
 mod after;
+#[allow(dead_code)]
+mod before;
 
 use std::{hint::black_box, time::Instant};
 use zterm::Terminal;
@@ -13,7 +13,11 @@ fn before_find(terminal: &Terminal, query: &str, insensitive: bool) -> before::R
     before::find(
         black_box(terminal),
         black_box(query),
-        if insensitive { before::Case::Insensitive } else { before::Case::Sensitive },
+        if insensitive {
+            before::Case::Insensitive
+        } else {
+            before::Case::Sensitive
+        },
         None,
         true,
     )
@@ -23,7 +27,11 @@ fn after_find(terminal: &Terminal, query: &str, insensitive: bool) -> after::Res
     after::find(
         black_box(terminal),
         black_box(query),
-        if insensitive { after::Case::Insensitive } else { after::Case::Sensitive },
+        if insensitive {
+            after::Case::Insensitive
+        } else {
+            after::Case::Sensitive
+        },
         None,
         true,
     )
@@ -41,8 +49,16 @@ fn verify(terminal: &Terminal, query: &str, insensitive: bool) -> usize {
         a.hit.and_then(|hit| before::text(terminal, hit)),
         b.hit.and_then(|hit| after::text(terminal, hit)),
     );
-    let ca = if insensitive { before::Case::Insensitive } else { before::Case::Sensitive };
-    let cb = if insensitive { after::Case::Insensitive } else { after::Case::Sensitive };
+    let ca = if insensitive {
+        before::Case::Insensitive
+    } else {
+        before::Case::Sensitive
+    };
+    let cb = if insensitive {
+        after::Case::Insensitive
+    } else {
+        after::Case::Sensitive
+    };
     assert_eq!(
         before::highlights(terminal, query, ca, 0),
         after::highlights(terminal, query, cb, 0),
@@ -75,7 +91,8 @@ fn main() {
     let iterations: usize = args[3].parse().unwrap();
     assert!(lines > 0 && samples > 0 && iterations > 0);
     let digits = "0123456789".repeat(7);
-    let repetitive = "ab".repeat(35);
+    let repetitive = "ab".repeat(40);
+    let failed_prefix = "a".repeat(80);
     let unicode_noise = "中Ωe\u{301}".repeat(12);
     let unicode_hit = format!("{}界é{}", "中Ω".repeat(6), "中Ω".repeat(6));
     let case_noise = "ZzΩ中".repeat(12);
@@ -86,18 +103,74 @@ fn main() {
     let wrapped_noise = "z".repeat(103);
     let sparse_hit = format!("{}needle{}", "0123456789".repeat(3), "0123456789".repeat(3));
     let scenarios = [
-        ("no_match_ascii", "needle", false, digits.as_str(), digits.as_str(), 97),
-        ("sparse_ascii", "needle", false, digits.as_str(), sparse_hit.as_str(), 97),
-        ("repetitive_ascii", "abab", false, repetitive.as_str(), repetitive.as_str(), 1),
-        ("utf8_wide_combining", "界é", false, unicode_noise.as_str(), unicode_hit.as_str(), 97),
-        ("unicode_lowercase_expansion", "ai\u{307}中e\u{301}", true, case_noise.as_str(), case_hit.as_str(), 97),
-        ("soft_wrap_wide_padding", "x界é", false, wrapped_noise.as_str(), wrapped_hit.as_str(), 97),
+        (
+            "failed_ascii_prefix",
+            "aaaaaaaaaaaaaaab",
+            false,
+            failed_prefix.as_str(),
+            failed_prefix.as_str(),
+            1,
+        ),
+        (
+            "no_match_ascii",
+            "needle",
+            false,
+            digits.as_str(),
+            digits.as_str(),
+            97,
+        ),
+        (
+            "sparse_ascii",
+            "needle",
+            false,
+            digits.as_str(),
+            sparse_hit.as_str(),
+            97,
+        ),
+        (
+            "repetitive_ascii",
+            "abab",
+            false,
+            repetitive.as_str(),
+            repetitive.as_str(),
+            1,
+        ),
+        (
+            "utf8_wide_combining",
+            "界é",
+            false,
+            unicode_noise.as_str(),
+            unicode_hit.as_str(),
+            97,
+        ),
+        (
+            "unicode_lowercase_expansion",
+            "ai\u{307}中e\u{301}",
+            true,
+            case_noise.as_str(),
+            case_hit.as_str(),
+            97,
+        ),
+        (
+            "soft_wrap_wide_padding",
+            "x界é",
+            false,
+            wrapped_noise.as_str(),
+            wrapped_hit.as_str(),
+            97,
+        ),
     ];
     println!("[");
-    for (scenario_index, (name, query, insensitive, noise, hit, interval)) in scenarios.iter().enumerate() {
+    for (scenario_index, (name, query, insensitive, noise, hit, interval)) in
+        scenarios.iter().enumerate()
+    {
         let mut terminal = Terminal::new(80, 24, lines.saturating_mul(3).saturating_add(64));
         for line in 0..lines {
-            terminal.feed(if line % interval == 0 { hit.as_bytes() } else { noise.as_bytes() });
+            terminal.feed(if line % interval == 0 {
+                hit.as_bytes()
+            } else {
+                noise.as_bytes()
+            });
             terminal.feed(b"\r\n");
         }
         let count = verify(&terminal, query, *insensitive);
@@ -114,11 +187,18 @@ fn main() {
             baseline_ns.push(timings[0]);
             candidate_ns.push(timings[1]);
         }
-        eprintln!("completed {name}: {} physical rows, {count} matches", terminal.history_len() + terminal.rows());
+        eprintln!(
+            "completed {name}: {} physical rows, {count} matches",
+            terminal.history_len() + terminal.rows()
+        );
         println!(
             "  {{\"scenario\":\"{name}\",\"logical_lines\":{lines},\"physical_rows\":{},\"columns\":80,\"matches\":{count},\"iterations_per_sample\":{iterations},\"baseline_ns\":{baseline_ns:?},\"candidate_ns\":{candidate_ns:?}}}{}",
             terminal.history_len() + terminal.rows(),
-            if scenario_index + 1 == scenarios.len() { "" } else { "," },
+            if scenario_index + 1 == scenarios.len() {
+                ""
+            } else {
+                ","
+            },
         );
     }
     println!("]");

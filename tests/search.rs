@@ -428,13 +428,14 @@ fn emoji_substring_search_selects_and_copies_the_complete_cluster() {
     assert_eq!(search::text(&terminal, hit).as_deref(), Some("👩🏽‍💻B"));
 }
 
-
 /// The literal string oracle is independent of the streaming matcher. Narrow
 /// cells force soft wraps while z noise exercises bytes outside any prefix.
 #[test]
 fn sparse_and_repetitive_ascii_search_matches_literal_string_oracle() {
     const ALPHABET: &[u8] = b"abz";
-    const QUERIES: &[&str] = &["a", "b", "aa", "ab", "ba", "bb", "aba", "abab", "baba", "zz"];
+    const QUERIES: &[&str] = &[
+        "a", "b", "aa", "ab", "ba", "bb", "aba", "abab", "baba", "zz",
+    ];
     for length in 0..=6u32 {
         for mut encoded in 0..3usize.pow(length) {
             let mut input = String::new();
@@ -485,7 +486,12 @@ fn sparse_unicode_lowercase_and_graphemes_keep_positions_after_idle_bytes() {
     assert_eq!((first.count, first.ordinal), (2, 1));
     let first_hit = first.hit.unwrap();
     assert_eq!(
-        (first_hit.row, first_hit.start, first_hit.end_row, first_hit.end),
+        (
+            first_hit.row,
+            first_hit.start,
+            first_hit.end_row,
+            first_hit.end
+        ),
         (1, 4, 2, 2)
     );
     assert_eq!(
