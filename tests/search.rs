@@ -427,3 +427,84 @@ fn emoji_substring_search_selects_and_copies_the_complete_cluster() {
         .unwrap();
     assert_eq!(search::text(&terminal, hit).as_deref(), Some("👩🏽‍💻B"));
 }
+
+
+/// The literal string oracle is independent of the streaming matcher. Narrow
+/// cells force soft wraps while z noise exercises bytes outside any prefix.
+#[test]
+fn sparse_and_repetitive_ascii_search_matches_literal_string_oracle() {
+    const ALPHABET: &[u8] = b"abz";
+    const QUERIES: &[&str] = &["a", "b", "aa", "ab", "ba", "bb", "aba", "abab", "baba", "zz"];
+    for length in 0..=6u32 {
+        for mut encoded in 0..3usize.pow(length) {
+            let mut input = String::new();
+            for _ in 0..length {
+                input.push(ALPHABET[encoded % ALPHABET.len()] as char);
+                encoded /= ALPHABET.len();
+            }
+            let mut terminal = Terminal::new(3, 2, 16);
+            terminal.feed(input.as_bytes());
+            for &query in QUERIES {
+                let expected: Vec<_> = input.match_indices(query).map(|(at, _)| at).collect();
+                let mut result = search::find(&terminal, query, Sensitive, None, true);
+                assert_eq!(result.count, expected.len(), "{input:?} / {query:?}");
+                for (index, &at) in expected.iter().enumerate() {
+                    assert_eq!(result.ordinal, index + 1, "{input:?} / {query:?}");
+                    let hit = result.hit.unwrap();
+                    assert_eq!(
+                        (hit.row, hit.start, hit.end_row, hit.end),
+                        (
+                            at / 3,
+                            at % 3,
+                            (at + query.len() - 1) / 3,
+                            (at + query.len() - 1) % 3
+                        ),
+                        "{input:?} / {query:?}",
+                    );
+                    assert_eq!(search::text(&terminal, hit).as_deref(), Some(query));
+                    result = search::find(&terminal, query, Sensitive, Some(hit), true);
+                }
+                if expected.is_empty() {
+                    assert!(result.hit.is_none());
+                } else {
+                    assert_eq!(result.ordinal, 1, "{input:?} / {query:?}");
+                    let last = search::find(&terminal, query, Sensitive, result.hit, false);
+                    assert_eq!(last.ordinal, expected.len(), "{input:?} / {query:?}");
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn sparse_unicode_lowercase_and_graphemes_keep_positions_after_idle_bytes() {
+    let mut terminal = Terminal::new(7, 2, 64);
+    terminal.feed("zzzzzzzzzzzAİ中e\u{301}zzzzzzzzAİ中e\u{301}zz".as_bytes());
+    let query = "ai\u{307}中e\u{301}";
+    let first = search::find(&terminal, query, Insensitive, None, true);
+    assert_eq!((first.count, first.ordinal), (2, 1));
+    let first_hit = first.hit.unwrap();
+    assert_eq!(
+        (first_hit.row, first_hit.start, first_hit.end_row, first_hit.end),
+        (1, 4, 2, 2)
+    );
+    assert_eq!(
+        search::text(&terminal, first_hit).as_deref(),
+        Some("Aİ中e\u{301}")
+    );
+    let second = search::find(&terminal, query, Insensitive, first.hit, true);
+    assert_eq!((second.count, second.ordinal), (2, 2));
+    let second_hit = second.hit.unwrap();
+    assert_ne!(first_hit, second_hit);
+    assert_eq!(
+        search::text(&terminal, second_hit).as_deref(),
+        Some("Aİ中e\u{301}")
+    );
+    assert_eq!(
+        search::find(&terminal, query, Insensitive, second.hit, true).hit,
+        first.hit,
+    );
+    let (offset, _) = search::viewport(&terminal, first_hit);
+    let highlights = search::highlights(&terminal, query, Insensitive, offset);
+    assert!(highlights.iter().any(|&bits| bits != 0));
+}
