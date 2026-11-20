@@ -116,3 +116,37 @@ requires `setxkbmap` in addition to Xvfb, Python Xlib and Pillow. It configures
 `numpad:pc` and `kpdl:dot` only on its private server to exercise the actual
 Num Lock/Shift layer and physical decimal/Delete key. The codec retains
 explicit Kitty identity and event negotiation when Num Lock overrides DECKPAM.
+
+## Clipboard images and application paste (unreleased main, 2026-11-20)
+
+With the default bindings, `Ctrl+Shift+V` invokes ztty's **text** paste;
+`Ctrl+V` is delivered to the foreground application. In a locally running
+Codex CLI 0.170.0 composer, `Ctrl+V` requests an image attachment through
+Codex's own clipboard reader. Codex also recognizes a pasted path to an
+existing image file. These routes require the Codex process to have access
+to the corresponding clipboard or file; custom key bindings can change
+which application receives the shortcut.
+[Codex image shortcut](https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/chatwidget/clipboard.rs#L22-L80),
+[clipboard reader](https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/clipboard_paste.rs#L55-L154),
+[image-path handling](https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/bottom_pane/chat_composer.rs#L1288-L1305).
+
+The development X11/XWayland frontend now requests `TARGETS` before reading
+selection data. It accepts an advertised `UTF8_STRING`,
+`text/plain;charset=utf-8`, `text/plain`, or `STRING` target and requires the
+returned property type to match. UTF-8 text is validated after a complete
+transfer, including all `INCR` chunks; `STRING` retains its Latin-1 conversion.
+An image-only selection produces a visible no-text message without requesting
+image bytes or putting them into the PTY. OSC 52 reads use the same type checks.
+The native Wayland frontend already selects advertised text MIME types and
+now also validates the completed UTF-8 response.
+
+The reported desktop advertised only `image/png` through a types-only Wayland
+query. Its X11 selection could not be inspected because the desktop denied
+X11 authorization; no real image contents were read. This
+establishes the available Wayland format, not the exact behavior of that
+desktop's XWayland conversion. The isolated Xvfb regression uses synthetic
+owners, including an image-only owner that incorrectly returns PNG bytes for
+text requests. Its scope is terminal text-paste negotiation and PTY delivery;
+it does not establish successful image attachment for every desktop or
+application. See the [performance and reload report](benchmarks/performance-reload-2026-11-20.md)
+for the recorded results and their environment.

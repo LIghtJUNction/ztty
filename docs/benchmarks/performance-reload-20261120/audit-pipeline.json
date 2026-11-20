@@ -1,0 +1,453 @@
+{
+  "schema": 1,
+  "generated_at": "2026-11-20T07:12:57.987575+00:00",
+  "audit_ok": true,
+  "failures": [],
+  "checks": {
+    "provenance": 19,
+    "matrix": 90,
+    "binary": 6,
+    "scope": 30,
+    "cleanup": 108,
+    "affinity": 36,
+    "payload": 72,
+    "integrity": 180,
+    "renderer": 198,
+    "throughput": 396,
+    "latency": 144,
+    "cpu": 72,
+    "evidence_immutable": 6
+  },
+  "input_file_sha256": {
+    "final-pipeline-before-r0.json": "afb79f61af34651b1f10fe6acc09bacc15cab75d66f837b18a2f870d38dcd74b",
+    "final-pipeline-final-r0.json": "e0c11690c46997259f8eeec441700559bc66e7f5e72b257e09fe715251159877",
+    "final-pipeline-before-r1.json": "25e532cbc310a4136313e2ab6ae953665b5fa1b8e1ab5debf14051dc36a482b4",
+    "final-pipeline-final-r1.json": "783cc565bebc1098307b250429cf0c0b6b398f7f48c5c687a652465a9dd5dd58",
+    "final-pipeline-before-r2.json": "63fee5cf4fe1d8cf0d1a055cf741bab7205234daad3e6bc78d2e28c4429ee1c4",
+    "final-pipeline-final-r2.json": "147c9fe6938fa59f92a4a0f6a7951a362976f4d108631091bda33f0cadf7215b"
+  },
+  "collector_sha256": "937baa15c808579518a5dcf3677d5e86b0c897daa666215f5a6d78a60da2336f",
+  "collector_origin": {
+    "repository": "LIghtJUNction/ztty",
+    "commit": "f7e019654684ceae4b0cb64d47d651ebed99bc35",
+    "git_blob_sha": "8c595e3b405fb59da58dbc6ad8c2fc8c317a7a01",
+    "url": "https://github.com/LIghtJUNction/ztty/blob/f7e019654684ceae4b0cb64d47d651ebed99bc35/tools/benchmark_output_pipeline.py"
+  },
+  "source_commit": "f7e019654684ceae4b0cb64d47d651ebed99bc35",
+  "baseline_source_commit": "755c2c01c2a3eb535088a6f06d1655aaef97d931",
+  "runs": 36,
+  "timed_bursts": 108,
+  "raw_dsr_samples": 7200,
+  "title": "Fixed-CPU ztty logical output processing: headless and observed X11 software renderer",
+  "summary": [
+    {
+      "kind": "ascii-log",
+      "mode": "headless",
+      "before_runs_mib_s": [
+        131.9206312044716,
+        125.17184099910601,
+        130.60986226374214
+      ],
+      "final_runs_mib_s": [
+        131.79211148110713,
+        129.24862049560784,
+        134.1756915561199
+      ],
+      "before_median_mib_s": 130.60986226374214,
+      "final_median_mib_s": 131.79211148110713,
+      "paired_ratios": [
+        0.9990257799542722,
+        1.0325694618211372,
+        1.0273013785526948
+      ],
+      "median_paired_ratio": 1.0273013785526948,
+      "median_paired_percent_change": 2.7301378552694766,
+      "ratio_of_medians": 1.0090517606930605,
+      "before_run_range_mib_s": [
+        125.17184099910601,
+        131.9206312044716
+      ],
+      "final_run_range_mib_s": [
+        129.24862049560784,
+        134.1756915561199
+      ],
+      "paired_repetitions_faster": 2,
+      "broker_cpu_before_ns": [
+        200000000,
+        190000000,
+        200000000
+      ],
+      "broker_cpu_final_ns": [
+        190000000,
+        180000000,
+        190000000
+      ]
+    },
+    {
+      "kind": "ascii-log",
+      "mode": "window",
+      "before_runs_mib_s": [
+        99.47578967563524,
+        93.35580645144421,
+        108.70826547748239
+      ],
+      "final_runs_mib_s": [
+        118.78922403474769,
+        123.01982497787343,
+        124.19015162159624
+      ],
+      "before_median_mib_s": 99.47578967563524,
+      "final_median_mib_s": 123.01982497787343,
+      "paired_ratios": [
+        1.1941521089914295,
+        1.3177522604537504,
+        1.1424168261365621
+      ],
+      "median_paired_ratio": 1.1941521089914295,
+      "median_paired_percent_change": 19.415210899142956,
+      "ratio_of_medians": 1.2366810595724766,
+      "before_run_range_mib_s": [
+        93.35580645144421,
+        108.70826547748239
+      ],
+      "final_run_range_mib_s": [
+        118.78922403474769,
+        124.19015162159624
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        250000000,
+        250000000,
+        230000000
+      ],
+      "broker_cpu_final_ns": [
+        220000000,
+        200000000,
+        210000000
+      ]
+    },
+    {
+      "kind": "unicode-log",
+      "mode": "headless",
+      "before_runs_mib_s": [
+        27.573950442348675,
+        22.043478478104447,
+        26.65244883074379
+      ],
+      "final_runs_mib_s": [
+        39.8941719249343,
+        40.05134742170547,
+        38.201112271652825
+      ],
+      "before_median_mib_s": 26.65244883074379,
+      "final_median_mib_s": 39.8941719249343,
+      "paired_ratios": [
+        1.4468065433113986,
+        1.816925013059443,
+        1.4333059042434995
+      ],
+      "median_paired_ratio": 1.4468065433113986,
+      "median_paired_percent_change": 44.680654331139856,
+      "ratio_of_medians": 1.4968295100492262,
+      "before_run_range_mib_s": [
+        22.043478478104447,
+        27.573950442348675
+      ],
+      "final_run_range_mib_s": [
+        38.201112271652825,
+        40.05134742170547
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        870000000,
+        1080000000,
+        890000000
+      ],
+      "broker_cpu_final_ns": [
+        600000000,
+        600000000,
+        630000000
+      ]
+    },
+    {
+      "kind": "unicode-log",
+      "mode": "window",
+      "before_runs_mib_s": [
+        24.656160421669664,
+        20.977691908197013,
+        24.50670929438746
+      ],
+      "final_runs_mib_s": [
+        35.9657616138087,
+        37.27643904446502,
+        37.598463326484215
+      ],
+      "before_median_mib_s": 24.50670929438746,
+      "final_median_mib_s": 37.27643904446502,
+      "paired_ratios": [
+        1.4586927160888896,
+        1.7769561688480746,
+        1.5342110144137155
+      ],
+      "median_paired_ratio": 1.5342110144137155,
+      "median_paired_percent_change": 53.421101441371555,
+      "ratio_of_medians": 1.5210707646090247,
+      "before_run_range_mib_s": [
+        20.977691908197013,
+        24.656160421669664
+      ],
+      "final_run_range_mib_s": [
+        35.9657616138087,
+        37.598463326484215
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        960000000,
+        1160000000,
+        1020000000
+      ],
+      "broker_cpu_final_ns": [
+        650000000,
+        650000000,
+        630000000
+      ]
+    },
+    {
+      "kind": "inplace-ascii",
+      "mode": "headless",
+      "before_runs_mib_s": [
+        196.4997852545673,
+        175.40981907677534,
+        202.00686364919798
+      ],
+      "final_runs_mib_s": [
+        189.25926386924434,
+        186.39482266061466,
+        185.95259595220216
+      ],
+      "before_median_mib_s": 196.4997852545673,
+      "final_median_mib_s": 186.39482266061466,
+      "paired_ratios": [
+        0.9631525226557229,
+        1.062624792851712,
+        0.9205261276424973
+      ],
+      "median_paired_ratio": 0.9631525226557229,
+      "median_paired_percent_change": -3.684747734427707,
+      "ratio_of_medians": 0.9485751977750939,
+      "before_run_range_mib_s": [
+        175.40981907677534,
+        202.00686364919798
+      ],
+      "final_run_range_mib_s": [
+        185.95259595220216,
+        189.25926386924434
+      ],
+      "paired_repetitions_faster": 1,
+      "broker_cpu_before_ns": [
+        130000000,
+        140000000,
+        120000000
+      ],
+      "broker_cpu_final_ns": [
+        130000000,
+        130000000,
+        130000000
+      ]
+    },
+    {
+      "kind": "inplace-ascii",
+      "mode": "window",
+      "before_runs_mib_s": [
+        138.4027376508775,
+        139.23328291193943,
+        128.38866751815343
+      ],
+      "final_runs_mib_s": [
+        179.0211168994674,
+        163.99431834625028,
+        148.56088592557018
+      ],
+      "before_median_mib_s": 138.4027376508775,
+      "final_median_mib_s": 163.99431834625028,
+      "paired_ratios": [
+        1.2934795939589736,
+        1.177838480257421,
+        1.1571183718731601
+      ],
+      "median_paired_ratio": 1.177838480257421,
+      "median_paired_percent_change": 17.78384802574211,
+      "ratio_of_medians": 1.184906607555176,
+      "before_run_range_mib_s": [
+        128.38866751815343,
+        139.23328291193943
+      ],
+      "final_run_range_mib_s": [
+        148.56088592557018,
+        179.0211168994674
+      ],
+      "paired_repetitions_faster": 3,
+      "broker_cpu_before_ns": [
+        180000000,
+        190000000,
+        190000000
+      ],
+      "broker_cpu_final_ns": [
+        140000000,
+        150000000,
+        170000000
+      ]
+    }
+  ],
+  "fingerprints": {
+    "ascii-log": {
+      "payload_sha256": "fe963a5118f52648ac7e635d5e3d9716e05c3767ca1f0f16b1d283ec8ec8b2db",
+      "visible_screen_sha256": "b3ba4cf5afcf9a0637b93b7b82f3bf558aa5ad9d1236ccdfef6e218a83c386a8",
+      "matches_all_12_runs": true,
+      "all_12_actual_visible_screen_checks": true
+    },
+    "unicode-log": {
+      "payload_sha256": "ca15b384dbe8eca0d3ff5093a0a77f42b16420ec05370605e543b045efc6ae69",
+      "visible_screen_sha256": "b2e6719807ae3617735aeb9a105bba0858dc9de5f7541a0e3e37453de71a5d50",
+      "matches_all_12_runs": true,
+      "all_12_actual_visible_screen_checks": true
+    },
+    "inplace-ascii": {
+      "payload_sha256": "4a81a00c25a6f367dabf062760f28ab91a4e4cfc120c6db8d12b19955f022cc8",
+      "visible_screen_sha256": "870e33e20b7680bd41f56ed49834ffbdedfeaf06276b47a2c032aad7c9535d8c",
+      "matches_all_12_runs": true,
+      "all_12_actual_visible_screen_checks": true
+    }
+  },
+  "host": [
+    {
+      "file": "final-pipeline-before-r0.json",
+      "kernel": "7.3.4-arch1-1",
+      "architecture": "x86_64",
+      "broker_cpu_governor": "powersave",
+      "load_before": [
+        6.28515625,
+        4.94287109375,
+        4.81640625
+      ],
+      "cpu_accounting_tick_ns": 10000000,
+      "load_after": [
+        5.86181640625,
+        4.876953125,
+        4.7958984375
+      ]
+    },
+    {
+      "file": "final-pipeline-final-r0.json",
+      "kernel": "7.3.4-arch1-1",
+      "architecture": "x86_64",
+      "broker_cpu_governor": "powersave",
+      "load_before": [
+        5.86181640625,
+        4.876953125,
+        4.7958984375
+      ],
+      "cpu_accounting_tick_ns": 10000000,
+      "load_after": [
+        5.63232421875,
+        4.845703125,
+        4.7861328125
+      ]
+    },
+    {
+      "file": "final-pipeline-before-r1.json",
+      "kernel": "7.3.4-arch1-1",
+      "architecture": "x86_64",
+      "broker_cpu_governor": "powersave",
+      "load_before": [
+        5.662109375,
+        4.865234375,
+        4.79296875
+      ],
+      "cpu_accounting_tick_ns": 10000000,
+      "load_after": [
+        5.36865234375,
+        4.8173828125,
+        4.77783203125
+      ]
+    },
+    {
+      "file": "final-pipeline-final-r1.json",
+      "kernel": "7.3.4-arch1-1",
+      "architecture": "x86_64",
+      "broker_cpu_governor": "powersave",
+      "load_before": [
+        5.63232421875,
+        4.845703125,
+        4.7861328125
+      ],
+      "cpu_accounting_tick_ns": 10000000,
+      "load_after": [
+        5.662109375,
+        4.865234375,
+        4.79296875
+      ]
+    },
+    {
+      "file": "final-pipeline-before-r2.json",
+      "kernel": "7.3.4-arch1-1",
+      "architecture": "x86_64",
+      "broker_cpu_governor": "powersave",
+      "load_before": [
+        5.36865234375,
+        4.8173828125,
+        4.77783203125
+      ],
+      "cpu_accounting_tick_ns": 10000000,
+      "load_after": [
+        4.8564453125,
+        4.724609375,
+        4.74755859375
+      ]
+    },
+    {
+      "file": "final-pipeline-final-r2.json",
+      "kernel": "7.3.4-arch1-1",
+      "architecture": "x86_64",
+      "broker_cpu_governor": "powersave",
+      "load_before": [
+        4.8564453125,
+        4.724609375,
+        4.74755859375
+      ],
+      "cpu_accounting_tick_ns": 10000000,
+      "load_after": [
+        4.8564453125,
+        4.724609375,
+        4.74755859375
+      ]
+    }
+  ],
+  "window_pixel_dimensions": {
+    "ascii-log": [
+      1112,
+      800
+    ],
+    "unicode-log": [
+      1112,
+      800
+    ],
+    "inplace-ascii": [
+      1112,
+      800
+    ]
+  },
+  "interpretation_limits": [
+    "The paired ratio is final/before for matching r0/r1/r2, then median over the three ratios. It differs from dividing the separate before/after medians.",
+    "The outer AB/BA/AB order is supplied by the native execution record. Individual JSON files contain no timestamps or external run-order manifest, so that schedule is not independently established by the JSON alone.",
+    "Every timed burst ends with direct cursor-position DSR without moving the cursor first. Actual full visible text is checked once after timed samples and 200 idle DSR samples; no per-frame presentation or complete scrollback dump is measured.",
+    "The saved screen digest is the expected full visible text; source asserts actual screen equality before all_visible_text_checked=true. Raw screen text is not stored, so this audit reconstructs expected hashes and verifies the equality receipts instead of re-reading the live screen.",
+    "Only three kinds were collected: ascii-log, unicode-log, inplace-ascii. color-log and progress remain outside this final matrix.",
+    "The unicode-log workload repeats one multilingual phrase with increasing row numbers; high-diversity Unicode/cache behavior belongs to the separate diverse-core experiment.",
+    "CPU affinity separates process roles but does not reserve cores, disable turbo, or remove other tasks. Governor is powersave; CPU time is quantized in 10ms ticks. Host PSI and swap-I/O counters are absent from this collector.",
+    "Every pipeline window is 1112x800 before and after. This differs from the 1112x768 ztty windows in benchmark_terminals/throughput; compare variants within this matrix rather than pooling cross-collector rates.",
+    "Inplace ASCII headless is slower in two of three paired repetitions; keep this regression signal and do not claim improvement in every output path.",
+    "No product benchmark was rerun by this auditor; raw evidence remains unchanged."
+  ],
+  "audit_revision_note": "The first offline checker accidentally assumed the other collector's 1112x768 geometry. It reported 18 geometry mismatches; all 18 actual pipeline windows are consistently 1112x800. This revision compares each kind to its observed baseline dimensions. Original collector evidence was not edited; initial audit saved separately."
+}

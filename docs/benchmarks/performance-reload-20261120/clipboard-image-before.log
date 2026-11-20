@@ -1,0 +1,10 @@
+{"name": "image-only owner lies about UTF8 conversion", "ok": true}
+{"name": "image-only owner lies about STRING fallback", "ok": true}
+{"name": "invalid UTF8 is rejected directly", "ok": true}
+{"name": "invalid UTF8 is rejected after complete INCR", "ok": true}
+{"name": "advertised UTF8 rejects a STRING property", "ok": true}
+{"name": "UTF8 direct", "ok": true}
+{"name": "UTF8 INCR split across codepoints", "ok": true}
+{"name": "STRING direct", "ok": true}
+{"name": "STRING INCR split across codepoints", "ok": true}
+{"ok": true, "checks": 10, "error": null, "output": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/clipboard-image-before.json"}

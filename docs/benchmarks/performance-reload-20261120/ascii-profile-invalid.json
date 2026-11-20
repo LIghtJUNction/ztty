@@ -1,0 +1,186 @@
+{
+  "valid": false,
+  "reason": "Cargo reused baseline object after restoring older source mtimes; do not use these counters for before/candidate inference.",
+  "sha256": {
+    "before": "22d73404858e0bb5358c2befccac89c306cb95a1e2a6bc634fdcb20c4bb0ef9d",
+    "cache": "22d73404858e0bb5358c2befccac89c306cb95a1e2a6bc634fdcb20c4bb0ef9d"
+  },
+  "samples": [
+    {
+      "history": 0,
+      "order": 0,
+      "version": "before",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 0,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 272.624,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:21 2026\n\n295.51,msec,task-clock:u,295507816,100.00,,\n991514911,,cpu_atom/cycles/u,295507816,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2540529067,,cpu_atom/instructions/u,295507816,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,295507816,100.00,,\n0,,cpu-migrations:u,295507816,100.00,,\n"
+    },
+    {
+      "history": 0,
+      "order": 1,
+      "version": "cache",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 0,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 277.384,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:21 2026\n\n282.86,msec,task-clock:u,282857670,100.00,,\n988674507,,cpu_atom/cycles/u,282857670,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2540528441,,cpu_atom/instructions/u,282857670,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,282857670,100.00,,\n0,,cpu-migrations:u,282857670,100.00,,\n"
+    },
+    {
+      "history": 0,
+      "order": 2,
+      "version": "cache",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 0,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 273.846,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:22 2026\n\n301.00,msec,task-clock:u,301000808,100.00,,\n990552009,,cpu_atom/cycles/u,301000808,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2540529389,,cpu_atom/instructions/u,301000808,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,301000808,100.00,,\n0,,cpu-migrations:u,301000808,100.00,,\n"
+    },
+    {
+      "history": 0,
+      "order": 3,
+      "version": "before",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 0,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 273.223,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:22 2026\n\n295.52,msec,task-clock:u,295523544,100.00,,\n993359236,,cpu_atom/cycles/u,295523544,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2540529191,,cpu_atom/instructions/u,295523544,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,295523544,100.00,,\n0,,cpu-migrations:u,295523544,100.00,,\n"
+    },
+    {
+      "history": 2048,
+      "order": 0,
+      "version": "before",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 2048,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 150.381,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:22 2026\n\n530.97,msec,task-clock:u,530970605,100.00,,\n1764298856,,cpu_atom/cycles/u,530970605,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2696148444,,cpu_atom/instructions/u,530970605,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,530970605,100.00,,\n0,,cpu-migrations:u,530970605,100.00,,\n"
+    },
+    {
+      "history": 2048,
+      "order": 1,
+      "version": "cache",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 2048,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 151.124,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:23 2026\n\n546.11,msec,task-clock:u,546110003,100.00,,\n1761988679,,cpu_atom/cycles/u,546110003,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2696149511,,cpu_atom/instructions/u,546110003,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,546110003,100.00,,\n0,,cpu-migrations:u,546110003,100.00,,\n"
+    },
+    {
+      "history": 2048,
+      "order": 2,
+      "version": "cache",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 2048,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 155.483,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:23 2026\n\n538.96,msec,task-clock:u,538957753,100.00,,\n1761370955,,cpu_atom/cycles/u,538957753,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2696147122,,cpu_atom/instructions/u,538957753,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,538957753,100.00,,\n0,,cpu-migrations:u,538957753,100.00,,\n"
+    },
+    {
+      "history": 2048,
+      "order": 3,
+      "version": "before",
+      "measurement": {
+        "schema": 1,
+        "scope": "ASCII parser plus screen; fixed feed work for perf stat",
+        "geometry": [
+          120,
+          32
+        ],
+        "history_limit": 2048,
+        "input_bytes": 2496,
+        "warmup_feeds": 4096,
+        "samples": 7,
+        "feeds_per_sample": 4096,
+        "total_feed_bytes_including_warmup": 81788928,
+        "median_mib_s": 112.549,
+        "steady_state_allocations": 0
+      },
+      "perf_csv": "# started on Fri Nov 20 14:32:24 2026\n\n689.85,msec,task-clock:u,689851123,100.00,,\n1754330145,,cpu_atom/cycles/u,689851123,100.00,,\n<not counted>,,cpu_core/cycles/u,0,0.00,,\n2696151932,,cpu_atom/instructions/u,689851123,100.00,,\n<not counted>,,cpu_core/instructions/u,0,0.00,,\n0,,context-switches:u,689851123,100.00,,\n0,,cpu-migrations:u,689851123,100.00,,\n"
+    }
+  ]
+}

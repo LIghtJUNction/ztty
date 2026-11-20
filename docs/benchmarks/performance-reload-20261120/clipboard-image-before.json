@@ -1,0 +1,190 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Ctrl+V remains raw application input",
+      "ok": true,
+      "actual_hex": "16",
+      "selection_requests": [],
+      "scope": "Proves key forwarding only; an application must implement image attachment itself"
+    },
+    {
+      "name": "image-only owner lies about UTF8 conversion",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "image/png"
+      ],
+      "requests": [
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 73,
+      "actual_bytes": 73,
+      "expected_sha256": "8f53894f6aedd507aa0137b5ff2cc42296a2c7ec49a64ef77c96e04f0f6a78dd",
+      "actual_sha256": "8f53894f6aedd507aa0137b5ff2cc42296a2c7ec49a64ef77c96e04f0f6a78dd",
+      "chunks_sent": 0
+    },
+    {
+      "name": "image-only owner lies about STRING fallback",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "image/png"
+      ],
+      "requests": [
+        "UTF8_STRING",
+        "STRING"
+      ],
+      "expected_bytes": 54,
+      "actual_bytes": 54,
+      "expected_sha256": "92ef7d8a5ffd21a662d6f8ef8406e96faf1b03f0abfbeec8ea819332a88e6ce4",
+      "actual_sha256": "92ef7d8a5ffd21a662d6f8ef8406e96faf1b03f0abfbeec8ea819332a88e6ce4",
+      "chunks_sent": 0
+    },
+    {
+      "name": "invalid UTF8 is rejected directly",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 43,
+      "actual_bytes": 43,
+      "expected_sha256": "a02a48650543eaa25777cd8a5aef9add564c215495f5b1932436c592470f212d",
+      "actual_sha256": "a02a48650543eaa25777cd8a5aef9add564c215495f5b1932436c592470f212d",
+      "chunks_sent": 0
+    },
+    {
+      "name": "invalid UTF8 is rejected after complete INCR",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 43,
+      "actual_bytes": 43,
+      "expected_sha256": "a02a48650543eaa25777cd8a5aef9add564c215495f5b1932436c592470f212d",
+      "actual_sha256": "a02a48650543eaa25777cd8a5aef9add564c215495f5b1932436c592470f212d",
+      "chunks_sent": 16
+    },
+    {
+      "name": "advertised UTF8 rejects a STRING property",
+      "ok": true,
+      "guard": true,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 36,
+      "actual_bytes": 36,
+      "expected_sha256": "2539ed45a6074a2d6fe71895071f8e590daa2aeb87c96dad3cc1c886af401e0d",
+      "actual_sha256": "2539ed45a6074a2d6fe71895071f8e590daa2aeb87c96dad3cc1c886af401e0d",
+      "chunks_sent": 0
+    },
+    {
+      "name": "UTF8 direct",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 44,
+      "actual_bytes": 44,
+      "expected_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "actual_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "chunks_sent": 0
+    },
+    {
+      "name": "UTF8 INCR split across codepoints",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "UTF8_STRING"
+      ],
+      "requests": [
+        "UTF8_STRING"
+      ],
+      "expected_bytes": 44,
+      "actual_bytes": 44,
+      "expected_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "actual_sha256": "ee790fdaa6d95ebcd661a4e205b603de67ee526e25ced1b9c00b5a61c638be71",
+      "chunks_sent": 17
+    },
+    {
+      "name": "STRING direct",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "STRING"
+      ],
+      "requests": [
+        "UTF8_STRING",
+        "STRING"
+      ],
+      "expected_bytes": 24,
+      "actual_bytes": 24,
+      "expected_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "actual_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "chunks_sent": 0
+    },
+    {
+      "name": "STRING INCR split across codepoints",
+      "ok": true,
+      "guard": false,
+      "advertised": [
+        "STRING"
+      ],
+      "requests": [
+        "UTF8_STRING",
+        "STRING"
+      ],
+      "expected_bytes": 24,
+      "actual_bytes": 24,
+      "expected_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "actual_sha256": "66919c60980de3fad720908c1cb02ac38f132cddbe8196db06b07ec7a00a70e0",
+      "chunks_sent": 6
+    }
+  ],
+  "cleanup_errors": [],
+  "binary": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/ztty-final",
+  "binary_sha256": "1e282546e621539a48855b54543e16acc5c7e1bc68be93b9b514877980f9d368",
+  "test_script_sha256": "899650a070aca910f979ddac0a19efec3b530926169045d62ea36505fc2ea334",
+  "xvfb_helper_sha256": "9baf8e2d731be49ed57eefbaa48e15ba30fe581839d0ad1738a5cc4a19ceeb0a",
+  "expect": "legacy-leak",
+  "png_sha256": "74feb298d9ba69b23a8d34334e57a58e5e468a42f4a98eaa4ffe4383777b6e26",
+  "png_bytes": 74,
+  "scope": "Owned private Xvfb, synthetic selection owner, XTEST, native pixels and raw PTY; no real desktop clipboard or Codex process",
+  "display_ownership": {
+    "display": ":12951",
+    "pid": 3362864,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X12951",
+        "inode": 113638351,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X12951",
+        "inode": 113638350,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "stderr": ""
+}

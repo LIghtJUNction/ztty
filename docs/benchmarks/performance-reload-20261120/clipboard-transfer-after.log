@@ -1,0 +1,26 @@
+{"name": "direct UTF-8 multiline and tabs", "ok": true}
+{"name": "INCR UTF-8 split inside codepoints", "ok": true}
+{"name": "direct STRING fallback", "ok": true}
+{"name": "INCR STRING fallback", "ok": true}
+{"name": "large INCR complete byte-for-byte", "ok": true}
+{"name": "empty clipboard sends no paste brackets", "ok": true}
+{"name": "control characters cannot close paste brackets", "ok": true}
+{"name": "missing text", "ok": true}
+{"name": "recovery after missing text", "ok": true}
+{"name": "non-text direct type", "ok": true}
+{"name": "recovery after non-text direct type", "ok": true}
+{"name": "wrong direct format", "ok": true}
+{"name": "recovery after wrong direct format", "ok": true}
+{"name": "malformed INCR header", "ok": true}
+{"name": "recovery after malformed INCR header", "ok": true}
+{"name": "INCR type change rejects prefix", "ok": true}
+{"name": "recovery after INCR type change rejects prefix", "ok": true}
+{"name": "malformed INCR chunk rejects prefix", "ok": true}
+{"name": "recovery after malformed INCR chunk rejects prefix", "ok": true}
+{"name": "oversized direct reply", "ok": true}
+{"name": "recovery after oversized direct reply", "ok": true}
+{"name": "oversized INCR declaration", "ok": true}
+{"name": "recovery after oversized INCR declaration", "ok": true}
+{"name": "cumulative INCR limit", "ok": true}
+{"name": "recovery after cumulative INCR limit", "ok": true}
+{"ok": true, "checks": 25, "error": null, "output": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/perf-regression-20261120/artifacts/performance-20261120/clipboard-transfer-after.json"}
