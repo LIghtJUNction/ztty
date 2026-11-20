@@ -297,6 +297,7 @@ impl Pool {
 
     pub(super) fn retire(&mut self, index: usize) -> Value {
         let session = self.sessions.remove(index);
+        let had_view = session.ui.is_some();
         self.watcher.retain(|path| {
             self.sessions
                 .iter()
@@ -324,6 +325,9 @@ impl Pool {
         }
         drop(session);
         self.remove_from_layout(result.get("id").and_then(Value::as_u64).unwrap_or(0));
+        if had_view {
+            os::release_unused_memory();
+        }
         result
     }
 

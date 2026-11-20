@@ -50,6 +50,8 @@ unsafe extern "C" {
     fn malloc(size: usize) -> *mut c_void;
     fn realloc(ptr: *mut c_void, size: usize) -> *mut c_void;
     fn free(ptr: *mut c_void);
+    #[cfg(target_env = "gnu")]
+    fn malloc_trim(pad: usize) -> c_int;
     fn posix_memalign(ptr: *mut *mut c_void, alignment: usize, size: usize) -> c_int;
 }
 
@@ -87,6 +89,15 @@ unsafe impl GlobalAlloc for Allocator {
             }
         }
         out
+    }
+}
+
+/// Return free allocator pages after a view has been fully torn down.
+/// Other libc implementations keep their existing allocation policy.
+pub fn release_unused_memory() {
+    #[cfg(target_env = "gnu")]
+    unsafe {
+        malloc_trim(0);
     }
 }
 
