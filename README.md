@@ -6,7 +6,7 @@ ztty is a native terminal for Linux, macOS and Windows. Its terminal core is
 written in Rust without the standard library. On Linux, the same live session
 can be used from a window, the CLI or an MCP client.
 
-This page documents source version **0.5.1**. Published binaries and their release
+This page documents source candidate **0.5.2**. Published binaries and their release
 notes are available on the [download page](https://github.com/LIghtJUNction/ztty/releases).
 
 ## Install on Linux
@@ -90,8 +90,8 @@ button returns from history to current output.
 [input compatibility](docs/input-compatibility.md) cover custom bindings and keypad behavior.
 
 `Ctrl+Shift+V` pastes text. `Ctrl+V` goes to the foreground application;
-Codex CLI 0.170.0 uses it to attach clipboard images. ztty 0.5.1
-rejects image-only selections in terminal text paste. See
+Codex CLI 0.170.0 uses it to attach clipboard images. Since ztty 0.5.1, terminal text paste
+rejects image-only selections. See
 [image paste and format checks](docs/input-compatibility.md#clipboard-images-and-application-paste).
 
 ## Shared sessions and MCP (Linux)
@@ -118,7 +118,7 @@ covers tools such as ssmcp.
 
 ## Reload the running executable
 
-A broker started from ztty 0.5.1 can replace its executable on Linux
+A broker started from ztty 0.5.1 or later can replace its executable on Linux
 X11/XWayland or without windows. Run this inside the session you want to update:
 
 ```sh
@@ -182,6 +182,13 @@ covers dependencies and the unverified physical GPU, desktop IME and scaling beh
 
 ## Performance and development
 
+After input is fully sent or explicitly cancelled, this source releases an
+input buffer whose allocated capacity exceeds 64 KiB; smaller buffers remain
+available for reuse. The [input-buffer regression](docs/benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
+records an 8 MiB queue retaining 0 bytes after clearing, compared with 8 MiB
+before the change. This measures queue allocation capacity; process RSS/PSS and
+throughput were not measured for this change.
+
 <!-- terminal-benchmark:start -->
 The [2026-11-20 performance and reload report](docs/benchmarks/performance-reload-2026-11-20.md)
 includes fixed source and executable hashes, every raw sample, and test limits.
@@ -222,7 +229,7 @@ Run `sh tools/check.sh` for the local development checks.
 | [zterm](https://github.com/LIghtJUNction/zterm) | Terminal screen and protocol state | Published [0.5.2](https://crates.io/crates/zterm/0.5.2) |
 
 These published versions include the terminal checkpoint and PTY handover APIs
-used by ztty 0.5.1. Source builds use their matching submodule pins; Cargo packages
+used by ztty 0.5.2. Source builds use their matching submodule pins; Cargo packages
 use the registry versions and lockfile. The application keeps zgpui's `std` and
 `native` features disabled.
 

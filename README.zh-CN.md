@@ -5,7 +5,7 @@
 ztty 是面向 Linux、macOS 和 Windows 的原生终端，核心用不依赖标准库的
 Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令行或 MCP 客户端使用。
 
-本页说明 **0.5.1 源码**。已发布的二进制及对应变更记录见
+本页说明 **0.5.2 候选源码**。已发布的二进制及对应变更记录见
 [下载页](https://github.com/LIghtJUNction/ztty/releases)。
 
 ## Linux 安装
@@ -85,7 +85,7 @@ Linux X11 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使
 [输入兼容性](docs/input-compatibility.md)说明自定义绑定、小键盘和其他操作。
 
 `Ctrl+Shift+V` 粘贴文本；`Ctrl+V` 默认交给前台应用，Codex CLI 0.170.0 用它
-添加剪贴板图片附件。ztty 0.5.1 会在终端文本粘贴时拒绝只有图片的剪贴板，
+添加剪贴板图片附件。从 ztty 0.5.1 开始，终端文本粘贴会拒绝只有图片的剪贴板，
 避免把图片变成字符。详见[图片粘贴与格式检查](docs/input-compatibility.md#clipboard-images-and-application-paste)。
 
 ## 共享会话与 MCP（Linux）
@@ -110,7 +110,7 @@ ssmcp 等工具的接入见[观察模式](docs/ssmcp-observer.md)。
 
 ## 替换运行中的程序
 
-由 ztty 0.5.1 启动的 Linux X11/XWayland 或无窗口共享进程支持程序热替换。
+由 ztty 0.5.1 或后续版本启动的 Linux X11/XWayland 或无窗口共享进程支持程序热替换。
 在要更新的会话内运行：
 
 ```sh
@@ -171,6 +171,11 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 
 ## 性能与开发
 
+输入发送完毕或明确取消后，当前源码释放容量超过 64 KiB 的输入缓冲，
+较小的缓冲继续复用。[输入缓冲回归记录](docs/benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
+中，一次 8 MiB 输入清空后保留的容量由 8 MiB 降为 0。这是队列的分配容量；
+本次改动尚未测量整进程 RSS/PSS 或吞吐变化。
+
 <!-- terminal-benchmark:start -->
 [2026-11-20 性能与热替换报告](docs/benchmarks/performance-reload-2026-11-20.md)
 提供固定源码、可执行文件哈希、全部原始样本和验收范围。与保留的旧版对照，
@@ -208,7 +213,7 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | 图片协议与放置 | 已发布 [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
 | [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.2](https://crates.io/crates/zterm/0.5.2) |
 
-这些正式库版本包含 ztty 0.5.1 使用的终端状态保存、恢复与 PTY 接管 API。
+这些正式库版本包含 ztty 0.5.2 使用的终端状态保存、恢复与 PTY 接管 API。
 源码构建使用对应子模块固定点；Cargo 包使用注册表版本与锁文件。
 应用保持 zgpui 的 `std` 和 `native` 特性关闭。
 

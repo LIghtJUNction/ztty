@@ -1,10 +1,22 @@
 # Releasing ztty and its reusable libraries
 
-## 0.5.1 release — 2026-11-20
+## 0.5.2 candidate — 2026-11-20
 
-The 0.5.1 source uses the published libraries below. Application publication
-requires the complete native workflow and registry-package verification.
-Installation is checked separately against the accepted release artifact.
+This candidate starts from the fixed
+[0.5.1 source](https://github.com/LIghtJUNction/ztty/commit/1631db8a02e8627d5d35ac0e1d4bef93475f45dc)
+and adds [input-buffer reclamation and its evidence](https://github.com/LIghtJUNction/ztty/commit/79001d4af9414cea9b53a46efc7350a0161973cb).
+Its runtime change releases queue allocations larger than 64 KiB after input
+is fully sent or explicitly cancelled, while retaining small buffers for reuse.
+
+The [memory report](benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
+records queue capacity and Linux backpressure checks at its stated source.
+It does not measure process RSS/PSS or throughput. Build, package verification
+and native acceptance of this integrated 0.5.2 candidate are pending.
+
+The source reuses the published libraries below and the 0.5.1 release gates.
+Application publication requires the complete native workflow and
+registry-package verification. Installation is checked separately against the
+accepted release artifact.
 
 ### Source and dependency order
 
@@ -16,7 +28,7 @@ Installation is checked separately against the accepted release artifact.
 | 1 | `zpty` | `0.2.3` | Its independent repository's release checks |
 | 1 | `ztty-plugin-api` | `0.1.0` | Package verification and `zplugin =0.3.1` |
 | 2 | `zterm` | `0.5.2` | Published `zgpui 0.1.2`, `zgraphics 0.2.0` and `zinput 0.1.3` |
-| 3 | `ztty` application | `0.5.1` | Published `zterm 0.5.2`, `zpty 0.2.3`, `ztty-plugin-api 0.1.0` and complete application gates |
+| 3 | `ztty` application | `0.5.2` | Published `zterm 0.5.2`, `zpty 0.2.3`, `ztty-plugin-api 0.1.0` and complete application gates |
 
 `zgpui 0.1.2`, `zgraphics 0.2.0`, `zinput 0.1.3`, `zpty 0.2.3` and
 `zterm 0.5.2` are published from their independent repositories. Reuse these
@@ -52,7 +64,7 @@ its existing platform hosts provide native windows and graphics.
    Confirm registry versions and package contents before verifying consumers
    without workspace path overrides.
 4. Run the [application Release workflow](../.github/workflows/release.yml) for
-   `v0.5.1`. Formal publication requires Verify and all six native architecture
+   `v0.5.2`. Formal publication requires Verify and all six native architecture
    gates on that tagged source, plus source and artifact readback. Retain the
    immutable tag and record published downloads separately from candidate
    artifacts.

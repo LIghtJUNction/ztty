@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.5.2 candidate — 2026-11-20 (Asia/Taipei)
+
+- Release input-queue allocations larger than 64 KiB after the input is fully
+  sent or explicitly cancelled. Smaller allocations remain available for reuse.
+- Keep unsent input intact after partial writes, `WouldBlock` and write errors.
+  The existing input-ownership rules still decide when pending input is cancelled.
+
+The [input-buffer report](docs/benchmarks/input-buffer-memory-20261120/report.zh-CN.md)
+records an 8 MiB queue retaining 0 bytes after clearing, compared with 8 MiB
+before the change. This is allocation capacity; process RSS/PSS and throughput
+were not measured for this change. The report retains the fixed-source capacity
+and native backpressure checks. This integrated candidate still needs its own
+build, package and formal native release acceptance.
+
 ## 0.5.1 changes — 2026-11-20 (Asia/Taipei)
 
 - Use published zgpui 0.1.2, zpty 0.2.3 and zterm 0.5.2. Their matching
