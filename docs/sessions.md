@@ -448,9 +448,9 @@ another's cursor. See [the bounded output contract and real PTY regression](sess
 ## Upgrading a running broker
 
 Installing a replacement executable leaves existing brokers running their
-current code. Current main, after the 0.5.0 release, adds an explicit Linux
-process handover. This is an unreleased source feature: installing the latest
-published package does not add it to a broker from the published 0.5.0 release.
+current code. ztty 0.5.1 adds an explicit Linux process handover for brokers
+started from a reload-capable executable. Installing it does not add this
+capability to a broker that is already running the 0.5.0 executable.
 
 ### Reload the running broker
 
@@ -518,7 +518,7 @@ A broker from the published 0.5.0 release has no checkpoint/restore handover
 support. A newer CLI receives a safe refusal; it cannot retrofit the capability
 into the running process. Keep the old windows open until their work finishes.
 
-Build the current source with its pinned submodules and start a new independent
+Install or build ztty 0.5.1 with its pinned dependencies, then start a new independent
 broker pool separated from the old executable for new work. An existing broker
 for the same new ELF may be reused. From an older ztty shell, clear its inherited socket only
 for this new launch:

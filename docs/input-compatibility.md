@@ -117,7 +117,9 @@ requires `setxkbmap` in addition to Xvfb, Python Xlib and Pillow. It configures
 Num Lock/Shift layer and physical decimal/Delete key. The codec retains
 explicit Kitty identity and event negotiation when Num Lock overrides DECKPAM.
 
-## Clipboard images and application paste (unreleased main, 2026-11-20)
+<a id="clipboard-images-and-application-paste-unreleased-main-2026-11-20"></a>
+
+## Clipboard images and application paste
 
 With the default bindings, `Ctrl+Shift+V` invokes ztty's **text** paste;
 `Ctrl+V` is delivered to the foreground application. In a locally running
@@ -130,7 +132,7 @@ which application receives the shortcut.
 [clipboard reader](https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/clipboard_paste.rs#L55-L154),
 [image-path handling](https://github.com/openai/codex/blob/29eb79e9866b3262a777fdf8195c1b9e63684c91/codex-rs/tui/src/bottom_pane/chat_composer.rs#L1288-L1305).
 
-The development X11/XWayland frontend now requests `TARGETS` before reading
+The ztty 0.5.1 X11/XWayland frontend requests `TARGETS` before reading
 selection data. It accepts an advertised `UTF8_STRING`,
 `text/plain;charset=utf-8`, `text/plain`, or `STRING` target and requires the
 returned property type to match. UTF-8 text is validated after a complete

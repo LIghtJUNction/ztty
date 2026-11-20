@@ -1,8 +1,23 @@
 # 依赖传播维护记录
 
+更新：2026-11-20。0.5.1 源码已接收下面的正式库版本；应用发布仍由完整原生门禁和 Cargo 包验证决定，实际安装另记回执。
+
+## 当前：0.5.1 的正式依赖
+
+| 库 | 注册表版本 | 固定发布源码 |
+| --- | --- | --- |
+| zgpui | [0.1.2](https://crates.io/crates/zgpui/0.1.2) | [5b268da](https://github.com/LIghtJUNction/zgpui/commit/5b268da910639abd2fb8e581acb4f6eed50b7516) |
+| zpty | [0.2.3](https://crates.io/crates/zpty/0.2.3) | [d263f9a](https://github.com/LIghtJUNction/zpty/commit/d263f9a8f0881d259e46c51a7b6753c61ab9be59) |
+| zterm | [0.5.2](https://crates.io/crates/zterm/0.5.2) | [b5adc3d](https://github.com/LIghtJUNction/zterm/commit/b5adc3dbc5ca5f28a3ea7e45650a45245be9dc2d) |
+
+zpty 0.2.3 的注册表包包含 Linux PTY 接管接口，zterm 0.5.2 包含终端状态保存与恢复接口，并要求 zgpui 0.1.2 及以上版本且关闭默认特性。应用的 [Cargo.toml](../Cargo.toml)、[锁文件](../Cargo.lock) 和子模块固定点必须一起更新；仅改变 Git 固定点会使源码构建与注册表安装得到不同接口。[完整发布步骤](releasing.md)
+
+下方保存原先的性能集成记录与 0.5.0 发布前快照。其“未发布”状态、版本号和测量值对应记录当时的固定源码，不替代上方的新注册表回执，也不冒充 0.5.1 发行制品的性能实测。
+
+## 历史集成快照：正式库发布前
+
 更新：2026-11-20。本节登记本轮性能、运行时重载与标签切换修复的固定源码，以及安装套件和聚合仓库的接续条件。**本轮是源码更新，尚未形成新的正式发布。** 已发布的 ztty 0.5.0 对应此前的 `c4f8f48`，其发布记录已包含正式制品；本页下半部分保留的“0.5.0 发布前”记录只用于追溯历史。[0.5.0 固定发布记录](https://github.com/LIghtJUNction/ztty/blob/f7e019654684ceae4b0cb64d47d651ebed99bc35/docs/reports/release-0.5.0-20261120/summary.json)
 
-## 当前：性能与运行时重载源码更新
 
 ### 可复用的源码与实际消费关系
 

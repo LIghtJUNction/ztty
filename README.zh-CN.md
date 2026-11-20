@@ -18,7 +18,7 @@ sh install.sh
 ztty
 ```
 
-安装器校验归档后安装到 `~/.local/bin`。下文的程序热替换尚未发布，需要构建当前源码。
+安装器校验归档后安装到 `~/.local/bin`。
 在 Wayland 桌面上，默认的 X11 后端通过 XWayland 运行。
 
 ## 从源码构建
@@ -85,8 +85,8 @@ Linux X11 默认使用 `renderer = auto`：可用时选择硬件 EGL，否则使
 [输入兼容性](docs/input-compatibility.md)说明自定义绑定、小键盘和其他操作。
 
 `Ctrl+Shift+V` 粘贴文本；`Ctrl+V` 默认交给前台应用，Codex CLI 0.170.0 用它
-添加剪贴板图片附件。当前开发源码会在终端文本粘贴时拒绝只有图片的剪贴板，
-避免把图片变成字符。详见[图片粘贴与格式检查](docs/input-compatibility.md#clipboard-images-and-application-paste-unreleased-main-2026-11-20)。
+添加剪贴板图片附件。ztty 0.5.1 会在终端文本粘贴时拒绝只有图片的剪贴板，
+避免把图片变成字符。详见[图片粘贴与格式检查](docs/input-compatibility.md#clipboard-images-and-application-paste)。
 
 ## 共享会话与 MCP（Linux）
 
@@ -108,9 +108,9 @@ HTTP 监听非回环地址时需要令牌。
 客户端配置、会话身份校验、JSON/SSE 响应与命令输出读取见[会话指南](docs/sessions.md)；
 ssmcp 等工具的接入见[观察模式](docs/ssmcp-observer.md)。
 
-## 替换运行中的程序（开发源码）
+## 替换运行中的程序
 
-由当前源码启动的 Linux X11/XWayland 或无窗口共享进程支持程序热替换。
+由 ztty 0.5.1 启动的 Linux X11/XWayland 或无窗口共享进程支持程序热替换。
 在要更新的会话内运行：
 
 ```sh
@@ -202,15 +202,15 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 
 | 库 | 在 ztty 中的职责 | 发布状态 |
 | --- | --- | --- |
-| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI 场景与布局 | 已发布 [0.1.0](https://crates.io/crates/zgpui/0.1.0) |
+| [zgpui](https://github.com/LIghtJUNction/zgpui) | UI 场景与布局 | 已发布 [0.1.2](https://crates.io/crates/zgpui/0.1.2) |
 | [zinput](https://github.com/LIghtJUNction/zinput) | 键盘、鼠标与粘贴编码 | 已发布 [0.1.3](https://crates.io/crates/zinput/0.1.3) |
-| [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY 进程管理 | 已发布 [0.2.2](https://crates.io/crates/zpty/0.2.2) |
+| [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY 进程管理 | 已发布 [0.2.3](https://crates.io/crates/zpty/0.2.3) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | 图片协议与放置 | 已发布 [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
-| [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.1](https://crates.io/crates/zterm/0.5.1) |
+| [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.2](https://crates.io/crates/zterm/0.5.2) |
 
-上表保留各库已经发布的版本。当前 main 还通过固定 Git 子模块提交使用尚未发布的
-`zterm` checkpoint 与 `zpty` PTY 接管 API；上表的已发布版本不包含这些新增接口。
-构建时请使用仓库记录的子模块版本和 `Cargo.lock`。
+这些正式库版本包含 ztty 0.5.1 使用的终端状态保存、恢复与 PTY 接管 API。
+源码构建使用对应子模块固定点；Cargo 包使用注册表版本与锁文件。
+应用保持 zgpui 的 `std` 和 `native` 特性关闭。
 
 可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；
 使用指南与验收记录集中在[文档索引](docs/README.md)。
