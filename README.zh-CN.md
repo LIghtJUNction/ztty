@@ -5,10 +5,8 @@
 ztty 是面向 Linux、macOS 和 Windows 的原生终端，核心用不依赖标准库的
 Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令行或 MCP 客户端使用。
 
-ztty 当前正式下载版本仍为 **0.4.1**。本页描述 **0.5.0 源码候选版**，
-平台范围对应 `iter/resume-20261120` 的
-[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb) 检查点。
-应用正式发布和设备安装尚未完成。
+本页说明 **0.5.0 源码**。已发布的二进制及对应变更记录见
+[下载页](https://github.com/LIghtJUNction/ztty/releases)。
 
 ## Linux 安装
 
@@ -20,8 +18,8 @@ sh install.sh
 ztty
 ```
 
-安装器校验归档后安装到 `~/.local/bin`。0.4.1 Linux 版需要 glibc、X11、
-Xft 和 Xrender；Wayland 桌面通过 XWayland 运行。
+安装器校验归档后安装到 `~/.local/bin`。
+在 Wayland 桌面上，默认的 X11 后端通过 XWayland 运行。
 
 ## 从源码构建
 
@@ -39,7 +37,7 @@ sudo apt install build-essential pkg-config libx11-dev libxft-dev libxrender-dev
 ```
 
 ```sh
-git clone --recurse-submodules --branch iter/resume-20261120 https://github.com/LIghtJUNction/ztty.git
+git clone --recurse-submodules https://github.com/LIghtJUNction/ztty.git
 cd ztty
 cargo build --locked --release
 ./target/release/ztty --font 'monospace:size=12' --geometry 100x28
@@ -150,7 +148,8 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 ## 性能与开发
 
 <!-- terminal-benchmark:start -->
-新的测量结果待补入[本轮基准报告](docs/benchmarks/resume-2026-11-20.md)。
+[本轮基准报告](docs/benchmarks/resume-2026-11-20.md)记录固定源码、
+原始测量及仍存在的性能差距。
 [复现方法](docs/benchmarks/README.md)说明如何运行同条件对比；
 [较早的性能记录](docs/performance.md)保留对应的测量环境。
 <!-- terminal-benchmark:end -->
@@ -165,7 +164,7 @@ Wayland 会拒绝标签页、分屏和工作区容器。[Wayland 配置](docs/co
 | [zinput](https://github.com/LIghtJUNction/zinput) | 键盘、鼠标与粘贴编码 | 已发布 [0.1.3](https://crates.io/crates/zinput/0.1.3) |
 | [zpty](https://github.com/LIghtJUNction/zpty) | PTY / ConPTY 进程管理 | 已发布 [0.2.2](https://crates.io/crates/zpty/0.2.2) |
 | [zgraphics](https://github.com/LIghtJUNction/zgraphics) | 图片协议与放置 | 已发布 [0.2.0](https://crates.io/crates/zgraphics/0.2.0) |
-| [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.0](https://crates.io/crates/zterm/0.5.0) |
+| [zterm](https://github.com/LIghtJUNction/zterm) | 终端屏幕与协议状态 | 已发布 [0.5.1](https://crates.io/crates/zterm/0.5.1) |
 
 可独立使用的 Project Z 库见[架构说明](docs/architecture.md)；
 使用指南与验收记录集中在[文档索引](docs/README.md)。
