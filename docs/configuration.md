@@ -78,8 +78,9 @@ for tested text and frame behavior.
 
 ## Native Wayland (experimental)
 
-This section covers `iter/resume-20261120` at
-[6053a97](https://github.com/LIghtJUNction/ztty/commit/6053a97920c29c852cd92d8b96e35f62cff92ecb).
+This section describes the backend included in ztty 0.5.2; its published
+artifacts and acceptance are recorded in the
+[release report](releases/0.5.2/report.zh-CN.md).
 
 Native Wayland uses xdg-shell, EGL/GLES and XKB, with the same Linux session
 broker and PTY ownership as X11. Enable the Cargo feature when building from
@@ -113,7 +114,7 @@ cargo build --locked --release --features wayland
 ./target/release/ztty attach --backend wayland work
 ```
 
-Each native window has its own PTY. Detach and reattach preserve the session;
+Each session has its own PTY. Detach and reattach preserve the session;
 X11 and Wayland views can coexist on one broker. MCP retains the existing
 input ownership checks. Tabs, splits and workspace containers are rejected
 on Wayland; open separate session windows instead.
@@ -128,12 +129,14 @@ Mesa software GL still uses that EGL/GLES path. Renderer selection is a
 configuration setting, not a `--renderer` command-line option.
 
 The [shared Wayland report](reports/native-wayland-shared-20261119/README.zh-CN.md)
-records the feature owner's frozen source and headless Sway/software EGL tests.
-Those 65 checks belong to the feature owner's source and ELF. The integrated
-candidate has passed local checks and six additional software EGL unit tests;
-fresh GUI checks and formal native release gates remain pending.
-Physical GPU behavior, real desktop IME combinations, HiDPI/fractional scaling
-and cross-monitor scale changes have not been demonstrated.
+records the earlier feature-owner candidate. The
+[0.5.2 release report](releases/0.5.2/report.zh-CN.md) records 65 Wayland checks
+for each released Linux architecture, bound to its own source and ELF. Those
+checks use headless Sway/software EGL and an IME protocol peer.
+Physical GPU behavior and real desktop IME combinations remain unverified.
+Output-scale and fractional-scale protocol handling are not implemented;
+HiDPI and cross-monitor scale changes are therefore not accepted features.
+Native Wayland also remains outside the supported `ztty reload` handover scope.
 
 ## Key and mouse bindings
 
@@ -151,8 +154,10 @@ See [binding names and input rules](daily-workflow.md#custom-keys-and-mouse-butt
 
 ## Text actions on Linux X11
 
-`ztty-plugin-api` 0.1.0 is a local source candidate awaiting its first registry
-release. The host and shared API both use [zplugin 0.3.1](https://crates.io/crates/zplugin/0.3.1);
+`ztty-plugin-api` 0.1.0 is published; the
+[registry verification record](reports/plugin-api-registry-20261120/README.md)
+records the archive and independent consumer checks. The host and shared API
+both use [zplugin 0.3.1](https://crates.io/crates/zplugin/0.3.1);
 the locked graph includes [zsys 0.1.1](https://crates.io/crates/zsys/0.1.1).
 These library releases are separate from the ztty application release.
 
