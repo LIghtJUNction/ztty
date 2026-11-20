@@ -305,6 +305,8 @@ def main():
             assert first["exit_status"] == 7 and second["exit_status"] == 0, completed
             first_output = rpc({"op": "command-read", "session": "daily", "command_id": first["id"]})
             assert first_output["complete"] and not first_output["truncated"], first_output
+            second_output = rpc({"op": "command-read", "session": "daily", "command_id": second["id"]})
+            assert second_output["complete"] and not second_output["truncated"], second_output
             assert "first-output 中文" in first_output["text"], first_output
             limited = rpc({"op": "command-read", "session": "daily", "command_id": first["id"], "max_bytes": 3})
             assert limited["truncated"] and len(limited["text"].encode()) <= 3, limited
@@ -413,15 +415,28 @@ def main():
             assert input_bytes() == b"", input_bytes()
             report["checks"].append("custom key and mouse bindings execute actions; application mouse reporting receives neither bound press nor release")
 
-            # A width change conservatively invalidates command regions that
-            # overlap the live screen; navigation must skip those records.
-            current_commands=rpc({"op":"commands","session":"daily"})["commands"]
-            assert any(not c["available"] for c in current_commands),current_commands
+            # Width reflow remaps retained OSC 133 ranges. These font changes
+            # do not exhaust history, so IDs, completion and output must survive.
+            current_commands = rpc({"op": "commands", "session": "daily"})["commands"]
+            assert current_commands == commands, (commands, current_commands)
+            retained_outputs = []
+            for command, expected in ((first, first_output), (second, second_output)):
+                actual = rpc({"op": "command-read", "session": "daily", "command_id": command["id"]})
+                assert actual["complete"] and not actual["truncated"], actual
+                assert actual["text"] == expected["text"], (command["id"], expected, actual)
+                retained_outputs.append({"id": command["id"], "exit_status": command["exit_status"],
+                                         "bytes": len(actual["text"].encode()),
+                                         "sha256": hashlib.sha256(actual["text"].encode()).hexdigest()})
+            report["command_reflow"] = {"before": commands, "after": current_commands,
+                                       "retained_outputs": retained_outputs}
             for _ in current_commands:
-                key("Control_L","Shift_L","k")
-            key("Control_L","Shift_L","y")
+                key("Control_L", "Shift_L", "k")
+            key("Control_L", "Shift_L", "y")
             expect_clipboard(first_output["text"])
-            report["checks"].append("command navigation skips regions invalidated by live-screen width changes and retains intact historical output")
+            key("Control_L", "Shift_L", "j")
+            key("Control_L", "Shift_L", "y")
+            expect_clipboard(second_output["text"])
+            report["checks"].append("width reflow preserves command IDs, exit codes and complete UTF-8 output; navigation copies both retained command regions")
 
             # Return to the live screen, then atomically replace the watched
             # config. Pixel color, grid and PID jointly check the applied state.

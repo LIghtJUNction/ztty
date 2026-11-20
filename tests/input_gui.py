@@ -162,16 +162,18 @@ def main():
             report["xvfb"] = xvfb.evidence
             connection = display.Display(xvfb.display)
             assert connection.has_extension("XTEST"), "XTEST extension is required"
-            # Keep a client connected so Xvfb does not reset this private keymap.
-            # The PC option exercises Num Lock/Shift layer inversion; kpdl:dot
-            # gives the physical decimal key its normal Delete/decimal pair.
-            subprocess.run(
-                ["setxkbmap", "-display", xvfb.display, "-layout", "us",
-                 "-option", "", "-option", "numpad:pc", "-option", "kpdl:dot"],
-                check=True, capture_output=True, timeout=10,
-            )
+            # Keep a client connected so Xvfb does not reset this private map.
+            # Older xkeyboard-config releases apply numpad:pc to different key
+            # types. Pin all eleven physical keys to the exact four-state map
+            # this test asserts instead of inheriting a distribution policy.
+            keymap = Path(__file__).resolve().parent / "fixtures" / "keypad-pc.xkb"
+            subprocess.run(["xkbcomp", "-w", "0", str(keymap), xvfb.display],
+                           check=True, capture_output=True, timeout=10)
             connection.sync()
-            report["keyboard_layout"] = {"layout": "us", "options": ["numpad:pc", "kpdl:dot"]}
+            report["keyboard_layout"] = {
+                "layout": "us", "keypad_type": "ZTTY_TEST_PC_KEYPAD",
+                "fixture": str(keymap), "fixture_sha256": hashlib.sha256(keymap.read_bytes()).hexdigest(),
+            }
             pointer_mapping = list(connection.get_pointer_mapping())
             report["pointer_mapping"] = pointer_mapping
             # Resolve the physical dual-purpose keypad keys, not a preferred
@@ -483,7 +485,7 @@ def main():
                 num_lock(enabled)
                 for index, (symbol, navigation, shifted_navigation) in enumerate(navigation_keys):
                     for shifted in (False, True):
-                        numeric = enabled != shifted  # the private numpad:pc map
+                        numeric = enabled != shifted  # the pinned private keypad type
                         expected = (b"." if index == 10 else str(index).encode()) if numeric else (
                             shifted_navigation if shifted else navigation)
                         begin(RESET)
