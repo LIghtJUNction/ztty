@@ -77,7 +77,9 @@ fn pty_size(cols: usize, rows: usize, window: Option<&Window>) -> zpty::Size {
 
 mod osc52;
 mod queries;
+mod reload;
 mod requests;
+pub(crate) use reload::{reload_fds, serve_reloaded, validate_reload};
 mod view;
 mod view_input;
 mod workspaces;
@@ -185,6 +187,8 @@ struct Workspace {
     window: x11::Container,
     layout: Layout,
     title: String,
+    reveal_pending: bool,
+    focus_after_reveal: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -196,6 +200,7 @@ struct NativeGesture {
 }
 
 struct Pool {
+    pending_reload: Option<CString>,
     sessions: Vec<Session>,
     workspaces: Vec<Workspace>,
     connections: Vec<(String, Rc<Connection>)>,
@@ -224,6 +229,7 @@ struct PluginRun {
 impl Pool {
     fn new() -> Self {
         Self {
+            pending_reload: None,
             sessions: Vec::new(),
             workspaces: Vec::new(),
             connections: Vec::new(),
@@ -985,6 +991,25 @@ impl Pool {
                     })
                 }) {
                     let kind = unsafe { event.kind };
+                    // An outgoing tab may temporarily cover the incoming
+                    // frame. Its pixels are a placeholder, not an input target.
+                    if !self.sessions[index].ui.as_ref().unwrap().visible
+                        && matches!(
+                            kind,
+                            x11::BUTTON_PRESS | x11::BUTTON_RELEASE | x11::MOTION_NOTIFY
+                        )
+                    {
+                        // The implicit X11 pointer grab can deliver the
+                        // shortcut's release to this outgoing placeholder.
+                        // Retire global bookkeeping without forwarding input.
+                        if kind == x11::BUTTON_RELEASE {
+                            let button = unsafe { event.button.button } as usize;
+                            if (1..=11).contains(&button) {
+                                self.mouse_shortcuts[button] = false;
+                            }
+                        }
+                        continue;
+                    }
                     let menu_handled = self.sessions[index]
                         .ui
                         .as_mut()
@@ -1229,6 +1254,9 @@ impl Pool {
                 self.detach(i);
             }
         }
+        for index in 0..self.workspaces.len() {
+            self.reveal_workspace(index);
+        }
         for workspace in &mut self.workspaces {
             if let Some(session) = self
                 .sessions
@@ -1280,8 +1308,10 @@ impl Pool {
     }
 }
 pub fn serve() -> Result<(), String> {
-    let mut server = broker::Server::new()?;
-    let mut pool = Pool::new();
+    serve_loop(broker::Server::new()?, Pool::new())
+}
+
+fn serve_loop(mut server: broker::Server, mut pool: Pool) -> Result<(), String> {
     let mut openers = os::Openers::new();
     let mut read_buffer = [0u8; 16384];
     let mut buffers = InputBuffers {
@@ -1304,6 +1334,21 @@ pub fn serve() -> Result<(), String> {
             },
         );
         openers.reap();
+        if let Some(target) = pool.pending_reload.take() {
+            let result = if openers.pending() {
+                Err(String::from(
+                    "reload waits for external opener processes to finish",
+                ))
+            } else {
+                pool.reload_checkpoint_ready(&server, &mut read_buffer)
+                    .and_then(|(meta, terminals, fds)| {
+                        crate::runtime_reload::execute(&target, meta, terminals, &fds)
+                    })
+            };
+            // A successful exec never returns. Any preparation/exec error keeps
+            // the existing Pool, windows, parser state and PTYs in this loop.
+            server.finish_reload(result.map(|()| Value::Null));
+        }
         if !pool.sessions.is_empty() || server.has_pending() {
             idle_since = os::milliseconds();
         }

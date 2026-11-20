@@ -114,6 +114,15 @@ pub fn parse(bytes: &[u8]) -> Result<Value, &'static str> {
     if bytes.len() > MAX_MESSAGE {
         return Err("JSON message exceeds 1 MiB");
     }
+    parse_checkpoint(bytes)
+}
+
+/// Decode private, sealed runtime checkpoint metadata. Network and public IPC
+/// messages continue to use `parse` and its independent 1 MiB limit.
+pub fn parse_checkpoint(bytes: &[u8]) -> Result<Value, &'static str> {
+    if bytes.len() > 32 * 1024 * 1024 {
+        return Err("checkpoint JSON exceeds 32 MiB");
+    }
     core::str::from_utf8(bytes).map_err(|_| "JSON is not UTF-8")?;
     let mut parser = Parser {
         bytes,

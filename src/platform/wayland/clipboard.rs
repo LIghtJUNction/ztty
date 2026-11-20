@@ -92,6 +92,13 @@ impl Window {
                 "Clipboard transfer failed or timed out"
             });
         }
+        if result
+            .as_ref()
+            .is_some_and(|bytes| core::str::from_utf8(bytes).is_err())
+        {
+            self.paste_error = Some("Clipboard text is not valid UTF-8");
+            return None;
+        }
         result
     }
     pub fn property(&mut self, _: PropertyEvent) -> Option<Vec<u8>> {

@@ -346,6 +346,31 @@ impl Pool {
         if op == "create" {
             return self.create(request).map(Reply::Value);
         }
+        if op == "reload" {
+            if actor(request)? != "local" {
+                return Err("runtime reload requires local control".into());
+            }
+            if self.pending_reload.is_some() {
+                return Err("a runtime reload is already pending".into());
+            }
+            let image = match request.get("_reload_image").and_then(Value::as_str) {
+                Some(path) => broker::unhex(path)?,
+                None => {
+                    let pid = request
+                        .get("_reload_peer_pid")
+                        .and_then(Value::as_u64)
+                        .filter(|pid| *pid > 0)
+                        .ok_or("runtime reload requires a verified local peer")?;
+                    CString::new(format!("/proc/{pid}/exe"))
+                        .map_err(|_| "invalid reload image path")?
+                }
+            };
+            if !image.to_bytes().starts_with(b"/") {
+                return Err("reload executable must be an absolute path".into());
+            }
+            self.pending_reload = Some(image);
+            return Ok(Reply::Wait(crate::runtime_reload::WAIT.into()));
+        }
         if op == "restore-layout" {
             if actor(request)? != "local" {
                 return Err("restoring desktop layouts requires local control".into());

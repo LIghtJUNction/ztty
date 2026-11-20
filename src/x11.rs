@@ -132,6 +132,8 @@ pub struct Window {
     pixmap: Xid,
     // Only a completed software frame may be copied on an Expose event.
     retained_valid: bool,
+    // A workspace keeps its previous tab above this mapped view until paint.
+    reveal_pending: bool,
     pending_damage: Option<(i32, i32)>,
     gc: *mut c_void,
     draw: *mut XftDraw,
@@ -147,6 +149,8 @@ pub struct Window {
     ic: Rc<InputContext>,
     clipboard: Atom,
     utf8: Atom,
+    utf8_mime: Atom,
+    text_mime: Atom,
     targets: Atom,
     transfer: Atom,
     osc_requestor: Xid,
