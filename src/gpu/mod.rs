@@ -20,6 +20,8 @@ use unicode_segmentation::UnicodeSegmentation;
 const ATLAS_SIZE: u32 = 1024;
 const IMAGE_BYTES: usize = 32 * 1024 * 1024;
 const MAX_VERTICES: usize = 4092;
+const MAX_TEXT_BYTES: usize = 16_384;
+const MAX_TEXT_CELLS: usize = 8192;
 
 #[derive(Clone, Copy, Default, Debug)]
 pub struct Rect {
@@ -96,6 +98,8 @@ pub struct Renderer {
     vertices: Vec<Vertex>,
     batch_texture: u32,
     driver: String,
+    row_text: String,
+    row_cells: Vec<TextCell>,
 }
 
 fn color(rgb: u32, alpha: u8) -> [f32; 4] {
@@ -287,6 +291,8 @@ impl Renderer {
             vertices: Vec::with_capacity(MAX_VERTICES),
             batch_texture: atlas,
             driver,
+            row_text: String::new(),
+            row_cells: Vec::new(),
         };
         renderer.white_pixel();
         renderer.configure();
@@ -591,7 +597,7 @@ impl Renderer {
     }
 
     fn runs(&mut self, text: &str, style: Style) -> Result<Vec<TextRun>, &'static str> {
-        if text.len() > 16_384 {
+        if text.len() > MAX_TEXT_BYTES {
             return Err("one shaping run is limited to 16 KiB");
         }
         let mut runs: Vec<TextRun> = Vec::new();
@@ -707,7 +713,7 @@ impl Renderer {
         }
         if cells.is_empty()
             || cells[0].byte != 0
-            || cells.len() > 8192
+            || cells.len() > MAX_TEXT_CELLS
             || cells.windows(2).any(|pair| pair[0].byte >= pair[1].byte)
             || cells.iter().any(|cell| {
                 !text.is_char_boundary(cell.byte as usize)
