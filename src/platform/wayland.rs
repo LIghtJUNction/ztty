@@ -114,6 +114,7 @@ pub struct Window {
     suspended: bool,
     notice: Option<String>,
     last_cursor: Option<DrawnCursor>,
+    ime_cursor: Option<(usize, usize)>,
     text_blink_visible: [bool; 2],
     search_cols: usize,
     search_bits: Vec<u64>,

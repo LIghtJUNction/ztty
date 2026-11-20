@@ -108,6 +108,9 @@ impl Window {
         self.paste_error.take()
     }
     pub(super) fn draw_preedit(&mut self) {
+        let Some((col, row)) = self.ime_cursor else {
+            return;
+        };
         let raw = unsafe { ztty_wl_preedit(self.native.ptr()) };
         if raw.is_null() {
             return;
@@ -117,7 +120,6 @@ impl Window {
             return;
         }
         let text = String::from(text);
-        let (col, row) = self.last_cursor.map_or((0, 0), |c| c.0);
         let x = (self.appearance.padding + col as i32 * self.state.cw)
             .min((self.state.width - self.state.cw).max(0));
         let y = (self.appearance.padding + row as i32 * self.state.ch)

@@ -31,6 +31,8 @@ parser.add_argument("--output", required=True)
 parser.add_argument("--sway", default=shutil.which("sway"))
 parser.add_argument("--swaymsg")
 parser.add_argument("--ime-peer")
+parser.add_argument("--ime-cursor-only", action="store_true",
+                    help="run only the native IME caret/blink regression")
 args = parser.parse_args()
 binary = Path(args.binary).resolve()
 output = Path(args.output).resolve()
@@ -54,6 +56,7 @@ report = {"schema": 1, "binary_sha256": hashlib.sha256(binary.read_bytes()).hexd
           "source": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
           "source_worktree_dirty": bool(subprocess.check_output(["git", "status", "--porcelain"], text=True).strip()),
           "scope": "Linux headless Sway, software Mesa EGL, private shared broker; no physical display",
+          "selected_case": "ime-cursor" if args.ime_cursor_only else "all",
           "checks": checks}
 report["test_source_sha256"] = {
     name: hashlib.sha256((Path(__file__).resolve().parents[1] / name).read_bytes()).hexdigest()
@@ -113,7 +116,9 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
                       "focus_follows_mouse no\n")
     app_config = output / "appearance.conf"
     app_config.write_text("font=monospace:pixelsize=16\nbackground=#161a23\n"
-                          "background-opacity=100\nwindow-padding=8\ncursor-blink=false\n")
+                          "background-opacity=100\nwindow-padding=8\n"
+                          + ("cursor-blink=true\ncursor-blink-interval=150\ncursor-color=#44cc88\ncursor-shape=block\n"
+                             if args.ime_cursor_only else "cursor-blink=false\n"))
     (runtime / "config/ztty").mkdir(parents=True)
     (runtime / "config/ztty/config").write_text(app_config.read_text())
     compositor_log = (output / "compositor.log").open("w")
@@ -344,6 +349,155 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
         time.sleep(0.03)
         got = input_bytes(root)[before:]
         check(name, got == expected, expected_hex=expected.hex(), actual_hex=got.hex())
+    def ime_cursor_regression(proc, root, con_id):
+        """Observe the real caret before composing, then span multiple blinks."""
+        import re
+        color = (68, 204, 136)
+        initial = cli("info", "interaction")
+        idle_keyboard = helper(["wtype", "-s", "60000"], "caret-keyboard")
+        time.sleep(.12)
+        ipc(f"[con_id={con_id}] focus")
+        peer = helper([str(Path(args.ime_peer).resolve())], "caret-input-method")
+
+        def peer_active(expected):
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                peer.stdin.write(b"status\n")
+                peer.stdin.flush()
+                line = received_line(peer)
+                report.setdefault("caret_ime_states", []).append(line)
+                assert line != "UNAVAILABLE", line
+                if line.startswith(f"STATE {int(expected)} "):
+                    return line
+            raise TimeoutError("IME activation state did not change")
+
+        peer_active(True)
+        state = read(root / "state.json")
+        command(root, b"\r\n" * (state["rows"] + 10))
+        samples = []
+        report["caret_samples"] = samples
+        rectangles = []
+
+        def geometry(before_query, row, col):
+            # The daemon intentionally redirects stderr. Query the real PTY's
+            # cell metrics instead of expecting its protocol log in the launcher.
+            response = re.search(rb"\x1b\[6;(\d+);(\d+)t", input_bytes(root)[before_query:])
+            if response is None:
+                return None
+            ch, cw = map(int, response.groups())
+            assert 0 < cw <= 256 and 0 < ch <= 256, (cw, ch)
+            return 8 + col * cw, 8 + row * ch, cw, ch
+
+        def viewport():
+            node = window(proc)
+            rect = node["rect"]
+            inner = node.get("window_rect", {"x": 0, "y": 0})
+            return rect["x"] + inner["x"], rect["y"] + inner["y"]
+
+        def count(image, box):
+            return sum(pixel == color for pixel in pixels(image.crop(box)))
+
+        for phase, row, col in [("on", 6, 9), ("off", 9, 17)]:
+            ime_command(peer, "preedit ")
+            before_query = len(input_bytes(root))
+            command(root, b"\x1b[?25h\x1b[2J\x1b[H\x1b[48;2;192;32;48m"
+                    + b" " * 20 + b"\x1b[0m"
+                    + f"\x1b[{row + 1};2Hanchor>\x1b[{row + 1};{col + 1}H\x1b[6n\x1b[16t".encode())
+            dsr = f"\x1b[{row + 1};{col + 1}R".encode()
+            wait(lambda: dsr in input_bytes(root)[before_query:])
+            x, y, cw, ch = wait(lambda: geometry(before_query, row, col))
+            rectangles.append({"phase": phase, "row": row, "col": col, "rectangle": [x, y, cw, ch]})
+            vx, vy = viewport()
+            cell = (vx + x, vy + y, vx + x + cw, vy + y + ch)
+            underline = (vx + x, vy + y + ch - 1, vx + x + 5 * cw, vy + y + ch)
+            origin = (vx + 8, vy + 8, vx + 8 + 12 * cw, vy + 8 + ch)
+            prompt = (vx + 8 + cw, vy + y, vx + 8 + 8 * cw, vy + y + ch)
+
+            def ready_frame():
+                image = screenshot("caret-" + phase + "-ready")
+                marker = sum(pixel == (192, 32, 48) for pixel in pixels(image.crop(origin)))
+                prompt_pixels = sum(pixel not in ((22, 26, 35), color) for pixel in pixels(image.crop(prompt)))
+                cursor_pixels = count(image, cell)
+                visible = cursor_pixels > cw * ch // 2
+                if marker >= cw * ch * 8 and prompt_pixels > 10 and visible == (phase == "on"):
+                    return image, cursor_pixels
+                return None
+
+            before, cursor_pixels = wait(ready_frame)
+            observed_at = time.monotonic()
+            origin_pixels = before.crop(origin).tobytes()
+            prompt_pixels = before.crop(prompt).tobytes()
+            check("caret_" + phase + "_rendered_prompt_and_cursor_phase", True,
+                  row=row, col=col, cursor_pixels=cursor_pixels,
+                  geometry=[x, y, cw, ch], dsr_hex=dsr.hex(),
+                  geometry_source="actual PTY DSR and CSI16t cell-size response",
+                  query_response_hex=input_bytes(root)[before_query:].hex())
+            before_input = len(input_bytes(root))
+            ime_command(peer, "preedit CARET")
+            wait(lambda: count(screenshot("caret-" + phase + "-first"), underline) >= 4 * cw)
+            started = time.monotonic()
+            index = 0
+            while time.monotonic() - started < 1.25:
+                image = screenshot(f"caret-{phase}-{index:02}")
+                row_value = {"phase_at_start": phase, "index": index,
+                             "seconds_since_observed_phase": time.monotonic() - observed_at,
+                             "underline_pixels": count(image, underline),
+                             "origin_unchanged": image.crop(origin).tobytes() == origin_pixels,
+                             "prompt_unchanged": image.crop(prompt).tobytes() == prompt_pixels}
+                samples.append(row_value)
+                assert row_value["underline_pixels"] >= 4 * cw, row_value
+                assert row_value["origin_unchanged"] and row_value["prompt_unchanged"], row_value
+                index += 1
+                time.sleep(.06)
+            check("caret_" + phase + "_composition_stays_at_logical_cursor", index >= 3,
+                  sampled_frames=index, sample_seconds=time.monotonic() - started,
+                  blink_interval_ms=150, starting_phase_observed=True,
+                  exact_phase_of_each_composed_frame_instrumented=False)
+            check("caret_" + phase + "_preedit_does_not_write_pty",
+                  input_bytes(root)[before_input:] == b"")
+
+        report["caret_geometry_from_pty"] = rectangles
+        command(root, b"\x1b[?25l")
+        wait(lambda: count(screenshot("caret-mode-hidden"), underline) == 0)
+        check("caret_hidden_mode_suppresses_overlay",
+              screenshot("caret-mode-hidden-final").crop(origin).tobytes() == origin_pixels)
+        command(root, b"\x1b[?25h")
+        wait(lambda: count(screenshot("caret-mode-restored"), underline) >= 4 * cw)
+        check("caret_visible_mode_restores_current_position", True)
+        cli("action", "interaction", "scroll-up")
+        wait(lambda: count(screenshot("caret-history"), (0, 0, 1280, 720)) == 0)
+        check("caret_scrollback_suppresses_overlay", True)
+        cli("action", "interaction", "scroll-down")
+        wait(lambda: count(screenshot("caret-history-restored"), underline) >= 4 * cw)
+        check("caret_live_view_restores_current_position", True)
+
+        workspace = next(item["name"] for item in ipc("", "get_workspaces") if item["focused"])
+        ipc("workspace number 99")
+        peer_active(False)
+        check("caret_focus_loss_deactivates_input_method", True)
+        ipc("workspace " + json.dumps(workspace))
+        ipc(f"[con_id={con_id}] focus")
+        peer_active(True)
+        wait(lambda: count(screenshot("caret-refocused"), underline) <= cw + 2)
+        check("caret_focus_return_does_not_replay_old_preedit", True)
+
+        before_input = len(input_bytes(root))
+        committed = "你好世界"
+        ime_command(peer, "commit " + committed)
+        wait(lambda: len(input_bytes(root)) >= before_input + len(committed.encode()))
+        after = cli("info", "interaction")
+        check("caret_commit_reaches_same_owned_pty_once",
+              input_bytes(root)[before_input:] == committed.encode()
+              and after["pid"] == initial["pid"]
+              and after["broker_pid"] == initial["broker_pid"],
+              actual_hex=input_bytes(root)[before_input:].hex(), pid=after["pid"],
+              broker_pid=after["broker_pid"])
+        peer.stdin.write(b"quit\n")
+        peer.stdin.flush()
+        check("caret_peer_exits_cleanly", peer.wait(timeout=5) == 0)
+        idle_keyboard.terminate()
+        idle_keyboard.wait(timeout=5)
+
     success = False
     try:
         socket = wait(lambda: next(runtime.glob("sway-ipc.*.sock"), None))
@@ -355,6 +509,10 @@ with tempfile.TemporaryDirectory(prefix="ztty-wayland-") as temp:
         check("native_surface_and_pty", proc.poll() is None and bool(window(proc)), app_id="org.project-z.ztty")
         check("cwd_and_terminal_environment", state["pwd_matches_cwd"] and state["term"] == "xterm-256color"
               and state["program"] == "ztty", state={k:state[k] for k in ("cols","rows","term","program","pwd_matches_cwd")})
+        if args.ime_cursor_only:
+            ime_cursor_regression(proc, root, con_id)
+            success = True
+            raise SystemExit(0)
         time.sleep(0.15)
         image = screenshot("initial")
         red = sum(1 for p in pixels(image) if p == (192,32,48))
