@@ -53,6 +53,103 @@ These addresses identify sessions in the local broker. The HTTP portion records
 which MCP listener created the session; attaching the address does not connect
 to a remote machine.
 
+## Headless CLI
+
+These Linux commands use the same local broker socket as `ztty info` and `list`.
+Use a client and broker built with this feature. A stock 0.6.1 broker cannot
+serve the new jobs or input leases. Existing GUI, MCP, attach and control
+commands keep their protocols. Use a canonical URI whenever names are ambiguous.
+
+**Targeting and input.** On each invocation the client resolves the selector
+and pins the URI, session ID, creation timestamp and broker PID. For work across
+invocations, pass a saved `ztty info SESSION` result with `--expect`. Stream
+reads check the session identity. A send also checks the input-control epoch
+from the supplied snapshot when present. Each temporary lease changes that
+epoch, so refresh a full info snapshot before the next pinned send. To pin only
+the session across multiple sends, pass the four identity fields
+`{uri,id,created_at,broker_pid}` as JSON. Even then the broker checks the epoch
+observed at the start of each invocation.
+
+`send SESSION -- DATA` writes the single argument's exact bytes. With
+`--stdin` it reads through EOF, including NUL and invalid UTF-8. The optional
+`--enter` appends a single carriage return (0x0d). The entire payload must fit
+in 65,536 bytes, including that CR. Terminal line discipline and the foreground
+application determine how the bytes are interpreted.
+
+```sh
+# With input already released by its owner:
+id=$(ztty info ztty://local/work | jq -c '{uri,id,created_at,broker_pid}')
+printf '%s' 'printf hello' | ztty send work --expect "$id" --stdin
+ztty send work --expect "$id" --enter -- ''
+```
+
+The owner releases control using its own interface (`ztty control SESSION
+release` for the local owner, `session_control` for an MCP owner). A send
+acquires only a free session and replies after the PTY accepts the input.
+A disconnect, takeover or five-second drain timeout can leave a prefix already
+accepted. The client never replays the request. The broker releases the
+temporary lease and drops unsent bytes. Inspect the target before deciding
+whether to submit again. `read` and `wait` never acquire input.
+
+**Output pages and waits.** Both commands return a JSON page. `output_base64`
+is lossless and `output` is a UTF-8 display string. Continue at `next_cursor`.
+`truncated` means older bytes have fallen out of the ring, `first_cursor` is
+the oldest retained offset and `has_more` signals remaining or incomplete
+bytes. The page defaults to 16,384 bytes. `--max-bytes` accepts 1–65,536,
+with up to three bytes of lookahead to complete a UTF-8 character. A separate
+bounded screen snapshot is also included.
+
+```sh
+page=$(ztty read work --expect "$id" --cursor 0 --max-bytes 1024)
+next=$(printf '%s' "$page" | jq -r .next_cursor)
+ztty wait work --expect "$id" --cursor "$next" --until output --timeout-ms 1000
+ztty wait work --expect "$id" --until eof --timeout-ms 3000
+```
+
+`wait` defaults to `--until output` from cursor 0. Existing bytes count.
+An output wait returns `output` for available bytes, `truncated` for a gap or
+`eof` when no further bytes can arrive. An EOF wait returns once the PTY
+output closes, even with unread bytes. Timeouts accept 0–30,000 ms (default
+5,000). Zero checks immediately. This deadline covers the broker wait. IPC
+connection and reply delivery have separate transport timeouts. An already-parked wait can receive the final page of an ordinary local PTY
+before its normal retirement. A session removed before the wait is registered,
+or explicitly closed during a wait, is reported as gone.
+
+**Command PTYs.** `exec --new NAME -- PROGRAM [ARG...]` creates
+`ztty://job/NAME` atomically with the caller's argv, working directory and
+environment. An existing job with that name rejects creation. The job runs
+without a window. Output shares the PTY's stdout/stderr stream. Completion
+requires the broker to reap the specified child and observe PTY EOF. An
+inherited open PTY in a descendant can delay completion. Ordinary shells'
+OSC 133 records have no per-submission receipt; `exec SESSION -- ...`
+returns `unsupported` before writing. The new PTY does not inherit an existing
+interactive shell's variables, functions or current directory.
+
+```sh
+ztty exec --new check --max-bytes 4096 --timeout-ms 5000 -- /bin/sh -c 'printf checked; exit 7'
+```
+
+A timeout returns the job identity and one bounded output page. The command
+keeps running. Use `wait --until eof`, `read` and `info` on the returned URI
+to resume observation. A completed job is removed automatically after a
+single-page result if its ownership and attachment still permit cleanup.
+If more output remains, or the job timed out, it stays in the broker.
+Use `ztty close ztty://job/NAME` when finished. Lost confirmation can leave
+a job retained. Inspect the named job before starting another invocation.
+
+| CLI outcome | Process exit | JSON status |
+| --- | ---: | --- |
+| Send drained, page read or wait condition met | 0 | `sent`, `read`, `output`, `truncated`, or requested `eof` |
+| Usage, ownership, cursor, broker or transport error | 1 | Diagnostic on stderr |
+| Output wait reached EOF with an empty page | 3 | `eof` |
+| Target identity changed or disappeared | 4 | `session_changed_or_gone` |
+| Unsupported exec mode or broker | 69 | `unsupported` |
+| Wait or job deadline expired | 124 | `timeout` |
+| Command PTY completed | Child exit code or 128 + signal | `completed` |
+
+A child's exit code can coincide with a CLI status. Use the JSON `status`
+field to distinguish them.
+
 ## Session lifetime
 
 | Event | Ordinary local session | MCP session |

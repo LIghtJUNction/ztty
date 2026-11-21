@@ -74,6 +74,7 @@ impl Pool {
             .unwrap_or("local");
         let valid_origin = origin == "local"
             || origin == "mux"
+            || origin == "job"
             || origin == "mcp/stdio"
             || origin.strip_prefix("mcp/http/").is_some_and(|a| {
                 !a.is_empty()
@@ -588,56 +589,56 @@ impl Pool {
             "terminal-frame" => self.sessions[index]
                 .terminal_frame(request)
                 .map(Reply::Value),
-            "write" => {
-                let drain_ms = broker::input_drain_timeout(request)?;
+            "write" => self.sessions[index].write_input(
+                request,
+                actor(request)?,
+                broker::input_drain_timeout(request)?,
+            ),
+            "job-finish" => {
+                // Only discard the original completed, unclaimed job after
+                // its final page was returned. A user may have attached to it.
+                let session = &self.sessions[index];
+                if request.get("expected_session").is_none() || session.origin != "job" {
+                    return Err("job-finish requires a pinned command PTY".into());
+                }
+                let retain = actor(request)? != "local"
+                    || session.ui.is_some()
+                    || !session.core.owns("local")
+                    || !session.core.eof()
+                    || session.status().is_none()
+                    || request.get("control_epoch").and_then(Value::as_u64)
+                        != Some(session.core.control_epoch());
+                if !retain {
+                    self.retire(index);
+                }
+                Ok(Reply::Value(retain.into()))
+            }
+            "cli-send" => {
                 let session = &mut self.sessions[index];
-                if session.core.eof() || session.status().is_some() {
-                    return Err("session has exited".into());
+                if request.get("expected_session").is_none() {
+                    return Err("cli-send requires a session identity".into());
                 }
-                let raw = request
-                    .get("_data_hex")
-                    .map(|value| {
-                        if request.get("data").is_some() {
-                            return Err(String::from("choose data or _data_hex"));
-                        }
-                        let value = value
-                            .as_str()
-                            .filter(|s| s.len() <= 131072)
-                            .ok_or("raw input exceeds 65536 bytes")?;
-                        broker::unhex_bytes(value)
-                    })
-                    .transpose()?;
-                let data = if let Some(raw) = &raw {
-                    raw.as_slice()
-                } else {
-                    request
-                        .get("data")
-                        .and_then(Value::as_str)
-                        .ok_or("data must be a string")?
-                        .as_bytes()
-                };
-                if data.len() > 65536 {
-                    return Err("write data exceeds 65536 bytes".into());
+                if session.core.owner().is_some() {
+                    return Err("input is owned; the current owner must release control".into());
                 }
-                if !session.core.input.push(data) {
-                    return Err("session input queue is full".into());
-                }
-                if !data.is_empty()
-                    && let Some(ui) = &mut session.ui
+                if request.get("control_epoch").and_then(Value::as_u64)
+                    != Some(session.core.control_epoch())
                 {
-                    ui.repaint.input_sent();
+                    return Err("input control epoch changed".into());
                 }
-                let flushed = session.core.flush_input();
-                if let Some(wait_ms) = drain_ms {
-                    flushed.map_err(|error| {
-                        format!("cannot write pending input to the PTY: {error}")
-                    })?;
-                    return session.drain_input(actor(request)?, data.len(), wait_ms);
+                if session.core.input.pending() {
+                    return Err("terminal has pending input".into());
                 }
-                Ok(Reply::Value(json::object([
-                    ("written", Value::from(data.len())),
-                    ("uri", Value::from(session.uri.clone())),
-                ])))
+                session.core.acquire(broker::CLI_SENDER, false)?;
+                let result = session.write_input(
+                    request,
+                    broker::CLI_SENDER,
+                    Some(broker::MAX_INPUT_DRAIN_MS),
+                );
+                if !matches!(result, Ok(Reply::ReadWait(_))) {
+                    session.core.release(broker::CLI_SENDER)?;
+                }
+                result
             }
             "resize" => {
                 let cols = bounded(request, "cols", 120, 2, 512)?;
@@ -784,12 +785,67 @@ pub(super) fn environment(request: &Value) -> Result<Vec<CString>, String> {
     }
 }
 
+impl Session {
+    fn write_input(
+        &mut self,
+        request: &Value,
+        actor: &str,
+        drain_ms: Option<u64>,
+    ) -> Result<Reply, String> {
+        if self.core.eof() || self.status().is_some() {
+            return Err("session has exited".into());
+        }
+        let raw = request
+            .get("_data_hex")
+            .map(|value| {
+                if request.get("data").is_some() {
+                    return Err(String::from("choose data or _data_hex"));
+                }
+                let value = value
+                    .as_str()
+                    .filter(|s| s.len() <= 131072)
+                    .ok_or("raw input exceeds 65536 bytes")?;
+                broker::unhex_bytes(value)
+            })
+            .transpose()?;
+        let data = if let Some(raw) = &raw {
+            raw.as_slice()
+        } else {
+            request
+                .get("data")
+                .and_then(Value::as_str)
+                .ok_or("data must be a string")?
+                .as_bytes()
+        };
+        if data.len() > 65536 {
+            return Err("write data exceeds 65536 bytes".into());
+        }
+        if !self.core.input.push(data) {
+            return Err("session input queue is full".into());
+        }
+        if !data.is_empty()
+            && let Some(ui) = &mut self.ui
+        {
+            ui.repaint.input_sent();
+        }
+        let flushed = self.core.flush_input();
+        if let Some(wait_ms) = drain_ms {
+            flushed.map_err(|error| format!("cannot write pending input to the PTY: {error}"))?;
+            return self.drain_input(actor, data.len(), wait_ms);
+        }
+        Ok(Reply::Value(json::object([
+            ("written", Value::from(data.len())),
+            ("uri", Value::from(self.uri.clone())),
+        ])))
+    }
+}
+
 pub(super) fn actor(request: &Value) -> Result<&str, String> {
     match request.get("_actor") {
         None => Ok("local"),
         Some(value) => value
             .as_str()
-            .filter(|s| session_control::valid_actor(s))
+            .filter(|s| session_control::valid_actor(s) && *s != broker::CLI_SENDER)
             .ok_or_else(|| String::from("invalid control identity")),
     }
 }

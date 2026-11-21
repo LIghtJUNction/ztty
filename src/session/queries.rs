@@ -1,7 +1,7 @@
 //! Session metadata, output pages and bounded deferred input/output waits.
 use super::{Session, requests::bounded};
 use crate::{
-    broker::{InputDrain, ReadWait, Reply},
+    broker::{InputDrain, ReadUntil, ReadWait, Reply},
     json::{self, Value},
     os,
 };
@@ -52,6 +52,7 @@ impl Session {
                 self.status().map(Value::from).unwrap_or(Value::Null),
             ),
             ("output_eof", Value::Bool(self.core.eof())),
+            ("control_epoch", self.core.control_epoch().into()),
             ("title", Value::from(self.core.terminal.title())),
             (
                 "input_owner",
@@ -106,10 +107,12 @@ impl Session {
             Some(v) => Some(v.as_u64().ok_or("max_bytes must be 1..65536")?),
         };
         let wait_ms = bounded(request, "wait_ms", 0, 0, 30000)? as u64;
+        let until = ReadUntil::parse(request.get("_until"))?;
         let chunk = self.core.read_output(cursor, max)?;
-        if wait_ms > 0 && !self.output_ready(&chunk) {
+        if wait_ms > 0 && !self.read_ready(until, &chunk) {
             return Ok(Reply::ReadWait(ReadWait {
                 session_id: self.id,
+                until,
                 cursor,
                 max_bytes: max,
                 deadline: os::milliseconds() + wait_ms,
@@ -122,10 +125,14 @@ impl Session {
         ))
     }
 
-    pub(super) fn output_ready(&self, chunk: &OutputChunk) -> bool {
+    fn read_ready(&self, until: Option<ReadUntil>, chunk: &OutputChunk) -> bool {
         // has_more also includes an incomplete UTF-8 suffix. Keep waiting for
         // its continuation instead of returning an empty page in a busy loop.
-        !chunk.bytes.is_empty() || chunk.truncated || self.core.eof()
+        match until.unwrap_or(ReadUntil::Output) {
+            ReadUntil::Output => !chunk.bytes.is_empty() || chunk.truncated || self.core.eof(),
+            ReadUntil::Eof => self.core.eof(),
+            ReadUntil::Exit => self.core.eof() && self.status().is_some(),
+        }
     }
 
     pub(super) fn wait_output(&self, wait: &ReadWait) -> Result<Option<Value>, String> {
@@ -156,8 +163,15 @@ impl Session {
                 || os::milliseconds() >= wait.deadline)
                 .then(|| self.frame_revision()));
         }
+        // EOF/exit waits can ignore unrelated output without copying a retained page.
+        if matches!(wait.until, Some(ReadUntil::Eof | ReadUntil::Exit))
+            && !self.core.eof()
+            && os::milliseconds() < wait.deadline
+        {
+            return Ok(None);
+        }
         let chunk = self.core.read_output(wait.cursor, wait.max_bytes)?;
-        let ready = self.output_ready(&chunk);
+        let ready = self.read_ready(wait.until, &chunk);
         if ready || os::milliseconds() >= wait.deadline {
             Ok(Some(self.read_value(chunk, Some(!ready))))
         } else {
@@ -175,6 +189,7 @@ impl Session {
     ) -> Result<Reply, String> {
         let wait = ReadWait {
             session_id: self.id,
+            until: None,
             cursor: 0,
             max_bytes: None,
             deadline: os::milliseconds().saturating_add(wait_ms),
@@ -259,6 +274,7 @@ impl Session {
         if !self.frame_changed(revision, epoch) && wait_ms > 0 {
             return Ok(Reply::ReadWait(ReadWait {
                 session_id: self.id,
+                until: None,
                 cursor: 0,
                 max_bytes: None,
                 deadline: os::milliseconds() + wait_ms,
