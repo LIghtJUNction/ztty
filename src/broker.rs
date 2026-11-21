@@ -9,6 +9,7 @@ use core::ffi::{CStr, c_char, c_int, c_void};
 use core::sync::atomic::{AtomicU64, Ordering};
 
 const LIMIT: usize = 1024 * 1024;
+pub const MAX_NEW_WINDOWS: usize = 16;
 const MAX_PEERS: usize = 192;
 const MAX_WAITERS: usize = 128;
 pub(crate) const MAX_INPUT_DRAIN_MS: u64 = 5000;
@@ -350,7 +351,7 @@ pub fn unhex_bytes(value: &str) -> Result<Vec<u8>, String> {
 fn caller_metadata(value: &mut Value) -> Result<(), String> {
     if matches!(
         value.get("op").and_then(Value::as_str),
-        Some("create" | "attach")
+        Some("create" | "new-windows" | "attach")
     ) {
         value.set(
             "_env",
@@ -403,6 +404,15 @@ impl PendingRequest {
         let operation = value.get("op").and_then(Value::as_str);
         let reply_timeout = if operation == Some("wait") {
             None
+        } else if operation == Some("new-windows") {
+            // One bounded request may pay the ordinary creation cost for each window.
+            Some(
+                5000 * value
+                    .get("count")
+                    .and_then(Value::as_u64)
+                    .unwrap_or(1)
+                    .clamp(1, MAX_NEW_WINDOWS as u64),
+            )
         } else if operation == Some("reload") {
             // The pinned replacement gets a bounded 10 s validation window;
             // reserve time for complete native view/layout reconstruction too.

@@ -47,6 +47,14 @@ pub fn run(cfg: Config) -> Result<i32, String> {
     if let Some(profile) = cfg.ssh_profile {
         request.set("_ssh", profile);
     }
+    if let Some(count) = cfg.new_windows {
+        request.set("op", "new-windows".into());
+        request.set("count", count.into());
+        let result = broker::request(&request)?;
+        os::print(1, json::stringify(&result).as_bytes());
+        os::print(1, b"\n");
+        return Ok(i32::from(result.get("error").is_some()));
+    }
     let created = broker::request(&request)?;
     wait_session(&created)
 }

@@ -21,6 +21,30 @@ ztty attach
 ztty attach work
 ```
 
+To open independent Linux windows and return after creation, use `ztty new`:
+
+```sh
+ztty new
+ztty new --count 3 --name build --cwd /tmp -e /bin/sh
+```
+
+`--count` defaults to 1 and accepts 1–16. Each window gets a separate session,
+PTY and instance of the command (the caller's shell by default). For one
+window, `--name build` gives the name `build`. For three, it gives `build-1`,
+`build-2` and `build-3`. Omitting the name uses the usual `session-N`
+names. Normal standalone launch options apply, including `--backend`. Tab
+and split targets are rejected.
+
+Before starting the first window, the local broker checks the entire batch
+against its 128-session limit, the 64-byte name limit (including suffixes),
+and existing local session names and creation URIs. On success the command
+prints JSON containing `requested` and a `created` array of session records,
+then exits 0. Closing one window follows its ordinary session lifetime.
+A preflight error exits 1 with a diagnostic on stderr. A runtime failure
+stops the batch, leaves earlier windows available, and exits 1 with
+`created`, `failed_name` and `error` in the JSON result. If the connection
+breaks before a reply, inspect `ztty list` on the same broker before retrying.
+
 Each ordinary launch opens its window and waits until that window closes or
 its command finishes. The `&` in the example leaves the launching shell
 available. The waiting launcher is small and is included in the multi-window

@@ -96,6 +96,8 @@ PTY、屏幕和历史。X11 窗口还共用显示连接与字体缓存。
 
 ```sh
 ztty --name work -e /bin/bash &
+ztty new                         # 打开一个独立窗口并返回
+ztty new --count 3 --name workset # 打开 workset-1、workset-2、workset-3
 ztty attach                     # 列出会话
 ztty attach work                # 打开窗口或将已有窗口置前
 ztty attach --observe work      # 只读观察

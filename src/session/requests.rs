@@ -13,6 +13,8 @@ use alloc::{ffi::CString, format, string::String, vec::Vec};
 use core::ffi::CStr;
 use zterm::Terminal;
 
+const SESSION_LIMIT: usize = 128;
+
 impl Pool {
     pub(super) fn selector(&self, request: &Value) -> Result<usize, String> {
         if let Some(id) = request.get("session").and_then(Value::as_u64) {
@@ -43,6 +45,73 @@ impl Pool {
         Ok(first)
     }
 
+    fn check_name(&self, origin: &str, name: &str) -> Result<String, String> {
+        if !valid_name(name) {
+            return Err(
+                "session names use 1..64 ASCII letters, digits, dot, underscore or hyphen".into(),
+            );
+        }
+        let uri = format!("ztty://{origin}/{name}");
+        if self
+            .sessions
+            .iter()
+            .any(|s| s.uri == uri || (s.origin == origin && s.name == name))
+        {
+            return Err(format!("session already exists: {uri}"));
+        }
+        Ok(uri)
+    }
+
+    fn new_windows(&mut self, request: &Value) -> Result<Value, String> {
+        let count = bounded(request, "count", 1, 1, broker::MAX_NEW_WINDOWS)?;
+        if self.sessions.len() + count > SESSION_LIMIT {
+            return Err(format!("batch exceeds session limit ({SESSION_LIMIT})"));
+        }
+        if request.get("target").is_some()
+            || request.get("origin").and_then(Value::as_str) != Some("local")
+            || request.get("headless").and_then(Value::as_bool) != Some(false)
+        {
+            return Err("new-windows requires standalone local windows".into());
+        }
+        let base = request
+            .get("name")
+            .map(|v| {
+                v.as_str()
+                    .filter(|s| valid_name(s))
+                    .ok_or("invalid window name base")
+            })
+            .transpose()?;
+
+        // One broker dispatch preflights the entire namespace before allocating
+        // IDs, windows or PTYs. A concurrent create cannot interleave here.
+        let mut names = Vec::with_capacity(count);
+        for index in 0..count {
+            let name = match base {
+                Some(name) if count == 1 => name.into(),
+                Some(base) => format!("{base}-{}", index + 1),
+                None => format!("session-{}", self.next + index as u64),
+            };
+            self.check_name("local", &name)?;
+            names.push(name);
+        }
+        let mut create = request.clone();
+        let mut created = Vec::with_capacity(count);
+        let mut result = json::object([("requested", count.into())]);
+        for name in names {
+            create.set("name", name.as_str().into());
+            match self.create(&create) {
+                Ok(session) => created.push(session),
+                Err(error) => {
+                    result.set("failed_name", name.into());
+                    result.set("error", error.into());
+                    break;
+                }
+            }
+        }
+        result.set("created", Value::Array(created));
+        Ok(result)
+    }
+
     pub(super) fn create(&mut self, request: &Value) -> Result<Value, String> {
         let ssh_profile = request
             .get("_ssh")
@@ -65,7 +134,7 @@ impl Pool {
         if observe && request.get("target").is_some() {
             return Err("observing launches require a standalone view".into());
         }
-        if self.sessions.len() >= 128 {
+        if self.sessions.len() >= SESSION_LIMIT {
             return Err("session limit reached (128); close unused sessions".into());
         }
         let origin = request
@@ -91,19 +160,7 @@ impl Pool {
             None => default.as_str(),
             Some(value) => value.as_str().ok_or("name must be a string")?,
         };
-        if !valid_name(name) {
-            return Err(
-                "session names use 1..64 ASCII letters, digits, dot, underscore or hyphen".into(),
-            );
-        }
-        let uri = format!("ztty://{origin}/{name}");
-        if self
-            .sessions
-            .iter()
-            .any(|s| s.uri == uri || (s.origin == origin && s.name == name))
-        {
-            return Err(format!("session already exists: {uri}"));
-        }
+        let uri = self.check_name(origin, name)?;
         let cols = bounded(request, "cols", 120, 2, 512)?;
         let rows = bounded(request, "rows", 32, 2, 256)?;
         let history = bounded(request, "history", 2000, 0, 100000)?;
@@ -380,6 +437,9 @@ impl Pool {
             .get("op")
             .and_then(Value::as_str)
             .ok_or("missing operation")?;
+        if op == "new-windows" {
+            return self.new_windows(request).map(Reply::Value);
+        }
         if op == "create" {
             return self.create(request).map(Reply::Value);
         }

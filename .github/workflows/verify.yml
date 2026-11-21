@@ -24,6 +24,7 @@ jobs:
           ZTTY_WAYLAND=1 ZTTY_BARE_METAL=1 make check
           cargo test --locked --workspace --doc
           cargo clippy --locked --workspace --all-targets --features wayland -- -D warnings
+          /usr/bin/python3 tests/new_windows.py --binary target/release/ztty
           /usr/bin/python3 tests/gui_smoke.py
           /usr/bin/python3 tests/ssh_mux.py --binary target/release/ztty --output artifacts/ssh-mux.json
           /usr/bin/python3 tests/ssh_mux_gui.py --binary target/release/ztty --output artifacts/ssh-mux-gui.json --screenshot artifacts/ssh-mux-gui.png
