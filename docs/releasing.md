@@ -9,9 +9,10 @@ Cargo.lock records the exact tested package versions and commits. Library
 submodule pins match the application graph for independent checks.
 Same-repository dependencies keep their workspace or path relationship.
 
-The [2026-11-21 source report](reports/default-branch-sources-20261121/README.zh-CN.md)
-records the current graph, shared Cargo artifact handling, local gates, plugins
-and actual same-PID reload checks. The package version remains `0.5.2`; this
+The [Git-only maintenance report](reports/git-only-dependencies-20261121/README.zh-CN.md)
+records the current graph and verified plugin consumption. The earlier
+[source report](reports/default-branch-sources-20261121/README.zh-CN.md) records
+shared Cargo artifact handling and same-PID reload checks. The package version remains `0.5.2`; this
 iteration does not establish a new registry release or desktop installation.
 The [propagation record](dependency-propagation.md) identifies the remaining
 suite and aggregate owners.
