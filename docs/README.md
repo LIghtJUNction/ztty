@@ -3,7 +3,7 @@
 The READMEs cover installation and common controls:
 [English](../README.md) · [中文](../README.zh-CN.md).
 
-These guides describe 0.6.0 and current main. Dated reports retain the source
+These guides describe 0.6.1 and current main. Dated reports retain the source
 revision and executable they tested; release notes identify published behavior.
 
 ## Use ztty
@@ -48,6 +48,7 @@ These reports retain the source, executable and environment used for each run.
 
 | Area | Record |
 | --- | --- |
+| SSH multiplexing | [Persistent sessions and frame measurements](reports/ssh-mux-20261121/README.zh-CN.md) |
 | X11 rendering | [GPU text and complete frames](reports/x11-gpu-20261119/report.zh-CN.md) |
 | Native Wayland | [Single-window acceptance](measurements/native-wayland-2026-11-19/README.md) |
 | Kitty and OSC 52 | [Linux GPU/software integration](reports/graphics-extensions-20261120/report.zh-CN.md) |

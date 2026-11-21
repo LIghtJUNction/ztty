@@ -120,7 +120,7 @@ covers tools such as ssmcp.
 
 ## SSH terminal multiplexing (Linux)
 
-ztty 0.6.0 keeps remote shells in a headless session broker. Closing an SSH
+ztty 0.6.1 keeps remote shells in a headless session broker. Closing an SSH
 connection or its window leaves those shells running; reconnecting restores
 their screen and bounded scrollback. Install ztty on both Linux machines, then:
 

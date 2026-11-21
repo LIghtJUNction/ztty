@@ -1,0 +1,273 @@
+{
+  "workflow_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44925439574",
+  "source_commit": "c63dbd52e9fb597b77245403460972ecb699f096",
+  "report": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "native_ssh_window_and_real_keyboard_input",
+        "ok": true,
+        "local_broker_pid": 8199,
+        "remote_broker_pid": 8209,
+        "remote_pty_pid": 8210,
+        "xtest_input": "echo guiinput + Return",
+        "elapsed_ms": 285.873
+      },
+      {
+        "name": "new_tab_inherits_remote_host_and_creates_an_independent_pty",
+        "ok": true,
+        "remote_session": "pane-8199-1795279105172-2",
+        "remote_pty_pid": 8214,
+        "elapsed_ms": 24.495
+      },
+      {
+        "name": "split_and_new_window_keep_the_ssh_profile_and_connection",
+        "ok": true,
+        "remote_sessions": [
+          "main",
+          "pane-8199-1795279105172-2",
+          "pane-8199-1795279105196-3",
+          "pane-8199-1795279105220-4"
+        ],
+        "remote_pty_pids": [
+          8210,
+          8214,
+          8217,
+          8220
+        ],
+        "control_masters": 1,
+        "ssh_authentications": 1,
+        "elapsed_ms": 70.044
+      },
+      {
+        "name": "native_split_pixels_and_chinese_colored_terminal_screenshot",
+        "ok": true,
+        "native_pixels": {
+          "left": {
+            "green_status": 101,
+            "blue_footer": 108,
+            "chinese_rows": 231,
+            "final_line": 127
+          },
+          "right": {
+            "green_status": 101,
+            "blue_footer": 108,
+            "chinese_rows": 231,
+            "final_line": 127
+          }
+        },
+        "native_coverage": {
+          "left": {
+            "green_status": 76.07,
+            "blue_footer": 87.48,
+            "chinese_rows": 197.69,
+            "final_line": 113.29
+          },
+          "right": {
+            "green_status": 76.07,
+            "blue_footer": 87.48,
+            "chinese_rows": 197.69,
+            "final_line": 113.29
+          }
+        },
+        "legacy_opaque_pixels": {
+          "left": {
+            "green_status": 60,
+            "blue_footer": 57,
+            "chinese_rows": 19,
+            "final_line": 89
+          },
+          "right": {
+            "green_status": 60,
+            "blue_footer": 57,
+            "chinese_rows": 19,
+            "final_line": 89
+          }
+        },
+        "native_geometry": {
+          "left": {
+            "x": 0,
+            "y": 0,
+            "width": 563,
+            "height": 752,
+            "cols": 57,
+            "rows": 32,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            },
+            "legacy_inferred_cell_height": 22,
+            "grid_matches": true
+          },
+          "right": {
+            "x": 565,
+            "y": 0,
+            "width": 563,
+            "height": 752,
+            "cols": 57,
+            "rows": 32,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            },
+            "legacy_inferred_cell_height": 22,
+            "grid_matches": true
+          }
+        },
+        "screenshot": "/home/runner/work/ztty/ztty/artifacts/ssh-mux-gui.png",
+        "width": 1128,
+        "height": 752,
+        "screenshot_sha256": "7fc4b2ba2121b7b94ec5e8e03155bb38975739e07da0f61c975396386d375863",
+        "elapsed_ms": 186.075
+      },
+      {
+        "name": "closing_all_native_views_preserves_remote_sessions",
+        "ok": true,
+        "preserved_remote_pty_pids": [
+          8210,
+          8214,
+          8217,
+          8220
+        ],
+        "elapsed_ms": 21.269
+      },
+      {
+        "name": "reopening_named_remote_gui_keeps_the_same_shell",
+        "ok": true,
+        "remote_pty_pid": 8210,
+        "restored_window_id": 2097188,
+        "elapsed_ms": 44.727
+      }
+    ],
+    "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+    "binary_sha256": "d6f7e455c99b26a6a668b89bc66ff219ce5d065e3d078b204dc7ab2b0b0eeb5e",
+    "test_script_sha256": "eab3d0f1caf5a0c626fdd2a41725be55d9e4ee90247665d5238141cca156a4b3",
+    "platform": "Linux X11 / owned Xvfb / real localhost OpenSSH",
+    "renderer": "software",
+    "xserver_ownership": {
+      "display": ":19950",
+      "pid": 8193,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X19950",
+          "inode": 39290,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X19950",
+          "inode": 39289,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    "cell_metrics": {
+      "width": 9,
+      "height": 22,
+      "padding": 24,
+      "initial_window": [
+        1128,
+        752
+      ],
+      "initial_grid": [
+        120,
+        32
+      ]
+    },
+    "decoration_readiness": {
+      "Remote 01": {
+        "remote": {
+          "title": "Remote 01",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        },
+        "local": {
+          "title": "Remote 01",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        }
+      },
+      "Remote 02": {
+        "remote": {
+          "title": "Remote 02",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        },
+        "local": {
+          "title": "Remote 02",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        }
+      }
+    },
+    "renderers": [
+      {
+        "window_id": 2097162,
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      },
+      {
+        "window_id": 2097170,
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      }
+    ],
+    "screenshot": "/home/runner/work/ztty/ztty/artifacts/ssh-mux-gui.png",
+    "cleanup_errors": [],
+    "remaining_owned_pids": []
+  }
+}

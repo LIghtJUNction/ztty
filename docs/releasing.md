@@ -26,9 +26,9 @@ release projection rejects repositories with submodules; extend and verify its
 recursive staging before using that entry point for ztty. The candidate and
 publication sections below describe their original historical inputs.
 
-## 0.6.0 SSH session release
+## 0.6.1 SSH session release
 
-The application version is `0.6.0`. Its [SSH session guide](ssh-sessions.md)
+The application version is `0.6.1`. Its [SSH session guide](ssh-sessions.md)
 describes the Linux client and persistent remote PTY, native tabs and splits,
 connection sharing, frame deltas, and compatibility limits. The application
 retains the existing locked Git dependency graph; this release does not change
@@ -39,6 +39,20 @@ The tagged source must pass Verify and all six native architecture jobs in the
 private real OpenSSH server and native SSH tabs/splits. Publication uses the
 workflow's existing source, checksum, provenance and downloaded-asset checks.
 Installation is checked separately against the built executable.
+
+The immutable `v0.6.0` candidate at `7e8e8ae2513165a0bc50c10385c8d787f608c7ef`
+passed all six native platform jobs and the 18 SSH checks in
+[Release run 44924311902](https://github.com/LIghtJUNction/ztty/actions/runs/44924311902),
+but Verify stopped at the new SSH screenshot readiness check. Publication was
+skipped. Its original tag is retained. The follow-up test measures native cell
+metrics and antialiased color coverage, records the original pixel counters,
+and uploads failure diagnostics. Version 0.6.1 must pass the full workflow again.
+
+[The corrected-probe CI run](https://github.com/LIghtJUNction/ztty/actions/runs/44925439574)
+passed. Its retained counters show 19 nearly opaque pixels in each Chinese text
+band under the old threshold, versus 197.69 equivalent opaque pixels when the
+actual antialiased coverage is included. The runner also lacked CJK glyphs, so
+Verify now installs Noto CJK for meaningful Chinese screenshot acceptance.
 
 ## Historical 0.5.2 candidate — 2026-11-20
 

@@ -111,7 +111,7 @@ ssmcp 等工具的接入见[观察模式](docs/ssmcp-observer.md)。
 
 ## SSH 终端多路复用（Linux）
 
-ztty 0.6.0 在远端共享进程中持有 shell 和 PTY。关闭窗口或断开 SSH 后，
+ztty 0.6.1 在远端共享进程中持有 shell 和 PTY。关闭窗口或断开 SSH 后，
 任务继续运行；重新连接恢复屏幕与有界滚屏历史。两端安装 ztty 后即可使用：
 
 ```sh

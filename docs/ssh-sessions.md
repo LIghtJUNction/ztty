@@ -1,6 +1,6 @@
 # SSH sessions
 
-ztty 0.6.0 can open a Linux terminal session over SSH and keep its PTY running
+ztty 0.6.1 can open a Linux terminal session over SSH and keep its PTY running
 after the connection closes. The remote ztty broker owns the shell, parsed screen
 and history. An SSH client is a view of that state. Reattaching a named session
 keeps its process and shell variables; its creation command runs once.
@@ -10,7 +10,7 @@ session protocol; it does not connect to a Rex Server or use Rex's wire format.
 
 ## Connect and reconnect
 
-Install ztty 0.6.0 or later on the local and remote Linux machines. The remote
+Install ztty 0.6.1 or later on the local and remote Linux machines. The remote
 executable is found on the SSH user's PATH or at `~/.local/bin/ztty`.
 
 ```sh
