@@ -3,8 +3,10 @@
 ## Current source dependency maintenance
 
 Development dependencies between Project Z repositories use canonical GitHub Git
-URLs and their default branches. Cargo.lock records the exact tested commits;
-library submodule pins match the application graph for independent checks.
+URLs and their default branches, without version, tag, branch or revision
+selectors. Refresh the application, example and fixture lockfiles together;
+Cargo.lock records the exact tested package versions and commits. Library
+submodule pins match the application graph for independent checks.
 Same-repository dependencies keep their workspace or path relationship.
 
 The [2026-11-21 source report](reports/default-branch-sources-20261121/README.zh-CN.md)
@@ -15,10 +17,13 @@ The [propagation record](dependency-propagation.md) identifies the remaining
 suite and aggregate owners.
 
 A later release must validate its own source, resolved dependencies and artifacts.
-If publishing a registry package, separately verify the generated archive and its
-registry dependency graph; the current Git-source checks do not establish that
-package's contents. The candidate and publication sections below describe their
-original historical inputs.
+Registry publication uses a separate staging manifest: derive exact registry
+versions from the committed lockfile, verify each version against its locked Git
+package, then validate the generated archive and registry dependency graph. Keep
+registry version selectors out of the development manifests. Project Z's current
+release projection rejects repositories with submodules; extend and verify its
+recursive staging before using that entry point for ztty. The candidate and
+publication sections below describe their original historical inputs.
 
 ## Historical 0.5.2 candidate — 2026-11-20
 

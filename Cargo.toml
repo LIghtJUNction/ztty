@@ -42,11 +42,11 @@ wayland = []
 unicode-segmentation = { version = "=1.13.3", default-features = false }
 # Project Z libraries follow their GitHub default branches; Cargo.lock records
 # the exact source snapshot used by this checkout.
-zgpui = { git = "https://github.com/LIghtJUNction/zgpui.git", version = "=0.1.5", default-features = false }
-zgraphics = { git = "https://github.com/LIghtJUNction/zgraphics.git", version = "=0.2.0", default-features = false }
-zinput = { git = "https://github.com/LIghtJUNction/zinput.git", version = "=0.1.3", default-features = false }
-zterm = { git = "https://github.com/LIghtJUNction/zterm.git", version = "=0.5.2", default-features = false }
-zpty = { git = "https://github.com/LIghtJUNction/zpty.git", version = "=0.2.3", default-features = false }
+zgpui = { git = "https://github.com/LIghtJUNction/zgpui.git", default-features = false }
+zgraphics = { git = "https://github.com/LIghtJUNction/zgraphics.git", default-features = false }
+zinput = { git = "https://github.com/LIghtJUNction/zinput.git", default-features = false }
+zterm = { git = "https://github.com/LIghtJUNction/zterm.git", default-features = false }
+zpty = { git = "https://github.com/LIghtJUNction/zpty.git", default-features = false }
 
 [profile.dev]
 panic = "abort"
@@ -63,5 +63,5 @@ codegen-units = 1
 
 [target.'cfg(target_os = "linux")'.dependencies]
 libc = { version = "=0.2.191", default-features = false }
-zplugin = { git = "https://github.com/LIghtJUNction/zplugin.git", version = "=0.3.1", default-features = false }
+zplugin = { git = "https://github.com/LIghtJUNction/zplugin.git", default-features = false }
 ztty-plugin-api = { path = "crates/ztty-plugin-api", version = "=0.1.0" }

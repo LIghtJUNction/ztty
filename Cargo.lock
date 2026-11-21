@@ -84,7 +84,7 @@ source = "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a04338
 [[package]]
 name = "zplugin"
 version = "0.3.1"
-source = "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#592a1be623b81a775026c470e6f0efe91fcf78f3"
 dependencies = [
  "zplugin-macros",
  "zsys",
@@ -93,7 +93,7 @@ dependencies = [
 [[package]]
 name = "zplugin-macros"
 version = "0.3.1"
-source = "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#592a1be623b81a775026c470e6f0efe91fcf78f3"
 dependencies = [
  "proc-macro2",
  "quote",
