@@ -29,6 +29,22 @@ from isolated_xvfb import start_xvfb
 from gui_renderer import record_renderer
 
 
+PADDING = 24
+
+
+def color_coverage(region, color):
+    """Measure requested ink over black, including antialiased glyph edges."""
+    energy = sum(channel * channel for channel in color)
+    pixels, coverage = 0, 0.0
+    for pixel in region.getdata():
+        alpha = sum(actual * target for actual, target in zip(pixel, color)) / energy
+        if .2 <= alpha <= 1.05 and all(abs(actual - alpha * target) <= 10
+                                       for actual, target in zip(pixel, color)):
+            pixels += 1
+            coverage += min(alpha, 1.0)
+    return pixels, round(coverage, 2)
+
+
 def main():
     from PIL import Image
     from Xlib import X, XK, display, protocol
@@ -56,7 +72,7 @@ def main():
         root = Path(temporary)
         fixture = Fixture(root, binary, report)
         processes = []
-        xvfb = connection = None
+        xvfb = connection = diagnostic_window = None
         log = (root / "gui.stderr").open("wb")
         local_socket = "@" + root.name + "-local"
 
@@ -170,15 +186,21 @@ def main():
             except BadWindow:
                 return True
 
+        def window_image(window):
+            connection.sync()
+            geometry = window.get_geometry()
+            raw = window.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
+            return Image.frombytes("RGB", (geometry.width, geometry.height), raw.data, "raw", "BGRX")
+
         def decorated(view, number):
             expected_title = "Remote " + number
             expected_lines = {
-                "REMOTE WORKSPACE " + number,
-                "CONNECTED",
-                "中文终端 · 持久会话",
-                "独立 PTY · 断开后继续运行",
-                "One SSH connection",
-                "Native tabs and split panes",
+                "workspace": "REMOTE WORKSPACE " + number,
+                "green_status": "CONNECTED",
+                "chinese_first": "中文终端 · 持久会话",
+                "chinese_second": "独立 PTY · 断开后继续运行",
+                "blue_footer": "One SSH connection",
+                "final_line": "Native tabs and split panes",
             }
             snapshots = {
                 "remote": fixture.output(remote_name(view)),
@@ -188,13 +210,17 @@ def main():
             ready = True
             for location, snapshot in snapshots.items():
                 screen = snapshot["screen"]
-                lines = {line.strip() for line in screen.splitlines()}
-                missing = sorted(expected_lines - lines)
+                lines = [line.strip() for line in screen.splitlines()]
+                missing = sorted(set(expected_lines.values()) - set(lines))
                 echoed = "\\033" in screen or "printf" in screen
                 evidence[location] = {
                     "title": snapshot["title"],
+                    "cols": snapshot["cols"],
+                    "rows": snapshot["rows"],
                     "missing_lines": missing,
                     "command_echo": echoed,
+                    "text_rows": {label: lines.index(text) for label, text in expected_lines.items()
+                                  if text in lines},
                 }
                 ready &= snapshot["title"] == expected_title and not missing and not echoed
             report.setdefault("decoration_readiness", {})[expected_title] = evidence
@@ -225,7 +251,7 @@ def main():
             config.parent.mkdir(parents=True, exist_ok=True)
             config.write_text("background = #000000\nforeground = #dce2ec\n"
                               "background-opacity = 100\nbackground-blur = false\n"
-                              "cursor-blink = false\nwindow-padding = 24\n"
+                              f"cursor-blink = false\nwindow-padding = {PADDING}\n"
                               "font = monospace:size=11\nrenderer = " + args.renderer + "\n")
             fixture.start_sshd()
             xvfb = start_xvfb(screen="1600x1000x24", stderr=log)
@@ -251,6 +277,25 @@ def main():
 
             with check(report, "native_ssh_window_and_real_keyboard_input") as row:
                 main_view = launch_main()
+                diagnostic_window = connection.create_resource_object("window", main_view["window_id"])
+                initial_geometry = diagnostic_window.get_geometry()
+                inner_width = initial_geometry.width - 2 * PADDING
+                inner_height = initial_geometry.height - 2 * PADDING
+                # A newly created standalone window is exactly cols*cw by
+                # rows*ch plus padding. Measure it before tab/split layouts add
+                # leftover pixels; division of a resized pane is not a font
+                # metric and can produce a different integer cell height.
+                require(inner_width > 0 and inner_width % main_view["cols"] == 0,
+                        "initial window width does not match the terminal grid")
+                require(inner_height > 0 and inner_height % main_view["rows"] == 0,
+                        "initial window height does not match the terminal grid")
+                cell_width = inner_width // main_view["cols"]
+                cell_height = inner_height // main_view["rows"]
+                report["cell_metrics"] = {
+                    "width": cell_width, "height": cell_height, "padding": PADDING,
+                    "initial_window": [initial_geometry.width, initial_geometry.height],
+                    "initial_grid": [main_view["cols"], main_view["rows"]],
+                }
                 require(remote_name(main_view) == "main", main_view)
                 initial = wait(lambda: fixture.info("main"), "remote main PTY")
                 require(initial["broker_pid"] != main_view["broker_pid"], "remote PTY used the local GUI broker")
@@ -297,52 +342,79 @@ def main():
                 same_session(remotes[remote_name(detached_view)], fixture.info(remote_name(detached_view)))
 
             with check(report, "native_split_pixels_and_chinese_colored_terminal_screenshot") as row:
-                decorate(tab_view, "tab", "01")
-                decorate(split_view, "split", "02")
                 tab_view, split_view = [local_info(view["uri"]) for view in (tab_view, split_view)]
                 parent = connection.create_resource_object("window", tab_view["workspace"])
+                diagnostic_window = parent
                 parent.configure(x=32, y=32, stack_mode=X.Above)
                 connection.sync()
+                decorate(tab_view, "tab", "01")
+                decorate(split_view, "split", "02")
                 report["renderers"] = [record_renderer(connection,
                     connection.create_resource_object("window", view["window_id"]), args.renderer)
                     for view in (tab_view, split_view)]
 
                 def capture():
-                    if not decorated(tab_view, "01") or not decorated(split_view, "02"):
+                    states = {"left": decorated(tab_view, "01"), "right": decorated(split_view, "02")}
+                    if not all(states.values()):
                         return None
-                    connection.sync()
-                    geometry = parent.get_geometry()
-                    raw = parent.get_image(0, 0, geometry.width, geometry.height, X.ZPixmap, 0xFFFFFFFF)
-                    picture = Image.frombytes("RGB", (geometry.width, geometry.height), raw.data, "raw", "BGRX")
-                    pixels = {}
+                    picture = window_image(parent)
+                    pixels, coverage, legacy_pixels, geometry = {}, {}, {}, {}
                     for label, view in (("left", tab_view), ("right", split_view)):
                         pane = connection.create_resource_object("window", view["window_id"]).get_geometry()
                         # Text parsing can precede the native paint. Require the
                         # custom-colored status/footer and final text row at
                         # their actual terminal positions, not arbitrary ink
                         # from an echoed command or a previous shell prompt.
-                        cell_height = (pane.height - 48) // view["rows"]
-                        require(cell_height > 0, "invalid terminal pixel geometry")
+                        state = states[label]["local"]
+                        inferred_height = (pane.height - 2 * PADDING) // state["rows"]
+                        geometry[label] = {
+                            "x": pane.x, "y": pane.y, "width": pane.width, "height": pane.height,
+                            "cols": state["cols"], "rows": state["rows"], "text_rows": state["text_rows"],
+                            "legacy_inferred_cell_height": inferred_height,
+                            "grid_matches": ((pane.width - 2 * PADDING) // cell_width == state["cols"]
+                                             and (pane.height - 2 * PADDING) // cell_height == state["rows"]),
+                        }
+
+                        def text_region(first_row, last_row, height=cell_height):
+                            return picture.crop((
+                                pane.x + PADDING,
+                                pane.y + PADDING + first_row * height,
+                                pane.x + pane.width - PADDING,
+                                pane.y + PADDING + (last_row + 1) * height,
+                            ))
 
                         def text_pixels(first_row, last_row, color):
-                            region = picture.crop((
-                                pane.x + 24,
-                                pane.y + 24 + first_row * cell_height,
-                                pane.x + pane.width - 24,
-                                pane.y + 24 + (last_row + 1) * cell_height,
-                            ))
-                            return sum(all(abs(actual - expected) <= 16
-                                           for actual, expected in zip(pixel, color))
-                                       for pixel in region.getdata())
+                            return color_coverage(text_region(first_row, last_row), color)
 
-                        pixels[label] = {
-                            "green_status": text_pixels(5, 5, (107, 208, 162)),
-                            "blue_footer": text_pixels(10, 10, (133, 165, 220)),
-                            "chinese_rows": text_pixels(7, 8, (220, 226, 236)),
-                            "final_line": text_pixels(11, 11, (220, 226, 236)),
+                        text_rows = state["text_rows"]
+                        measured = {
+                            "green_status": text_pixels(text_rows["green_status"], text_rows["green_status"],
+                                                        (107, 208, 162)),
+                            "blue_footer": text_pixels(text_rows["blue_footer"], text_rows["blue_footer"],
+                                                       (133, 165, 220)),
+                            "chinese_rows": text_pixels(text_rows["chinese_first"], text_rows["chinese_second"],
+                                                        (220, 226, 236)),
+                            "final_line": text_pixels(text_rows["final_line"], text_rows["final_line"],
+                                                      (220, 226, 236)),
                         }
+                        pixels[label] = {name: value[0] for name, value in measured.items()}
+                        coverage[label] = {name: value[1] for name, value in measured.items()}
+                        legacy_pixels[label] = {}
+                        for name, first_row, last_row, color in (
+                            ("green_status", 5, 5, (107, 208, 162)),
+                            ("blue_footer", 10, 10, (133, 165, 220)),
+                            ("chinese_rows", 7, 8, (220, 226, 236)),
+                            ("final_line", 11, 11, (220, 226, 236)),
+                        ):
+                            legacy_pixels[label][name] = sum(
+                                all(abs(actual - expected) <= 16 for actual, expected in zip(pixel, color))
+                                for pixel in text_region(first_row, last_row, inferred_height).getdata())
                     row["native_pixels"] = pixels
-                    if all(all(count >= 30 for count in pane.values()) for pane in pixels.values()):
+                    row["native_coverage"] = coverage
+                    row["legacy_opaque_pixels"] = legacy_pixels
+                    row["native_geometry"] = geometry
+                    if (all(pane["grid_matches"] for pane in geometry.values())
+                            and all(all(ink >= 30 for ink in pane.values()) for pane in coverage.values())):
                         return picture
                     return None
 
@@ -375,6 +447,14 @@ def main():
         except BaseException as error:
             report["error"] = str(error)
             report["traceback"] = traceback.format_exc()
+            if connection is not None:
+                try:
+                    failure_path = args.screenshot.with_name(args.screenshot.stem + "-failed.png")
+                    window_image(diagnostic_window or connection.screen().root).save(failure_path)
+                    report["diagnostic_screenshot"] = str(failure_path.resolve())
+                    report["diagnostic_screenshot_sha256"] = hashlib.sha256(failure_path.read_bytes()).hexdigest()
+                except Exception as diagnostic_error:
+                    report["diagnostic_screenshot_error"] = repr(diagnostic_error)
         finally:
             local_errors = []
             try:
@@ -409,8 +489,16 @@ def main():
             if not report["ok"]:
                 report["stderr"] = (root / "gui.stderr").read_text(errors="replace")[-6000:]
             args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
-    print(json.dumps({"ok": report["ok"], "checks": len(report["checks"]),
-                      "output": str(args.output), "screenshot": report.get("screenshot")}, ensure_ascii=False))
+    summary = {"ok": report["ok"], "checks": len(report["checks"]),
+               "output": str(args.output), "screenshot": report.get("screenshot")}
+    if not report["ok"]:
+        summary.update({key: report[key] for key in (
+            "error", "traceback", "cell_metrics", "decoration_readiness", "diagnostic_screenshot",
+            "diagnostic_screenshot_sha256", "diagnostic_screenshot_error", "cleanup_errors",
+            "remaining_owned_pids", "stderr",
+        ) if key in report})
+        summary["failed_check"] = next((row for row in report["checks"] if not row.get("ok")), None)
+    print(json.dumps(summary, ensure_ascii=False), flush=True)
     return 0 if report["ok"] else 1
 
 
