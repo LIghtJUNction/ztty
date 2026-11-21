@@ -109,6 +109,27 @@ HTTP 监听非回环地址时需要令牌。
 客户端配置、会话身份校验、JSON/SSE 响应与命令输出读取见[会话指南](docs/sessions.md)；
 ssmcp 等工具的接入见[观察模式](docs/ssmcp-observer.md)。
 
+## SSH 终端多路复用（Linux）
+
+ztty 0.6.0 在远端共享进程中持有 shell 和 PTY。关闭窗口或断开 SSH 后，
+任务继续运行；重新连接恢复屏幕与有界滚屏历史。两端安装 ztty 后即可使用：
+
+```sh
+ztty ssh dev main                         # 使用 ~/.ssh/config 中的别名
+ztty ssh ssh://alice@host:2222 build
+ztty ssh --list dev
+ztty ssh --observe dev build              # 只读，不改变写入者的终端尺寸
+ztty ssh --terminal dev main              # 在当前终端中附着
+ztty ssh --close dev build                # 明确结束远端会话
+```
+
+Ctrl+] 分离。在 SSH 窗口中按 Ctrl+Shift+T 或分屏快捷键，会在同一主机上创建
+独立的远端会话。多个面板复用同一条已认证的 OpenSSH 连接，密钥、SSH 配置与
+主机密钥校验仍由系统 SSH 处理。一个会话只有一个输入控制者，`--takeover` 可显式接管。
+
+[SSH 会话指南](docs/ssh-sessions.md)说明端口、密钥和配置文件、标签页与分屏、
+远端命令、本地无窗口使用及当前文本视图的支持范围。
+
 ## 替换运行中的程序
 
 由 ztty 0.5.1 或后续版本启动的 Linux X11/XWayland 或无窗口共享进程支持程序热替换。

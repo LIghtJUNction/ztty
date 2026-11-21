@@ -118,6 +118,29 @@ See [sessions and MCP](docs/sessions.md) for client setup, session identities,
 JSON/SSE replies and command-output reads; [observer mode](docs/ssmcp-observer.md)
 covers tools such as ssmcp.
 
+## SSH terminal multiplexing (Linux)
+
+ztty 0.6.0 keeps remote shells in a headless session broker. Closing an SSH
+connection or its window leaves those shells running; reconnecting restores
+their screen and bounded scrollback. Install ztty on both Linux machines, then:
+
+```sh
+ztty ssh dev main                         # SSH alias from ~/.ssh/config
+ztty ssh ssh://alice@host:2222 build
+ztty ssh --list dev
+ztty ssh --observe dev build              # Read-only; does not resize the writer
+ztty ssh --terminal dev main              # Attach in the current terminal
+ztty ssh --close dev build                # Explicitly terminate a remote session
+```
+
+Ctrl+] detaches. Ctrl+Shift+T and the split shortcuts in an SSH window create
+independent remote sessions on the same host. OpenSSH reuses one authenticated
+connection for these panes and continues to manage keys, SSH config and host-key
+checks. Input has one owner; `--takeover` explicitly transfers it.
+
+[SSH sessions](docs/ssh-sessions.md) covers ports, identity/config files, native
+tabs and splits, remote commands, local headless use and the text-view scope.
+
 ## Reload the running executable
 
 A broker started from ztty 0.5.1 or later can replace its executable on Linux

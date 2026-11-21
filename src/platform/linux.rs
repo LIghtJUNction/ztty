@@ -44,6 +44,9 @@ pub fn run(cfg: Config) -> Result<i32, String> {
     if let Some(path) = cfg.config_path {
         request.set("_config", Value::from(broker::hex(path.to_bytes())));
     }
+    if let Some(profile) = cfg.ssh_profile {
+        request.set("_ssh", profile);
+    }
     let created = broker::request(&request)?;
     wait_session(&created)
 }

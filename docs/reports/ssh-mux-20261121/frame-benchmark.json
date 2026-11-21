@@ -1,0 +1,10 @@
+{
+  "cols": 120,
+  "rows": 40,
+  "updates": 1000,
+  "initial_bytes": 6539,
+  "idle_bytes": 0,
+  "full_frame_bytes": 6569000,
+  "delta_bytes": 343000,
+  "bytes_saved_percent": 94.779
+}

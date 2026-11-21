@@ -11,6 +11,7 @@ mod graphics_io;
 pub mod input_queue;
 pub mod json;
 pub mod layout;
+pub mod mux_input;
 pub mod native_resize;
 pub mod native_ui;
 pub mod output_tail;
@@ -19,6 +20,8 @@ pub mod selection;
 pub mod session_control;
 pub mod session_core;
 pub mod session_identity;
+pub mod ssh_command;
+pub mod terminal_frame;
 pub mod workspace_state;
 
 pub mod text_blink;

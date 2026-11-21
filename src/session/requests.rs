@@ -44,6 +44,13 @@ impl Pool {
     }
 
     pub(super) fn create(&mut self, request: &Value) -> Result<Value, String> {
+        let ssh_profile = request
+            .get("_ssh")
+            .map(|profile| {
+                crate::mux::validate_profile(profile)?;
+                Ok::<_, String>(profile.clone())
+            })
+            .transpose()?;
         let backend = backend_preference(request)?;
         if backend == Preference::Wayland && request.get("target").is_some() {
             return Err(
@@ -66,6 +73,7 @@ impl Pool {
             .and_then(Value::as_str)
             .unwrap_or("local");
         let valid_origin = origin == "local"
+            || origin == "mux"
             || origin == "mcp/stdio"
             || origin.strip_prefix("mcp/http/").is_some_and(|a| {
                 !a.is_empty()
@@ -267,6 +275,7 @@ impl Pool {
             terminal.set_cell_size(ui.window.cw as u32, ui.window.ch as u32);
         }
         let session = Session {
+            ssh_profile,
             id,
             created_at: os::unix_milliseconds(),
             uri,
@@ -575,19 +584,42 @@ impl Pool {
                 Ok(Reply::Value(self.sessions[index].info()))
             }
             "read" => self.sessions[index].read(request),
+            "watch" => self.sessions[index].watch_frame(request),
+            "terminal-frame" => self.sessions[index]
+                .terminal_frame(request)
+                .map(Reply::Value),
             "write" => {
+                let drain_ms = broker::input_drain_timeout(request)?;
                 let session = &mut self.sessions[index];
                 if session.core.eof() || session.status().is_some() {
                     return Err("session has exited".into());
                 }
-                let data = request
-                    .get("data")
-                    .and_then(Value::as_str)
-                    .ok_or("data must be a string")?;
+                let raw = request
+                    .get("_data_hex")
+                    .map(|value| {
+                        if request.get("data").is_some() {
+                            return Err(String::from("choose data or _data_hex"));
+                        }
+                        let value = value
+                            .as_str()
+                            .filter(|s| s.len() <= 131072)
+                            .ok_or("raw input exceeds 65536 bytes")?;
+                        broker::unhex_bytes(value)
+                    })
+                    .transpose()?;
+                let data = if let Some(raw) = &raw {
+                    raw.as_slice()
+                } else {
+                    request
+                        .get("data")
+                        .and_then(Value::as_str)
+                        .ok_or("data must be a string")?
+                        .as_bytes()
+                };
                 if data.len() > 65536 {
                     return Err("write data exceeds 65536 bytes".into());
                 }
-                if !session.core.input.push(data.as_bytes()) {
+                if !session.core.input.push(data) {
                     return Err("session input queue is full".into());
                 }
                 if !data.is_empty()
@@ -595,7 +627,13 @@ impl Pool {
                 {
                     ui.repaint.input_sent();
                 }
-                let _ = session.core.flush_input();
+                let flushed = session.core.flush_input();
+                if let Some(wait_ms) = drain_ms {
+                    flushed.map_err(|error| {
+                        format!("cannot write pending input to the PTY: {error}")
+                    })?;
+                    return session.drain_input(actor(request)?, data.len(), wait_ms);
+                }
                 Ok(Reply::Value(json::object([
                     ("written", Value::from(data.len())),
                     ("uri", Value::from(session.uri.clone())),

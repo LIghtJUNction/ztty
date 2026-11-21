@@ -1,0 +1,150 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "native_ssh_window_and_real_keyboard_input",
+      "ok": true,
+      "local_broker_pid": 2095140,
+      "remote_broker_pid": 2095156,
+      "remote_pty_pid": 2095157,
+      "xtest_input": "echo guiinput + Return",
+      "elapsed_ms": 376.06
+    },
+    {
+      "name": "new_tab_inherits_remote_host_and_creates_an_independent_pty",
+      "ok": true,
+      "remote_session": "pane-2095140-1795277886428-2",
+      "remote_pty_pid": 2095161,
+      "elapsed_ms": 47.567
+    },
+    {
+      "name": "split_and_new_window_keep_the_ssh_profile_and_connection",
+      "ok": true,
+      "remote_sessions": [
+        "main",
+        "pane-2095140-1795277886428-2",
+        "pane-2095140-1795277886475-3",
+        "pane-2095140-1795277886527-4"
+      ],
+      "remote_pty_pids": [
+        2095157,
+        2095161,
+        2095168,
+        2095185
+      ],
+      "control_masters": 1,
+      "ssh_authentications": 1,
+      "elapsed_ms": 118.705
+    },
+    {
+      "name": "native_split_pixels_and_chinese_colored_terminal_screenshot",
+      "ok": true,
+      "native_pixels": {
+        "left": {
+          "green_status": 92,
+          "blue_footer": 111,
+          "chinese_rows": 419,
+          "final_line": 172
+        },
+        "right": {
+          "green_status": 92,
+          "blue_footer": 111,
+          "chinese_rows": 419,
+          "final_line": 172
+        }
+      },
+      "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/ssh-mux-20261121/artifacts/ssh-release-checks/ssh-gpu.png",
+      "width": 1128,
+      "height": 816,
+      "screenshot_sha256": "17c65c4d65befb6bba1ec4b7f8387694e82152380b9c19e7481176ba9754ff33",
+      "elapsed_ms": 329.806
+    },
+    {
+      "name": "closing_all_native_views_preserves_remote_sessions",
+      "ok": true,
+      "preserved_remote_pty_pids": [
+        2095157,
+        2095161,
+        2095168,
+        2095185
+      ],
+      "elapsed_ms": 21.401
+    },
+    {
+      "name": "reopening_named_remote_gui_keeps_the_same_shell",
+      "ok": true,
+      "remote_pty_pid": 2095157,
+      "restored_window_id": 2097192,
+      "elapsed_ms": 83.759
+    }
+  ],
+  "binary": "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+  "binary_sha256": "8dc097df858240827d3d8deb2cabc04274d150e686a27c9387d398c4af958aa4",
+  "test_script_sha256": "02e84af51636198137bc84b9fccc632758376dacd71a6c5ea1e0cc710fb0e71e",
+  "platform": "Linux X11 / owned Xvfb / real localhost OpenSSH",
+  "renderer": "gpu",
+  "xserver_ownership": {
+    "display": ":27380",
+    "pid": 2095118,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X27380",
+        "inode": 20831365,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X27380",
+        "inode": 20831364,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "decoration_readiness": {
+    "Remote 01": {
+      "remote": {
+        "title": "Remote 01",
+        "missing_lines": [],
+        "command_echo": false
+      },
+      "local": {
+        "title": "Remote 01",
+        "missing_lines": [],
+        "command_echo": false
+      }
+    },
+    "Remote 02": {
+      "remote": {
+        "title": "Remote 02",
+        "missing_lines": [],
+        "command_echo": false
+      },
+      "local": {
+        "title": "Remote 02",
+        "missing_lines": [],
+        "command_echo": false
+      }
+    }
+  },
+  "renderers": [
+    {
+      "window_id": 2097158,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+    },
+    {
+      "window_id": 2097174,
+      "requested": "gpu",
+      "actual": "gpu",
+      "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+    }
+  ],
+  "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/ssh-mux-20261121/artifacts/ssh-release-checks/ssh-gpu.png",
+  "cleanup_errors": [],
+  "remaining_owned_pids": []
+}

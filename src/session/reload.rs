@@ -321,6 +321,7 @@ impl Pool {
                 ("uri", session.uri.clone().into()),
                 ("name", session.name.clone().into()),
                 ("origin", session.origin.clone().into()),
+                ("ssh", session.ssh_profile.clone().unwrap_or(Value::Null)),
                 ("appearance", session.appearance.to_json()),
                 ("core", core_value(&session.core)),
                 ("fd", session.core.pty.fd().into()),
@@ -469,6 +470,9 @@ pub(crate) fn validate_reload(meta: &Value, terminals: &[zterm::Terminal]) -> Re
         }
         uris.push(uri);
         text(session, "origin")?;
+        if let Some(profile) = session.get("ssh").filter(|v| **v != Value::Null) {
+            crate::mux::validate_profile(profile)?;
+        }
         text(session, "base_font")?;
         process_id(session)?;
         raw_status(session)?;
@@ -677,6 +681,7 @@ pub(crate) fn serve_reloaded(meta: Value, terminals: Vec<zterm::Terminal>) -> Re
             )
         };
         let session = Session {
+            ssh_profile: saved.get("ssh").filter(|v| **v != Value::Null).cloned(),
             id: number(saved, "id")?,
             created_at: number(saved, "created_at")?,
             uri: text(saved, "uri")?.into(),

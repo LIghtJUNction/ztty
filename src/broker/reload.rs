@@ -37,6 +37,36 @@ impl Server {
                                                         .unwrap_or(Value::Null),
                                                 ),
                                                 ("deadline", read.deadline.into()),
+                                                (
+                                                    "watch",
+                                                    read.watch_revision
+                                                        .map(|(revision, epoch)| {
+                                                            Value::Array(alloc::vec![
+                                                                revision.into(),
+                                                                epoch.into()
+                                                            ])
+                                                        })
+                                                        .unwrap_or(Value::Null),
+                                                ),
+                                                (
+                                                    "input_drain",
+                                                    read.input_drain
+                                                        .as_ref()
+                                                        .map(|drain| {
+                                                            json::object([
+                                                                (
+                                                                    "actor",
+                                                                    drain.actor.as_str().into(),
+                                                                ),
+                                                                (
+                                                                    "epoch",
+                                                                    drain.control_epoch.into(),
+                                                                ),
+                                                                ("written", drain.written.into()),
+                                                            ])
+                                                        })
+                                                        .unwrap_or(Value::Null),
+                                                ),
                                             ])
                                         })
                                         .unwrap_or(Value::Null),
@@ -80,6 +110,26 @@ impl Server {
                 number(read, "session")?;
                 number(read, "cursor")?;
                 number(read, "deadline")?;
+                if let Some(watch) = read.get("watch").filter(|v| **v != Value::Null) {
+                    let values = watch.as_array().ok_or("invalid reload frame watcher")?;
+                    if values.len() != 2 || values.iter().any(|v| v.as_u64().is_none()) {
+                        return Err("invalid reload frame watcher".into());
+                    }
+                }
+                if let Some(drain) = read.get("input_drain").filter(|v| **v != Value::Null) {
+                    if drain
+                        .get("actor")
+                        .and_then(Value::as_str)
+                        .is_none_or(|actor| !ztty::session_control::valid_actor(actor))
+                        || number(drain, "written")? > 65536
+                        || number(read, "cursor")? != 0
+                        || read.get("watch").is_some_and(|v| *v != Value::Null)
+                        || read.get("max").is_some_and(|v| *v != Value::Null)
+                    {
+                        return Err("invalid reload input drain".into());
+                    }
+                    number(drain, "epoch")?;
+                }
                 if read.get("max").is_some_and(|v| {
                     *v != Value::Null && v.as_u64().is_none_or(|n| n == 0 || n > 65536)
                 }) {
@@ -107,6 +157,22 @@ impl Server {
                     cursor: number(read, "cursor")?,
                     max_bytes: read.get("max").and_then(Value::as_u64),
                     deadline: number(read, "deadline")?,
+                    watch_revision: read
+                        .get("watch")
+                        .and_then(Value::as_array)
+                        .map(|v| (v[0].as_u64().unwrap(), v[1].as_u64().unwrap())),
+                    input_drain: match read.get("input_drain").filter(|v| **v != Value::Null) {
+                        Some(drain) => Some(InputDrain {
+                            actor: drain
+                                .get("actor")
+                                .and_then(Value::as_str)
+                                .ok_or("invalid reload input drain")?
+                                .into(),
+                            control_epoch: number(drain, "epoch")?,
+                            written: number(drain, "written")? as usize,
+                        }),
+                        None => None,
+                    },
                 }),
                 None => None,
             };

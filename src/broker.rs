@@ -11,6 +11,7 @@ use core::sync::atomic::{AtomicU64, Ordering};
 const LIMIT: usize = 1024 * 1024;
 const MAX_PEERS: usize = 192;
 const MAX_WAITERS: usize = 128;
+pub(crate) const MAX_INPUT_DRAIN_MS: u64 = 5000;
 const CLOEXEC: i32 = 0o2000000;
 const NONBLOCK: i32 = 0o4000;
 const NOSIGNAL: i32 = 0x4000;
@@ -322,6 +323,10 @@ pub fn hex(bytes: &[u8]) -> String {
 }
 
 pub fn unhex(value: &str) -> Result<CString, String> {
+    CString::new(unhex_bytes(value)?).map_err(|_| "NUL in process metadata".into())
+}
+
+pub fn unhex_bytes(value: &str) -> Result<Vec<u8>, String> {
     if !value.len().is_multiple_of(2) {
         return Err("invalid byte string".into());
     }
@@ -339,7 +344,7 @@ pub fn unhex(value: &str) -> Result<CString, String> {
                 | digit(pair[1]).ok_or("invalid byte string")?,
         );
     }
-    CString::new(bytes).map_err(|_| "NUL in process metadata".into())
+    Ok(bytes)
 }
 
 fn caller_metadata(value: &mut Value) -> Result<(), String> {
@@ -403,7 +408,9 @@ impl PendingRequest {
             // reserve time for complete native view/layout reconstruction too.
             Some(60_000)
         } else {
-            let wait = if operation == Some("read") {
+            let wait = if operation == Some("write") {
+                input_drain_timeout(&value)?.unwrap_or(0)
+            } else if matches!(operation, Some("read" | "watch")) {
                 match value.get("wait_ms") {
                     None => 0,
                     Some(value) => value
@@ -651,13 +658,37 @@ pub enum Reply {
     ReadWait(ReadWait),
 }
 
-/// A parked read refers to one PTY incarnation in this broker, even when the
-/// caller used a short name and did not supply an explicit identity guard.
+/// Mux writes can wait for PTY acceptance without changing ordinary MCP write
+/// acknowledgements. Validate the bound before any bytes enter the input queue.
+pub(crate) fn input_drain_timeout(value: &Value) -> Result<Option<u64>, String> {
+    value
+        .get("_drain_ms")
+        .map(|value| {
+            value
+                .as_u64()
+                .filter(|&wait| (1..=MAX_INPUT_DRAIN_MS).contains(&wait))
+                .ok_or_else(|| String::from("_drain_ms must be 1..5000"))
+        })
+        .transpose()
+}
+
+/// Input must reach the PTY under the same ownership epoch that enqueued it.
+/// A takeover clears pending input and must never look like a successful drain.
+pub struct InputDrain {
+    pub actor: String,
+    pub control_epoch: u64,
+    pub written: usize,
+}
+
+/// A deferred output read, frame watch or input drain refers to one PTY
+/// incarnation, even when the caller used a short name without an identity.
 pub struct ReadWait {
     pub session_id: u64,
     pub cursor: u64,
     pub max_bytes: Option<u64>,
     pub deadline: u64,
+    pub watch_revision: Option<(u64, u64)>,
+    pub input_drain: Option<InputDrain>,
 }
 
 struct Peer {
@@ -752,7 +783,7 @@ impl Server {
     }
 
     /// Run after PTY reads and management operations. Only a ready read builds
-    /// its screen snapshot; parked peers retain a fixed-size cursor condition.
+    /// its screen snapshot; parked peers retain a bounded wait condition.
     pub fn wake_reads(&mut self, mut read: impl FnMut(&ReadWait) -> Option<Result<Value, String>>) {
         for peer in &mut self.peers {
             if let Some(wait) = &peer.read_wait

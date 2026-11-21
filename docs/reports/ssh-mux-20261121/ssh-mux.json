@@ -1,0 +1,148 @@
+{
+  "ok": true,
+  "binary": "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+  "binary_sha256": "8dc097df858240827d3d8deb2cabc04274d150e686a27c9387d398c4af958aa4",
+  "checks": [
+    {
+      "name": "private_ssh_server_and_pinned_host_key",
+      "ok": true,
+      "elapsed_ms": 28.122
+    },
+    {
+      "name": "local_mux_create_and_real_pty_input",
+      "ok": true,
+      "pty_pid": 2094387,
+      "broker_pid": 2094385,
+      "elapsed_ms": 41.924
+    },
+    {
+      "name": "writer_exclusion_and_read_only_observer",
+      "ok": true,
+      "elapsed_ms": 27.474
+    },
+    {
+      "name": "explicit_takeover_revokes_previous_writer",
+      "ok": true,
+      "elapsed_ms": 22.683
+    },
+    {
+      "name": "resize_reaches_remote_pty",
+      "ok": true,
+      "elapsed_ms": 21.3
+    },
+    {
+      "name": "detach_preserves_session_and_explicit_close_ends_it",
+      "ok": true,
+      "elapsed_ms": 14.823
+    },
+    {
+      "name": "real_ssh_two_sessions_share_one_connection",
+      "ok": true,
+      "first_connect_ms": 197.753,
+      "reused_connect_ms": 43.29,
+      "ssh_authentications": 1,
+      "control_masters": 1,
+      "distinct_pty_pids": [
+        2094406,
+        2094410
+      ],
+      "elapsed_ms": 322.639
+    },
+    {
+      "name": "transport_loss_keeps_both_remote_shells_running",
+      "ok": true,
+      "elapsed_ms": 412.785
+    },
+    {
+      "name": "reconnect_restores_screen_and_existing_process_without_reexecution",
+      "ok": true,
+      "reattach_ms": 152.977,
+      "snapshot_bytes": 3080,
+      "elapsed_ms": 205.725
+    },
+    {
+      "name": "ssh_resize_reaches_same_child_pty",
+      "ok": true,
+      "elapsed_ms": 51.485
+    },
+    {
+      "name": "remote_argv_and_binary_path_preserve_literal_shell_characters",
+      "ok": true,
+      "elapsed_ms": 62.001
+    },
+    {
+      "name": "ssh_close_terminates_only_the_selected_session",
+      "ok": true,
+      "elapsed_ms": 90.304
+    },
+    {
+      "name": "local_eof_before_exit_preserves_frame_and_status",
+      "ok": true,
+      "exit_code": 42,
+      "retained_pty_pid": 2094586,
+      "command_executions": 1,
+      "elapsed_ms": 194.469
+    },
+    {
+      "name": "ssh_eof_before_exit_preserves_frame_and_status",
+      "ok": true,
+      "exit_code": 42,
+      "retained_pty_pid": 2094602,
+      "command_executions": 1,
+      "elapsed_ms": 237.714
+    },
+    {
+      "name": "local_binary_input_and_event_driven_output",
+      "ok": true,
+      "payload_bytes": 3603,
+      "idle_seconds": 0.35,
+      "idle_cpu_seconds": 0.0,
+      "idle_cpu_ticks": {
+        "2094385": 0,
+        "2094634": 0,
+        "2094636": 0
+      },
+      "watch_latency_ms": 0.521,
+      "rendered_latency_ms": 10.742,
+      "elapsed_ms": 559.186
+    },
+    {
+      "name": "ssh_binary_input_and_event_driven_output",
+      "ok": true,
+      "payload_bytes": 3603,
+      "idle_seconds": 0.35,
+      "idle_cpu_seconds": 0.0,
+      "idle_cpu_ticks": {
+        "2094385": 0,
+        "2094653": 0,
+        "2094659": 0,
+        "2094663": 0
+      },
+      "watch_latency_ms": 0.789,
+      "rendered_latency_ms": 11.053,
+      "elapsed_ms": 607.994
+    },
+    {
+      "name": "local_paste_then_detach_drains_all_queued_input",
+      "ok": true,
+      "payload_bytes": 524425,
+      "reader_pause_ms": 500,
+      "input_submit_ms": 741.126,
+      "detach_ms": 742.109,
+      "retained_pty_pid": 2094729,
+      "elapsed_ms": 767.597
+    },
+    {
+      "name": "ssh_paste_then_detach_drains_all_queued_input",
+      "ok": true,
+      "payload_bytes": 524425,
+      "reader_pause_ms": 500,
+      "input_submit_ms": 268.427,
+      "detach_ms": 501.059,
+      "retained_pty_pid": 2094836,
+      "elapsed_ms": 546.697
+    }
+  ],
+  "cleanup_errors": [],
+  "remaining_owned_pids": []
+}

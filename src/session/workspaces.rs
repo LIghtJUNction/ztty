@@ -320,7 +320,25 @@ impl Pool {
         ]);
         // OSC 7 is parsed as data. Only local absolute file URLs can influence
         // a new local shell's cwd; an SSH host is never interpreted as local.
-        if let Some(cwd) = local_directory(session.core.terminal.working_directory()) {
+        if let Some(profile) = &session.ssh_profile {
+            let name = alloc::format!(
+                "pane-{}-{}-{}",
+                unsafe { os::getpid() },
+                os::unix_milliseconds(),
+                self.next
+            );
+            let (profile, command) = crate::mux::related_command(profile, &name)?;
+            request.set("_ssh", profile);
+            request.set(
+                "_argv",
+                Value::Array(
+                    command
+                        .iter()
+                        .map(|arg| Value::from(broker::hex(arg.to_bytes())))
+                        .collect(),
+                ),
+            );
+        } else if let Some(cwd) = local_directory(session.core.terminal.working_directory()) {
             request.set("cwd", Value::from(cwd));
         }
         if let Some(path) = &session.config_path {

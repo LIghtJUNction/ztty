@@ -1,0 +1,208 @@
+{
+  "ok": true,
+  "base_commit": "094085e90eda4df1e696bbc16283527445ee5a8d",
+  "checks": [
+    {
+      "name": "format",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all"
+      ],
+      "exit_code": 0,
+      "seconds": 0.728
+    },
+    {
+      "name": "rust-tests",
+      "command": [
+        "cargo",
+        "test",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--features",
+        "wayland"
+      ],
+      "exit_code": 0,
+      "seconds": 27.134,
+      "passed": 265,
+      "ignored": 8
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--offline",
+        "--locked",
+        "--workspace",
+        "--all-targets",
+        "--features",
+        "wayland",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 8.645
+    },
+    {
+      "name": "release-build",
+      "command": [
+        "cargo",
+        "build",
+        "--offline",
+        "--locked",
+        "--release",
+        "--features",
+        "wayland",
+        "--bin",
+        "ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 32.355
+    },
+    {
+      "name": "no-std",
+      "command": [
+        "python3",
+        "tools/check_no_std.py",
+        "--binary",
+        "/var/tmp/ztty-ssh-target-20261121/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 0.273
+    },
+    {
+      "name": "ssh-mux",
+      "command": [
+        "python3",
+        "tests/ssh_mux.py",
+        "--binary",
+        "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+        "--output",
+        "artifacts/ssh-release-checks/ssh-mux.json"
+      ],
+      "exit_code": 0,
+      "seconds": 4.39
+    },
+    {
+      "name": "ssh-gui-software",
+      "command": [
+        "python3",
+        "tests/ssh_mux_gui.py",
+        "--binary",
+        "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+        "--output",
+        "artifacts/ssh-release-checks/ssh-gui-software.json",
+        "--screenshot",
+        "artifacts/ssh-release-checks/ssh-software.png",
+        "--renderer",
+        "software"
+      ],
+      "exit_code": 0,
+      "seconds": 1.219
+    },
+    {
+      "name": "ssh-gui-gpu",
+      "command": [
+        "python3",
+        "tests/ssh_mux_gui.py",
+        "--binary",
+        "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+        "--output",
+        "artifacts/ssh-release-checks/ssh-gui-gpu.json",
+        "--screenshot",
+        "artifacts/ssh-release-checks/ssh-gpu.png",
+        "--renderer",
+        "gpu"
+      ],
+      "exit_code": 0,
+      "seconds": 1.348
+    },
+    {
+      "name": "mcp-sessions",
+      "command": [
+        "python3",
+        "tests/mcp_sessions.py",
+        "--binary",
+        "/var/tmp/ztty-ssh-target-20261121/release/ztty"
+      ],
+      "exit_code": 0,
+      "seconds": 1.314
+    },
+    {
+      "name": "mcp-wait",
+      "command": [
+        "python3",
+        "tests/mcp_wait.py",
+        "--binary",
+        "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+        "--output",
+        "artifacts/ssh-release-checks/mcp-wait.json"
+      ],
+      "exit_code": 0,
+      "seconds": 15.633
+    },
+    {
+      "name": "reload",
+      "command": [
+        "python3",
+        "tests/reload_runtime.py",
+        "--binary",
+        "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+        "--renderer",
+        "software",
+        "--output",
+        "artifacts/ssh-release-checks/reload.json"
+      ],
+      "exit_code": 0,
+      "seconds": 2.03
+    },
+    {
+      "name": "frame-benchmark",
+      "command": [
+        "cargo",
+        "run",
+        "--offline",
+        "--locked",
+        "--release",
+        "--example",
+        "ssh_frame_benchmark"
+      ],
+      "exit_code": 0,
+      "seconds": 9.708
+    }
+  ],
+  "binary_sha256": "8dc097df858240827d3d8deb2cabc04274d150e686a27c9387d398c4af958aa4",
+  "source_sha256": {
+    ".github/workflows/verify.yml": "d9c931c9d66c0f58a164a30159f300a02b84cf6c4cb369fd3bfa672ba91a6fb9",
+    "Cargo.lock": "0e842a83d1549bbe2604c263f51c97be74bf9379acb825d8b9cf65edb74a23af",
+    "Cargo.toml": "46af209c4d3ea2c6fd59368aca37655da991d5bb1f1dd28102e1ef1a520bf872",
+    "README.md": "ac801e98197643e0a0bef65e8fd1d22831d2f64ee99e585b6e72187e35e4aa14",
+    "README.zh-CN.md": "c143212aafca7fcd19fbc78721453ae78ddef37d8c91e4e43e72718a0117e765",
+    "docs/README.md": "04569b6411a7dc37edda127aa6659c12cd0c24aa8b8685ff7d5e2cf321253066",
+    "docs/releasing.md": "ea1f209396afbe67cca961092604b0862a2e7d961e79c80ed509cb73c057ac4e",
+    "src/broker.rs": "60b7ec88650ae3b2adbd1995ca070240355e444bf570a68c6d2bc51b13b9cd2f",
+    "src/broker/reload.rs": "7dad362a2c9c34d0f4411da026502696919cf98cb6048b08af6b1efed616740b",
+    "src/lib.rs": "870d933b6da3763ac1f5dc902bc6286c26af74c7a2a74a6cfb9cf8d3964c3f26",
+    "src/main.rs": "79a5f05d7baaa84d3fba194f3625e07e9d932e0fbbdfbe4232af3696f77031a4",
+    "src/platform/linux.rs": "d3baca63def3e6b38c269d95faf6b9da29ffbcbcb1a3bcfa71d17def2227a636",
+    "src/session.rs": "a5997c8f65f9f8cb5c825f059a6d0d70bedc6b109b5d340dd5fde528fb6870d8",
+    "src/session/queries.rs": "b304b0dd1b7dac1f575986b1b29055eceaad308f54b5f5797633b7b52cc7e00b",
+    "src/session/reload.rs": "03ac76abcfe12546090c45780d651ce8f745fec9af225779601cd2dbad5a9947",
+    "src/session/requests.rs": "1cde05da200ddf4e2c47603aaf2046ab524fab036bbea800ffc5aea7b3279c63",
+    "src/session/workspaces.rs": "23cfe0438ad9290f832e0a09b7fbf36f07f811bf2995ebaf6f192b7677e673d3",
+    "docs/ssh-sessions.md": "0703ceb088d8cc81c37a455beff1349d6972773229808108b7917130f9815ee0",
+    "examples/ssh_frame_benchmark.rs": "1fa71ecfea6e1c9ccca865599d81251b2862af111e599b77740b4066e1175028",
+    "src/mux.rs": "5c93411fb5df06dba952c2efecb11c804b332afe638adc18a1fd31af30903333",
+    "src/mux_input.rs": "8ec101974117fceed7b550208a1970e6a5837bef95133b464fddf01012198483",
+    "src/ssh_command.rs": "b838ddf2f99a5444fa133541cfd58c7b0b719f051ff1b6f893af3bb4cddc75c1",
+    "src/terminal_frame.rs": "8897a9566c177bbc7fcde7db2c9d4babe6df8ad1547f860661337d10efec17df",
+    "tests/mux_input.rs": "f40757ab7e980b5abd1967fca857c6ab9947337cbfb68391a72dd22bb4dc3d0a",
+    "tests/ssh_command.rs": "8645f6391ec3eac5671378e7d7986479b8edf810f97d55e5211d86af9e548d3c",
+    "tests/ssh_mux.py": "6e1e56b5687944805b31aa0010aefa085191399b4e33b7f4846bae4c478b8401",
+    "tests/ssh_mux_gui.py": "02e84af51636198137bc84b9fccc632758376dacd71a6c5ea1e0cc710fb0e71e",
+    "tests/terminal_frame.rs": "105133eb120fc2ef7549bd7ed7193f3cd15f7f576ccedee967676c0ef7476b7d"
+  }
+}

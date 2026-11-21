@@ -133,6 +133,7 @@ struct Ui {
 }
 
 struct Session {
+    ssh_profile: Option<Value>,
     id: u64,
     created_at: u64,
     uri: String,

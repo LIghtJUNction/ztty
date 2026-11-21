@@ -12,8 +12,8 @@ Same-repository dependencies keep their workspace or path relationship.
 The [Git-only maintenance report](reports/git-only-dependencies-20261121/README.zh-CN.md)
 records the current graph and verified plugin consumption. The earlier
 [source report](reports/default-branch-sources-20261121/README.zh-CN.md) records
-shared Cargo artifact handling and same-PID reload checks. The package version remains `0.5.2`; this
-iteration does not establish a new registry release or desktop installation.
+shared Cargo artifact handling and same-PID reload checks. Those records describe
+the earlier `0.5.2` development source, rather than the current release candidate.
 The [propagation record](dependency-propagation.md) identifies the remaining
 suite and aggregate owners.
 
@@ -25,6 +25,20 @@ registry version selectors out of the development manifests. Project Z's current
 release projection rejects repositories with submodules; extend and verify its
 recursive staging before using that entry point for ztty. The candidate and
 publication sections below describe their original historical inputs.
+
+## 0.6.0 SSH session release
+
+The application version is `0.6.0`. Its [SSH session guide](ssh-sessions.md)
+describes the Linux client and persistent remote PTY, native tabs and splits,
+connection sharing, frame deltas, and compatibility limits. The application
+retains the existing locked Git dependency graph; this release does not change
+the reusable libraries' versions or publish a registry projection.
+
+The tagged source must pass Verify and all six native architecture jobs in the
+[Release workflow](../.github/workflows/release.yml). Verify also exercises a
+private real OpenSSH server and native SSH tabs/splits. Publication uses the
+workflow's existing source, checksum, provenance and downloaded-asset checks.
+Installation is checked separately against the built executable.
 
 ## Historical 0.5.2 candidate — 2026-11-20
 

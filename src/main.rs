@@ -16,6 +16,8 @@ mod display;
 #[cfg(target_os = "linux")]
 mod mcp;
 #[cfg(target_os = "linux")]
+mod mux;
+#[cfg(target_os = "linux")]
 mod os;
 #[cfg(target_os = "windows")]
 #[path = "os_windows.rs"]
@@ -94,6 +96,8 @@ const HELP: &str = "ztty — shared no_std terminal sessions for Linux\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty attach [NAME | ztty://ADDRESS]\n\
        ztty attach --observe NAME\n\
+       ztty ssh [OPTIONS] HOST [SESSION] [-- COMMAND [ARG...]]\n\
+       ztty mux attach NAME | list | close NAME\n\
        ztty detach NAME | close NAME | rename NAME NEW_NAME | list [FILTER]\n\
        ztty action NAME ACTION | move NAME TARGET [tab|right|down]\n\
        ztty control NAME acquire|release [--takeover]\n\
@@ -177,6 +181,8 @@ struct Config {
     cwd: Option<String>,
     #[cfg(target_os = "linux")]
     config_path: Option<CString>,
+    #[cfg(target_os = "linux")]
+    ssh_profile: Option<json::Value>,
 }
 
 fn number(bytes: &[u8]) -> Option<usize> {
@@ -205,6 +211,8 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         cwd: None,
         #[cfg(target_os = "linux")]
         config_path: None,
+        #[cfg(target_os = "linux")]
+        ssh_profile: None,
     };
     let mut i = 1;
     while i < args.len() {
@@ -579,6 +587,8 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
     #[cfg(target_os = "linux")]
     let result = match args.get(1).map(|s| s.to_bytes()) {
         Some(b"mcp") => mcp::run(&args[2..]),
+        Some(b"ssh") => mux::ssh(&args[2..]),
+        Some(b"mux") => mux::command(&args[2..]),
         Some(b"plugin") => plugin_host::command(&args[2..]),
         Some(b"__plugin-worker") => plugin_host::worker(&args[2..]),
         Some(b"shell-integration") => shell_integration(&args[2..]),
