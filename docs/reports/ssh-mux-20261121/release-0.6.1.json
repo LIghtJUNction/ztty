@@ -1,0 +1,2121 @@
+{
+  "version": "0.6.1",
+  "source_commit": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+  "official_workflow_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476",
+  "local": {
+    "gates": {
+      "ok": true,
+      "version": "0.6.1",
+      "base_commit": "c63dbd52e9fb597b77245403460972ecb699f096",
+      "checks": [
+        {
+          "name": "release-build",
+          "command": [
+            "cargo",
+            "build",
+            "--offline",
+            "--locked",
+            "--release",
+            "--features",
+            "wayland",
+            "--bin",
+            "ztty"
+          ],
+          "exit_code": 0,
+          "seconds": 412.216
+        },
+        {
+          "name": "no-std",
+          "command": [
+            "python3",
+            "tools/check_no_std.py",
+            "--binary",
+            "/var/tmp/ztty-ssh-target-20261121/release/ztty"
+          ],
+          "exit_code": 0,
+          "seconds": 0.431
+        },
+        {
+          "name": "ssh-mux",
+          "command": [
+            "python3",
+            "tests/ssh_mux.py",
+            "--binary",
+            "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+            "--output",
+            "artifacts/ssh-release-0.6.1/ssh-mux.json"
+          ],
+          "exit_code": 0,
+          "seconds": 5.798
+        },
+        {
+          "name": "gui-software",
+          "command": [
+            "python3",
+            "tests/ssh_mux_gui.py",
+            "--binary",
+            "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+            "--output",
+            "artifacts/ssh-release-0.6.1/gui-software.json",
+            "--screenshot",
+            "artifacts/ssh-release-0.6.1/gui-software.png",
+            "--renderer",
+            "software"
+          ],
+          "exit_code": 0,
+          "seconds": 2.912
+        },
+        {
+          "name": "gui-gpu",
+          "command": [
+            "python3",
+            "tests/ssh_mux_gui.py",
+            "--binary",
+            "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+            "--output",
+            "artifacts/ssh-release-0.6.1/gui-gpu.json",
+            "--screenshot",
+            "artifacts/ssh-release-0.6.1/gui-gpu.png",
+            "--renderer",
+            "gpu"
+          ],
+          "exit_code": 0,
+          "seconds": 2.33
+        }
+      ],
+      "binary_sha256": "148bae3f08f90e446404516230533e2e9e66ee380167f66c761b78a175be093c",
+      "source_sha256": {
+        "Cargo.toml": "72011ab065feae4cf69ad9632465a41ab1098117933d1ee5c28ff0cfca6ccde0",
+        "Cargo.lock": "76b7374c2864c50aafb0e818d0b52c8a71ad86dbe93361b9df15c3c1991a0e2e",
+        "README.md": "06e9e4fb050bfa67b05c3518babad39f74b5cbb09865aae74e6d40c8e23810ef",
+        "README.zh-CN.md": "f674a16f59b13606dfb56a00c0d043a4bb41bdbc3e11fbb84d78f95d36d13abe",
+        "docs/README.md": "d0e8acd490c49d07b600e63cebbd7b74552ff6df1dd5479a41492366121000f0",
+        "docs/releasing.md": "d29598de67d0dbd571042508ce452ffe3a18249f53541173780a100521363c49",
+        "docs/ssh-sessions.md": "b57d9aa2580d89b20e9d9cb912dce4a46f68bcb62d3877f7d3041e4ab9c268b5"
+      },
+      "test_sha256": {
+        "tests/ssh_mux.py": "6e1e56b5687944805b31aa0010aefa085191399b4e33b7f4846bae4c478b8401",
+        "tests/ssh_mux_gui.py": "eab3d0f1caf5a0c626fdd2a41725be55d9e4ee90247665d5238141cca156a4b3"
+      }
+    },
+    "ssh-mux": {
+      "ok": true,
+      "binary": "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+      "binary_sha256": "148bae3f08f90e446404516230533e2e9e66ee380167f66c761b78a175be093c",
+      "checks": [
+        {
+          "name": "private_ssh_server_and_pinned_host_key",
+          "ok": true,
+          "elapsed_ms": 146.427
+        },
+        {
+          "name": "local_mux_create_and_real_pty_input",
+          "ok": true,
+          "pty_pid": 2259355,
+          "broker_pid": 2259351,
+          "elapsed_ms": 134.306
+        },
+        {
+          "name": "writer_exclusion_and_read_only_observer",
+          "ok": true,
+          "elapsed_ms": 66.948
+        },
+        {
+          "name": "explicit_takeover_revokes_previous_writer",
+          "ok": true,
+          "elapsed_ms": 51.588
+        },
+        {
+          "name": "resize_reaches_remote_pty",
+          "ok": true,
+          "elapsed_ms": 11.982
+        },
+        {
+          "name": "detach_preserves_session_and_explicit_close_ends_it",
+          "ok": true,
+          "elapsed_ms": 19.018
+        },
+        {
+          "name": "real_ssh_two_sessions_share_one_connection",
+          "ok": true,
+          "first_connect_ms": 212.293,
+          "reused_connect_ms": 67.034,
+          "ssh_authentications": 1,
+          "control_masters": 1,
+          "distinct_pty_pids": [
+            2259509,
+            2259558
+          ],
+          "elapsed_ms": 428.187
+        },
+        {
+          "name": "transport_loss_keeps_both_remote_shells_running",
+          "ok": true,
+          "elapsed_ms": 432.598
+        },
+        {
+          "name": "reconnect_restores_screen_and_existing_process_without_reexecution",
+          "ok": true,
+          "reattach_ms": 186.562,
+          "snapshot_bytes": 3080,
+          "elapsed_ms": 272.769
+        },
+        {
+          "name": "ssh_resize_reaches_same_child_pty",
+          "ok": true,
+          "elapsed_ms": 47.115
+        },
+        {
+          "name": "remote_argv_and_binary_path_preserve_literal_shell_characters",
+          "ok": true,
+          "elapsed_ms": 133.452
+        },
+        {
+          "name": "ssh_close_terminates_only_the_selected_session",
+          "ok": true,
+          "elapsed_ms": 180.87
+        },
+        {
+          "name": "local_eof_before_exit_preserves_frame_and_status",
+          "ok": true,
+          "exit_code": 42,
+          "retained_pty_pid": 2259825,
+          "command_executions": 1,
+          "elapsed_ms": 228.724
+        },
+        {
+          "name": "ssh_eof_before_exit_preserves_frame_and_status",
+          "ok": true,
+          "exit_code": 42,
+          "retained_pty_pid": 2259914,
+          "command_executions": 1,
+          "elapsed_ms": 335.98
+        },
+        {
+          "name": "local_binary_input_and_event_driven_output",
+          "ok": true,
+          "payload_bytes": 3603,
+          "idle_seconds": 0.35,
+          "idle_cpu_seconds": 0.01,
+          "idle_cpu_ticks": {
+            "2259351": 1,
+            "2259980": 0,
+            "2259984": 0
+          },
+          "watch_latency_ms": 1.671,
+          "rendered_latency_ms": 12.495,
+          "elapsed_ms": 595.355
+        },
+        {
+          "name": "ssh_binary_input_and_event_driven_output",
+          "ok": true,
+          "payload_bytes": 3603,
+          "idle_seconds": 0.35,
+          "idle_cpu_seconds": 0.0,
+          "idle_cpu_ticks": {
+            "2259351": 0,
+            "2260082": 0,
+            "2260089": 0,
+            "2260104": 0
+          },
+          "watch_latency_ms": 1.257,
+          "rendered_latency_ms": 11.932,
+          "elapsed_ms": 757.643
+        },
+        {
+          "name": "local_paste_then_detach_drains_all_queued_input",
+          "ok": true,
+          "payload_bytes": 524425,
+          "reader_pause_ms": 500,
+          "input_submit_ms": 757.58,
+          "detach_ms": 762.158,
+          "retained_pty_pid": 2260195,
+          "elapsed_ms": 828.284
+        },
+        {
+          "name": "ssh_paste_then_detach_drains_all_queued_input",
+          "ok": true,
+          "payload_bytes": 524425,
+          "reader_pause_ms": 500,
+          "input_submit_ms": 242.425,
+          "detach_ms": 539.678,
+          "retained_pty_pid": 2260227,
+          "elapsed_ms": 701.134
+        }
+      ],
+      "cleanup_errors": [],
+      "remaining_owned_pids": []
+    },
+    "gui-software": {
+      "ok": true,
+      "checks": [
+        {
+          "name": "native_ssh_window_and_real_keyboard_input",
+          "ok": true,
+          "local_broker_pid": 2260695,
+          "remote_broker_pid": 2260712,
+          "remote_pty_pid": 2260714,
+          "xtest_input": "echo guiinput + Return",
+          "elapsed_ms": 438.524
+        },
+        {
+          "name": "new_tab_inherits_remote_host_and_creates_an_independent_pty",
+          "ok": true,
+          "remote_session": "pane-2260695-1795279546366-2",
+          "remote_pty_pid": 2260718,
+          "elapsed_ms": 49.791
+        },
+        {
+          "name": "split_and_new_window_keep_the_ssh_profile_and_connection",
+          "ok": true,
+          "remote_sessions": [
+            "main",
+            "pane-2260695-1795279546366-2",
+            "pane-2260695-1795279546416-3",
+            "pane-2260695-1795279546446-4"
+          ],
+          "remote_pty_pids": [
+            2260714,
+            2260718,
+            2260724,
+            2260727
+          ],
+          "control_masters": 1,
+          "ssh_authentications": 1,
+          "elapsed_ms": 91.842
+        },
+        {
+          "name": "native_split_pixels_and_chinese_colored_terminal_screenshot",
+          "ok": true,
+          "native_pixels": {
+            "left": {
+              "green_status": 471,
+              "blue_footer": 690,
+              "chinese_rows": 1666,
+              "final_line": 1007
+            },
+            "right": {
+              "green_status": 471,
+              "blue_footer": 690,
+              "chinese_rows": 1666,
+              "final_line": 1007
+            }
+          },
+          "native_coverage": {
+            "left": {
+              "green_status": 315.95,
+              "blue_footer": 466.24,
+              "chinese_rows": 1158.28,
+              "final_line": 687.33
+            },
+            "right": {
+              "green_status": 315.95,
+              "blue_footer": 466.24,
+              "chinese_rows": 1158.28,
+              "final_line": 687.33
+            }
+          },
+          "legacy_opaque_pixels": {
+            "left": {
+              "green_status": 100,
+              "blue_footer": 106,
+              "chinese_rows": 523,
+              "final_line": 161
+            },
+            "right": {
+              "green_status": 100,
+              "blue_footer": 106,
+              "chinese_rows": 523,
+              "final_line": 161
+            }
+          },
+          "native_geometry": {
+            "left": {
+              "x": 0,
+              "y": 0,
+              "width": 563,
+              "height": 816,
+              "cols": 57,
+              "rows": 32,
+              "text_rows": {
+                "workspace": 3,
+                "green_status": 5,
+                "chinese_first": 7,
+                "chinese_second": 8,
+                "blue_footer": 10,
+                "final_line": 11
+              },
+              "legacy_inferred_cell_height": 24,
+              "grid_matches": true
+            },
+            "right": {
+              "x": 565,
+              "y": 0,
+              "width": 563,
+              "height": 816,
+              "cols": 57,
+              "rows": 32,
+              "text_rows": {
+                "workspace": 3,
+                "green_status": 5,
+                "chinese_first": 7,
+                "chinese_second": 8,
+                "blue_footer": 10,
+                "final_line": 11
+              },
+              "legacy_inferred_cell_height": 24,
+              "grid_matches": true
+            }
+          },
+          "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/ssh-mux-20261121/artifacts/ssh-release-0.6.1/gui-software.png",
+          "width": 1128,
+          "height": 816,
+          "screenshot_sha256": "d8906a68076d2b199d7865cbebdf9174d1620334b8fd8f13fdc1a051a28c9fde",
+          "elapsed_ms": 443.224
+        },
+        {
+          "name": "closing_all_native_views_preserves_remote_sessions",
+          "ok": true,
+          "preserved_remote_pty_pids": [
+            2260714,
+            2260718,
+            2260724,
+            2260727
+          ],
+          "elapsed_ms": 23.153
+        },
+        {
+          "name": "reopening_named_remote_gui_keeps_the_same_shell",
+          "ok": true,
+          "remote_pty_pid": 2260714,
+          "restored_window_id": 2097189,
+          "elapsed_ms": 341.643
+        }
+      ],
+      "binary": "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+      "binary_sha256": "148bae3f08f90e446404516230533e2e9e66ee380167f66c761b78a175be093c",
+      "test_script_sha256": "eab3d0f1caf5a0c626fdd2a41725be55d9e4ee90247665d5238141cca156a4b3",
+      "platform": "Linux X11 / owned Xvfb / real localhost OpenSSH",
+      "renderer": "software",
+      "xserver_ownership": {
+        "display": ":14479",
+        "pid": 2260604,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X14479",
+            "inode": 23317369,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X14479",
+            "inode": 23317368,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "cell_metrics": {
+        "width": 9,
+        "height": 24,
+        "padding": 24,
+        "initial_window": [
+          1128,
+          816
+        ],
+        "initial_grid": [
+          120,
+          32
+        ]
+      },
+      "decoration_readiness": {
+        "Remote 01": {
+          "remote": {
+            "title": "Remote 01",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          },
+          "local": {
+            "title": "Remote 01",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          }
+        },
+        "Remote 02": {
+          "remote": {
+            "title": "Remote 02",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          },
+          "local": {
+            "title": "Remote 02",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          }
+        }
+      },
+      "renderers": [
+        {
+          "window_id": 2097162,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        },
+        {
+          "window_id": 2097170,
+          "requested": "software",
+          "actual": "software",
+          "driver": ""
+        }
+      ],
+      "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/ssh-mux-20261121/artifacts/ssh-release-0.6.1/gui-software.png",
+      "cleanup_errors": [],
+      "remaining_owned_pids": []
+    },
+    "gui-gpu": {
+      "ok": true,
+      "checks": [
+        {
+          "name": "native_ssh_window_and_real_keyboard_input",
+          "ok": true,
+          "local_broker_pid": 2261139,
+          "remote_broker_pid": 2261172,
+          "remote_pty_pid": 2261174,
+          "xtest_input": "echo guiinput + Return",
+          "elapsed_ms": 455.645
+        },
+        {
+          "name": "new_tab_inherits_remote_host_and_creates_an_independent_pty",
+          "ok": true,
+          "remote_session": "pane-2261139-1795279548564-2",
+          "remote_pty_pid": 2261196,
+          "elapsed_ms": 94.678
+        },
+        {
+          "name": "split_and_new_window_keep_the_ssh_profile_and_connection",
+          "ok": true,
+          "remote_sessions": [
+            "main",
+            "pane-2261139-1795279548564-2",
+            "pane-2261139-1795279548648-3",
+            "pane-2261139-1795279548729-4"
+          ],
+          "remote_pty_pids": [
+            2261174,
+            2261196,
+            2261202,
+            2261217
+          ],
+          "control_masters": 1,
+          "ssh_authentications": 1,
+          "elapsed_ms": 187.148
+        },
+        {
+          "name": "native_split_pixels_and_chinese_colored_terminal_screenshot",
+          "ok": true,
+          "native_pixels": {
+            "left": {
+              "green_status": 458,
+              "blue_footer": 700,
+              "chinese_rows": 2134,
+              "final_line": 1028
+            },
+            "right": {
+              "green_status": 458,
+              "blue_footer": 700,
+              "chinese_rows": 2134,
+              "final_line": 1028
+            }
+          },
+          "native_coverage": {
+            "left": {
+              "green_status": 307.41,
+              "blue_footer": 463.47,
+              "chinese_rows": 1341.45,
+              "final_line": 686.35
+            },
+            "right": {
+              "green_status": 307.41,
+              "blue_footer": 463.47,
+              "chinese_rows": 1341.45,
+              "final_line": 686.35
+            }
+          },
+          "legacy_opaque_pixels": {
+            "left": {
+              "green_status": 92,
+              "blue_footer": 111,
+              "chinese_rows": 419,
+              "final_line": 172
+            },
+            "right": {
+              "green_status": 92,
+              "blue_footer": 111,
+              "chinese_rows": 419,
+              "final_line": 172
+            }
+          },
+          "native_geometry": {
+            "left": {
+              "x": 0,
+              "y": 0,
+              "width": 563,
+              "height": 816,
+              "cols": 57,
+              "rows": 32,
+              "text_rows": {
+                "workspace": 3,
+                "green_status": 5,
+                "chinese_first": 7,
+                "chinese_second": 8,
+                "blue_footer": 10,
+                "final_line": 11
+              },
+              "legacy_inferred_cell_height": 24,
+              "grid_matches": true
+            },
+            "right": {
+              "x": 565,
+              "y": 0,
+              "width": 563,
+              "height": 816,
+              "cols": 57,
+              "rows": 32,
+              "text_rows": {
+                "workspace": 3,
+                "green_status": 5,
+                "chinese_first": 7,
+                "chinese_second": 8,
+                "blue_footer": 10,
+                "final_line": 11
+              },
+              "legacy_inferred_cell_height": 24,
+              "grid_matches": true
+            }
+          },
+          "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/ssh-mux-20261121/artifacts/ssh-release-0.6.1/gui-gpu.png",
+          "width": 1128,
+          "height": 816,
+          "screenshot_sha256": "17c65c4d65befb6bba1ec4b7f8387694e82152380b9c19e7481176ba9754ff33",
+          "elapsed_ms": 766.613
+        },
+        {
+          "name": "closing_all_native_views_preserves_remote_sessions",
+          "ok": true,
+          "preserved_remote_pty_pids": [
+            2261174,
+            2261196,
+            2261202,
+            2261217
+          ],
+          "elapsed_ms": 44.131
+        },
+        {
+          "name": "reopening_named_remote_gui_keeps_the_same_shell",
+          "ok": true,
+          "remote_pty_pid": 2261174,
+          "restored_window_id": 2097191,
+          "elapsed_ms": 135.271
+        }
+      ],
+      "binary": "/var/tmp/ztty-ssh-target-20261121/release/ztty",
+      "binary_sha256": "148bae3f08f90e446404516230533e2e9e66ee380167f66c761b78a175be093c",
+      "test_script_sha256": "eab3d0f1caf5a0c626fdd2a41725be55d9e4ee90247665d5238141cca156a4b3",
+      "platform": "Linux X11 / owned Xvfb / real localhost OpenSSH",
+      "renderer": "gpu",
+      "xserver_ownership": {
+        "display": ":24726",
+        "pid": 2261078,
+        "pid_lock_verified": true,
+        "owned_listeners": [
+          {
+            "path": "/tmp/.X11-unix/X24726",
+            "inode": 23325441,
+            "state": "01",
+            "type": "0001"
+          },
+          {
+            "path": "@/tmp/.X11-unix/X24726",
+            "inode": 23325440,
+            "state": "01",
+            "type": "0001"
+          }
+        ],
+        "filesystem_peer_pid_verified": true,
+        "allocation": "guarded explicit random display 100..30000"
+      },
+      "cell_metrics": {
+        "width": 9,
+        "height": 24,
+        "padding": 24,
+        "initial_window": [
+          1128,
+          816
+        ],
+        "initial_grid": [
+          120,
+          32
+        ]
+      },
+      "decoration_readiness": {
+        "Remote 01": {
+          "remote": {
+            "title": "Remote 01",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          },
+          "local": {
+            "title": "Remote 01",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          }
+        },
+        "Remote 02": {
+          "remote": {
+            "title": "Remote 02",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          },
+          "local": {
+            "title": "Remote 02",
+            "cols": 57,
+            "rows": 32,
+            "missing_lines": [],
+            "command_echo": false,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            }
+          }
+        }
+      },
+      "renderers": [
+        {
+          "window_id": 2097158,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+        },
+        {
+          "window_id": 2097173,
+          "requested": "gpu",
+          "actual": "gpu",
+          "driver": "llvmpipe (LLVM 23.1.5, 256 bits)"
+        }
+      ],
+      "screenshot": "/home/lightjunction/Documents/GITHUB/ztty/artifacts/ssh-mux-20261121/artifacts/ssh-release-0.6.1/gui-gpu.png",
+      "cleanup_errors": [],
+      "remaining_owned_pids": []
+    },
+    "installation": {
+      "source_commit": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+      "targets": [
+        {
+          "path": "/home/lightjunction/.cargo/bin/ztty",
+          "sha256": "148bae3f08f90e446404516230533e2e9e66ee380167f66c761b78a175be093c",
+          "version": "ztty 0.6.1"
+        },
+        {
+          "path": "/home/lightjunction/.local/bin/ztty",
+          "sha256": "148bae3f08f90e446404516230533e2e9e66ee380167f66c761b78a175be093c",
+          "version": "ztty 0.6.1"
+        }
+      ],
+      "desktop_exec": [
+        "Exec=\"/home/lightjunction/.local/bin/ztty\""
+      ],
+      "ok": true,
+      "primary_worktree": {
+        "branch": "main",
+        "merge_exit_code": 0
+      }
+    }
+  },
+  "ci_gui": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "native_ssh_window_and_real_keyboard_input",
+        "ok": true,
+        "local_broker_pid": 8210,
+        "remote_broker_pid": 8220,
+        "remote_pty_pid": 8221,
+        "xtest_input": "echo guiinput + Return",
+        "elapsed_ms": 315.212
+      },
+      {
+        "name": "new_tab_inherits_remote_host_and_creates_an_independent_pty",
+        "ok": true,
+        "remote_session": "pane-8210-1795279753424-2",
+        "remote_pty_pid": 8225,
+        "elapsed_ms": 45.191
+      },
+      {
+        "name": "split_and_new_window_keep_the_ssh_profile_and_connection",
+        "ok": true,
+        "remote_sessions": [
+          "main",
+          "pane-8210-1795279753424-2",
+          "pane-8210-1795279753469-3",
+          "pane-8210-1795279753494-4"
+        ],
+        "remote_pty_pids": [
+          8221,
+          8225,
+          8228,
+          8231
+        ],
+        "control_masters": 1,
+        "ssh_authentications": 1,
+        "elapsed_ms": 80.242
+      },
+      {
+        "name": "native_split_pixels_and_chinese_colored_terminal_screenshot",
+        "ok": true,
+        "native_pixels": {
+          "left": {
+            "green_status": 101,
+            "blue_footer": 108,
+            "chinese_rows": 404,
+            "final_line": 127
+          },
+          "right": {
+            "green_status": 101,
+            "blue_footer": 108,
+            "chinese_rows": 404,
+            "final_line": 127
+          }
+        },
+        "native_coverage": {
+          "left": {
+            "green_status": 76.07,
+            "blue_footer": 87.48,
+            "chinese_rows": 376.97,
+            "final_line": 113.29
+          },
+          "right": {
+            "green_status": 76.07,
+            "blue_footer": 87.48,
+            "chinese_rows": 376.97,
+            "final_line": 113.29
+          }
+        },
+        "legacy_opaque_pixels": {
+          "left": {
+            "green_status": 60,
+            "blue_footer": 57,
+            "chinese_rows": 333,
+            "final_line": 89
+          },
+          "right": {
+            "green_status": 60,
+            "blue_footer": 57,
+            "chinese_rows": 333,
+            "final_line": 89
+          }
+        },
+        "native_geometry": {
+          "left": {
+            "x": 0,
+            "y": 0,
+            "width": 563,
+            "height": 752,
+            "cols": 57,
+            "rows": 32,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            },
+            "legacy_inferred_cell_height": 22,
+            "grid_matches": true
+          },
+          "right": {
+            "x": 565,
+            "y": 0,
+            "width": 563,
+            "height": 752,
+            "cols": 57,
+            "rows": 32,
+            "text_rows": {
+              "workspace": 3,
+              "green_status": 5,
+              "chinese_first": 7,
+              "chinese_second": 8,
+              "blue_footer": 10,
+              "final_line": 11
+            },
+            "legacy_inferred_cell_height": 22,
+            "grid_matches": true
+          }
+        },
+        "screenshot": "/home/runner/work/ztty/ztty/artifacts/ssh-mux-gui.png",
+        "width": 1128,
+        "height": 752,
+        "screenshot_sha256": "2101282387702a6d43cc55e0438f2eeffa5160fad48ee618fbb9f6cbe28e7012",
+        "elapsed_ms": 201.697
+      },
+      {
+        "name": "closing_all_native_views_preserves_remote_sessions",
+        "ok": true,
+        "preserved_remote_pty_pids": [
+          8221,
+          8225,
+          8228,
+          8231
+        ],
+        "elapsed_ms": 24.279
+      },
+      {
+        "name": "reopening_named_remote_gui_keeps_the_same_shell",
+        "ok": true,
+        "remote_pty_pid": 8221,
+        "restored_window_id": 2097189,
+        "elapsed_ms": 68.339
+      }
+    ],
+    "binary": "/home/runner/work/ztty/ztty/target/release/ztty",
+    "binary_sha256": "bcd562c4a1c78e3db945e9cb978fabfbc94c89f88a9324337edda46dcd6dcda0",
+    "test_script_sha256": "eab3d0f1caf5a0c626fdd2a41725be55d9e4ee90247665d5238141cca156a4b3",
+    "platform": "Linux X11 / owned Xvfb / real localhost OpenSSH",
+    "renderer": "software",
+    "xserver_ownership": {
+      "display": ":16859",
+      "pid": 8204,
+      "pid_lock_verified": true,
+      "owned_listeners": [
+        {
+          "path": "/tmp/.X11-unix/X16859",
+          "inode": 35020,
+          "state": "01",
+          "type": "0001"
+        },
+        {
+          "path": "@/tmp/.X11-unix/X16859",
+          "inode": 35019,
+          "state": "01",
+          "type": "0001"
+        }
+      ],
+      "filesystem_peer_pid_verified": true,
+      "allocation": "guarded explicit random display 100..30000"
+    },
+    "cell_metrics": {
+      "width": 9,
+      "height": 22,
+      "padding": 24,
+      "initial_window": [
+        1128,
+        752
+      ],
+      "initial_grid": [
+        120,
+        32
+      ]
+    },
+    "decoration_readiness": {
+      "Remote 01": {
+        "remote": {
+          "title": "Remote 01",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        },
+        "local": {
+          "title": "Remote 01",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        }
+      },
+      "Remote 02": {
+        "remote": {
+          "title": "Remote 02",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        },
+        "local": {
+          "title": "Remote 02",
+          "cols": 57,
+          "rows": 32,
+          "missing_lines": [],
+          "command_echo": false,
+          "text_rows": {
+            "workspace": 3,
+            "green_status": 5,
+            "chinese_first": 7,
+            "chinese_second": 8,
+            "blue_footer": 10,
+            "final_line": 11
+          }
+        }
+      }
+    },
+    "renderers": [
+      {
+        "window_id": 2097162,
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      },
+      {
+        "window_id": 2097170,
+        "requested": "software",
+        "actual": "software",
+        "driver": ""
+      }
+    ],
+    "screenshot": "/home/runner/work/ztty/ztty/artifacts/ssh-mux-gui.png",
+    "cleanup_errors": [],
+    "remaining_owned_pids": []
+  },
+  "publication": {
+    "release": {
+      "exit_code": 0,
+      "data": {
+        "assets": [
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776220748",
+            "contentType": "application/x-shellscript",
+            "createdAt": "2026-11-21T16:52:17Z",
+            "digest": "sha256:e078404f113ce6337c70f0878ab2be057f7135572a5e2c4ad19c6025206f2b08",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDBM",
+            "label": "",
+            "name": "install.sh",
+            "size": 9889,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:17Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/install.sh"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776220645",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:15Z",
+            "digest": "sha256:c1d36f24096a84bf99f91a23b14b081c0cd2c3931cba7a54d09ce0bb4e2ee9df",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRC_l",
+            "label": "",
+            "name": "SHA256SUMS",
+            "size": 84,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:15Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/SHA256SUMS"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776225204",
+            "contentType": "application/zip",
+            "createdAt": "2026-11-21T16:53:41Z",
+            "digest": "sha256:fddf8b28e88beaf99a5f0ef6f34fa94218b7d98351d17b05323457eb3a6dc137",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uREG0",
+            "label": "",
+            "name": "ztty-0.6.1-native-evidence.zip",
+            "size": 17363026,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:42Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-0.6.1-native-evidence.zip"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776225321",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:44Z",
+            "digest": "sha256:de1188459d11164599b47b876a109d8881d86be520a26d9da3ca95cff783f157",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uREIp",
+            "label": "",
+            "name": "ztty-0.6.1-native-evidence.zip.sha256",
+            "size": 97,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:44Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-0.6.1-native-evidence.zip.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776220540",
+            "contentType": "application/x-gtar",
+            "createdAt": "2026-11-21T16:52:13Z",
+            "digest": "sha256:d5284891588847e3154ac84a3905dae3ac978a24c7740b425d7af019a7c368d7",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRC98",
+            "label": "",
+            "name": "ztty-0.6.1.tar.gz",
+            "size": 5559658,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:13Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-0.6.1.tar.gz"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776220870",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:19Z",
+            "digest": "sha256:aa2152f0e3d37868d5b19dd0795ea5d20fd7c8e70df1cb57b2674c97a9346083",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDDG",
+            "label": "",
+            "name": "ztty-linux-aarch64.build.json",
+            "size": 1546,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:19Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-aarch64.build.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776220970",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:21Z",
+            "digest": "sha256:a3a0131646d980bacd48beddb5a05f13abd4cdebb338bbbf53b76f08b1576a3f",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDEq",
+            "label": "",
+            "name": "ztty-linux-aarch64.build.json.sha256",
+            "size": 96,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:21Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-aarch64.build.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221045",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:22Z",
+            "digest": "sha256:402998b6778c1b0c34635c0ae6c9a28cbaafb94635ded7f4e265e1f7a4ddc81e",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDF1",
+            "label": "",
+            "name": "ztty-linux-aarch64.native.json",
+            "size": 27525,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:23Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-aarch64.native.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221150",
+            "contentType": "application/x-gtar",
+            "createdAt": "2026-11-21T16:52:24Z",
+            "digest": "sha256:8060f9cf8070ff61b47b8169147ba5ce1ad475e0bd27acb1b44cb5957f34d6be",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDHe",
+            "label": "",
+            "name": "ztty-linux-aarch64.tar.gz",
+            "size": 677272,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:25Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-aarch64.tar.gz"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221277",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:27Z",
+            "digest": "sha256:640c532032268f661488c1d0b5c0724385f95d7ec0a455cdc68526c531f9e7b5",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDJd",
+            "label": "",
+            "name": "ztty-linux-aarch64.tar.gz.sha256",
+            "size": 92,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:27Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-aarch64.tar.gz.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221421",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:29Z",
+            "digest": "sha256:996d7998188ed9ebf9997669b4ab002d5a169861f92610542ef8172d7d71ec9c",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDLt",
+            "label": "",
+            "name": "ztty-linux-x86_64.build.json",
+            "size": 1532,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:29Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-x86_64.build.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221536",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:31Z",
+            "digest": "sha256:6a1e94075022e75793072c6742c0a0dec7a9e4f310672d3bc8ce05b84bf55629",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDNg",
+            "label": "",
+            "name": "ztty-linux-x86_64.build.json.sha256",
+            "size": 95,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:31Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-x86_64.build.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221670",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:33Z",
+            "digest": "sha256:2e5ebccca24ce53d2d53ab5314ee4a3d190631dce758c51ffea8c08d06007586",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDPm",
+            "label": "",
+            "name": "ztty-linux-x86_64.native.json",
+            "size": 27465,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:33Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-x86_64.native.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221787",
+            "contentType": "application/x-gtar",
+            "createdAt": "2026-11-21T16:52:35Z",
+            "digest": "sha256:f4eb2633c40b9fe72a7b2b4be2f2348778e6a5711786de71483bf93d1087d84d",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDRb",
+            "label": "",
+            "name": "ztty-linux-x86_64.tar.gz",
+            "size": 717255,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:35Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-x86_64.tar.gz"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776221910",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:37Z",
+            "digest": "sha256:27377863c4c11d28da8a05a265f0767c0949ba9d91a21e364931394d56715837",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDTW",
+            "label": "",
+            "name": "ztty-linux-x86_64.tar.gz.sha256",
+            "size": 91,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:37Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-linux-x86_64.tar.gz.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222027",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:39Z",
+            "digest": "sha256:4f7f8604309d0c07e9dfb72c8ff7b856dd1452c437846e525d8720db4d9a07b6",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDVL",
+            "label": "",
+            "name": "ztty-macos-aarch64.build.json",
+            "size": 11956,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:39Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.build.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222109",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:41Z",
+            "digest": "sha256:a16bd5617ffc2780bda8d313b23c65ab9ad3363d164ca1116bf02f0134010e22",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDWd",
+            "label": "",
+            "name": "ztty-macos-aarch64.build.json.sha256",
+            "size": 96,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:41Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.build.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222248",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:43Z",
+            "digest": "sha256:14916ce6907b19fe0f742082fe0fb1fc9552fb96318c2b2bef4d7a5bc672028d",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDYo",
+            "label": "",
+            "name": "ztty-macos-aarch64.manifest.json",
+            "size": 2967,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:43Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.manifest.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222348",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:44Z",
+            "digest": "sha256:761b54d48a12a13c70571241241a7705481f22224371b017d374d920725562cf",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDaM",
+            "label": "",
+            "name": "ztty-macos-aarch64.manifest.json.sha256",
+            "size": 99,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:45Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.manifest.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222426",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:46Z",
+            "digest": "sha256:ced20a98d3bd641226b286be05863734ac0fbd0638e10b96f21b0acd93cbf544",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDba",
+            "label": "",
+            "name": "ztty-macos-aarch64.native.json",
+            "size": 69957,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:47Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.native.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222554",
+            "contentType": "application/x-gtar",
+            "createdAt": "2026-11-21T16:52:48Z",
+            "digest": "sha256:d9c641f4c7493ab528ae57b88c224c34a00ff3460f29c63d9637979abd8b7f72",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDda",
+            "label": "",
+            "name": "ztty-macos-aarch64.tar.gz",
+            "size": 252109,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:48Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.tar.gz"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222659",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:50Z",
+            "digest": "sha256:2e9338712f293bd5d4afdaf2f1b590074ec4516b44492911e8330a237151e655",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDfD",
+            "label": "",
+            "name": "ztty-macos-aarch64.tar.gz.sha256",
+            "size": 92,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:50Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.tar.gz.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222744",
+            "contentType": "application/zip",
+            "createdAt": "2026-11-21T16:52:52Z",
+            "digest": "sha256:ac481e3daf71bbed25cf0e7e5d25aa9c11792ff7b00710f35fe09a5d3b8fc79e",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDgY",
+            "label": "",
+            "name": "ztty-macos-aarch64.zip",
+            "size": 252615,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:52Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.zip"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222853",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:54Z",
+            "digest": "sha256:2e816ffba1e007d1dc8ef5699c58f66f96bd2670f7577e11bb9dd4c46090d927",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDiF",
+            "label": "",
+            "name": "ztty-macos-aarch64.zip.sha256",
+            "size": 89,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:54Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-aarch64.zip.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776222938",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:52:56Z",
+            "digest": "sha256:2e32c166ff4f563524d52f1c0c4929376d1896b2470952b43034697423d1d7fe",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDja",
+            "label": "",
+            "name": "ztty-macos-x86_64.build.json",
+            "size": 11899,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:56Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.build.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223018",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:52:58Z",
+            "digest": "sha256:e8bcd64de58d2d034f968101debc539fe09d8c134e69d493d9a1348a8fcf3859",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDkq",
+            "label": "",
+            "name": "ztty-macos-x86_64.build.json.sha256",
+            "size": 95,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:52:58Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.build.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223114",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:00Z",
+            "digest": "sha256:9f8492762be42ca0d2019e6864120c6225e82f062722b4a685720682bffa84f8",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDmK",
+            "label": "",
+            "name": "ztty-macos-x86_64.manifest.json",
+            "size": 2963,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:00Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.manifest.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223182",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:02Z",
+            "digest": "sha256:090d5ac783a2313e564e7c7518c5440f201830c66ab5b39bc01b8bb854c82079",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDnO",
+            "label": "",
+            "name": "ztty-macos-x86_64.manifest.json.sha256",
+            "size": 98,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:02Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.manifest.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223284",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:04Z",
+            "digest": "sha256:3b5cb02878f4e3e1db683a48f08e6ae435ab7ebdfc34b77eb10298a88f4057a5",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDo0",
+            "label": "",
+            "name": "ztty-macos-x86_64.native.json",
+            "size": 70032,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:04Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.native.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223386",
+            "contentType": "application/x-gtar",
+            "createdAt": "2026-11-21T16:53:06Z",
+            "digest": "sha256:0b7680ad541411ff47f8713b009e78ce0acdb8a4991bab473b1dd8e6a7cef728",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDqa",
+            "label": "",
+            "name": "ztty-macos-x86_64.tar.gz",
+            "size": 278119,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:06Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.tar.gz"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223525",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:08Z",
+            "digest": "sha256:f182b009ff4b0c72fb6d886983e3bbd63f856e62954e081afc98b7e3768e3f4b",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDsl",
+            "label": "",
+            "name": "ztty-macos-x86_64.tar.gz.sha256",
+            "size": 91,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:08Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.tar.gz.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223644",
+            "contentType": "application/zip",
+            "createdAt": "2026-11-21T16:53:10Z",
+            "digest": "sha256:17f865907f3122bd328cbcc704550960ceb796c9127352f5387ff5da32d15480",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDuc",
+            "label": "",
+            "name": "ztty-macos-x86_64.zip",
+            "size": 278828,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:10Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.zip"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223733",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:12Z",
+            "digest": "sha256:62b27d22f841948e91ad28d83b157f0ca4bf9023d0558efbb9b08e36949d1767",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDv1",
+            "label": "",
+            "name": "ztty-macos-x86_64.zip.sha256",
+            "size": 88,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:12Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-macos-x86_64.zip.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223812",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:13Z",
+            "digest": "sha256:6903c36f00560376ffdef521c92bf3ea4a0dd11e9c4f7c18d7008364f6cc491c",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDxE",
+            "label": "",
+            "name": "ztty-windows-aarch64.build.json",
+            "size": 72226,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:14Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-aarch64.build.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776223961",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:15Z",
+            "digest": "sha256:1feb8612856801e19911382daf7ac3495deb639600cc5d59dd9572570cceec8d",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRDzZ",
+            "label": "",
+            "name": "ztty-windows-aarch64.build.json.sha256",
+            "size": 99,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:16Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-aarch64.build.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224080",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:17Z",
+            "digest": "sha256:8bf06ead696c27d30d0d5ffb7840a715abf97f478c35a93b5597f335f11b3857",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD1Q",
+            "label": "",
+            "name": "ztty-windows-aarch64.manifest.json",
+            "size": 1257,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:18Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-aarch64.manifest.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224170",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:19Z",
+            "digest": "sha256:320a549139b7d8be5c983ec7d03965bf5aa5e3b4d598620922bf3377609745b8",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD2q",
+            "label": "",
+            "name": "ztty-windows-aarch64.manifest.json.sha256",
+            "size": 102,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:20Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-aarch64.manifest.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224283",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:22Z",
+            "digest": "sha256:ba8c1055c6ba9f4da4d887159ffc90edf7c3fa56fbcdff89d4989554b69ae3e3",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD4b",
+            "label": "",
+            "name": "ztty-windows-aarch64.native.json",
+            "size": 339093,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:22Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-aarch64.native.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224368",
+            "contentType": "application/zip",
+            "createdAt": "2026-11-21T16:53:24Z",
+            "digest": "sha256:03ec1581451a7401b3f41925a864273346e770977fa16c0c688686c4b24e70a5",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD5w",
+            "label": "",
+            "name": "ztty-windows-aarch64.zip",
+            "size": 858797,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:24Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-aarch64.zip"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224471",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:26Z",
+            "digest": "sha256:d4bde4140f09b517b61f35c425febe43656beaad8a3d3e74a59959756610e4fc",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD7X",
+            "label": "",
+            "name": "ztty-windows-aarch64.zip.sha256",
+            "size": 92,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:26Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-aarch64.zip.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224559",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:28Z",
+            "digest": "sha256:0a7421a21c65ac66632a18b91382dc67315408267caa2dfcdbc47bc3050d0bdb",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD8v",
+            "label": "",
+            "name": "ztty-windows-x86_64.build.json",
+            "size": 71829,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:28Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-x86_64.build.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224658",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:29Z",
+            "digest": "sha256:0926bb1a5a86ca5df14dafb502bfb6e66dcf91fae594e8f1590a59f85acc5619",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD-S",
+            "label": "",
+            "name": "ztty-windows-x86_64.build.json.sha256",
+            "size": 98,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:30Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-x86_64.build.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224739",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:31Z",
+            "digest": "sha256:77fbf0789338f22e9f42f369b6c32c9843ae8d2b97dbf974ff2dc0bf387e7ea1",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRD_j",
+            "label": "",
+            "name": "ztty-windows-x86_64.manifest.json",
+            "size": 1255,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:31Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-x86_64.manifest.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224820",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:33Z",
+            "digest": "sha256:bfd0ab34b08f15e5355ed1060e8e0abdd9a41ac4eee889d7aaaff1e52d69a8bd",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uREA0",
+            "label": "",
+            "name": "ztty-windows-x86_64.manifest.json.sha256",
+            "size": 101,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:33Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-x86_64.manifest.json.sha256"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224913",
+            "contentType": "application/json",
+            "createdAt": "2026-11-21T16:53:35Z",
+            "digest": "sha256:d7b6892e3dbaa721d9d4b4de2c5133cb0d273a4d34627e746ba2369a8856e923",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uRECR",
+            "label": "",
+            "name": "ztty-windows-x86_64.native.json",
+            "size": 337461,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:35Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-x86_64.native.json"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776224996",
+            "contentType": "application/zip",
+            "createdAt": "2026-11-21T16:53:37Z",
+            "digest": "sha256:13b105211b3c58d46d521712ea3de954cb5dbde05d8cd0b3598651f8113b35bc",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uREDk",
+            "label": "",
+            "name": "ztty-windows-x86_64.zip",
+            "size": 932868,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:37Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-x86_64.zip"
+          },
+          {
+            "apiUrl": "https://api.github.com/repos/LIghtJUNction/ztty/releases/assets/776225099",
+            "contentType": "application/octet-stream",
+            "createdAt": "2026-11-21T16:53:39Z",
+            "digest": "sha256:6f1a753e854321cbd8996969dde3470846cf356905c5b7e70893504f4a179c00",
+            "downloadCount": 0,
+            "id": "RA_kwDOVxueTs4uREFL",
+            "label": "",
+            "name": "ztty-windows-x86_64.zip.sha256",
+            "size": 91,
+            "state": "uploaded",
+            "updatedAt": "2026-11-21T16:53:39Z",
+            "url": "https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-windows-x86_64.zip.sha256"
+          }
+        ],
+        "isDraft": false,
+        "isPrerelease": false,
+        "name": "v0.6.1",
+        "publishedAt": "2026-11-21T16:53:49Z",
+        "tagName": "v0.6.1",
+        "targetCommitish": "main",
+        "url": "https://github.com/LIghtJUNction/ztty/releases/tag/v0.6.1"
+      },
+      "stderr": ""
+    },
+    "latest": {
+      "exit_code": 0,
+      "data": {
+        "tag_name": "v0.6.1",
+        "draft": false,
+        "prerelease": false,
+        "published_at": "2026-11-21T16:53:49Z",
+        "html_url": "https://github.com/LIghtJUNction/ztty/releases/tag/v0.6.1",
+        "target_commitish": "main"
+      },
+      "stderr": ""
+    },
+    "publish_job": {
+      "exit_code": 0,
+      "data": {
+        "id": 136914474722,
+        "conclusion": "success",
+        "started_at": "2026-11-21T16:50:45Z",
+        "completed_at": "2026-11-21T16:54:07Z",
+        "html_url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136914474722",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-11-21T16:50:45Z",
+            "completed_at": "2026-11-21T16:50:46Z"
+          },
+          {
+            "name": "Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-11-21T16:50:46Z",
+            "completed_at": "2026-11-21T16:50:52Z"
+          },
+          {
+            "name": "Prepare source and test Arch package",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-11-21T16:50:52Z",
+            "completed_at": "2026-11-21T16:52:05Z"
+          },
+          {
+            "name": "Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-11-21T16:52:05Z",
+            "completed_at": "2026-11-21T16:52:06Z"
+          },
+          {
+            "name": "Verify every platform artifact belongs to the accepted source",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-11-21T16:52:06Z",
+            "completed_at": "2026-11-21T16:52:06Z"
+          },
+          {
+            "name": "Check release evidence packaging contracts",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-11-21T16:52:06Z",
+            "completed_at": "2026-11-21T16:52:07Z"
+          },
+          {
+            "name": "Publish or verify GitHub Release",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-11-21T16:52:07Z",
+            "completed_at": "2026-11-21T16:53:49Z"
+          },
+          {
+            "name": "Update AUR",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-11-21T16:53:49Z",
+            "completed_at": "2026-11-21T16:54:05Z"
+          },
+          {
+            "name": "Post Run actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16,
+            "started_at": "2026-11-21T16:54:05Z",
+            "completed_at": "2026-11-21T16:54:05Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17,
+            "started_at": "2026-11-21T16:54:05Z",
+            "completed_at": "2026-11-21T16:54:05Z"
+          }
+        ]
+      },
+      "stderr": ""
+    }
+  },
+  "public_readback": {
+    "workflow": {
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476",
+      "headSha": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+      "jobs": [
+        {
+          "name": "version",
+          "databaseId": 136913411552,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913411552"
+        },
+        {
+          "name": "windows (windows-11-arm, aarch64, arm64, aarch64-pc-windows-msvc, aarch64-pc-windows-gnullvm, 7d7...",
+          "databaseId": 136913480482,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913480482"
+        },
+        {
+          "name": "macos (macos-15-intel, x86_64, x86_64, x64, x86_64-apple-darwin)",
+          "databaseId": 136913480532,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913480532"
+        },
+        {
+          "name": "linux (ubuntu-24.04, x86_64, x64)",
+          "databaseId": 136913480536,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913480536"
+        },
+        {
+          "name": "windows (windows-2025, x86_64, x64, x86_64-pc-windows-msvc, x86_64-pc-windows-gnullvm, 552191b575...",
+          "databaseId": 136913480545,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913480545"
+        },
+        {
+          "name": "linux (ubuntu-24.04-arm, aarch64, arm64)",
+          "databaseId": 136913480580,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913480580"
+        },
+        {
+          "name": "macos (macos-15, aarch64, arm64, arm64, aarch64-apple-darwin)",
+          "databaseId": 136913480604,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913480604"
+        },
+        {
+          "name": "verify / checks",
+          "databaseId": 136913480673,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136913480673"
+        },
+        {
+          "name": "publish",
+          "databaseId": 136914474722,
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/LIghtJUNction/ztty/actions/runs/44926426476/job/136914474722"
+        }
+      ]
+    },
+    "build_manifests": [
+      {
+        "name": "ztty-linux-aarch64.build.json",
+        "sha256": "aa2152f0e3d37868d5b19dd0795ea5d20fd7c8e70df1cb57b2674c97a9346083",
+        "source_sha": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+        "version": "0.6.1",
+        "passed": true,
+        "build_only": false,
+        "candidate_platform": "all",
+        "run_id": "44926426476",
+        "architecture": "aarch64",
+        "platform": "Linux-7.0.0-1017-azure-aarch64-with-glibc2.39"
+      },
+      {
+        "name": "ztty-linux-x86_64.build.json",
+        "sha256": "996d7998188ed9ebf9997669b4ab002d5a169861f92610542ef8172d7d71ec9c",
+        "source_sha": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+        "version": "0.6.1",
+        "passed": true,
+        "build_only": false,
+        "candidate_platform": "all",
+        "run_id": "44926426476",
+        "architecture": "x86_64",
+        "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.39"
+      },
+      {
+        "name": "ztty-macos-aarch64.build.json",
+        "sha256": "4f7f8604309d0c07e9dfb72c8ff7b856dd1452c437846e525d8720db4d9a07b6",
+        "source_sha": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+        "version": "0.6.1",
+        "passed": true,
+        "build_only": false,
+        "candidate_platform": "all",
+        "run_id": "44926426476",
+        "architecture": "aarch64",
+        "platform": "macOS-15.8.2-arm64-arm-64bit-Mach-O"
+      },
+      {
+        "name": "ztty-macos-x86_64.build.json",
+        "sha256": "2e32c166ff4f563524d52f1c0c4929376d1896b2470952b43034697423d1d7fe",
+        "source_sha": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+        "version": "0.6.1",
+        "passed": true,
+        "build_only": false,
+        "candidate_platform": "all",
+        "run_id": "44926426476",
+        "architecture": "x86_64",
+        "platform": "macOS-15.7.9-x86_64-i386-64bit-Mach-O"
+      },
+      {
+        "name": "ztty-windows-aarch64.build.json",
+        "sha256": "6903c36f00560376ffdef521c92bf3ea4a0dd11e9c4f7c18d7008364f6cc491c",
+        "source_sha": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+        "version": "0.6.1",
+        "passed": true,
+        "build_only": false,
+        "candidate_platform": "all",
+        "run_id": "44926426476",
+        "architecture": "aarch64",
+        "platform": "Windows-11-10.0.26200-SP0"
+      },
+      {
+        "name": "ztty-windows-x86_64.build.json",
+        "sha256": "0a7421a21c65ac66632a18b91382dc67315408267caa2dfcdbc47bc3050d0bdb",
+        "source_sha": "842f1a8cb7cd23ec09e3c7c1f993886bde665e62",
+        "version": "0.6.1",
+        "passed": true,
+        "build_only": false,
+        "candidate_platform": "all",
+        "run_id": "44926426476",
+        "architecture": "x86_64",
+        "platform": "Windows-2025Server-10.0.26100-SP0"
+      }
+    ],
+    "aur": {
+      "url": "https://aur.archlinux.org/packages/ztty",
+      "rpc_result": {
+        "resultcount": 1,
+        "results": [
+          {
+            "Depends": [
+              "gcc-libs",
+              "glibc",
+              "libx11",
+              "libxft",
+              "libxrender",
+              "fontconfig",
+              "freetype2",
+              "harfbuzz",
+              "libglvnd",
+              "wayland",
+              "libxkbcommon"
+            ],
+            "Description": "Lightweight no_std Rust terminal emulator for X11, XWayland and native Wayland",
+            "FirstSubmitted": 1794942233,
+            "ID": 2359188,
+            "Keywords": [],
+            "LastModified": 1795167924,
+            "License": [
+              "MIT"
+            ],
+            "Maintainer": "lightjunction",
+            "MakeDepends": [
+              "rustup",
+              "pkgconf",
+              "wayland-protocols"
+            ],
+            "Name": "ztty",
+            "NumVotes": 0,
+            "OptDepends": [
+              "xdg-utils",
+              "ttf-dejavu"
+            ],
+            "OutOfDate": null,
+            "PackageBase": "ztty",
+            "PackageBaseID": 252535,
+            "Popularity": 0,
+            "Submitter": "lightjunction",
+            "URL": "https://github.com/LIghtJUNction/ztty",
+            "URLPath": "/cgit/aur.git/snapshot/ztty.tar.gz",
+            "Version": "0.5.2-1"
+          }
+        ],
+        "type": "multiinfo",
+        "version": 5
+      }
+    }
+  },
+  "ci_screenshot_visual_inspection": {
+    "checked": true,
+    "result": "Both panes show complete Chinese text, colors and independent remote workspace labels."
+  },
+  "aur_verified": {
+    "rpc_url": "https://aur.archlinux.org/rpc/v5/info?arg%5B%5D=ztty&_=1795280457541463028",
+    "rpc_result": {
+      "resultcount": 1,
+      "results": [
+        {
+          "Depends": [
+            "gcc-libs",
+            "glibc",
+            "libx11",
+            "libxft",
+            "libxrender",
+            "fontconfig",
+            "freetype2",
+            "harfbuzz",
+            "libglvnd",
+            "wayland",
+            "libxkbcommon"
+          ],
+          "Description": "Lightweight no_std Rust terminal emulator for X11, XWayland and native Wayland",
+          "FirstSubmitted": 1794942233,
+          "ID": 2361724,
+          "Keywords": [],
+          "LastModified": 1795280042,
+          "License": [
+            "MIT"
+          ],
+          "Maintainer": "lightjunction",
+          "MakeDepends": [
+            "rustup",
+            "pkgconf",
+            "wayland-protocols"
+          ],
+          "Name": "ztty",
+          "NumVotes": 0,
+          "OptDepends": [
+            "xdg-utils",
+            "ttf-dejavu"
+          ],
+          "OutOfDate": null,
+          "PackageBase": "ztty",
+          "PackageBaseID": 252535,
+          "Popularity": 0,
+          "Submitter": "lightjunction",
+          "URL": "https://github.com/LIghtJUNction/ztty",
+          "URLPath": "/cgit/aur.git/snapshot/ztty.tar.gz",
+          "Version": "0.6.1-1"
+        }
+      ],
+      "type": "multiinfo",
+      "version": 5
+    },
+    "srcinfo_url": "https://aur.archlinux.org/cgit/aur.git/plain/.SRCINFO?h=ztty&_=1795280457541463028",
+    "srcinfo": "pkgbase = ztty\n\tpkgdesc = Lightweight no_std Rust terminal emulator for X11, XWayland and native Wayland\n\tpkgver = 0.6.1\n\tpkgrel = 1\n\turl = https://github.com/LIghtJUNction/ztty\n\tarch = x86_64\n\tlicense = MIT\n\tmakedepends = rustup\n\tmakedepends = pkgconf\n\tmakedepends = wayland-protocols\n\tdepends = gcc-libs\n\tdepends = glibc\n\tdepends = libx11\n\tdepends = libxft\n\tdepends = libxrender\n\tdepends = fontconfig\n\tdepends = freetype2\n\tdepends = harfbuzz\n\tdepends = libglvnd\n\tdepends = wayland\n\tdepends = libxkbcommon\n\toptdepends = xdg-utils: open hyperlinks\n\toptdepends = ttf-dejavu: default monospace font\n\tsource = https://github.com/LIghtJUNction/ztty/releases/download/v0.6.1/ztty-0.6.1.tar.gz\n\tsha256sums = d5284891588847e3154ac84a3905dae3ac978a24c7740b425d7af019a7c368d7\n\npkgname = ztty\n",
+    "push_log": "2026-11-21T16:53:56.0286320Z [master a69370e] Update ztty to 0.6.1\n2026-11-21T16:53:56.0286757Z  2 files changed, 5 insertions(+), 5 deletions(-)\n2026-11-21T16:54:05.6957244Z To ssh://aur.archlinux.org/ztty.git\n2026-11-21T16:54:05.6957550Z    1bcb8f0..a69370e  HEAD -> master",
+    "note": "The first ordinary RPC lookup returned a cached 0.5.2-1 result. A fresh request and current .SRCINFO both confirm 0.6.1-1."
+  }
+}

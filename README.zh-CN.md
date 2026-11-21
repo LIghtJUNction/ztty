@@ -5,8 +5,8 @@
 ztty 是面向 Linux、macOS 和 Windows 的原生终端，核心用不依赖标准库的
 Rust 编写。Linux 上，同一个运行中的会话可以通过窗口、命令行或 MCP 客户端使用。
 
-本页说明 **0.5.2 候选源码**。已发布的二进制及对应变更记录见
-[下载页](https://github.com/LIghtJUNction/ztty/releases)。
+本页说明 **0.6.1**。已发布的二进制及对应变更记录见
+[下载页](https://github.com/LIghtJUNction/ztty/releases/tag/v0.6.1)。
 
 ## Linux 安装
 

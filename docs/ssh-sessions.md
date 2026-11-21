@@ -23,8 +23,9 @@ ztty ssh --remote-bin /opt/ztty/bin/ztty dev build
 
 The first command creates `main` if it is absent and otherwise reattaches it.
 The default session name is `main`. Names contain 1–64 ASCII letters, digits,
-dots, underscores or hyphens. SSH aliases, IPv6 addresses, ports, identity files,
-agents and host-key checks use the system OpenSSH client.
+dots, underscores or hyphens. Names cannot start with `-` or be `.` or `..`.
+SSH aliases, IPv6 addresses, ports, identity files, agents and host-key checks use
+the system OpenSSH client.
 
 Press **Ctrl+]** to detach, including when an application enables Kitty's
 enhanced keyboard protocol. Closing the local window also disconnects its view.
@@ -103,8 +104,10 @@ text; Kitty/Sixel image data, shell command marks and soft-wrap metadata are not
 included in this SSH view.
 
 An unchanged session parks a revision watcher without copying output or walking
-the screen. Changed frames are limited to one per 16 milliseconds; only changed
-rows cross SSH. The terminal input queue and one pending output frame provide
+the screen. Changed frames are limited to one per 16 milliseconds. Stable-view
+updates redraw only changed rows and send necessary terminal state; initial
+attachment, resizing and screen switches redraw the full view. The terminal
+input queue and one pending output frame provide
 bounded backpressure. A slow or disconnected viewer cannot accumulate an
 unbounded transcript in the broker.
 

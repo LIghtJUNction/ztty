@@ -13,7 +13,7 @@ The [Git-only maintenance report](reports/git-only-dependencies-20261121/README.
 records the current graph and verified plugin consumption. The earlier
 [source report](reports/default-branch-sources-20261121/README.zh-CN.md) records
 shared Cargo artifact handling and same-PID reload checks. Those records describe
-the earlier `0.5.2` development source, rather than the current release candidate.
+the earlier `0.5.2` development source, rather than the current release.
 The [propagation record](dependency-propagation.md) identifies the remaining
 suite and aggregate owners.
 
@@ -40,13 +40,20 @@ private real OpenSSH server and native SSH tabs/splits. Publication uses the
 workflow's existing source, checksum, provenance and downloaded-asset checks.
 Installation is checked separately against the built executable.
 
+[v0.6.1](https://github.com/LIghtJUNction/ztty/releases/tag/v0.6.1) is published
+as the latest release from `842f1a8cb7cd23ec09e3c7c1f993886bde665e62`.
+[Release run 44926426476](https://github.com/LIghtJUNction/ztty/actions/runs/44926426476)
+completed all of these gates successfully. The [final verification record](reports/ssh-mux-20261121/README.zh-CN.md)
+retains the public build-manifest readback and the installed executable's version
+and SHA-256, separately from the earlier candidate measurements.
+
 The immutable `v0.6.0` candidate at `7e8e8ae2513165a0bc50c10385c8d787f608c7ef`
 passed all six native platform jobs and the 18 SSH checks in
 [Release run 44924311902](https://github.com/LIghtJUNction/ztty/actions/runs/44924311902),
 but Verify stopped at the new SSH screenshot readiness check. Publication was
 skipped. Its original tag is retained. The follow-up test measures native cell
 metrics and antialiased color coverage, records the original pixel counters,
-and uploads failure diagnostics. Version 0.6.1 must pass the full workflow again.
+and uploads failure diagnostics. Version 0.6.1 passed the full workflow again.
 
 [The corrected-probe CI run](https://github.com/LIghtJUNction/ztty/actions/runs/44925439574)
 passed. Its retained counters show 19 nearly opaque pixels in each Chinese text
