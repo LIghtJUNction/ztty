@@ -79,7 +79,7 @@ dependencies = [
 [[package]]
 name = "zinput"
 version = "0.1.3"
-source = "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a043383d45f612b8d19dcd32"
+source = "git+https://github.com/LIghtJUNction/zinput.git#da22743e1ad16bedb79751c8e8bb71e63c45d197"
 
 [[package]]
 name = "zplugin"
@@ -113,7 +113,7 @@ source = "git+https://github.com/LIghtJUNction/zsys.git#808fcfdb73584ca7ca122e20
 [[package]]
 name = "zterm"
 version = "0.5.2"
-source = "git+https://github.com/LIghtJUNction/zterm.git#1a761334f0b9cf26da700426a5b82778f0d48c3d"
+source = "git+https://github.com/LIghtJUNction/zterm.git#fde08990612a8e8eb62dd90c664faab917214a8b"
 dependencies = [
  "unicode-segmentation",
  "unicode-width",
