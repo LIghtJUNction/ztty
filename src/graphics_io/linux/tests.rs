@@ -174,8 +174,8 @@ fn shared_memory_cannot_follow_links_or_escape_the_namespace() {
 }
 
 #[test]
-fn normal_root_owned_sticky_temp_path_is_cleaned_without_leaking_files() {
-    use std::io::Write;
+fn system_temp_file_cleanup_respects_directory_ownership_and_mode() {
+    use std::{io::Write, os::unix::fs::MetadataExt};
     let path = std::path::Path::new("/tmp").join(alloc::format!(
         "tty-graphics-protocol-{}-{}",
         std::process::id(),
@@ -187,10 +187,14 @@ fn normal_root_owned_sticky_temp_path_is_cleaned_without_leaking_files() {
         .open(&path)
         .unwrap();
     file.write_all(&[1, 2, 3, 4]).unwrap();
+    let owner = file.metadata().unwrap().uid();
+    let dir = fs::metadata(path.parent().unwrap()).unwrap();
+    let private = dir.uid() == owner && dir.mode() & 0o077 == 0;
+    let root_sticky = dir.uid() == 0 && dir.mode() & 0o1000 != 0;
     drop(file);
     let result = read(request(Medium::TemporaryFile, path_bytes(&path), 0, 0, 4));
     let retained = path.exists();
     let _ = fs::remove_file(&path);
     assert_eq!(result.unwrap(), [1, 2, 3, 4]);
-    assert!(!retained);
+    assert_eq!(retained, !(private || root_sticky));
 }
