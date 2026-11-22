@@ -64,7 +64,7 @@ checksum = "ca718471876992059f251e33aafc334346ada08042b7661dd1fe313a9bced557"
 [[package]]
 name = "zgpui"
 version = "0.1.8"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#eeb909e956ed0cff05e14525d4f29f5a78c553ec"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#d34c41f79ddab343e7468c5192885a82ca487687"
 
 [[package]]
 name = "zgraphics"
