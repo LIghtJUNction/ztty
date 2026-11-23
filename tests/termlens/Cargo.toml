@@ -1,0 +1,12 @@
+[package]
+name = "ztty-termlens-tests"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.100"
+publish = false
+
+# Keep this PTY harness and its lockfile outside ztty's no_std runtime graph.
+[workspace]
+
+[dev-dependencies]
+termlens = { git = "https://github.com/vyncint/termlens", rev = "d8a16d6c9d8691f8c61896f40bceb273806cd42c", default-features = false }
