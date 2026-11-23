@@ -24,27 +24,11 @@ impl OutputChunk {
     /// Lossless standard Base64 for this page's original PTY bytes. Encoding is
     /// performed only on an explicit read, never while retaining PTY output.
     pub fn output_base64(&self) -> String {
-        const ALPHABET: &[u8; 64] =
-            b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        let mut encoded = String::with_capacity(self.bytes.len().div_ceil(3) * 4);
-        for chunk in self.bytes.chunks(3) {
-            let word = ((chunk[0] as u32) << 16)
-                | ((chunk.get(1).copied().unwrap_or(0) as u32) << 8)
-                | chunk.get(2).copied().unwrap_or(0) as u32;
-            encoded.push(ALPHABET[(word >> 18) as usize] as char);
-            encoded.push(ALPHABET[((word >> 12) & 63) as usize] as char);
-            encoded.push(if chunk.len() > 1 {
-                ALPHABET[((word >> 6) & 63) as usize] as char
-            } else {
-                '='
-            });
-            encoded.push(if chunk.len() > 2 {
-                ALPHABET[(word & 63) as usize] as char
-            } else {
-                '='
-            });
-        }
-        encoded
+        let mode = z64::Mode::Standard;
+        let length = z64::encoded_len(self.bytes.len(), mode).expect("Base64 length overflow");
+        let mut encoded = alloc::vec![0; length];
+        z64::encode(&self.bytes, &mut encoded, mode).expect("exact Base64 output capacity");
+        String::from_utf8(encoded).expect("Base64 output is ASCII")
     }
 }
 
@@ -156,6 +140,83 @@ impl OutputTail {
 mod tests {
     use super::*;
     use alloc::vec;
+
+    fn encoded(bytes: &[u8]) -> String {
+        OutputChunk {
+            bytes: bytes.to_vec(),
+            next_cursor: bytes.len() as u64,
+            first_cursor: 0,
+            truncated: false,
+            has_more: false,
+        }
+        .output_base64()
+    }
+
+    #[test]
+    fn base64_matches_standard_alphabet_padding_and_all_bytes() {
+        for (input, expected) in [
+            (b"".as_slice(), ""),
+            (b"f".as_slice(), "Zg=="),
+            (b"fo".as_slice(), "Zm8="),
+            (b"foo".as_slice(), "Zm9v"),
+            (b"foob".as_slice(), "Zm9vYg=="),
+            (b"fooba".as_slice(), "Zm9vYmE="),
+            (b"foobar".as_slice(), "Zm9vYmFy"),
+            (b"\xfb\xff\xff".as_slice(), "+///"),
+            (b"\x00\xff".as_slice(), "AP8="),
+        ] {
+            assert_eq!(encoded(input), expected);
+        }
+        let all_bytes: Vec<u8> = (0..=255).collect();
+        assert_eq!(
+            encoded(&all_bytes),
+            concat!(
+                "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v",
+                "MDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5f",
+                "YGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6P",
+                "kJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/",
+                "wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v",
+                "8PHy8/T19vf4+fr7/P3+/w==",
+            )
+        );
+    }
+
+    #[test]
+    fn base64_pages_keep_byte_cursors_and_read_limits() {
+        let mut history: Vec<u8> = (0..PERSISTENT_LIMIT + 64)
+            .map(|index| index as u8)
+            .collect();
+        let mut tail = OutputTail::new();
+        tail.append(&history, true);
+        let suffix = [0; 37];
+        tail.append(&suffix, true);
+        history.extend_from_slice(&suffix);
+        let first = (history.len() - PERSISTENT_LIMIT) as u64;
+        for max in [1, 2, 3, 7, 31, MAX_READ] {
+            let chunk = tail.read(0, Some(max), true).unwrap();
+            assert_eq!(chunk.first_cursor, first);
+            assert!(chunk.truncated && chunk.has_more);
+            assert_eq!(
+                chunk.bytes,
+                history[first as usize..chunk.next_cursor as usize]
+            );
+            assert!(chunk.bytes.len() <= max as usize + 3);
+            assert!(chunk.bytes.capacity() <= max as usize + 3);
+            let text = chunk.output_base64();
+            assert_eq!(text.len(), chunk.bytes.len().div_ceil(3) * 4);
+            let mut decoded = vec![0; chunk.bytes.len()];
+            let written = z64::decode(text.as_bytes(), &mut decoded, z64::Mode::Standard).unwrap();
+            assert_eq!(&decoded[..written], chunk.bytes);
+            let next = tail.read(chunk.next_cursor, Some(4), true).unwrap();
+            assert!(!next.truncated);
+            assert_eq!(
+                next.bytes,
+                history[chunk.next_cursor as usize..next.next_cursor as usize]
+            );
+        }
+        assert_eq!(tail.bytes.len(), PERSISTENT_LIMIT);
+        assert!(tail.bytes.capacity() <= PERSISTENT_LIMIT * 2);
+    }
 
     #[test]
     fn storage_and_read_allocations_remain_bounded_through_wraps_and_limit_changes() {

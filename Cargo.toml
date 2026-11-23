@@ -39,7 +39,9 @@ default = []
 wayland = []
 
 [dependencies]
+z64 = { git = "https://github.com/LIghtJUNction/z64.git", default-features = false }
 unicode-segmentation = { version = "=1.13.3", default-features = false }
+zhex = { git = "https://github.com/LIghtJUNction/zhex.git", default-features = false }
 # Project Z libraries follow their GitHub default branches; Cargo.lock records
 # the exact source snapshot used by this checkout.
 zgpui = { git = "https://github.com/LIghtJUNction/zgpui.git", default-features = false }
