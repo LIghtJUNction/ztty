@@ -39,6 +39,7 @@ default = []
 wayland = []
 
 [dependencies]
+zconv = { git = "https://github.com/LIghtJUNction/zconv.git", default-features = false }
 z64 = { git = "https://github.com/LIghtJUNction/z64.git", default-features = false }
 unicode-segmentation = { version = "=1.13.3", default-features = false }
 zhex = { git = "https://github.com/LIghtJUNction/zhex.git", default-features = false }

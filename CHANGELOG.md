@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Use zconv for JSON string and object-key escaping while retaining one output buffer, insertion order, original number text and lowercase `\u0008` / `\u000c` bytes. Keep the existing session/checkpoint parsing limits and errors.
 - Pin the portable zgpui dependency to 0.1.5 and align its source with the
   Project Z snapshot, together with the zinput and zgraphics submodules.
 - Record Linux no_std, native UI, GPU path, plugin and registry-package

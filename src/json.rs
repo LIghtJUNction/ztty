@@ -1,5 +1,4 @@
 //! Bounded JSON values shared by the local session protocol and MCP.
-use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
@@ -391,53 +390,83 @@ fn unique_keys(fields: &[(String, Value)]) -> Result<(), &'static str> {
 }
 
 pub fn stringify(value: &Value) -> String {
-    let mut output = String::new();
+    let mut output = Vec::new();
     encode(value, &mut output);
-    output
+    String::from_utf8(output).expect("JSON values contain UTF-8 strings")
 }
 
-fn encode(value: &Value, output: &mut String) {
+fn quote_into(value: &str, output: &mut Vec<u8>) {
+    use zconv::json::{ControlEscapes, Writer};
+    let mut sizing = Writer::new(&mut []);
+    sizing.string_with_control_escapes(value.as_bytes(), ControlEscapes::Unicode);
+    let needed = match sizing.finish() {
+        Err(zconv::Error::OutputTooSmall { needed }) => needed,
+        result => panic!("valid JSON string sizing failed: {result:?}"),
+    };
+    let start = output.len();
+    output.resize(
+        start
+            .checked_add(needed)
+            .expect("JSON output length overflow"),
+        0,
+    );
+    let mut writer = Writer::new(&mut output[start..]);
+    writer.string_with_control_escapes(value.as_bytes(), ControlEscapes::Unicode);
+    writer.finish().expect("sized JSON string output");
+}
+
+fn encode(value: &Value, output: &mut Vec<u8>) {
     match value {
-        Value::Null => output.push_str("null"),
-        Value::Bool(true) => output.push_str("true"),
-        Value::Bool(false) => output.push_str("false"),
-        Value::Number(value) => output.push_str(value),
-        Value::String(value) => {
-            output.push('"');
-            for character in value.chars() {
-                match character {
-                    '"' => output.push_str("\\\""),
-                    '\\' => output.push_str("\\\\"),
-                    '\n' => output.push_str("\\n"),
-                    '\r' => output.push_str("\\r"),
-                    '\t' => output.push_str("\\t"),
-                    c if c < ' ' => output.push_str(&format!("\\u{:04x}", c as u32)),
-                    c => output.push(c),
-                }
-            }
-            output.push('"');
-        }
+        Value::Null => output.extend_from_slice(b"null"),
+        Value::Bool(true) => output.extend_from_slice(b"true"),
+        Value::Bool(false) => output.extend_from_slice(b"false"),
+        Value::Number(value) => output.extend_from_slice(value.as_bytes()),
+        Value::String(value) => quote_into(value, output),
         Value::Array(items) => {
-            output.push('[');
+            output.push(b'[');
             for (index, item) in items.iter().enumerate() {
                 if index != 0 {
-                    output.push(',');
+                    output.push(b',');
                 }
                 encode(item, output);
             }
-            output.push(']');
+            output.push(b']');
         }
         Value::Object(fields) => {
-            output.push('{');
+            output.push(b'{');
             for (index, (key, value)) in fields.iter().enumerate() {
                 if index != 0 {
-                    output.push(',');
+                    output.push(b',');
                 }
-                encode(&Value::String(key.clone()), output);
-                output.push(':');
+                quote_into(key, output);
+                output.push(b':');
                 encode(value, output);
             }
-            output.push('}');
+            output.push(b'}');
         }
+    }
+}
+
+#[cfg(test)]
+mod shared_escape_contract {
+    use super::{Value, stringify};
+    use alloc::string::String;
+
+    #[test]
+    fn serialized_control_bytes_and_object_order_keep_the_contract() {
+        let controls: String = (0u8..32).map(char::from).collect();
+        let expected = r#""\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\u0008\t\n\u000b\u000c\r\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f""#;
+        assert_eq!(stringify(&Value::String(controls)), expected);
+        assert_eq!(
+            stringify(&Value::String("literal \\b \\f \\u0008 \" 模型🚀".into())),
+            r#""literal \\b \\f \\u0008 \" 模型🚀""#
+        );
+        assert_eq!(
+            stringify(&Value::Object(alloc::vec![
+                ("z".into(), Value::String("\u{8}".into())),
+                ("a".into(), Value::String("\u{c}".into())),
+            ])),
+            r#"{"z":"\u0008","a":"\u000c"}"#
+        );
     }
 }
