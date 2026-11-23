@@ -40,7 +40,7 @@ checksum = "a2c754d6c33795a1c324727428e5a7dedb5b06195f9890bdbcba760d3e246563"
 [[package]]
 name = "zplugin"
 version = "0.3.1"
-source = "git+https://github.com/LIghtJUNction/zplugin.git#592a1be623b81a775026c470e6f0efe91fcf78f3"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#cb24ece40f49257b077da54091b0ecaebea7488a"
 dependencies = [
  "zplugin-macros",
  "zsys",
@@ -49,7 +49,7 @@ dependencies = [
 [[package]]
 name = "zplugin-macros"
 version = "0.3.1"
-source = "git+https://github.com/LIghtJUNction/zplugin.git#592a1be623b81a775026c470e6f0efe91fcf78f3"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#cb24ece40f49257b077da54091b0ecaebea7488a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -59,7 +59,7 @@ dependencies = [
 [[package]]
 name = "zsys"
 version = "0.1.1"
-source = "git+https://github.com/LIghtJUNction/zsys.git#808fcfdb73584ca7ca122e20b76f0209f56ab0f7"
+source = "git+https://github.com/LIghtJUNction/zsys.git#48c4cafaf940fd7a404b885adefd2e1201b51881"
 
 [[package]]
 name = "ztty-plugin-api"
