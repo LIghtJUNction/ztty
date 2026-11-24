@@ -25,6 +25,7 @@ jobs:
           cargo test --locked --workspace --doc
           cargo clippy --locked --workspace --all-targets --features wayland -- -D warnings
           /usr/bin/python3 tests/gui_smoke.py
+          /usr/bin/python3 tests/gpu_isolation.py --binary target/release/ztty --output artifacts/gpu-isolation.json
           /usr/bin/python3 tests/ssh_mux.py --binary target/release/ztty --output artifacts/ssh-mux.json
           /usr/bin/python3 tests/ssh_mux_gui.py --binary target/release/ztty --output artifacts/ssh-mux-gui.json --screenshot artifacts/ssh-mux-gui.png
       - name: Upload SSH acceptance diagnostics

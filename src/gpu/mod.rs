@@ -5,7 +5,7 @@
 mod egl;
 mod font;
 mod gl;
-mod grid;
+pub mod grid;
 
 use alloc::{collections::BTreeMap, rc::Rc, string::String, vec, vec::Vec};
 use core::{
@@ -99,8 +99,7 @@ pub struct Renderer {
     vertices: Vec<Vertex>,
     batch_texture: u32,
     driver: String,
-    row_text: String,
-    row_cells: Vec<TextCell>,
+    grid_scratch: grid::GridScratch,
     text_runs: Vec<TextRun>,
 }
 
@@ -293,8 +292,7 @@ impl Renderer {
             vertices: Vec::with_capacity(MAX_VERTICES),
             batch_texture: atlas,
             driver,
-            row_text: String::new(),
-            row_cells: Vec::new(),
+            grid_scratch: grid::GridScratch::default(),
             text_runs: Vec::new(),
         };
         renderer.white_pixel();

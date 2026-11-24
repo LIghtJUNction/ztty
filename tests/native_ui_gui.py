@@ -507,7 +507,9 @@ def main():
             other_view = connection.create_resource_object("window", other_session["window_id"])
             control("\x1b[?1003h\x1b[?1006h", clear=True, path=other_control)
             rpc({"op": "action", "session": "ui-other", "action": "previous-tab"})
-            wait(lambda: view.get_attributes().map_state == X.IsViewable, "original tab visible")
+            wait(lambda: view.get_attributes().map_state == X.IsViewable
+                         and other_view.get_attributes().map_state == X.IsUnmapped,
+                 "original tab committed before cross-view gesture")
             view.set_input_focus(X.RevertToParent, X.CurrentTime)
             connection.sync()
             wait(image_pixels, "original tab image")
@@ -515,7 +517,11 @@ def main():
             move(700, 40)  # Blank panel header: no button keyboard focus.
             button_event(True)
             chord("Control_L", "Shift_L", "Next")
-            wait(lambda: other_view.get_attributes().map_state == X.IsViewable, "second tab focused")
+            # Mapping stages an incoming frame underneath the old view. The
+            # pointer probe needs the completed transition, including unmap.
+            wait(lambda: other_view.get_attributes().map_state == X.IsViewable
+                         and view.get_attributes().map_state == X.IsUnmapped,
+                 "second tab committed before cross-view release")
             other_view.warp_pointer(160, 160)
             connection.sync()
             button_event(False)

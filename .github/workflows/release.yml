@@ -188,6 +188,7 @@ jobs:
             --output "dist/$ARTIFACT_STEM.native.json" \
             --evidence-dir "dist/$ARTIFACT_STEM.native"
           cargo +"$RUST_TOOLCHAIN" test --locked --features wayland --lib gpu:: -- --ignored --test-threads=1 --show-output > "dist/$ARTIFACT_STEM.native/gpu-tests.log" 2>&1
+          python tests/gpu_isolation.py --binary target/release/ztty --output "dist/$ARTIFACT_STEM.native/gpu-isolation.json"
           python tests/text_gpu_gui.py --binary target/release/ztty --renderer gpu \
             --output "dist/$ARTIFACT_STEM.native/gpu-text.json" \
             --screenshots "dist/$ARTIFACT_STEM.native/gpu-text"

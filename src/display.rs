@@ -21,9 +21,9 @@ pub struct WindowState {
 }
 
 pub enum Window {
-    X11(x11::Window),
+    X11(alloc::boxed::Box<x11::Window>),
     #[cfg(feature = "wayland")]
-    Wayland(crate::wayland::Window),
+    Wayland(alloc::boxed::Box<crate::wayland::Window>),
 }
 impl core::ops::Deref for Window {
     type Target = WindowState;
@@ -76,13 +76,12 @@ impl Window {
         connection: &Rc<Connection>,
     ) -> Result<Self, &'static str> {
         match &connection.kind {
-            ConnectionKind::X11(c) => {
-                x11::Window::new_shared(cols, rows, appearance, c).map(Self::X11)
-            }
+            ConnectionKind::X11(c) => x11::Window::new_shared(cols, rows, appearance, c)
+                .map(|window| Self::X11(alloc::boxed::Box::new(window))),
             #[cfg(feature = "wayland")]
             ConnectionKind::Wayland(c) => {
                 crate::wayland::Window::new(cols, rows, appearance, c, connection.display, true)
-                    .map(Self::Wayland)
+                    .map(|window| Self::Wayland(alloc::boxed::Box::new(window)))
             }
         }
     }
@@ -94,13 +93,12 @@ impl Window {
         activate: bool,
     ) -> Result<Self, &'static str> {
         match &connection.kind {
-            ConnectionKind::X11(c) => {
-                x11::Window::new_view(cols, rows, appearance, c, activate).map(Self::X11)
-            }
+            ConnectionKind::X11(c) => x11::Window::new_view(cols, rows, appearance, c, activate)
+                .map(|window| Self::X11(alloc::boxed::Box::new(window))),
             #[cfg(feature = "wayland")]
             ConnectionKind::Wayland(c) => {
                 crate::wayland::Window::new(cols, rows, appearance, c, connection.display, activate)
-                    .map(Self::Wayland)
+                    .map(|window| Self::Wayland(alloc::boxed::Box::new(window)))
             }
         }
     }

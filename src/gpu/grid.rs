@@ -53,7 +53,69 @@ fn hidden(cell: &Cell, style: &GridStyle) -> bool {
         || (cell.flags & RAPID_BLINK != 0 && !style.rapid_blink_visible)
 }
 
-impl Renderer {
+/// Drawing operations used by both the local renderer and the isolated X11
+/// command recorder. Grid layout stays identical across the two paths.
+pub trait Painter {
+    fn begin_frame(&mut self, background: u32, alpha: u8) -> Result<(), &'static str>;
+    fn clip(&mut self, rectangle: Option<Rect>) -> Result<(), &'static str>;
+    fn draw_rect(&mut self, rectangle: Rect, rgb: u32, alpha: u8) -> Result<(), &'static str>;
+    fn draw_cells(
+        &mut self,
+        text: &str,
+        cells: &[TextCell],
+        x: f32,
+        baseline: f32,
+        rgb: u32,
+        style: Style,
+    ) -> Result<(), &'static str>;
+    fn draw_image(
+        &mut self,
+        key: u64,
+        revision: u64,
+        size: (u32, u32),
+        rgba: &[u8],
+        source: Rect,
+        destination: Rect,
+    ) -> Result<(), &'static str>;
+    fn remove_image(&mut self, key: u64) -> Result<(), &'static str>;
+    fn image_revisions(&self) -> Vec<(u64, u64)>;
+}
+
+#[derive(Default)]
+pub struct GridScratch {
+    pub(super) row_text: String,
+    pub(super) row_cells: Vec<TextCell>,
+}
+
+struct Grid<'a, P> {
+    painter: &'a mut P,
+    scratch: &'a mut GridScratch,
+}
+
+impl<P> core::ops::Deref for Grid<'_, P> {
+    type Target = P;
+    fn deref(&self) -> &P {
+        self.painter
+    }
+}
+impl<P> core::ops::DerefMut for Grid<'_, P> {
+    fn deref_mut(&mut self) -> &mut P {
+        self.painter
+    }
+}
+
+pub fn draw_terminal(
+    painter: &mut impl Painter,
+    scratch: &mut GridScratch,
+    terminal: &Terminal,
+    offset: usize,
+    style: GridStyle,
+    selected: impl Fn(usize, usize) -> bool,
+) -> Result<(), &'static str> {
+    Grid { painter, scratch }.draw_terminal(terminal, offset, style, selected)
+}
+
+impl<P: Painter> Grid<'_, P> {
     /// Render one complete terminal viewport. Add overlays after this call and
     /// present once after the complete frame is ready.
     pub fn draw_terminal(
@@ -155,16 +217,16 @@ impl Renderer {
         terminal: &Terminal,
         offset: usize,
     ) -> Result<(), &'static str> {
-        let retired: Vec<u64> = self.images.iter().filter_map(|(key, cached)| {
+        let retired: Vec<u64> = self.image_revisions().into_iter().filter_map(|(key, revision)| {
             let placed = terminal.graphics_draws(offset).any(|draw|
-                u64::from(draw.image_id) == *key && draw.image.generation == cached.revision);
+                u64::from(draw.image_id) == key && draw.image.generation == revision);
             let in_ui = terminal.ui_scene().is_some_and(|scene| scene.nodes.iter().any(|node| {
                 matches!(&node.kind, zterm::ui::Kind::Image { image_id, generation, .. }
-                    if u64::from(*image_id) == *key
-                        && generation.is_none_or(|g| g == cached.revision)
-                        && terminal.graphics().image(*image_id).is_some_and(|image| image.generation == cached.revision))
+                    if u64::from(*image_id) == key
+                        && generation.is_none_or(|g| g == revision)
+                        && terminal.graphics().image(*image_id).is_some_and(|image| image.generation == revision))
             }));
-            (!placed && !in_ui).then_some(*key)
+            (!placed && !in_ui).then_some(key)
         }).collect();
         for key in retired {
             self.remove_image(key)?;
@@ -301,8 +363,8 @@ impl Renderer {
     ) -> Result<(), &'static str> {
         // Own the buffers while drawing so draw_cells can borrow the renderer.
         // Keep them between rows and frames, including fallible shaping/GL paths.
-        let mut text = core::mem::take(&mut self.row_text);
-        let mut cells = core::mem::take(&mut self.row_cells);
+        let mut text = core::mem::take(&mut self.scratch.row_text);
+        let mut cells = core::mem::take(&mut self.scratch.row_cells);
         let result = (|| {
             let mut column = 0;
             let y = style.padding + row as f32 * style.cell_height;
@@ -393,16 +455,73 @@ impl Renderer {
         cells.clear();
         // Bound retained text to one shaping run and release cell capacity from
         // a larger terminal after a resize. Vec's smallest capacity is four.
-        self.row_text = if text.capacity() <= MAX_TEXT_BYTES {
+        self.scratch.row_text = if text.capacity() <= MAX_TEXT_BYTES {
             text
         } else {
             String::new()
         };
-        self.row_cells = if cells.capacity() <= terminal.cols().max(4).next_power_of_two() {
+        self.scratch.row_cells = if cells.capacity() <= terminal.cols().max(4).next_power_of_two() {
             cells
         } else {
             Vec::new()
         };
         result
+    }
+}
+
+impl Renderer {
+    pub fn draw_terminal(
+        &mut self,
+        terminal: &Terminal,
+        offset: usize,
+        style: GridStyle,
+        selected: impl Fn(usize, usize) -> bool,
+    ) -> Result<(), &'static str> {
+        let mut scratch = core::mem::take(&mut self.grid_scratch);
+        let result = draw_terminal(self, &mut scratch, terminal, offset, style, selected);
+        self.grid_scratch = scratch;
+        result
+    }
+}
+impl Painter for Renderer {
+    fn begin_frame(&mut self, background: u32, alpha: u8) -> Result<(), &'static str> {
+        self.begin_frame(background, alpha)
+    }
+    fn clip(&mut self, rectangle: Option<Rect>) -> Result<(), &'static str> {
+        self.clip(rectangle)
+    }
+    fn draw_rect(&mut self, rectangle: Rect, rgb: u32, alpha: u8) -> Result<(), &'static str> {
+        self.draw_rect(rectangle, rgb, alpha)
+    }
+    fn draw_cells(
+        &mut self,
+        text: &str,
+        cells: &[TextCell],
+        x: f32,
+        baseline: f32,
+        rgb: u32,
+        style: Style,
+    ) -> Result<(), &'static str> {
+        self.draw_cells(text, cells, x, baseline, rgb, style)
+    }
+    fn draw_image(
+        &mut self,
+        key: u64,
+        revision: u64,
+        size: (u32, u32),
+        rgba: &[u8],
+        source: Rect,
+        destination: Rect,
+    ) -> Result<(), &'static str> {
+        self.draw_image(key, revision, size, rgba, source, destination)
+    }
+    fn remove_image(&mut self, key: u64) -> Result<(), &'static str> {
+        self.remove_image(key)
+    }
+    fn image_revisions(&self) -> Vec<(u64, u64)> {
+        self.images
+            .iter()
+            .map(|(key, image)| (*key, image.revision))
+            .collect()
     }
 }
