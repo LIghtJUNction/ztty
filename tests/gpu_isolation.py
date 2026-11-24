@@ -188,6 +188,10 @@ def main():
                 raise
             finally:
                 add_owned_children(identities, [os.getpid()])
+                # The test connection must close before its X server. Terminal
+                # cleanup includes adopted helpers, but Xvfb has its own owner.
+                if server:
+                    identities.pop(server.process.pid, None)
                 for channel in channels:
                     channel.close()
                 if listener:
