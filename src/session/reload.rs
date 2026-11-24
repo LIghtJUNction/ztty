@@ -414,6 +414,7 @@ impl Pool {
                 ),
             ),
             ("server", server.checkpoint_reload()),
+            ("gpu_workers", crate::gpu_worker::checkpoint()),
         ]);
         let fds = reload_fds(&meta)?;
         Ok((meta, terminals, fds))
@@ -537,6 +538,7 @@ pub(crate) fn validate_reload(meta: &Value, terminals: &[zterm::Terminal]) -> Re
             .and_then(|n| i32::try_from(n).ok())
             .ok_or("invalid completed reload status")?;
     }
+    crate::gpu_worker::validate_checkpoint(meta.get("gpu_workers"))?;
     reload_fds(meta)?;
     Ok(())
 }
@@ -714,6 +716,7 @@ pub(crate) fn serve_reloaded(meta: Value, terminals: Vec<zterm::Terminal>) -> Re
                 .ok_or("missing status")? as i32,
         ));
     }
+    crate::gpu_worker::restore_children(meta.get("gpu_workers"));
     let window_result = pool.restore_reload_views(&meta);
     let mut result = json::object([
         ("reloaded", true.into()),

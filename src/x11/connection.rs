@@ -48,7 +48,6 @@ impl Connection {
                 im_opening: core::cell::Cell::new(false),
                 contexts: RefCell::new(Vec::new()),
                 fonts: RefCell::new(Vec::new()),
-                gpu_display: RefCell::new(None),
             });
             if !connection.open_im() {
                 connection.watch_im();
@@ -60,7 +59,6 @@ impl Connection {
 
 impl Drop for Connection {
     fn drop(&mut self) {
-        drop(self.gpu_display.get_mut().take());
         unsafe {
             self.unwatch_im();
             let im = self.im.replace(core::ptr::null_mut());

@@ -14,6 +14,8 @@ mod config_watch;
 #[cfg(target_os = "linux")]
 mod display;
 #[cfg(target_os = "linux")]
+mod gpu_worker;
+#[cfg(target_os = "linux")]
 mod mcp;
 #[cfg(target_os = "linux")]
 mod mux;
@@ -125,7 +127,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
 Ctrl+Shift+C copies a selection; Ctrl+Shift+V pastes.\n\
 Shift+PageUp/PageDown and the wheel browse scrollback.\n\
 Shift+drag selects while applications use the mouse; Ctrl+click opens links.\n\
-Multiple windows share one process, display connection and font cache.\n\
+Windows share a session broker; X11 GPU calls run in isolated render workers.\n\
 Ctrl+Shift+T adds a tab; E/O splits right/down; PageUp/PageDown switches tabs.\n\
 Ctrl+Tab / Ctrl+Shift+Tab also switches to the next / previous tab.\n\
 Ctrl+Shift+Left/Right focuses panes; Up/Down swaps; Enter maximizes/restores.\n\
@@ -591,6 +593,7 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
         Some(b"mux") => mux::command(&args[2..]),
         Some(b"plugin") => plugin_host::command(&args[2..]),
         Some(b"__plugin-worker") => plugin_host::worker(&args[2..]),
+        Some(b"__gpu-worker") => gpu_worker::worker(&args[2..]),
         Some(b"shell-integration") => shell_integration(&args[2..]),
         Some(b"attach") => platform::attach(&args[2..]),
         Some(b"reload") => runtime_reload::command(&args[2..]),

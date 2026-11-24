@@ -84,7 +84,6 @@ pub struct Connection {
     im_opening: core::cell::Cell<bool>,
     contexts: RefCell<Vec<Weak<InputContext>>>,
     fonts: RefCell<Vec<Weak<Fonts>>>,
-    gpu_display: RefCell<Option<Rc<ztty::gpu::Display>>>,
 }
 
 #[repr(C)]
@@ -139,7 +138,7 @@ pub struct Window {
     pending_damage: Option<(i32, i32)>,
     gc: *mut c_void,
     draw: *mut XftDraw,
-    gpu: Option<ztty::gpu::Renderer>,
+    gpu: Option<crate::gpu_worker::Renderer>,
     renderer_kind: crate::appearance::RendererKind,
     gpu_repaint: bool,
     gpu_notice: Option<&'static str>,

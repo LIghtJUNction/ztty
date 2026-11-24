@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.6.2 — 2026-11-24
+
+- Isolate X11/XWayland EGL/OpenGL calls, including initialization and destruction,
+  in per-view GPU workers. A 500 ms command deadline triggers software fallback
+  without restarting the session broker, PTY or child task. New GPU setup has a
+  separate 2 second deadline. Explicit software rendering starts no worker.
+- Keep terminal layout/shaping commands and GPU composition on the existing
+  rendering path; cache image uploads across frames. Track/reap helper children
+  through normal close and runtime executable reload.
+- Require a four-window synthetic GPU-stall regression in verification and Linux
+  release acceptance: bounded real CLI list, software pixel recovery, unchanged
+  PTY/task identities, exact input delivery and software-window reattachment.
+- Await both incoming-map and outgoing-unmap in the native UI pointer fixture,
+  preserving all gesture/input assertions across the staged frame transition.
+
+This bounds the userspace GPU-driver boundary on X11. It does not isolate native
+Wayland rendering or guarantee recovery from a stalled X server/kernel. Physical
+GPU/Hyprland behavior remains unverified; cloud acceptance uses Xvfb/Mesa.
+
 ## Unreleased
 
 - Use zconv for JSON string and object-key escaping while retaining one output buffer, insertion order, original number text and lowercase `\u0008` / `\u000c` bytes. Keep the existing session/checkpoint parsing limits and errors.

@@ -1,13 +1,14 @@
 //! The X11 host owns the native window; the shared renderer owns EGL resources.
 //! A failed GPU frame is discarded and the next full frame uses Xft.
 
-use super::{Appearance, Connection, DrawnCursor, Selection, Window};
+use super::{Appearance, DrawnCursor, Selection, Window};
 use crate::appearance::RendererKind;
-use alloc::{ffi::CString, format, rc::Rc, string::String};
+use crate::gpu_worker::Renderer;
+use alloc::{ffi::CString, format, string::String};
 use core::ffi::{CStr, c_char, c_int, c_void};
 use unicode_segmentation::UnicodeSegmentation;
 use zterm::Terminal;
-use ztty::gpu::{Display, GridStyle, Rect, Renderer, Style, Target};
+use ztty::gpu::{GridStyle, Rect, Style, grid::Painter};
 
 #[link(name = "fontconfig")]
 unsafe extern "C" {
@@ -23,19 +24,6 @@ unsafe extern "C" {
     fn FcPatternDel(pattern: *mut c_void, object: *const c_char) -> c_int;
     fn FcPatternAddDouble(pattern: *mut c_void, object: *const c_char, value: f64) -> c_int;
     fn FcStrFree(value: *mut u8);
-}
-
-impl Connection {
-    fn gpu_display(&self) -> Result<Rc<Display>, &'static str> {
-        if let Some(display) = self.gpu_display.borrow().as_ref() {
-            return Ok(Rc::clone(display));
-        }
-        // Every renderer is dropped before its X window. Windows/fonts retain
-        // Connection, which drops this final display reference before XCloseDisplay.
-        let display = unsafe { Display::x11(self.display.cast()) }?;
-        *self.gpu_display.borrow_mut() = Some(Rc::clone(&display));
-        Ok(display)
-    }
 }
 
 // Honor an explicit software environment before loading EGL drivers.
@@ -130,6 +118,7 @@ impl Window {
         self.gpu_notice = None;
         if software_requested(appearance.renderer) {
             self.gpu = None;
+            self.renderer_property(c"_ZTTY_GPU_WORKER", "");
             self.renderer_property(c"_ZTTY_RENDERER", "software");
             self.renderer_property(c"_ZTTY_GPU_DRIVER", "");
             return;
@@ -141,6 +130,7 @@ impl Window {
                 .is_some_and(|renderer| software_driver(renderer.driver()))
         {
             self.gpu = None;
+            self.renderer_property(c"_ZTTY_GPU_WORKER", "");
             self.renderer_property(c"_ZTTY_RENDERER", "software");
             return;
         }
@@ -162,18 +152,17 @@ impl Window {
         }
         let result = (|| {
             let font = self.gpu_font_pattern()?;
-            let display = self.fonts.connection.gpu_display()?;
             let visual = unsafe { super::XVisualIDFromVisual(self.visual) };
-            Renderer::new(
-                display,
-                Target::X11 {
-                    window: self.state.id as usize,
-                    visual: visual as i32,
-                },
-                self.state.width as u32,
-                self.state.height as u32,
-                &font,
-            )
+            unsafe {
+                Renderer::new(
+                    self.state.display.cast(),
+                    self.state.id as usize,
+                    visual as i32,
+                    self.state.width as u32,
+                    self.state.height as u32,
+                    &font,
+                )
+            }
         })();
         match result {
             Ok(renderer) => {
@@ -182,6 +171,7 @@ impl Window {
                     self.renderer_property(c"_ZTTY_RENDERER", "software");
                     return;
                 }
+                self.renderer_property(c"_ZTTY_GPU_WORKER", &format!("{}", renderer.pid()));
                 self.gpu = Some(renderer);
                 self.resize_pixmap(1, 1);
                 self.gpu_repaint = false;
@@ -201,6 +191,8 @@ impl Window {
         // Dropping the context before the X window also makes an ordinary Xft
         // redraw possible. Never publish the partially built fallback pixmap.
         self.gpu = None;
+        self.renderer_kind = RendererKind::Software;
+        self.renderer_property(c"_ZTTY_GPU_WORKER", "");
         self.retained_valid = false;
         self.gpu_repaint = true;
         self.gpu_notice = Some(error);
@@ -244,6 +236,7 @@ impl Window {
             // A hidden tab retains its terminal model, not a framebuffer and
             // glyph/image uploads. Its next visible frame rebuilds them once.
             self.gpu = None;
+            self.renderer_property(c"_ZTTY_GPU_WORKER", "");
         }
     }
 

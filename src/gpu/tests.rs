@@ -434,8 +434,14 @@ fn terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors() {
         .draw_terminal(&terminal, 0, style, selected)
         .unwrap();
     let expected = renderer.read_pixels().unwrap();
-    let text_buffer = (renderer.row_text.as_ptr(), renderer.row_text.capacity());
-    let cell_buffer = (renderer.row_cells.as_ptr(), renderer.row_cells.capacity());
+    let text_buffer = (
+        renderer.grid_scratch.row_text.as_ptr(),
+        renderer.grid_scratch.row_text.capacity(),
+    );
+    let cell_buffer = (
+        renderer.grid_scratch.row_cells.as_ptr(),
+        renderer.grid_scratch.row_cells.capacity(),
+    );
     assert!(text_buffer.1 > 0 && text_buffer.1 <= MAX_TEXT_BYTES);
     assert!(cell_buffer.1 > 0 && cell_buffer.1 <= terminal.cols().next_power_of_two());
     for _ in 0..3 {
@@ -443,13 +449,21 @@ fn terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors() {
             .draw_terminal(&terminal, 0, style, selected)
             .unwrap();
         assert_eq!(renderer.read_pixels().unwrap(), expected);
-        assert!(renderer.row_text.is_empty() && renderer.row_cells.is_empty());
+        assert!(
+            renderer.grid_scratch.row_text.is_empty() && renderer.grid_scratch.row_cells.is_empty()
+        );
         assert_eq!(
-            (renderer.row_text.as_ptr(), renderer.row_text.capacity()),
+            (
+                renderer.grid_scratch.row_text.as_ptr(),
+                renderer.grid_scratch.row_text.capacity()
+            ),
             text_buffer
         );
         assert_eq!(
-            (renderer.row_cells.as_ptr(), renderer.row_cells.capacity()),
+            (
+                renderer.grid_scratch.row_cells.as_ptr(),
+                renderer.grid_scratch.row_cells.capacity()
+            ),
             cell_buffer
         );
     }
@@ -472,13 +486,21 @@ fn terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors() {
         renderer.draw_terminal(&terminal, 0, invalid, selected),
         Err("invalid shaped-cell mapping")
     );
-    assert!(renderer.row_text.is_empty() && renderer.row_cells.is_empty());
+    assert!(
+        renderer.grid_scratch.row_text.is_empty() && renderer.grid_scratch.row_cells.is_empty()
+    );
     assert_eq!(
-        (renderer.row_text.as_ptr(), renderer.row_text.capacity()),
+        (
+            renderer.grid_scratch.row_text.as_ptr(),
+            renderer.grid_scratch.row_text.capacity()
+        ),
         text_buffer
     );
     assert_eq!(
-        (renderer.row_cells.as_ptr(), renderer.row_cells.capacity()),
+        (
+            renderer.grid_scratch.row_cells.as_ptr(),
+            renderer.grid_scratch.row_cells.capacity()
+        ),
         cell_buffer
     );
     renderer
@@ -491,7 +513,7 @@ fn terminal_row_scratch_preserves_pixels_and_recovers_from_draw_errors() {
     renderer
         .draw_terminal(&narrow, 0, style, |_, _| false)
         .unwrap();
-    assert!(renderer.row_cells.capacity() <= narrow.cols().next_power_of_two());
+    assert!(renderer.grid_scratch.row_cells.capacity() <= narrow.cols().next_power_of_two());
 }
 
 #[test]

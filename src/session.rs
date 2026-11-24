@@ -1417,6 +1417,7 @@ fn serve_loop(mut server: broker::Server, mut pool: Pool) -> Result<(), String> 
     let mut fds = Vec::new();
     let mut idle_since = os::milliseconds();
     loop {
+        crate::gpu_worker::reap();
         pool.events(&mut openers, &mut buffers, &mut read_buffer);
         let deadline = pool.tick(&mut read_buffer);
         server.pump(|request| pool.handle(request));
