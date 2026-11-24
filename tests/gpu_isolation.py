@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stop only owned GPU helpers; verify bounded management and unchanged live PTYs.
+"""Stall owned EGL presentation calls; verify management and unchanged live PTYs.
 
 This is a controlled userspace stall on Xvfb/Mesa, not a physical GPU test.
 """
@@ -11,7 +11,6 @@ import json
 import os
 from pathlib import Path
 import select
-import signal
 import socket
 import subprocess
 import sys
@@ -56,19 +55,26 @@ def child(path, log):
         task.wait()
 
 
+class NegativeControlPassed(Exception):
+    pass
+
+
 def main():
     from Xlib import X, display
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--expect-blocked", action="store_true",
+                        help="negative control for an unisolated baseline; never a release pass")
     args = parser.parse_args()
     binary = args.binary.resolve(strict=True)
     report = {"ok": False, "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
-              "scope": "Owned Xvfb/Mesa and SIGSTOP on renderer helpers; physical GPU/Hyprland unverified",
+              "scope": "Owned Xvfb/Mesa and test-only eglSwapBuffers stall; physical GPU/Hyprland unverified",
+              "negative_control": args.expect_blocked,
               "checks": [], "list_ms": []}
     assert ctypes.CDLL(None).prctl(36, 1, 0, 0, 0) == 0
     identities, launchers, channels = {}, [], []
-    server = connection = listener = None
+    server = connection = listener = trigger = None
     with tempfile.TemporaryDirectory(prefix="ztty-gpu-isolation-") as temporary:
         directory = Path(temporary)
         with (directory / "stderr.log").open("wb") as log:
@@ -81,6 +87,12 @@ def main():
                            XDG_STATE_HOME=str(directory / "state"),
                            ZTTY_SOCKET="@" + directory.name)
                 env.pop("WAYLAND_DISPLAY", None)
+                shim = directory / "render-stall.so"
+                subprocess.run(["cc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-shared", "-fPIC",
+                                str(ROOT / "tests/egl_render_stall.c"), "-ldl", "-o", str(shim)], check=True)
+                trigger = directory / "armed"
+                env["LD_PRELOAD"] = str(shim)
+                env["ZTTY_TEST_RENDER_STALL"] = str(trigger)
                 config = directory / "gpu.conf"
                 config.write_text("renderer = gpu\nfont = monospace:size=11\ncursor-blink = false\nbackground-opacity = 100\nbackground-blur = false\n")
                 listener = socket.socket(socket.AF_UNIX)
@@ -125,32 +137,49 @@ def main():
                     window = connection.create_resource_object("window", info["window_id"])
                     window.configure(x=(index % 2) * 850, y=(index // 2) * 450)
                     connection.sync()
-                    worker = wait(lambda: text(window, "_ZTTY_GPU_WORKER"), "GPU worker property")
-                    worker = int(worker)
+                    worker = info["broker_pid"] if args.expect_blocked else int(
+                        wait(lambda: text(window, "_ZTTY_GPU_WORKER"), "GPU worker property"))
                     identities[worker] = process_stat(worker)["start_ticks"]
                     assert text(window, "_ZTTY_RENDERER") == "gpu"
                     rpc({"op": "write", "session": name, "data": "once\n"})
                     wait(lambda: status(channel)["input_hex"] == b"once\n".hex(), "initial input")
                     views.append(dict(name=name, channel=channel, worker=worker, window=window,
                                       info=info, hello=hello, command_log=command_log))
-                report["checks"].append("four real GPU views share one broker with distinct helpers")
                 assert len({v["info"]["broker_pid"] for v in views}) == 1
-                assert len({v["worker"] for v in views}) == 4
+                if not args.expect_blocked:
+                    assert len({v["worker"] for v in views}) == 4
+                report["checks"].append("four real GPU views share one broker")
                 before = [status(v["channel"])["heartbeat"] for v in views]
-                # A stopped renderer cannot consume or acknowledge any GPU command.
-                for view in views:
-                    os.kill(view["worker"], signal.SIGSTOP)
+                # Pause only eglSwapBuffers, through the same native call in both builds.
+                trigger.touch()
                 for view in views:
                     send(view["channel"], {"op": "write"})
                     assert receive(view["channel"])["ok"]
+                wait(lambda: list(directory.glob("armed.entered-*")), "real EGL stall entered")
                 started = time.monotonic()
+                if args.expect_blocked:
+                    try:
+                        subprocess.run([str(binary), "list"], env=env, capture_output=True, timeout=0.75)
+                    except subprocess.TimeoutExpired:
+                        report["negative_control_list_timed_out"] = True
+                    else:
+                        raise AssertionError("baseline unexpectedly serviced list during stalled EGL")
+                    assert all(status(v["channel"])["heartbeat"] > before[i] for i, v in enumerate(views))
+                    trigger.unlink()
+                    listed = subprocess.run([str(binary), "list"], env=env, capture_output=True, text=True, timeout=3)
+                    assert listed.returncode == 0 and all(v["name"] in listed.stdout for v in views)
+                    assert all(v["command_log"].read_text() == "launch\n" for v in views)
+                    report["checks"].append("baseline CLI list times out during EGL stall; tasks survive and trigger removal restores list")
+                    report["ok"] = True
+                    raise NegativeControlPassed()
                 listed = subprocess.run([str(binary), "list"], env=env, capture_output=True,
                                         text=True, timeout=3)
                 report["list_ms"].append((time.monotonic() - started) * 1000)
                 assert listed.returncode == 0, listed.stderr
                 assert all(view["name"] in listed.stdout for view in views), listed.stdout
                 assert report["list_ms"][-1] < 3000
-                report["checks"].append("real CLI list returns within 3 seconds with all four helpers stopped")
+                assert len(list(directory.glob("armed.entered-*"))) == 4
+                report["checks"].append("real CLI list returns within 3 seconds while all four EGL presenters stall")
                 for index, view in enumerate(views):
                     wait(lambda: text(view["window"], "_ZTTY_RENDERER") == "software", "software fallback")
                     info = rpc({"op": "info", "session": view["name"]})
@@ -183,10 +212,14 @@ def main():
                 assert view["command_log"].read_text() == "launch\n"
                 report["checks"].append("software replacement attaches same live PTY and accepts exactly one new input")
                 report["ok"] = True
+            except NegativeControlPassed:
+                pass
             except BaseException as error:
                 report["error"] = repr(error)
                 raise
             finally:
+                if trigger:
+                    trigger.unlink(missing_ok=True)
                 add_owned_children(identities, [os.getpid()])
                 # The test connection must close before its X server. Terminal
                 # cleanup includes adopted helpers, but Xvfb has its own owner.
