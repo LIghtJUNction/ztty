@@ -92,6 +92,30 @@ class ReleaseScope(unittest.TestCase):
         self.assertEqual(output, {})
 
 
+class ReleaseArtifactAttempts(unittest.TestCase):
+    def test_retry_collects_whole_latest_platform_artifact_and_preserves_other_jobs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            release = Path(temporary) / "ztty-release"
+            attempts = release / "attempts"
+            for name, files in {
+                "ztty-windows-aarch64-2": {"arm.build.json": "failed", "stale.log": "old"},
+                "ztty-windows-aarch64-10": {"arm.build.json": "passed", "latest.log": "new"},
+                "ztty-linux-x86_64": {"linux.build.json": "passed"},
+                "ztty-verify-ssh-diagnostics-2": {"ssh.json": "accepted"},
+            }.items():
+                directory = attempts / name
+                directory.mkdir(parents=True)
+                for filename, value in files.items():
+                    (directory / filename).write_text(value)
+            step = workflow_script("Collect the latest attempt for each platform and diagnostic")
+            result = subprocess.run([sys.executable, "-c", step],
+                                    env=dict(os.environ, RUNNER_TEMP=temporary), capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            actual = {file.name: file.read_text() for file in (release / "bin").iterdir()}
+            self.assertEqual(actual, {"arm.build.json": "passed", "latest.log": "new",
+                                      "linux.build.json": "passed", "ssh.json": "accepted"})
+
+
 class NativeReleaseRegressions(unittest.TestCase):
     def native_script(self):
         return workflow_script("Run native Linux PTY and X11 GUI acceptance")

@@ -308,7 +308,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ${{ env.ARTIFACT_STEM }}
+          name: ${{ github.run_attempt == '1' && env.ARTIFACT_STEM || format('{0}-{1}', env.ARTIFACT_STEM, github.run_attempt) }}
           path: dist/
           if-no-files-found: error
           retention-days: 14
@@ -517,7 +517,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ${{ env.ARTIFACT_STEM }}
+          name: ${{ github.run_attempt == '1' && env.ARTIFACT_STEM || format('{0}-{1}', env.ARTIFACT_STEM, github.run_attempt) }}
           path: |
             dist/*.zip*
             dist/*.tar.gz*
@@ -769,7 +769,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: ${{ env.ARTIFACT_STEM }}
+          name: ${{ github.run_attempt == '1' && env.ARTIFACT_STEM || format('{0}-{1}', env.ARTIFACT_STEM, github.run_attempt) }}
           path: |
             dist/*.zip*
             dist/*.tar.gz*
@@ -819,8 +819,33 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           pattern: ztty-*
-          merge-multiple: true
-          path: ${{ runner.temp }}/ztty-release/bin
+          path: ${{ runner.temp }}/ztty-release/attempts
+      - name: Collect the latest attempt for each platform and diagnostic
+        shell: python {0}
+        run: |
+          import os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "ztty-release"
+          selected = {}
+          for artifact in (root / "attempts").iterdir():
+              stem, _, number = artifact.name.rpartition("-")
+              if not artifact.is_dir():
+                  raise ValueError(f"expected an artifact directory, found {artifact.name}")
+              if number.isascii() and number.isdecimal():
+                  attempt = int(number)
+              else:
+                  stem, attempt = artifact.name, 1
+              if stem not in selected or attempt > selected[stem][0]:
+                  selected[stem] = (attempt, artifact)
+          output = root / "bin"
+          output.mkdir()
+          for _, artifact in sorted(selected.values()):
+              print(f"Collecting {artifact.name}")
+              for entry in artifact.iterdir():
+                  target = output / entry.name
+                  if target.exists():
+                      raise ValueError(f"artifact filename collision: {entry.name}")
+                  entry.rename(target)
       - name: Verify every platform artifact belongs to the accepted source
         shell: python {0}
         run: |

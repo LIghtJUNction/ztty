@@ -14,6 +14,7 @@ import argparse
 import base64
 import binascii
 import ctypes
+import errno
 import hashlib
 from ctypes import wintypes
 import json
@@ -292,6 +293,50 @@ def archive_child_failures(directory, output, report):
                 "error": repr(error)[:2048]})
 
 
+def read_owned_probe_bytes(path, report=None):
+    """Retry a Windows sharing conflict only while opening an owned fixture file."""
+    try:
+        return path.read_bytes()
+    except PermissionError as error:
+        if (sys.platform != "win32" or error.errno != errno.EACCES
+                or getattr(error, "winerror", None) not in (None, 5, 32, 33)):
+            raise
+        started = time.monotonic()
+        deadline = started + 1.0
+        first = {"type": type(error).__name__, "errno": error.errno,
+                 "winerror": getattr(error, "winerror", None)}
+        last_error, attempts, outcome = error, 1, "failed"
+        try:
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise last_error
+                time.sleep(min(0.005, remaining))
+                if time.monotonic() >= deadline:
+                    raise last_error
+                attempts += 1
+                try:
+                    value = path.read_bytes()
+                except PermissionError as repeated:
+                    if (repeated.errno != errno.EACCES
+                            or getattr(repeated, "winerror", None) not in (None, 5, 32, 33)):
+                        raise
+                    last_error = repeated
+                else:
+                    outcome = "read"
+                    return value
+        finally:
+            if report is not None:
+                events = report.setdefault("probe_file_read_retries", [])
+                if len(events) < 64:
+                    events.append({"path": str(path), "attempts": attempts, "retries": attempts - 1,
+                        "elapsed_seconds": round(time.monotonic() - started, 6),
+                        "retry_timeout_seconds": 1.0, "retry_interval_seconds": 0.005,
+                        "first_error": first, "outcome": outcome})
+                else:
+                    report["probe_file_read_retries_omitted"] = report.get("probe_file_read_retries_omitted", 0) + 1
+
+
 def child(directory, stdio_only=False):
     kernel = ctypes.WinDLL("kernel32", use_last_error=True)
     kernel.GetStdHandle.restype = wintypes.HANDLE
@@ -372,7 +417,7 @@ def child(directory, stdio_only=False):
             size_sequence += 1
         path = directory / f"command-{sequence}.bin"
         if path.exists():
-            payload = path.read_bytes()
+            payload = read_owned_probe_bytes(path)
             sys.stdout.buffer.write(payload)
             sys.stdout.buffer.flush()
             (directory / f"done-{sequence}").write_text("sent", encoding="utf-8")

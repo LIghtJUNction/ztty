@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Contract checks for resource disposal, separate from native pixel acceptance."""
+import errno
 import hashlib
 import json
 import subprocess
@@ -70,6 +71,21 @@ class ConflictedDirectory:
         if self.failures is None or self.attempts <= self.failures:
             raise self.error
         self.directory.cleanup()
+
+
+class CommandFileContract(unittest.TestCase):
+    def test_transient_permission_denial_before_pty_output_returns_original_command(self):
+        path = Path("command-6.bin")
+        payload = b"\x1b_Gcommand\x1b\\"
+        conflict = PermissionError(errno.EACCES, "permission denied", str(path))
+        clock = Clock()
+        with (mock.patch.object(native.sys, "platform", "win32"),
+              mock.patch.object(native.time, "monotonic", clock.monotonic),
+              mock.patch.object(native.time, "sleep", clock.sleep),
+              mock.patch.object(Path, "read_bytes", side_effect=[conflict, payload]) as read):
+            self.assertEqual(native.read_owned_probe_bytes(path), payload)
+        self.assertEqual(read.call_count, 2)
+        self.assertEqual(clock.sleeps, [0.005])
 
 
 class WindowDiscoveryContract(unittest.TestCase):
