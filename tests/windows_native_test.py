@@ -72,6 +72,38 @@ class ConflictedDirectory:
         self.directory.cleanup()
 
 
+class WindowDiscoveryContract(unittest.TestCase):
+    def test_selects_only_owned_terminal_and_waits_for_its_drawable_grid(self):
+        # A helper HWND can enumerate ahead of the application's terminal on Windows.
+        windows = {
+            11: (7, "IME", True, (120, 100)),
+            12: (8, "ztty.NativeWindow", True, (120, 100)),
+            13: (7, "ztty.NativeWindow", False, (120, 100)),
+            14: (7, "ztty.NativeWindow", True, (0, 0)),
+        }
+        user = mock.Mock()
+        user.EnumWindows.side_effect = lambda visit, arg: all(visit(hwnd, arg) for hwnd in windows)
+        def owner(hwnd, ptr):
+            ptr._obj.value = windows[hwnd][0]
+            return 1
+        def window_class(hwnd, name, size):
+            name.value = windows[hwnd][1]
+            return len(name.value)
+        def client_rect(hwnd, ptr):
+            ptr._obj.right, ptr._obj.bottom = windows[hwnd][3]
+            return True
+        user.GetWindowThreadProcessId.side_effect = owner
+        user.GetClassNameW.side_effect = window_class
+        user.IsWindowVisible.side_effect = lambda hwnd: windows[hwnd][2]
+        user.GetClientRect.side_effect = client_rect
+        def find(minimum=None):
+            return native.owned_terminal_windows(user, lambda func: func, 7, minimum)
+        self.assertEqual(find(), [13, 14])  # Workspace count includes all owned terminals.
+        self.assertEqual(find((20, 10)), [])
+        windows[14] = (7, "ztty.NativeWindow", True, (120, 100))
+        self.assertEqual(find((20, 10)), [14])
+
+
 class CleanupContract(unittest.TestCase):
     def test_live_child_exits_before_directory_removal_on_success_and_failure(self):
         for passed in (True, False):

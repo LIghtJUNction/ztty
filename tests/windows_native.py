@@ -380,6 +380,32 @@ def child(directory, stdio_only=False):
         time.sleep(0.01)
 
 
+def owned_terminal_windows(user, enum_proc, pid, minimum_client=None):
+    """Enumerate only this process's terminal windows; Win32 can also create helper HWNDs."""
+    matches = []
+
+    @enum_proc
+    def visit(window, _):
+        owner = wintypes.DWORD()
+        user.GetWindowThreadProcessId(window, ctypes.byref(owner))
+        if owner.value != pid:
+            return True
+        name = ctypes.create_unicode_buffer(256)
+        if not user.GetClassNameW(window, name, len(name)) or name.value != "ztty.NativeWindow":
+            return True
+        if minimum_client is not None:
+            rect = wintypes.RECT()
+            width, height = minimum_client
+            if (not user.IsWindowVisible(window) or not user.GetClientRect(window, ctypes.byref(rect))
+                    or rect.right < width or rect.bottom < height):
+                return True
+        matches.append(window)
+        return True
+
+    user.EnumWindows(visit, 0)
+    return matches
+
+
 def wait_for(predicate, description, timeout=10):
     deadline = time.monotonic() + timeout
     last_error = None
@@ -896,21 +922,10 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         assert report["ztty_process"] == interpreter, "ztty must run natively on the test machine"
         checks.append({"name": "native_ztty_process_architecture", "passed": True})
 
-        def find_window():
-            matches = []
-
-            @enum_proc
-            def visit(window, _):
-                pid = wintypes.DWORD()
-                user.GetWindowThreadProcessId(window, ctypes.byref(pid))
-                if pid.value == process.pid:
-                    matches.append(window)
-                return True
-
-            user.EnumWindows(visit, 0)
-            return matches[0] if matches else None
-
-        hwnd = wait_for(find_window, "native ztty window")
+        hwnd = wait_for(lambda: next(iter(owned_terminal_windows(
+            user, enum_proc, process.pid, minimum_client=(20, 10))), None),
+            "visible native terminal window with a drawable 20x10 grid")
+        report["initial_window"] = window_identity(hwnd)
         wait_for(lambda: (directory / "ready").exists(), "Unicode command arguments and ConPTY child")
         checks.append({"name": "unicode_arguments_and_native_child", "passed": True})
         startup_state = json.loads((directory / "startup.json").read_text(encoding="utf-8"))
@@ -924,7 +939,7 @@ def run(binary, output, expected_arch=None, trace_runtime=False, staged_resize=F
         rect = wintypes.RECT()
         assert user.GetClientRect(hwnd, ctypes.byref(rect))
         cw, ch = rect.right // 20, rect.bottom // 10
-        assert cw > 0 and ch > 0
+        assert cw > 0 and ch > 0, f"invalid terminal client dimensions: {rect.right}x{rect.bottom}"
         report["client_pixels"] = [rect.right, rect.bottom]
         report["cell_pixels"] = [cw, ch]
 

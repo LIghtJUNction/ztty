@@ -305,16 +305,7 @@ class Window:
         return value.value
 
     def windows(self):
-        result = []
-        @self.enum_proc
-        def visit(hwnd, _):
-            name = ctypes.create_unicode_buffer(256)
-            self.user.GetClassNameW(hwnd, name, len(name))
-            if self.pid(hwnd) == self.process.pid and name.value == "ztty.NativeWindow":
-                result.append(hwnd)
-            return True
-        self.user.EnumWindows(visit, 0)
-        return result
+        return native.owned_terminal_windows(self.user, self.enum_proc, self.process.pid)
 
     def title(self):
         text = ctypes.create_unicode_buffer(512)
