@@ -14,6 +14,12 @@ unsafe extern "C" fn handle_error(display: *mut Display, event: *mut ErrorEvent)
         if (*event).error_code == 9 && (*event).request_code == 62 {
             return 0;
         }
+        // XSetInputFocus can return BadMatch while the window manager is
+        // still mapping a new workspace's parent. A later FocusIn on the
+        // container focuses its active child.
+        if (*event).error_code == 8 && (*event).request_code == 42 {
+            return 0;
+        }
         if let Some(previous) = PREVIOUS_ERROR_HANDLER {
             return previous(display, event);
         }
