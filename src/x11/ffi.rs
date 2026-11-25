@@ -39,7 +39,11 @@ pub const MOTION_NOTIFY: i32 = 6;
 pub const FOCUS_IN: i32 = 9;
 pub const FOCUS_OUT: i32 = 10;
 pub const EXPOSE: i32 = 12;
+pub const VISIBILITY_NOTIFY: i32 = 15;
+pub const VISIBILITY_FULLY_OBSCURED: i32 = 2;
+pub const VISIBILITY_CHANGE_MASK: c_long = 1 << 16;
 pub const DESTROY_NOTIFY: i32 = 17;
+pub const MAP_NOTIFY: i32 = 19;
 pub const CONFIGURE_NOTIFY: i32 = 22;
 pub const PROPERTY_NOTIFY: i32 = 28;
 pub const SELECTION_CLEAR: i32 = 29;
@@ -103,6 +107,16 @@ pub struct MotionEvent {
     pub state: c_uint,
     pub is_hint: c_char,
     pub same_screen: c_int,
+}
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VisibilityEvent {
+    pub kind: c_int,
+    pub serial: c_ulong,
+    pub send_event: c_int,
+    pub display: *mut Display,
+    pub window: Xid,
+    pub state: c_int,
 }
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -186,6 +200,7 @@ pub union Event {
     pub button: ButtonEvent,
     pub motion: MotionEvent,
     pub configure: ConfigureEvent,
+    pub visibility: VisibilityEvent,
     pub client: ClientEvent,
     pub request: SelectionRequest,
     pub selection: SelectionEvent,
@@ -198,7 +213,7 @@ impl Event {
         // Configure/DestroyNotify place the subject after the event destination.
         unsafe {
             match self.kind {
-                CONFIGURE_NOTIFY | DESTROY_NOTIFY => self.configure.window,
+                CONFIGURE_NOTIFY | DESTROY_NOTIFY | MAP_NOTIFY => self.configure.window,
                 SELECTION_REQUEST => self.request.owner,
                 SELECTION_NOTIFY => self.selection.requestor,
                 _ => self.key.window,

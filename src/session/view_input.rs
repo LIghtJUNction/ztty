@@ -490,6 +490,18 @@ impl Ui {
                     queue_input(&mut core.input, &encoded_focus);
                 }
             }
+            x11::MAP_NOTIFY | x11::VISIBILITY_NOTIFY => {
+                if unsafe { event.kind } == x11::MAP_NOTIFY
+                    || unsafe { event.visibility.state } != x11::VISIBILITY_FULLY_OBSCURED
+                {
+                    // A compositor can expose a retained surface without an
+                    // X11 Expose. Restore it even when the PTY is quiet.
+                    self.force = true;
+                    if core.terminal.modes().synchronized_output {
+                        self.window.present();
+                    }
+                }
+            }
             x11::EXPOSE => {
                 self.window.present();
                 self.force = true;

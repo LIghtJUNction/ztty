@@ -149,7 +149,7 @@ class PrivateXvfb:
         self.close()
 
 
-def start_xvfb(*, screen="1600x1000x24", stderr=None, dpi=None, timeout=8.0, env=None):
+def start_xvfb(*, screen="1600x1000x24", stderr=None, dpi=None, timeout=8.0, env=None, disable_composite=False):
     """Return a verified PrivateXvfb; fail safely if a startup/race check fails."""
     match = re.fullmatch(r"([1-9][0-9]*)x([1-9][0-9]*)x(16|24|32)", screen)
     if not match or any(int(value) > 16384 for value in match.groups()[:2]):
@@ -185,6 +185,8 @@ def start_xvfb(*, screen="1600x1000x24", stderr=None, dpi=None, timeout=8.0, env
                 _release_lease(lease, lease_identity)
                 continue
             command = ["Xvfb",f":{number}","-screen","0",screen,"-nolisten","tcp"]
+            if disable_composite:
+                command.extend(["-extension", "COMPOSITE"])
             if dpi is not None:
                 command.extend(["-dpi",str(int(dpi))])
             process = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=stderr,

@@ -210,7 +210,8 @@ impl Window {
                 // An empty CARDINAL region requests blur across the window.
                 XChangeProperty(display, id, blur, 6, 32, 0, core::ptr::null(), 0);
             }
-            let events = 1 | 2 | 4 | 8 | 64 | 32768 | 131072 | 2097152 | 4194304;
+            let events =
+                1 | 2 | 4 | 8 | 64 | 32768 | VISIBILITY_CHANGE_MASK | 131072 | 2097152 | 4194304;
             XSelectInput(display, id, events);
             let mut wm_delete = XInternAtom(display, c"WM_DELETE_WINDOW".as_ptr(), 0);
             XSetWMProtocols(display, id, &mut wm_delete, 1);
