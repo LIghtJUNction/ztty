@@ -45,18 +45,26 @@ impl Connection {
             XkbSetDetectableAutoRepeat(display, 1, &mut supported);
             let fd = XConnectionNumber(display);
             crate::os::fcntl(fd, 2, 1);
+            // XIM servers advertise on screen zero, including for clients on
+            // another screen. This freshly opened display has no root mask yet.
+            let im_root = XRootWindow(display, 0);
+            let im_servers = XInternAtom(display, c"XIM_SERVERS".as_ptr(), 0);
+            XSelectInput(display, im_root, 1 << 22); // PropertyChangeMask
             let connection = Rc::new(Self {
                 display,
                 fd,
                 screen,
                 im: core::cell::Cell::new(core::ptr::null_mut()),
-                im_registered: core::cell::Cell::new(false),
-                im_opening: core::cell::Cell::new(false),
+                im_root,
+                im_servers,
+                im_retry: core::cell::Cell::new(false),
                 contexts: RefCell::new(Vec::new()),
                 fonts: RefCell::new(Vec::new()),
             });
             if !connection.open_im() {
-                connection.watch_im();
+                // Retry once when dispatch starts, even if the server was
+                // already advertised when the first open failed.
+                connection.im_retry.set(true);
             }
             Ok(connection)
         }
@@ -66,7 +74,6 @@ impl Connection {
 impl Drop for Connection {
     fn drop(&mut self) {
         unsafe {
-            self.unwatch_im();
             let im = self.im.replace(core::ptr::null_mut());
             if !im.is_null() {
                 XCloseIM(im);

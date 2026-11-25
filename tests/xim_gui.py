@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Real fcitx5/XIM restart and delayed startup on an owned Xvfb and D-Bus."""
 import argparse
+from contextlib import contextmanager
 import ctypes
 import hashlib
 import json
@@ -12,6 +13,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import traceback
 
@@ -71,6 +73,66 @@ def wait(predicate, seconds=5):
             pass
         time.sleep(0.025)
     return None
+
+
+@contextmanager
+def xim_handshakes(connection, window):
+    """Record client-to-server XIM connects, including libX11's internal probes."""
+    from Xlib import X, display
+    from Xlib.ext import record
+    atom = connection.intern_atom("_XIM_XCONNECT")
+    assert connection.has_extension("RECORD"), "private Xvfb needs the RECORD extension"
+    # Any XID owned by the client can select that connection. This excludes
+    # the server's replies, the test driver, and brokers from earlier scenarios.
+    context = connection.record_create_context(0, [window.id], [{
+        "core_requests": (25, 25), "core_replies": (0, 0),  # SendEvent
+        "ext_requests": (0, 0, 0, 0), "ext_replies": (0, 0, 0, 0),
+        "delivered_events": (0, 0), "device_events": (0, 0), "errors": (0, 0),
+        "client_started": False, "client_died": False,
+    }])
+    connection.sync()
+    ready = threading.Event()
+    handshakes, errors = [], []
+
+    def capture(reply):
+        if reply.category == record.StartOfData:
+            ready.set()
+        elif reply.category == record.FromClient:
+            # A core SendEvent is a 12-byte request header and a 32-byte event.
+            # All clients here run locally on the private display.
+            assert not reply.client_swapped and len(reply.data) % 44 == 0
+            for offset in range(0, len(reply.data), 44):
+                event = reply.data[offset + 12:offset + 44]
+                if (event[0] == X.ClientMessage and event[1] == 32
+                        and int.from_bytes(event[8:12], sys.byteorder) == atom):
+                    handshakes.append(int.from_bytes(event[4:8], sys.byteorder))
+
+    def record_client():
+        try:
+            stream = display.Display(connection.get_display_name())
+            try:
+                stream.record_enable_context(context, capture)
+            finally:
+                stream.close()
+        except Exception as error:
+            errors.append(error)
+            ready.set()
+
+    reader = threading.Thread(target=record_client, daemon=True)
+    reader.start()
+    try:
+        assert ready.wait(5), "X RECORD startup timed out"
+        if errors:
+            raise errors[0]
+        yield handshakes
+    finally:
+        connection.record_disable_context(context)
+        connection.sync()
+        reader.join(5)
+        connection.record_free_context(context)
+        assert not reader.is_alive(), "X RECORD shutdown timed out"
+        if errors:
+            raise errors[0]
 
 
 def main():
@@ -288,8 +350,10 @@ XIC XCreateIC(XIM im, ...) {
                     input_check(scenario + " initial Chinese commit", first, "nihao ", "你好", True)
                     stop_im()
                 input_check(scenario + " ASCII without server", first, "abc", "abc")
-                start_im()
-                check(scenario + " existing context reconnects", bool(wait(lambda: contexts() == 1, 3)), True)
+                with xim_handshakes(connection, first["view"]) as handshakes:
+                    start_im()
+                    check(scenario + " existing context reconnects", bool(wait(lambda: contexts() == 1, 3)), True)
+                check(scenario + " XIM connect requests for one recovery", len(handshakes), 1)
                 input_check(scenario + " existing Chinese commit", first, "nihao ", "你好", True)
                 second = launch(scenario + "-second")
                 check(scenario + " same broker", second["info"]["broker_pid"], first["info"]["broker_pid"])

@@ -453,14 +453,22 @@ impl Connection {
     pub fn next_event(&self) -> Option<x11::Event> {
         match &self.kind {
             ConnectionKind::X11(c) => unsafe {
-                while x11::XPending(c.display) != 0 {
+                loop {
+                    c.service_im();
+                    if x11::XPending(c.display) == 0 {
+                        return None;
+                    }
                     let mut event = x11::Event { pad: [0; 24] };
                     x11::XNextEvent(c.display, &mut event);
+                    // The Xlib instantiate filter opens a throwaway IM during
+                    // property dispatch. Observe the advertisement directly.
+                    if c.im_server_event(&event) {
+                        continue;
+                    }
                     if x11::XFilterEvent(&mut event, 0) == 0 {
                         return Some(event);
                     }
                 }
-                None
             },
             #[cfg(feature = "wayland")]
             ConnectionKind::Wayland(c) => c.next_event(self.display),
@@ -468,7 +476,9 @@ impl Connection {
     }
     pub fn pending(&self) -> bool {
         match &self.kind {
-            ConnectionKind::X11(c) => unsafe { x11::XPending(c.display) != 0 },
+            ConnectionKind::X11(c) => {
+                c.im_retry_pending() || unsafe { x11::XPending(c.display) != 0 }
+            }
             #[cfg(feature = "wayland")]
             ConnectionKind::Wayland(c) => c.pending(),
         }

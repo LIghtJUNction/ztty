@@ -546,22 +546,6 @@ unsafe extern "C" {
     ) -> *mut c_void;
     pub(super) fn XCloseIM(im: *mut c_void) -> c_int;
     pub(super) fn XSetIMValues(im: *mut c_void, ...) -> *mut c_char;
-    pub(super) fn XRegisterIMInstantiateCallback(
-        display: *mut Display,
-        database: *mut c_void,
-        name: *mut c_char,
-        class: *mut c_char,
-        callback: unsafe extern "C" fn(*mut Display, *mut c_void, *mut c_void),
-        data: *mut c_void,
-    ) -> c_int;
-    pub(super) fn XUnregisterIMInstantiateCallback(
-        display: *mut Display,
-        database: *mut c_void,
-        name: *mut c_char,
-        class: *mut c_char,
-        callback: unsafe extern "C" fn(*mut Display, *mut c_void, *mut c_void),
-        data: *mut c_void,
-    ) -> c_int;
     pub(super) fn XCreateIC(im: *mut c_void, ...) -> *mut c_void;
     pub(super) fn XGetICValues(ic: *mut c_void, ...) -> *mut c_char;
     pub(super) fn XDestroyIC(ic: *mut c_void);

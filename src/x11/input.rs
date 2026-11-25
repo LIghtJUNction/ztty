@@ -13,52 +13,39 @@ pub fn input_focus(display: *mut Display) -> Xid {
 }
 
 impl Connection {
-    // Xlib keeps these callback pointers until unregister/close. Connection is
-    // always Rc-allocated, so its address stays stable even when windows move.
+    // The destroy callback borrows the stable address of the Rc allocation.
     fn callback_data(&self) -> *mut c_void {
         (self as *const Self).cast_mut().cast()
     }
 
-    pub(super) fn watch_im(&self) {
-        if self.im_registered.replace(true) {
-            return;
-        }
-        let registered = unsafe {
-            XRegisterIMInstantiateCallback(
-                self.display,
-                core::ptr::null_mut(),
-                core::ptr::null_mut(),
-                core::ptr::null_mut(),
-                im_available,
-                self.callback_data(),
-            )
-        };
-        if registered == 0 {
-            self.im_registered.set(false);
+    pub(crate) fn im_retry_pending(&self) -> bool {
+        self.im_retry.get()
+    }
+
+    pub(crate) fn service_im(&self) {
+        if self.im_retry.replace(false) {
+            self.open_im();
         }
     }
 
-    pub(super) fn unwatch_im(&self) {
-        if self.im_registered.replace(false) {
-            unsafe {
-                XUnregisterIMInstantiateCallback(
-                    self.display,
-                    core::ptr::null_mut(),
-                    core::ptr::null_mut(),
-                    core::ptr::null_mut(),
-                    im_available,
-                    self.callback_data(),
-                );
+    pub(crate) fn im_server_event(&self, event: &Event) -> bool {
+        unsafe {
+            if event.kind != PROPERTY_NOTIFY
+                || event.property.window != self.im_root
+                || event.property.atom != self.im_servers
+            {
+                return false;
             }
         }
+        if self.im.get().is_null() {
+            self.im_retry.set(true);
+        }
+        true
     }
 
     pub(super) fn open_im(&self) -> bool {
         if !self.im.get().is_null() {
             return true;
-        }
-        if self.im_opening.replace(true) {
-            return false;
         }
         unsafe {
             let im = XOpenIM(
@@ -80,6 +67,7 @@ impl Connection {
                     core::ptr::null::<c_char>(),
                 )
                 .is_null()
+                    && self.im.get() == im
                 {
                     self.im.set(core::ptr::null_mut());
                     XCloseIM(im);
@@ -87,7 +75,6 @@ impl Connection {
             }
         }
         if !self.im.get().is_null() {
-            self.unwatch_im();
             // Xlib can call the destroy callback while creating an IC. Do not
             // hold a RefCell borrow across any Xlib call.
             let contexts = self.contexts.borrow().clone();
@@ -95,7 +82,6 @@ impl Connection {
                 context.create();
             }
         }
-        self.im_opening.set(false);
         !self.im.get().is_null()
     }
 
@@ -117,11 +103,6 @@ impl Connection {
     }
 }
 
-unsafe extern "C" fn im_available(_display: *mut Display, data: *mut c_void, _call: *mut c_void) {
-    let connection = unsafe { &*data.cast::<Connection>() };
-    connection.open_im();
-}
-
 unsafe extern "C" fn im_destroyed(im: *mut c_void, data: *mut c_void, _call: *mut c_void) {
     let connection = unsafe { &*data.cast::<Connection>() };
     if connection.im.get() != im {
@@ -138,7 +119,8 @@ unsafe extern "C" fn im_destroyed(im: *mut c_void, data: *mut c_void, _call: *mu
     {
         context.handle.set(core::ptr::null_mut());
     }
-    connection.watch_im();
+    // Reconnect only after Xlib has finished destroying the old handles.
+    connection.im_retry.set(true);
 }
 
 impl InputContext {

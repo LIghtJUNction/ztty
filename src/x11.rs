@@ -80,8 +80,9 @@ pub struct Connection {
     pub fd: i32,
     screen: i32,
     im: core::cell::Cell<*mut c_void>,
-    im_registered: core::cell::Cell<bool>,
-    im_opening: core::cell::Cell<bool>,
+    im_root: Xid,
+    im_servers: Atom,
+    im_retry: core::cell::Cell<bool>,
     contexts: RefCell<Vec<Weak<InputContext>>>,
     fonts: RefCell<Vec<Weak<Fonts>>>,
 }
