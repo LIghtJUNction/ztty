@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.3 — 2026-11-26
+
+- Recover X11 input methods after a server restart from the session event loop.
+  The broker watches the XIM server advertisement directly, avoiding the
+  temporary input-method connection that crashed inside libX11. The private
+  Fcitx5 regression checks one XIM handshake per recovery and verifies that
+  existing and newly opened windows can enter Chinese text.
+- Redraw quiet X11 terminal windows when they are mapped or become visible
+  again, even when the child process produces no new output.
+- Keep the X11 session broker and its other terminals alive if the window
+  manager requests focus before a new workspace window has finished mapping.
+
 ## 0.6.2 — 2026-11-24
 
 - Isolate X11/XWayland EGL/OpenGL calls, including initialization and destruction,
