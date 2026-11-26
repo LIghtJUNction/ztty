@@ -73,8 +73,8 @@ source = "git+https://github.com/LIghtJUNction/zconv.git#f9448d27997dc70dac05f0c
 
 [[package]]
 name = "zgpui"
-version = "0.1.8"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#2ad0e1e7986e57b2084e2a80d3f5066740c10a33"
+version = "0.1.9"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#087dc628c3bb137448bf57dc25b965adcd9ae188"
 
 [[package]]
 name = "zgraphics"
@@ -128,7 +128,7 @@ source = "git+https://github.com/LIghtJUNction/zsys.git#44dbc7f57ad2ba3336b95dde
 [[package]]
 name = "zterm"
 version = "0.5.2"
-source = "git+https://github.com/LIghtJUNction/zterm.git#8dac2dbdedb3107eaff140af20c822fd6036864c"
+source = "git+https://github.com/LIghtJUNction/zterm.git#0bfbb0f35cd9e33972812feed9735f6f4f60d0d1"
 dependencies = [
  "unicode-segmentation",
  "unicode-width",
