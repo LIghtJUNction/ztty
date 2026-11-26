@@ -12,7 +12,7 @@ repository = "https://github.com/LIghtJUNction/ztty"
 
 [package]
 name = "ztty"
-version = "0.6.3"
+version = "0.6.4"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true

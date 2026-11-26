@@ -147,7 +147,11 @@ impl Window {
     }
 
     fn start_gpu(&mut self) {
-        if self.suspended || self.state.id == 0 || software_requested(self.renderer_kind) {
+        if self.suspended
+            || self.state.id == 0
+            || self.gpu.is_some()
+            || software_requested(self.renderer_kind)
+        {
             return;
         }
         let result = (|| {
@@ -178,10 +182,10 @@ impl Window {
                 self.renderer_property(c"_ZTTY_RENDERER", "gpu");
             }
             Err(error) => {
-                self.renderer_property(c"_ZTTY_RENDERER", "software");
-                self.renderer_property(c"_ZTTY_GPU_DRIVER", "");
-                if self.renderer_kind == RendererKind::Gpu {
-                    self.gpu_notice = Some(error);
+                let report = self.renderer_kind == RendererKind::Gpu;
+                self.gpu_failure(error);
+                if !report {
+                    self.gpu_notice = None;
                 }
             }
         }
@@ -193,6 +197,7 @@ impl Window {
         self.gpu = None;
         self.renderer_kind = RendererKind::Software;
         self.renderer_property(c"_ZTTY_GPU_WORKER", "");
+        self.renderer_property(c"_ZTTY_GPU_DRIVER", "");
         self.retained_valid = false;
         self.gpu_repaint = true;
         self.gpu_notice = Some(error);
@@ -207,7 +212,14 @@ impl Window {
         self.renderer_property(c"_ZTTY_RENDERER", "software");
     }
 
+    pub(crate) fn renderer_failure_descriptor(&self) -> Option<crate::os::PollFd> {
+        self.gpu.as_ref().map(Renderer::failure_descriptor)
+    }
+
     pub fn take_renderer_notice(&mut self) -> Option<String> {
+        if self.gpu.as_ref().is_some_and(Renderer::disconnected) {
+            self.gpu_failure("GPU worker disconnected");
+        }
         self.gpu_notice
             .take()
             .map(|error| format!("GPU renderer: {error}; using software rendering"))

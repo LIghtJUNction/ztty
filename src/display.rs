@@ -366,6 +366,13 @@ impl Window {
             Self::Wayland(w) => w.property(event),
         }
     }
+    pub(crate) fn renderer_failure_descriptor(&self) -> Option<crate::os::PollFd> {
+        match self {
+            Self::X11(window) => window.renderer_failure_descriptor(),
+            #[cfg(feature = "wayland")]
+            Self::Wayland(_) => None,
+        }
+    }
     pub fn take_renderer_notice(&mut self) -> Option<String> {
         match self {
             Self::X11(w) => w.take_renderer_notice(),

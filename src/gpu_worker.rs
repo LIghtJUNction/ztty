@@ -333,6 +333,20 @@ impl Renderer {
     pub fn pid(&self) -> i32 {
         CHILDREN[self.slot].load(Ordering::Relaxed)
     }
+    pub(crate) fn failure_descriptor(&self) -> os::PollFd {
+        // poll reports a hangup or error even without requesting read/write
+        // events. Normal replies are consumed synchronously by the renderer.
+        os::PollFd {
+            fd: self.channel.0,
+            events: 0,
+            revents: 0,
+        }
+    }
+    pub(crate) fn disconnected(&self) -> bool {
+        let mut descriptor = self.failure_descriptor();
+        // SAFETY: the descriptor is initialized and borrowed for one poll.
+        (unsafe { os::poll(&mut descriptor, 1, 0) }) > 0 && descriptor.revents != 0
+    }
     pub fn driver(&self) -> &str {
         &self.driver
     }

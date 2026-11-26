@@ -1474,6 +1474,14 @@ fn serve_loop(mut server: broker::Server, mut pool: Pool) -> Result<(), String> 
             connection.descriptors(&mut fds);
         }
         for session in &pool.sessions {
+            if let Some(descriptor) = session
+                .ui
+                .as_ref()
+                .filter(|ui| ui.open && ui.visible && ui.window.id != 0)
+                .and_then(|ui| ui.window.renderer_failure_descriptor())
+            {
+                fds.push(descriptor);
+            }
             if !session.core.eof() {
                 fds.push(os::PollFd {
                     fd: session.core.pty.fd(),

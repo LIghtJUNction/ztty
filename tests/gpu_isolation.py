@@ -66,7 +66,10 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--expect-blocked", action="store_true",
                         help="negative control for an unisolated baseline; never a release pass")
+    parser.add_argument("--kill-idle", action="store_true",
+                        help="terminate workers with no new PTY output")
     args = parser.parse_args()
+    assert not (args.kill_idle and args.expect_blocked)
     binary = args.binary.resolve(strict=True)
     report = {"ok": False, "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
               "scope": "Owned Xvfb/Mesa and test-only eglSwapBuffers stall; physical GPU/Hyprland unverified",
@@ -150,36 +153,49 @@ def main():
                     assert len({v["worker"] for v in views}) == 4
                 report["checks"].append("four real GPU views share one broker")
                 before = [status(v["channel"])["heartbeat"] for v in views]
-                # Pause only eglSwapBuffers, through the same native call in both builds.
-                trigger.touch()
-                for view in views:
-                    send(view["channel"], {"op": "write"})
-                    assert receive(view["channel"])["ok"]
-                wait(lambda: list(directory.glob("armed.entered-*")), "real EGL stall entered")
-                started = time.monotonic()
-                if args.expect_blocked:
-                    try:
-                        subprocess.run([str(binary), "list"], env=env, capture_output=True, timeout=0.75)
-                    except subprocess.TimeoutExpired:
-                        report["negative_control_list_timed_out"] = True
-                    else:
-                        raise AssertionError("baseline unexpectedly serviced list during stalled EGL")
-                    assert all(status(v["channel"])["heartbeat"] > before[i] for i, v in enumerate(views))
-                    trigger.unlink()
-                    listed = subprocess.run([str(binary), "list"], env=env, capture_output=True, text=True, timeout=3)
-                    assert listed.returncode == 0 and all(v["name"] in listed.stdout for v in views)
-                    assert all(v["command_log"].read_text() == "launch\n" for v in views)
-                    report["checks"].append("baseline CLI list times out during EGL stall; tasks survive and trigger removal restores list")
-                    report["ok"] = True
-                    raise NegativeControlPassed()
-                listed = subprocess.run([str(binary), "list"], env=env, capture_output=True,
-                                        text=True, timeout=3)
-                report["list_ms"].append((time.monotonic() - started) * 1000)
-                assert listed.returncode == 0, listed.stderr
-                assert all(view["name"] in listed.stdout for view in views), listed.stdout
-                assert report["list_ms"][-1] < 3000
-                assert len(list(directory.glob("armed.entered-*"))) == 4
-                report["checks"].append("real CLI list returns within 3 seconds while all four EGL presenters stall")
+                if args.kill_idle:
+                    # Paint once before killing the workers. Nothing writes to
+                    # the PTYs until software pixels have been verified.
+                    for view in views:
+                        send(view["channel"], {"op": "write"})
+                        assert receive(view["channel"])["ok"]
+                    for view in views:
+                        wait(lambda: tuple(view["window"].get_image(
+                            25, 80, 1, 1, X.ZPixmap, 0xffffffff).data[:3])
+                            == (97, 153, 23), "initial GPU frame")
+                    for view in views:
+                        os.kill(view["worker"], 9)
+                else:
+                    # Pause only eglSwapBuffers, through the same native call in both builds.
+                    trigger.touch()
+                    for view in views:
+                        send(view["channel"], {"op": "write"})
+                        assert receive(view["channel"])["ok"]
+                    wait(lambda: list(directory.glob("armed.entered-*")), "real EGL stall entered")
+                    started = time.monotonic()
+                    if args.expect_blocked:
+                        try:
+                            subprocess.run([str(binary), "list"], env=env, capture_output=True, timeout=0.75)
+                        except subprocess.TimeoutExpired:
+                            report["negative_control_list_timed_out"] = True
+                        else:
+                            raise AssertionError("baseline unexpectedly serviced list during stalled EGL")
+                        assert all(status(v["channel"])["heartbeat"] > before[i] for i, v in enumerate(views))
+                        trigger.unlink()
+                        listed = subprocess.run([str(binary), "list"], env=env, capture_output=True, text=True, timeout=3)
+                        assert listed.returncode == 0 and all(v["name"] in listed.stdout for v in views)
+                        assert all(v["command_log"].read_text() == "launch\n" for v in views)
+                        report["checks"].append("baseline CLI list times out during EGL stall; tasks survive and trigger removal restores list")
+                        report["ok"] = True
+                        raise NegativeControlPassed()
+                    listed = subprocess.run([str(binary), "list"], env=env, capture_output=True,
+                                            text=True, timeout=3)
+                    report["list_ms"].append((time.monotonic() - started) * 1000)
+                    assert listed.returncode == 0, listed.stderr
+                    assert all(view["name"] in listed.stdout for view in views), listed.stdout
+                    assert report["list_ms"][-1] < 3000
+                    assert len(list(directory.glob("armed.entered-*"))) == 4
+                    report["checks"].append("real CLI list returns within 3 seconds while all four EGL presenters stall")
                 for index, view in enumerate(views):
                     wait(lambda: text(view["window"], "_ZTTY_RENDERER") == "software", "software fallback")
                     info = rpc({"op": "info", "session": view["name"]})

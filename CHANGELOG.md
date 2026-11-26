@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.4 — 2026-11-26
+
+- Recover quiet X11 terminal windows when the GPU worker disconnects. The
+  broker wakes on the worker socket closing and redraws from the existing
+  terminal state using Xft, preserving the PTY and child process.
+
 ## 0.6.3 — 2026-11-26
 
 - Recover X11 input methods after a server restart from the session event loop.
