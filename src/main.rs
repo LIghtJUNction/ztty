@@ -96,6 +96,7 @@ fn panic(_: &core::panic::PanicInfo<'_>) -> ! {
 #[cfg(target_os = "linux")]
 const HELP: &str = "ztty — shared no_std terminal sessions for Linux\n\n\
 Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
+       ztty new [--count N] [--name BASE] [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty attach [NAME | ztty://ADDRESS]\n\
        ztty attach --observe NAME\n\
        ztty ssh [OPTIONS] HOST [SESSION] [-- COMMAND [ARG...]]\n\
@@ -175,6 +176,8 @@ struct Config {
     #[cfg(target_os = "linux")]
     name: Option<String>,
     #[cfg(target_os = "linux")]
+    new_windows: Option<usize>,
+    #[cfg(target_os = "linux")]
     backend: backend::Preference,
     #[cfg(target_os = "linux")]
     observe: bool,
@@ -192,6 +195,8 @@ fn number(bytes: &[u8]) -> Option<usize> {
 }
 
 fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
+    #[cfg(target_os = "linux")]
+    let new_windows = args.get(1) == Some(&c"new");
     let mut config_path = None;
     let mut font = None;
     #[cfg(target_os = "linux")]
@@ -205,6 +210,8 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         #[cfg(target_os = "linux")]
         name: None,
         #[cfg(target_os = "linux")]
+        new_windows: new_windows.then_some(1),
+        #[cfg(target_os = "linux")]
         backend: backend::Preference::Auto,
         #[cfg(target_os = "linux")]
         observe: false,
@@ -216,9 +223,29 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
         #[cfg(target_os = "linux")]
         ssh_profile: None,
     };
+    #[cfg(target_os = "linux")]
+    let mut i = if new_windows { 2 } else { 1 };
+    #[cfg(not(target_os = "linux"))]
     let mut i = 1;
     while i < args.len() {
         match args[i].to_bytes() {
+            #[cfg(target_os = "linux")]
+            b"--help" | b"-h" if new_windows => {
+                os::print(1, b"Usage: ztty new [--count 1..16] [--name BASE] [launch options] [-e COMMAND [ARG...]]\n\
+                    Open independent windows and return once created. The count defaults to 1.\n\
+                    --name uses BASE for one window or BASE-1 through BASE-N for multiple windows.\n");
+                return Ok(None);
+            }
+            #[cfg(target_os = "linux")]
+            b"--count" if new_windows => {
+                i += 1;
+                let count = args
+                    .get(i)
+                    .and_then(|arg| number(arg.to_bytes()))
+                    .filter(|n| (1..=broker::MAX_NEW_WINDOWS).contains(n))
+                    .ok_or("--count must be an integer in 1..16")?;
+                cfg.new_windows = Some(count);
+            }
             b"--help" | b"-h" => {
                 os::print(1, HELP.as_bytes());
                 return Ok(None);
@@ -336,6 +363,10 @@ fn config(args: &[&CStr]) -> Result<Option<Config>, String> {
             _ => return Err("unknown argument; run ztty --help".into()),
         }
         i += 1;
+    }
+    #[cfg(target_os = "linux")]
+    if new_windows && cfg.target.is_some() {
+        return Err("new opens independent windows; tab and split targets are invalid".into());
     }
     #[cfg(target_os = "linux")]
     if cfg.observe && cfg.target.is_some() {

@@ -104,6 +104,8 @@ and font cache.
 
 ```sh
 ztty --name work -e /bin/bash &
+ztty new                         # Open one independent window and return
+ztty new --count 3 --name workset # Open workset-1, workset-2 and workset-3
 ztty attach                     # List sessions
 ztty attach work                # Open or raise its window
 ztty attach --observe work      # Read-only view
