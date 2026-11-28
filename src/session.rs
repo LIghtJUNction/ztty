@@ -1277,7 +1277,7 @@ impl Pool {
         }
     }
 
-    fn tick(&mut self, buffer: &mut [u8]) -> Option<u64> {
+    fn tick(&mut self, buffer: &mut [u8], server: &mut broker::Server) -> Option<u64> {
         let changed = self.watcher.changed();
         if !changed.is_empty() {
             for index in 0..self.sessions.len() {
@@ -1345,6 +1345,18 @@ impl Pool {
                 // An attached observer cannot terminate another actor's live PTY.
                 self.detach(i);
             } else if !self.sessions[i].persistent && (closed || ended) {
+                if ended {
+                    // Headless CLI waiters already bound to this local PTY can
+                    // collect its final page immediately before normal retirement.
+                    let session = &self.sessions[i];
+                    server.wake_reads(|wait| {
+                        if wait.session_id == session.id && wait.until.is_some() {
+                            session.wait_output(wait).transpose()
+                        } else {
+                            None
+                        }
+                    });
+                }
                 self.retire(i);
             } else if closed {
                 self.detach(i);
@@ -1419,7 +1431,7 @@ fn serve_loop(mut server: broker::Server, mut pool: Pool) -> Result<(), String> 
     loop {
         crate::gpu_worker::reap();
         pool.events(&mut openers, &mut buffers, &mut read_buffer);
-        let deadline = pool.tick(&mut read_buffer);
+        let deadline = pool.tick(&mut read_buffer, &mut server);
         server.pump(|request| pool.handle(request));
         for (uri, status) in pool.finished.drain(..) {
             server.finish(&uri, status);
@@ -1430,6 +1442,15 @@ fn serve_loop(mut server: broker::Server, mut pool: Pool) -> Result<(), String> 
                 None => Some(Err("session closed while waiting for output".into())),
             },
         );
+        // A disconnected, rejected or completed drain no longer owns input.
+        // Only its original lease can be released here, even after a takeover.
+        for session in &mut pool.sessions {
+            if session.core.owns(broker::CLI_SENDER)
+                && !server.has_cli_drain(session.id, session.core.control_epoch())
+            {
+                session.core.release(broker::CLI_SENDER)?;
+            }
+        }
         openers.reap();
         if let Some(target) = pool.pending_reload.take() {
             let result = if openers.pending() {

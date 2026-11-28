@@ -29,6 +29,12 @@ impl Server {
                                         .map(|read| {
                                             json::object([
                                                 ("session", read.session_id.into()),
+                                                (
+                                                    "until",
+                                                    read.until
+                                                        .map(|until| Value::from(until.name()))
+                                                        .unwrap_or(Value::Null),
+                                                ),
                                                 ("cursor", read.cursor.into()),
                                                 (
                                                     "max",
@@ -108,6 +114,7 @@ impl Server {
             }
             if let Some(read) = peer.get("read").filter(|v| **v != Value::Null) {
                 number(read, "session")?;
+                ReadUntil::parse(read.get("until"))?;
                 number(read, "cursor")?;
                 number(read, "deadline")?;
                 if let Some(watch) = read.get("watch").filter(|v| **v != Value::Null) {
@@ -154,6 +161,7 @@ impl Server {
             let read_wait = match peer.get("read").filter(|v| **v != Value::Null) {
                 Some(read) => Some(ReadWait {
                     session_id: number(read, "session")?,
+                    until: ReadUntil::parse(read.get("until"))?,
                     cursor: number(read, "cursor")?,
                     max_bytes: read.get("max").and_then(Value::as_u64),
                     deadline: number(read, "deadline")?,

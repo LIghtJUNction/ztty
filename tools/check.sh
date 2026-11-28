@@ -33,6 +33,7 @@ if [ "$(uname -s)" = Linux ]; then
     python3 tests/bash_integration.py --output artifacts/bash-integration/report.json
     python3 tests/mcp_transport.py --binary "$ztty_binary"
     python3 tests/mcp_sessions.py --binary "$ztty_binary"
+    python3 tests/session_cli.py --binary "$ztty_binary"
     python3 tests/mcp_security.py --binary "$ztty_binary"
     python3 tests/mcp_wait.py --binary "$ztty_binary" --output artifacts/mcp-wait/report.json
     python3 tests/mcp_sse.py --binary "$ztty_binary" --output artifacts/mcp-sse/report.json

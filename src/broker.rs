@@ -375,7 +375,9 @@ impl PendingRequest {
             // reserve time for complete native view/layout reconstruction too.
             Some(60_000)
         } else {
-            let wait = if operation == Some("write") {
+            let wait = if operation == Some("cli-send") {
+                MAX_INPUT_DRAIN_MS
+            } else if operation == Some("write") {
                 input_drain_timeout(&value)?.unwrap_or(0)
             } else if matches!(operation, Some("read" | "watch")) {
                 match value.get("wait_ms") {
@@ -639,6 +641,9 @@ pub(crate) fn input_drain_timeout(value: &Value) -> Result<Option<u64>, String> 
         .transpose()
 }
 
+/// A lease held by the broker only while draining one headless CLI write.
+pub const CLI_SENDER: &str = "cli:send";
+
 /// Input must reach the PTY under the same ownership epoch that enqueued it.
 /// A takeover clears pending input and must never look like a successful drain.
 pub struct InputDrain {
@@ -647,9 +652,39 @@ pub struct InputDrain {
     pub written: usize,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum ReadUntil {
+    Output,
+    Eof,
+    Exit,
+}
+
+impl ReadUntil {
+    pub fn parse(value: Option<&Value>) -> Result<Option<Self>, &'static str> {
+        match value {
+            None | Some(Value::Null) => Ok(None),
+            Some(v) => match v.as_str() {
+                Some("output") => Ok(Some(Self::Output)),
+                Some("eof") => Ok(Some(Self::Eof)),
+                Some("exit") => Ok(Some(Self::Exit)),
+                _ => Err("invalid output wait condition"),
+            },
+        }
+    }
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Output => "output",
+            Self::Eof => "eof",
+            Self::Exit => "exit",
+        }
+    }
+}
+
 /// A deferred output read, frame watch or input drain refers to one PTY
 /// incarnation, even when the caller used a short name without an identity.
 pub struct ReadWait {
+    pub until: Option<ReadUntil>,
     pub session_id: u64,
     pub cursor: u64,
     pub max_bytes: Option<u64>,
@@ -761,6 +796,18 @@ impl Server {
         }
     }
 
+    pub fn has_cli_drain(&self, session_id: u64, epoch: u64) -> bool {
+        self.peers
+            .iter()
+            .filter_map(|peer| peer.read_wait.as_ref())
+            .any(|wait| {
+                wait.session_id == session_id
+                    && wait.input_drain.as_ref().is_some_and(|drain| {
+                        drain.actor == CLI_SENDER && drain.control_epoch == epoch
+                    })
+            })
+    }
+
     pub fn finish(&mut self, name: &str, status: i32) {
         for peer in &mut self.peers {
             if peer.wait.as_deref() == Some(name) {
@@ -852,6 +899,13 @@ impl Server {
                     let result = json::parse(&peer.input[..newline])
                         .map_err(String::from)
                         .and_then(|mut v| {
+                            if v.get("op").and_then(Value::as_str) == Some("cli-send")
+                                && waiting >= MAX_WAITERS
+                            {
+                                return Err(
+                                    "session waiter limit reached before sending input".into()
+                                );
+                            }
                             if v.get("op").and_then(Value::as_str) == Some("reload") {
                                 let pid = credentials(peer.fd.0)
                                     .ok_or("cannot verify reload caller")?

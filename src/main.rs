@@ -46,6 +46,8 @@ mod runtime_reload;
 mod search;
 #[cfg(target_os = "linux")]
 mod session;
+#[cfg(target_os = "linux")]
+mod session_cli;
 #[cfg(all(target_os = "linux", feature = "wayland"))]
 #[path = "platform/wayland.rs"]
 mod wayland;
@@ -103,6 +105,7 @@ Usage: ztty [OPTIONS] [-e COMMAND [ARG...]]\n\
        ztty detach NAME | close NAME | rename NAME NEW_NAME | list [FILTER]\n\
        ztty action NAME ACTION | move NAME TARGET [tab|right|down]\n\
        ztty control NAME acquire|release [--takeover]\n\
+       ztty send|exec|read|wait --help    Headless session I/O and command PTYs\n\
        ztty commands NAME | command-output NAME COMMAND_ID\n\
        ztty shell-integration bash|zsh|fish|nu\n\
        ztty plugin check|run /absolute/library.so\n\
@@ -588,6 +591,7 @@ pub unsafe extern "C" fn main(argc: c_int, argv: *const *const c_char) -> c_int 
     let _ = (argc, argv);
     #[cfg(target_os = "linux")]
     let result = match args.get(1).map(|s| s.to_bytes()) {
+        Some(b"send" | b"exec" | b"read" | b"wait") => session_cli::run(&args[1..]),
         Some(b"mcp") => mcp::run(&args[2..]),
         Some(b"ssh") => mux::ssh(&args[2..]),
         Some(b"mux") => mux::command(&args[2..]),

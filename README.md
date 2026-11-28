@@ -118,6 +118,28 @@ See [sessions and MCP](docs/sessions.md) for client setup, session identities,
 JSON/SSE replies and command-output reads; [observer mode](docs/ssmcp-observer.md)
 covers tools such as ssmcp.
 
+### Headless CLI
+
+For a local window named `work`, the local owner can release input for a
+one-shot write. Each successful send releases its temporary lease.
+
+```sh
+ztty control ztty://local/work release
+target=$(ztty info ztty://local/work | jq -c '{uri,id,created_at,broker_pid}')
+ztty send work --expect "$target" -- 'echo hello'  # leave the line unsubmitted
+ztty send work --expect "$target" --enter -- ''     # append one CR
+ztty read work --expect "$target" --cursor 0 --max-bytes 4096
+ztty wait work --expect "$target" --until output --cursor 0 --timeout-ms 500
+ztty control ztty://local/work acquire              # return input to the window
+
+ztty exec --new check -- /bin/sh -c 'printf result; exit 7'
+```
+
+`exec --new` runs argv in a dedicated named PTY and returns a JSON output page
+and the child's exit status. Existing interactive sessions support `send`,
+`read` and `wait`. See the [headless CLI contract](docs/sessions.md#headless-cli)
+for cursor continuation, ownership, deadlines, exit codes and job cleanup.
+
 ## SSH terminal multiplexing (Linux)
 
 ztty 0.6.1 keeps remote shells in a headless session broker. Closing an SSH

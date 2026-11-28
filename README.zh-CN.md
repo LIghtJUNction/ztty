@@ -109,6 +109,23 @@ HTTP 监听非回环地址时需要令牌。
 客户端配置、会话身份校验、JSON/SSE 响应与命令输出读取见[会话指南](docs/sessions.md)；
 ssmcp 等工具的接入见[观察模式](docs/ssmcp-observer.md)。
 
+### 无窗口会话控制
+
+```sh
+ztty control ztty://local/work release             # 由当前本地所有者释放输入权
+target=$(ztty info ztty://local/work | jq -c '{uri,id,created_at,broker_pid}')
+ztty send work --expect "$target" -- 'echo hello'  # 保留原始字节
+ztty send work --expect "$target" --enter -- ''     # 追加一个回车并提交
+ztty read work --expect "$target" --cursor 0 --max-bytes 4096
+ztty wait work --expect "$target" --until output --cursor 0 --timeout-ms 500
+ztty control ztty://local/work acquire             # 把输入权交还窗口
+ztty exec --new check -- /bin/sh -c 'printf result; exit 7'
+```
+
+`exec --new` 使用独立命名 PTY，收到子进程退出状态和 PTY EOF 后返回 JSON 输出页及退出码。
+普通交互会话支持 `send`、`read`、`wait`，请求 `exec` 会返回 `unsupported`。
+游标续读、超时、会话更换和清理规则见[无窗口 CLI](docs/sessions.md#headless-cli)。
+
 ## SSH 终端多路复用（Linux）
 
 ztty 0.6.1 在远端共享进程中持有 shell 和 PTY。关闭窗口或断开 SSH 后，
